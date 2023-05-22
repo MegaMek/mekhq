@@ -22,7 +22,7 @@
 package mekhq.campaign.force;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -217,7 +217,7 @@ public class Lance {
 
         /* Check that the number of units and weight are within the limits
          * and that the force contains at least one ground unit. */
-        if (c.getCampaignOptions().getLimitLanceNumUnits()) {
+        if (c.getCampaignOptions().isLimitLanceNumUnits()) {
             int size = getSize(c);
             if (size < getStdLanceSize(c.getFaction()) - 1 ||
                     size > getStdLanceSize(c.getFaction()) + 2) {
@@ -225,7 +225,7 @@ public class Lance {
             }
         }
 
-        if (c.getCampaignOptions().getLimitLanceWeight() &&
+        if (c.getCampaignOptions().isLimitLanceWeight() &&
                 getWeightClass(c) > EntityWeightClass.WEIGHT_ASSAULT) {
             return false;
         }
@@ -262,9 +262,9 @@ public class Lance {
                 }
             }
         }
-        //sort person vector by rank
+        // sort person vector by rank
         people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if (people.size() > 0) {
+        if (!people.isEmpty()) {
             return people.get(0).getId();
         }
         return null;
@@ -283,7 +283,7 @@ public class Lance {
         }
 
         // if we are using StratCon, don't *also* generate legacy scenarios
-        if (c.getCampaignOptions().getUseStratCon() &&
+        if (c.getCampaignOptions().isUseStratCon() &&
                 (getContract(c).getStratconCampaignState() != null)) {
             return null;
         }
@@ -323,7 +323,7 @@ public class Lance {
                             AtBScenario.STANDUP, false,
                             getBattleDate(c.getLocalDate()));
                 } else if (roll < 33) {
-                    if (c.getCampaignOptions().generateChases()) {
+                    if (c.getCampaignOptions().isGenerateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, false,
                                 getBattleDate(c.getLocalDate()));
@@ -349,7 +349,7 @@ public class Lance {
                             AtBScenario.BASEATTACK, false,
                             getBattleDate(c.getLocalDate()));
                 } else if (roll < 11) {
-                    if (c.getCampaignOptions().generateChases()) {
+                    if (c.getCampaignOptions().isGenerateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, true,
                                 getBattleDate(c.getLocalDate()));
@@ -423,7 +423,7 @@ public class Lance {
                             AtBScenario.BREAKTHROUGH, true,
                             getBattleDate(c.getLocalDate()));
                 } else if (roll < 7) {
-                    if (c.getCampaignOptions().generateChases()) {
+                    if (c.getCampaignOptions().isGenerateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, true,
                                 getBattleDate(c.getLocalDate()));
@@ -437,7 +437,7 @@ public class Lance {
                             AtBScenario.HIDEANDSEEK, false,
                             getBattleDate(c.getLocalDate()));
                 } else {
-                    if (c.getCampaignOptions().generateChases()) {
+                    if (c.getCampaignOptions().isGenerateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, false,
                                 getBattleDate(c.getLocalDate()));
@@ -455,12 +455,12 @@ public class Lance {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "lance", "type", getClass());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceId", forceId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "missionId", missionId);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "role", role.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "commanderId", commanderId);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "lance");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lance", "type", getClass());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceId", forceId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionId", missionId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "role", role.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commanderId", commanderId);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lance");
     }
 
     public static Lance generateInstanceFromXML(Node wn) {
@@ -510,7 +510,7 @@ public class Lance {
                             (entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
                         weight += entity.getWeight();
                     } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
-                        if (c.getFaction().isClan() || c.getCampaignOptions().getAdjustPlayerVehicles()) {
+                        if (c.getFaction().isClan() || c.getCampaignOptions().isAdjustPlayerVehicles()) {
                             weight += entity.getWeight() * 0.5;
                         } else {
                             weight += entity.getWeight();

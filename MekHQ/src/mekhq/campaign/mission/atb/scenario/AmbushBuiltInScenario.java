@@ -34,7 +34,7 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 @AtBScenarioEnabled
 public class AmbushBuiltInScenario extends AtBScenario {
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -45,7 +45,7 @@ public class AmbushBuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Ambush";
+        return "Special Scenario: Ambush";
     }
 
     @Override
@@ -60,31 +60,33 @@ public class AmbushBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         setStart(Board.START_CENTER);
         int enemyStart = Board.START_CENTER;
 
-        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-            enemyEntities = new ArrayList<Entity>();
-            if (weight == EntityWeightClass.WEIGHT_LIGHT) {
+        for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
+            enemyEntities = new ArrayList<>();
+            if (weight <= EntityWeightClass.WEIGHT_LIGHT) {
+                // Generate Two Meks of the same Weight Class
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
                         getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
 
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
                         getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
             } else {
+                // Generate 3 Meks of a lower Weight Class
                 for (int i = 0; i < 3; i++) {
-                    enemyEntities
-                            .add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                                    getContract(campaign).getEnemyQuality(), UnitType.MEK, weight - 1, campaign));
+                    enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(),
+                            getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
+                            UnitType.MEK, weight - 1, campaign));
                 }
             }
 
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
     }
 
     @Override

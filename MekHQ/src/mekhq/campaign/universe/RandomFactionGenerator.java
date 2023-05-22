@@ -25,6 +25,7 @@ import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.util.weightedMaps.WeightedIntMap;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -45,17 +46,6 @@ import java.util.stream.Collectors;
  * TODO : Fortress Republic in a way that doesn't involve hard-coding them here.
  */
 public class RandomFactionGenerator {
-    /* When checking for potential enemies, count the planets controlled
-     * by potentially hostile factions within a certain number of jumps of
-     * friendly worlds; the number is based on the region of space.
-     */
-    private static final int BORDER_RANGE_IS = 60;
-    private static final int BORDER_RANGE_CLAN = 90;
-    private static final int BORDER_RANGE_NEAR_PERIPHERY = 90;
-    private static final int BORDER_RANGE_DEEP_PERIPHERY = 210; //a bit more than this distance between HL and NC
-
-    private static final LocalDate FORTRESS_REPUBLIC = LocalDate.of(3135, Month.NOVEMBER, 1);
-
     private static RandomFactionGenerator rfg = null;
 
     private FactionBorderTracker borderTracker;
@@ -80,7 +70,9 @@ public class RandomFactionGenerator {
         borderTracker = new FactionBorderTracker();
         borderTracker.setDayThreshold(30);
         borderTracker.setDistanceThreshold(100);
-        borderTracker.setDefaultBorderSize(BORDER_RANGE_IS, BORDER_RANGE_NEAR_PERIPHERY, BORDER_RANGE_CLAN);
+        borderTracker.setDefaultBorderSize(MHQConstants.FACTION_GENERATOR_BORDER_RANGE_IS,
+                MHQConstants.FACTION_GENERATOR_BORDER_RANGE_NEAR_PERIPHERY,
+                MHQConstants.FACTION_GENERATOR_BORDER_RANGE_CLAN);
     }
 
     public static RandomFactionGenerator getInstance() {
@@ -98,12 +90,12 @@ public class RandomFactionGenerator {
         borderTracker.setDate(c.getLocalDate());
         final PlanetarySystem location = c.getLocation().getCurrentSystem();
         borderTracker.setRegionCenter(location.getX(), location.getY());
-        borderTracker.setRegionRadius(c.getCampaignOptions().getSearchRadius());
+        borderTracker.setRegionRadius(c.getCampaignOptions().getContractSearchRadius());
         MekHQ.registerHandler(borderTracker);
         MekHQ.registerHandler(this);
         for (final Faction faction : Factions.getInstance().getFactions()) {
             if (faction.isDeepPeriphery()) {
-                borderTracker.setBorderSize(faction, BORDER_RANGE_DEEP_PERIPHERY);
+                borderTracker.setBorderSize(faction, MHQConstants.FACTION_GENERATOR_BORDER_RANGE_DEEP_PERIPHERY);
             }
         }
     }
@@ -130,7 +122,7 @@ public class RandomFactionGenerator {
 
     @Subscribe
     public void handleCampaignOptionsChanged(OptionsChangedEvent event) {
-        borderTracker.setRegionRadius(event.getOptions().getSearchRadius());
+        borderTracker.setRegionRadius(event.getOptions().getContractSearchRadius());
     }
 
     public void dispose() {
@@ -153,7 +145,7 @@ public class RandomFactionGenerator {
                     || f.getShortName().equals("CLAN")) {
                 continue;
             }
-            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
+            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
                 continue;
             }
 
@@ -180,7 +172,7 @@ public class RandomFactionGenerator {
             if (f.isClan() || FactionHints.isEmptyFaction(f)) {
                 continue;
             }
-            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
+            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
                 continue;
             }
 
@@ -234,7 +226,7 @@ public class RandomFactionGenerator {
     public String getEnemy(String employer, boolean useRebels) {
         Faction employerFaction = Factions.getInstance().getFaction(employer);
         if (null == employerFaction) {
-            LogManager.getLogger().error("Could not find enemy for " + employer); //$NON-NLS-1$
+            LogManager.getLogger().error("Could not find enemy for " + employer);
             return "PIR";
         } else {
             return getEnemy(employerFaction, useRebels);
@@ -353,7 +345,7 @@ public class RandomFactionGenerator {
             if (!f.isClan() && !FactionHints.isEmptyFaction(f)) {
                 set.add(f.getShortName());
             }
-            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(FORTRESS_REPUBLIC)) {
+            if (f.getShortName().equals("ROS") && getCurrentDate().isAfter(MHQConstants.FORTRESS_REPUBLIC)) {
                 continue;
             }
             /* Add factions which do not control any planets to the employer list */
@@ -374,7 +366,7 @@ public class RandomFactionGenerator {
     public List<String> getEnemyList(String employerName) {
         Faction employer = Factions.getInstance().getFaction(employerName);
         if (null == employer) {
-            LogManager.getLogger().warn("Unknown faction key: " + employerName); //$NON-NLS-1$
+            LogManager.getLogger().warn("Unknown faction key: " + employerName);
             return Collections.emptyList();
         }
         return getEnemyList(Factions.getInstance().getFaction(employerName));
@@ -477,11 +469,11 @@ public class RandomFactionGenerator {
         Faction f1 = Factions.getInstance().getFaction(attacker);
         Faction f2 = Factions.getInstance().getFaction(defender);
         if (null == f1) {
-            LogManager.getLogger().error("Non-existent faction key: " + attacker); // $NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + attacker);
             return null;
         }
         if (null == f2) {
-            LogManager.getLogger().error("Non-existent faction key: " + attacker); // $NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + attacker);
             return null;
         }
         List<PlanetarySystem> planetList = getMissionTargetList(f1, f2);
@@ -503,10 +495,10 @@ public class RandomFactionGenerator {
         Faction attacker = Factions.getInstance().getFaction(attackerKey);
         Faction defender = Factions.getInstance().getFaction(defenderKey);
         if (null == attacker) {
-            LogManager.getLogger().error("Non-existent faction key: " + attackerKey); //$NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + attackerKey);
         }
         if (null == defender) {
-            LogManager.getLogger().error("Non-existent faction key: " + defenderKey); //$NON-NLS-1$
+            LogManager.getLogger().error("Non-existent faction key: " + defenderKey);
         }
         if ((null != attacker) && (null != defender)) {
             return getMissionTargetList(attacker, defender);
@@ -527,33 +519,36 @@ public class RandomFactionGenerator {
         // If the attacker or defender are not in the set of factions that control planets,
         // and they are not rebels or pirates, they will be a faction contained within another
         // (e.g. Nova Cat in the Draconis Combine, or Wolf-in-Exile in Lyran space
-        if (!borderTracker.getFactionsInRegion().contains(attacker)
-                && !attacker.is(Faction.Tag.PIRATE)) {
+        if (!borderTracker.getFactionsInRegion().contains(attacker) && !attacker.isPirate()) {
             attacker = factionHints.getContainedFactionHost(attacker, getCurrentDate());
         }
-        if (!borderTracker.getFactionsInRegion().contains(defender)
-                && !defender.is(Faction.Tag.PIRATE)
-                && !defender.is(Faction.Tag.REBEL)) {
+
+        if (!borderTracker.getFactionsInRegion().contains(defender) && !defender.isRebelOrPirate()) {
             defender = factionHints.getContainedFactionHost(defender, getCurrentDate());
         }
+
         if ((null == attacker) || (null == defender)) {
             return Collections.emptyList();
         }
+
         // Locate rebels on any of the attacker's planet
-        if (defender.is(Faction.Tag.REBEL)) {
-            return new ArrayList<>(borderTracker.getBorders(attacker).getSystems());
+        if (defender.isRebel()) {
+            final FactionBorders factionBorders = borderTracker.getBorders(attacker);
+            return (factionBorders == null) ? new ArrayList<>()
+                    : new ArrayList<>(factionBorders.getSystems());
         }
 
         Set<PlanetarySystem> planetSet = new HashSet<>(borderTracker.getBorderSystems(attacker, defender));
         // If mission is against generic pirates (those that don't control any systems),
         // add all border systems as possible locations
-        if ((attacker.is(Faction.Tag.PIRATE) && !borderTracker.getFactionsInRegion().contains(attacker))
-                || (defender.is(Faction.Tag.PIRATE) && !borderTracker.getFactionsInRegion().contains(defender))) {
+        if ((attacker.isPirate() && !borderTracker.getFactionsInRegion().contains(attacker))
+                || (defender.isPirate() && !borderTracker.getFactionsInRegion().contains(defender))) {
             for (Faction f : borderTracker.getFactionsInRegion()) {
                 planetSet.addAll(borderTracker.getBorderSystems(f, attacker));
                 planetSet.addAll(borderTracker.getBorderSystems(attacker, f));
             }
         }
+
         /* No border with defender found among systems controlled by
          * attacker; check for presence of attacker and defender
          * in systems controlled by other factions.

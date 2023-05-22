@@ -1,13 +1,12 @@
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.util.ArrayList;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.DefaultTableCellRenderer;
-
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.Part;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * A table model for displaying parts
@@ -77,10 +76,10 @@ public class PartsTableModel extends DataTableModel {
         }
 
         if (col == COL_NAME) {
-            return "<html><nobr>"+part.getName()+"</nobr></html>";
+            return "<html><nobr>" + part.getName() + "</nobr></html>";
         }
         if (col == COL_DETAIL) {
-            return "<html><nobr>"+part.getDetails()+"</nobr></html>";
+            return "<html><nobr>" + part.getDetails() + "</nobr></html>";
         }
         if (col == COL_COST) {
             return part.getActualValue().toAmountAndSymbolString();
@@ -98,7 +97,7 @@ public class PartsTableModel extends DataTableModel {
             return Math.round(part.getTonnage() * 100) / 100.0;
         }
         if (col == COL_STATUS) {
-            return "<html><nobr>"+part.getStatus()+"</nobr></html>";
+            return "<html><nobr>" + part.getStatus() + "</nobr></html>";
         }
         if (col == COL_TECH_BASE) {
             return part.getTechBaseName();
@@ -111,7 +110,6 @@ public class PartsTableModel extends DataTableModel {
 
     public Part getPartAt(int row) {
         return ((Part) data.get(row));
-
     }
 
     public int getColumnWidth(int c) {
@@ -145,7 +143,7 @@ public class PartsTableModel extends DataTableModel {
         }
     }
 
-    public String getTooltip(int row, int col) {
+    public @Nullable String getTooltip(int row, int col) {
         switch (col) {
             default:
                 return null;

@@ -134,6 +134,7 @@
                 <objectiveLinkedForces/>
                 <retreatThreshold>50</retreatThreshold>
                 <startingAltitude>0</startingAltitude>
+		<subjectToRandomRemoval>false</subjectToRandomRemoval>
                 <syncDeploymentType>SameEdge</syncDeploymentType>
                 <syncedForceName>Player</syncedForceName>
                 <useArtillery>false</useArtillery>

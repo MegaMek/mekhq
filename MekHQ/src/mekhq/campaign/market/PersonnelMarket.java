@@ -23,7 +23,7 @@ import megamek.common.*;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -66,7 +66,7 @@ public class PersonnelMarket {
 
     public PersonnelMarket(Campaign c) {
         generatePersonnelForDay(c);
-        setType(c.getCampaignOptions().getPersonnelMarketType());
+        setType(c.getCampaignOptions().getPersonnelMarketName());
         MekHQ.registerHandler(this);
     }
 
@@ -83,7 +83,7 @@ public class PersonnelMarket {
 
     @Subscribe
     public void handleCampaignOptionsEvent(OptionsChangedEvent ev) {
-        setType(ev.getOptions().getPersonnelMarketType());
+        setType(ev.getOptions().getPersonnelMarketName());
     }
 
     /*
@@ -106,7 +106,7 @@ public class PersonnelMarket {
             }
         }
 
-        if (updated && c.getCampaignOptions().getPersonnelMarketReportRefresh()) {
+        if (updated && c.getCampaignOptions().isPersonnelMarketReportRefresh()) {
             c.addReport("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
         }
     }
@@ -201,24 +201,24 @@ public class PersonnelMarket {
     }
 
     public void writeToXML(final PrintWriter pw, int indent, final Campaign campaign) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "personnelMarket");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnelMarket");
         for (Person p : personnel) {
             p.writeToXML(pw, indent, campaign);
         }
 
         if (null != method) {
-            method.writeToXml(pw, indent);
+            method.writeToXML(pw, indent);
         }
 
         if (paidRecruitment) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paidRecruitment", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paidRecruitment", true);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paidRecruitType", getPaidRecruitRole().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paidRecruitType", getPaidRecruitRole().name());
 
         for (UUID id : attachedEntities.keySet()) {
-            MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "entity", "id", id, attachedEntities.get(id).getShortNameRaw());
+            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "entity", "id", id, attachedEntities.get(id).getShortNameRaw());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "personnelMarket");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelMarket");
     }
 
     public static PersonnelMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {
@@ -227,7 +227,7 @@ public class PersonnelMarket {
         try {
             // Instantiate the correct child class, and call its parsing function.
             retVal = new PersonnelMarket();
-            retVal.setType(c.getCampaignOptions().getPersonnelMarketType());
+            retVal.setType(c.getCampaignOptions().getPersonnelMarketName());
 
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();

@@ -20,30 +20,8 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.UUID;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JTabbedPane;
-
-import megamek.common.util.EncodeControl;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Asset;
@@ -52,8 +30,12 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+import java.util.*;
 
 /**
  * A dialog to decide how you want to pay off collateral when you
@@ -61,8 +43,7 @@ import megamek.client.ui.preferences.PreferencesNode;
  * @author Taharqa
  */
 public class PayCollateralDialog extends JDialog {
-    @SuppressWarnings("unused") // FIXME
-    private Frame frame;
+    private JFrame frame;
     private Campaign campaign;
     private boolean cancelled;
     private boolean paid;
@@ -76,38 +57,38 @@ public class PayCollateralDialog extends JDialog {
     private JButton btnDontPay;
     private JButton btnCancel;
 
-    public PayCollateralDialog(java.awt.Frame parent, boolean modal, Campaign c, Loan l) {
-        super(parent, modal);
-        this.frame = parent;
-        campaign = c;
-        loan = l;
+    public PayCollateralDialog(final JFrame frame, final boolean modal, final Campaign campaign,
+                               final Loan loan) {
+        super(frame, modal);
+        this.frame = frame;
+        this.campaign = campaign;
+        this.loan = loan;
         cancelled = false;
         paid = false;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PayCollateralDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        java.awt.GridBagConstraints gridBagConstraints;
+                MekHQ.getMHQOptions().getLocale());
 
         JTabbedPane panMain = new JTabbedPane();
         JPanel panInfo = new JPanel(new GridLayout(1,0));
         JPanel panBtn = new JPanel(new GridLayout(0,3));
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(resourceMap.getString("Form.title"));
         getContentPane().setLayout(new BorderLayout());
 
         barAmount = new JProgressBar(0, 100);
         barAmount.setValue(0);
         barAmount.setStringPainted(true);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
@@ -126,23 +107,23 @@ public class PayCollateralDialog extends JDialog {
             box.setEnabled(u.isPresent() && !u.isDeployed());
             box.addItemListener(evt -> updateAmount());
             unitBoxes.put(box, u.getId());
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
             if (j == units.size()) {
                 gridBagConstraints.weighty = 1.0;
             }
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             pnlUnits.add(box, gridBagConstraints);
             i++;
         }
         JScrollPane scrUnits = new JScrollPane();
         scrUnits.setViewportView(pnlUnits);
-        scrUnits.setMinimumSize(new java.awt.Dimension(400, 300));
-        scrUnits.setPreferredSize(new java.awt.Dimension(400, 300));
+        scrUnits.setMinimumSize(new Dimension(400, 300));
+        scrUnits.setPreferredSize(new Dimension(400, 300));
 
         partSliders = new LinkedHashMap<>();
         JPanel pnlParts = new JPanel(new GridBagLayout());
@@ -167,42 +148,43 @@ public class PayCollateralDialog extends JDialog {
             partSlider.addChangeListener(e -> updateAmount());
             partSlider.setEnabled(p.isPresent() && !p.isReservedForRefit() && !p.isReservedForReplacement());
             partSliders.put(partSlider, p.getId());
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             gridBagConstraints.weightx = 0.0;
             if (j == spareParts.size()) {
                 gridBagConstraints.weighty = 1.0;
             }
             pnlParts.add(partSlider, gridBagConstraints);
             gridBagConstraints.gridx = 1;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "+ p.getCurrentValue().toAmountAndSymbolString() + "</html>"), gridBagConstraints);
+            pnlParts.add(new JLabel("<html>" + p.getName() + "<br>" + p.getDetails()  + ", "
+                    + p.getActualValue().toAmountAndSymbolString() + "</html>"), gridBagConstraints);
             i++;
         }
         JScrollPane scrParts = new JScrollPane();
         scrParts.setViewportView(pnlParts);
-        scrParts.setMinimumSize(new java.awt.Dimension(400, 300));
-        scrParts.setPreferredSize(new java.awt.Dimension(400, 300));
+        scrParts.setMinimumSize(new Dimension(400, 300));
+        scrParts.setPreferredSize(new Dimension(400, 300));
 
         //TODO: use cash reserves
 
-        btnPay = new JButton(resourceMap.getString("btnPay.text")); // NOI18N
+        btnPay = new JButton(resourceMap.getString("btnPay.text"));
         btnPay.addActionListener(evt -> payCollateral());
         btnPay.setEnabled(false);
         panBtn.add(btnPay);
 
-        btnDontPay = new JButton(resourceMap.getString("btnDontPay.text")); // NOI18N
+        btnDontPay = new JButton(resourceMap.getString("btnDontPay.text"));
         btnDontPay.addActionListener(evt -> dontPayCollateral());
         panBtn.add(btnDontPay);
 
-        btnCancel = new JButton(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnCancel"); // NOI18N
+        btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnCancel");
         btnCancel.addActionListener(evt -> {
             cancelled = true;
             setVisible(false);
@@ -213,28 +195,28 @@ public class PayCollateralDialog extends JDialog {
         i = 0;
         j = 0;
         JPanel pnlAssets = new JPanel(new GridBagLayout());
-        for (Asset a : campaign.getFinances().getAllAssets()) {
+        for (Asset a : campaign.getFinances().getAssets()) {
             j++;
             box = new JCheckBox(a.getName() + " (" + a.getValue().toAmountAndSymbolString() + ")");
             box.setSelected(false);
             box.addItemListener(evt -> updateAmount());
             assetBoxes.add(box);
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             gridBagConstraints.weightx = 1.0;
-            if (j == (campaign.getFinances().getAllAssets().size())) {
+            if (j == (campaign.getFinances().getAssets().size())) {
                 gridBagConstraints.weighty = 1.0;
             }
-            gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
             pnlAssets.add(box, gridBagConstraints);
             i++;
         }
         JScrollPane scrAssets = new JScrollPane(pnlAssets);
-        scrAssets.setMinimumSize(new java.awt.Dimension(400, 300));
-        scrAssets.setPreferredSize(new java.awt.Dimension(400, 300));
+        scrAssets.setMinimumSize(new Dimension(400, 300));
+        scrAssets.setPreferredSize(new Dimension(400, 300));
 
         updateAmount();
 
@@ -247,11 +229,15 @@ public class PayCollateralDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PayCollateralDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PayCollateralDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public boolean wasCancelled() {
@@ -285,14 +271,14 @@ public class PayCollateralDialog extends JDialog {
         for (Map.Entry<JSlider, Integer> m : partSliders.entrySet()) {
             int quantity = m.getKey().getValue();
             if (quantity > 0) {
-                amount = amount.plus(campaign.getWarehouse().getPart(m.getValue()).getCurrentValue().multipliedBy(quantity));
+                amount = amount.plus(campaign.getWarehouse().getPart(m.getValue()).getActualValue().multipliedBy(quantity));
             }
         }
 
         for (int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
             if (box.isSelected()) {
-                amount = amount.plus(campaign.getFinances().getAllAssets().get(i).getValue());
+                amount = amount.plus(campaign.getFinances().getAssets().get(i).getValue());
             }
         }
 
@@ -340,7 +326,7 @@ public class PayCollateralDialog extends JDialog {
         for (int i = 0; i < assetBoxes.size(); i++) {
             JCheckBox box = assetBoxes.get(i);
             if (!box.isSelected()) {
-                newAssets.add(campaign.getFinances().getAllAssets().get(i));
+                newAssets.add(campaign.getFinances().getAssets().get(i));
             }
         }
         return newAssets;

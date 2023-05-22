@@ -1,6 +1,15 @@
 package mekhq.gui.model;
 
-import java.awt.Component;
+import mekhq.MekHQ;
+import mekhq.campaign.parts.PartInUse;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -9,23 +18,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Set;
-
-import javax.swing.AbstractCellEditor;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.parts.PartInUse;
-import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class PartsInUseTableModel extends DataTableModel {
     private static final DecimalFormat FORMATTER = new DecimalFormat();
@@ -46,7 +38,7 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_BUTTON_GMADD_BULK  = 9;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public PartsInUseTableModel () {
         data = new ArrayList<PartInUse>();
@@ -66,17 +58,17 @@ public class PartsInUseTableModel extends DataTableModel {
     public String getColumnName(int column) {
         switch (column) {
             case COL_PART:
-                return resourceMap.getString("part.heading"); //$NON-NLS-1$
+                return resourceMap.getString("part.heading");
             case COL_IN_USE:
-                return resourceMap.getString("inUse.heading"); //$NON-NLS-1$
+                return resourceMap.getString("inUse.heading");
             case COL_STORED:
-                return resourceMap.getString("stored.heading"); //$NON-NLS-1$
+                return resourceMap.getString("stored.heading");
             case COL_TONNAGE:
-                return resourceMap.getString("storedTonnage.heading"); //$NON-NLS-1$
+                return resourceMap.getString("storedTonnage.heading");
             case COL_IN_TRANSFER:
-                return resourceMap.getString("ordered.heading"); //$NON-NLS-1$
+                return resourceMap.getString("ordered.heading");
             case COL_COST:
-                return resourceMap.getString("cost.heading"); //$NON-NLS-1$
+                return resourceMap.getString("cost.heading");
             default:
                 return EMPTY_CELL;
         }
@@ -98,7 +90,7 @@ public class PartsInUseTableModel extends DataTableModel {
                 if ( piu.getTransferCount() > 0 && piu.getPlannedCount() <= 0 ) {
                     return FORMATTER.format(piu.getTransferCount());
                 } else if ( piu.getPlannedCount() > 0 ) {
-                    return String.format("%s [+%s]", //$NON-NLS-1$
+                    return String.format("%s [+%s]",
                         FORMATTER.format(piu.getTransferCount()), FORMATTER.format(piu.getPlannedCount()));
                 } else {
                     return EMPTY_CELL;
@@ -106,13 +98,13 @@ public class PartsInUseTableModel extends DataTableModel {
             case COL_COST:
                 return piu.getCost().toAmountAndSymbolString();
             case COL_BUTTON_BUY:
-                return resourceMap.getString("buy.text"); //$NON-NLS-1$
+                return resourceMap.getString("buy.text");
             case COL_BUTTON_BUY_BULK:
-                return resourceMap.getString("buyInBulk.text"); //$NON-NLS-1$
+                return resourceMap.getString("buyInBulk.text");
             case COL_BUTTON_GMADD:
-                return resourceMap.getString("add.text"); //$NON-NLS-1$
+                return resourceMap.getString("add.text");
             case COL_BUTTON_GMADD_BULK:
-                return resourceMap.getString("addInBulk.text"); //$NON-NLS-1$
+                return resourceMap.getString("addInBulk.text");
             default:
                 return EMPTY_CELL;
         }
@@ -313,7 +305,7 @@ public class PartsInUseTableModel extends DataTableModel {
             fireEditingStopped();
 
             //  Invoke the Action
-            ActionEvent event = new ActionEvent(table, ActionEvent.ACTION_PERFORMED, "" + row); //$NON-NLS-1$
+            ActionEvent event = new ActionEvent(table, ActionEvent.ACTION_PERFORMED, "" + row);
             action.actionPerformed(event);
         }
 
@@ -346,7 +338,7 @@ public class PartsInUseTableModel extends DataTableModel {
                  renderButton.setBackground(table.getSelectionBackground());
             } else {
                 renderButton.setForeground(table.getForeground());
-                renderButton.setBackground(UIManager.getColor("Button.background")); //$NON-NLS-1$
+                renderButton.setBackground(UIManager.getColor("Button.background"));
             }
 
             if (hasFocus && enabled && buyable) {

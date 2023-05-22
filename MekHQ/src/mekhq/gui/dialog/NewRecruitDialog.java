@@ -1,17 +1,20 @@
-/*
- * MegaMekLab - Copyright (C) 2019 - The MegaMekTeam
+/*/*
+ * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
- * Original author - Jay Lawson (jaylawson39 at yahoo.com)
+ * This file is part of MekHQ.
  *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.gui.dialog;
 
@@ -20,13 +23,13 @@ import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.enums.Gender;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.view.PersonViewPanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -59,30 +62,29 @@ public class NewRecruitDialog extends JDialog {
     private void refreshView() {
         scrollView.setViewportView(new PersonViewPanel(person, hqView.getCampaign(), hqView));
         // This odd code is to make sure that the scrollbar stays at the top
-        // I cant just call it here, because it ends up getting reset somewhere
-        // later
-        javax.swing.SwingUtilities.invokeLater(() -> scrollView.getVerticalScrollBar().setValue(0));
+        // I can't just call it here, because it ends up getting reset somewhere later
+        SwingUtilities.invokeLater(() -> scrollView.getVerticalScrollBar().setValue(0));
     }
 
     private void initComponents() {
         scrollView = new JScrollPane();
-        choiceRanks = new javax.swing.JComboBox<>();
+        choiceRanks = new JComboBox<>();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewRecruitDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+                MekHQ.getMHQOptions().getLocale());
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title"));
 
         setName("Form");
-        getContentPane().setLayout(new java.awt.BorderLayout());
+        getContentPane().setLayout(new BorderLayout());
 
         JPanel panSidebar = createSidebar(resourceMap);
 
         JPanel panBottomButtons = createButtonPanel(resourceMap);
 
-        scrollView.setMinimumSize(new java.awt.Dimension(450, 180));
-        scrollView.setPreferredSize(new java.awt.Dimension(450, 180));
+        scrollView.setMinimumSize(new Dimension(450, 180));
+        scrollView.setPreferredSize(new Dimension(450, 180));
         scrollView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollView.setViewportView(null);
         refreshView();
@@ -96,31 +98,31 @@ public class NewRecruitDialog extends JDialog {
 
     private JPanel createButtonPanel(ResourceBundle resourceMap) {
         JPanel panButtons = new JPanel();
-        panButtons.setName("panButtons"); // NOI18N
+        panButtons.setName("panButtons");
         panButtons.setLayout(new GridBagLayout());
 
-        JButton button = new JButton(resourceMap.getString("btnHire.text")); // NOI18N
-        button.setName("btnOk"); // NOI18N
+        JButton button = new JButton(resourceMap.getString("btnHire.text"));
+        button.setName("btnOk");
         button.addActionListener(e -> hire());
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
 
         panButtons.add(button, gridBagConstraints);
         gridBagConstraints.gridx++;
 
         if (hqView.getCampaign().isGM()) {
-            button = new JButton(resourceMap.getString("btnAddGM.text")); // NOI18N
-            button.setName("btnGM"); // NOI18N
+            button = new JButton(resourceMap.getString("btnAddGM.text"));
+            button.setName("btnGM");
             button.addActionListener(e -> addGM());
 
             panButtons.add(button, gridBagConstraints);
             gridBagConstraints.gridx++;
         }
 
-        button = new JButton(resourceMap.getString("btnClose.text")); // NOI18N
-        button.setName("btnClose"); // NOI18N
+        button = new JButton(resourceMap.getString("btnClose.text"));
+        button.setName("btnClose");
         button.addActionListener(e -> setVisible(false));
         panButtons.add(button, gridBagConstraints);
 
@@ -131,44 +133,44 @@ public class NewRecruitDialog extends JDialog {
         boolean randomizeOrigin = hqView.getCampaign().getCampaignOptions().getRandomOriginOptions().isRandomizeOrigin();
 
         JPanel panSidebar = new JPanel();
-        panSidebar.setName("panButtons"); // NOI18N
-        panSidebar.setLayout(new java.awt.GridLayout(6 + (randomizeOrigin ? 1 : 0), 1));
+        panSidebar.setName("panButtons");
+        panSidebar.setLayout(new GridLayout(6 + (randomizeOrigin ? 1 : 0), 1));
 
-        choiceRanks.setName("choiceRanks"); // NOI18N
+        choiceRanks.setName("choiceRanks");
         refreshRanksCombo();
         choiceRanks.addActionListener(e -> changeRank());
         panSidebar.add(choiceRanks);
 
-        JButton button = new JButton(resourceMap.getString("btnRandomName.text")); // NOI18N
-        button.setName("btnRandomName"); // NOI18N
+        JButton button = new JButton(resourceMap.getString("btnRandomName.text"));
+        button.setName("btnRandomName");
         button.addActionListener(e -> randomName());
         panSidebar.add(button);
 
-        button = new JButton(resourceMap.getString("btnRandomPortrait.text")); // NOI18N
-        button.setName("btnRandomPortrait"); // NOI18N
+        button = new JButton(resourceMap.getString("btnRandomPortrait.text"));
+        button.setName("btnRandomPortrait");
         button.addActionListener(e -> randomPortrait());
         panSidebar.add(button);
 
         if (randomizeOrigin) {
-            button = new JButton(resourceMap.getString("btnRandomOrigin.text")); // NOI18N
-            button.setName("btnRandomOrigin"); // NOI18N
+            button = new JButton(resourceMap.getString("btnRandomOrigin.text"));
+            button.setName("btnRandomOrigin");
             button.addActionListener(e -> randomOrigin());
             panSidebar.add(button);
         }
 
-        button = new JButton(resourceMap.getString("btnChoosePortrait.text")); // NOI18N
-        button.setName("btnChoosePortrait"); // NOI18N
+        button = new JButton(resourceMap.getString("btnChoosePortrait.text"));
+        button.setName("btnChoosePortrait");
         button.addActionListener(e -> choosePortrait());
         panSidebar.add(button);
 
-        button = new JButton(resourceMap.getString("btnEditPerson.text")); // NOI18N
-        button.setName("btnEditPerson"); // NOI18N
+        button = new JButton(resourceMap.getString("btnEditPerson.text"));
+        button.setName("btnEditPerson");
         button.addActionListener(e -> editPerson());
         button.setEnabled(hqView.getCampaign().isGM());
         panSidebar.add(button);
 
-        button = new JButton(resourceMap.getString("btnRegenerate.text")); // NOI18N
-        button.setName("btnRegenerate"); // NOI18N
+        button = new JButton(resourceMap.getString("btnRegenerate.text"));
+        button.setName("btnRegenerate");
         button.addActionListener(e -> regenerate());
         button.setEnabled(hqView.getCampaign().isGM());
         panSidebar.add(button);
@@ -176,11 +178,15 @@ public class NewRecruitDialog extends JDialog {
         return panSidebar;
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewRecruitDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(NewRecruitDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private void hire() {
@@ -204,12 +210,12 @@ public class NewRecruitDialog extends JDialog {
     }
 
     private void randomName() {
-        String factionCode = hqView.getCampaign().getCampaignOptions().useOriginFactionForNames()
+        String factionCode = hqView.getCampaign().getCampaignOptions().isUseOriginFactionForNames()
                 ? person.getOriginFaction().getShortName()
                 : RandomNameGenerator.getInstance().getChosenFaction();
 
         String[] name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
-                person.getGender(), person.isClanner(), factionCode);
+                person.getGender(), person.isClanPersonnel(), factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
         refreshView();

@@ -21,7 +21,6 @@
  */
 package mekhq.gui.view;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
@@ -32,7 +31,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Systems;
-import mekhq.gui.GuiTabType;
+import mekhq.gui.enums.MHQTabType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,7 +62,7 @@ public class ContractSummaryPanel extends JPanel {
     private JLabel txtBattleLossComp;
 
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractMarketDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     private ContractPaymentBreakdown contractPaymentBreakdown;
 
     // These three are used locally to ensure consistent formatting
@@ -205,7 +204,7 @@ public class ContractSummaryPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 // Display where it is on the interstellar map
                 campaign.getApp().getCampaigngui().getMapTab().switchSystemsMap(contract.getSystem());
-                campaign.getApp().getCampaigngui().setSelectedTab(GuiTabType.MAP);
+                campaign.getApp().getCampaigngui().setSelectedTab(MHQTabType.INTERSTELLAR_MAP);
             }
         });
         gridBagConstraintsText.gridy = y;

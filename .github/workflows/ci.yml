@@ -25,7 +25,7 @@ jobs:
       matrix:
         os: [ ubuntu-latest ] # For CI/CD running on *nix is sufficient
         java-distribution: [ temurin ]
-        java-version: [ 11 ]
+        java-version: [ 11, 17 ]
       fail-fast: false
 
     steps:
@@ -36,10 +36,11 @@ jobs:
 
     # Setup composite build for MekHQ
     # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-    - name: Setup Composite Build for MekHQ
-      run: |
-        echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
-        echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
+# Disabled - 25-Jun-2022 - Causing regular build failures and . 
+#    - name: Setup Composite Build for MekHQ
+#      run: |
+#        echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
+#        echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
 
     # Find the repo and branch to use for MM
     #
@@ -47,33 +48,34 @@ jobs:
     #
     #    - mmRepo: The MM repository to use.
     #    - mmBranch: The MM branch to use.
-    - name: Find the Right MegaMek Branch
-      id: find_mm
+#    - name: Find the Right MegaMek Branch
+#      id: find_mm
       # Override bash so that it doesn't fail fast (the default)
       # if we can't find the branch
-      shell: bash {0}
+#      shell: bash {0}
       # This shell script searches the PR submitter's MM repo for
       # a branch that has the same name as the current PR branch.
       # If found it sets the `mmRepo` and `mmBranch` step output variables
       # to that branch.
-      run: |
-        git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megamek.git ${{ github.event.pull_request.head.ref }}
-        if [ "$?" == "0" ]
-        then
-          echo "${{ github.event.pull_request.head.repo.owner.html_url }}" | awk -F/ '{print "::set-output name=mmRepo::" $4 "/megamek"}'
-          echo "::set-output name=mmBranch::${{ github.event.pull_request.head.ref }}"
-        else
-          echo "::set-output name=mmRepo::MegaMek/megamek"
-          echo "::set-output name=mmBranch::master"
-        fi
-        exit 0
+#      run: |
+#        git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megamek.git ${{ github.event.pull_request.head.ref }}
+#        if [ "$?" == "0" ]
+#        then
+#          echo "${{ github.event.pull_request.head.repo.owner.html_url }}" | awk -F/ '{print "::set-output name=mmRepo::" $4 "/megamek"}'
+#          echo "::set-output name=mmBranch::${{ github.event.pull_request.head.ref }}"
+#        else
+#          echo "::set-output name=mmRepo::MegaMek/megamek"
+#          echo "::set-output name=mmBranch::master"
+#        fi
+#        exit 0
 
     # Checkout the latest MegaMek source and put it in: ./megamek
     - name: Checkout MegaMek
       uses: actions/checkout@v2
       with:
-        repository: ${{ steps.find_mm.outputs.mmRepo }}
-        ref:  ${{ steps.find_mm.outputs.mmBranch }}
+#        repository: ${{ steps.find_mm.outputs.mmRepo }}
+#        ref:  ${{ steps.find_mm.outputs.mmBranch }}
+        repository: MegaMek/megamek
         path: megamek
 
     # Find the repo and branch to use for MML
@@ -82,40 +84,41 @@ jobs:
     #
     #    - mmlRepo: The MML repository to use.
     #    - mmlBranch: The MML branch to use.
-    - name: Find the Right MegaMekLab Branch
-      id: find_mml
+#    - name: Find the Right MegaMekLab Branch
+#      id: find_mml
       # Override bash so that it doesn't fail fast (the default)
       # if we can't find the branch
-      shell: bash {0}
+#      shell: bash {0}
       # This shell script searches the PR submitter's MML repo for
       # a branch that has the same name as the current PR branch.
       # If found it sets the mmlRepo and mmlBranch step output variables
       # to that branch.
-      run: |
-        git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megameklab.git ${{ github.event.pull_request.head.ref }}
-        if [ "$?" == "0" ]
-        then
-          echo "${{ github.event.pull_request.head.repo.owner.html_url }}" | awk -F/ '{print "::set-output name=mmlRepo::" $4 "/megameklab"}'
-          echo "::set-output name=mmlBranch::${{ github.event.pull_request.head.ref }}"
-        else
-          echo "::set-output name=mmlRepo::MegaMek/megameklab"
-          echo "::set-output name=mmlBranch::master"
-        fi
-        exit 0
+#      run: |
+#        git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megameklab.git ${{ github.event.pull_request.head.ref }}
+#        if [ "$?" == "0" ]
+#        then
+#          echo "${{ github.event.pull_request.head.repo.owner.html_url }}" | awk -F/ '{print "::set-output name=mmlRepo::" $4 "/megameklab"}'
+#          echo "::set-output name=mmlBranch::${{ github.event.pull_request.head.ref }}"
+#        else
+#          echo "::set-output name=mmlRepo::MegaMek/megameklab"
+#          echo "::set-output name=mmlBranch::master"
+#        fi
+#        exit 0
 
     # Checkout the latest MegaMekLab source and put it in: ./megameklab
     - name: Checkout MegaMekLab
       uses: actions/checkout@v2
       with:
-        repository: ${{ steps.find_mml.outputs.mmlRepo }}
-        ref: ${{ steps.find_mml.outputs.mmlBranch }}
+#        repository: ${{ steps.find_mml.outputs.mmlRepo }}
+#        ref: ${{ steps.find_mml.outputs.mmlBranch }}
+        repository: MegaMek/megameklab
         path: megameklab
 
     # Setup composite build for MegaMekLab
     # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-    - name: Setup Composite Build for MegaMekLab
-      run: |
-        echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
+#    - name: Setup Composite Build for MegaMekLab
+#      run: |
+#        echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
 
     # Setup the requested Java Distribution and Version from the matrix
     - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
@@ -143,17 +146,17 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: clean build --stacktrace --scan
+        arguments: clean build --continue --stacktrace --scan
         build-root-directory: mekhq
 
     # If the build step fails, try to upload any test logs in case it was a unit test failure.
     # The logs will be relative to the ./mekhq directory.
-    - name: Upload Test Logs on Failure
-      uses: actions/upload-artifact@v2.2.4
-      if: failure()
-      with:
-        name: cd-failure-logs
-        path: ./mekhq/MekHQ/build/reports/
+#    - name: Upload Test Logs on Failure
+#      uses: actions/upload-artifact@v2.2.4
+#      if: failure()
+#      with:
+#        name: cd-failure-logs
+#        path: ./mekhq/MekHQ/build/reports/
 
     # Upload our Code Coverage Reports to CodeCov.io
     - name: CodeCov.io Coverage Report

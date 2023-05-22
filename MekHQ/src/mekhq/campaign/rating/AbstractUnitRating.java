@@ -21,6 +21,7 @@
 package mekhq.campaign.rating;
 
 import megamek.common.*;
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
@@ -54,7 +55,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     static final BigDecimal greenThreshold = new BigDecimal("5.5");
     static final BigDecimal regularThreshold = new BigDecimal("4.0");
     static final BigDecimal veteranThreshold = new BigDecimal("2.5");
-    private final Map<String, Integer> skillRatingCounts = new HashMap<>();
+    private final Map<SkillLevel, Integer> skillLevelCounts = new HashMap<>();
 
     private List<Person> commanderList = new ArrayList<>();
     private BigDecimal numberUnits = BigDecimal.ZERO;
@@ -90,6 +91,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
     private int breachCount = 0;
     private int successCount = 0;
     private int failCount = 0;
+    private int partialCount = 0;
     private BigDecimal supportPercent = BigDecimal.ZERO;
     private BigDecimal transportPercent = BigDecimal.ZERO;
 
@@ -120,19 +122,25 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     @Override
-    public String getAverageExperience() {
+    public SkillLevel getAverageExperience() {
         return getExperienceLevelName(calcAverageExperience());
     }
+
+    protected abstract SkillLevel getExperienceLevelName(BigDecimal experience);
 
     @Override
     public int getCombatRecordValue() {
         setSuccessCount(0);
+        setPartialCount(0);
         setFailCount(0);
         setBreachCount(0);
         for (Mission m : getCampaign().getCompletedMissions()) {
             switch (m.getStatus()) {
                 case SUCCESS:
                     setSuccessCount(getSuccessCount() + 1);
+                    break;
+                case PARTIAL:
+                    setPartialCount(getPartialCount() + 1);
                     break;
                 case FAILED:
                     setFailCount(getFailCount() + 1);
@@ -145,6 +153,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             }
         }
 
+        /* getPartialCount() x 0 is still 0, not needed to calculate final score. */
         return (getSuccessCount() * 5) - (getFailCount() * 10) - (getBreachCount() * 25);
     }
 
@@ -255,6 +264,13 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     int getSuccessCount() {
         return successCount;
+    }
+
+    /**
+     * Returns number of partially completed contracts.
+     */
+    int getPartialCount() {
+        return partialCount;
     }
 
     /**
@@ -369,7 +385,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
      */
     BigDecimal getUnitValue(Unit u) {
         BigDecimal value = BigDecimal.ONE;
-        if (u.isConventionalInfantry() && (((Infantry) u.getEntity()).getSquadN() == 1)) {
+        if (u.isConventionalInfantry() && (((Infantry) u.getEntity()).getSquadCount() == 1)) {
             value = new BigDecimal("0.25");
         }
         return value;
@@ -402,13 +418,11 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * @return if the the unit has any units
+     * @return if the unit has any units
      */
     protected boolean hasUnits() {
         return getNumberUnits().compareTo(BigDecimal.ZERO) != 0;
     }
-
-    protected abstract String getExperienceLevelName(BigDecimal experience);
 
     /**
      * Calculates the unit's rating score.
@@ -459,6 +473,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
         setBreachCount(0);
         setSuccessCount(0);
         setFailCount(0);
+        setPartialCount(0);
         setSupportPercent(BigDecimal.ZERO);
         setTransportPercent(BigDecimal.ZERO);
         setInitialized(true);
@@ -522,28 +537,28 @@ public abstract class AbstractUnitRating implements IUnitRating {
     }
 
     /**
-     * Increments the count of the given skill rating by one.
+     * Increments the count of the given skill level by one.
      *
-     * @param rating The skill rating to be incremented.
+     * @param skillLevel The skill level to be incremented.
      */
-    void incrementSkillRatingCounts(final String rating) {
+    void incrementSkillRatingCounts(final SkillLevel skillLevel) {
         int count = 1;
-        if (skillRatingCounts.containsKey(rating)) {
-            count += skillRatingCounts.get(rating);
+        if (skillLevelCounts.containsKey(skillLevel)) {
+            count += skillLevelCounts.get(skillLevel);
         }
-        skillRatingCounts.put(rating, count);
+        skillLevelCounts.put(skillLevel, count);
     }
 
     /**
-     * Returns a map of skill ratings and their counts.
+     * Returns a map of skill levels and their counts.
      */
-    Map<String, Integer> getSkillRatingCounts() {
+    Map<SkillLevel, Integer> getSkillLevelCounts() {
         // defensive copy
-        return new HashMap<>(skillRatingCounts);
+        return new HashMap<>(skillLevelCounts);
     }
 
     private void clearSkillRatingCounts() {
-        skillRatingCounts.clear();
+        skillLevelCounts.clear();
     }
 
     int getMechCount() {
@@ -844,6 +859,9 @@ public abstract class AbstractUnitRating implements IUnitRating {
         this.failCount = failCount;
     }
 
+    private void setPartialCount(int partialCount) {
+        this.partialCount = partialCount;
+    }
     void setSupportPercent(BigDecimal supportPercent) {
         this.supportPercent = supportPercent;
     }
@@ -914,7 +932,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.INFANTRY:
                 Infantry i = (Infantry) e;
 
-                incrementInfantryCount(i.getSquadSize() * i.getSquadN());
+                incrementInfantryCount(i.getSquadSize() * i.getSquadCount());
                 incrementInfantryUnitCount();
                 break;
         }

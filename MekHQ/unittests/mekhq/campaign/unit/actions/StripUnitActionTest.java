@@ -1,7 +1,7 @@
 /*
  * StripUnitActionTest.java
  *
- * Copyright (C) 2018 MegaMek team
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,13 +28,14 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.Systems;
 import org.apache.logging.log4j.LogManager;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StripUnitActionTest {
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void beforeAll() {
         EquipmentType.initializeTypes();
         Ranks.initializeRankSystems();
         try {
@@ -50,8 +51,7 @@ public class StripUnitActionTest {
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
         action.execute(campaign, unit);
-
-        Assert.assertTrue(0 == unit.getSalvageableParts().size());
+        assertTrue(unit.getSalvageableParts().isEmpty());
     }
 
     @Test
@@ -60,8 +60,7 @@ public class StripUnitActionTest {
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getWaspLAMMk1());
         action.execute(campaign, unit);
-
-        Assert.assertTrue(0 == unit.getSalvageableParts().size());
+        assertTrue(unit.getSalvageableParts().isEmpty());
     }
 
     @Test
@@ -70,8 +69,7 @@ public class StripUnitActionTest {
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getArionStandard());
         action.execute(campaign, unit);
-
-        Assert.assertTrue(0 == unit.getSalvageableParts().size());
+        assertTrue(unit.getSalvageableParts().isEmpty());
     }
 
     @Test
@@ -80,7 +78,6 @@ public class StripUnitActionTest {
         Campaign campaign = TestUtilities.getTestCampaign();
         Unit unit = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
         action.execute(campaign, unit);
-
-        Assert.assertTrue(unit.isSalvage());
+        assertTrue(unit.isSalvage());
     }
 }

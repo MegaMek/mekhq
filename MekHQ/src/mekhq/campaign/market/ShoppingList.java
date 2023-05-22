@@ -22,8 +22,9 @@ package mekhq.campaign.market;
 
 import megamek.Version;
 import megamek.common.Entity;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
@@ -87,13 +88,11 @@ public class ShoppingList {
     }
     //endregion Getters/Setters
 
-    public IAcquisitionWork getShoppingItem(Object newEquipment) {
-        for (IAcquisitionWork shoppingItem : getShoppingList()) {
-            if (isSameEquipment(shoppingItem.getNewEquipment(), newEquipment)) {
-                return shoppingItem;
-            }
-        }
-        return null;
+    public @Nullable IAcquisitionWork getShoppingItem(final Object newEquipment) {
+        return getShoppingList().stream()
+                .filter(shoppingItem -> isSameEquipment(shoppingItem.getNewEquipment(), newEquipment))
+                .findFirst()
+                .orElse(null);
     }
 
     public void removeItem(Object equipment) {
@@ -141,8 +140,8 @@ public class ShoppingList {
             // if using planetary acquisition check with low verbosity, check to see if nothing was found
             // because it is not reported elsewhere
             if ((newWork.getQuantity() == origQuantity)
-                    && campaign.getCampaignOptions().usesPlanetaryAcquisition()
-                    && !campaign.getCampaignOptions().usePlanetAcquisitionVerboseReporting()) {
+                    && campaign.getCampaignOptions().isUsePlanetaryAcquisition()
+                    && !campaign.getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 campaign.addReport("<font color='red'><b>You failed to find " + newWork.getAcquisitionName()
                         + " within " + campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition()
                         + " jumps</b></font>");
@@ -160,7 +159,7 @@ public class ShoppingList {
             return;
         }
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "shoppingList");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "shoppingList");
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
             //don't write refits to the shopping list - we will add them manually
             //when we parse units and find refit kits that have not been found
@@ -170,7 +169,7 @@ public class ShoppingList {
                 ((UnitOrder) shoppingItem).writeToXML(pw, indent);
             }
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "shoppingList");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "shoppingList");
     }
 
     public static ShoppingList generateInstanceFromXML(Node wn, Campaign c, Version version) {

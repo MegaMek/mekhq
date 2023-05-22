@@ -1,7 +1,7 @@
 /*
  * HistoricalDailyReportDialog.java
  *
- * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,30 +20,21 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+import mekhq.campaign.log.LogEntry;
+import mekhq.gui.CampaignGUI;
+import mekhq.gui.DailyReportLogPanel;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.ResourceBundle;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.MHQConstants;
-import mekhq.campaign.log.LogEntry;
-import mekhq.gui.CampaignGUI;
-import mekhq.gui.DailyReportLogPanel;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 
 public class HistoricalDailyReportDialog extends JDialog {
     private CampaignGUI gui;
@@ -56,20 +47,20 @@ public class HistoricalDailyReportDialog extends JDialog {
     private JLabel cacheInfoLabel;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HistoricalDailyReportDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     /**
      * HistoricalDailyReportDialog - opens a dialog that shows a history of the daily log
-     * @param owner - the Frame owner
-     * @param gui - a CampaignGUI object
+     * @param frame the JFrame
+     * @param gui the CampaignGUI object
      */
-    public HistoricalDailyReportDialog (Frame owner, CampaignGUI gui) {
-        super(owner, true);
+    public HistoricalDailyReportDialog(final JFrame frame, final CampaignGUI gui) {
+        super(frame, true);
         this.gui = gui;
         this.setPreferredSize(new Dimension(650,500));
         initComponents();
 
-        setLocationRelativeTo(owner);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
@@ -137,11 +128,15 @@ public class HistoricalDailyReportDialog extends JDialog {
         }
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HistoricalDailyReportDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HistoricalDailyReportDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private void updateLogPanel(Integer days) {

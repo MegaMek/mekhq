@@ -25,6 +25,7 @@ import mekhq.IconPackage;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.gui.enums.MHQTabType;
 
 /**
  * Abstract base class for CampaignGUI tab components. Custom tabs should extend
@@ -72,7 +73,7 @@ public abstract class CampaignGuiTab extends JPanel {
 
     abstract public void refreshAll();
 
-    abstract public GuiTabType tabType();
+    abstract public MHQTabType tabType();
 
     /**
      * Called when tab is removed from gui.

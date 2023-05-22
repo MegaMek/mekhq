@@ -21,11 +21,11 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Transaction;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.gui.utilities.JMoneyTextField;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +46,7 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
     private JButton cancelButton;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditTransactionDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public EditTransactionDialog(JFrame parent, Transaction transaction, boolean modal) {
         super(parent, modal);
@@ -68,11 +68,15 @@ public class EditTransactionDialog extends JDialog implements ActionListener, Fo
         add(buildButtonPanel(), BorderLayout.SOUTH);
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditTransactionDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditTransactionDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private JPanel buildMainPanel() {

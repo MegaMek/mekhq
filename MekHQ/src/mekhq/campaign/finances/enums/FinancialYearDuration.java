@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.finances.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -46,7 +45,7 @@ public enum FinancialYearDuration {
     //region Constructors
     FinancialYearDuration(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -58,10 +57,37 @@ public enum FinancialYearDuration {
     }
     //endregion Getters
 
+    //region Boolean Comparison Methods
+    public boolean isSemiannual() {
+        return this == SEMIANNUAL;
+    }
+
+    public boolean isAnnual() {
+        return this == ANNUAL;
+    }
+
+    public boolean isBiennial() {
+        return this == BIENNIAL;
+    }
+
+    public boolean isQuinquennial() {
+        return this == QUINQUENNIAL;
+    }
+
+    public boolean isDecennial() {
+        return this == DECENNIAL;
+    }
+
+    public boolean isForever() {
+        return this == FOREVER;
+    }
+    //endregion Boolean Comparison Methods
+
     public boolean isEndOfFinancialYear(final LocalDate today) {
         switch (this) {
             case SEMIANNUAL:
-                return (today.getDayOfYear() == 1) || ((today.getMonthValue() == 7) && (today.getDayOfMonth() == 1));
+                return (today.getDayOfYear() == 1)
+                        || ((today.getMonthValue() == 7) && (today.getDayOfMonth() == 1));
             case BIENNIAL:
                 return (today.getDayOfYear() == 1) && (today.getYear() % 2 == 0);
             case QUINQUENNIAL:
@@ -72,7 +98,7 @@ public enum FinancialYearDuration {
                 return false;
             case ANNUAL:
             default:
-                return (today.getDayOfYear() == 1);
+                return today.getDayOfYear() == 1;
         }
     }
 
@@ -125,8 +151,7 @@ public enum FinancialYearDuration {
             return BIENNIAL;
         }
 
-        LogManager.getLogger().error("Failed to parse the FinancialYearDuration from text " + text + ", returning ANNUAL.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a FinancialYearDuration. Returning ANNUAL.");
         return ANNUAL;
     }
     //endregion File I/O

@@ -1,17 +1,15 @@
 package mekhq.gui.model;
 
-import java.util.Vector;
-
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.unit.Unit;
 
-public class OrgTreeModel implements TreeModel {
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+import java.util.Vector;
 
+public class OrgTreeModel implements TreeModel {
     private Force rootForce;
     private Vector<TreeModelListener> listeners = new Vector<>();
     private Campaign campaign;
@@ -52,12 +50,12 @@ public class OrgTreeModel implements TreeModel {
 
     @Override
     public boolean isLeaf(Object node) {
-        return node instanceof Unit || (node instanceof Force && ((Force) node).getAllChildren(campaign).size() == 0);
+        return (node instanceof Unit)
+                || ((node instanceof Force) && ((Force) node).getAllChildren(campaign).isEmpty());
     }
 
     @Override
     public void valueForPathChanged(TreePath arg0, Object arg1) {
-        // TODO Auto-generated method stub
 
     }
 

@@ -39,12 +39,15 @@ public class CrewSkillUpgrader {
     private double twoThirdsXPCost;
     private double oneThirdXPCost;
     private double minAbilityCost = Double.MAX_VALUE;
-
+    private int upgradeIntensity;
 
     /**
      * Constructor. Initializes updated SPA list, broken down by unit type.
+     * @param upgradeIntensity how likely a pilot is to receive consideration for an SPA (<0 means none, 3+ means every time)
      */
-    public CrewSkillUpgrader() {
+    public CrewSkillUpgrader(int upgradeIntensity) {
+        this.upgradeIntensity = upgradeIntensity;
+        
         specialAbilitiesByUnitType = new HashMap<>();
 
         for (SpecialAbility spa : SpecialAbility.getWeightedSpecialAbilities()) {
@@ -74,19 +77,20 @@ public class CrewSkillUpgrader {
      * @param entity The entity to potentially upgrade.
      */
     public void upgradeCrew(Entity entity) {
-        // roll 1d4, and get SPAs with 25% odds (as recommended by CamOps)
+        // roll 1d4, and get SPAs with configurable odds
         // determine veterancy level
         // this sets the weight limit and how many SPAs we can assign
+        // complete scrubs don't get SPAs.
         // this is described in some detail in CamOps page 70 (Special Pilot Abilities)
         int upgradeRoll = Compute.randomInt(4);
-        if (upgradeRoll != 3) {
+        if (upgradeRoll > upgradeIntensity) {
             return;
         }
 
         double skillAvg = (entity.getCrew().getGunnery() + entity.getCrew().getPiloting()) / 2.0;
         double xpCap = 0;
         int spaCap = 0;
-
+        
         // elite
         if (skillAvg < 3) {
             xpCap = maxAbilityXPCost;
@@ -124,11 +128,11 @@ public class CrewSkillUpgrader {
         int unitType = entity.getUnitType();
 
         List<SpecialAbility> choices = coalescedSPAList(unitType, xpCap);
-        if (choices.size() == 0) {
+        if (choices.isEmpty()) {
             return 0;
         }
 
-        while (choices.size() > 0) {
+        while (!choices.isEmpty()) {
             int spaIndex = Compute.randomInt(choices.size());
             SpecialAbility spa = choices.get(spaIndex);
 
@@ -142,6 +146,9 @@ public class CrewSkillUpgrader {
                 String spaValue;
 
                 switch (spa.getName()) {
+                    case OptionsConstants.MISC_ENV_SPECIALIST:
+                        spaValue = pickRandomEnvSpec();
+                        break;
                     case OptionsConstants.MISC_HUMAN_TRO:
                         spaValue = pickRandomHumanTRO();
                         break;
@@ -228,7 +235,7 @@ public class CrewSkillUpgrader {
             }
         }
 
-        if (eligibleWeapons.size() == 0) {
+        if (eligibleWeapons.isEmpty()) {
             return Crew.SPECIAL_NONE;
         }
 
@@ -270,5 +277,10 @@ public class CrewSkillUpgrader {
     private String pickRandomHumanTRO() {
         return ObjectUtility.getRandomItem(
                 Arrays.asList(Crew.HUMANTRO_MECH, Crew.HUMANTRO_AERO, Crew.HUMANTRO_VEE, Crew.HUMANTRO_BA));
+    }
+
+    private String pickRandomEnvSpec() {
+        return ObjectUtility.getRandomItem(
+                Arrays.asList(Crew.ENVSPC_FOG, Crew.ENVSPC_LIGHT, Crew.ENVSPC_RAIN, Crew.ENVSPC_SNOW, Crew.ENVSPC_WIND));
     }
 }

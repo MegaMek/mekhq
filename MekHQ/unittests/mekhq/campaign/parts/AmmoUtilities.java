@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,15 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts;
-
-import static org.junit.Assert.*;
 
 import megamek.common.AmmoType;
 import megamek.common.BombType;
 import megamek.common.EquipmentType;
 import megamek.common.weapons.infantry.InfantryWeapon;
+
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AmmoUtilities {
     /**
@@ -36,8 +37,7 @@ public class AmmoUtilities {
     public synchronized static AmmoType getAmmoType(String name) {
         EquipmentType equipmentType = EquipmentType.get(name);
         assertNotNull(equipmentType);
-        assertTrue(equipmentType instanceof AmmoType);
-
+        assertInstanceOf(AmmoType.class, equipmentType);
         return (AmmoType) equipmentType;
     }
 
@@ -50,8 +50,7 @@ public class AmmoUtilities {
     public synchronized static BombType getBombType(String name) {
         EquipmentType equipmentType = EquipmentType.get(name);
         assertNotNull(equipmentType);
-        assertTrue(equipmentType instanceof BombType);
-
+        assertInstanceOf(BombType.class, equipmentType);
         return (BombType) equipmentType;
     }
 
@@ -64,8 +63,7 @@ public class AmmoUtilities {
     public synchronized static InfantryWeapon getInfantryWeapon(String name) {
         EquipmentType equipmentType = EquipmentType.get(name);
         assertNotNull(equipmentType);
-        assertTrue(equipmentType instanceof InfantryWeapon);
-
+        assertInstanceOf(InfantryWeapon.class, equipmentType);
         return (InfantryWeapon) equipmentType;
     }
 }

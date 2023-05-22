@@ -14,17 +14,6 @@
 
 package mekhq.gui.stratcon;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate;
@@ -32,6 +21,11 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconCoords;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.gui.StratconPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * This class handles the "assign force to track" interaction,

@@ -20,23 +20,17 @@
  */
 package mekhq.campaign.parts;
 
-import java.io.PrintWriter;
-
+import megamek.common.*;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.SkillType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.Jumpship;
-import megamek.common.SimpleTechLevel;
-import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.SkillType;
+import java.io.PrintWriter;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -59,6 +53,7 @@ public class AeroSensor extends Part {
         this.largeCraft = lc;
     }
 
+    @Override
     public AeroSensor clone() {
         AeroSensor clone = new AeroSensor(getUnitTonnage(), largeCraft, campaign);
         clone.copyBaseData(this);
@@ -72,7 +67,7 @@ public class AeroSensor extends Part {
             hits = ((Aero) unit.getEntity()).getSensorHits();
             if (checkForDestruction
                     && hits > priorHits
-                    && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 3) {
@@ -84,8 +79,8 @@ public class AeroSensor extends Part {
     @Override
     public int getBaseTime() {
         int time = 0;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 120;
             } else {
@@ -120,7 +115,7 @@ public class AeroSensor extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
             // Test of proposed errata for repair time and difficulty
             if (isSalvaging()) {
                 return -2;
@@ -181,7 +176,7 @@ public class AeroSensor extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -214,13 +209,10 @@ public class AeroSensor extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<dropship>"
-                +largeCraft
-                +"</dropship>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dropship", largeCraft);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -284,7 +276,7 @@ public class AeroSensor extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ELECTRONICS;
     }
 }

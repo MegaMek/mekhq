@@ -18,16 +18,8 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Frame;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.BayMunitionsChoicePanel;
 import megamek.common.Mounted;
 import mekhq.MekHQ;
@@ -35,8 +27,12 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Neoancient
@@ -46,7 +42,7 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
     private final BayMunitionsChoicePanel mainPanel;
     private boolean canceled = true;
 
-    public LargeCraftAmmoSwapDialog(Frame frame, Unit unit) {
+    public LargeCraftAmmoSwapDialog(final JFrame frame, final Unit unit) {
         super(frame, true);
         this.unit = unit;
 
@@ -66,11 +62,15 @@ public class LargeCraftAmmoSwapDialog extends JDialog {
         setUserPreferences();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LargeCraftAmmoSwapDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LargeCraftAmmoSwapDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public boolean wasCanceled() {

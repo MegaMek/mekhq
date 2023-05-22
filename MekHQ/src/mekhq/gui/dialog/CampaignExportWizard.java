@@ -20,7 +20,6 @@ package mekhq.gui.dialog;
 
 import megamek.common.AmmoType;
 import megamek.common.UnitType;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
@@ -78,7 +77,7 @@ public class CampaignExportWizard extends JDialog {
 
     private Optional<File> destinationCampaignFile;
     private ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignExportWizard",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public enum CampaignExportWizardState {
         ForceSelection,
@@ -425,8 +424,8 @@ public class CampaignExportWizard extends JDialog {
     private boolean exportToCampaign(File file) {
         boolean newCampaign = !file.exists();
 
-        Hashtable<String, SkillType> skillPush = SkillType.getSkillHash();
-        Hashtable<String, SpecialAbility> spaPush = SpecialAbility.getAllSpecialAbilities();
+        Map<String, SkillType> skillPush = SkillType.getSkillHash();
+        Map<String, SpecialAbility> spaPush = SpecialAbility.getSpecialAbilities();
 
         Campaign destinationCampaign;
         if (newCampaign) {
@@ -435,13 +434,11 @@ public class CampaignExportWizard extends JDialog {
             destinationCampaign.setCampaignOptions(sourceCampaign.getCampaignOptions());
             destinationCampaign.setGameOptions(sourceCampaign.getGameOptions());
         } else {
-            try {
-                FileInputStream fis = new FileInputStream(file);
+            try (FileInputStream fis = new FileInputStream(file)) {
                 destinationCampaign = CampaignFactory.newInstance(sourceCampaign.getApp()).createCampaign(fis);
                 // Restores all transient attributes from serialized objects
                 destinationCampaign.restore();
                 destinationCampaign.cleanUp();
-                fis.close();
             } catch (NullEntityException ex) {
                 LogManager.getLogger().error("The following units could not be loaded by the campaign:\n" + ex.getMessage() + "\n\nPlease be sure to copy over any custom units before starting a new version of MekHQ.\nIf you believe the units listed are not customs, then try deleting the file data/mechfiles/units.cache and restarting MekHQ.\nIt is also possible that unit chassi and model names have changed across versions of MegaMek. You can check this by\nopening up MegaMek and searching for the units. Chassis and models can be edited in your MekHQ save file with a text editor.");
                 return false;
@@ -778,13 +775,11 @@ public class CampaignExportWizard extends JDialog {
             Component cmp = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Person person = (Person) value;
             String callsign = "";
-            if ((person.getCallsign() != null) && (person.getCallsign().trim().length() > 0)) {
+            if ((person.getCallsign() != null) && !person.getCallsign().isBlank()) {
                 callsign = String.format("\"%s\" ", person.getCallsign());
             }
 
-            String cellValue = String.format("%s %s(%s)",
-                    person.getFullName(),
-                    callsign,
+            String cellValue = String.format("%s %s(%s)", person.getFullName(), callsign,
                     person.getPrimaryRoleDesc());
             ((JLabel) cmp).setText(cellValue);
             return cmp;

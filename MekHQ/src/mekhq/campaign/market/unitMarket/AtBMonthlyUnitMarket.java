@@ -22,10 +22,10 @@ import megamek.client.ratgenerator.MissionRole;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
 import megamek.common.EntityMovementMode;
-import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.mission.AtBContract;
@@ -76,6 +76,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                 null, IUnitRating.DRAGOON_F, 7);
         addOffers(campaign, Compute.d6() - 2, UnitMarketType.OPEN, UnitType.AERO,
                 null, IUnitRating.DRAGOON_F, 7);
+        addOffers(campaign, Compute.d6() - 2, UnitMarketType.OPEN, UnitType.CONV_FIGHTER,
+                null, IUnitRating.DRAGOON_F, 7);
 
         if (contract != null) {
             final Faction employer = contract.getEmployerFaction();
@@ -84,6 +86,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             addOffers(campaign, Compute.d6() - 2, UnitMarketType.EMPLOYER, UnitType.TANK,
                     employer, IUnitRating.DRAGOON_D, 7);
             addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.AERO,
+                    employer, IUnitRating.DRAGOON_D, 7);
+            addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER,
                     employer, IUnitRating.DRAGOON_D, 7);
         }
 
@@ -95,6 +99,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     UnitType.TANK, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
             addOffers(campaign, Compute.d6(3) - 9, UnitMarketType.MERCENARY,
                     UnitType.AERO, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
+            addOffers(campaign, Compute.d6(3) - 9, UnitMarketType.MERCENARY,
+                    UnitType.CONV_FIGHTER, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
         }
 
         if (campaign.getUnitRatingMod() >= IUnitRating.DRAGOON_B) {
@@ -107,6 +113,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                         faction, IUnitRating.DRAGOON_A, 6);
                 addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.AERO,
                         faction, IUnitRating.DRAGOON_A, 6);
+                addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.CONV_FIGHTER,
+                        faction, IUnitRating.DRAGOON_A, 6);
             }
         }
 
@@ -116,6 +124,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             addOffers(campaign, Compute.d6(2) - 4, UnitMarketType.BLACK_MARKET, UnitType.TANK,
                     null, IUnitRating.DRAGOON_C, 6);
             addOffers(campaign, Compute.d6(2) - 6, UnitMarketType.BLACK_MARKET, UnitType.AERO,
+                    null, IUnitRating.DRAGOON_C, 6);
+            addOffers(campaign, Compute.d6(2) - 6, UnitMarketType.BLACK_MARKET, UnitType.CONV_FIGHTER,
                     null, IUnitRating.DRAGOON_C, 6);
         }
 
@@ -147,7 +157,6 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         }
     }
 
-    //region Random Weight
     /**
      * This generates a random weight using the static weight generation methods in this market
      * @param campaign the campaign to generate the unit weight based on
@@ -157,118 +166,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      */
     @Override
     protected int generateWeight(final Campaign campaign, final int unitType, final Faction faction) {
-        return getRandomWeight(unitType, faction, campaign.getCampaignOptions().useUnitMarketRegionalMechVariations());
+        return AtBStaticWeightGenerator.getRandomWeight(campaign, unitType, faction);
     }
-
-    /**
-     * This is a simplification method that is used for regional 'Mech variations not part of the
-     * Unit Market while sharing the same code
-     * @param campaign the campaign to generate the unit weight based on
-     * @param unitType the unit type to determine the format of weight to generate
-     * @param faction the faction to generate the weight for
-     * @return the generated weight
-     */
-    public static int getRandomWeight(final Campaign campaign, final int unitType, final Faction faction) {
-        return getRandomWeight(unitType, faction, campaign.getCampaignOptions().getRegionalMechVariations());
-    }
-
-
-    /**
-     * @param unitType the unit type to determine the format of weight to generate
-     * @param faction the faction to generate the weight for
-     * @param regionVariations whether to generate 'Mech weights based on hardcoded regional variations
-     * @return the generated weight
-     */
-    private static int getRandomWeight(final int unitType, final Faction faction, final boolean regionVariations) {
-        if (unitType == UnitType.AERO) {
-            return getRandomAerospaceWeight();
-        } else if ((unitType == UnitType.MEK) && regionVariations) {
-            return getRegionalMechWeight(faction);
-        } else {
-            return getRandomMechWeight();
-        }
-    }
-
-    /**
-     * @return the generated weight for a BattleMech
-     */
-    private static int getRandomMechWeight() {
-        final int roll = Compute.randomInt(10);
-        if (roll < 3) {
-            return EntityWeightClass.WEIGHT_LIGHT;
-        } else if (roll < 7) {
-            return EntityWeightClass.WEIGHT_MEDIUM;
-        } else if (roll < 9) {
-            return EntityWeightClass.WEIGHT_HEAVY;
-        } else {
-            return EntityWeightClass.WEIGHT_ASSAULT;
-        }
-    }
-
-    /**
-     * @param faction the faction to determine the regional BattleMech weight for
-     * @return the generated weight for a BattleMech
-     */
-    private static int getRegionalMechWeight(final Faction faction) {
-        final int roll = Compute.randomInt(100);
-        switch (faction.getShortName()) {
-            case "DC":
-                if (roll < 40) {
-                    return EntityWeightClass.WEIGHT_LIGHT;
-                } else if (roll < 60) {
-                    return EntityWeightClass.WEIGHT_MEDIUM;
-                } else if (roll < 90) {
-                    return EntityWeightClass.WEIGHT_HEAVY;
-                } else {
-                    return EntityWeightClass.WEIGHT_ASSAULT;
-                }
-            case "LA":
-                if (roll < 20) {
-                    return EntityWeightClass.WEIGHT_LIGHT;
-                } else if (roll < 50) {
-                    return EntityWeightClass.WEIGHT_MEDIUM;
-                } else if (roll < 85) {
-                    return EntityWeightClass.WEIGHT_HEAVY;
-                } else {
-                    return EntityWeightClass.WEIGHT_ASSAULT;
-                }
-            case "FWL":
-                if (roll < 30) {
-                    return EntityWeightClass.WEIGHT_LIGHT;
-                } else if (roll < 70) {
-                    return EntityWeightClass.WEIGHT_MEDIUM;
-                } else if (roll < 92) {
-                    return EntityWeightClass.WEIGHT_HEAVY;
-                } else {
-                    return EntityWeightClass.WEIGHT_ASSAULT;
-                }
-            default:
-                if (roll < 30) {
-                    return EntityWeightClass.WEIGHT_LIGHT;
-                } else if (roll < 70) {
-                    return EntityWeightClass.WEIGHT_MEDIUM;
-                } else if (roll < 90) {
-                    return EntityWeightClass.WEIGHT_HEAVY;
-                } else {
-                    return EntityWeightClass.WEIGHT_ASSAULT;
-                }
-        }
-    }
-
-    /**
-     * @return the generated random weight for an Aerospace Fighter
-     */
-    private static int getRandomAerospaceWeight() {
-        final int roll = Compute.randomInt(8);
-        if (roll < 3) {
-            return EntityWeightClass.WEIGHT_LIGHT;
-        } else if (roll < 7) {
-            return EntityWeightClass.WEIGHT_MEDIUM;
-        } else {
-            return EntityWeightClass.WEIGHT_HEAVY;
-        }
-    }
-    //endregion Random Weight
     //endregion Offer Generation
 
     //region Offer Removal

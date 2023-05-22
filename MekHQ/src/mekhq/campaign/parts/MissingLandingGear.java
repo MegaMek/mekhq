@@ -29,6 +29,7 @@ import megamek.common.Jumpship;
 import megamek.common.LandAirMech;
 import megamek.common.Mech;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 
 import java.util.StringJoiner;
@@ -50,9 +51,9 @@ public class MissingLandingGear extends MissingPart {
 
     @Override
     public int getBaseTime() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
             int time = 0;
-            //Test of proposed errata for repair times
+            // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 1200;
             } else {
@@ -69,7 +70,7 @@ public class MissingLandingGear extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if ((unit != null) && (unit.getEntity() instanceof LandAirMech)) {
             // Landing Gear is installed in the CT and both Side Torsos,
             // make sure they're not missing.

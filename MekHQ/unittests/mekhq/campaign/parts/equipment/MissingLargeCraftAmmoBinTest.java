@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,41 +16,39 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import megamek.Version;
+import megamek.common.AmmoType;
+import megamek.common.Entity;
+import megamek.common.Mounted;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.Quartermaster;
+import mekhq.campaign.Warehouse;
+import mekhq.campaign.parts.MekLocation;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQXMLUtility;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Vector;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import static mekhq.campaign.parts.AmmoUtilities.*;
-
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
-import megamek.common.AmmoType;
-import megamek.common.Entity;
-import megamek.common.Mounted;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.unit.Unit;
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MissingLargeCraftAmmoBinTest {
     @Test
@@ -60,13 +58,13 @@ public class MissingLargeCraftAmmoBinTest {
     }
 
     @Test
-    public void missingLargeCraftAmmoBinMassRepairOptionType() {
+    public void missingLargeCraftAmmoBinMRMSOptionType() {
         Campaign mockCampaign = mock(Campaign.class);
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
 
         MissingLargeCraftAmmoBin missingAmmoBin = new MissingLargeCraftAmmoBin(0, ammoType, 18, 25.0, mockCampaign);
 
-        assertEquals(PartRepairType.AMMO, missingAmmoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMUNITION, missingAmmoBin.getMRMSOptionType());
     }
 
     @Test
@@ -104,7 +102,7 @@ public class MissingLargeCraftAmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -115,7 +113,7 @@ public class MissingLargeCraftAmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MissingLargeCraftAmmoBin);
+        assertInstanceOf(MissingLargeCraftAmmoBin.class, deserializedPart);
 
         MissingLargeCraftAmmoBin deserialized = (MissingLargeCraftAmmoBin) deserializedPart;
 
@@ -214,7 +212,7 @@ public class MissingLargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
         Mounted bay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<Integer>();
+        Vector<Integer> bayAmmo = new Vector<>();
         bayAmmo.addElement(equipmentNum);
         when(bay.getBayAmmo()).thenReturn(bayAmmo);
         when(entity.getEquipment(bayNum)).thenReturn(bay);
@@ -233,7 +231,7 @@ public class MissingLargeCraftAmmoBinTest {
         // 1. Unit should have received a new replacement
         Part replacementPart = replacementCaptor.getValue();
         assertNotNull(replacementPart);
-        assertTrue(replacementPart instanceof LargeCraftAmmoBin);
+        assertInstanceOf(LargeCraftAmmoBin.class, replacementPart);
 
         // 2. And the replacement should match the missing ammo bin
         LargeCraftAmmoBin replacementAmmoBin = (LargeCraftAmmoBin) replacementPart;

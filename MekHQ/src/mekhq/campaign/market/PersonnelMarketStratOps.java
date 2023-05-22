@@ -27,7 +27,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.w3c.dom.Node;
 
 import megamek.common.Compute;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.module.api.PersonnelMarketMethod;
@@ -95,7 +95,7 @@ public class PersonnelMarketStratOps implements PersonnelMarketMethod {
     }
 
     @Override
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "daysSinceRolled", daysSinceRolled);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysSinceRolled", daysSinceRolled);
     }
 }

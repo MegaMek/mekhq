@@ -22,7 +22,7 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import org.apache.logging.log4j.LogManager;
 
@@ -251,7 +251,7 @@ public class StratconFacility implements Cloneable {
             JAXBContext context = JAXBContext.newInstance(StratconFacility.class);
             Unmarshaller um = context.createUnmarshaller();
             try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                Source inputSource = MekHqXmlUtil.createSafeXmlSource(fileStream);
+                Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
                 JAXBElement<StratconFacility> facilityElement = um.unmarshal(inputSource, StratconFacility.class);
                 resultingFacility = facilityElement.getValue();
             }

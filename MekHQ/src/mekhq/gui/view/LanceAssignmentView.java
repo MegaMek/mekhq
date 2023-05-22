@@ -20,6 +20,7 @@
  */
 package mekhq.gui.view;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -29,10 +30,10 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.gui.model.DataTableModel;
-import mekhq.gui.model.XTableColumnModel;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
@@ -155,15 +156,17 @@ public class LanceAssignmentView extends JPanel {
                     return this;
                 }
             });
+
             if (i == LanceAssignmentTableModel.COL_CONTRACT) {
                 column.setCellEditor(new DefaultCellEditor(cbContract));
             }
+
             if (i == LanceAssignmentTableModel.COL_ROLE) {
                 column.setCellEditor(new DefaultCellEditor(cbRole));
             }
         }
-        RowFilter<LanceAssignmentTableModel, Integer> laFilter;
-        laFilter = new RowFilter<LanceAssignmentTableModel, Integer>() {
+
+        RowFilter<LanceAssignmentTableModel, Integer> laFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends LanceAssignmentTableModel, ? extends Integer> entry) {
                 Lance l = entry.getModel().getRow(entry.getIdentifier());
@@ -178,8 +181,8 @@ public class LanceAssignmentView extends JPanel {
                 noc.compare(((AtBContract) c1).getName(), ((AtBContract) c2).getName()));
         laSorter.setComparator(LanceAssignmentTableModel.COL_ROLE, (r1, r2) ->
                 noc.compare(r1.toString(), r2.toString()));
-        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-        sortKeys.add(new RowSorter.SortKey(LanceAssignmentTableModel.COL_FORCE, SortOrder.ASCENDING));
+        List<SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new SortKey(LanceAssignmentTableModel.COL_FORCE, SortOrder.ASCENDING));
         sorter.setSortKeys(sortKeys);
         tblAssignments.setRowSorter(laSorter);
 
@@ -253,8 +256,8 @@ public class LanceAssignmentView extends JPanel {
             return 1;
         }
 
-        /* Find closest common ancestor. They must be or descend from
-         * different subforces of this one. */
+        // Find the closest common ancestor. They must be either from the same force or descend from
+        // different subforces of this one.
         Force f = f1;
         while (!f.isAncestorOf(f2)) {
             f = f.getParentForce();
@@ -263,6 +266,7 @@ public class LanceAssignmentView extends JPanel {
             if (sf.isAncestorOf(f1) || sf.getId() == f1.getId()) {
                 return -1;
             }
+
             if (sf.isAncestorOf(f2) || sf.getId() == f2.getId()) {
                 return 1;
             }
@@ -306,7 +310,6 @@ class RequiredLancesTableModel extends DataTableModel {
             return 20;
         }
     }
-
 
     public int getAlignment(int col) {
         if (col == COL_CONTRACT) {

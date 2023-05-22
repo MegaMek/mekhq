@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,18 +18,18 @@
  */
 package mekhq.campaign.parts.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public enum PartRepairType {
     //region Enum Declarations
-    ARMOR("PartRepairType.ARMOR.text", true),
-    AMMO("PartRepairType.AMMO.text", true),
+    ARMOUR("PartRepairType.ARMOUR.text", true),
+    AMMUNITION("PartRepairType.AMMUNITION.text", true),
     WEAPON("PartRepairType.WEAPON.text", true),
     GENERAL_LOCATION("PartRepairType.GENERAL_LOCATION.text", true),
     ENGINE("PartRepairType.ENGINE.text", true),
@@ -50,9 +50,9 @@ public enum PartRepairType {
     //endregion Variable Declarations
 
     //region Constructors
-    PartRepairType(String name, boolean validForMRMS) {
+    PartRepairType(final String name, final boolean validForMRMS) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.validForMRMS = validForMRMS;
     }
@@ -64,30 +64,94 @@ public enum PartRepairType {
     }
     //endregion Getters
 
-    public static List<PartRepairType> getMRMSValidTypes() {
-        List<PartRepairType> partRepairTypes = new ArrayList<>();
-        for (PartRepairType partRepairType : values()) {
-            if (partRepairType.isValidForMRMS()) {
-                partRepairTypes.add(partRepairType);
-            }
-        }
-
-        return partRepairTypes;
+    //region Boolean Comparison Methods
+    public boolean isArmour() {
+        return this == ARMOUR;
     }
 
-    public static PartRepairType parseFromString(String text) {
+    public boolean isAmmunition() {
+        return this == AMMUNITION;
+    }
+
+    public boolean isWeapon() {
+        return this == WEAPON;
+    }
+
+    public boolean isGeneralLocation() {
+        return this == GENERAL_LOCATION;
+    }
+
+    public boolean isEngine() {
+        return this == ENGINE;
+    }
+
+    public boolean isGyro() {
+        return this == GYRO;
+    }
+
+    public boolean isActuator() {
+        return this == ACTUATOR;
+    }
+
+    public boolean isElectronics() {
+        return this == ELECTRONICS;
+    }
+
+    public boolean isGeneral() {
+        return this == GENERAL;
+    }
+
+    public boolean isHeatSink() {
+        return this == HEAT_SINK;
+    }
+
+    public boolean isMekLocation() {
+        return this == MEK_LOCATION;
+    }
+
+    public boolean isPhysicalWeapon() {
+        return this == PHYSICAL_WEAPON;
+    }
+
+    public boolean isPodSpace() {
+        return this == POD_SPACE;
+    }
+
+    public boolean isUnknownLocation() {
+        return this == UNKNOWN_LOCATION;
+    }
+    //endregion Boolean Comparison Methods
+
+    public static List<PartRepairType> getMRMSValidTypes() {
+        return Arrays.stream(values())
+                .filter(PartRepairType::isValidForMRMS)
+                .collect(Collectors.toList());
+    }
+
+    //region File I/O
+    public static PartRepairType parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
 
         }
 
+        // Text migration, which occurred in 0.49.9
+        switch (text) {
+            case "ARMOR":
+                return ARMOUR;
+            case "AMMO":
+                return AMMUNITION;
+            default:
+                break;
+        }
+
         try {
             switch (Integer.parseInt(text)) {
                 case 0:
-                    return ARMOR;
+                    return ARMOUR;
                 case 1:
-                    return AMMO;
+                    return AMMUNITION;
                 case 2:
                     return WEAPON;
                 case 3:
@@ -110,15 +174,17 @@ public enum PartRepairType {
                     return PHYSICAL_WEAPON;
                 case 12:
                     return POD_SPACE;
+                default:
+                    break;
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
 
-        LogManager.getLogger().error("Unknown part repair type, returning GENERAL_LOCATION");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a PartRepairType. Returning GENERAL_LOCATION.");
         return GENERAL_LOCATION;
     }
+    //endregion File I/O
 
     @Override
     public String toString() {

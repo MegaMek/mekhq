@@ -33,7 +33,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
-import mekhq.gui.model.XTableColumnModel;
+import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.WeightClassSorter;
 import org.apache.logging.log4j.LogManager;
 
@@ -55,6 +55,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     private JCheckBox chkShowMechs;
     private JCheckBox chkShowVehicles;
     private JCheckBox chkShowAerospace;
+    private JCheckBox chkShowConvAero;
     private JCheckBox chkFilterByPercentageOfCost;
     private JSpinner spnCostPercentageThreshold;
 
@@ -109,6 +110,14 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
     public void setChkShowAerospace(final JCheckBox chkShowAerospace) {
         this.chkShowAerospace = chkShowAerospace;
+    }
+
+    public JCheckBox getChkShowConvAero() {
+        return chkShowConvAero;
+    }
+
+    public void setChkShowConvAero(final JCheckBox chkShowConvAero) {
+        this.chkShowConvAero = chkShowConvAero;
     }
 
     public JCheckBox getChkFilterByPercentageOfCost() {
@@ -236,6 +245,11 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         getChkShowAerospace().setName("chkShowAerospace");
         getChkShowAerospace().addActionListener(evt -> filterOffers());
 
+        setChkShowConvAero(new JCheckBox(resources.getString("chkShowConvAero.text")));
+        getChkShowConvAero().setToolTipText(resources.getString("chkShowConvAero.toolTipText"));
+        getChkShowConvAero().setName("chkShowConvAero");
+        getChkShowConvAero().addActionListener(evt -> filterOffers());
+
         setChkFilterByPercentageOfCost(new JCheckBox(resources.getString("chkFilterByPercentageOfCost.text")));
         getChkFilterByPercentageOfCost().setToolTipText(resources.getString("chkFilterByPercentageOfCost.toolTipText"));
         getChkFilterByPercentageOfCost().setName("chkFilterByPercentageOfCost");
@@ -268,7 +282,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(getChkShowMechs())
                                 .addComponent(getChkShowVehicles())
-                                .addComponent(getChkShowAerospace(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getChkShowAerospace())
+                                .addComponent(getChkShowConvAero(), GroupLayout.Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(getChkFilterByPercentageOfCost())
                                 .addComponent(getSpnCostPercentageThreshold())
@@ -280,7 +295,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkShowMechs())
                                 .addComponent(getChkShowVehicles())
-                                .addComponent(getChkShowAerospace()))
+                                .addComponent(getChkShowAerospace())
+                                .addComponent(getChkShowConvAero()))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkFilterByPercentageOfCost())
                                 .addComponent(getSpnCostPercentageThreshold())
@@ -305,6 +321,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
         // Create Table
         setMarketTable(new JTable(getMarketModel(), columnModel, null));
+        getMarketTable().setName("marketTable");
         getMarketTable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         getMarketTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         getMarketTable().createDefaultColumnsFromModel();
@@ -317,7 +334,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         getMarketTable().setIntercellSpacing(new Dimension(0, 0));
         getMarketTable().setShowGrid(false);
         columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitMarketTableModel.COL_DELIVERY),
-                !getCampaign().getCampaignOptions().getInstantUnitMarketDelivery());
+                !getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
         getMarketTable().getSelectionModel().addListSelectionListener(evt -> updateDisplay());
 
         final JScrollPane marketTableScrollPane = new JScrollPane(getMarketTable(),
@@ -336,17 +353,18 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     }
 
     @Override
-    protected void finalizeInitialization() {
+    protected void finalizeInitialization() throws Exception {
         super.finalizeInitialization();
         filterOffers();
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         // Left Component
         preferences.manage(new JToggleButtonPreference(getChkShowMechs()));
         preferences.manage(new JToggleButtonPreference(getChkShowVehicles()));
         preferences.manage(new JToggleButtonPreference(getChkShowAerospace()));
+        preferences.manage(new JToggleButtonPreference(getChkShowConvAero()));
         preferences.manage(new JToggleButtonPreference(getChkFilterByPercentageOfCost()));
         preferences.manage(new JIntNumberSpinnerPreference(getSpnCostPercentageThreshold()));
         preferences.manage(new JTablePreference(getMarketTable()));
@@ -394,6 +412,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             final Entity entity = offer.getEntity();
             if (entity == null) {
                 LogManager.getLogger().error("Cannot purchase a null entity");
+                getCampaign().getUnitMarket().getOffers().remove(offer);
                 offersIterator.remove();
                 continue;
             }
@@ -412,6 +431,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                         price.dividedBy(roll), String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
                                 entity.getShortName()));
                 getCampaign().addReport(resources.getString("UnitMarketPane.BlackMarketSwindled.report"));
+                getCampaign().getUnitMarket().getOffers().remove(offer);
                 offersIterator.remove();
                 continue;
             }
@@ -420,7 +440,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                     price, String.format(resources.getString("UnitMarketPane.PurchasedUnit.finances"), entity.getShortName()));
         }
 
-        finalizeEntityAcquisition(offers, getCampaign().getCampaignOptions().getInstantUnitMarketDelivery());
+        finalizeEntityAcquisition(offers, getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
     }
 
     public void addSelectedOffers() {
@@ -481,6 +501,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                         return getChkShowVehicles().isSelected();
                     case UnitType.AERO:
                         return getChkShowAerospace().isSelected();
+                    case UnitType.CONV_FIGHTER:
+                        return getChkShowConvAero().isSelected();
                     default:
                         return false;
                 }

@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -31,7 +32,7 @@ import megamek.common.EntityMovementMode;
 import megamek.common.IArmorState;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -89,7 +90,7 @@ public class MissingBattleArmorSuit extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -144,42 +145,18 @@ public class MissingBattleArmorSuit extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<chassis>"
-                +MekHqXmlUtil.escape(chassis)
-                +"</chassis>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<model>"
-                +MekHqXmlUtil.escape(model)
-                +"</model>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<clan>"
-                +clan
-                +"</clan>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<trooper>"
-                +trooper
-                +"</trooper>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<quad>"
-                +quad
-                +"</quad>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<groundMP>"
-                +groundMP
-                +"</groundMP>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<jumpMP>"
-                +jumpMP
-                +"</jumpMP>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<weightClass>"
-                +weightClass
-                +"</weightClass>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "jumpType", jumpType.name());
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chassis", chassis);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "model", model);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clan", clan);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trooper", trooper);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quad", quad);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "groundMP", groundMP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpMP", jumpMP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weightClass", weightClass);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpType", jumpType.name());
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -201,11 +178,11 @@ public class MissingBattleArmorSuit extends MissingPart {
             } else if (wn2.getNodeName().equalsIgnoreCase("clan")) {
                 clan = Boolean.parseBoolean(wn2.getTextContent().trim());
             } else if (wn2.getNodeName().equalsIgnoreCase("chassis")) {
-                chassis = MekHqXmlUtil.unEscape(wn2.getTextContent());
+                chassis = MHQXMLUtility.unEscape(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("model")) {
-                model = MekHqXmlUtil.unEscape(wn2.getTextContent());
+                model = MHQXMLUtility.unEscape(wn2.getTextContent());
             } else if (wn2.getNodeName().equalsIgnoreCase("jumpType")) {
-                jumpType = EntityMovementMode.parseFromString(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()));
+                jumpType = EntityMovementMode.parseFromString(MHQXMLUtility.unEscape(wn2.getTextContent().trim()));
             }
         }
     }

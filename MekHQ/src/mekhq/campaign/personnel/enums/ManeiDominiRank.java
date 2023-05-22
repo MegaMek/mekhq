@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -43,7 +42,7 @@ public enum ManeiDominiRank {
     //region Constructors
     ManeiDominiRank(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     //endregion Constructors
@@ -51,6 +50,34 @@ public enum ManeiDominiRank {
     //region Boolean Comparison Methods
     public boolean isNone() {
         return this == NONE;
+    }
+
+    public boolean isAlpha() {
+        return this == ALPHA;
+    }
+
+    public boolean isBeta() {
+        return this == BETA;
+    }
+
+    public boolean isOmega() {
+        return this == OMEGA;
+    }
+
+    public boolean isTau() {
+        return this == TAU;
+    }
+
+    public boolean isDelta() {
+        return this == DELTA;
+    }
+
+    public boolean isSigma() {
+        return this == SIGMA;
+    }
+
+    public boolean isOmicron() {
+        return this == OMICRON;
     }
     //endregion Boolean Comparison Methods
 
@@ -64,7 +91,7 @@ public enum ManeiDominiRank {
         }
 
         // Parse from Ordinal Int - Legacy save method
-        ManeiDominiRank[] values = values();
+        final ManeiDominiRank[] values = values();
         try {
             int mdRank = Integer.parseInt(text) + 1;
             if (values.length > mdRank) {
@@ -75,7 +102,6 @@ public enum ManeiDominiRank {
         }
 
         LogManager.getLogger().error("Unable to parse " + text + "into a ManeiDominiRank. Returning NONE.");
-
         return NONE;
     }
     //endregion File I/O
@@ -84,5 +110,4 @@ public enum ManeiDominiRank {
     public String toString() {
         return name;
     }
-
 }

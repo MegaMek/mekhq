@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,18 +16,20 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq;
+
+import megamek.common.annotations.Nullable;
+import megamek.common.event.MMEvent;
+import megamek.common.event.Subscribe;
+import mekhq.campaign.event.PartArrivedEvent;
+import mekhq.campaign.event.PartChangedEvent;
+import mekhq.campaign.event.PartNewEvent;
+import mekhq.campaign.event.PartRemovedEvent;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
-
-import megamek.common.annotations.Nullable;
-import megamek.common.event.MMEvent;
-import megamek.common.event.Subscribe;
-import mekhq.campaign.event.*;
 
 /**
  * Provides a list of events captured during its lifetime.
@@ -48,6 +50,7 @@ public class EventSpy implements AutoCloseable {
     /**
      * Deregisters this instance from MekHQ's event bus.
      */
+    @Override
     public void close() {
         MekHQ.unregisterHandler(this);
     }

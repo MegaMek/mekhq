@@ -21,7 +21,8 @@ package mekhq.campaign.parts;
 import megamek.common.BayType;
 import megamek.common.Entity;
 import megamek.common.ITechnology;
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -71,7 +72,7 @@ public class MissingCubicle extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -130,9 +131,10 @@ public class MissingCubicle extends MissingPart {
     }
 
     @Override
-    public void writeToXmlBegin(PrintWriter pw1, int indent) {
-        super.writeToXmlBegin(pw1, indent);
-        pw1.println(String.format("%s<bayType>%s</bayType>", MekHqXmlUtil.indentStr(indent+1), bayType));
+    public int writeToXMLBegin(final PrintWriter pw, int indent) {
+        indent = super.writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bayType", bayType.name());
+        return indent;
     }
 
     @Override

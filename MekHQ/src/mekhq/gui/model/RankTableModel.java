@@ -19,7 +19,6 @@
 package mekhq.gui.model;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -55,7 +54,7 @@ public class RankTableModel extends DefaultTableModel {
     public final static int COL_NUM = 12;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -102,7 +101,7 @@ public class RankTableModel extends DefaultTableModel {
             array[i][RankTableModel.COL_NAME_INF] = rank.getNameWithLevels(Profession.INFANTRY);
             array[i][RankTableModel.COL_NAME_TECH] = rank.getNameWithLevels(Profession.TECH);
             array[i][RankTableModel.COL_NAME_MEDICAL] = rank.getNameWithLevels(Profession.MEDICAL);
-            array[i][RankTableModel.COL_NAME_ADMIN] = rank.getNameWithLevels(Profession.ADMIN);
+            array[i][RankTableModel.COL_NAME_ADMIN] = rank.getNameWithLevels(Profession.ADMINISTRATOR);
             array[i][RankTableModel.COL_NAME_CIVILIAN] = rank.getNameWithLevels(Profession.CIVILIAN);
             array[i][RankTableModel.COL_OFFICER] = rank.isOfficer();
             array[i][RankTableModel.COL_PAYMULT] = rank.getPayMultiplier();
@@ -192,7 +191,7 @@ public class RankTableModel extends DefaultTableModel {
             case COL_NAME_MEDICAL:
                 return Profession.MEDICAL.getToolTipText();
             case COL_NAME_ADMIN:
-                return Profession.ADMIN.getToolTipText();
+                return Profession.ADMINISTRATOR.getToolTipText();
             case COL_NAME_CIVILIAN:
                 return Profession.CIVILIAN.getToolTipText();
             case COL_OFFICER:

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -53,19 +52,18 @@ public enum PersonnelRole {
     ASTECH("PersonnelRole.ASTECH.text", KeyEvent.VK_UNDEFINED),
     DOCTOR("PersonnelRole.DOCTOR.text", KeyEvent.VK_D),
     MEDIC("PersonnelRole.MEDIC.text", KeyEvent.VK_UNDEFINED),
-    ADMINISTRATOR_COMMAND("PersonnelRole.ADMINISTRATOR_COMMAND.text", KeyEvent.VK_C),
+    ADMINISTRATOR_COMMAND("PersonnelRole.ADMINISTRATOR_COMMAND.text", KeyEvent.VK_UNDEFINED),
     ADMINISTRATOR_LOGISTICS("PersonnelRole.ADMINISTRATOR_LOGISTICS.text", KeyEvent.VK_L),
     ADMINISTRATOR_TRANSPORT("PersonnelRole.ADMINISTRATOR_TRANSPORT.text", KeyEvent.VK_R),
     ADMINISTRATOR_HR("PersonnelRole.ADMINISTRATOR_HR.text", KeyEvent.VK_H),
-    DEPENDENT("PersonnelRole.DEPENDENT.text", KeyEvent.VK_UNDEFINED, false),
-    NONE("PersonnelRole.NONE.text", KeyEvent.VK_UNDEFINED, false);
+    DEPENDENT("PersonnelRole.DEPENDENT.text", KeyEvent.VK_UNDEFINED),
+    NONE("PersonnelRole.NONE.text", KeyEvent.VK_UNDEFINED);
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
     private final String clanName;
     private final int mnemonic; // Unused: J, K, Q, X, Z
-    private final boolean marketable;
     //endregion Variable Declarations
 
     //region Constructors
@@ -73,21 +71,12 @@ public enum PersonnelRole {
         this(name, null, mnemonic);
     }
 
-    PersonnelRole(final String name, final int mnemonic, final boolean marketable) {
-        this(name, null, mnemonic, marketable);
-    }
-
     PersonnelRole(final String name, final String clanName, final int mnemonic) {
-        this(name, clanName, mnemonic, true);
-    }
-
-    PersonnelRole(final String name, final String clanName, final int mnemonic, final boolean marketable) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
-        this.clanName = (clanName != null) ? resources.getString(clanName) : this.name;
+        this.clanName = (clanName == null) ? this.name : resources.getString(clanName);
         this.mnemonic = mnemonic;
-        this.marketable = marketable;
     }
     //endregion Constructors
 
@@ -99,13 +88,9 @@ public enum PersonnelRole {
     public int getMnemonic() {
         return mnemonic;
     }
-
-    public boolean isMarketable() {
-        return marketable;
-    }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isMechWarrior() {
         return this == MECHWARRIOR;
     }
@@ -299,8 +284,8 @@ public enum PersonnelRole {
         return isSupport(false);
     }
 
-    public boolean isSupport(final boolean excludeUnmarketable) {
-        return (!excludeUnmarketable || isMarketable()) && !isCombat();
+    public boolean isSupport(final boolean excludeCivilian) {
+        return !isCombat() && (!excludeCivilian || !isCivilian());
     }
 
     public boolean isTech() {
@@ -320,52 +305,64 @@ public enum PersonnelRole {
                 || isAdministratorTransport() || isAdministratorHR();
     }
 
-    public boolean isDependentOrNone() {
+    public boolean isCivilian() {
         return isDependent() || isNone();
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     //region Static Methods
     /**
      * @return a list of roles that can be included in the personnel market
      */
-    public static List<PersonnelRole> getMarketableRoles() {
-        return Stream.of(values()).filter(PersonnelRole::isMarketable).collect(Collectors.toList());
+    public static List<PersonnelRole> getMilitaryRoles() {
+        return Stream.of(values())
+                .filter(personnelRole -> !personnelRole.isCivilian())
+                .collect(Collectors.toList());
     }
 
     /**
-     * @return a list of roles that are potential primary roles. Currently this is all bar NONE
+     * @return a list of roles that are potential primary roles. Currently, this is all bar NONE
      */
     public static List<PersonnelRole> getPrimaryRoles() {
-        return Stream.of(values()).filter(role -> !role.isNone()).collect(Collectors.toList());
+        return Stream.of(values())
+                .filter(role -> !role.isNone())
+                .collect(Collectors.toList());
     }
 
     /**
      * @return a list of roles that are considered to be vessel (as in spacecraft) crewmembers
      */
     public static List<PersonnelRole> getVesselRoles() {
-        return Stream.of(values()).filter(PersonnelRole::isVesselCrewmember).collect(Collectors.toList());
+        return Stream.of(values())
+                .filter(PersonnelRole::isVesselCrewmember)
+                .collect(Collectors.toList());
     }
 
     /**
      * @return a list of roles that are considered to be techs
      */
     public static List<PersonnelRole> getTechRoles() {
-        return Stream.of(values()).filter(PersonnelRole::isTech).collect(Collectors.toList());
+        return Stream.of(values())
+                .filter(PersonnelRole::isTech)
+                .collect(Collectors.toList());
     }
 
     /**
      * @return a list of all roles that are considered to be administrators
      */
     public static List<PersonnelRole> getAdministratorRoles() {
-        return Stream.of(values()).filter(PersonnelRole::isAdministrator).collect(Collectors.toList());
+        return Stream.of(values())
+                .filter(PersonnelRole::isAdministrator)
+                .collect(Collectors.toList());
     }
 
     /**
-     * @return the number of roles that are not tagged as marketable
+     * @return the number of civilian roles
      */
-    public static int getUnmarketableCount() {
-        return Math.toIntExact(Stream.of(values()).filter(role -> !role.isMarketable()).count());
+    public static int getCivilianCount() {
+        return Math.toIntExact(Stream.of(values())
+                .filter(PersonnelRole::isCivilian)
+                .count());
     }
     //endregion Static Methods
 
@@ -436,13 +433,14 @@ public enum PersonnelRole {
                     return LAM_PILOT;
                 case 27:
                     return VEHICLE_CREW;
+                default:
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
         LogManager.getLogger().error("Unable to parse " + text + " into a PersonnelRole. Returning NONE.");
-
         return NONE;
     }
     //endregion File I/O

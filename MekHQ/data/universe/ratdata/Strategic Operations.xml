@@ -135,7 +135,7 @@
 			<weightClasses>M</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='Comstar Dropships Late 3075'>
+		<rat name='ComStar Dropships Late 3075'>
 			<factions>CS</factions>
 			<unitTypes>Dropship</unitTypes>
 			<ratings>F,D,C,B,A</ratings>

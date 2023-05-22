@@ -18,7 +18,6 @@
  */
 package mekhq.gui.control;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
@@ -27,6 +26,7 @@ import mekhq.gui.dialog.AddOrEditPersonnelEntryDialog;
 import mekhq.gui.model.LogTableModel;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ResourceBundle;
@@ -55,36 +55,36 @@ public class EditPersonnelLogControl extends JPanel {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogControl",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
-        setName(resourceMap.getString("control.name")); // NOI18N
-        this.setLayout(new java.awt.BorderLayout());
+        setName(resourceMap.getString("control.name"));
+        this.setLayout(new BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1, 0));
 
         btnAdd = new JButton();
-        btnAdd.setText(resourceMap.getString("btnAdd.text")); // NOI18N
-        btnAdd.setName("btnAdd"); // NOI18N
+        btnAdd.setText(resourceMap.getString("btnAdd.text"));
+        btnAdd.setName("btnAdd");
         btnAdd.addActionListener(evt -> addEntry());
         panBtns.add(btnAdd);
 
         btnEdit = new JButton();
-        btnEdit.setText(resourceMap.getString("btnEdit.text")); // NOI18N
-        btnEdit.setName("btnEdit"); // NOI18N
+        btnEdit.setText(resourceMap.getString("btnEdit.text"));
+        btnEdit.setName("btnEdit");
         btnEdit.setEnabled(false);
         btnEdit.addActionListener(evt -> editEntry());
         panBtns.add(btnEdit);
 
         btnDelete = new JButton();
-        btnDelete.setText(resourceMap.getString("btnDelete.text")); // NOI18N
-        btnDelete.setName("btnDelete"); // NOI18N
+        btnDelete.setText(resourceMap.getString("btnDelete.text"));
+        btnDelete.setName("btnDelete");
         btnDelete.setEnabled(false);
         btnDelete.addActionListener(evt -> deleteEntry());
         panBtns.add(btnDelete);
         this.add(panBtns, BorderLayout.PAGE_START);
 
         logsTable = new JTable(logModel);
-        logsTable.setName(resourceMap.getString("logsTable.name")); // NOI18N
+        logsTable.setName(resourceMap.getString("logsTable.name"));
         TableColumn column;
         for (int i = 0; i < LogTableModel.N_COL; i++) {
             column = logsTable.getColumnModel().getColumn(i);
@@ -97,12 +97,12 @@ public class EditPersonnelLogControl extends JPanel {
         logsTable.getSelectionModel().addListSelectionListener(this::logTableValueChanged);
 
         scrollLogsTable = new JScrollPane();
-        scrollLogsTable.setName(resourceMap.getString("scrollLogsTable.name")); // NOI18N
+        scrollLogsTable.setName(resourceMap.getString("scrollLogsTable.name"));
         scrollLogsTable.setViewportView(logsTable);
         this.add(scrollLogsTable, BorderLayout.CENTER);
     }
 
-    private void logTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void logTableValueChanged(ListSelectionEvent evt) {
         int row = logsTable.getSelectedRow();
         btnDelete.setEnabled(row != -1);
         btnEdit.setEnabled(row != -1);

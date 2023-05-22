@@ -213,13 +213,13 @@ public class FileDialogs {
      *
      * @return the file selected, if any
      */
-    public static Optional<File> saveDeployUnits(JFrame frame, Scenario scenario) {
+    public static Optional<File> saveDeployUnits(JFrame frame, Scenario scenario, String name) {
         Optional<File> value = GUI.fileDialogSave(
                 frame,
                 "Deploy Units",
                 FileType.MUL,
                 MekHQ.getUnitsDirectory().getValue(),
-                scenario.getName() + ".mul");
+                scenario.getName() + " - " + name + ".mul");
 
         value.ifPresent(x -> MekHQ.getUnitsDirectory().setValue(x.getParent()));
         return value;
@@ -282,7 +282,7 @@ public class FileDialogs {
      */
     public static Optional<File> saveScenarioTemplate(JFrame frame, ScenarioTemplate template) {
         String fileName = String.format(
-                "%s.xml", //$NON-NLS-1$
+                "%s.xml",
                 template.name);
 
         Optional<File> value = GUI.fileDialogSave(

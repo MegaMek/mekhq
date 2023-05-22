@@ -2,7 +2,7 @@
  * Loan.java
  *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,23 +21,20 @@
  */
 package mekhq.campaign.finances;
 
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.Compute;
-import mekhq.MekHqXmlUtil;
 import mekhq.campaign.finances.enums.FinancialTerm;
+import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 
 /**
  * TODO : Update loan baseline based on latest Campaign Operations Rules
- * TODO : Move MADE_UP_INSTITUTIONS to data
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Loan {
@@ -53,29 +50,22 @@ public class Loan {
     private Money paymentAmount;
     private LocalDate nextPayment;
     private boolean overdue;
-
-    // TODO : I shouldn't be inline but instead part of a data file
-    private static final List<String> MADE_UP_INSTITUTIONS = Arrays.asList(
-            "Southern Bank and Trust" /* Canon */, "The Alliance Reserve Bank" /* Canon */,
-            "Capellan Commonality Bank" /* Canon */, "Potwin Bank and Trust" /* Canon */,
-            "ComStar Reserve", "Federated Employees Union", "Bank of Oriente",
-            "New Avalon Interstellar Bank", "Federated Boeing Credit Union",
-            "First Commonwealth Bank", "Donegal Bank and Trust", "Defiance Industries Credit Union",
-            "Superior Bank of Sarna", "St. Ives Bank and Trust", "Luthien Bank of the Dragon",
-            "Golden Bank of Sian", "Rasalhague National Bank", "Canopus Federal Reserve",
-            "Concordat Bank and Trust", "Outworlds Alliance National Bank",
-            "Hegemony Bank and Trust", "Andurien First National Bank");
     //endregion Variable Declarations
 
     //region Constructors
-    public Loan() {
-        //don't do anything, this is for loading
+    private Loan() {
+        // don't do anything, this is for loading
+    }
+
+    public Loan(final int principal, final int rate, final int years,
+                final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
+        this(Money.of(principal), rate, years, financialTerm, collateral, today);
     }
 
     public Loan(final Money principal, final int rate, final int years,
                 final FinancialTerm financialTerm, final int collateral, final LocalDate today) {
-        this(ObjectUtility.getRandomItem(MADE_UP_INSTITUTIONS), randomReferenceNumber(), principal, rate,
-                years, financialTerm, collateral, today);
+        this(FinancialInstitutions.randomFinancialInstitution(today).toString(), randomReferenceNumber(),
+                principal, rate, years, financialTerm, collateral, today);
     }
 
     public Loan(final String institution, final String referenceNumber, final Money principal,
@@ -191,7 +181,8 @@ public class Loan {
     }
 
     public Money determineRemainingValue() {
-        return getPaymentAmount().multipliedBy(getRemainingPayments());
+        return getPaymentAmount()
+                .multipliedBy(getRemainingPayments());
     }
     //endregion Determination Methods
 
@@ -222,15 +213,15 @@ public class Loan {
         // we are going to treat the score from StellarOps the same as dragoons score
         // TODO: pirates and government forces
         if (rating <= 0) {
-            return new Loan(Money.of(10000000), 35, 1, FinancialTerm.MONTHLY, 80, date);
+            return new Loan(10000000, 35, 1, FinancialTerm.MONTHLY, 80, date);
         } else if (rating < 5) {
-            return new Loan(Money.of(10000000), 20, 1, FinancialTerm.MONTHLY, 60, date);
+            return new Loan(10000000, 20, 1, FinancialTerm.MONTHLY, 60, date);
         } else if (rating < 10) {
-            return new Loan(Money.of(10000000), 15, 2, FinancialTerm.MONTHLY, 40, date);
+            return new Loan(10000000, 15, 2, FinancialTerm.MONTHLY, 40, date);
         } else if (rating < 14) {
-            return new Loan(Money.of(10000000), 10, 3, FinancialTerm.MONTHLY, 25, date);
+            return new Loan(10000000, 10, 3, FinancialTerm.MONTHLY, 25, date);
         } else {
-            return new Loan(Money.of(10000000), 7, 5, FinancialTerm.MONTHLY, 15, date);
+            return new Loan(10000000, 7, 5, FinancialTerm.MONTHLY, 15, date);
         }
     }
 
@@ -243,29 +234,29 @@ public class Loan {
      */
     public static int[] getInterestBracket(final int rating) {
         if (rating <= 0) {
-            return new int[]{15, 35, 75};
+            return new int[] { 15, 35, 75 };
         } else if (rating < 5) {
-            return new int[]{10, 20, 60};
+            return new int[] { 10, 20, 60 };
         } else if (rating < 10) {
-            return new int[]{5, 15, 35};
+            return new int[] { 5, 15, 35 };
         } else if (rating < 14) {
-            return new int[]{5, 10, 25};
+            return new int[] { 5, 10, 25 };
         } else {
-            return new int[]{4, 7, 17};
+            return new int[] { 4, 7, 17 };
         }
     }
 
     public static int[] getCollateralBracket(final int rating) {
         if (rating <= 0) {
-            return new int[]{60, 80, 380};
+            return new int[] { 60, 80, 380 };
         } else if (rating < 5) {
-            return new int[]{40, 60, 210};
+            return new int[] { 40, 60, 210 };
         } else if (rating < 10) {
-            return new int[]{20, 40, 140};
+            return new int[] { 20, 40, 140 };
         } else if (rating < 14) {
-            return new int[]{10, 25, 75};
+            return new int[] { 10, 25, 75 };
         } else {
-            return new int[]{5, 15, 35};
+            return new int[] { 5, 15, 35 };
         }
     }
 
@@ -305,10 +296,9 @@ public class Loan {
         } else {
             return getInterestBracket(rating)[1] - (collateralDiff / getCollateralIncrement(rating, false));
         }
-
     }
 
-    public static String randomReferenceNumber() {
+    private static String randomReferenceNumber() {
         int length = Compute.randomInt(5) + 6;
         final StringBuilder stringBuilder = new StringBuilder();
         int nSinceSlash = 2;
@@ -320,9 +310,9 @@ public class Loan {
             }
             length--;
             nSinceSlash++;
-            //Check for a random slash
+            // Check for a random slash
             if ((length > 0) && (Compute.randomInt(9) < 3) && (nSinceSlash >= 3)) {
-                stringBuilder.append("-");
+                stringBuilder.append('-');
                 nSinceSlash = 0;
             }
         }
@@ -331,19 +321,19 @@ public class Loan {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loan");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "institution", getInstitution());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "referenceNumber", getReferenceNumber());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "principal", getPrincipal());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rate", getRate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "years", getYears());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "collateral", getCollateral());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "remainingPayments", getRemainingPayments());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paymentAmount", getPaymentAmount());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nextPayment", getNextPayment());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overdue", isOverdue());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loan");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "loan");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "institution", getInstitution());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "referenceNumber", getReferenceNumber());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "principal", getPrincipal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rate", getRate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "years", getYears());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "financialTerm", getFinancialTerm().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "collateral", getCollateral());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "remainingPayments", getRemainingPayments());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paymentAmount", getPaymentAmount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nextPayment", getNextPayment());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overdue", isOverdue());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loan");
     }
 
     public static Loan generateInstanceFromXML(final Node wn) {
@@ -371,7 +361,7 @@ public class Loan {
                 } else if (wn2.getNodeName().equalsIgnoreCase("paymentAmount")) {
                     loan.setPaymentAmount(Money.fromXmlString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextPayment")) {
-                    loan.setNextPayment(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                    loan.setNextPayment(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("overdue")) {
                     loan.setOverdue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payAmount")) { // Legacy - 0.49.3 Removal
@@ -393,7 +383,7 @@ public class Loan {
 
     @Override
     public String toString() {
-        return getInstitution() + " " + getReferenceNumber();
+        return getInstitution() + ' ' + getReferenceNumber();
     }
 
     @Override

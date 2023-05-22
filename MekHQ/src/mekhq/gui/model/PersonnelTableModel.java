@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -153,10 +153,28 @@ public class PersonnelTableModel extends DataTableModel {
 
             setOpaque(true);
             setHorizontalAlignment(personnelColumn.getAlignment());
+
+            // Display Text
+            final String displayText = personnelColumn.getDisplayText(getCampaign(), person);
+            if (displayText != null) {
+                setText(displayText);
+            }
+
+            // Tool Tips
             setToolTipText(personnelColumn.getToolTipText(person, loadAssignmentFromMarket));
 
+            // Colouring
             if (!isSelected) {
-                if (person.isDeployed()) {
+                if (person.getStatus().isDead() || person.getStatus().isRetired()
+                        || person.getStatus().isDeserted()) {
+                    setBackground(UIManager.getColor("Table.background"));
+                    setForeground(UIManager.getColor("Table.foreground"));
+                } else if (person.getStatus().isAbsent()) {
+                    // TODO : Add a specific colour for absent personnel, as they are treated
+                    // TODO : differently than normal personnel
+                    setBackground(UIManager.getColor("Table.background"));
+                    setForeground(UIManager.getColor("Table.foreground"));
+                } else if (person.isDeployed()) {
                     setForeground(MekHQ.getMHQOptions().getDeployedForeground());
                     setBackground(MekHQ.getMHQOptions().getDeployedBackground());
                 } else if (person.hasInjuries(true)
@@ -194,7 +212,7 @@ public class PersonnelTableModel extends DataTableModel {
             setText(getValueAt(person, personnelColumn));
 
             switch (personnelColumn) {
-                case RANK:
+                case PERSON:
                     setText(person.getFullDesc(getCampaign()));
                     setImage(person.getPortrait().getImage(54));
                     break;
@@ -233,7 +251,7 @@ public class PersonnelTableModel extends DataTableModel {
                         StringBuilder desc = new StringBuilder("<html><b>").append(force.getName())
                                 .append("</b>");
                         Force parent = force.getParentForce();
-                        //cut off after three lines and don't include the top level
+                        // cut off after three lines and don't include the top level
                         int lines = 1;
                         while ((parent != null) && (parent.getParentForce() != null) && (lines < 4)) {
                             desc.append("<br>").append(parent.getName());

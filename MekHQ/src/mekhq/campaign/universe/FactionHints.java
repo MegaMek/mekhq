@@ -20,7 +20,7 @@ package mekhq.campaign.universe;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.*;
 
@@ -397,7 +397,7 @@ public class FactionHints {
         Document xmlDoc;
 
         try (InputStream is = new FileInputStream(MHQConstants.FACTION_HINTS_FILE)) {
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             xmlDoc = db.parse(is);
         } catch (Exception e) {
@@ -442,10 +442,10 @@ public class FactionHints {
                     String innerCode = "";
                     List<Faction> opponents = null;
                     if (wn.getAttributes().getNamedItem("start") != null) {
-                        start = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                        start = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                     }
                     if (wn.getAttributes().getNamedItem("end") != null) {
-                        end = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+                        end = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
                     }
                     for (int j = 0; j < wn.getChildNodes().getLength(); j++) {
                         try {
@@ -497,10 +497,10 @@ public class FactionHints {
             name = node.getAttributes().getNamedItem("name").getTextContent().trim();
         }
         if (node.getAttributes().getNamedItem("start") != null) {
-            start = MekHqXmlUtil.parseDate(node.getAttributes().getNamedItem("start").getTextContent().trim());
+            start = MHQXMLUtility.parseDate(node.getAttributes().getNamedItem("start").getTextContent().trim());
         }
         if (node.getAttributes().getNamedItem("end") != null) {
-            end = MekHqXmlUtil.parseDate(node.getAttributes().getNamedItem("end").getTextContent().trim());
+            end = MHQXMLUtility.parseDate(node.getAttributes().getNamedItem("end").getTextContent().trim());
         }
         for (int n = 0; n < node.getChildNodes().getLength(); n++) {
             Node wn = node.getChildNodes().item(n);
@@ -508,10 +508,10 @@ public class FactionHints {
                 LocalDate localStart = start;
                 LocalDate localEnd = end;
                 if (wn.getAttributes().getNamedItem("start") != null) {
-                    localStart = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                    localStart = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                 }
                 if (wn.getAttributes().getNamedItem("end") != null) {
-                    localEnd = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+                    localEnd = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
                 }
 
                 String[] factionKeys = wn.getTextContent().trim().split(",");
@@ -532,7 +532,7 @@ public class FactionHints {
     private void addNeutralExceptions(Faction faction, Node node) throws DOMException {
         LocalDate end = null;
         if (node.getAttributes().getNamedItem("end") != null) {
-            end = MekHqXmlUtil.parseDate(node.getAttributes().getNamedItem("end").getTextContent().trim());
+            end = MHQXMLUtility.parseDate(node.getAttributes().getNamedItem("end").getTextContent().trim());
         }
 
         for (int n = 0; n < node.getChildNodes().getLength(); n++) {
@@ -541,11 +541,11 @@ public class FactionHints {
                 LocalDate localStart = null;
                 LocalDate localEnd = end;
                 if (wn.getAttributes().getNamedItem("start") != null) {
-                    localStart = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
+                    localStart = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("start").getTextContent().trim());
                 }
 
                 if (wn.getAttributes().getNamedItem("end") != null) {
-                    localEnd = MekHqXmlUtil.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
+                    localEnd = MHQXMLUtility.parseDate(wn.getAttributes().getNamedItem("end").getTextContent().trim());
                 }
 
                 String[] parties = wn.getTextContent().trim().split(",");

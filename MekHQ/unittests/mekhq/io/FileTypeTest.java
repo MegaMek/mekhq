@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 The MegaMek Team. All rights reserved.
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -10,22 +10,21 @@
  *
  * MekHQ is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with MekHQ.  If not, see <http://www.gnu.org/licenses/>.
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.io;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings({"javadoc","nls"})
 public class FileTypeTest {
 
     /**
@@ -34,27 +33,24 @@ public class FileTypeTest {
     @Test
     public void testExtensionsProvided() {
         for (FileType ft : FileType.values()) {
-            assertTrue(!ft.getExtensions().isEmpty());
+            assertFalse(ft.getExtensions().isEmpty());
         }
     }
 
     @Test
     public void testFileNamefilter() {
-
         Arrays.asList(
             "file.cpnx", "file.CPNX",
-            "file.xml",  "file.XML",
+            "file.xml", "file.XML",
             "file.cpnx.gz", "file.CPNX.GZ", "file.CPNX.gz",
             "some/dir/file.xml"
-        ).forEach(fn -> assertTrue(fn + " was not accepted",FileType.CPNX.getNameFilter().test(fn)));
+        ).forEach(fn -> assertTrue(FileType.CPNX.getNameFilter().test(fn), fn + " was not accepted"));
 
         Arrays.asList(
             "file.abc",
             "file.xml.abc",
             "file.xmlabc",
             "file.abcxml"
-        ).forEach(fn -> assertFalse(fn + " was not refused",FileType.CPNX.getNameFilter().test(fn)));
-
+        ).forEach(fn -> assertFalse(FileType.CPNX.getNameFilter().test(fn), fn + " was not refused"));
     }
-
 }

@@ -30,6 +30,7 @@ import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.*;
+import megamek.server.GameManager;
 import megamek.server.Server;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
@@ -61,6 +62,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * The main class of the application.
@@ -168,35 +170,39 @@ public class MekHQ implements GameListener {
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = getMHQPreferences().forClass(MekHQ.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQ.class);
 
-        selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
-        selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
-        preferences.manage(new StringPreference(selectedTheme));
+            selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
+            selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
+            preferences.manage(new StringPreference(selectedTheme));
 
-        personnelDirectory = new ObservableString("personnelDirectory", ".");
-        preferences.manage(new StringPreference(personnelDirectory));
+            personnelDirectory = new ObservableString("personnelDirectory", ".");
+            preferences.manage(new StringPreference(personnelDirectory));
 
-        partsDirectory = new ObservableString("partsDirectory", ".");
-        preferences.manage(new StringPreference(partsDirectory));
+            partsDirectory = new ObservableString("partsDirectory", ".");
+            preferences.manage(new StringPreference(partsDirectory));
 
-        planetsDirectory = new ObservableString("planetsDirectory", ".");
-        preferences.manage(new StringPreference(planetsDirectory));
+            planetsDirectory = new ObservableString("planetsDirectory", ".");
+            preferences.manage(new StringPreference(planetsDirectory));
 
-        starMapsDirectory = new ObservableString("starMapsDirectory", ".");
-        preferences.manage(new StringPreference(starMapsDirectory));
+            starMapsDirectory = new ObservableString("starMapsDirectory", ".");
+            preferences.manage(new StringPreference(starMapsDirectory));
 
-        unitsDirectory = new ObservableString("unitsDirectory", ".");
-        preferences.manage(new StringPreference(unitsDirectory));
+            unitsDirectory = new ObservableString("unitsDirectory", ".");
+            preferences.manage(new StringPreference(unitsDirectory));
 
-        campaignsDirectory = new ObservableString("campaignsDirectory", "./campaigns");
-        preferences.manage(new StringPreference(campaignsDirectory));
+            campaignsDirectory = new ObservableString("campaignsDirectory", "./campaigns");
+            preferences.manage(new StringPreference(campaignsDirectory));
 
-        scenarioTemplatesDirectory = new ObservableString("scenarioTemplatesDirectory", ".");
-        preferences.manage(new StringPreference(scenarioTemplatesDirectory));
+            scenarioTemplatesDirectory = new ObservableString("scenarioTemplatesDirectory", ".");
+            preferences.manage(new StringPreference(scenarioTemplatesDirectory));
 
-        financesDirectory = new ObservableString("financesDirectory", ".");
-        preferences.manage(new StringPreference(financesDirectory));
+            financesDirectory = new ObservableString("financesDirectory", ".");
+            preferences.manage(new StringPreference(financesDirectory));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public void exit() {
@@ -343,7 +349,7 @@ public class MekHQ implements GameListener {
         hostDialog.dispose();
 
         try {
-            myServer = new Server(password, port, register, metaserver);
+            myServer = new Server(password, port, new GameManager(), register, metaserver);
             if (loadSavegame) {
                 FileDialog f = new FileDialog(campaignGUI.getFrame(), "Load Savegame");
                 f.setDirectory(System.getProperty("user.dir") + "/savegames");
@@ -372,7 +378,7 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
 
         // Start the game thread
-        if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
             gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario);
         } else {
             gameThread = new GameThread(playerName, password, client, this, meks, scenario);
@@ -457,7 +463,7 @@ public class MekHQ implements GameListener {
             ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true,
                     tracker);
             resolveDialog.setVisible(true);
-            if (campaignGUI.getCampaign().getCampaignOptions().getUseAtB()
+            if (campaignGUI.getCampaign().getCampaignOptions().isUseAtB()
                     && (campaignGUI.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract)
                     && !campaignGUI.getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
@@ -469,14 +475,19 @@ public class MekHQ implements GameListener {
             }
             gameThread.requestStop();
             // MegaMek dumps these in the deployment phase to free memory
-            if (getCampaign().getCampaignOptions().getUseAtB()) {
+            if (getCampaign().getCampaignOptions().isUseAtB()) {
                 RandomUnitGenerator.getInstance();
                 RandomNameGenerator.getInstance();
             }
+            // MegaMek creates some temporary files that MHQ needs to remove between runs
+            final File tempImageDirectory = new File("data/images/temp");
+            if (tempImageDirectory.isDirectory()) {
+                // This can't be null because of the above
+                Stream.of(tempImageDirectory.listFiles()).filter(file -> file.getName().endsWith(".png")).forEach(File::delete);
+            }
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
-
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -538,7 +549,9 @@ public class MekHQ implements GameListener {
         EVENT_BUS.unregister(handler);
     }
 
-    // TODO: This needs to be way more flexible, but it will do for now.
+    /**
+     * TODO : This needs to be way more flexible, but it will do for now.
+     */
     private void initEventHandlers() {
         EVENT_BUS.register(new XPHandler());
 
@@ -559,9 +572,11 @@ public class MekHQ implements GameListener {
                     addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
                     addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
                 }
-                for (Frame frame : Frame.getFrames()) {
+
+                for (final Frame frame : Frame.getFrames()) {
                     SwingUtilities.updateComponentTreeUI(frame);
                 }
+
                 for (Window window : Window.getWindows()) {
                     SwingUtilities.updateComponentTreeUI(window);
                 }

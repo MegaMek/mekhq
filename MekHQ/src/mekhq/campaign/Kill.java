@@ -22,7 +22,7 @@
 package mekhq.campaign;
 
 import megamek.Version;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -99,7 +99,7 @@ public class Kill {
                 } else if (wn2.getNodeName().equalsIgnoreCase("killer")) {
                     retVal.killer = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
-                    retVal.date = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    retVal.date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
@@ -111,13 +111,13 @@ public class Kill {
         return retVal;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "kill");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "pilotId", pilotId);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "killed", killed);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "killer", killer);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "date", MekHqXmlUtil.saveFormattedDate(date));
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "kill");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "kill");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pilotId", pilotId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killed", killed);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killer", killer);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "kill");
     }
 
     @Override

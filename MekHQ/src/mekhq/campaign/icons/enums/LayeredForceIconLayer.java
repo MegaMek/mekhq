@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.icons.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MHQConstants;
 
@@ -62,7 +61,7 @@ public enum LayeredForceIconLayer {
     LayeredForceIconLayer(final String name, final String toolTipText, final String layerPath,
                           final String tableName, final int listSelectionMode) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
         this.layerPath = layerPath;

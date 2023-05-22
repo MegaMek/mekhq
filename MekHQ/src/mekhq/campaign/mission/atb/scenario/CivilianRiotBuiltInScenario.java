@@ -18,22 +18,9 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import java.util.ArrayList;
-import java.util.UUID;
-
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.CommonObjectiveFactory;
-import mekhq.campaign.mission.ObjectiveEffect;
-import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
@@ -41,6 +28,9 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
+
+import java.util.ArrayList;
+import java.util.UUID;
 
 @AtBScenarioEnabled
 public class CivilianRiotBuiltInScenario extends AtBScenario {
@@ -99,8 +89,8 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         // north, south, east, west
         int boardEdge = (Compute.randomInt(4) + 1) * 2;
         setStart(boardEdge);
@@ -113,7 +103,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
                     campaign));
         }
 
-        ArrayList<Entity> otherForce = new ArrayList<Entity>();
+        ArrayList<Entity> otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 8, campaign);
 
         for (Entity e : otherForce) {
@@ -122,7 +112,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
 
         addBotForce(new BotForce(LOYALIST_FORCE_ID, 1, Board.START_CENTER, otherForce), campaign);
 
-        otherForce = new ArrayList<Entity>();
+        otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 12, campaign);
         addBotForce(new BotForce(RIOTER_FORCE_ID, 2, Board.START_CENTER, otherForce), campaign);
 
@@ -133,8 +123,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
                     Compute.d6() < 4 ? EntityWeightClass.WEIGHT_LIGHT : EntityWeightClass.WEIGHT_MEDIUM, campaign));
         }
 
-        addBotForce(
-                new BotForce(REBEL_FORCE_ID, 2, AtBDynamicScenarioFactory.getOppositeEdge(boardEdge), enemyEntities), campaign);
+        addBotForce(new BotForce(REBEL_FORCE_ID, 2, AtBDynamicScenarioFactory.getOppositeEdge(boardEdge), enemyEntities), campaign);
     }
 
     @Override

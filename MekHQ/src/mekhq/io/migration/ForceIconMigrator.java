@@ -1194,7 +1194,7 @@ public class ForceIconMigrator {
                     migrated.getPieces().get(LayeredForceIconLayer.BACKGROUND)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.BACKGROUND, "Inner Sphere/", "Capellan Confederation.png"));
                     break;
-                case "Comstar background.png":
+                case "ComStar background.png":
                     migrated.getPieces().put(LayeredForceIconLayer.BACKGROUND, new ArrayList<>());
                     migrated.getPieces().get(LayeredForceIconLayer.BACKGROUND)
                             .add(new ForcePieceIcon(LayeredForceIconLayer.BACKGROUND, "Inner Sphere/", "ComStar.png"));
@@ -2135,7 +2135,7 @@ public class ForceIconMigrator {
                 return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Steel Viper.png");
             case "ClanWolverine.png":
                 return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Clan/", "Clan Wolverine.png");
-            case "Comstar.png":
+            case "ComStar.png":
                 return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "ComStar.png");
             case "DraconisCombine.png":
                 return new UnitIcon(LayeredForceIconLayer.LOGO.getLayerPath() + "Inner Sphere/", "Draconis Combine.png");
@@ -4014,7 +4014,7 @@ public class ForceIconMigrator {
                 layered.getPieces().get(LayeredForceIconLayer.LOGO)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.LOGO, "Clan/", "Clan Wolverine.png"));
                 return layered;
-            case "Comstar.png":
+            case "ComStar.png":
                 layered.getPieces().put(LayeredForceIconLayer.LOGO, new ArrayList<>());
                 layered.getPieces().get(LayeredForceIconLayer.LOGO)
                         .add(new ForcePieceIcon(LayeredForceIconLayer.LOGO, "Inner Sphere/", "ComStar.png"));

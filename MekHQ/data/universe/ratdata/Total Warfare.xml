@@ -173,25 +173,25 @@
 			<weightClasses>M</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='Comstar Assault &apos;Mech'>
+		<rat name='ComStar Assault &apos;Mech'>
 			<factions>CS</factions>
 			<unitTypes>Mek</unitTypes>
 			<weightClasses>A</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='Comstar Heavy &apos;Mech'>
+		<rat name='ComStar Heavy &apos;Mech'>
 			<factions>CS</factions>
 			<unitTypes>Mek</unitTypes>
 			<weightClasses>H</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='Comstar Light &apos;Mech'>
+		<rat name='ComStar Light &apos;Mech'>
 			<factions>CS</factions>
 			<unitTypes>Mek</unitTypes>
 			<weightClasses>L</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='Comstar Medium &apos;Mech'>
+		<rat name='ComStar Medium &apos;Mech'>
 			<factions>CS</factions>
 			<unitTypes>Mek</unitTypes>
 			<weightClasses>M</weightClasses>

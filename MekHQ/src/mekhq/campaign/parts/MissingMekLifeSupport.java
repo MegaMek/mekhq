@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.parts;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 
@@ -68,9 +69,8 @@ public class MissingMekLifeSupport extends MissingPart {
         return part instanceof MekLifeSupport;
     }
 
-
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (null == unit) {
             return null;
         }
@@ -139,7 +139,7 @@ public class MissingMekLifeSupport extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ELECTRONICS;
     }
 }

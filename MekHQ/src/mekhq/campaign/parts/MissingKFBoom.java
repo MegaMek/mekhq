@@ -22,13 +22,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 
 /**
@@ -73,7 +74,7 @@ public class MissingKFBoom extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -84,9 +85,9 @@ public class MissingKFBoom extends MissingPart {
 
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
-        writeToXmlBegin(pw, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "boomType", boomType);
-        writeToXmlEnd(pw, --indent);
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "boomType", boomType);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

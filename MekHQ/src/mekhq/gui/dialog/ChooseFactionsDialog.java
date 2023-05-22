@@ -18,36 +18,19 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
-
-import javax.swing.AbstractAction;
-import javax.swing.AbstractListModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JList;
-import javax.swing.JScrollPane;
-import javax.swing.WindowConstants;
-
-import mekhq.MekHQ;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-
-import megamek.common.util.EncodeControl;
+import mekhq.MekHQ;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
 
 public class ChooseFactionsDialog extends JDialog {
     private LocalDate date;
@@ -57,19 +40,21 @@ public class ChooseFactionsDialog extends JDialog {
     private boolean changed;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseFactionsDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
-    public ChooseFactionsDialog(Frame parent, LocalDate date, List<String> defaults) {
-        this(parent, date, defaults, true);
+    public ChooseFactionsDialog(final JFrame frame, final LocalDate date,
+                                final List<String> defaults) {
+        this(frame, true, date, defaults);
     }
 
-    public ChooseFactionsDialog(Frame parent, LocalDate date, List<String> defaults, boolean modal) {
-        super(parent, modal);
+    public ChooseFactionsDialog(final JFrame frame, final boolean modal, final LocalDate date,
+                                final List<String> defaults) {
+        super(frame, modal);
         this.date = Objects.requireNonNull(date);
         this.result = defaults;
         this.changed = false;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
@@ -133,11 +118,15 @@ public class ChooseFactionsDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseFactionsDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChooseFactionsDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public List<String> getResult() {

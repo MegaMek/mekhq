@@ -23,7 +23,6 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.*;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.UnitTechProgression;
 
@@ -56,14 +55,14 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     @Override
     public void updateOptionValues() {
         gameOptions = campaign.getGameOptions();
-        enableYearLimits = campaign.getCampaignOptions().limitByYear();
+        enableYearLimits = campaign.getCampaignOptions().isLimitByYear();
         allowedYear = campaign.getGameYear();
-        canonOnly = campaign.getCampaignOptions().allowCanonOnly();
+        canonOnly = campaign.getCampaignOptions().isAllowCanonOnly();
         gameTechLevel = campaign.getCampaignOptions().getTechLevel();
 
-        if (campaign.getCampaignOptions().allowClanPurchases() && campaign.getCampaignOptions().allowISPurchases()) {
+        if (campaign.getCampaignOptions().isAllowClanPurchases() && campaign.getCampaignOptions().isAllowISPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_IS_CLAN;
-        } else if (campaign.getCampaignOptions().allowClanPurchases()) {
+        } else if (campaign.getCampaignOptions().isAllowClanPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_CLAN;
         } else {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_IS;
@@ -189,9 +188,9 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         final int nUnit = comboUnitType.getSelectedIndex() - 1;
         final boolean checkSupportVee = Messages.getString("MechSelectorDialog.SupportVee")
                 .equals(comboUnitType.getSelectedItem());
-        //If current expression doesn't parse, don't update.
+        // If the current expression doesn't parse, don't update.
         try {
-            unitTypeFilter = new RowFilter<MechTableModel, Integer>() {
+            unitTypeFilter = new RowFilter<>() {
                 @Override
                 public boolean include(Entry<? extends MechTableModel, ? extends Integer> entry) {
                     MechTableModel mechModel = entry.getModel();
@@ -205,12 +204,13 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                             break;
                         }
                     }
+
                     if (
                             /* year limits */
                             (!enableYearLimits || (mech.getYear() <= allowedYear))
                             /* Clan/IS limits */
-                            && (campaign.getCampaignOptions().allowClanPurchases() || !TechConstants.isClan(mech.getType()))
-                            && (campaign.getCampaignOptions().allowISPurchases() || TechConstants.isClan(mech.getType()))
+                            && (campaign.getCampaignOptions().isAllowClanPurchases() || !TechConstants.isClan(mech.getType()))
+                            && (campaign.getCampaignOptions().isAllowISPurchases() || TechConstants.isClan(mech.getType()))
                             /* Canon */
                             && (!canonOnly || mech.isCanon())
                             /* Weight */
@@ -225,7 +225,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                             /* Advanced Search */
                             && ((searchFilter == null) || MechSearchFilter.isMatch(mech, searchFilter))
                     ) {
-                        if (textFilter.getText().length() > 0) {
+                        if (!textFilter.getText().isBlank()) {
                             String text = textFilter.getText();
                             return mech.getName().toLowerCase().contains(text.toLowerCase());
                         }

@@ -19,7 +19,6 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.dialogs.AbstractIconChooserDialog;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.gui.panels.AbstractMHQIconChooser;
 
@@ -36,14 +35,14 @@ public abstract class AbstractMHQIconChooserDialog extends AbstractIconChooserDi
     protected AbstractMHQIconChooserDialog(final JFrame frame, final String name, final String title,
                                            final AbstractMHQIconChooser chooser) {
         super(frame, true, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale()),
                 name, title, chooser, false);
     }
     //endregion Constructors
 
     //region Initialization
     @Override
-    protected void setPreferences() {
+    protected void setPreferences() throws Exception {
         setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
     //endregion Initialization

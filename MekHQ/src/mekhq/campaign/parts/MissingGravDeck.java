@@ -22,13 +22,14 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 
 /**
@@ -87,7 +88,7 @@ public class MissingGravDeck extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -104,11 +105,11 @@ public class MissingGravDeck extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "deckType", deckType);
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "deckNumber", deckNumber);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deckType", deckType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deckNumber", deckNumber);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

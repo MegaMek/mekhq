@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -29,7 +30,7 @@ import megamek.common.Entity;
 import megamek.common.EntityMovementMode;
 import megamek.common.Infantry;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 
 /**
@@ -92,7 +93,7 @@ public class MissingInfantryMotiveType extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -112,10 +113,10 @@ public class MissingInfantryMotiveType extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent++);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "moveMode", mode.name());
-        writeToXmlEnd(pw1, --indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moveMode", mode.name());
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

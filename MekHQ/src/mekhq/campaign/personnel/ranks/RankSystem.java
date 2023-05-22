@@ -21,7 +21,7 @@ package mekhq.campaign.personnel.ranks;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.io.migration.PersonMigrator;
 import org.apache.logging.log4j.LogManager;
@@ -158,36 +158,37 @@ public class RankSystem {
             path += ".xml";
             file = new File(path);
         }
+        int indent = 0;
         try (OutputStream fos = new FileOutputStream(file);
              OutputStream bos = new BufferedOutputStream(fos);
              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<individualRankSystem version=\"" + MHQConstants.VERSION + "\">");
-            writeToXML(pw, 1, true);
-            MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw, 0, "individualRankSystem");
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "individualRankSystem", "version", MHQConstants.VERSION);
+            writeToXML(pw, indent, true);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "individualRankSystem");
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
     public void writeToXML(final PrintWriter pw, int indent, final boolean export) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "rankSystem");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "code", getCode());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rankSystem");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "code", getCode());
 
         // Only write out any other information if we are exporting the system or we are using a
         // campaign-specific custom system
         if (export || getType().isCampaign()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", toString());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "description", getDescription());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", toString());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "description", getDescription());
 
             if (isUseROMDesignation()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "useROMDesignation", isUseROMDesignation());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useROMDesignation", isUseROMDesignation());
             }
 
             if (isUseManeiDomini()) {
-                MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "useManeiDomini", isUseManeiDomini());
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManeiDomini", isUseManeiDomini());
             }
 
             for (int i = 0; i < getRanks().size(); i++) {
@@ -195,7 +196,7 @@ public class RankSystem {
             }
         }
 
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "rankSystem");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "rankSystem");
     }
 
     /**
@@ -213,9 +214,9 @@ public class RankSystem {
 
         // Open up the file.
         try (InputStream is = new FileInputStream(file)) {
-            element = MekHqXmlUtil.newSafeDocumentBuilder().parse(is).getDocumentElement();
-        } catch (Exception e) {
-            LogManager.getLogger().error("Failed to open file, returning null", e);
+            element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to open file, returning null", ex);
             return null;
         }
         element.normalize();
@@ -274,7 +275,7 @@ public class RankSystem {
                         return Ranks.getRankSystemFromCode(code);
                     }
                 } else if (wn.getNodeName().equalsIgnoreCase("code")) {
-                    final String systemCode = MekHqXmlUtil.unEscape(wn.getTextContent().trim());
+                    final String systemCode = MHQXMLUtility.unEscape(wn.getTextContent().trim());
                     // If this isn't the initial load and we already have a loaded system with the
                     // provided key, just return the rank system saved by the key in question.
                     // This does not need to be validated to ensure it is a proper rank system
@@ -283,9 +284,9 @@ public class RankSystem {
                     }
                     rankSystem.setCode(systemCode);
                 } else if (wn.getNodeName().equalsIgnoreCase("name")) {
-                    rankSystem.setName(MekHqXmlUtil.unEscape(wn.getTextContent().trim()));
+                    rankSystem.setName(MHQXMLUtility.unEscape(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("description")) {
-                    rankSystem.setDescription(MekHqXmlUtil.unEscape(wn.getTextContent().trim()));
+                    rankSystem.setDescription(MHQXMLUtility.unEscape(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("useROMDesignation")) {
                     rankSystem.setUseROMDesignation(Boolean.parseBoolean(wn.getTextContent().trim()));
                 } else if (wn.getNodeName().equalsIgnoreCase("useManeiDomini")) {

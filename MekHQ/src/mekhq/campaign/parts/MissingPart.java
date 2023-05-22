@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 
 import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
@@ -53,13 +54,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public Money getStickerPrice() {
-        //missing parts aren't worth a thing
+        // missing parts aren't worth a thing
         return Money.zero();
     }
 
     @Override
     public Money getBuyCost() {
-        return getNewPart().getStickerPrice();
+        return getNewPart().getActualValue();
     }
 
     @Override
@@ -343,13 +344,13 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
-    public String checkScrappable() {
+    public @Nullable String checkScrappable() {
         if (!isReplacementAvailable()) {
             return "Nothing to scrap";
         }
@@ -383,11 +384,11 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public void reservePart() {
-        //this is being set as an overnight repair, so
-        //we also need to reserve the replacement. If the
-        //quantity of the replacement is more than one, we will
-        //also need to split off a separate one
-        //shouldn't be null, but it never hurts to check
+        // this is being set as an overnight repair, so
+        // we also need to reserve the replacement. If the
+        // quantity of the replacement is more than one, we will
+        // also need to split off a separate one
+        // shouldn't be null, but it never hurts to check
         Part replacement = findReplacement(false);
         if ((null != replacement) && (null != getTech())) {
             if (replacement.getQuantity() > 1) {

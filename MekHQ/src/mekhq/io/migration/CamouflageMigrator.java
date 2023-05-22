@@ -61,8 +61,8 @@ public class CamouflageMigrator {
             text = text.replaceFirst("Hells Horses", "Hell's Horses");
         } else if (text.startsWith("Clans/Wolf in Exile/")) {
             text = text.replaceFirst("Wolf in Exile", "Wolf-in-Exile");
-        } else if (text.startsWith("Comstar/")) {
-            text = text.replaceFirst("Comstar", "ComStar");
+        } else if (text.startsWith("ComStar/")) {
+            text = text.replaceFirst("ComStar", "ComStar");
         } else if (text.startsWith("Kurita/")) {
             text = text.replaceFirst("Kurita", "Draconis Combine");
         } else if (text.startsWith("Davion/")) {
@@ -792,7 +792,7 @@ public class CamouflageMigrator {
                 return "Clan Diamond Shark.png";
             case "Clan Widow Maker.png":
                 return "Clan Widowmaker.png";
-            case "Comstar.png":
+            case "ComStar.png":
                 return "ComStar.png";
             case "Federated Suns, Commonwealth.png":
                 return "Federated Suns.png";
@@ -809,7 +809,7 @@ public class CamouflageMigrator {
                 return "Clan Diamond Shark.png";
             case "Clan Widow Maker.png":
                 return "Clan Widowmaker.png";
-            case "Comstar.png":
+            case "ComStar.png":
                 return "ComStar.png";
             case "Federated Suns, Commonwealth.png":
                 return "Federated Suns.png";

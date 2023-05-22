@@ -26,7 +26,7 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -108,38 +108,40 @@ public class Loot {
 
     public String getShortDescription() {
         String desc = getName() + " - ";
-        if (cash.isPositive()) {
+        if (!cash.isZero()) {
             desc += cash.toAmountAndSymbolString();
         }
 
-        if (units.size() > 0) {
+        if (!units.isEmpty()) {
             String s = units.size() + " unit";
             if (units.size() > 1) {
                 s += "s";
             }
 
-            if (cash.isPositive()) {
+            if (!cash.isZero()) {
                 s = ", " + s;
             }
             desc += s;
         }
 
-        if (parts.size() > 0) {
+        if (!parts.isEmpty()) {
             String s = parts.size() + " part";
             if (parts.size() > 1) {
                 s += "s";
             }
 
-            if (cash.isPositive() || units.size() > 0) {
+            if (!cash.isZero() || !units.isEmpty()) {
                 s = ", " + s;
             }
             desc += s;
         }
+
         return desc;
+
     }
 
     public void get(Campaign campaign, Scenario s) {
-        //TODO: put in some reports
+        // TODO: put in some reports
         if (cash.isPositive()) {
             campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
                     "Reward for " + getName() + " during " + s.getName());
@@ -155,17 +157,17 @@ public class Loot {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "loot");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cash", getCash());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "loot");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cash", getCash());
         for (Entity e : units) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "entityName", e.getChassis() + ' ' + e.getModel());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "entityName", e.getChassis() + ' ' + e.getModel());
         }
 
         for (Part p : parts) {
             p.writeToXML(pw, indent);
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "loot");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "loot");
     }
 
     public static Loot generateInstanceFromXML(Node wn, Campaign c, Version version) {

@@ -18,15 +18,13 @@
  */
 package mekhq.gui.model;
 
+import javax.swing.*;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
-
-import javax.swing.AbstractListModel;
-import javax.swing.ListModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 
 public class FilterableListModel<E> extends AbstractListModel<E> implements ListDataListener {
     private ListModel<E> peerModel;
@@ -162,7 +160,7 @@ public class FilterableListModel<E> extends AbstractListModel<E> implements List
                 int oldRange = indices.size();
                 filterModel(false);
                 fireIntervalRemoved(this, 0, oldRange);
-                if (indices.size() > 0) {
+                if (!indices.isEmpty()) {
                     fireIntervalAdded(this, 0, indices.size());
                 }
             } else {

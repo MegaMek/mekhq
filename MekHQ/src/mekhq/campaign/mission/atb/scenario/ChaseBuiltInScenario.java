@@ -61,8 +61,8 @@ public class ChaseBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         boolean startNorth = Compute.d6() > 3;
 
         int destinationEdge = startNorth ? Board.START_S : Board.START_N;
@@ -73,7 +73,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
         BotForce allyEntitiesForce = null;
 
-        if (allyEntities.size() > 0) {
+        if (!allyEntities.isEmpty()) {
             allyEntitiesForce = getAllyBotForce(getContract(campaign), getStart(), destinationEdge, allyEntities);
             addBotForce(allyEntitiesForce, campaign);
         }

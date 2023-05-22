@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -20,10 +20,11 @@
 package mekhq.campaign;
 
 import megamek.Version;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
+import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
 import mekhq.Utilities;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
@@ -33,24 +34,24 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.parts.enums.PartRepairType;
-import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.rating.UnitRatingMethod;
-import mekhq.service.MassRepairOption;
-import org.apache.commons.lang3.StringUtils;
+import mekhq.service.mrms.MRMSOption;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * @author natit
  */
 public class CampaignOptions {
-    //region Variable Declarations
-    //region Magic Numbers and Constants
+    //region Magic Numbers
     public static final int TECH_INTRO = 0;
     public static final int TECH_STANDARD = 1;
     public static final int TECH_ADVANCED = 2;
@@ -72,22 +73,39 @@ public class CampaignOptions {
     public static final double MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT = 1.0;
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
-    //endregion Magic Numbers and Constants
 
-    //region Unlisted Variables
-    //Mass Repair/Salvage Options
-    private boolean massRepairUseRepair;
-    private boolean massRepairUseSalvage;
-    private boolean massRepairUseExtraTime;
-    private boolean massRepairUseRushJob;
-    private boolean massRepairAllowCarryover;
-    private boolean massRepairOptimizeToCompleteToday;
-    private boolean massRepairScrapImpossible;
-    private boolean massRepairUseAssignedTechsFirst;
-    private boolean massRepairReplacePod;
-    private List<MassRepairOption> massRepairOptions;
-    //endregion Unlisted Variables
+    public static String getTechLevelName(final int techLevel) {
+        switch (techLevel) {
+            case TECH_INTRO:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
+            case TECH_STANDARD:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
+            case TECH_ADVANCED:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
+            case TECH_EXPERIMENTAL:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
+            case TECH_UNOFFICIAL:
+                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
+            default:
+                return "Unknown";
+        }
+    }
 
+    public static String getTransitUnitName(final int unit) {
+        switch (unit) {
+            case TRANSIT_UNIT_DAY:
+                return "Days";
+            case TRANSIT_UNIT_WEEK:
+                return "Weeks";
+            case TRANSIT_UNIT_MONTH:
+                return "Months";
+            default:
+                return "Unknown";
+        }
+    }
+    //endregion Magic Numbers
+
+    //region Variable Declarations
     //region General Tab
     private UnitRatingMethod unitRatingMethod;
     private int manualUnitRatingModifier;
@@ -112,6 +130,18 @@ public class CampaignOptions {
     private boolean reverseQualityNames;
     private boolean useUnofficialMaintenance;
     private boolean logMaintenance;
+
+    // Mass Repair / Mass Salvage
+    private boolean mrmsUseRepair;
+    private boolean mrmsUseSalvage;
+    private boolean mrmsUseExtraTime;
+    private boolean mrmsUseRushJob;
+    private boolean mrmsAllowCarryover;
+    private boolean mrmsOptimizeToCompleteToday;
+    private boolean mrmsScrapImpossible;
+    private boolean mrmsUseAssignedTechsFirst;
+    private boolean mrmsReplacePod;
+    private List<MRMSOption> mrmsOptions;
     //endregion Repair and Maintenance Tab
 
     //region Supplies and Acquisition Tab
@@ -213,7 +243,7 @@ public class CampaignOptions {
     private boolean trackUnitFatigue;
 
     // Family
-    private FamilialRelationshipDisplayLevel displayFamilyLevel;
+    private FamilialRelationshipDisplayLevel familyDisplayLevel;
 
     // Dependent
     private RandomDependentMethod randomDependentMethod;
@@ -225,12 +255,12 @@ public class CampaignOptions {
     private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
     private double salarySpecialistInfantryMultiplier;
-    private double[] salaryXPMultipliers;
+    private Map<SkillLevel, Double> salaryXPMultipliers;
     private Money[] roleBaseSalaries;
 
     // Marriage
     private boolean useManualMarriages;
-    private boolean useClannerMarriages;
+    private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
     private int minimumMarriageAge;
     private int checkMutualAncestorsDepth;
@@ -238,7 +268,7 @@ public class CampaignOptions {
     private Map<MergingSurnameStyle, Integer> marriageSurnameWeights;
     private RandomMarriageMethod randomMarriageMethod;
     private boolean useRandomSameSexMarriages;
-    private boolean useRandomClannerMarriages;
+    private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
     private int randomMarriageAgeRange;
     private double percentageRandomMarriageOppositeSexChance;
@@ -246,22 +276,20 @@ public class CampaignOptions {
 
     // Divorce
     private boolean useManualDivorce;
-    private boolean useClannerDivorce;
+    private boolean useClanPersonnelDivorce;
     private boolean usePrisonerDivorce;
     private Map<SplittingSurnameStyle, Integer> divorceSurnameWeights;
     private RandomDivorceMethod randomDivorceMethod;
     private boolean useRandomOppositeSexDivorce;
     private boolean useRandomSameSexDivorce;
-    private boolean useRandomClannerDivorce;
+    private boolean useRandomClanPersonnelDivorce;
     private boolean useRandomPrisonerDivorce;
     private double percentageRandomDivorceOppositeSexChance;
     private double percentageRandomDivorceSameSexChance;
 
-    // Divorce
-
     // Procreation
     private boolean useManualProcreation;
-    private boolean useClannerProcreation;
+    private boolean useClanPersonnelProcreation;
     private boolean usePrisonerProcreation;
     private int multiplePregnancyOccurrences;
     private BabySurnameStyle babySurnameStyle;
@@ -272,13 +300,23 @@ public class CampaignOptions {
     private boolean logProcreation;
     private RandomProcreationMethod randomProcreationMethod;
     private boolean useRelationshiplessRandomProcreation;
-    private boolean useRandomClannerProcreation;
+    private boolean useRandomClanPersonnelProcreation;
     private boolean useRandomPrisonerProcreation;
     private double percentageRandomProcreationRelationshipChance;
     private double percentageRandomProcreationRelationshiplessChance;
 
     // Death
     private boolean keepMarriedNameUponSpouseDeath;
+    private RandomDeathMethod randomDeathMethod;
+    private Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups;
+    private boolean useRandomClanPersonnelDeath;
+    private boolean useRandomPrisonerDeath;
+    private boolean useRandomDeathSuicideCause;
+    private double percentageRandomDeathChance;
+    private double[] exponentialRandomDeathMaleValues;
+    private double[] exponentialRandomDeathFemaleValues;
+    private Map<TenYearAgeRange, Double> ageRangeRandomDeathMaleValues;
+    private Map<TenYearAgeRange, Double> ageRangeRandomDeathFemaleValues;
     //endregion Personnel Tab
 
     //region Finance tab
@@ -318,9 +356,9 @@ public class CampaignOptions {
     private boolean equipmentContractBase;
     private double equipmentContractPercent;
     private boolean equipmentContractSaleValue;
-    private double dropshipContractPercent;
-    private double jumpshipContractPercent;
-    private double warshipContractPercent;
+    private double dropShipContractPercent;
+    private double jumpShipContractPercent;
+    private double warShipContractPercent;
     private boolean blcSaleValue;
     private boolean overageRepaymentInFinalPayment;
     //endregion Mercenary Tab
@@ -365,11 +403,7 @@ public class CampaignOptions {
     // Personnel Market
     private String personnelMarketName;
     private boolean personnelMarketReportRefresh;
-    private int personnelMarketRandomEliteRemoval;
-    private int personnelMarketRandomVeteranRemoval;
-    private int personnelMarketRandomRegularRemoval;
-    private int personnelMarketRandomGreenRemoval;
-    private int personnelMarketRandomUltraGreenRemoval;
+    private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
     private double personnelMarketDylansWeight;
 
     // Unit Market
@@ -380,6 +414,8 @@ public class CampaignOptions {
 
     // Contract Market
     private ContractMarketMethod contractMarketMethod;
+    private int contractSearchRadius;
+    private boolean variableContractLength;
     private boolean contractMarketReportRefresh;
     //endregion Markets Tab
 
@@ -392,7 +428,7 @@ public class CampaignOptions {
     //region Against the Bot Tab
     private boolean useAtB;
     private boolean useStratCon;
-    private int skillLevel;
+    private SkillLevel skillLevel;
 
     // Unit Administration
     private boolean useShareSystem;
@@ -406,8 +442,6 @@ public class CampaignOptions {
     private boolean clanVehicles;
 
     // Contract Operations
-    private int searchRadius;
-    private boolean variableContractLength;
     private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
     private boolean limitLanceWeight;
@@ -421,14 +455,14 @@ public class CampaignOptions {
 
     // Scenarios
     private boolean doubleVehicles;
-    private int opforLanceTypeMechs;
-    private int opforLanceTypeMixed;
-    private int opforLanceTypeVehicles;
-    private boolean opforUsesVTOLs;
-    private boolean allowOpforAeros;
-    private int opforAeroChance;
-    private boolean allowOpforLocalUnits;
-    private int opforLocalUnitChance;
+    private int opForLanceTypeMechs;
+    private int opForLanceTypeMixed;
+    private int opForLanceTypeVehicles;
+    private boolean opForUsesVTOLs;
+    private boolean allowOpForAeros;
+    private int opForAeroChance;
+    private boolean allowOpForLocalUnits;
+    private int opForLocalUnitChance;
     private boolean adjustPlayerVehicles;
     private boolean regionalMechVariations;
     private boolean attachedPlayerCamouflage;
@@ -438,6 +472,7 @@ public class CampaignOptions {
     private boolean useLightConditions;
     private boolean usePlanetaryConditions;
     private int fixedMapChance;
+    private int spaUpgradeIntensity;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -445,24 +480,6 @@ public class CampaignOptions {
     public CampaignOptions() {
         // Initialize any reused variables
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
-
-        //region Unlisted Variables
-        //Mass Repair/Salvage Options
-        massRepairUseRepair = true;
-        massRepairUseSalvage = true;
-        massRepairUseExtraTime = true;
-        massRepairUseRushJob = true;
-        massRepairAllowCarryover = true;
-        massRepairOptimizeToCompleteToday = false;
-        massRepairScrapImpossible = false;
-        massRepairUseAssignedTechsFirst = false;
-        massRepairReplacePod = true;
-        massRepairOptions = new ArrayList<>();
-
-        for (PartRepairType type : PartRepairType.values()) {
-            massRepairOptions.add(new MassRepairOption(type));
-        }
-        //endregion Unlisted Variables
 
         //region General Tab
         unitRatingMethod = UnitRatingMethod.CAMPAIGN_OPS;
@@ -488,6 +505,21 @@ public class CampaignOptions {
         reverseQualityNames = false;
         useUnofficialMaintenance = false;
         logMaintenance = false;
+
+        // Mass Repair / Mass Salvage
+        setMRMSUseRepair(true);
+        setMRMSUseSalvage(true);
+        setMRMSUseExtraTime(true);
+        setMRMSUseRushJob(true);
+        setMRMSAllowCarryover(true);
+        setMRMSOptimizeToCompleteToday(false);
+        setMRMSScrapImpossible(false);
+        setMRMSUseAssignedTechsFirst(false);
+        setMRMSReplacePod(true);
+        setMRMSOptions(new ArrayList<>());
+        for (final PartRepairType type : PartRepairType.values()) {
+            getMRMSOptions().add(new MRMSOption(type));
+        }
         //endregion Repair and Maintenance Tab
 
         //region Supplies and Acquisitions Tab
@@ -608,7 +640,7 @@ public class CampaignOptions {
         setTrackUnitFatigue(false);
 
         // Family
-        setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.SPOUSE);
+        setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
 
         // Dependent
         setRandomDependentMethod(RandomDependentMethod.NONE);
@@ -620,12 +652,15 @@ public class CampaignOptions {
         setSalaryEnlistedMultiplier(1.0);
         setSalaryAntiMekMultiplier(1.5);
         setSalarySpecialistInfantryMultiplier(1.0);
-        setSalaryXPMultipliers(new double[5]);
-        setSalaryXPMultiplier(SkillType.EXP_ULTRA_GREEN, 0.6);
-        setSalaryXPMultiplier(SkillType.EXP_GREEN, 0.6);
-        setSalaryXPMultiplier(SkillType.EXP_REGULAR, 1.0);
-        setSalaryXPMultiplier(SkillType.EXP_VETERAN, 1.6);
-        setSalaryXPMultiplier(SkillType.EXP_ELITE, 3.2);
+        setSalaryXPMultipliers(new HashMap<>());
+        getSalaryXPMultipliers().put(SkillLevel.NONE, 0.5);
+        getSalaryXPMultipliers().put(SkillLevel.ULTRA_GREEN, 0.6);
+        getSalaryXPMultipliers().put(SkillLevel.GREEN, 0.6);
+        getSalaryXPMultipliers().put(SkillLevel.REGULAR, 1.0);
+        getSalaryXPMultipliers().put(SkillLevel.VETERAN, 1.6);
+        getSalaryXPMultipliers().put(SkillLevel.ELITE, 3.2);
+        getSalaryXPMultipliers().put(SkillLevel.HEROIC, 6.4);
+        getSalaryXPMultipliers().put(SkillLevel.LEGENDARY, 12.8);
         setRoleBaseSalaries(new Money[personnelRoles.length]);
         setRoleBaseSalary(PersonnelRole.MECHWARRIOR, 1500);
         setRoleBaseSalary(PersonnelRole.LAM_PILOT, 3000);
@@ -659,7 +694,7 @@ public class CampaignOptions {
 
         // Marriage
         setUseManualMarriages(true);
-        setUseClannerMarriages(false);
+        setUseClanPersonnelMarriages(false);
         setUsePrisonerMarriages(true);
         setMinimumMarriageAge(16);
         setCheckMutualAncestorsDepth(4);
@@ -670,17 +705,17 @@ public class CampaignOptions {
         getMarriageSurnameWeights().put(MergingSurnameStyle.SPOUSE, 55);
         getMarriageSurnameWeights().put(MergingSurnameStyle.SPACE_YOURS, 10);
         getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_SPACE_YOURS, 5);
-        getMarriageSurnameWeights().put(MergingSurnameStyle.HYP_YOURS, 30);
-        getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYP_YOURS, 20);
+        getMarriageSurnameWeights().put(MergingSurnameStyle.HYPHEN_YOURS, 30);
+        getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYPHEN_YOURS, 20);
         getMarriageSurnameWeights().put(MergingSurnameStyle.SPACE_SPOUSE, 10);
         getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_SPACE_SPOUSE, 5);
-        getMarriageSurnameWeights().put(MergingSurnameStyle.HYP_SPOUSE, 30);
-        getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYP_SPOUSE, 20);
+        getMarriageSurnameWeights().put(MergingSurnameStyle.HYPHEN_SPOUSE, 30);
+        getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE, 20);
         getMarriageSurnameWeights().put(MergingSurnameStyle.MALE, 500);
         getMarriageSurnameWeights().put(MergingSurnameStyle.FEMALE, 160);
         setRandomMarriageMethod(RandomMarriageMethod.NONE);
         setUseRandomSameSexMarriages(false);
-        setUseRandomClannerMarriages(false);
+        setUseRandomClanPersonnelMarriages(false);
         setUseRandomPrisonerMarriages(true);
         setRandomMarriageAgeRange(10);
         setPercentageRandomMarriageOppositeSexChance(0.00025);
@@ -688,7 +723,7 @@ public class CampaignOptions {
 
         // Divorce
         setUseManualDivorce(true);
-        setUseClannerDivorce(true);
+        setUseClanPersonnelDivorce(true);
         setUsePrisonerDivorce(false);
         setDivorceSurnameWeights(new HashMap<>());
         getDivorceSurnameWeights().put(SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME, 10);
@@ -698,7 +733,7 @@ public class CampaignOptions {
         setRandomDivorceMethod(RandomDivorceMethod.NONE);
         setUseRandomOppositeSexDivorce(true);
         setUseRandomSameSexDivorce(true);
-        setUseRandomClannerDivorce(true);
+        setUseRandomClanPersonnelDivorce(true);
         setUseRandomPrisonerDivorce(false);
         setPercentageRandomDivorceOppositeSexChance(0.000001);
         setPercentageRandomDivorceSameSexChance(0.000001);
@@ -707,7 +742,7 @@ public class CampaignOptions {
 
         // Procreation
         setUseManualProcreation(true);
-        setUseClannerProcreation(false);
+        setUseClanPersonnelProcreation(false);
         setUsePrisonerProcreation(true);
         setMultiplePregnancyOccurrences(50); // Hellin's Law is 89, but we make it more common so it shows up more
         setBabySurnameStyle(BabySurnameStyle.MOTHERS);
@@ -718,13 +753,53 @@ public class CampaignOptions {
         setLogProcreation(false);
         setRandomProcreationMethod(RandomProcreationMethod.NONE);
         setUseRelationshiplessRandomProcreation(false);
-        setUseRandomClannerProcreation(false);
+        setUseRandomClanPersonnelProcreation(false);
         setUseRandomPrisonerProcreation(true);
         setPercentageRandomProcreationRelationshipChance(0.0005);
         setPercentageRandomProcreationRelationshiplessChance(0.00005);
 
         // Death
         setKeepMarriedNameUponSpouseDeath(true);
+        setRandomDeathMethod(RandomDeathMethod.NONE);
+        setEnabledRandomDeathAgeGroups(new HashMap<>());
+        getEnabledRandomDeathAgeGroups().put(AgeGroup.ELDER, true);
+        getEnabledRandomDeathAgeGroups().put(AgeGroup.ADULT, true);
+        getEnabledRandomDeathAgeGroups().put(AgeGroup.TEENAGER, true);
+        getEnabledRandomDeathAgeGroups().put(AgeGroup.PRETEEN, false);
+        getEnabledRandomDeathAgeGroups().put(AgeGroup.CHILD, false);
+        getEnabledRandomDeathAgeGroups().put(AgeGroup.TODDLER, false);
+        getEnabledRandomDeathAgeGroups().put(AgeGroup.BABY, false);
+        setUseRandomDeathSuicideCause(false);
+        setUseRandomClanPersonnelDeath(true);
+        setUseRandomPrisonerDeath(true);
+        setPercentageRandomDeathChance(0.00002);
+        // The following four setups are all based on the 2018 US death rate: https://www.statista.com/statistics/241572/death-rate-by-age-and-sex-in-the-us/
+        setExponentialRandomDeathMaleValues(5.4757, -7.0, 0.0709); // base equation of 2 * 10^-4 * e^(0.0709 * age) per year, divided by 365.25
+        setExponentialRandomDeathFemaleValues(2.4641, -7.0, 0.0752); // base equation of 9 * 10^-5 * e^(0.0752 * age) per year, divided by 365.25
+        setAgeRangeRandomDeathMaleValues(new HashMap<>());
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.UNDER_ONE, 613.1);
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.ONE_FOUR, 27.5);
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.FIVE_FOURTEEN, 14.7);
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.FIFTEEN_TWENTY_FOUR, 100.1);
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.TWENTY_FIVE_THIRTY_FOUR, 176.1);
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.THIRTY_FIVE_FORTY_FOUR, 249.5);
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.FORTY_FIVE_FIFTY_FOUR, 491.8);
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.FIFTY_FIVE_SIXTY_FOUR, 1119.0);
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.SIXTY_FIVE_SEVENTY_FOUR, 2196.5);
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.SEVENTY_FIVE_EIGHTY_FOUR, 5155.0);
+        getAgeRangeRandomDeathMaleValues().put(TenYearAgeRange.EIGHTY_FIVE_OR_OLDER, 14504.0);
+        setAgeRangeRandomDeathFemaleValues(new HashMap<>());
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.UNDER_ONE, 500.0);
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.ONE_FOUR, 20.4);
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.FIVE_FOURTEEN, 11.8);
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.FIFTEEN_TWENTY_FOUR, 38.8);
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.TWENTY_FIVE_THIRTY_FOUR, 80.0);
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.THIRTY_FIVE_FORTY_FOUR, 140.2);
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.FORTY_FIVE_FIFTY_FOUR, 302.5);
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.FIFTY_FIVE_SIXTY_FOUR, 670.0);
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.SIXTY_FIVE_SEVENTY_FOUR, 1421.0);
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.SEVENTY_FIVE_EIGHTY_FOUR, 3788.0);
+        getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.EIGHTY_FIVE_OR_OLDER, 12870.0);
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -764,9 +839,9 @@ public class CampaignOptions {
         equipmentContractBase = false;
         equipmentContractPercent = 5.0;
         equipmentContractSaleValue = false;
-        dropshipContractPercent = 1.0;
-        jumpshipContractPercent = 0.0;
-        warshipContractPercent = 0.0;
+        setDropShipContractPercent(1.0);
+        setJumpShipContractPercent(0.0);
+        setWarShipContractPercent(0.0);
         blcSaleValue = false;
         overageRepaymentInFinalPayment = false;
         //endregion Mercenary Tab
@@ -796,12 +871,12 @@ public class CampaignOptions {
 
         //region Skill Randomization Tab
         phenotypeProbabilities = new int[Phenotype.getExternalPhenotypes().size()];
-        phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = 95;
-        phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = 100;
-        phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = 95;
-        phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = 0;
-        phenotypeProbabilities[Phenotype.PROTOMECH.getIndex()] = 95;
-        phenotypeProbabilities[Phenotype.NAVAL.getIndex()] = 25;
+        phenotypeProbabilities[Phenotype.MECHWARRIOR.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = 100;
+        phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = 0;
+        phenotypeProbabilities[Phenotype.PROTOMECH.ordinal()] = 95;
+        phenotypeProbabilities[Phenotype.NAVAL.ordinal()] = 25;
         //endregion Skill Randomization Tab
 
         //region Rank System Tab
@@ -817,13 +892,17 @@ public class CampaignOptions {
 
         //region Markets Tab
         // Personnel Market
-        setPersonnelMarketType(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS));
+        setPersonnelMarketName(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS));
         setPersonnelMarketReportRefresh(true);
-        setPersonnelMarketRandomEliteRemoval(10);
-        setPersonnelMarketRandomVeteranRemoval(8);
-        setPersonnelMarketRandomRegularRemoval(6);
-        setPersonnelMarketRandomGreenRemoval(4);
-        setPersonnelMarketRandomUltraGreenRemoval(4);
+        setPersonnelMarketRandomRemovalTargets(new HashMap<>());
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.NONE, 3);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ULTRA_GREEN, 4);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.GREEN, 4);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.REGULAR, 6);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.VETERAN, 8);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ELITE, 10);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.HEROIC, 11);
+        getPersonnelMarketRandomRemovalTargets().put(SkillLevel.LEGENDARY, 11);
         setPersonnelMarketDylansWeight(0.3);
 
         // Unit Market
@@ -834,6 +913,8 @@ public class CampaignOptions {
 
         // Contract Market
         setContractMarketMethod(ContractMarketMethod.NONE);
+        setContractSearchRadius(800);
+        setVariableContractLength(true);
         setContractMarketReportRefresh(true);
         //endregion Markets Tab
 
@@ -846,7 +927,7 @@ public class CampaignOptions {
         //region Against the Bot Tab
         useAtB = false;
         useStratCon = false;
-        skillLevel = 2;
+        setSkillLevel(SkillLevel.REGULAR);
 
         // Unit Administration
         useShareSystem = false;
@@ -860,8 +941,6 @@ public class CampaignOptions {
         clanVehicles = false;
 
         // Contract Operations
-        searchRadius = 800;
-        variableContractLength = false;
         mercSizeLimited = false;
         restrictPartsByMission = true;
         limitLanceWeight = true;
@@ -879,15 +958,16 @@ public class CampaignOptions {
 
         // Scenarios
         doubleVehicles = false;
-        opforLanceTypeMechs = 1;
-        opforLanceTypeMixed = 2;
-        opforLanceTypeVehicles = 3;
-        opforUsesVTOLs = true;
-        allowOpforAeros = false;
-        opforAeroChance = 5;
-        allowOpforLocalUnits = false;
-        opforLocalUnitChance = 5;
+        setOpForLanceTypeMechs(1);
+        setOpForLanceTypeMixed(2);
+        setOpForLanceTypeVehicles(3);
+        setOpForUsesVTOLs(true);
+        setAllowOpForAeros(false);
+        setOpForAeroChance(5);
+        setAllowOpForLocalUnits(false);
+        setOpForLocalUnitChance(5);
         setFixedMapChance(25);
+        setSpaUpgradeIntensity(0);
         adjustPlayerVehicles = false;
         regionalMechVariations = false;
         attachedPlayerCamouflage = true;
@@ -909,17 +989,17 @@ public class CampaignOptions {
     }
 
     /**
-     * @param method the method of unit rating to use
+     * @param unitRatingMethod the method of unit rating to use
      */
-    public void setUnitRatingMethod(UnitRatingMethod method) {
-        this.unitRatingMethod = method;
+    public void setUnitRatingMethod(final UnitRatingMethod unitRatingMethod) {
+        this.unitRatingMethod = unitRatingMethod;
     }
 
     public int getManualUnitRatingModifier() {
         return manualUnitRatingModifier;
     }
 
-    public void setManualUnitRatingModifier(int manualUnitRatingModifier) {
+    public void setManualUnitRatingModifier(final int manualUnitRatingModifier) {
         this.manualUnitRatingModifier = manualUnitRatingModifier;
     }
     //endregion General Tab
@@ -929,62 +1009,153 @@ public class CampaignOptions {
     //endregion Repair
 
     //region Maintenance
-    public boolean checkMaintenance() {
+    public boolean isCheckMaintenance() {
         return checkMaintenance;
     }
 
-    public void setCheckMaintenance(boolean b) {
-        checkMaintenance = b;
+    public void setCheckMaintenance(final boolean checkMaintenance) {
+        this.checkMaintenance = checkMaintenance;
     }
 
     public int getMaintenanceCycleDays() {
         return maintenanceCycleDays;
     }
 
-    public void setMaintenanceCycleDays(int d) {
-        maintenanceCycleDays = d;
+    public void setMaintenanceCycleDays(final int maintenanceCycleDays) {
+        this.maintenanceCycleDays = maintenanceCycleDays;
     }
 
     public int getMaintenanceBonus() {
         return maintenanceBonus;
     }
 
-    public void setMaintenanceBonus(int d) {
-        maintenanceBonus = d;
+    public void setMaintenanceBonus(final int maintenanceBonus) {
+        this.maintenanceBonus = maintenanceBonus;
     }
 
-    public boolean useQualityMaintenance() {
+    public boolean isUseQualityMaintenance() {
         return useQualityMaintenance;
     }
 
-    public void setUseQualityMaintenance(boolean b) {
-        useQualityMaintenance = b;
+    public void setUseQualityMaintenance(final boolean useQualityMaintenance) {
+        this.useQualityMaintenance = useQualityMaintenance;
     }
 
-    public boolean reverseQualityNames() {
+    public boolean isReverseQualityNames() {
         return reverseQualityNames;
     }
 
-    public void setReverseQualityNames(boolean b) {
-        reverseQualityNames = b;
+    public void setReverseQualityNames(final boolean reverseQualityNames) {
+        this.reverseQualityNames = reverseQualityNames;
     }
 
-    public boolean useUnofficialMaintenance() {
+    public boolean isUseUnofficialMaintenance() {
         return useUnofficialMaintenance;
     }
 
-    public void setUseUnofficialMaintenance(boolean b) {
-        useUnofficialMaintenance = b;
+    public void setUseUnofficialMaintenance(final boolean useUnofficialMaintenance) {
+        this.useUnofficialMaintenance = useUnofficialMaintenance;
     }
 
-    public boolean logMaintenance() {
+    public boolean isLogMaintenance() {
         return logMaintenance;
     }
 
-    public void setLogMaintenance(boolean b) {
-        logMaintenance = b;
+    public void setLogMaintenance(final boolean logMaintenance) {
+        this.logMaintenance = logMaintenance;
     }
     //endregion Maintenance
+
+    //region Mass Repair/ Mass Salvage
+    public boolean isMRMSUseRepair() {
+        return mrmsUseRepair;
+    }
+
+    public void setMRMSUseRepair(final boolean mrmsUseRepair) {
+        this.mrmsUseRepair = mrmsUseRepair;
+    }
+
+    public boolean isMRMSUseSalvage() {
+        return mrmsUseSalvage;
+    }
+
+    public void setMRMSUseSalvage(final boolean mrmsUseSalvage) {
+        this.mrmsUseSalvage = mrmsUseSalvage;
+    }
+
+    public boolean isMRMSUseExtraTime() {
+        return mrmsUseExtraTime;
+    }
+
+    public void setMRMSUseExtraTime(final boolean mrmsUseExtraTime) {
+        this.mrmsUseExtraTime = mrmsUseExtraTime;
+    }
+
+    public boolean isMRMSUseRushJob() {
+        return mrmsUseRushJob;
+    }
+
+    public void setMRMSUseRushJob(final boolean mrmsUseRushJob) {
+        this.mrmsUseRushJob = mrmsUseRushJob;
+    }
+
+    public boolean isMRMSAllowCarryover() {
+        return mrmsAllowCarryover;
+    }
+
+    public void setMRMSAllowCarryover(final boolean mrmsAllowCarryover) {
+        this.mrmsAllowCarryover = mrmsAllowCarryover;
+    }
+
+    public boolean isMRMSOptimizeToCompleteToday() {
+        return mrmsOptimizeToCompleteToday;
+    }
+
+    public void setMRMSOptimizeToCompleteToday(final boolean mrmsOptimizeToCompleteToday) {
+        this.mrmsOptimizeToCompleteToday = mrmsOptimizeToCompleteToday;
+    }
+
+    public boolean isMRMSScrapImpossible() {
+        return mrmsScrapImpossible;
+    }
+
+    public void setMRMSScrapImpossible(final boolean mrmsScrapImpossible) {
+        this.mrmsScrapImpossible = mrmsScrapImpossible;
+    }
+
+    public boolean isMRMSUseAssignedTechsFirst() {
+        return mrmsUseAssignedTechsFirst;
+    }
+
+    public void setMRMSUseAssignedTechsFirst(final boolean mrmsUseAssignedTechsFirst) {
+        this.mrmsUseAssignedTechsFirst = mrmsUseAssignedTechsFirst;
+    }
+
+    public boolean isMRMSReplacePod() {
+        return mrmsReplacePod;
+    }
+
+    public void setMRMSReplacePod(final boolean mrmsReplacePod) {
+        this.mrmsReplacePod = mrmsReplacePod;
+    }
+
+    public List<MRMSOption> getMRMSOptions() {
+        return mrmsOptions;
+    }
+
+    public void setMRMSOptions(final List<MRMSOption> mrmsOptions) {
+        this.mrmsOptions = mrmsOptions;
+    }
+
+    public void addMRMSOption(final MRMSOption mrmsOption) {
+        if (mrmsOption.getType().isUnknownLocation()) {
+            return;
+        }
+
+        getMRMSOptions().removeIf(option -> option.getType() == mrmsOption.getType());
+        getMRMSOptions().add(mrmsOption);
+    }
+    //endregion Mass Repair/ Mass Salvage
     //endregion Repair and Maintenance Tab
 
     //region Supplies and Acquisitions Tab
@@ -992,7 +1163,7 @@ public class CampaignOptions {
 
     //region Personnel Tab
     //region General Personnel
-    public boolean useTactics() {
+    public boolean isUseTactics() {
         return useTactics;
     }
 
@@ -1000,7 +1171,7 @@ public class CampaignOptions {
         this.useTactics = useTactics;
     }
 
-    public boolean useInitiativeBonus() {
+    public boolean isUseInitiativeBonus() {
         return useInitiativeBonus;
     }
 
@@ -1008,7 +1179,7 @@ public class CampaignOptions {
         this.useInitiativeBonus = useInitiativeBonus;
     }
 
-    public boolean useToughness() {
+    public boolean isUseToughness() {
         return useToughness;
     }
 
@@ -1016,7 +1187,7 @@ public class CampaignOptions {
         this.useToughness = useToughness;
     }
 
-    public boolean useArtillery() {
+    public boolean isUseArtillery() {
         return useArtillery;
     }
 
@@ -1024,7 +1195,7 @@ public class CampaignOptions {
         this.useArtillery = useArtillery;
     }
 
-    public boolean useAbilities() {
+    public boolean isUseAbilities() {
         return useAbilities;
     }
 
@@ -1032,7 +1203,7 @@ public class CampaignOptions {
         this.useAbilities = useAbilities;
     }
 
-    public boolean useEdge() {
+    public boolean isUseEdge() {
         return useEdge;
     }
 
@@ -1040,7 +1211,7 @@ public class CampaignOptions {
         this.useEdge = useEdge;
     }
 
-    public boolean useSupportEdge() {
+    public boolean isUseSupportEdge() {
         return useSupportEdge;
     }
 
@@ -1048,7 +1219,7 @@ public class CampaignOptions {
         this.useSupportEdge = useSupportEdge;
     }
 
-    public boolean useImplants() {
+    public boolean isUseImplants() {
         return useImplants;
     }
 
@@ -1056,7 +1227,7 @@ public class CampaignOptions {
         this.useImplants = useImplants;
     }
 
-    public boolean useAlternativeQualityAveraging() {
+    public boolean isAlternativeQualityAveraging() {
         return alternativeQualityAveraging;
     }
 
@@ -1064,7 +1235,7 @@ public class CampaignOptions {
         this.alternativeQualityAveraging = alternativeQualityAveraging;
     }
 
-    public boolean useTransfers() {
+    public boolean isUseTransfers() {
         return useTransfers;
     }
 
@@ -1109,7 +1280,7 @@ public class CampaignOptions {
     /**
      * @return whether or not to use time in service
      */
-    public boolean getUseTimeInService() {
+    public boolean isUseTimeInService() {
         return useTimeInService;
     }
 
@@ -1137,7 +1308,7 @@ public class CampaignOptions {
     /**
      * @return whether or not to use time in rank
      */
-    public boolean getUseTimeInRank() {
+    public boolean isUseTimeInRank() {
         return useTimeInRank;
     }
 
@@ -1195,7 +1366,7 @@ public class CampaignOptions {
      * Gets a value indicating whether or not to show a person's origin faction when displaying
      * their details.
      */
-    public boolean showOriginFaction() {
+    public boolean isShowOriginFaction() {
         return showOriginFaction;
     }
 
@@ -1209,7 +1380,7 @@ public class CampaignOptions {
     //endregion Expanded Personnel Information
 
     //region Medical
-    public boolean useAdvancedMedical() {
+    public boolean isUseAdvancedMedical() {
         return useAdvancedMedical;
     }
 
@@ -1241,7 +1412,7 @@ public class CampaignOptions {
         this.minimumHitsForVehicles = minimumHitsForVehicles;
     }
 
-    public boolean useRandomHitsForVehicles() {
+    public boolean isUseRandomHitsForVehicles() {
         return useRandomHitsForVehicles;
     }
 
@@ -1249,7 +1420,7 @@ public class CampaignOptions {
         this.useRandomHitsForVehicles = useRandomHitsForVehicles;
     }
 
-    public boolean useTougherHealing() {
+    public boolean isTougherHealing() {
         return tougherHealing;
     }
 
@@ -1275,7 +1446,7 @@ public class CampaignOptions {
         this.defaultPrisonerStatus = defaultPrisonerStatus;
     }
 
-    public boolean getPrisonerBabyStatus() {
+    public boolean isPrisonerBabyStatus() {
         return prisonerBabyStatus;
     }
 
@@ -1283,7 +1454,7 @@ public class CampaignOptions {
         this.prisonerBabyStatus = prisonerBabyStatus;
     }
 
-    public boolean useAtBPrisonerDefection() {
+    public boolean isUseAtBPrisonerDefection() {
         return useAtBPrisonerDefection;
     }
 
@@ -1291,7 +1462,7 @@ public class CampaignOptions {
         this.useAtBPrisonerDefection = useAtBPrisonerDefection;
     }
 
-    public boolean useAtBPrisonerRansom() {
+    public boolean isUseAtBPrisonerRansom() {
         return useAtBPrisonerRansom;
     }
 
@@ -1301,7 +1472,7 @@ public class CampaignOptions {
     //endregion Prisoners
 
     //region Personnel Randomization
-    public boolean useDylansRandomXP() {
+    public boolean isUseDylansRandomXP() {
         return useDylansRandomXP;
     }
 
@@ -1386,15 +1557,15 @@ public class CampaignOptions {
     /**
      * @return the level of familial relation to display
      */
-    public FamilialRelationshipDisplayLevel getDisplayFamilyLevel() {
-        return displayFamilyLevel;
+    public FamilialRelationshipDisplayLevel getFamilyDisplayLevel() {
+        return familyDisplayLevel;
     }
 
     /**
-     * @param displayFamilyLevel the level of familial relation to display
+     * @param familyDisplayLevel the level of familial relation to display
      */
-    public void setDisplayFamilyLevel(final FamilialRelationshipDisplayLevel displayFamilyLevel) {
-        this.displayFamilyLevel = displayFamilyLevel;
+    public void setFamilyDisplayLevel(final FamilialRelationshipDisplayLevel familyDisplayLevel) {
+        this.familyDisplayLevel = familyDisplayLevel;
     }
     //endregion Family
 
@@ -1415,7 +1586,7 @@ public class CampaignOptions {
         this.useRandomDependentAddition = useRandomDependentAddition;
     }
 
-    public boolean isUseRandomDependentsRemoval() {
+    public boolean isUseRandomDependentRemoval() {
         return useRandomDependentRemoval;
     }
 
@@ -1457,23 +1628,12 @@ public class CampaignOptions {
         this.salarySpecialistInfantryMultiplier = salarySpecialistInfantryMultiplier;
     }
 
-    public double[] getSalaryXPMultipliers() {
+    public Map<SkillLevel, Double> getSalaryXPMultipliers() {
         return salaryXPMultipliers;
     }
 
-    public double getSalaryXPMultiplier(final int index) {
-        return ((index < 0) || (index >= getSalaryXPMultipliers().length)) ? 1.0 : getSalaryXPMultipliers()[index];
-    }
-
-    public void setSalaryXPMultipliers(final double... salaryXPMultipliers) {
+    public void setSalaryXPMultipliers(final Map<SkillLevel, Double> salaryXPMultipliers) {
         this.salaryXPMultipliers = salaryXPMultipliers;
-    }
-
-    public void setSalaryXPMultiplier(final int index, final double multiplier) {
-        if ((index < 0) || (index >= getSalaryXPMultipliers().length)) {
-            return;
-        }
-        getSalaryXPMultipliers()[index] = multiplier;
     }
 
     public Money[] getRoleBaseSalaries() {
@@ -1484,12 +1644,12 @@ public class CampaignOptions {
         this.roleBaseSalaries = roleBaseSalaries;
     }
 
-    public void setRoleBaseSalary(final PersonnelRole role, final double base) {
-        setRoleBaseSalary(role, Money.of(base));
+    public void setRoleBaseSalary(final PersonnelRole role, final double baseSalary) {
+        setRoleBaseSalary(role, Money.of(baseSalary));
     }
 
-    public void setRoleBaseSalary(final PersonnelRole role, final Money base) {
-        getRoleBaseSalaries()[role.ordinal()] = base;
+    public void setRoleBaseSalary(final PersonnelRole role, final Money baseSalary) {
+        getRoleBaseSalaries()[role.ordinal()] = baseSalary;
     }
     //endregion Salary
 
@@ -1508,12 +1668,12 @@ public class CampaignOptions {
         this.useManualMarriages = useManualMarriages;
     }
 
-    public boolean isUseClannerMarriages() {
-        return useClannerMarriages;
+    public boolean isUseClanPersonnelMarriages() {
+        return useClanPersonnelMarriages;
     }
 
-    public void setUseClannerMarriages(final boolean useClannerMarriages) {
-        this.useClannerMarriages = useClannerMarriages;
+    public void setUseClanPersonnelMarriages(final boolean useClanPersonnelMarriages) {
+        this.useClanPersonnelMarriages = useClanPersonnelMarriages;
     }
 
     public boolean isUsePrisonerMarriages() {
@@ -1591,25 +1751,25 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether or not to use random same sex marriages
+     * @return whether or not to use random same-sex marriages
      */
     public boolean isUseRandomSameSexMarriages() {
         return useRandomSameSexMarriages;
     }
 
     /**
-     * @param useRandomSameSexMarriages whether or not to use random same sex marriages
+     * @param useRandomSameSexMarriages whether or not to use random same-sex marriages
      */
     public void setUseRandomSameSexMarriages(final boolean useRandomSameSexMarriages) {
         this.useRandomSameSexMarriages = useRandomSameSexMarriages;
     }
 
-    public boolean isUseRandomClannerMarriages() {
-        return useRandomClannerMarriages;
+    public boolean isUseRandomClanPersonnelMarriages() {
+        return useRandomClanPersonnelMarriages;
     }
 
-    public void setUseRandomClannerMarriages(final boolean useRandomClannerMarriages) {
-        this.useRandomClannerMarriages = useRandomClannerMarriages;
+    public void setUseRandomClanPersonnelMarriages(final boolean useRandomClanPersonnelMarriages) {
+        this.useRandomClanPersonnelMarriages = useRandomClanPersonnelMarriages;
     }
 
     public boolean isUseRandomPrisonerMarriages() {
@@ -1653,7 +1813,7 @@ public class CampaignOptions {
     }
 
     /**
-     * This gets the decimal chance (between 0 and 1) of a random same sex marriage occurring
+     * This gets the decimal chance (between 0 and 1) of a random same-sex marriage occurring
      * @return the chance, with a value between 0 and 1
      */
     public double getPercentageRandomMarriageSameSexChance() {
@@ -1661,7 +1821,7 @@ public class CampaignOptions {
     }
 
     /**
-     * This sets the decimal chance (between 0 and 1) of a random same sex marriage occurring
+     * This sets the decimal chance (between 0 and 1) of a random same-sex marriage occurring
      * @param percentageRandomMarriageSameSexChance the chance, with a value between 0 and 1
      */
     public void setPercentageRandomMarriageSameSexChance(final double percentageRandomMarriageSameSexChance) {
@@ -1678,12 +1838,12 @@ public class CampaignOptions {
         this.useManualDivorce = useManualDivorce;
     }
 
-    public boolean isUseClannerDivorce() {
-        return useClannerDivorce;
+    public boolean isUseClanPersonnelDivorce() {
+        return useClanPersonnelDivorce;
     }
 
-    public void setUseClannerDivorce(final boolean useClannerDivorce) {
-        this.useClannerDivorce = useClannerDivorce;
+    public void setUseClanPersonnelDivorce(final boolean useClanPersonnelDivorce) {
+        this.useClanPersonnelDivorce = useClanPersonnelDivorce;
     }
 
     public boolean isUsePrisonerDivorce() {
@@ -1726,12 +1886,12 @@ public class CampaignOptions {
         this.useRandomSameSexDivorce = useRandomSameSexDivorce;
     }
 
-    public boolean isUseRandomClannerDivorce() {
-        return useRandomClannerDivorce;
+    public boolean isUseRandomClanPersonnelDivorce() {
+        return useRandomClanPersonnelDivorce;
     }
 
-    public void setUseRandomClannerDivorce(final boolean useRandomClannerDivorce) {
-        this.useRandomClannerDivorce = useRandomClannerDivorce;
+    public void setUseRandomClanPersonnelDivorce(final boolean useRandomClanPersonnelDivorce) {
+        this.useRandomClanPersonnelDivorce = useRandomClanPersonnelDivorce;
     }
 
     public boolean isUseRandomPrisonerDivorce() {
@@ -1768,12 +1928,12 @@ public class CampaignOptions {
         this.useManualProcreation = useManualProcreation;
     }
 
-    public boolean isUseClannerProcreation() {
-        return useClannerProcreation;
+    public boolean isUseClanPersonnelProcreation() {
+        return useClanPersonnelProcreation;
     }
 
-    public void setUseClannerProcreation(final boolean useClannerProcreation) {
-        this.useClannerProcreation = useClannerProcreation;
+    public void setUseClanPersonnelProcreation(final boolean useClanPersonnelProcreation) {
+        this.useClanPersonnelProcreation = useClanPersonnelProcreation;
     }
 
     public boolean isUsePrisonerProcreation() {
@@ -1893,12 +2053,12 @@ public class CampaignOptions {
         this.useRelationshiplessRandomProcreation = useRelationshiplessRandomProcreation;
     }
 
-    public boolean isUseRandomClannerProcreation() {
-        return useRandomClannerProcreation;
+    public boolean isUseRandomClanPersonnelProcreation() {
+        return useRandomClanPersonnelProcreation;
     }
 
-    public void setUseRandomClannerProcreation(final boolean useRandomClannerProcreation) {
-        this.useRandomClannerProcreation = useRandomClannerProcreation;
+    public void setUseRandomClanPersonnelProcreation(final boolean useRandomClanPersonnelProcreation) {
+        this.useRandomClanPersonnelProcreation = useRandomClanPersonnelProcreation;
     }
 
     public boolean isUseRandomPrisonerProcreation() {
@@ -1946,7 +2106,7 @@ public class CampaignOptions {
     /**
      * @return whether to keep ones married name upon spouse death or not
      */
-    public boolean getKeepMarriedNameUponSpouseDeath() {
+    public boolean isKeepMarriedNameUponSpouseDeath() {
         return keepMarriedNameUponSpouseDeath;
     }
 
@@ -1956,136 +2116,222 @@ public class CampaignOptions {
     public void setKeepMarriedNameUponSpouseDeath(final boolean keepMarriedNameUponSpouseDeath) {
         this.keepMarriedNameUponSpouseDeath = keepMarriedNameUponSpouseDeath;
     }
+
+    /**
+     * @return the random death method to use
+     */
+    public RandomDeathMethod getRandomDeathMethod() {
+        return randomDeathMethod;
+    }
+
+    /**
+     * @param randomDeathMethod the random death method to use
+     */
+    public void setRandomDeathMethod(final RandomDeathMethod randomDeathMethod) {
+        this.randomDeathMethod = randomDeathMethod;
+    }
+
+    public Map<AgeGroup, Boolean> getEnabledRandomDeathAgeGroups() {
+        return enabledRandomDeathAgeGroups;
+    }
+
+    public void setEnabledRandomDeathAgeGroups(final Map<AgeGroup, Boolean> enabledRandomDeathAgeGroups) {
+        this.enabledRandomDeathAgeGroups = enabledRandomDeathAgeGroups;
+    }
+
+    public boolean isUseRandomClanPersonnelDeath() {
+        return useRandomClanPersonnelDeath;
+    }
+
+    public void setUseRandomClanPersonnelDeath(final boolean useRandomClanPersonnelDeath) {
+        this.useRandomClanPersonnelDeath = useRandomClanPersonnelDeath;
+    }
+
+    public boolean isUseRandomPrisonerDeath() {
+        return useRandomPrisonerDeath;
+    }
+
+    public void setUseRandomPrisonerDeath(final boolean useRandomPrisonerDeath) {
+        this.useRandomPrisonerDeath = useRandomPrisonerDeath;
+    }
+
+    public boolean isUseRandomDeathSuicideCause() {
+        return useRandomDeathSuicideCause;
+    }
+
+    public void setUseRandomDeathSuicideCause(final boolean useRandomDeathSuicideCause) {
+        this.useRandomDeathSuicideCause = useRandomDeathSuicideCause;
+    }
+
+    public double getPercentageRandomDeathChance() {
+        return percentageRandomDeathChance;
+    }
+
+    public void setPercentageRandomDeathChance(final double percentageRandomDeathChance) {
+        this.percentageRandomDeathChance = percentageRandomDeathChance;
+    }
+
+    public double[] getExponentialRandomDeathMaleValues() {
+        return exponentialRandomDeathMaleValues;
+    }
+
+    public void setExponentialRandomDeathMaleValues(final double... exponentialRandomDeathMaleValues) {
+        this.exponentialRandomDeathMaleValues = exponentialRandomDeathMaleValues;
+    }
+
+    public double[] getExponentialRandomDeathFemaleValues() {
+        return exponentialRandomDeathFemaleValues;
+    }
+
+    public void setExponentialRandomDeathFemaleValues(final double... exponentialRandomDeathFemaleValues) {
+        this.exponentialRandomDeathFemaleValues = exponentialRandomDeathFemaleValues;
+    }
+
+    public Map<TenYearAgeRange, Double> getAgeRangeRandomDeathMaleValues() {
+        return ageRangeRandomDeathMaleValues;
+    }
+
+    public void setAgeRangeRandomDeathMaleValues(final Map<TenYearAgeRange, Double> ageRangeRandomDeathMaleValues) {
+        this.ageRangeRandomDeathMaleValues = ageRangeRandomDeathMaleValues;
+    }
+
+    public Map<TenYearAgeRange, Double> getAgeRangeRandomDeathFemaleValues() {
+        return ageRangeRandomDeathFemaleValues;
+    }
+
+    public void setAgeRangeRandomDeathFemaleValues(final Map<TenYearAgeRange, Double> ageRangeRandomDeathFemaleValues) {
+        this.ageRangeRandomDeathFemaleValues = ageRangeRandomDeathFemaleValues;
+    }
     //endregion Death
     //endregion Personnel Tab
 
     //region Finances Tab
-    public boolean payForParts() {
+    public boolean isPayForParts() {
         return payForParts;
     }
 
-    public void setPayForParts(boolean b) {
-        this.payForParts = b;
+    public void setPayForParts(final boolean payForParts) {
+        this.payForParts = payForParts;
     }
 
-    public boolean payForRepairs() {
+    public boolean isPayForRepairs() {
         return payForRepairs;
     }
 
-    public void setPayForRepairs(boolean b) {
-        this.payForRepairs = b;
+    public void setPayForRepairs(final boolean payForRepairs) {
+        this.payForRepairs = payForRepairs;
     }
 
-    public boolean payForUnits() {
+    public boolean isPayForUnits() {
         return payForUnits;
     }
 
-    public void setPayForUnits(boolean b) {
-        this.payForUnits = b;
+    public void setPayForUnits(final boolean payForUnits) {
+        this.payForUnits = payForUnits;
     }
 
-    public boolean payForSalaries() {
+    public boolean isPayForSalaries() {
         return payForSalaries;
     }
 
-    public void setPayForSalaries(boolean b) {
-        this.payForSalaries = b;
+    public void setPayForSalaries(final boolean payForSalaries) {
+        this.payForSalaries = payForSalaries;
     }
 
-    public boolean payForOverhead() {
+    public boolean isPayForOverhead() {
         return payForOverhead;
     }
 
-    public void setPayForOverhead(boolean b) {
-        this.payForOverhead = b;
+    public void setPayForOverhead(final boolean payForOverhead) {
+        this.payForOverhead = payForOverhead;
     }
 
-    public boolean payForMaintain() {
+    public boolean isPayForMaintain() {
         return payForMaintain;
     }
 
-    public void setPayForMaintain(boolean b) {
-        this.payForMaintain = b;
+    public void setPayForMaintain(final boolean payForMaintain) {
+        this.payForMaintain = payForMaintain;
     }
 
-    public boolean payForTransport() {
+    public boolean isPayForTransport() {
         return payForTransport;
     }
 
-    public void setPayForTransport(boolean b) {
-        this.payForTransport = b;
+    public void setPayForTransport(final boolean payForTransport) {
+        this.payForTransport = payForTransport;
     }
 
-    public boolean canSellUnits() {
+    public boolean isSellUnits() {
         return sellUnits;
     }
 
-    public void setSellUnits(boolean b) {
-        this.sellUnits = b;
+    public void setSellUnits(final boolean sellUnits) {
+        this.sellUnits = sellUnits;
     }
 
-    public boolean canSellParts() {
+    public boolean isSellParts() {
         return sellParts;
     }
 
-    public void setSellParts(boolean b) {
-        this.sellParts = b;
+    public void setSellParts(final boolean sellParts) {
+        this.sellParts = sellParts;
     }
 
-    public boolean payForRecruitment() {
+    public boolean isPayForRecruitment() {
         return payForRecruitment;
     }
 
-    public void setPayForRecruitment(boolean b) {
-        this.payForRecruitment = b;
+    public void setPayForRecruitment(final boolean payForRecruitment) {
+        this.payForRecruitment = payForRecruitment;
     }
 
-    public boolean useLoanLimits() {
+    public boolean isUseLoanLimits() {
         return useLoanLimits;
     }
 
-    public void setLoanLimits(boolean b) {
-        this.useLoanLimits = b;
+    public void setLoanLimits(final boolean useLoanLimits) {
+        this.useLoanLimits = useLoanLimits;
     }
 
-    public boolean usePercentageMaint() {
+    public boolean isUsePercentageMaint() {
         return usePercentageMaint;
     }
 
-    public void setUsePercentageMaint(boolean b) {
-        usePercentageMaint = b;
+    public void setUsePercentageMaint(final boolean usePercentageMaint) {
+        this.usePercentageMaint = usePercentageMaint;
     }
 
-    public boolean useInfantryDontCount() {
+    public boolean isInfantryDontCount() {
         return infantryDontCount;
     }
 
-    public void setUseInfantryDontCount(boolean b) {
-        infantryDontCount = b;
+    public void setUseInfantryDontCount(final boolean infantryDontCount) {
+        this.infantryDontCount = infantryDontCount;
     }
 
-    public boolean usePeacetimeCost() {
+    public boolean isUsePeacetimeCost() {
         return usePeacetimeCost;
     }
 
-    public void setUsePeacetimeCost(boolean b) {
-        this.usePeacetimeCost = b;
+    public void setUsePeacetimeCost(final boolean usePeacetimeCost) {
+        this.usePeacetimeCost = usePeacetimeCost;
     }
 
-    public boolean useExtendedPartsModifier() {
+    public boolean isUseExtendedPartsModifier() {
         return useExtendedPartsModifier;
     }
 
-    public void setUseExtendedPartsModifier(boolean b) {
-        this.useExtendedPartsModifier = b;
+    public void setUseExtendedPartsModifier(final boolean useExtendedPartsModifier) {
+        this.useExtendedPartsModifier = useExtendedPartsModifier;
     }
 
-    public boolean showPeacetimeCost() {
+    public boolean isShowPeacetimeCost() {
         return showPeacetimeCost;
     }
 
-    public void setShowPeacetimeCost(boolean b) {
-        this.showPeacetimeCost = b;
+    public void setShowPeacetimeCost(final boolean showPeacetimeCost) {
+        this.showPeacetimeCost = showPeacetimeCost;
     }
 
     /**
@@ -2098,22 +2344,22 @@ public class CampaignOptions {
     /**
      * @param financialYearDuration the financial year duration to set
      */
-    public void setFinancialYearDuration(FinancialYearDuration financialYearDuration) {
+    public void setFinancialYearDuration(final FinancialYearDuration financialYearDuration) {
         this.financialYearDuration = financialYearDuration;
     }
 
     /**
      * @return whether or not to export finances to CSV at the end of a financial year
      */
-    public boolean getNewFinancialYearFinancesToCSVExport() {
+    public boolean isNewFinancialYearFinancesToCSVExport() {
         return newFinancialYearFinancesToCSVExport;
     }
 
     /**
-     * @param b whether or not to export finances to CSV at the end of a financial year
+     * @param newFinancialYearFinancesToCSVExport whether or not to export finances to CSV at the end of a financial year
      */
-    public void setNewFinancialYearFinancesToCSVExport(boolean b) {
-        newFinancialYearFinancesToCSVExport = b;
+    public void setNewFinancialYearFinancesToCSVExport(final boolean newFinancialYearFinancesToCSVExport) {
+        this.newFinancialYearFinancesToCSVExport = newFinancialYearFinancesToCSVExport;
     }
 
     //region Price Multipliers
@@ -2201,15 +2447,15 @@ public class CampaignOptions {
 
     //region Markets Tab
     //region Personnel Market
-    public String getPersonnelMarketType() {
+    public String getPersonnelMarketName() {
         return personnelMarketName;
     }
 
-    public void setPersonnelMarketType(final String personnelMarketName) {
+    public void setPersonnelMarketName(final String personnelMarketName) {
         this.personnelMarketName = personnelMarketName;
     }
 
-    public boolean getPersonnelMarketReportRefresh() {
+    public boolean isPersonnelMarketReportRefresh() {
         return personnelMarketReportRefresh;
     }
 
@@ -2217,44 +2463,12 @@ public class CampaignOptions {
         this.personnelMarketReportRefresh = personnelMarketReportRefresh;
     }
 
-    public int getPersonnelMarketRandomEliteRemoval() {
-        return personnelMarketRandomEliteRemoval;
+    public Map<SkillLevel, Integer> getPersonnelMarketRandomRemovalTargets() {
+        return personnelMarketRandomRemovalTargets;
     }
 
-    public void setPersonnelMarketRandomEliteRemoval(final int personnelMarketRandomEliteRemoval) {
-        this.personnelMarketRandomEliteRemoval = personnelMarketRandomEliteRemoval;
-    }
-
-    public int getPersonnelMarketRandomVeteranRemoval() {
-        return personnelMarketRandomVeteranRemoval;
-    }
-
-    public void setPersonnelMarketRandomVeteranRemoval(final int personnelMarketRandomVeteranRemoval) {
-        this.personnelMarketRandomVeteranRemoval = personnelMarketRandomVeteranRemoval;
-    }
-
-    public int getPersonnelMarketRandomRegularRemoval() {
-        return personnelMarketRandomRegularRemoval;
-    }
-
-    public void setPersonnelMarketRandomRegularRemoval(final int personnelMarketRandomRegularRemoval) {
-        this.personnelMarketRandomRegularRemoval = personnelMarketRandomRegularRemoval;
-    }
-
-    public int getPersonnelMarketRandomGreenRemoval() {
-        return personnelMarketRandomGreenRemoval;
-    }
-
-    public void setPersonnelMarketRandomGreenRemoval(final int personnelMarketRandomGreenRemoval) {
-        this.personnelMarketRandomGreenRemoval = personnelMarketRandomGreenRemoval;
-    }
-
-    public int getPersonnelMarketRandomUltraGreenRemoval() {
-        return personnelMarketRandomUltraGreenRemoval;
-    }
-
-    public void setPersonnelMarketRandomUltraGreenRemoval(final int personnelMarketRandomUltraGreenRemoval) {
-        this.personnelMarketRandomUltraGreenRemoval = personnelMarketRandomUltraGreenRemoval;
+    public void setPersonnelMarketRandomRemovalTargets(final Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets) {
+        this.personnelMarketRandomRemovalTargets = personnelMarketRandomRemovalTargets;
     }
 
     public double getPersonnelMarketDylansWeight() {
@@ -2275,7 +2489,7 @@ public class CampaignOptions {
         this.unitMarketMethod = unitMarketMethod;
     }
 
-    public boolean useUnitMarketRegionalMechVariations() {
+    public boolean isUnitMarketRegionalMechVariations() {
         return unitMarketRegionalMechVariations;
     }
 
@@ -2283,7 +2497,7 @@ public class CampaignOptions {
         this.unitMarketRegionalMechVariations = unitMarketRegionalMechVariations;
     }
 
-    public boolean getInstantUnitMarketDelivery() {
+    public boolean isInstantUnitMarketDelivery() {
         return instantUnitMarketDelivery;
     }
 
@@ -2291,7 +2505,7 @@ public class CampaignOptions {
         this.instantUnitMarketDelivery = instantUnitMarketDelivery;
     }
 
-    public boolean getUnitMarketReportRefresh() {
+    public boolean isUnitMarketReportRefresh() {
         return unitMarketReportRefresh;
     }
 
@@ -2309,7 +2523,23 @@ public class CampaignOptions {
         this.contractMarketMethod = contractMarketMethod;
     }
 
-    public boolean getContractMarketReportRefresh() {
+    public int getContractSearchRadius() {
+        return contractSearchRadius;
+    }
+
+    public void setContractSearchRadius(final int contractSearchRadius) {
+        this.contractSearchRadius = contractSearchRadius;
+    }
+
+    public boolean isVariableContractLength() {
+        return variableContractLength;
+    }
+
+    public void setVariableContractLength(final boolean variableContractLength) {
+        this.variableContractLength = variableContractLength;
+    }
+
+    public boolean isContractMarketReportRefresh() {
         return contractMarketReportRefresh;
     }
 
@@ -2341,396 +2571,366 @@ public class CampaignOptions {
     }
 
     public void setIgnoreRATEra(final boolean ignore) {
-        ignoreRATEra = ignore;
+        this.ignoreRATEra = ignore;
     }
     //endregion RATs Tab
 
-    public static String getTechLevelName(int lvl) {
-        switch (lvl) {
-            case TECH_INTRO:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
-            case TECH_STANDARD:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
-            case TECH_ADVANCED:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
-            case TECH_EXPERIMENTAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
-            case TECH_UNOFFICIAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
-            default:
-                return "Unknown";
-        }
-    }
-
-    public static String getTransitUnitName(int unit) {
-        switch (unit) {
-            case TRANSIT_UNIT_DAY:
-                return "Days";
-            case TRANSIT_UNIT_WEEK:
-                return "Weeks";
-            case TRANSIT_UNIT_MONTH:
-                return "Months";
-            default:
-                return "Unknown";
-        }
-    }
-
-    public boolean useEraMods() {
+    public boolean isUseEraMods() {
         return useEraMods;
     }
 
-    public void setEraMods(boolean b) {
-        this.useEraMods = b;
+    public void setEraMods(final boolean useEraMods) {
+        this.useEraMods = useEraMods;
     }
 
-    public boolean useAssignedTechFirst() {
+    public boolean isAssignedTechFirst() {
         return assignedTechFirst;
     }
 
-    public void setAssignedTechFirst(boolean assignedTechFirst) {
+    public void setAssignedTechFirst(final boolean assignedTechFirst) {
         this.assignedTechFirst = assignedTechFirst;
     }
 
-    public boolean useResetToFirstTech() {
+    public boolean isResetToFirstTech() {
         return resetToFirstTech;
     }
 
-    public void setResetToFirstTech(boolean resetToFirstTech) {
+    public void setResetToFirstTech(final boolean resetToFirstTech) {
         this.resetToFirstTech = resetToFirstTech;
     }
 
     /**
      * @return true to use the origin faction for personnel names instead of a set faction
      */
-    public boolean useOriginFactionForNames() {
+    public boolean isUseOriginFactionForNames() {
         return useOriginFactionForNames;
     }
 
     /**
      * @param useOriginFactionForNames whether to use personnel names or a set faction
      */
-    public void setUseOriginFactionForNames(boolean useOriginFactionForNames) {
+    public void setUseOriginFactionForNames(final boolean useOriginFactionForNames) {
         this.useOriginFactionForNames = useOriginFactionForNames;
     }
 
-    public boolean useQuirks() {
+    public boolean isUseQuirks() {
         return useQuirks;
     }
 
-    public void setQuirks(boolean b) {
-        this.useQuirks = b;
+    public void setQuirks(final boolean useQuirks) {
+        this.useQuirks = useQuirks;
     }
 
     public int getScenarioXP() {
         return scenarioXP;
     }
 
-    public void setScenarioXP(int xp) {
-        scenarioXP = xp;
+    public void setScenarioXP(final int scenarioXP) {
+        this.scenarioXP = scenarioXP;
     }
 
     public int getKillsForXP() {
         return killsForXP;
     }
 
-    public void setKillsForXP(int k) {
-        killsForXP = k;
+    public void setKillsForXP(final int killsForXP) {
+        this.killsForXP = killsForXP;
     }
 
     public int getKillXPAward() {
         return killXPAward;
     }
 
-    public void setKillXPAward(int xp) {
-        killXPAward = xp;
+    public void setKillXPAward(final int killXPAward) {
+        this.killXPAward = killXPAward;
     }
 
     public int getNTasksXP() {
         return nTasksXP;
     }
 
-    public void setNTasksXP(int xp) {
-        nTasksXP = xp;
+    public void setNTasksXP(final int nTasksXP) {
+        this.nTasksXP = nTasksXP;
     }
 
     public int getTaskXP() {
         return tasksXP;
     }
 
-    public void setTaskXP(int b) {
-        tasksXP = b;
+    public void setTaskXP(final int tasksXP) {
+        this.tasksXP = tasksXP;
     }
 
     public int getMistakeXP() {
         return mistakeXP;
     }
 
-    public void setMistakeXP(int b) {
-        mistakeXP = b;
+    public void setMistakeXP(final int mistakeXP) {
+        this.mistakeXP = mistakeXP;
     }
 
     public int getSuccessXP() {
         return successXP;
     }
 
-    public void setSuccessXP(int b) {
-        successXP = b;
+    public void setSuccessXP(final int successXP) {
+        this.successXP = successXP;
     }
 
-    public boolean limitByYear() {
+    public boolean isLimitByYear() {
         return limitByYear;
     }
 
-    public void setLimitByYear(boolean b) {
-        limitByYear = b;
+    public void setLimitByYear(final boolean limitByYear) {
+        this.limitByYear = limitByYear;
     }
 
-    public boolean disallowExtinctStuff() {
+    public boolean isDisallowExtinctStuff() {
         return disallowExtinctStuff;
     }
 
-    public void setDisallowExtinctStuff(boolean b) {
-        disallowExtinctStuff = b;
+    public void setDisallowExtinctStuff(final boolean disallowExtinctStuff) {
+        this.disallowExtinctStuff = disallowExtinctStuff;
     }
 
-    public boolean allowClanPurchases() {
+    public boolean isAllowClanPurchases() {
         return allowClanPurchases;
     }
 
-    public void setAllowClanPurchases(boolean b) {
-        allowClanPurchases = b;
+    public void setAllowClanPurchases(final boolean allowClanPurchases) {
+        this.allowClanPurchases = allowClanPurchases;
     }
 
-    public boolean allowISPurchases() {
+    public boolean isAllowISPurchases() {
         return allowISPurchases;
     }
 
-    public void setAllowISPurchases(boolean b) {
-        allowISPurchases = b;
+    public void setAllowISPurchases(final boolean allowISPurchases) {
+        this.allowISPurchases = allowISPurchases;
     }
 
-    public boolean allowCanonOnly() {
+    public boolean isAllowCanonOnly() {
         return allowCanonOnly;
     }
 
-    public void setAllowCanonOnly(boolean b) {
-        allowCanonOnly = b;
+    public void setAllowCanonOnly(final boolean allowCanonOnly) {
+        this.allowCanonOnly = allowCanonOnly;
     }
 
-    public boolean allowCanonRefitOnly() {
+    public boolean isAllowCanonRefitOnly() {
         return allowCanonRefitOnly;
     }
 
-    public void setAllowCanonRefitOnly(boolean b) {
-        allowCanonRefitOnly = b;
+    public void setAllowCanonRefitOnly(final boolean allowCanonRefitOnly) {
+        this.allowCanonRefitOnly = allowCanonRefitOnly;
     }
 
-    public boolean useVariableTechLevel() {
+    public boolean isVariableTechLevel() {
         return variableTechLevel;
     }
 
-    public void setVariableTechLevel(boolean b) {
-        variableTechLevel = b;
+    public void setVariableTechLevel(final boolean variableTechLevel) {
+        this.variableTechLevel = variableTechLevel;
     }
 
-    public void setFactionIntroDate(boolean b) {
-        factionIntroDate = b;
-    }
-
-    public boolean useFactionIntroDate() {
+    public boolean isFactionIntroDate() {
         return factionIntroDate;
     }
 
-    public boolean useAmmoByType() {
+    public void setFactionIntroDate(final boolean factionIntroDate) {
+        this.factionIntroDate = factionIntroDate;
+    }
+
+    public boolean isUseAmmoByType() {
         return useAmmoByType;
     }
 
-    public void setUseAmmoByType(boolean b) {
-        useAmmoByType = b;
+    public void setUseAmmoByType(final boolean useAmmoByType) {
+        this.useAmmoByType = useAmmoByType;
     }
 
     public int getTechLevel() {
         return techLevel;
     }
 
-    public void setTechLevel(int lvl) {
-        techLevel = lvl;
+    public void setTechLevel(final int techLevel) {
+        this.techLevel = techLevel;
     }
 
     public int[] getPhenotypeProbabilities() {
         return phenotypeProbabilities;
     }
 
-    public int getPhenotypeProbability(Phenotype phenotype) {
-        return getPhenotypeProbabilities()[phenotype.getIndex()];
+    public int getPhenotypeProbability(final Phenotype phenotype) {
+        return getPhenotypeProbabilities()[phenotype.ordinal()];
     }
 
-    public void setPhenotypeProbability(int index, int percentage) {
-        phenotypeProbabilities[index] = percentage;
+    public void setPhenotypeProbability(final int index, final int percentage) {
+        this.phenotypeProbabilities[index] = percentage;
     }
 
-    public boolean[] usePortraitForRoles() {
+    public boolean[] isUsePortraitForRoles() {
         return usePortraitForRole;
     }
 
-    public boolean usePortraitForRole(final PersonnelRole role) {
-        return usePortraitForRoles()[role.ordinal()];
+    public boolean isUsePortraitForRole(final PersonnelRole role) {
+        return isUsePortraitForRoles()[role.ordinal()];
     }
 
-    public void setUsePortraitForRole(int index, boolean b) {
-        usePortraitForRole[index] = b;
+    public void setUsePortraitForRole(final int index, final boolean use) {
+        this.usePortraitForRole[index] = use;
     }
 
-    public boolean getAssignPortraitOnRoleChange() {
+    public boolean isAssignPortraitOnRoleChange() {
         return assignPortraitOnRoleChange;
     }
 
-    public void setAssignPortraitOnRoleChange(boolean b) {
-        assignPortraitOnRoleChange = b;
+    public void setAssignPortraitOnRoleChange(final boolean assignPortraitOnRoleChange) {
+        this.assignPortraitOnRoleChange = assignPortraitOnRoleChange;
     }
 
     public int getIdleXP() {
         return idleXP;
     }
 
-    public void setIdleXP(int xp) {
-        idleXP = xp;
+    public void setIdleXP(final int idleXP) {
+        this.idleXP = idleXP;
     }
 
     public int getTargetIdleXP() {
         return targetIdleXP;
     }
 
-    public void setTargetIdleXP(int xp) {
-        targetIdleXP = xp;
+    public void setTargetIdleXP(final int targetIdleXP) {
+        this.targetIdleXP = targetIdleXP;
     }
 
     public int getMonthsIdleXP() {
         return monthsIdleXP;
     }
 
-    public void setMonthsIdleXP(int m) {
-        monthsIdleXP = m;
+    public void setMonthsIdleXP(final int monthsIdleXP) {
+        this.monthsIdleXP = monthsIdleXP;
     }
 
     public int getContractNegotiationXP() {
         return contractNegotiationXP;
     }
 
-    public void setContractNegotiationXP(int m) {
-        contractNegotiationXP = m;
+    public void setContractNegotiationXP(final int contractNegotiationXP) {
+        this.contractNegotiationXP = contractNegotiationXP;
     }
 
     public int getAdminXP() {
         return adminXP;
     }
 
-    public void setAdminXP(int m) {
-        adminXP = m;
+    public void setAdminXP(final int adminXP) {
+        this.adminXP = adminXP;
     }
 
     public int getAdminXPPeriod() {
         return adminXPPeriod;
     }
 
-    public void setAdminXPPeriod(int m) {
-        adminXPPeriod = m;
+    public void setAdminXPPeriod(final int adminXPPeriod) {
+        this.adminXPPeriod = adminXPPeriod;
     }
 
     public int getEdgeCost() {
         return edgeCost;
     }
 
-    public void setEdgeCost(int b) {
-        edgeCost = b;
+    public void setEdgeCost(final int edgeCost) {
+        this.edgeCost = edgeCost;
     }
 
     public int getWaitingPeriod() {
         return waitingPeriod;
     }
 
-    public void setWaitingPeriod(int d) {
-        waitingPeriod = d;
+    public void setWaitingPeriod(final int acquisitionSkill) {
+        this.waitingPeriod = acquisitionSkill;
     }
 
     public String getAcquisitionSkill() {
         return acquisitionSkill;
     }
 
-    public void setAcquisitionSkill(String skill) {
-        acquisitionSkill = skill;
-    }
-
-    public void setAcquisitionSupportStaffOnly(boolean b) {
-        this.acquisitionSupportStaffOnly = b;
+    public void setAcquisitionSkill(final String acquisitionSkill) {
+        this.acquisitionSkill = acquisitionSkill;
     }
 
     public boolean isAcquisitionSupportStaffOnly() {
         return acquisitionSupportStaffOnly;
     }
 
+    public void setAcquisitionSupportStaffOnly(final boolean acquisitionSupportStaffOnly) {
+        this.acquisitionSupportStaffOnly = acquisitionSupportStaffOnly;
+    }
+
     public int getNDiceTransitTime() {
         return nDiceTransitTime;
     }
 
-    public void setNDiceTransitTime(int d) {
-        nDiceTransitTime = d;
+    public void setNDiceTransitTime(final int nDiceTransitTime) {
+        this.nDiceTransitTime = nDiceTransitTime;
     }
 
     public int getConstantTransitTime() {
         return constantTransitTime;
     }
 
-    public void setConstantTransitTime(int d) {
-        constantTransitTime = d;
+    public void setConstantTransitTime(final int constantTransitTime) {
+        this.constantTransitTime = constantTransitTime;
     }
 
     public int getUnitTransitTime() {
         return unitTransitTime;
     }
 
-    public void setUnitTransitTime(int d) {
-        unitTransitTime = d;
+    public void setUnitTransitTime(final int unitTransitTime) {
+        this.unitTransitTime = unitTransitTime;
     }
 
     public int getAcquireMosUnit() {
         return acquireMosUnit;
     }
 
-    public void setAcquireMosUnit(int b) {
-        acquireMosUnit = b;
+    public void setAcquireMosUnit(final int acquireMosUnit) {
+        this.acquireMosUnit = acquireMosUnit;
     }
 
     public int getAcquireMosBonus() {
         return acquireMosBonus;
     }
 
-    public void setAcquireMosBonus(int b) {
-        acquireMosBonus = b;
+    public void setAcquireMosBonus(final int acquireMosBonus) {
+        this.acquireMosBonus = acquireMosBonus;
     }
 
     public int getAcquireMinimumTimeUnit() {
         return acquireMinimumTimeUnit;
     }
 
-    public void setAcquireMinimumTimeUnit(int b) {
-        acquireMinimumTimeUnit = b;
+    public void setAcquireMinimumTimeUnit(final int acquireMinimumTimeUnit) {
+        this.acquireMinimumTimeUnit = acquireMinimumTimeUnit;
     }
 
     public int getAcquireMinimumTime() {
         return acquireMinimumTime;
     }
 
-    public void setAcquireMinimumTime(int b) {
-        acquireMinimumTime = b;
+    public void setAcquireMinimumTime(final int acquireMinimumTime) {
+        this.acquireMinimumTime = acquireMinimumTime;
     }
 
-    public boolean usesPlanetaryAcquisition() {
+    public boolean isUsePlanetaryAcquisition() {
         return usePlanetaryAcquisition;
     }
 
-    public void setPlanetaryAcquisition(boolean b) {
-        usePlanetaryAcquisition = b;
+    public void setPlanetaryAcquisition(final boolean usePlanetaryAcquisition) {
+        this.usePlanetaryAcquisition = usePlanetaryAcquisition;
     }
 
     public PlanetaryAcquisitionFactionLimit getPlanetAcquisitionFactionLimit() {
@@ -2741,107 +2941,107 @@ public class CampaignOptions {
         this.planetAcquisitionFactionLimit = planetAcquisitionFactionLimit;
     }
 
-    public boolean disallowPlanetAcquisitionClanCrossover() {
+    public boolean isPlanetAcquisitionNoClanCrossover() {
         return planetAcquisitionNoClanCrossover;
     }
 
-    public void setDisallowPlanetAcquisitionClanCrossover(boolean b) {
-        planetAcquisitionNoClanCrossover = b;
+    public void setDisallowPlanetAcquisitionClanCrossover(final boolean planetAcquisitionNoClanCrossover) {
+        this.planetAcquisitionNoClanCrossover = planetAcquisitionNoClanCrossover;
     }
 
     public int getMaxJumpsPlanetaryAcquisition() {
         return maxJumpsPlanetaryAcquisition;
     }
 
-    public void setMaxJumpsPlanetaryAcquisition(int m) {
-        maxJumpsPlanetaryAcquisition = m;
+    public void setMaxJumpsPlanetaryAcquisition(final int maxJumpsPlanetaryAcquisition) {
+        this.maxJumpsPlanetaryAcquisition = maxJumpsPlanetaryAcquisition;
     }
 
-    public int getPenaltyClanPartsFroIS() {
+    public int getPenaltyClanPartsFromIS() {
         return penaltyClanPartsFromIS;
     }
 
-    public void setPenaltyClanPartsFroIS(int i) {
-        penaltyClanPartsFromIS = i ;
+    public void setPenaltyClanPartsFromIS(final int penaltyClanPartsFromIS) {
+        this.penaltyClanPartsFromIS = penaltyClanPartsFromIS;
     }
 
-    public boolean disallowClanPartsFromIS() {
+    public boolean isNoClanPartsFromIS() {
         return noClanPartsFromIS;
     }
 
-    public void setDisallowClanPartsFromIS(boolean b) {
-        noClanPartsFromIS = b;
+    public void setDisallowClanPartsFromIS(final boolean noClanPartsFromIS) {
+        this.noClanPartsFromIS = noClanPartsFromIS;
     }
 
-    public boolean usePlanetAcquisitionVerboseReporting() {
+    public boolean isPlanetAcquisitionVerbose() {
         return planetAcquisitionVerbose;
     }
 
-    public void setPlanetAcquisitionVerboseReporting(boolean b) {
-        planetAcquisitionVerbose = b;
+    public void setPlanetAcquisitionVerboseReporting(final boolean planetAcquisitionVerbose) {
+        this.planetAcquisitionVerbose = planetAcquisitionVerbose;
     }
 
     public double getEquipmentContractPercent() {
         return equipmentContractPercent;
     }
 
-    public void setEquipmentContractPercent(double b) {
-        equipmentContractPercent = Math.min(b, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
+    public void setEquipmentContractPercent(final double equipmentContractPercent) {
+        this.equipmentContractPercent = Math.min(equipmentContractPercent, MAXIMUM_COMBAT_EQUIPMENT_PERCENT);
     }
 
-    public boolean useEquipmentContractBase() {
+    public boolean isEquipmentContractBase() {
         return equipmentContractBase;
     }
 
-    public void setEquipmentContractBase(boolean b) {
-        this.equipmentContractBase = b;
+    public void setEquipmentContractBase(final boolean equipmentContractBase) {
+        this.equipmentContractBase = equipmentContractBase;
     }
 
-    public boolean useEquipmentContractSaleValue() {
+    public boolean isEquipmentContractSaleValue() {
         return equipmentContractSaleValue;
     }
 
-    public void setEquipmentContractSaleValue(boolean b) {
-        this.equipmentContractSaleValue = b;
+    public void setEquipmentContractSaleValue(final boolean equipmentContractSaleValue) {
+        this.equipmentContractSaleValue = equipmentContractSaleValue;
     }
 
-    public double getDropshipContractPercent() {
-        return dropshipContractPercent;
+    public double getDropShipContractPercent() {
+        return dropShipContractPercent;
     }
 
-    public void setDropshipContractPercent(double b) {
-        dropshipContractPercent = Math.min(b, MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT);
+    public void setDropShipContractPercent(final double dropShipContractPercent) {
+        this.dropShipContractPercent = Math.min(dropShipContractPercent, MAXIMUM_DROPSHIP_EQUIPMENT_PERCENT);
     }
 
-    public double getJumpshipContractPercent() {
-        return jumpshipContractPercent;
+    public double getJumpShipContractPercent() {
+        return jumpShipContractPercent;
     }
 
-    public void setJumpshipContractPercent(double b) {
-        jumpshipContractPercent = Math.min(b, MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT);
+    public void setJumpShipContractPercent(final double jumpShipContractPercent) {
+        this.jumpShipContractPercent = Math.min(jumpShipContractPercent, MAXIMUM_JUMPSHIP_EQUIPMENT_PERCENT);
     }
 
-    public double getWarshipContractPercent() {
-        return warshipContractPercent;
+    public double getWarShipContractPercent() {
+        return warShipContractPercent;
     }
 
-    public void setWarshipContractPercent(double b) {
-        warshipContractPercent = Math.min(b, MAXIMUM_WARSHIP_EQUIPMENT_PERCENT);
+    public void setWarShipContractPercent(final double warShipContractPercent) {
+        this.warShipContractPercent = Math.min(warShipContractPercent, MAXIMUM_WARSHIP_EQUIPMENT_PERCENT);
     }
 
-    public boolean useBLCSaleValue() {
+    public boolean isBLCSaleValue() {
         return blcSaleValue;
     }
 
-    public void setBLCSaleValue(boolean b) {
-        this.blcSaleValue = b;
+    public void setBLCSaleValue(final boolean blcSaleValue) {
+        this.blcSaleValue = blcSaleValue;
     }
 
-    public boolean getOverageRepaymentInFinalPayment() {
+    public boolean isOverageRepaymentInFinalPayment() {
         return overageRepaymentInFinalPayment;
     }
 
-    public void setOverageRepaymentInFinalPayment(boolean overageRepaymentInFinalPayment) {
+    public void setOverageRepaymentInFinalPayment(final boolean overageRepaymentInFinalPayment) {
         this.overageRepaymentInFinalPayment = overageRepaymentInFinalPayment;
     }
 
@@ -2849,55 +3049,46 @@ public class CampaignOptions {
         return clanAcquisitionPenalty;
     }
 
-    public void setClanAcquisitionPenalty(int b) {
-        clanAcquisitionPenalty = b;
+    public void setClanAcquisitionPenalty(final int clanAcquisitionPenalty) {
+        this.clanAcquisitionPenalty = clanAcquisitionPenalty;
     }
 
     public int getIsAcquisitionPenalty() {
         return isAcquisitionPenalty;
     }
 
-    public void setIsAcquisitionPenalty(int b) {
-        isAcquisitionPenalty = b;
+    public void setIsAcquisitionPenalty(final int isAcquisitionPenalty) {
+        this.isAcquisitionPenalty = isAcquisitionPenalty;
     }
 
-    public int getPlanetTechAcquisitionBonus(int type) {
-        if (type < 0 || type >= planetTechAcquisitionBonus.length) {
-            return 0;
-        }
-        return planetTechAcquisitionBonus[type];
+    public int getPlanetTechAcquisitionBonus(final int type) {
+        return ((type < 0) || (type >= planetTechAcquisitionBonus.length)) ? 0 : planetTechAcquisitionBonus[type];
     }
 
-    public void setPlanetTechAcquisitionBonus(int base, int type) {
-        if (type < 0 || type >= planetTechAcquisitionBonus.length) {
+    public void setPlanetTechAcquisitionBonus(final int base, final int type) {
+        if ((type < 0) || (type >= planetTechAcquisitionBonus.length)) {
             return;
         }
         this.planetTechAcquisitionBonus[type] = base;
     }
 
-    public int getPlanetIndustryAcquisitionBonus(int type) {
-        if (type < 0 || type >= planetIndustryAcquisitionBonus.length) {
-            return 0;
-        }
-        return planetIndustryAcquisitionBonus[type];
+    public int getPlanetIndustryAcquisitionBonus(final int type) {
+        return ((type < 0) || (type >= planetIndustryAcquisitionBonus.length)) ? 0 : planetIndustryAcquisitionBonus[type];
     }
 
-    public void setPlanetIndustryAcquisitionBonus(int base, int type) {
-        if (type < 0 || type >= planetIndustryAcquisitionBonus.length) {
+    public void setPlanetIndustryAcquisitionBonus(final int base, final int type) {
+        if ((type < 0) || (type >= planetIndustryAcquisitionBonus.length)) {
             return;
         }
         this.planetIndustryAcquisitionBonus[type] = base;
     }
 
-    public int getPlanetOutputAcquisitionBonus(int type) {
-        if (type < 0 || type >= planetOutputAcquisitionBonus.length) {
-            return 0;
-        }
-        return planetOutputAcquisitionBonus[type];
+    public int getPlanetOutputAcquisitionBonus(final int type) {
+        return ((type < 0) || (type >= planetOutputAcquisitionBonus.length)) ? 0 : planetOutputAcquisitionBonus[type];
     }
 
-    public void setPlanetOutputAcquisitionBonus(int base, int type) {
-        if (type < 0 || type >= planetOutputAcquisitionBonus.length) {
+    public void setPlanetOutputAcquisitionBonus(final int base, final int type) {
+        if ((type < 0) || (type >= planetOutputAcquisitionBonus.length)) {
             return;
         }
         this.planetOutputAcquisitionBonus[type] = base;
@@ -2907,224 +3098,216 @@ public class CampaignOptions {
         return destroyByMargin;
     }
 
-    public void setDestroyByMargin(boolean b) {
-        destroyByMargin = b;
+    public void setDestroyByMargin(final boolean destroyByMargin) {
+        this.destroyByMargin = destroyByMargin;
     }
 
     public int getDestroyMargin() {
         return destroyMargin;
     }
 
-    public void setDestroyMargin(int d) {
-        destroyMargin = d;
+    public void setDestroyMargin(final int destroyMargin) {
+        this.destroyMargin = destroyMargin;
     }
 
     public int getDestroyPartTarget() {
         return destroyPartTarget;
     }
 
-    public void setDestroyPartTarget(int d) {
-        destroyPartTarget = d;
+    public void setDestroyPartTarget(final int destroyPartTarget) {
+        this.destroyPartTarget = destroyPartTarget;
     }
 
-    public boolean useAeroSystemHits() {
+    public boolean isUseAeroSystemHits() {
         return useAeroSystemHits;
     }
 
-    public void setUseAeroSystemHits(boolean b) {
-        useAeroSystemHits = b;
+    public void setUseAeroSystemHits(final boolean useAeroSystemHits) {
+        this.useAeroSystemHits = useAeroSystemHits;
     }
 
     public int getMaxAcquisitions() {
         return maxAcquisitions;
     }
 
-    public void setMaxAcquisitions(int d) {
-        maxAcquisitions = d;
+    public void setMaxAcquisitions(final int maxAcquisitions) {
+        this.maxAcquisitions = maxAcquisitions;
     }
 
-    public boolean getUseAtB() {
+    public boolean isUseAtB() {
         return useAtB;
     }
 
-    public void setUseAtB(boolean useAtB) {
+    public void setUseAtB(final boolean useAtB) {
         this.useAtB = useAtB;
     }
 
-    public boolean getUseStratCon() {
+    public boolean isUseStratCon() {
         return useStratCon;
     }
 
-    public void setUseStratCon(boolean useStratCon) {
+    public void setUseStratCon(final boolean useStratCon) {
         this.useStratCon = useStratCon;
     }
 
-    public boolean getUseAero() {
+    public boolean isUseAero() {
         return useAero;
     }
 
-    public void setUseAero(boolean useAero) {
+    public void setUseAero(final boolean useAero) {
         this.useAero = useAero;
     }
 
-    public boolean getUseVehicles() {
+    public boolean isUseVehicles() {
         return useVehicles;
     }
 
-    public void setUseVehicles(boolean useVehicles) {
+    public void setUseVehicles(final boolean useVehicles) {
         this.useVehicles = useVehicles;
     }
 
-    public boolean getClanVehicles() {
+    public boolean isClanVehicles() {
         return clanVehicles;
     }
 
-    public void setClanVehicles(boolean clanVehicles) {
+    public void setClanVehicles(final boolean clanVehicles) {
         this.clanVehicles = clanVehicles;
     }
 
-    public boolean getDoubleVehicles() {
+    public boolean isDoubleVehicles() {
         return doubleVehicles;
     }
 
-    public void setDoubleVehicles(boolean doubleVehicles) {
+    public void setDoubleVehicles(final boolean doubleVehicles) {
         this.doubleVehicles = doubleVehicles;
     }
 
-    public boolean getAdjustPlayerVehicles() {
+    public boolean isAdjustPlayerVehicles() {
         return adjustPlayerVehicles;
     }
 
-    public int getOpforLanceTypeMechs() {
-        return opforLanceTypeMechs;
+    public void setAdjustPlayerVehicles(final boolean adjustPlayerVehicles) {
+        this.adjustPlayerVehicles = adjustPlayerVehicles;
     }
 
-    public void setOpforLanceTypeMechs(int weight) {
-        opforLanceTypeMechs = weight;
+    public int getOpForLanceTypeMechs() {
+        return opForLanceTypeMechs;
     }
 
-    public int getOpforLanceTypeMixed() {
-        return opforLanceTypeMixed;
+    public void setOpForLanceTypeMechs(final int opForLanceTypeMechs) {
+        this.opForLanceTypeMechs = opForLanceTypeMechs;
     }
 
-    public void setOpforLanceTypeMixed(int weight) {
-        opforLanceTypeMixed = weight;
+    public int getOpForLanceTypeMixed() {
+        return opForLanceTypeMixed;
     }
 
-    public int getOpforLanceTypeVehicles() {
-        return opforLanceTypeVehicles;
+    public void setOpForLanceTypeMixed(final int opForLanceTypeMixed) {
+        this.opForLanceTypeMixed = opForLanceTypeMixed;
     }
 
-    public void setOpforLanceTypeVehicles(int weight) {
-        opforLanceTypeVehicles = weight;
+    public int getOpForLanceTypeVehicles() {
+        return opForLanceTypeVehicles;
     }
 
-    public boolean getOpforUsesVTOLs() {
-        return opforUsesVTOLs;
+    public void setOpForLanceTypeVehicles(final int opForLanceTypeVehicles) {
+        this.opForLanceTypeVehicles = opForLanceTypeVehicles;
     }
 
-    public void setOpforUsesVTOLs(boolean vtol) {
-        opforUsesVTOLs = vtol;
+    public boolean isOpForUsesVTOLs() {
+        return opForUsesVTOLs;
     }
 
-    public void setAdjustPlayerVehicles(boolean adjust) {
-        adjustPlayerVehicles = adjust;
+    public void setOpForUsesVTOLs(final boolean opForUsesVTOLs) {
+        this.opForUsesVTOLs = opForUsesVTOLs;
     }
 
-    public boolean getUseDropShips() {
+    public boolean isUseDropShips() {
         return useDropShips;
     }
 
-    public void setUseDropShips(boolean useDropShips) {
+    public void setUseDropShips(final boolean useDropShips) {
         this.useDropShips = useDropShips;
     }
 
-    public int getSkillLevel() {
+    public SkillLevel getSkillLevel() {
         return skillLevel;
     }
 
-    public void setSkillLevel(int level) {
-        skillLevel = level;
+    public void setSkillLevel(final SkillLevel skillLevel) {
+        this.skillLevel = skillLevel;
     }
 
-    public boolean getAeroRecruitsHaveUnits() {
+    public boolean isAeroRecruitsHaveUnits() {
         return aeroRecruitsHaveUnits;
     }
 
-    public void setAeroRecruitsHaveUnits(boolean haveUnits) {
-        aeroRecruitsHaveUnits = haveUnits;
+    public void setAeroRecruitsHaveUnits(final boolean aeroRecruitsHaveUnits) {
+        this.aeroRecruitsHaveUnits = aeroRecruitsHaveUnits;
     }
 
-    public boolean getUseShareSystem() {
+    public boolean isUseShareSystem() {
         return useShareSystem;
     }
 
-    public boolean getSharesExcludeLargeCraft() {
+    public void setUseShareSystem(final boolean useShareSystem) {
+        this.useShareSystem = useShareSystem;
+    }
+
+    public boolean isSharesExcludeLargeCraft() {
         return sharesExcludeLargeCraft;
     }
 
-    public void setSharesExcludeLargeCraft(boolean exclude) {
-        sharesExcludeLargeCraft = exclude;
+    public void setSharesExcludeLargeCraft(final boolean sharesExcludeLargeCraft) {
+        this.sharesExcludeLargeCraft = sharesExcludeLargeCraft;
     }
 
-    public boolean getSharesForAll() {
+    public boolean isSharesForAll() {
         return sharesForAll;
     }
 
-    public void setSharesForAll(boolean set) {
-        sharesForAll = set;
+    public void setSharesForAll(final boolean sharesForAll) {
+        this.sharesForAll = sharesForAll;
     }
 
-    public boolean getTrackOriginalUnit() {
+    public boolean isTrackOriginalUnit() {
         return trackOriginalUnit;
     }
 
-    public void setTrackOriginalUnit(boolean track) {
-        trackOriginalUnit = track;
+    public void setTrackOriginalUnit(final boolean trackOriginalUnit) {
+        this.trackOriginalUnit = trackOriginalUnit;
     }
 
     public boolean isMercSizeLimited() {
         return mercSizeLimited;
     }
 
-    public void setMercSizeLimited(boolean limit) {
-        mercSizeLimited = limit;
+    public void setMercSizeLimited(final boolean mercSizeLimited) {
+        this.mercSizeLimited = mercSizeLimited;
     }
 
-    public void setUseShareSystem(boolean shares) {
-        useShareSystem = shares;
-    }
-
-    public boolean getRegionalMechVariations() {
+    public boolean isRegionalMechVariations() {
         return regionalMechVariations;
     }
 
-    public void setRegionalMechVariations(boolean regionalMechVariations) {
+    public void setRegionalMechVariations(final boolean regionalMechVariations) {
         this.regionalMechVariations = regionalMechVariations;
     }
 
-    public boolean getAttachedPlayerCamouflage() {
+    public boolean isAttachedPlayerCamouflage() {
         return attachedPlayerCamouflage;
     }
 
-    public void setAttachedPlayerCamouflage(boolean attachedPlayerCamouflage) {
+    public void setAttachedPlayerCamouflage(final boolean attachedPlayerCamouflage) {
         this.attachedPlayerCamouflage = attachedPlayerCamouflage;
     }
 
-    public boolean getPlayerControlsAttachedUnits() {
+    public boolean isPlayerControlsAttachedUnits() {
         return playerControlsAttachedUnits;
     }
 
-    public void setPlayerControlsAttachedUnits(boolean playerControlsAttachedUnits) {
+    public void setPlayerControlsAttachedUnits(final boolean playerControlsAttachedUnits) {
         this.playerControlsAttachedUnits = playerControlsAttachedUnits;
-    }
-
-    public int getSearchRadius() {
-        return searchRadius;
-    }
-
-    public void setSearchRadius(int radius) {
-        searchRadius = radius;
     }
 
     /**
@@ -3139,69 +3322,55 @@ public class CampaignOptions {
      * @param role      the {@link AtBLanceRole} ordinal value
      * @param frequency the frequency to set the generation to (percent chance from 0 to 100)
      */
-    public void setAtBBattleChance(int role, int frequency) {
-        if (frequency < 0) {
-            frequency = 0;
-        } else if (frequency > 100) {
-            frequency = 100;
-        }
-
-        this.atbBattleChance[role] = frequency;
+    public void setAtBBattleChance(final int role, final int frequency) {
+        this.atbBattleChance[role] = MathUtility.clamp(frequency, 0, 100);
     }
 
-    public boolean generateChases() {
+    public boolean isGenerateChases() {
         return generateChases;
     }
 
-    public void setGenerateChases(boolean generateChases) {
+    public void setGenerateChases(final boolean generateChases) {
         this.generateChases = generateChases;
     }
 
-    public boolean getVariableContractLength() {
-        return variableContractLength;
-    }
-
-    public void setVariableContractLength(boolean variable) {
-        variableContractLength = variable;
-    }
-
-    public boolean getUseWeatherConditions() {
+    public boolean isUseWeatherConditions() {
         return useWeatherConditions;
     }
 
-    public void setUseWeatherConditions(boolean useWeatherConditions) {
+    public void setUseWeatherConditions(final boolean useWeatherConditions) {
         this.useWeatherConditions = useWeatherConditions;
     }
 
-    public boolean getUseLightConditions() {
+    public boolean isUseLightConditions() {
         return useLightConditions;
     }
 
-    public void setUseLightConditions(boolean useLightConditions) {
+    public void setUseLightConditions(final boolean useLightConditions) {
         this.useLightConditions = useLightConditions;
     }
 
-    public boolean getUsePlanetaryConditions() {
+    public boolean isUsePlanetaryConditions() {
         return usePlanetaryConditions;
     }
 
-    public void setUsePlanetaryConditions(boolean usePlanetaryConditions) {
+    public void setUsePlanetaryConditions(final boolean usePlanetaryConditions) {
         this.usePlanetaryConditions = usePlanetaryConditions;
     }
 
-    public boolean getUseLeadership() {
+    public boolean isUseLeadership() {
         return useLeadership;
     }
 
-    public void setUseLeadership(boolean useLeadership) {
+    public void setUseLeadership(final boolean useLeadership) {
         this.useLeadership = useLeadership;
     }
 
-    public boolean getUseStrategy() {
+    public boolean isUseStrategy() {
         return useStrategy;
     }
 
-    public void setUseStrategy(boolean useStrategy) {
+    public void setUseStrategy(final boolean useStrategy) {
         this.useStrategy = useStrategy;
     }
 
@@ -3209,7 +3378,7 @@ public class CampaignOptions {
         return baseStrategyDeployment;
     }
 
-    public void setBaseStrategyDeployment(int baseStrategyDeployment) {
+    public void setBaseStrategyDeployment(final int baseStrategyDeployment) {
         this.baseStrategyDeployment = baseStrategyDeployment;
     }
 
@@ -3217,554 +3386,478 @@ public class CampaignOptions {
         return additionalStrategyDeployment;
     }
 
-    public void setAdditionalStrategyDeployment(int additionalStrategyDeployment) {
+    public void setAdditionalStrategyDeployment(final int additionalStrategyDeployment) {
         this.additionalStrategyDeployment = additionalStrategyDeployment;
     }
 
-    public boolean getAdjustPaymentForStrategy() {
+    public boolean isAdjustPaymentForStrategy() {
         return adjustPaymentForStrategy;
     }
 
-    public void setAdjustPaymentForStrategy(boolean adjustPaymentForStrategy) {
+    public void setAdjustPaymentForStrategy(final boolean adjustPaymentForStrategy) {
         this.adjustPaymentForStrategy = adjustPaymentForStrategy;
     }
 
-    public boolean getRestrictPartsByMission() {
+    public boolean isRestrictPartsByMission() {
         return restrictPartsByMission;
     }
 
-    public void setRestrictPartsByMission(boolean restrictPartsByMission) {
+    public void setRestrictPartsByMission(final boolean restrictPartsByMission) {
         this.restrictPartsByMission = restrictPartsByMission;
     }
 
-    public boolean getLimitLanceWeight() {
+    public boolean isLimitLanceWeight() {
         return limitLanceWeight;
     }
 
-    public void setLimitLanceWeight(boolean limit) {
-        limitLanceWeight = limit;
+    public void setLimitLanceWeight(final boolean limitLanceWeight) {
+        this.limitLanceWeight = limitLanceWeight;
     }
 
-    public boolean getLimitLanceNumUnits() {
+    public boolean isLimitLanceNumUnits() {
         return limitLanceNumUnits;
     }
 
-    public void setLimitLanceNumUnits(boolean limit) {
-        limitLanceNumUnits = limit;
+    public void setLimitLanceNumUnits(final boolean limitLanceNumUnits) {
+        this.limitLanceNumUnits = limitLanceNumUnits;
     }
 
-    //region Mass Repair/ Mass Salvage
-    public boolean massRepairUseRepair() {
-        return massRepairUseRepair;
+    public boolean isAllowOpForAeros() {
+        return allowOpForAeros;
     }
 
-    public void setMassRepairUseRepair(boolean massRepairUseRepair) {
-        this.massRepairUseRepair = massRepairUseRepair;
+    public void setAllowOpForAeros(final boolean allowOpForAeros) {
+        this.allowOpForAeros = allowOpForAeros;
     }
 
-    public boolean massRepairUseSalvage() {
-        return massRepairUseSalvage;
+    public boolean isAllowOpForLocalUnits() {
+        return allowOpForLocalUnits;
     }
 
-    public void setMassRepairUseSalvage(boolean massRepairUseSalvage) {
-        this.massRepairUseSalvage = massRepairUseSalvage;
+    public void setAllowOpForLocalUnits(final boolean allowOpForLocalUnits) {
+        this.allowOpForLocalUnits = allowOpForLocalUnits;
     }
 
-    public boolean massRepairUseExtraTime() {
-        return massRepairUseExtraTime;
+    public int getOpForAeroChance() {
+        return opForAeroChance;
     }
 
-    public void setMassRepairUseExtraTime(boolean b) {
-        this.massRepairUseExtraTime = b;
+    public void setOpForAeroChance(final int opForAeroChance) {
+        this.opForAeroChance = opForAeroChance;
     }
 
-    public boolean massRepairUseRushJob() {
-        return massRepairUseRushJob;
+    public int getOpForLocalUnitChance() {
+        return opForLocalUnitChance;
     }
 
-    public void setMassRepairUseRushJob(boolean b) {
-        this.massRepairUseRushJob = b;
-    }
-
-    public boolean massRepairAllowCarryover() {
-        return massRepairAllowCarryover;
-    }
-
-    public void setMassRepairAllowCarryover(boolean b) {
-        this.massRepairAllowCarryover = b;
-    }
-
-    public boolean massRepairOptimizeToCompleteToday() {
-        return massRepairOptimizeToCompleteToday;
-    }
-
-    public void setMassRepairOptimizeToCompleteToday(boolean massRepairOptimizeToCompleteToday) {
-        this.massRepairOptimizeToCompleteToday = massRepairOptimizeToCompleteToday;
-    }
-
-    public boolean massRepairScrapImpossible() {
-        return massRepairScrapImpossible;
-    }
-
-    public void setMassRepairScrapImpossible(boolean b) {
-        this.massRepairScrapImpossible = b;
-    }
-
-    public boolean massRepairUseAssignedTechsFirst() {
-        return massRepairUseAssignedTechsFirst;
-    }
-
-    public void setMassRepairUseAssignedTechsFirst(boolean massRepairUseAssignedTechsFirst) {
-        this.massRepairUseAssignedTechsFirst = massRepairUseAssignedTechsFirst;
-    }
-
-    public void setMassRepairReplacePod(boolean setMassRepairReplacePod) {
-        this.massRepairReplacePod = setMassRepairReplacePod;
-    }
-
-    public boolean massRepairReplacePod() {
-        return massRepairReplacePod;
-    }
-
-    public List<MassRepairOption> getMassRepairOptions() {
-        return (massRepairOptions != null) ? massRepairOptions : new ArrayList<>();
-    }
-
-    public void setMassRepairOptions(List<MassRepairOption> massRepairOptions) {
-        this.massRepairOptions = massRepairOptions;
-    }
-
-    public void addMassRepairOption(MassRepairOption mro) {
-        if (mro.getType() == PartRepairType.UNKNOWN_LOCATION) {
-            return;
-        }
-
-        getMassRepairOptions().removeIf(massRepairOption -> massRepairOption.getType() == mro.getType());
-        getMassRepairOptions().add(mro);
-    }
-    //endregion Mass Repair/ Mass Salvage
-
-    public void setAllowOpforAeros(boolean allowOpforAeros) {
-        this.allowOpforAeros = allowOpforAeros;
-    }
-
-    public boolean getAllowOpforAeros() {
-        return allowOpforAeros;
-    }
-
-    public void setAllowOpforLocalUnits(boolean allowOpforLocalUnits) {
-        this.allowOpforLocalUnits = allowOpforLocalUnits;
-    }
-
-    public boolean getAllowOpforLocalUnits() {
-        return allowOpforLocalUnits;
-    }
-
-    public void setOpforAeroChance(int chance) {
-        this.opforAeroChance = chance;
-    }
-
-    public int getOpforAeroChance() {
-        return opforAeroChance;
-    }
-
-    public void setOpforLocalUnitChance(int chance) {
-        this.opforLocalUnitChance = chance;
-    }
-
-    public int getOpforLocalUnitChance() {
-        return opforLocalUnitChance;
+    public void setOpForLocalUnitChance(final int opForLocalUnitChance) {
+        this.opForLocalUnitChance = opForLocalUnitChance;
     }
 
     public int getFixedMapChance() {
         return fixedMapChance;
     }
 
-    public void setFixedMapChance(int fixedMapChance) {
+    public void setFixedMapChance(final int fixedMapChance) {
         this.fixedMapChance = fixedMapChance;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<campaignOptions>");
+    public int getSpaUpgradeIntensity() {
+        return spaUpgradeIntensity;
+    }
+
+    public void setSpaUpgradeIntensity(final int spaUpgradeIntensity) {
+        this.spaUpgradeIntensity = spaUpgradeIntensity;
+    }
+
+    //region File IO
+    public void writeToXml(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaignOptions");
         //region General Tab
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "manualUnitRatingModifier", getManualUnitRatingModifier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "manualUnitRatingModifier", getManualUnitRatingModifier());
         //endregion General Tab
 
         //region Repair and Maintenance Tab
         //region Maintenance
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "logMaintenance", logMaintenance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMaintenance", logMaintenance);
         //endregion Maintenance
+
+        //region Mass Repair / Mass Salvage
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsUseRepair", isMRMSUseRepair());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsUseSalvage", isMRMSUseSalvage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsUseExtraTime", isMRMSUseExtraTime());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsUseRushJob", isMRMSUseRushJob());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsAllowCarryover", isMRMSAllowCarryover());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsOptimizeToCompleteToday", isMRMSOptimizeToCompleteToday());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsScrapImpossible", isMRMSScrapImpossible());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsUseAssignedTechsFirst", isMRMSUseAssignedTechsFirst());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrmsReplacePod", isMRMSReplacePod());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "mrmsOptions");
+        for (final MRMSOption mrmsOption : getMRMSOptions()) {
+            mrmsOption.writeToXML(pw, indent);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mrmsOptions");
+        //endregion Mass Repair / Mass Salvage
         //endregion Repair and Maintenance Tab
 
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useFactionForNames", useOriginFactionForNames);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitRatingMethod", unitRatingMethod.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useEraMods", useEraMods);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignedTechFirst", assignedTechFirst);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "resetToFirstTech", resetToFirstTech);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQuirks", useQuirks);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "scenarioXP", scenarioXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "killsForXP", killsForXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "killXPAward", killXPAward);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nTasksXP", nTasksXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "tasksXP", tasksXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mistakeXP", mistakeXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "successXP", successXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "idleXP", idleXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "targetIdleXP", targetIdleXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "monthsIdleXP", monthsIdleXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "contractNegotiationXP", contractNegotiationXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminWeeklyXP", adminXP);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adminXPPeriod", adminXPPeriod);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "edgeCost", edgeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitByYear", limitByYear);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "disallowExtinctStuff", disallowExtinctStuff);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowClanPurchases", allowClanPurchases);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowISPurchases", allowISPurchases);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonOnly", allowCanonOnly);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowCanonRefitOnly", allowCanonRefitOnly);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableTechLevel", variableTechLevel);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "factionIntroDate", factionIntroDate);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAmmoByType", useAmmoByType);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "waitingPeriod", waitingPeriod);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSkill", acquisitionSkill);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "techLevel", techLevel);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "nDiceTransitTime", nDiceTransitTime);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "constantTransitTime", constantTransitTime);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "unitTransitTime", unitTransitTime);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMosBonus", acquireMosBonus);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMosUnit", acquireMosUnit);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTime", acquireMinimumTime);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryAcquisition", usePlanetaryAcquisition);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionFactionLimit", getPlanetAcquisitionFactionLimit().name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionNoClanCrossover", planetAcquisitionNoClanCrossover);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "noClanPartsFromIS", noClanPartsFromIS);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "penaltyClanPartsFromIS", penaltyClanPartsFromIS);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "planetAcquisitionVerbose", planetAcquisitionVerbose);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxJumpsPlanetaryAcquisition", maxJumpsPlanetaryAcquisition);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractPercent", equipmentContractPercent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "dropshipContractPercent", dropshipContractPercent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "jumpshipContractPercent", jumpshipContractPercent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "warshipContractPercent", warshipContractPercent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractBase", equipmentContractBase);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentContractSaleValue", equipmentContractSaleValue);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "blcSaleValue", blcSaleValue);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "overageRepaymentInFinalPayment", overageRepaymentInFinalPayment);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanAcquisitionPenalty", clanAcquisitionPenalty);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "isAcquisitionPenalty", isAcquisitionPenalty);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyByMargin", destroyByMargin);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyMargin", destroyMargin);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "destroyPartTarget", destroyPartTarget);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAeroSystemHits", useAeroSystemHits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceCycleDays", maintenanceCycleDays);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maintenanceBonus", maintenanceBonus);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useQualityMaintenance", useQualityMaintenance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "reverseQualityNames", reverseQualityNames);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useUnofficalMaintenance", useUnofficialMaintenance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "checkMaintenance", checkMaintenance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "maxAcquisitions", maxAcquisitions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionForNames", useOriginFactionForNames);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitRatingMethod", unitRatingMethod.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEraMods", useEraMods);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechFirst", assignedTechFirst);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "resetToFirstTech", resetToFirstTech);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQuirks", useQuirks);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioXP", scenarioXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killsForXP", killsForXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killXPAward", killXPAward);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nTasksXP", nTasksXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tasksXP", tasksXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mistakeXP", mistakeXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "successXP", successXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "idleXP", idleXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "targetIdleXP", targetIdleXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "monthsIdleXP", monthsIdleXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractNegotiationXP", contractNegotiationXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminWeeklyXP", adminXP);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminXPPeriod", adminXPPeriod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "edgeCost", edgeCost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitByYear", limitByYear);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disallowExtinctStuff", disallowExtinctStuff);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowClanPurchases", allowClanPurchases);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowISPurchases", allowISPurchases);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowCanonOnly", allowCanonOnly);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowCanonRefitOnly", allowCanonRefitOnly);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableTechLevel", variableTechLevel);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "factionIntroDate", factionIntroDate);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAmmoByType", useAmmoByType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "waitingPeriod", waitingPeriod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSkill", acquisitionSkill);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitionSupportStaffOnly", acquisitionSupportStaffOnly);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techLevel", techLevel);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nDiceTransitTime", nDiceTransitTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "constantTransitTime", constantTransitTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitTransitTime", unitTransitTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMosBonus", acquireMosBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMosUnit", acquireMosUnit);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMinimumTime", acquireMinimumTime);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquireMinimumTimeUnit", acquireMinimumTimeUnit);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryAcquisition", usePlanetaryAcquisition);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetAcquisitionFactionLimit", getPlanetAcquisitionFactionLimit().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetAcquisitionNoClanCrossover", planetAcquisitionNoClanCrossover);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "noClanPartsFromIS", noClanPartsFromIS);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "penaltyClanPartsFromIS", penaltyClanPartsFromIS);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetAcquisitionVerbose", planetAcquisitionVerbose);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxJumpsPlanetaryAcquisition", maxJumpsPlanetaryAcquisition);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractPercent", equipmentContractPercent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dropShipContractPercent", getDropShipContractPercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpShipContractPercent", getJumpShipContractPercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "warShipContractPercent", getWarShipContractPercent());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractBase", equipmentContractBase);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentContractSaleValue", equipmentContractSaleValue);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "blcSaleValue", blcSaleValue);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overageRepaymentInFinalPayment", overageRepaymentInFinalPayment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanAcquisitionPenalty", clanAcquisitionPenalty);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isAcquisitionPenalty", isAcquisitionPenalty);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destroyByMargin", destroyByMargin);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destroyMargin", destroyMargin);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "destroyPartTarget", destroyPartTarget);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAeroSystemHits", useAeroSystemHits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maintenanceCycleDays", maintenanceCycleDays);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maintenanceBonus", maintenanceBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQualityMaintenance", useQualityMaintenance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reverseQualityNames", reverseQualityNames);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnofficialMaintenance", isUseUnofficialMaintenance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMaintenance", checkMaintenance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxAcquisitions", maxAcquisitions);
 
         //region Personnel Tab
         //region General Personnel
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, ++indent, "useTactics", useTactics());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useInitiativeBonus", useInitiativeBonus());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useToughness", useToughness());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useArtillery", useArtillery());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useAbilities", useAbilities());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useEdge", useEdge());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useSupportEdge", useSupportEdge());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useImplants", useImplants());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "alternativeQualityAveraging", useAlternativeQualityAveraging());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTransfers", useTransfers());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useExtendedTOEForceName", isUseExtendedTOEForceName());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogAbilityGain", isPersonnelLogAbilityGain());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelLogEdgeGain", isPersonnelLogEdgeGain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTactics", isUseTactics());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInitiativeBonus", isUseInitiativeBonus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useToughness", isUseToughness());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useArtillery", isUseArtillery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAbilities", isUseAbilities());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEdge", isUseEdge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSupportEdge", isUseSupportEdge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useImplants", isUseImplants());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "alternativeQualityAveraging", isAlternativeQualityAveraging());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTransfers", isUseTransfers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useExtendedTOEForceName", isUseExtendedTOEForceName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogAbilityGain", isPersonnelLogAbilityGain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogEdgeGain", isPersonnelLogEdgeGain());
         //endregion General Personnel
 
         //region Expanded Personnel Information
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTimeInService", getUseTimeInService());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "timeInServiceDisplayFormat", getTimeInServiceDisplayFormat().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useTimeInRank", getUseTimeInRank());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalEarnings", isTrackTotalEarnings());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "showOriginFaction", showOriginFaction());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTimeInService", isUseTimeInService());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeInServiceDisplayFormat", getTimeInServiceDisplayFormat().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTimeInRank", isUseTimeInRank());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeInRankDisplayFormat", getTimeInRankDisplayFormat().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackTotalEarnings", isTrackTotalEarnings());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showOriginFaction", isShowOriginFaction());
         //endregion Expanded Personnel Information
 
         //region Medical
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useAdvancedMedical", useAdvancedMedical());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "healWaitingPeriod", getHealingWaitingPeriod());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "naturalHealingWaitingPeriod", getNaturalHealingWaitingPeriod());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "minimumHitsForVehicles", getMinimumHitsForVehicles());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomHitsForVehicles", useRandomHitsForVehicles());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "tougherHealing", useTougherHealing());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedMedical", isUseAdvancedMedical());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "healWaitingPeriod", getHealingWaitingPeriod());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "naturalHealingWaitingPeriod", getNaturalHealingWaitingPeriod());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumHitsForVehicles", getMinimumHitsForVehicles());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomHitsForVehicles", isUseRandomHitsForVehicles());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "tougherHealing", isTougherHealing());
         //endregion Medical
 
         //region Prisoners
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "prisonerBabyStatus", getPrisonerBabyStatus());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useAtBPrisonerDefection", useAtBPrisonerDefection());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useAtBPrisonerRansom", useAtBPrisonerRansom());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerCaptureStyle", getPrisonerCaptureStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "defaultPrisonerStatus", getDefaultPrisonerStatus().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prisonerBabyStatus", isPrisonerBabyStatus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerDefection", isUseAtBPrisonerDefection());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerRansom", isUseAtBPrisonerRansom());
         //endregion Prisoners
 
         //region Personnel Randomization
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useDylansRandomXP", useDylansRandomXP());
-        getRandomOriginOptions().writeToXML(pw1, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
+        getRandomOriginOptions().writeToXML(pw, indent);
         //endregion Personnel Randomization
 
         //region Retirement
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomRetirementMethod", getRandomRetirementMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "trackUnitFatigue", isTrackUnitFatigue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomRetirementMethod", getRandomRetirementMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
         //endregion Retirement
 
         //region Family
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayFamilyLevel", getDisplayFamilyLevel().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "familyDisplayLevel", getFamilyDisplayLevel().name());
         //endregion Family
 
         //region Dependent
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomDependentMethod", getRandomDependentMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomDependentAddition", isUseRandomDependentAddition());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomDependentRemoval", isUseRandomDependentsRemoval());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDependentMethod", getRandomDependentMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentAddition", isUseRandomDependentAddition());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentRemoval", isUseRandomDependentRemoval());
         //endregion Dependent
 
         //region Salary
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryXPMultiplier", getSalaryXPMultipliers());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salaryXPMultipliers");
+        for (final Entry<SkillLevel, Double> entry : getSalaryXPMultipliers().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salaryXPMultipliers");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
 
         //region Marriage
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualMarriages", isUseManualMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useClannerMarriages", isUseClannerMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "usePrisonerMarriages", isUsePrisonerMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "minimumMarriageAge", getMinimumMarriageAge());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "marriageSurnameWeights");
-        for (final Map.Entry<MergingSurnameStyle, Integer> entry : getMarriageSurnameWeights().entrySet()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualMarriages", isUseManualMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelMarriages", isUseClanPersonnelMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerMarriages", isUsePrisonerMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumMarriageAge", getMinimumMarriageAge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMutualAncestorsDepth", getCheckMutualAncestorsDepth());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logMarriageNameChanges", isLogMarriageNameChanges());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "marriageSurnameWeights");
+        for (final Entry<MergingSurnameStyle, Integer> entry : getMarriageSurnameWeights().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "marriageSurnameWeights");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomMarriageMethod", getRandomMarriageMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomSameSexMarriages", isUseRandomSameSexMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomClannerMarriages", isUseRandomClannerMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageOppositeSexChance", getPercentageRandomMarriageOppositeSexChance());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomMarriageSameSexChance", getPercentageRandomMarriageSameSexChance());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "marriageSurnameWeights");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageMethod", getRandomMarriageMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomSameSexMarriages", isUseRandomSameSexMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelMarriages", isUseRandomClanPersonnelMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerMarriages", isUseRandomPrisonerMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomMarriageAgeRange", getRandomMarriageAgeRange());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomMarriageOppositeSexChance", getPercentageRandomMarriageOppositeSexChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomMarriageSameSexChance", getPercentageRandomMarriageSameSexChance());
         //endregion Marriage
 
         //region Divorce
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualDivorce", isUseManualDivorce());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useClannerDivorce", isUseClannerDivorce());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "usePrisonerDivorce", isUsePrisonerDivorce());
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw1, indent++, "divorceSurnameWeights");
-        for (final Map.Entry<SplittingSurnameStyle, Integer> entry : getDivorceSurnameWeights().entrySet()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, entry.getKey().name(), entry.getValue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualDivorce", isUseManualDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelDivorce", isUseClanPersonnelDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerDivorce", isUsePrisonerDivorce());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "divorceSurnameWeights");
+        for (final Entry<SplittingSurnameStyle, Integer> entry : getDivorceSurnameWeights().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "divorceSurnameWeights");
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomDivorceMethod", getRandomDivorceMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomOppositeSexDivorce", isUseRandomOppositeSexDivorce());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomSameSexDivorce", isUseRandomSameSexDivorce());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomClannerDivorce", isUseRandomClannerDivorce());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerDivorce", isUseRandomPrisonerDivorce());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomDivorceOppositeSexChance", getPercentageRandomDivorceOppositeSexChance());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomDivorceSameSexChance", getPercentageRandomDivorceSameSexChance());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "divorceSurnameWeights");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDivorceMethod", getRandomDivorceMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomOppositeSexDivorce", isUseRandomOppositeSexDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomSameSexDivorce", isUseRandomSameSexDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelDivorce", isUseRandomClanPersonnelDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerDivorce", isUseRandomPrisonerDivorce());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDivorceOppositeSexChance", getPercentageRandomDivorceOppositeSexChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDivorceSameSexChance", getPercentageRandomDivorceSameSexChance());
         //endregion Divorce
 
         //region Procreation
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useManualProcreation", isUseManualProcreation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useClannerProcreation", isUseClannerProcreation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "usePrisonerProcreation", isUsePrisonerProcreation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "multiplePregnancyOccurrences", getMultiplePregnancyOccurrences());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "babySurnameStyle", getBabySurnameStyle().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "assignChildrenOfFoundersFounderTag", isAssignChildrenOfFoundersFounderTag());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "determineFatherAtBirth", isDetermineFatherAtBirth());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "displayTrueDueDate", isDisplayTrueDueDate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "logProcreation", isLogProcreation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "randomProcreationMethod", getRandomProcreationMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRelationshiplessRandomProcreation", isUseRelationshiplessRandomProcreation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomClannerProcreation", isUseRandomClannerProcreation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useRandomPrisonerProcreation", isUseRandomPrisonerProcreation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomProcreationRelationshipChance", getPercentageRandomProcreationRelationshipChance());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "percentageRandomProcreationRelationshiplessChance", getPercentageRandomProcreationRelationshiplessChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualProcreation", isUseManualProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelProcreation", isUseClanPersonnelProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePrisonerProcreation", isUsePrisonerProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiplePregnancyOccurrences", getMultiplePregnancyOccurrences());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "babySurnameStyle", getBabySurnameStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignNonPrisonerBabiesFounderTag", isAssignNonPrisonerBabiesFounderTag());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignChildrenOfFoundersFounderTag", isAssignChildrenOfFoundersFounderTag());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "determineFatherAtBirth", isDetermineFatherAtBirth());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayTrueDueDate", isDisplayTrueDueDate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "logProcreation", isLogProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomProcreationMethod", getRandomProcreationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRelationshiplessRandomProcreation", isUseRelationshiplessRandomProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelProcreation", isUseRandomClanPersonnelProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerProcreation", isUseRandomPrisonerProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomProcreationRelationshipChance", getPercentageRandomProcreationRelationshipChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomProcreationRelationshiplessChance", getPercentageRandomProcreationRelationshiplessChance());
         //endregion Procreation
 
         //region Death
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "keepMarriedNameUponSpouseDeath", getKeepMarriedNameUponSpouseDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "keepMarriedNameUponSpouseDeath", isKeepMarriedNameUponSpouseDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathMethod", getRandomDeathMethod().name());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "enabledRandomDeathAgeGroups");
+        for (final Entry<AgeGroup, Boolean> entry : getEnabledRandomDeathAgeGroups().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "enabledRandomDeathAgeGroups");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomClanPersonnelDeath", isUseRandomClanPersonnelDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomPrisonerDeath", isUseRandomPrisonerDeath());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDeathSuicideCause", isUseRandomDeathSuicideCause());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomDeathChance", getPercentageRandomDeathChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "exponentialRandomDeathMaleValues", getExponentialRandomDeathMaleValues());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "exponentialRandomDeathFemaleValues", getExponentialRandomDeathFemaleValues());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathMaleValues");
+        for (final Entry<TenYearAgeRange, Double> entry : getAgeRangeRandomDeathMaleValues().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathMaleValues");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "ageRangeRandomDeathFemaleValues");
+        for (final Entry<TenYearAgeRange, Double> entry : getAgeRangeRandomDeathFemaleValues().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathFemaleValues");
         //endregion Death
         //endregion Personnel Tab
 
         //region Finances Tab
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForParts", payForParts);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForRepairs", payForRepairs);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForUnits", payForUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForSalaries", payForSalaries);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForOverhead", payForOverhead);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForMaintain", payForMaintain);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForTransport", payForTransport);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "sellUnits", sellUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "sellParts", sellParts);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "payForRecruitment", payForRecruitment);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useLoanLimits", useLoanLimits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePercentageMaint", usePercentageMaint);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "infantryDontCount", infantryDontCount);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePeacetimeCost", usePeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "useExtendedPartsModifier", useExtendedPartsModifier);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "showPeacetimeCost", showPeacetimeCost);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "financialYearDuration", financialYearDuration.name());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForParts", payForParts);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRepairs", payForRepairs);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForUnits", payForUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForSalaries", payForSalaries);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForOverhead", payForOverhead);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForMaintain", payForMaintain);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForTransport", payForTransport);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellUnits", sellUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sellParts", sellParts);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForRecruitment", payForRecruitment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoanLimits", useLoanLimits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePercentageMaint", usePercentageMaint);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "infantryDontCount", infantryDontCount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePeacetimeCost", usePeacetimeCost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useExtendedPartsModifier", useExtendedPartsModifier);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showPeacetimeCost", showPeacetimeCost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "financialYearDuration", financialYearDuration.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "newFinancialYearFinancesToCSVExport", newFinancialYearFinancesToCSVExport);
 
         //region Price Multipliers
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "innerSphereUnitPriceMultiplier", getInnerSphereUnitPriceMultiplier());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "innerSpherePartPriceMultiplier", getInnerSpherePartPriceMultiplier());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clanUnitPriceMultiplier", getClanUnitPriceMultiplier());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "clanPartPriceMultiplier", getClanPartPriceMultiplier());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "mixedTechUnitPriceMultiplier", getMixedTechUnitPriceMultiplier());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "usedPartPriceMultipliers", getUsedPartPriceMultipliers());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "damagedPartsValueMultiplier", getDamagedPartsValueMultiplier());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "unrepairablePartsValueMultiplier", getUnrepairablePartsValueMultiplier());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "cancelledOrderRefundMultiplier", getCancelledOrderRefundMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commonPartPriceMultiplier", getCommonPartPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "innerSphereUnitPriceMultiplier", getInnerSphereUnitPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "innerSpherePartPriceMultiplier", getInnerSpherePartPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanUnitPriceMultiplier", getClanUnitPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPartPriceMultiplier", getClanPartPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mixedTechUnitPriceMultiplier", getMixedTechUnitPriceMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usedPartPriceMultipliers", getUsedPartPriceMultipliers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "damagedPartsValueMultiplier", getDamagedPartsValueMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unrepairablePartsValueMultiplier", getUnrepairablePartsValueMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cancelledOrderRefundMultiplier", getCancelledOrderRefundMultiplier());
         //endregion Price Multipliers
         //endregion Finances Tab
 
         //region Markets Tab
         //region Personnel Market
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketName", getPersonnelMarketType());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketReportRefresh", getPersonnelMarketReportRefresh());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomEliteRemoval", getPersonnelMarketRandomEliteRemoval());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomVeteranRemoval", getPersonnelMarketRandomVeteranRemoval());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomRegularRemoval", getPersonnelMarketRandomRegularRemoval());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomGreenRemoval", getPersonnelMarketRandomGreenRemoval());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketRandomUltraGreenRemoval", getPersonnelMarketRandomUltraGreenRemoval());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "personnelMarketDylansWeight", getPersonnelMarketDylansWeight());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketName", getPersonnelMarketName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketReportRefresh", isPersonnelMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "personnelMarketRandomRemovalTargets");
+        for (final Entry<SkillLevel, Integer> entry : getPersonnelMarketRandomRemovalTargets().entrySet()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelMarketRandomRemovalTargets");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketDylansWeight", getPersonnelMarketDylansWeight());
         //endregion Personnel Market
 
         //region Unit Market
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitMarketMethod", getUnitMarketMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitMarketRegionalMechVariations", useUnitMarketRegionalMechVariations());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "instantUnitMarketDelivery", getInstantUnitMarketDelivery());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "unitMarketReportRefresh", getUnitMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketMethod", getUnitMarketMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRegionalMechVariations", isUnitMarketRegionalMechVariations());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", isInstantUnitMarketDelivery());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketReportRefresh", isUnitMarketReportRefresh());
         //endregion Unit Market
 
         //region Contract Market
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "contractMarketMethod", getContractMarketMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "contractMarketReportRefresh", getContractMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketMethod", getContractMarketMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractSearchRadius", getContractSearchRadius());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableContractLength", isVariableContractLength());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketReportRefresh", isContractMarketReportRefresh());
         //endregion Contract Market
         //endregion Markets Tab
 
         //region RATs Tab
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "useStaticRATs", isUseStaticRATs());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent, "rats", getRATs());
-        MekHqXmlUtil.writeSimpleXMLTag(pw1, indent--, "ignoreRATEra", isIgnoreRATEra());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStaticRATs", isUseStaticRATs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rats", getRATs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreRATEra", isIgnoreRATEra());
         //endregion RATs Tab
 
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                + "<phenotypeProbabilities>"
-                + StringUtils.join(phenotypeProbabilities, ',')
-                + "</phenotypeProbabilities>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAtB", useAtB);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useStratCon", useStratCon);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useAero", useAero);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useVehicles", useVehicles);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "clanVehicles", clanVehicles);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "doubleVehicles", doubleVehicles);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adjustPlayerVehicles", adjustPlayerVehicles);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeMechs", opforLanceTypeMechs);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeMixed", opforLanceTypeMixed);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLanceTypeVehicles", opforLanceTypeVehicles);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforUsesVTOLs", opforUsesVTOLs);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useDropShips", useDropShips);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "skillLevel", skillLevel);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useShareSystem", useShareSystem);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesExcludeLargeCraft", sharesExcludeLargeCraft);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "sharesForAll", sharesForAll);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "mercSizeLimited", mercSizeLimited);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trackOriginalUnit", trackOriginalUnit);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "regionalMechVariations", regionalMechVariations);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "attachedPlayerCamouflage", attachedPlayerCamouflage);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "playerControlsAttachedUnits", playerControlsAttachedUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "searchRadius", searchRadius);
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1)
-                + "<atbBattleChance>"
-                + StringUtils.join(atbBattleChance, ',')
-                + "</atbBattleChance>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "generateChases", generateChases);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "variableContractLength", variableContractLength);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useWeatherConditions", useWeatherConditions);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLightConditions", useLightConditions);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "usePlanetaryConditions", usePlanetaryConditions);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useLeadership", useLeadership);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "useStrategy", useStrategy);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "baseStrategyDeployment", baseStrategyDeployment);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "additionalStrategyDeployment", additionalStrategyDeployment);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "adjustPaymentForStrategy", adjustPaymentForStrategy);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "restrictPartsByMission", restrictPartsByMission);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceWeight", limitLanceWeight);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "limitLanceNumUnits", limitLanceNumUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforAeros", allowOpforAeros);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "allowOpforLocalUnits", allowOpforLocalUnits);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforAeroChance", opforAeroChance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "opforLocalUnitChance", opforLocalUnitChance);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "fixedMapChance", fixedMapChance);
+        //region AtB Tab
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillLevel", getSkillLevel().name());
+        //endregion AtB Tab
 
-        //Mass Repair/Salvage Options
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, ++indent, "massRepairUseRepair", massRepairUseRepair());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairUseSalvage", massRepairUseSalvage());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairUseExtraTime", massRepairUseExtraTime);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairUseRushJob", massRepairUseRushJob);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairAllowCarryover", massRepairAllowCarryover);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairOptimizeToCompleteToday", massRepairOptimizeToCompleteToday);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairScrapImpossible", massRepairScrapImpossible);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairUseAssignedTechsFirst", massRepairUseAssignedTechsFirst);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "massRepairReplacePod", massRepairReplacePod);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotypeProbabilities", phenotypeProbabilities);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtB", useAtB);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStratCon", useStratCon);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAero", useAero);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVehicles", useVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanVehicles", clanVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doubleVehicles", doubleVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPlayerVehicles", adjustPlayerVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMechs", getOpForLanceTypeMechs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMixed", getOpForLanceTypeMixed());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeVehicles", getOpForLanceTypeVehicles());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForUsesVTOLs", isOpForUsesVTOLs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", useDropShips);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", useShareSystem);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", sharesExcludeLargeCraft);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", sharesForAll);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", mercSizeLimited);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackOriginalUnit", trackOriginalUnit);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regionalMechVariations", regionalMechVariations);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attachedPlayerCamouflage", attachedPlayerCamouflage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "playerControlsAttachedUnits", playerControlsAttachedUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atbBattleChance", atbBattleChance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateChases", generateChases);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useWeatherConditions", useWeatherConditions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLightConditions", useLightConditions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryConditions", usePlanetaryConditions);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadership", useLeadership);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStrategy", useStrategy);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseStrategyDeployment", baseStrategyDeployment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPaymentForStrategy", adjustPaymentForStrategy);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "restrictPartsByMission", restrictPartsByMission);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForAeros", isAllowOpForAeros());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allowOpForLocalUnits", isAllowOpForLocalUnits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForAeroChance", getOpForAeroChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLocalUnitChance", getOpForLocalUnitChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", fixedMapChance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", spaUpgradeIntensity);
 
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "massRepairOptions");
-        for (MassRepairOption massRepairOption : massRepairOptions) {
-            massRepairOption.writeToXML(pw1, indent);
-        }
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "massRepairOptions");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetOutputAcquisitionBonus", planetOutputAcquisitionBonus);
 
-        pw1.println(MekHqXmlUtil.indentStr(indent)
-                + "<planetTechAcquisitionBonus>"
-                + StringUtils.join(planetTechAcquisitionBonus, ',')
-                + "</planetTechAcquisitionBonus>");
-        pw1.println(MekHqXmlUtil.indentStr(indent)
-                + "<planetIndustryAcquisitionBonus>"
-                + StringUtils.join(planetIndustryAcquisitionBonus, ',')
-                + "</planetIndustryAcquisitionBonus>");
-        pw1.println(MekHqXmlUtil.indentStr(indent)
-                + "<planetOutputAcquisitionBonus>"
-                + StringUtils.join(planetOutputAcquisitionBonus, ',')
-                + "</planetOutputAcquisitionBonus>");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePortraitForType", isUsePortraitForRoles());
 
-
-        // cannot use StringUtils.join for a boolean array, so we are using this instead
-        StringBuilder csv = new StringBuilder();
-        for (int i = 0; i < usePortraitForRoles().length; i++) {
-            csv.append(usePortraitForRoles()[i]);
-            if (i < usePortraitForRoles().length - 1) {
-                csv.append(",");
-            }
-        }
-
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "usePortraitForType", csv.toString());
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw1, --indent, "campaignOptions");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "campaignOptions");
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
@@ -3796,10 +3889,44 @@ public class CampaignOptions {
                     retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
                     retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) {
-                    retVal.useUnofficialMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialMaintenance")
+                        || wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) { // Legacy, 0.49.12 Removal
+                    retVal.setUseUnofficialMaintenance(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("logMaintenance")) {
                     retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
+
+                //region Mass Repair / Mass Salvage
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseRepair")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseSalvage")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSUseSalvage(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseExtraTime")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSUseExtraTime(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseRushJob")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSUseRushJob(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsAllowCarryover")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSAllowCarryover(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsOptimizeToCompleteToday")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairOptimizeToCompleteToday")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSOptimizeToCompleteToday(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsScrapImpossible")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSScrapImpossible(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseAssignedTechsFirst")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSUseAssignedTechsFirst(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsReplacePod")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSReplacePod(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("mrmsOptions")
+                        || wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) { // Legacy, 0.49.12 removal
+                    retVal.setMRMSOptions(MRMSOption.parseListFromXML(wn2, version));
+                //endregion Mass Repair / Mass Salvage
                 //endregion Repair and Maintenance Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
@@ -3893,12 +4020,12 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractPercent")) {
                     retVal.setEquipmentContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("dropshipContractPercent")) {
-                    retVal.setDropshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("jumpshipContractPercent")) {
-                    retVal.setJumpshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("warshipContractPercent")) {
-                    retVal.setWarshipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("dropShipContractPercent")) {
+                    retVal.setDropShipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("jumpShipContractPercent")) {
+                    retVal.setJumpShipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("warShipContractPercent")) {
+                    retVal.setWarShipContractPercent(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractBase")) {
                     retVal.equipmentContractBase = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("equipmentContractSaleValue")) {
@@ -4081,8 +4208,9 @@ public class CampaignOptions {
                 //endregion Retirement
 
                 //region Family
-                } else if (wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) {
-                    retVal.setDisplayFamilyLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("familyDisplayLevel")
+                        || wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) { // Legacy, 0.49.12 removal
+                    retVal.setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
                 //endregion Family
 
                 //region Dependent
@@ -4103,10 +4231,19 @@ public class CampaignOptions {
                     retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salarySpecialistInfantryMultiplier")) {
                     retVal.setSalarySpecialistInfantryMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) {
-                    String[] values = wn2.getTextContent().split(",");
-                    for (int i = 0; i < values.length; i++) {
-                        retVal.setSalaryXPMultiplier(i, Double.parseDouble(values[i]));
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultipliers")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int j = 0; j < nl2.getLength(); j++) {
+                        final Node wn3 = nl2.item(j);
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                        retVal.getSalaryXPMultipliers().put(
+                                SkillLevel.valueOf(wn3.getNodeName().trim()),
+                                Double.parseDouble(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryTypeBase")) {
                     if (version.isLowerThan("0.49.0")) {
@@ -4122,8 +4259,9 @@ public class CampaignOptions {
                 //region Marriage
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
                     retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useClannerMarriages")) {
-                    retVal.setUseClannerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useClanPersonnelMarriages")
+                        || wn2.getNodeName().equalsIgnoreCase("useClannerMarriages")) { // Legacy, 0.49.12 removal
+                    retVal.setUseClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerMarriages")) {
                     retVal.setUsePrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("minimumMarriageAge")) {
@@ -4143,15 +4281,16 @@ public class CampaignOptions {
                             continue;
                         }
                         retVal.getMarriageSurnameWeights().put(
-                                MergingSurnameStyle.valueOf(wn3.getNodeName().trim()),
+                                MergingSurnameStyle.parseFromString(wn3.getNodeName().trim()),
                                 Integer.parseInt(wn3.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageMethod")) {
                     retVal.setRandomMarriageMethod(RandomMarriageMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexMarriages")) {
                     retVal.setUseRandomSameSexMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClannerMarriages")) {
-                    retVal.setUseRandomClannerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelMarriages")
+                        || wn2.getNodeName().equalsIgnoreCase("useRandomClannerMarriages")) { // Legacy, 0.49.12 removal
+                    retVal.setUseRandomClanPersonnelMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerMarriages")) {
                     retVal.setUseRandomPrisonerMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomMarriageAgeRange")) {
@@ -4165,8 +4304,9 @@ public class CampaignOptions {
                 //region Divorce
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualDivorce")) {
                     retVal.setUseManualDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useClannerDivorce")) {
-                    retVal.setUseClannerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useClanPersonnelDivorce")
+                        || wn2.getNodeName().equalsIgnoreCase("useClannerDivorce")) { // Legacy, 0.49.12 removal
+                    retVal.setUseClanPersonnelDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerDivorce")) {
                     retVal.setUsePrisonerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("divorceSurnameWeights")) {
@@ -4189,8 +4329,9 @@ public class CampaignOptions {
                     retVal.setUseRandomOppositeSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomSameSexDivorce")) {
                     retVal.setUseRandomSameSexDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClannerDivorce")) {
-                    retVal.setUseRandomClannerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelDivorce")
+                        || wn2.getNodeName().equalsIgnoreCase("useRandomClannerDivorce")) { // Legacy, 0.49.12 removal
+                    retVal.setUseRandomClanPersonnelDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerDivorce")) {
                     retVal.setUseRandomPrisonerDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDivorceOppositeSexChance")) {
@@ -4202,8 +4343,9 @@ public class CampaignOptions {
                 //region Procreation
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualProcreation")) {
                     retVal.setUseManualProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useClannerProcreation")) {
-                    retVal.setUseClannerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useClanPersonnelProcreation")
+                        || wn2.getNodeName().equalsIgnoreCase("useClannerProcreation")) { // Legacy, 0.49.12 removal
+                    retVal.setUseClanPersonnelProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("usePrisonerProcreation")) {
                     retVal.setUsePrisonerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("multiplePregnancyOccurrences")) {
@@ -4224,8 +4366,9 @@ public class CampaignOptions {
                     retVal.setRandomProcreationMethod(RandomProcreationMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRelationshiplessRandomProcreation")) {
                     retVal.setUseRelationshiplessRandomProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClannerProcreation")) {
-                    retVal.setUseRandomClannerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelProcreation")
+                        || wn2.getNodeName().equalsIgnoreCase("useRandomClannerProcreation")) { // Legacy, 0.49.12 removal
+                    retVal.setUseRandomClanPersonnelProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerProcreation")) {
                     retVal.setUseRandomPrisonerProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomProcreationRelationshipChance")) {
@@ -4237,6 +4380,71 @@ public class CampaignOptions {
                 //region Death
                 } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
                     retVal.setKeepMarriedNameUponSpouseDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathMethod")) {
+                    retVal.setRandomDeathMethod(RandomDeathMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enabledRandomDeathAgeGroups")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int i = 0; i < nl2.getLength(); i++) {
+                        final Node wn3 = nl2.item(i);
+                        try {
+                            retVal.getEnabledRandomDeathAgeGroups().put(
+                                    AgeGroup.valueOf(wn3.getNodeName()),
+                                    Boolean.parseBoolean(wn3.getTextContent().trim()));
+                        } catch (Exception ignored) {
+
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomClanPersonnelDeath")) {
+                    retVal.setUseRandomClanPersonnelDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomPrisonerDeath")) {
+                    retVal.setUseRandomPrisonerDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDeathSuicideCause")) {
+                    retVal.setUseRandomDeathSuicideCause(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDeathChance")) {
+                    retVal.setPercentageRandomDeathChance(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("exponentialRandomDeathMaleValues")) {
+                    final String[] values = wn2.getTextContent().trim().split(",");
+                    retVal.setExponentialRandomDeathMaleValues(Arrays.stream(values)
+                            .mapToDouble(Double::parseDouble)
+                            .toArray());
+                } else if (wn2.getNodeName().equalsIgnoreCase("exponentialRandomDeathFemaleValues")) {
+                    final String[] values = wn2.getTextContent().trim().split(",");
+                    retVal.setExponentialRandomDeathFemaleValues(Arrays.stream(values)
+                            .mapToDouble(Double::parseDouble)
+                            .toArray());
+                } else if (wn2.getNodeName().equalsIgnoreCase("ageRangeRandomDeathMaleValues")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int i = 0; i < nl2.getLength(); i++) {
+                        final Node wn3 = nl2.item(i);
+                        try {
+                            retVal.getAgeRangeRandomDeathMaleValues().put(
+                                    TenYearAgeRange.valueOf(wn3.getNodeName()),
+                                    Double.parseDouble(wn3.getTextContent().trim()));
+                        } catch (Exception ignored) {
+
+                        }
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("ageRangeRandomDeathFemaleValues")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int i = 0; i < nl2.getLength(); i++) {
+                        final Node wn3 = nl2.item(i);
+                        try {
+                            retVal.getAgeRangeRandomDeathFemaleValues().put(
+                                    TenYearAgeRange.valueOf(wn3.getNodeName()),
+                                    Double.parseDouble(wn3.getTextContent().trim()));
+                        } catch (Exception ignored) {
+
+                        }
+                    }
                 //endregion Death
                 //endregion Personnel Tab
 
@@ -4311,22 +4519,24 @@ public class CampaignOptions {
 
                 //region Markets Tab
                 //region Personnel Market
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy - pre-0.48
-                    retVal.setPersonnelMarketType(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
-                    retVal.setPersonnelMarketType(wn2.getTextContent().trim());
+                    retVal.setPersonnelMarketName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
                     retVal.setPersonnelMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) {
-                    retVal.setPersonnelMarketRandomEliteRemoval(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) {
-                    retVal.setPersonnelMarketRandomVeteranRemoval(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) {
-                    retVal.setPersonnelMarketRandomRegularRemoval(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) {
-                    retVal.setPersonnelMarketRandomGreenRemoval(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) {
-                    retVal.setPersonnelMarketRandomUltraGreenRemoval(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRemovalTargets")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final NodeList nl2 = wn2.getChildNodes();
+                    for (int j = 0; j < nl2.getLength(); j++) {
+                        final Node wn3 = nl2.item(j);
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
+                            continue;
+                        }
+                        retVal.getPersonnelMarketRandomRemovalTargets().put(
+                                SkillLevel.valueOf(wn3.getNodeName().trim()),
+                                Integer.parseInt(wn3.getTextContent().trim()));
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
                     retVal.setPersonnelMarketDylansWeight(Double.parseDouble(wn2.getTextContent().trim()));
                 //endregion Personnel Market
@@ -4345,6 +4555,11 @@ public class CampaignOptions {
                 //region Contract Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketMethod")) {
                     retVal.setContractMarketMethod(ContractMarketMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("contractSearchRadius")
+                        || wn2.getNodeName().equalsIgnoreCase("searchRadius")) { // Legacy, 0.49.12 Removal
+                    retVal.setContractSearchRadius(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
+                    retVal.setVariableContractLength(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
                     retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion Contract Market
@@ -4354,10 +4569,17 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equals("useStaticRATs")) {
                     retVal.setUseStaticRATs(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
-                    retVal.setRATs(MekHqXmlUtil.unEscape(wn2.getTextContent().trim()).split(","));
+                    retVal.setRATs(MHQXMLUtility.unEscape(wn2.getTextContent().trim()).split(","));
                 } else if (wn2.getNodeName().equals("ignoreRATEra")) {
                     retVal.setIgnoreRATEra(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion RATs Tab
+
+                //region AtB Tab
+                } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
+                    retVal.setSkillLevel(version.isLowerThan("0.49.12")
+                            ? Skills.SKILL_LEVELS[Integer.parseInt(wn2.getTextContent().trim()) + 1]
+                            : SkillLevel.valueOf(wn2.getTextContent().trim()));
+                //endregion AtB Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
                     String[] values = wn2.getTextContent().split(",");
@@ -4378,18 +4600,16 @@ public class CampaignOptions {
                     retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {
                     retVal.adjustPlayerVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeMechs")) {
-                    retVal.opforLanceTypeMechs = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeMixed")) {
-                    retVal.opforLanceTypeMixed = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("opforLanceTypeVehicles")) {
-                    retVal.opforLanceTypeVehicles = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("opforUsesVTOLs")) {
-                    retVal.opforUsesVTOLs = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("opForLanceTypeMechs")) {
+                    retVal.setOpForLanceTypeMechs(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("opForLanceTypeMixed")) {
+                    retVal.setOpForLanceTypeMixed(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("opForLanceTypeVehicles")) {
+                    retVal.setOpForLanceTypeVehicles(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("opForUsesVTOLs")) {
+                    retVal.setOpForUsesVTOLs(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
                     retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
-                    retVal.skillLevel = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aeroRecruitsHaveUnits")) {
                     retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
@@ -4408,8 +4628,6 @@ public class CampaignOptions {
                     retVal.attachedPlayerCamouflage = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("playerControlsAttachedUnits")) {
                     retVal.setPlayerControlsAttachedUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("searchRadius")) {
-                    retVal.searchRadius = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("atbBattleChance")) {
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
@@ -4424,8 +4642,6 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("generateChases")) {
                     retVal.setGenerateChases(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("variableContractLength")) {
-                    retVal.variableContractLength = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useWeatherConditions")) {
                     retVal.useWeatherConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useLightConditions")) {
@@ -4448,39 +4664,36 @@ public class CampaignOptions {
                     retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceNumUnits")) {
                     retVal.limitLanceNumUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforLocalUnits")) {
-                    retVal.allowOpforLocalUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("allowOpforAeros")) {
-                    retVal.allowOpforAeros = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("opforAeroChance")) {
-                    retVal.opforAeroChance = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("opforLocalUnitChance")) {
-                    retVal.opforLocalUnitChance = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("allowOpForLocalUnits")) {
+                    retVal.setAllowOpForLocalUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("allowOpForAeros")) {
+                    retVal.setAllowOpForAeros(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("opForAeroChance")) {
+                    retVal.setOpForAeroChance(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("opForLocalUnitChance")) {
+                    retVal.setOpForLocalUnitChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fixedMapChance")) {
                     retVal.fixedMapChance = Integer.parseInt(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) {
-                    retVal.setMassRepairUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseSalvage")) {
-                    retVal.setMassRepairUseSalvage(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseExtraTime")) {
-                    retVal.massRepairUseExtraTime = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseRushJob")) {
-                    retVal.massRepairUseRushJob = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairAllowCarryover")) {
-                    retVal.massRepairAllowCarryover = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptimizeToCompleteToday")) {
-                    retVal.massRepairOptimizeToCompleteToday = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairScrapImpossible")) {
-                    retVal.massRepairScrapImpossible = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairUseAssignedTechsFirst")) {
-                    retVal.massRepairUseAssignedTechsFirst = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairReplacePod")) {
-                    retVal.massRepairReplacePod = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) {
-                    retVal.setMassRepairOptions(MassRepairOption.parseListFromXML(wn2, version));
+                } else if (wn2.getNodeName().equalsIgnoreCase("spaUpgradeIntensity")) {
+                    retVal.setSpaUpgradeIntensity(Integer.parseInt(wn2.getTextContent().trim()));
 
                 //region Legacy
                 // Removed in 0.49.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) { // Legacy, 0.49.12 removal
+                    String[] values = wn2.getTextContent().split(",");
+                    for (int i = 0; i < values.length; i++) {
+                        retVal.getSalaryXPMultipliers().put(Skills.SKILL_LEVELS[i + 1], Double.parseDouble(values[i]));
+                    }
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomEliteRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ELITE, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomVeteranRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.VETERAN, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomRegularRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.REGULAR, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomGreenRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.GREEN, Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketRandomUltraGreenRemoval")) { // Legacy, 0.49.12 removal
+                    retVal.getPersonnelMarketRandomRemovalTargets().put(SkillLevel.ULTRA_GREEN, Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomizeOrigin")) { // Legacy, 0.49.7 Removal
                     retVal.getRandomOriginOptions().setRandomizeOrigin(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomizeDependentOrigin")) { // Legacy, 0.49.7 Removal
@@ -4493,7 +4706,7 @@ public class CampaignOptions {
                     retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) { // Legacy - 0.49.7 Removal
                     final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
-                    retVal.setRandomRetirementMethod(value ? RandomRetirementMethod.AGAINST_THE_BOT : RandomRetirementMethod.NONE);
+                    retVal.setRandomRetirementMethod((value && retVal.isUseAtB()) ? RandomRetirementMethod.AGAINST_THE_BOT : RandomRetirementMethod.NONE);
                     retVal.setUseYearEndRandomRetirement(value);
                     retVal.setUseContractCompletionRandomRetirement(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) { // Legacy - 0.49.7 Removal
@@ -4502,7 +4715,7 @@ public class CampaignOptions {
                     retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) { // Legacy - 0.49.7 Removal
                     final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
-                    retVal.setRandomDependentMethod(value? RandomDependentMethod.AGAINST_THE_BOT : RandomDependentMethod.NONE);
+                    retVal.setRandomDependentMethod((value && retVal.isUseAtB()) ? RandomDependentMethod.AGAINST_THE_BOT : RandomDependentMethod.NONE);
                     retVal.setUseRandomDependentAddition(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("dependentsNeverLeave")) { // Legacy - 0.49.7 Removal
                     retVal.setUseRandomDependentRemoval(!Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -4568,6 +4781,8 @@ public class CampaignOptions {
                     retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
 
                 // Removed in 0.47.*
+                } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
+                    retVal.setPersonnelMarketName(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy
                     if (Boolean.parseBoolean(wn2.getTextContent().trim())) {
                         retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.ATB);
@@ -4596,22 +4811,22 @@ public class CampaignOptions {
                         retVal.setUnitRatingMethod(UnitRatingMethod.NONE);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoMW")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.phenotypeProbabilities[Phenotype.MECHWARRIOR.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoBA")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.phenotypeProbabilities[Phenotype.ELEMENTAL.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoAero")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.AEROSPACE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.phenotypeProbabilities[Phenotype.AEROSPACE.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("probPhenoVee")) { // Legacy
-                    retVal.phenotypeProbabilities[Phenotype.VEHICLE.getIndex()] = Integer.parseInt(wn2.getTextContent().trim());
+                    retVal.phenotypeProbabilities[Phenotype.VEHICLE.ordinal()] = Integer.parseInt(wn2.getTextContent().trim());
                 }
                 //endregion Legacy
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
 
         // Fixing Old Data
-        if (version.isLowerThan("0.49.3") && retVal.getUseAtB()) {
+        if (version.isLowerThan("0.49.3") && retVal.isUseAtB()) {
             retVal.setUnitMarketMethod(UnitMarketMethod.ATB_MONTHLY);
             retVal.setContractMarketMethod(ContractMarketMethod.ATB_MONTHLY);
         }
@@ -4632,8 +4847,8 @@ public class CampaignOptions {
         for (int i = 0; i < weights.length; i++) {
             try {
                 weights[i] = Integer.parseInt(values[i]);
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
                 weights[i] = 0;
             }
         }
@@ -4644,10 +4859,10 @@ public class CampaignOptions {
                 (weights[0] != getMarriageSurnameWeights().get(MergingSurnameStyle.NO_CHANGE))
                         || (weights[1] != getMarriageSurnameWeights().get(MergingSurnameStyle.YOURS) + 5)
                         || (weights[2] != getMarriageSurnameWeights().get(MergingSurnameStyle.SPOUSE) + 5)
-                        || (weights[3] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYP_SPOUSE) + 5)
-                        || (weights[4] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYP_SPOUSE) + 5)
-                        || (weights[5] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYP_YOURS) + 5)
-                        || (weights[6] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYP_YOURS) + 5)
+                        || (weights[3] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_SPOUSE) + 5)
+                        || (weights[4] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE) + 5)
+                        || (weights[5] != getMarriageSurnameWeights().get(MergingSurnameStyle.HYPHEN_YOURS) + 5)
+                        || (weights[6] != getMarriageSurnameWeights().get(MergingSurnameStyle.BOTH_HYPHEN_YOURS) + 5)
                         || (weights[7] != getMarriageSurnameWeights().get(MergingSurnameStyle.MALE))
                         || (weights[8] != getMarriageSurnameWeights().get(MergingSurnameStyle.FEMALE))
         ) {
@@ -4656,14 +4871,15 @@ public class CampaignOptions {
             getMarriageSurnameWeights().put(MergingSurnameStyle.SPOUSE, weights[2]);
             // SPACE_YOURS is newly added
             // BOTH_SPACE_YOURS is newly added
-            getMarriageSurnameWeights().put(MergingSurnameStyle.HYP_YOURS, weights[3]);
-            getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYP_YOURS, weights[4]);
+            getMarriageSurnameWeights().put(MergingSurnameStyle.HYPHEN_YOURS, weights[3]);
+            getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYPHEN_YOURS, weights[4]);
             // SPACE_SPOUSE is newly added
             // BOTH_SPACE_SPOUSE is newly added
-            getMarriageSurnameWeights().put(MergingSurnameStyle.HYP_SPOUSE, weights[5]);
-            getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYP_SPOUSE, weights[6]);
+            getMarriageSurnameWeights().put(MergingSurnameStyle.HYPHEN_SPOUSE, weights[5]);
+            getMarriageSurnameWeights().put(MergingSurnameStyle.BOTH_HYPHEN_SPOUSE, weights[6]);
             getMarriageSurnameWeights().put(MergingSurnameStyle.MALE, weights[7]);
             getMarriageSurnameWeights().put(MergingSurnameStyle.FEMALE, weights[8]);
         }
     }
+    //endregion File IO
 }

@@ -20,7 +20,7 @@ package mekhq.campaign;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
 import mekhq.campaign.event.PartRemovedEvent;
@@ -339,13 +339,9 @@ public class Warehouse {
         return true;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent, String tag) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
-
-        forEachPart(part -> {
-            part.writeToXML(pw1, indent + 1);
-        });
-
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);
+    public void writeToXML(final PrintWriter pw, final int indent, final String tag) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, tag);
+        forEachPart(part -> part.writeToXML(pw, indent + 1));
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, tag);
     }
 }

@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog.reportDialogs;
 
+import mekhq.MHQConstants;
 import mekhq.campaign.report.PersonnelReport;
 
 import javax.swing.*;
@@ -46,13 +47,13 @@ public class PersonnelReportDialog extends AbstractReportDialog {
         final JTextPane txtCombatPersonnel = new JTextPane();
         txtCombatPersonnel.setText(getPersonnelReport().getCombatPersonnelDetails());
         txtCombatPersonnel.setName("txtCombatPersonnel");
-        txtCombatPersonnel.setFont(new Font("Courier New", Font.PLAIN, 12));
+        txtCombatPersonnel.setFont(new Font(MHQConstants.FONT_COURIER_NEW, Font.PLAIN, 12));
         txtCombatPersonnel.setEditable(false);
 
         final JTextPane txtSupportPersonnel = new JTextPane();
         txtSupportPersonnel.setText(getPersonnelReport().getSupportPersonnelDetails());
         txtSupportPersonnel.setName("txtSupportPersonnel");
-        txtSupportPersonnel.setFont(new Font("Courier New", Font.PLAIN, 12));
+        txtSupportPersonnel.setFont(new Font(MHQConstants.FONT_COURIER_NEW, Font.PLAIN, 12));
         txtSupportPersonnel.setEditable(false);
 
         final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,

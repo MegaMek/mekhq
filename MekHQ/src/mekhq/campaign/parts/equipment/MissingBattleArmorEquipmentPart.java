@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 import megamek.common.EquipmentType;
 import megamek.common.MiscType;
 import megamek.common.Mounted;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 
@@ -59,14 +59,14 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "size", size);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "trooper", trooper);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentNum", equipmentNum);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "size", size);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipTonnage", equipTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trooper", trooper);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -175,7 +175,7 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
 
     @Override
     public void updateConditionFromPart() {
-        //you cant crit BA equipment, so do nothing
+        // You can't crit BA equipment, so do nothing
     }
 
     @Override
@@ -196,6 +196,4 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
         String toReturn = unit.getEntity().getLocationName(trooper) + "<br>";
         return toReturn + super.getDetails(includeRepairDetails);
     }
-
-
 }

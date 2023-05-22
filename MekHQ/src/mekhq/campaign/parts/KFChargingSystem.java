@@ -24,7 +24,8 @@ import megamek.common.Compute;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
@@ -168,7 +169,7 @@ public class KFChargingSystem extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (isSalvaging()) {
             // Can't salvage this part of the K-F Drive.
             return "You cannot salvage a K-F Charging System. You must scrap it instead.";
@@ -211,17 +212,11 @@ public class KFChargingSystem extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<coreType>"
-                +coreType
-                +"</coreType>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<docks>"
-                +docks
-                +"</docks>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "coreType", coreType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "docks", docks);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

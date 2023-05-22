@@ -18,18 +18,18 @@
  */
 package mekhq.gui.utilities;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.Vector;
-import java.util.stream.Stream;
-
 import megamek.common.UnitType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.Vector;
+import java.util.stream.Stream;
 
 public class StaticChecks {
 
@@ -92,10 +92,13 @@ public class StaticChecks {
         int numberProto = 0;
         int numberSC = 0;
         int numberSHVee = 0;
-        //First test all units in the selection and find out how many of each we have
+        int numberDropShips = 0;
+        // First test all units in the selection and find out how many of each we have
         for (Unit unit : units) {
-            if (unit.getEntity().isLargeCraft()) {
-                //No. Try your selection again.
+            if (unit.getEntity().getUnitType() == UnitType.DROPSHIP) {
+                numberDropShips++;
+            } else if (unit.getEntity().isLargeCraft()) {
+                // No. Try your selection again.
                 return "    Selection of Units includes a large spacecraft. \n";
             } else if (unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT) {
                 numberSC++;
@@ -106,7 +109,7 @@ public class StaticChecks {
             } else if (unit.getEntity().getUnitType() == UnitType.BATTLE_ARMOR) {
                 numberBA++;
             } else if (unit.getEntity().getUnitType() == UnitType.INFANTRY) {
-                //Make sure we account for space consumed by different platoon types
+                // Make sure we account for space consumed by different platoon types
                 numberInfantry += (int) Math.ceil(unit.getEntity().getWeight());
             } else if (unit.getEntity().getUnitType() == UnitType.MEK) {
                 // Includes LAMs and Quadvees
@@ -127,41 +130,55 @@ public class StaticChecks {
                 }
             }
         }
+
+        if (numberDropShips > ship.getCurrentDocks()) {
+            reason.add("    Selection of Units includes too many DropShips. \n");
+            loadOK = false;
+        }
+
         // Now test the designated ship and let us know if it can carry everyone
         if (numberSC > ship.getCurrentSmallCraftCapacity()) {
             reason.add("    Selection of Units includes too many small craft. \n");
             loadOK = false;
         }
+
         // Fighters can fit into any unused SC bays
         if (numberASF > (ship.getCurrentASFCapacity() + (ship.getCurrentSmallCraftCapacity() - numberSC))) {
             reason.add("    Selection of Units includes too many fighters. \n");
             loadOK = false;
         }
+
         if (numberBA > ship.getCurrentBattleArmorCapacity()) {
             reason.add("    Selection of Units includes too many Battle Armor units. \n");
             loadOK = false;
         }
+
         if (numberInfantry > ship.getCurrentInfantryCapacity()) {
             reason.add("    Selection of Units includes too many Infantry units. \n");
             loadOK = false;
         }
+
         if (numberMech > ship.getCurrentMechCapacity()) {
             reason.add("    Selection of Units includes too many Mechs. \n");
             loadOK = false;
         }
+
         if (numberProto > ship.getCurrentProtomechCapacity()) {
             reason.add("    Selection of Units includes too many ProtoMechs. \n");
             loadOK = false;
         }
+
         if (numberSHVee > ship.getCurrentSuperHeavyVehicleCapacity()) {
             reason.add("    Selection of Units includes too many SuperHeavy Vehicles. \n");
             loadOK = false;
         }
+
         // Heavy vehicles can fit into unused SuperHeavy bays
         if (numberHVee > (ship.getCurrentHeavyVehicleCapacity() + (ship.getCurrentSuperHeavyVehicleCapacity() - numberSHVee))) {
             reason.add("    Selection of Units includes too many Heavy Vehicles. \n");
             loadOK = false;
         }
+
         // Light vehicles can fit into any unused vehicle bays
         if (numberLVee >
             (ship.getCurrentLightVehicleCapacity() +
@@ -170,11 +187,8 @@ public class StaticChecks {
             reason.add("    Selection of Units includes too many Light Vehicles. \n");
             loadOK = false;
         }
-        if (!loadOK) {
-            return reason.toString();
-        }
-        // Everything's ok to load. Return a blank string.
-        return null;
+
+        return loadOK ? null : reason.toString();
     }
 
     //region C3
@@ -293,7 +307,7 @@ public class StaticChecks {
     }
 
     public static boolean areAllClanEligible(Person... people) {
-        return Stream.of(people).allMatch(Person::isClanner) && areAllEligible(people);
+        return Stream.of(people).allMatch(Person::isClanPersonnel) && areAllEligible(people);
     }
 
     public static boolean areAllEligible(Person... people) {
@@ -321,43 +335,11 @@ public class StaticChecks {
     }
 
     public static boolean areAllPrisoners(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isPrisoner());
-    }
-
-    /**
-     * @param people an array of people
-     * @return true if all of the people are female, otherwise false
-     */
-    public static boolean areAllFemale(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getGender().isFemale());
-    }
-
-    /**
-     * @param people an array of people
-     * @return true if they are either all trying to conceive or all not, otherwise false
-     */
-    public static boolean areEitherAllTryingToConceiveOrNot(Person... people) {
-        return Stream.of(people).allMatch(p -> p.isTryingToConceive() == people[0].isTryingToConceive());
-    }
-
-    /**
-     * @param people an array of people
-     * @return true if they are either all trying to marry or all not, otherwise false
-     */
-    public static boolean areEitherAllTryingToMarryOrNot(Person... people) {
-        return Stream.of(people).allMatch(p -> p.isMarriageable() == people[0].isMarriageable());
-    }
-
-    /**
-     * @param people an array of people
-     * @return true if they are either all founders or all not, otherwise false
-     */
-    public static boolean areEitherAllFoundersOrNot(Person... people) {
-        return Stream.of(people).allMatch(p -> p.isFounder() == people[0].isFounder());
+        return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isCurrentPrisoner());
     }
 
     public static boolean areAnyWillingToDefect(Person... people) {
-        return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isWillingToDefect());
+        return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isPrisonerDefector());
     }
 
     public static boolean areAllSameSite(Unit... units) {

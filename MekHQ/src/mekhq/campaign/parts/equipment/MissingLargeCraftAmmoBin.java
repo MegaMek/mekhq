@@ -21,7 +21,7 @@ package mekhq.campaign.parts.equipment;
 import megamek.common.AmmoType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import org.apache.logging.log4j.LogManager;
@@ -152,9 +152,9 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     }
 
     @Override
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "bayEqNum", bayEqNum);
-        super.writeToXmlEnd(pw1, indent);
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bayEqNum", bayEqNum);
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override

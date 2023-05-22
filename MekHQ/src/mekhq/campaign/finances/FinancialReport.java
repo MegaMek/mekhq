@@ -1,6 +1,4 @@
 /*
- * FinancialReport.java
- *
  * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -18,23 +16,14 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.finances;
 
-import java.util.stream.Collectors;
-
-import megamek.common.Aero;
-import megamek.common.BattleArmor;
-import megamek.common.Dropship;
-import megamek.common.Infantry;
-import megamek.common.Jumpship;
-import megamek.common.Mech;
-import megamek.common.Protomech;
-import megamek.common.Tank;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.mission.Contract;
-import mekhq.campaign.unit.Unit;
+
+import java.util.stream.Collectors;
 
 public class FinancialReport {
     private Money assets = Money.zero();
@@ -181,16 +170,16 @@ public class FinancialReport {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Accountant accountant = campaign.getAccountant();
 
-        if (campaignOptions.payForMaintain()) {
+        if (campaignOptions.isPayForMaintain()) {
             r.maintenance = accountant.getWeeklyMaintenanceCosts().multipliedBy(4);
         }
-        if (campaignOptions.payForSalaries()) {
+        if (campaignOptions.isPayForSalaries()) {
             r.salaries = accountant.getPayRoll();
         }
-        if (campaignOptions.payForOverhead()) {
+        if (campaignOptions.isPayForOverhead()) {
             r.overhead = accountant.getOverheadExpenses();
         }
-        if (campaignOptions.usePeacetimeCost()) {
+        if (campaignOptions.isUsePeacetimeCost()) {
             r.coSpareParts = accountant.getMonthlySpareParts();
             r.coAmmo = accountant.getMonthlyAmmo();
             r.coFuel = accountant.getMonthlyFuel();

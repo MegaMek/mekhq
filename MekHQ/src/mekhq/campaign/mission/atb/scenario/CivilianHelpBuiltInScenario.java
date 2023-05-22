@@ -43,7 +43,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
     private static final String CIVILIAN_FORCE_ID = "Civilians";
 
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -54,7 +54,7 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Civilian Help";
+        return "Special Scenario: Civilian Help";
     }
 
     @Override
@@ -68,8 +68,8 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         setStart(startPos[Compute.randomInt(4)]);
         int enemyStart = getStart() + 4;
 
@@ -77,15 +77,16 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
             enemyStart -= 8;
         }
 
-        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+        for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
             enemyEntities = new ArrayList<>();
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++) {
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
                         getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
-            getSpecMissionEnemies().add(enemyEntities);
+            }
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
 
         List<Entity> otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 4, campaign);

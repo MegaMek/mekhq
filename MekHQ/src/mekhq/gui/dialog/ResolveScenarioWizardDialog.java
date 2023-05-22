@@ -1,8 +1,8 @@
 /*
  * ResolveScenarioWizardDialog.java
  *
- * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,7 +27,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.GunEmplacement;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -64,7 +63,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     final static String SALVAGEPANEL = "Claim Salvage";
     final static String PRISONERPANEL= "Captured Personnel Status";
     final static String KILLPANEL    = "Assign Kills";
-    final static String REWARDPANEL  = "Collect Rewards";
+    final static String REWARDPANEL  = "Scenario Costs & Payouts";
     final static String PREVIEWPANEL = "Preview";
     /* Used by AtB to determine minor contract breaches and bonus rolls */
     final static String OBJECTIVEPANEL    = "Objective Status";
@@ -176,7 +175,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     //endregion Preview Panel components
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {
@@ -1082,7 +1081,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
                 // if it's a custom objective or there are no associated units, we display
                 // a single line and an override
-                if (currentObjectiveUnits.size() == 0) {
+                if (currentObjectiveUnits.isEmpty()) {
                     JCheckBox chkObjective = new JCheckBox();
                     chkObjective.setText(objective.getDescription());
                     chkObjective.setForeground(Color.RED);
@@ -1124,11 +1123,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ResolveScenarioWizardDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ResolveScenarioWizardDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private void switchPanel(String name) {
@@ -1402,20 +1405,20 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private boolean usePanel(String panelName) {
         switch (panelName) {
             case UNITSPANEL:
-                return tracker.getUnitsStatus().keySet().size() > 0;
+                return !tracker.getUnitsStatus().keySet().isEmpty();
             case OBJECTIVEPANEL:
                 return tracker.getScenario().hasObjectives();
             case PILOTPANEL:
-                return tracker.getPeopleStatus().keySet().size() > 0;
+                return !tracker.getPeopleStatus().keySet().isEmpty();
             case PRISONERPANEL:
-                return tracker.getOppositionPersonnel().keySet().size() > 0;
+                return !tracker.getOppositionPersonnel().keySet().isEmpty();
             case SALVAGEPANEL:
-                return tracker.getPotentialSalvage().size() > 0
+                return !tracker.getPotentialSalvage().isEmpty()
                         && (!(tracker.getMission() instanceof Contract) || ((Contract) tracker.getMission()).canSalvage());
             case KILLPANEL:
                 return !tracker.getKillCredits().isEmpty();
             case REWARDPANEL:
-                return loots.size() > 0;
+                return !loots.isEmpty();
             case PREVIEWPANEL:
                 return true;
             default:

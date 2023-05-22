@@ -151,7 +151,7 @@ public class HirePersonnelUnitAction implements IUnitAction {
 
         // Ensure we generate at least one person with the artillery skill if using that skill and
         // the unit has an artillery weapon
-        if (campaign.getCampaignOptions().useArtillery() && (unit.getEntity() != null)
+        if (campaign.getCampaignOptions().isUseArtillery() && (unit.getEntity() != null)
                 && unit.getEntity().getWeaponList().stream()
                         .anyMatch(weapon -> (weapon.getType() instanceof WeaponType)
                                 && (((WeaponType) weapon.getType()).getDamage() == WeaponType.DAMAGE_ARTILLERY))) {

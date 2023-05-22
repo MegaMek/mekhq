@@ -18,13 +18,14 @@
  */
 package mekhq.campaign.log;
 
-import megamek.common.util.EncodeControl;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import org.apache.logging.log4j.LogManager;
 
 import java.text.MessageFormat;
 import java.time.LocalDate;
@@ -36,12 +37,12 @@ import java.util.ResourceBundle;
  */
 public class ServiceLogger {
     private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public static void retireDueToWounds(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("retiredDueToWounds.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                GenderDescriptors.HIS_HER.getDescriptor(person.getGender()))));
+                GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender()))));
     }
 
     public static void madeBondsman(Person person, LocalDate date, String name, String rankEntry) {
@@ -89,6 +90,10 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredMia.text")));
     }
 
+    public static void recoveredPoW(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredPoW.text")));
+    }
+
     public static void returnedFromLeave(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromLeave.text")));
     }
@@ -119,9 +124,10 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, person.getRankName())));
     }
 
-    public static void participatedInMission(Person person, LocalDate date, String scenarioName, String missionName) {
-        String message = logEntriesResourceMap.getString("participatedInMission.text");
-        person.addMissionLogEntry(new ServiceLogEntry(date,
+    public static void participatedInScenarioDuringMission(Person person, LocalDate date,
+                                                           String scenarioName, String missionName) {
+        String message = logEntriesResourceMap.getString("participatedInScenarioDuringMission.text");
+        person.addScenarioLogEntry(new ServiceLogEntry(date,
                 MessageFormat.format(message, scenarioName, missionName)));
     }
 
@@ -163,8 +169,12 @@ public class ServiceLogger {
         }
     }
 
-    public static void reassignedTOEForce(Campaign campaign, Person person, LocalDate date, Force oldForce, Force newForce) {
+    public static void reassignedTOEForce(final Campaign campaign, final Person person,
+                                          final LocalDate date, final @Nullable Force oldForce,
+                                          final @Nullable Force newForce) {
         if ((oldForce == null) && (newForce == null)) {
+            LogManager.getLogger().error(String.format("Cannot reassign %s on %s because both specified forces are null",
+                    person.getFullTitle(), date));
             return;
         }
 

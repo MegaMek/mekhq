@@ -25,15 +25,18 @@ import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.PlanetarySystem;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Miguel Azevedo
@@ -46,77 +49,83 @@ public class ContractTest {
     @Test
     public void testGetBaseAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(130), contract.getBaseAmount());
+        assertEquals(Money.of(130), contract.getBaseAmount());
     }
 
     @Test
     public void testGetOverheadAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(10), contract.getOverheadAmount());
+        assertEquals(Money.of(10), contract.getOverheadAmount());
     }
 
     @Test
     public void testGetSupportAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(10), contract.getSupportAmount());
+        assertEquals(Money.of(10), contract.getSupportAmount());
     }
 
     @Test
     public void testGetTransportAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(20), contract.getTransportAmount());
+        assertEquals(Money.of(20), contract.getTransportAmount());
     }
 
     @Test
     public void testGetTransitAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(30), contract.getTransitAmount());
+        assertEquals(Money.of(30), contract.getTransitAmount());
     }
 
     @Test
     public void testSigningBonusAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(20), contract.getSigningBonusAmount());
+        assertEquals(Money.of(20), contract.getSigningBonusAmount());
     }
 
     @Test
     public void testGetFeeAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(10), contract.getFeeAmount());
+        assertEquals(Money.of(10), contract.getFeeAmount());
     }
 
     @Test
     public void testGetTotalAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(200), contract.getTotalAmount());
+        assertEquals(Money.of(200), contract.getTotalAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFees() {
         initializeTest();
-        Assert.assertEquals(Money.of(190), contract.getTotalAmountPlusFees());
+        assertEquals(Money.of(190), contract.getTotalAmountPlusFees());
     }
 
     @Test
     public void testGetAdvanceAmount() {
         initializeTest();
-        Assert.assertEquals(Money.of(19), contract.getAdvanceAmount());
+        assertEquals(Money.of(19), contract.getAdvanceAmount());
     }
 
     @Test
     public void testGetTotalAmountPlusFeesAndBonuses() {
         initializeTest();
-        Assert.assertEquals(Money.of(210), contract.getTotalAmountPlusFeesAndBonuses());
+        assertEquals(Money.of(210), contract.getTotalAmountPlusFeesAndBonuses());
     }
 
     @Test
     public void testGetMonthlyPayout() {
         initializeTest();
-        Assert.assertEquals(Money.of(17.10), contract.getMonthlyPayOut());
+        assertEquals(Money.of(17.10), contract.getMonthlyPayOut());
     }
 
     private void initializeTest() {
-        initCampaign();
+        final PlanetarySystem mockPlanetarySystem = mock(PlanetarySystem.class);
+
+        final JumpPath mockJumpPath = mock(JumpPath.class);
+        when(mockJumpPath.getJumps()).thenReturn(2);
+        when(mockJumpPath.getFirstSystem()).thenReturn(mockPlanetarySystem);
+
+        initCampaign(mockJumpPath);
         initContract();
         contract.calculateContract(mockCampaign);
     }
@@ -136,34 +145,32 @@ public class ContractTest {
         contract.setMRBCFee(true);
         contract.setAdvancePct(10);
 
-        Mockito.when(contract.getSystem()).thenReturn(new PlanetarySystem());
+        when(contract.getSystem()).thenReturn(new PlanetarySystem());
     }
 
-    private void initCampaign() {
-        mockCampaign = Mockito.mock(Campaign.class);
+    private void initCampaign(final JumpPath mockJumpPath) {
+        mockCampaign = mock(Campaign.class);
 
-        CampaignOptions mockCampaignOptions = Mockito.mock(CampaignOptions.class);
-        Mockito.when(mockCampaignOptions.usePeacetimeCost()).thenReturn(true);
-        Mockito.when(mockCampaignOptions.getUnitRatingMethod()).thenReturn(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS);
-
-        JumpPath mockJumpPath = Mockito.mock(JumpPath.class);
-        Mockito.when(mockJumpPath.getJumps()).thenReturn(2);
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaignOptions.isUsePeacetimeCost()).thenReturn(true);
+        when(mockCampaignOptions.isPayForTransport()).thenReturn(true);
+        when(mockCampaignOptions.getUnitRatingMethod()).thenReturn(UnitRatingMethod.CAMPAIGN_OPS);
 
         Money jumpCost = Money.of(5);
         Money contractBase = Money.of(10);
         Money overHeadExpenses = Money.of(1);
         Money peacetimeCost = Money.of(1);
 
-        Accountant mockAccountant = Mockito.mock(Accountant.class);
-        Mockito.when(mockAccountant.getOverheadExpenses()).thenReturn(overHeadExpenses);
-        Mockito.when(mockAccountant.getContractBase()).thenReturn(contractBase);
-        Mockito.when(mockAccountant.getPeacetimeCost()).thenReturn(peacetimeCost);
+        Accountant mockAccountant = mock(Accountant.class);
+        when(mockAccountant.getOverheadExpenses()).thenReturn(overHeadExpenses);
+        when(mockAccountant.getContractBase()).thenReturn(contractBase);
+        when(mockAccountant.getPeacetimeCost()).thenReturn(peacetimeCost);
 
-        Mockito.when(mockCampaign.calculateJumpPath(Mockito.nullable(PlanetarySystem.class), Mockito.nullable(PlanetarySystem.class))).thenReturn(mockJumpPath);
-        Mockito.when(mockCampaign.calculateCostPerJump(Mockito.anyBoolean(), Mockito.anyBoolean())).thenReturn(jumpCost);
-        Mockito.when(mockCampaign.getUnitRatingMod()).thenReturn(10);
-        Mockito.when(mockCampaign.getAccountant()).thenReturn(mockAccountant);
-        Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Mockito.when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
+        when(mockCampaign.calculateJumpPath(nullable(PlanetarySystem.class), nullable(PlanetarySystem.class))).thenReturn(mockJumpPath);
+        when(mockCampaign.calculateCostPerJump(anyBoolean(), anyBoolean())).thenReturn(jumpCost);
+        when(mockCampaign.getUnitRatingMod()).thenReturn(10);
+        when(mockCampaign.getAccountant()).thenReturn(mockAccountant);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3067, 1, 1));
     }
 }

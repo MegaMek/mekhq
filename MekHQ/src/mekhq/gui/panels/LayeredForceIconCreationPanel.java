@@ -159,11 +159,15 @@ public class LayeredForceIconCreationPanel extends AbstractMHQPanel {
                     "RefreshDirectory.toolTipText", evt -> refreshDirectory(true)), gbc);
         }
 
-        setPreferences();
+        try {
+            setPreferences();
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Error setting the Layered Force Icon Creation Panel's preferences. Keeping the created panel, but this is likely to cause some oddities.", ex);
+        }
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
         preferences.manage(new JTabbedPanePreference(getTabbedPane()));
     }

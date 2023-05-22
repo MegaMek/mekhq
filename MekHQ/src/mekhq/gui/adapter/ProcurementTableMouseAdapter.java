@@ -19,7 +19,6 @@
 package mekhq.gui.adapter;
 
 import megamek.common.Entity;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
@@ -42,7 +41,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
     private final ProcurementTableModel model;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors

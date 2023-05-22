@@ -36,7 +36,7 @@ import mekhq.campaign.unit.Unit;
 @AtBScenarioEnabled
 public class AceDuelBuiltInScenario extends AtBScenario {
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -47,7 +47,7 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Ace Duel";
+        return "Special Scenario: Ace Duel";
     }
 
     @Override
@@ -94,7 +94,7 @@ public class AceDuelBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities, ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities, ArrayList<Entity> enemyEntities) {
         setStart(startPos[Compute.randomInt(4)]);
         int enemyStart = getStart() + 4;
 
@@ -102,23 +102,36 @@ public class AceDuelBuiltInScenario extends AtBScenario {
             enemyStart -= 8;
         }
 
-        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+        for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
+            final Entity en;
+            if (weight == EntityWeightClass.WEIGHT_COLOSSAL) {
+                // Treat Colossal as a unique case, generating at that tier
+                en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
+                        getContract(campaign).getEnemyQuality(), UnitType.MEK,
+                        EntityWeightClass.WEIGHT_COLOSSAL, campaign);
+            } else {
+                // Generate up to a maximum of Assault
+                en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
+                        getContract(campaign).getEnemyQuality(), UnitType.MEK,
+                        Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
+            }
 
-            Entity en = getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                    getContract(campaign).getEnemyQuality(), UnitType.MEK,
-                    Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
+            if (en == null) {
+                getSpecialScenarioEnemies().add(new ArrayList<>());
+                continue;
+            }
 
-            if (weight == EntityWeightClass.WEIGHT_ASSAULT) {
+            if (weight >= EntityWeightClass.WEIGHT_ASSAULT) {
                 en.getCrew().setGunnery(en.getCrew().getGunnery() - 1);
                 en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);
             }
 
-            enemyEntities = new ArrayList<Entity>();
+            enemyEntities = new ArrayList<>();
             enemyEntities.add(en);
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
     }
 
     @Override

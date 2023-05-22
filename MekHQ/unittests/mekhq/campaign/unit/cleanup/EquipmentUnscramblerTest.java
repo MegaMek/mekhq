@@ -1,15 +1,20 @@
 package mekhq.campaign.unit.cleanup;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import org.junit.Test;
-
-import java.util.*;
-
 import megamek.common.*;
-import mekhq.campaign.parts.equipment.*;
+import mekhq.campaign.parts.equipment.AmmoBin;
+import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 public class EquipmentUnscramblerTest {
     @Test
@@ -18,13 +23,13 @@ public class EquipmentUnscramblerTest {
         Entity mockEntity = mock(Entity.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
 
-        assertTrue(EquipmentUnscrambler.create(mockUnit) instanceof DefaultEquipmentUnscrambler);
+        assertInstanceOf(DefaultEquipmentUnscrambler.class, EquipmentUnscrambler.create(mockUnit));
 
         mockUnit = mock(Unit.class);
         BattleArmor mockBAEntity = mock(BattleArmor.class);
         when(mockUnit.getEntity()).thenReturn(mockBAEntity);
 
-        assertTrue(EquipmentUnscrambler.create(mockUnit) instanceof BattleArmorEquipmentUnscrambler);
+        assertInstanceOf(BattleArmorEquipmentUnscrambler.class, EquipmentUnscrambler.create(mockUnit));
     }
 
     @Test

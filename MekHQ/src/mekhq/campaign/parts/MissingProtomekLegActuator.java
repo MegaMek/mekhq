@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 
@@ -55,15 +56,15 @@ public class MissingProtomekLegActuator extends MissingPart {
 
     @Override
     public double getTonnage() {
-        //TODO: how much do actuators weight?
-        //apparently nothing
+        // TODO : how much do actuators weight?
+        // apparently nothing
         return 0;
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -79,7 +80,7 @@ public class MissingProtomekLegActuator extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (null == unit) {
             return null;
         }
@@ -133,7 +134,7 @@ public class MissingProtomekLegActuator extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ACTUATOR;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,23 +18,23 @@
  */
 package mekhq.campaign;
 
+import mekhq.campaign.log.*;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import mekhq.campaign.log.*;
-import org.junit.Assert;
-import org.junit.Test;
-import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class LogEntryTest {
     @Test
     public void testNullDescriptionBecomesEmpty() {
-        Assert.assertEquals("", new HistoricalLogEntry(null, null).getDesc());
+        assertEquals("", new HistoricalLogEntry(null, null).getDesc());
     }
 
     @Test
@@ -47,16 +47,19 @@ public class LogEntryTest {
     }
 
     private static void checkMarshalling(LogEntry le) throws Exception {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try (PrintWriter pw = new PrintWriter(baos)) {
+                le.writeToXML(pw, 0);
+            }
 
-        PrintWriter pw = new PrintWriter(baos);
-        le.writeToXML(pw, 0);
-        pw.close();
+            Node node;
+            try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {
+                node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                        .parse(new InputSource(bais))
+                        .getDocumentElement();
+            }
 
-        Node node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-                .parse(new InputSource(new ByteArrayInputStream(baos.toByteArray())))
-                .getDocumentElement();
-
-        Assert.assertEquals(le, LogEntryFactory.getInstance().generateInstanceFromXML(node));
+            assertEquals(le, LogEntryFactory.getInstance().generateInstanceFromXML(node));
+        }
     }
 }

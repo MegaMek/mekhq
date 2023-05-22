@@ -22,7 +22,9 @@ import megamek.Version;
 import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.enums.*;
@@ -36,17 +38,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
  * @author Justin "Windchild" Bowen
  */
-public class CompanyGenerationOptions implements Serializable {
+public class CompanyGenerationOptions {
     //region Variable Declarations
-    private static final long serialVersionUID = 3034123423672457769L;
-
     // Base Information
     private CompanyGenerationMethod method;
+    private Faction specifiedFaction;
     private boolean generateMercenaryCompanyCommandLance;
     private int companyCount;
     private int individualLanceCount;
@@ -66,6 +68,7 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean prioritizeOfficerCombatSkills;
     private boolean assignMostSkilledToPrimaryLances;
     private boolean automaticallyAssignRanks;
+    private boolean useSpecifiedFactionToAssignRanks;
     private boolean assignMechWarriorsCallsigns;
     private boolean assignFounderFlag;
 
@@ -79,6 +82,7 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean simulateRandomProcreation;
 
     // Units
+    private BattleMechFactionGenerationMethod battleMechFactionGenerationMethod;
     private BattleMechWeightClassGenerationMethod battleMechWeightClassGenerationMethod;
     private BattleMechQualityGenerationMethod battleMechQualityGenerationMethod;
     private boolean neverGenerateStarLeagueMechs;
@@ -95,6 +99,7 @@ public class CompanyGenerationOptions implements Serializable {
     // Unit
     private ForceNamingMethod forceNamingMethod;
     private boolean generateForceIcons;
+    private boolean useSpecifiedFactionToGenerateForceIcons;
     private boolean generateOriginNodeForceIcon;
     private boolean useOriginNodeForceIconLogo;
     private TreeMap<Integer, Integer> forceWeightLimits;
@@ -137,6 +142,7 @@ public class CompanyGenerationOptions implements Serializable {
     public CompanyGenerationOptions(final CompanyGenerationMethod method) {
         // Base Information
         setMethod(method);
+        setSpecifiedFaction(Factions.getInstance().getDefaultFaction());
         setGenerateMercenaryCompanyCommandLance(false);
         setCompanyCount(1);
         setIndividualLanceCount(0);
@@ -171,6 +177,7 @@ public class CompanyGenerationOptions implements Serializable {
         setPrioritizeOfficerCombatSkills(false);
         setAssignMostSkilledToPrimaryLances(method.isWindchild());
         setAutomaticallyAssignRanks(true);
+        setUseSpecifiedFactionToAssignRanks(false);
         setAssignMechWarriorsCallsigns(true);
         setAssignFounderFlag(true);
 
@@ -184,26 +191,28 @@ public class CompanyGenerationOptions implements Serializable {
         setSimulateRandomProcreation(method.isWindchild());
 
         // Units
-        setBattleMechWeightClassGenerationMethod(method.isAtB()
+        setBattleMechFactionGenerationMethod(BattleMechFactionGenerationMethod.ORIGIN_FACTION);
+        setBattleMechWeightClassGenerationMethod(method.isAgainstTheBot()
                 ? BattleMechWeightClassGenerationMethod.AGAINST_THE_BOT
                 : BattleMechWeightClassGenerationMethod.WINDCHILD);
-        setBattleMechQualityGenerationMethod(method.isAtB()
+        setBattleMechQualityGenerationMethod(method.isAgainstTheBot()
                 ? BattleMechQualityGenerationMethod.AGAINST_THE_BOT
                 : BattleMechQualityGenerationMethod.WINDCHILD);
         setNeverGenerateStarLeagueMechs(false);
         setOnlyGenerateStarLeagueMechs(false);
         setOnlyGenerateOmniMechs(false);
-        setGenerateUnitsAsAttached(method.isAtB());
+        setGenerateUnitsAsAttached(method.isAgainstTheBot());
         setAssignBestRollToCompanyCommander(method.isWindchild());
         setSortStarLeagueUnitsFirst(true);
         setGroupByWeight(true);
         setGroupByQuality(method.isWindchild());
-        setKeepOfficerRollsSeparate(method.isAtB());
+        setKeepOfficerRollsSeparate(method.isAgainstTheBot());
         setAssignTechsToUnits(true);
 
         // Unit
         setForceNamingMethod(ForceNamingMethod.CCB_1943);
         setGenerateForceIcons(true);
+        setUseSpecifiedFactionToGenerateForceIcons(false);
         setGenerateOriginNodeForceIcon(true);
         setUseOriginNodeForceIconLogo(false);
         setForceWeightLimits(new TreeMap<>());
@@ -257,6 +266,14 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setMethod(final CompanyGenerationMethod method) {
         this.method = method;
+    }
+
+    public Faction getSpecifiedFaction() {
+        return specifiedFaction;
+    }
+
+    public void setSpecifiedFaction(final Faction specifiedFaction) {
+        this.specifiedFaction = specifiedFaction;
     }
 
     public boolean isGenerateMercenaryCompanyCommandLance() {
@@ -397,6 +414,14 @@ public class CompanyGenerationOptions implements Serializable {
         this.automaticallyAssignRanks = automaticallyAssignRanks;
     }
 
+    public boolean isUseSpecifiedFactionToAssignRanks() {
+        return useSpecifiedFactionToAssignRanks;
+    }
+
+    public void setUseSpecifiedFactionToAssignRanks(final boolean useSpecifiedFactionToAssignRanks) {
+        this.useSpecifiedFactionToAssignRanks = useSpecifiedFactionToAssignRanks;
+    }
+
     public boolean isAssignMechWarriorsCallsigns() {
         return assignMechWarriorsCallsigns;
     }
@@ -459,6 +484,15 @@ public class CompanyGenerationOptions implements Serializable {
     //endregion Starting Simulation
 
     //region Units
+    public BattleMechFactionGenerationMethod getBattleMechFactionGenerationMethod() {
+        return battleMechFactionGenerationMethod;
+    }
+
+    public void setBattleMechFactionGenerationMethod(
+            final BattleMechFactionGenerationMethod battleMechFactionGenerationMethod) {
+        this.battleMechFactionGenerationMethod = battleMechFactionGenerationMethod;
+    }
+
     public BattleMechWeightClassGenerationMethod getBattleMechWeightClassGenerationMethod() {
         return battleMechWeightClassGenerationMethod;
     }
@@ -573,6 +607,14 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setGenerateForceIcons(final boolean generateForceIcons) {
         this.generateForceIcons = generateForceIcons;
+    }
+
+    public boolean isUseSpecifiedFactionToGenerateForceIcons() {
+        return useSpecifiedFactionToGenerateForceIcons;
+    }
+
+    public void setUseSpecifiedFactionToGenerateForceIcons(final boolean useSpecifiedFactionToGenerateForceIcons) {
+        this.useSpecifiedFactionToGenerateForceIcons = useSpecifiedFactionToGenerateForceIcons;
     }
 
     public boolean isGenerateOriginNodeForceIcon() {
@@ -845,110 +887,114 @@ public class CompanyGenerationOptions implements Serializable {
      */
     public void writeToXML(final PrintWriter pw, int indent, final @Nullable Version version) {
         if (version == null) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions");
         } else {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions", "version", version);
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "companyGenerationOptions", "version", version);
         }
 
         // Base Information
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "method", getMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMercenaryCompanyCommandLance", isGenerateMercenaryCompanyCommandLance());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "companyCount", getCompanyCount());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "individualLanceCount", getIndividualLanceCount());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lancesPerCompany", getLancesPerCompany());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceSize", getLanceSize());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "starLeagueYear", getStarLeagueYear());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "method", getMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specifiedFaction", getSpecifiedFaction().getShortName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMercenaryCompanyCommandLance", isGenerateMercenaryCompanyCommandLance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "companyCount", getCompanyCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "individualLanceCount", getIndividualLanceCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lancesPerCompany", getLancesPerCompany());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceSize", getLanceSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "starLeagueYear", getStarLeagueYear());
 
         // Personnel
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "supportPersonnel");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "supportPersonnel");
         for (final Entry<PersonnelRole, Integer> entry : getSupportPersonnel().entrySet()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "supportPersonnel");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "poolAssistants", isPoolAssistants());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateCaptains", isGenerateCaptains());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignCompanyCommanderFlag", isAssignCompanyCommanderFlag());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "applyOfficerStatBonusToWorstSkill", isApplyOfficerStatBonusToWorstSkill());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestCompanyCommander", isAssignBestCompanyCommander());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "prioritizeCompanyCommanderCombatSkills", isPrioritizeCompanyCommanderCombatSkills());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestOfficers", isAssignBestOfficers());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "prioritizeOfficerCombatSkills", isPrioritizeOfficerCombatSkills());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignMostSkilledToPrimaryLances", isAssignMostSkilledToPrimaryLances());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "automaticallyAssignRanks", isAutomaticallyAssignRanks());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignMechWarriorsCallsigns", isAssignMechWarriorsCallsigns());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignFounderFlag", isAssignFounderFlag());
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "supportPersonnel");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "poolAssistants", isPoolAssistants());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateCaptains", isGenerateCaptains());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignCompanyCommanderFlag", isAssignCompanyCommanderFlag());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "applyOfficerStatBonusToWorstSkill", isApplyOfficerStatBonusToWorstSkill());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignBestCompanyCommander", isAssignBestCompanyCommander());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prioritizeCompanyCommanderCombatSkills", isPrioritizeCompanyCommanderCombatSkills());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignBestOfficers", isAssignBestOfficers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prioritizeOfficerCombatSkills", isPrioritizeOfficerCombatSkills());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMostSkilledToPrimaryLances", isAssignMostSkilledToPrimaryLances());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "automaticallyAssignRanks", isAutomaticallyAssignRanks());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSpecifiedFactionToAssignRanks", isUseSpecifiedFactionToAssignRanks());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMechWarriorsCallsigns", isAssignMechWarriorsCallsigns());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignFounderFlag", isAssignFounderFlag());
 
         // Personnel Randomization
         getRandomOriginOptions().writeToXML(pw, indent);
 
         // Starting Simulation
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "runStartingSimulation", isRunStartingSimulation());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "simulationDuration", getSimulationDuration());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "simulateRandomMarriages", isSimulateRandomMarriages());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "simulateRandomProcreation", isSimulateRandomProcreation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "runStartingSimulation", isRunStartingSimulation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulationDuration", getSimulationDuration());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateRandomMarriages", isSimulateRandomMarriages());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateRandomProcreation", isSimulateRandomProcreation());
 
         // Units
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleMechWeightClassGenerationMethod", getBattleMechWeightClassGenerationMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleMechQualityGenerationMethod", getBattleMechQualityGenerationMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "neverGenerateStarLeagueMechs", isNeverGenerateStarLeagueMechs());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateStarLeagueMechs", isOnlyGenerateStarLeagueMechs());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "onlyGenerateOmniMechs", isOnlyGenerateOmniMechs());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateUnitsAsAttached", isGenerateUnitsAsAttached());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignBestRollToCompanyCommander", isAssignBestRollToCompanyCommander());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "sortStarLeagueUnitsFirst", isSortStarLeagueUnitsFirst());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "groupByWeight", isGroupByWeight());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "groupByQuality", isGroupByQuality());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "keepOfficerRollsSeparate", isKeepOfficerRollsSeparate());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "assignTechsToUnits", isAssignTechsToUnits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechFactionGenerationMethod", getBattleMechFactionGenerationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechWeightClassGenerationMethod", getBattleMechWeightClassGenerationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechQualityGenerationMethod", getBattleMechQualityGenerationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "neverGenerateStarLeagueMechs", isNeverGenerateStarLeagueMechs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "onlyGenerateStarLeagueMechs", isOnlyGenerateStarLeagueMechs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "onlyGenerateOmniMechs", isOnlyGenerateOmniMechs());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateUnitsAsAttached", isGenerateUnitsAsAttached());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignBestRollToCompanyCommander", isAssignBestRollToCompanyCommander());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sortStarLeagueUnitsFirst", isSortStarLeagueUnitsFirst());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "groupByWeight", isGroupByWeight());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "groupByQuality", isGroupByQuality());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "keepOfficerRollsSeparate", isKeepOfficerRollsSeparate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignTechsToUnits", isAssignTechsToUnits());
 
         // Unit
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceNamingMethod", getForceNamingMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateForceIcons", isGenerateForceIcons());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateOriginNodeForceIcon", isGenerateOriginNodeForceIcon());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "useOriginNodeForceIconLogo", isUseOriginNodeForceIconLogo());
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceNamingMethod", getForceNamingMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateForceIcons", isGenerateForceIcons());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSpecifiedFactionToGenerateForceIcons", isUseSpecifiedFactionToGenerateForceIcons());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateOriginNodeForceIcon", isGenerateOriginNodeForceIcon());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useOriginNodeForceIconLogo", isUseOriginNodeForceIconLogo());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
         for (final Entry<Integer, Integer> entry : getForceWeightLimits().entrySet()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().toString(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "WeightClass:" + entry.getValue(), entry.getKey().toString());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forceWeightLimits");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forceWeightLimits");
 
         // Spares
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMothballedSpareUnits", isGenerateMothballedSpareUnits());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "sparesPercentOfActiveUnits", getSparesPercentOfActiveUnits());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "partGenerationMethod", getPartGenerationMethod().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startingArmourWeight", getStartingArmourWeight());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateSpareAmmunition", isGenerateSpareAmmunition());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "numberReloadsPerWeapon", getNumberReloadsPerWeapon());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateFractionalMachineGunAmmunition", isGenerateFractionalMachineGunAmmunition());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMothballedSpareUnits", isGenerateMothballedSpareUnits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sparesPercentOfActiveUnits", getSparesPercentOfActiveUnits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partGenerationMethod", getPartGenerationMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingArmourWeight", getStartingArmourWeight());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateSpareAmmunition", isGenerateSpareAmmunition());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "numberReloadsPerWeapon", getNumberReloadsPerWeapon());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateFractionalMachineGunAmmunition", isGenerateFractionalMachineGunAmmunition());
 
         // Contracts
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "selectStartingContract", isSelectStartingContract());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startCourseToContractPlanet", isStartCourseToContractPlanet());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "selectStartingContract", isSelectStartingContract());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startCourseToContractPlanet", isStartCourseToContractPlanet());
 
         // Finances
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "processFinances", isProcessFinances());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startingCash", getStartingCash());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomizeStartingCash", isRandomizeStartingCash());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "randomStartingCashDiceCount", getRandomStartingCashDiceCount());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "minimumStartingFloat", getMinimumStartingFloat());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "includeInitialContractPayment", isIncludeInitialContractPayment());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startingLoan", isStartingLoan());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForSetup", isPayForSetup());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForPersonnel", isPayForPersonnel());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForUnits", isPayForUnits());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForParts", isPayForParts());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForArmour", isPayForArmour());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "payForAmmunition", isPayForAmmunition());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "processFinances", isProcessFinances());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingCash", getStartingCash());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomizeStartingCash", isRandomizeStartingCash());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomStartingCashDiceCount", getRandomStartingCashDiceCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minimumStartingFloat", getMinimumStartingFloat());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "includeInitialContractPayment", isIncludeInitialContractPayment());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingLoan", isStartingLoan());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForSetup", isPayForSetup());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForPersonnel", isPayForPersonnel());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForUnits", isPayForUnits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForParts", isPayForParts());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForArmour", isPayForArmour());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForAmmunition", isPayForAmmunition());
 
         // Surprises
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateSurprises", isGenerateSurprises());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "generateMysteryBoxes", isGenerateMysteryBoxes());
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "generateMysteryBoxTypes");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateSurprises", isGenerateSurprises());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMysteryBoxes", isGenerateMysteryBoxes());
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "generateMysteryBoxTypes");
         for (final Entry<MysteryBoxType, Boolean> entry : getGenerateMysteryBoxTypes().entrySet()) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().name(), entry.getValue());
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "generateMysteryBoxTypes");
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "companyGenerationOptions");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "generateMysteryBoxTypes");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "companyGenerationOptions");
     }
 
     /**
@@ -966,35 +1012,37 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Open up the file.
         try (InputStream is = new FileInputStream(file)) {
-            element = MekHqXmlUtil.newSafeDocumentBuilder().parse(is).getDocumentElement();
-        } catch (Exception e) {
-            LogManager.getLogger().error("Failed to open file, returning the default Windchild options", e);
+            element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to open file, returning the default Windchild options", ex);
             return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         }
         element.normalize();
 
         final Version version = new Version(element.getAttribute("version"));
-        final NodeList nl = element.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            final Node wn = nl.item(i);
-            if ("companyGenerationOptions".equals(wn.getNodeName()) && wn.hasChildNodes()) {
-                final CompanyGenerationOptions options = parseFromXML(wn.getChildNodes(), version);
-                if (options != null) {
-                    return options;
-                }
-            }
+        final CompanyGenerationOptions options = parseFromXML(element.getChildNodes(), version);
+        if (options == null) {
+            LogManager.getLogger().error("Failed to parse file, returning the default Windchild options");
+            return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
+        } else {
+            return options;
         }
-        LogManager.getLogger().error("Failed to parse file, returning the default Windchild options");
-        return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
     }
 
     /**
      * @param nl the node list to parse the options from
-     * @param ignoredVersion the Version of the XML to parse from. This is included for future-proofing
+     * @param version the Version of the XML to parse from
      * @return the parsed company generation options, or null if the parsing fails
      */
     public static @Nullable CompanyGenerationOptions parseFromXML(final NodeList nl,
-                                                                  final Version ignoredVersion) {
+                                                                  final Version version) {
+        if (MHQConstants.VERSION.isLowerThan(version)) {
+            LogManager.getLogger().error(String.format(
+                    "Cannot parse Company Generation Options from %s in older version %s.",
+                    version.toString(), MHQConstants.VERSION));
+            return null;
+        }
+
         final CompanyGenerationOptions options = new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         try {
             for (int x = 0; x < nl.getLength(); x++) {
@@ -1003,6 +1051,12 @@ public class CompanyGenerationOptions implements Serializable {
                     //region Base Information
                     case "method":
                         options.setMethod(CompanyGenerationMethod.valueOf(wn.getTextContent().trim()));
+                        break;
+                    case "specifiedFaction":
+                        final String factionCode = wn.getTextContent().trim();
+                        final Faction faction = Factions.getInstance().getFaction(factionCode);
+                        Objects.requireNonNull(faction, "Cannot parse unknown faction with code " + factionCode);
+                        options.setSpecifiedFaction(faction);
                         break;
                     case "generateMercenaryCompanyCommandLance":
                         options.setGenerateMercenaryCompanyCommandLance(Boolean.parseBoolean(wn.getTextContent().trim()));
@@ -1070,6 +1124,9 @@ public class CompanyGenerationOptions implements Serializable {
                     case "automaticallyAssignRanks":
                         options.setAutomaticallyAssignRanks(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
+                    case "useSpecifiedFactionToAssignRanks":
+                        options.setUseSpecifiedFactionToAssignRanks(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
                     case "assignMechWarriorsCallsigns":
                         options.setAssignMechWarriorsCallsigns(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
@@ -1106,6 +1163,9 @@ public class CompanyGenerationOptions implements Serializable {
                     //endregion Starting Simulation
 
                     //region Units
+                    case "battleMechFactionGenerationMethod":
+                        options.setBattleMechFactionGenerationMethod(BattleMechFactionGenerationMethod.valueOf(wn.getTextContent().trim()));
+                        break;
                     case "battleMechWeightClassGenerationMethod":
                         options.setBattleMechWeightClassGenerationMethod(BattleMechWeightClassGenerationMethod.valueOf(wn.getTextContent().trim()));
                         break;
@@ -1151,6 +1211,9 @@ public class CompanyGenerationOptions implements Serializable {
                     case "generateForceIcons":
                         options.setGenerateForceIcons(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
+                    case "useSpecifiedFactionToGenerateForceIcons":
+                        options.setUseSpecifiedFactionToGenerateForceIcons(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
                     case "generateOriginNodeForceIcon":
                         options.setGenerateOriginNodeForceIcon(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
@@ -1164,8 +1227,8 @@ public class CompanyGenerationOptions implements Serializable {
                             final Node wn2 = nl2.item(y);
                             try {
                                 options.getForceWeightLimits().put(
-                                        Integer.parseInt(wn2.getNodeName().trim()),
-                                        Integer.parseInt(wn2.getTextContent().trim()));
+                                        Integer.parseInt(wn2.getTextContent().trim()),
+                                        Integer.parseInt(wn2.getNodeName().trim().split(":")[1]));
                             } catch (Exception ignored) {
 
                             }

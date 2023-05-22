@@ -24,7 +24,7 @@ import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.FinancialReport;
@@ -72,20 +72,20 @@ public class RetirementDefectionTracker {
      * @return The value of each share in C-bills
      */
     public static Money getShareValue(Campaign campaign) {
-        if (!campaign.getCampaignOptions().getUseShareSystem()) {
+        if (!campaign.getCampaignOptions().isUseShareSystem()) {
             return Money.zero();
         }
 
         FinancialReport r = FinancialReport.calculate(campaign);
 
         Money netWorth = r.getNetWorth();
-        if (campaign.getCampaignOptions().getSharesExcludeLargeCraft()) {
+        if (campaign.getCampaignOptions().isSharesExcludeLargeCraft()) {
                 netWorth = netWorth.minus(r.getLargeCraftValue());
         }
 
         int totalShares = 0;
         for (Person p : campaign.getActivePersonnel()) {
-            totalShares += p.getNumShares(campaign, campaign.getCampaignOptions().getSharesForAll());
+            totalShares += p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll());
         }
 
         if (totalShares <= 0) {
@@ -114,12 +114,12 @@ public class RetirementDefectionTracker {
             rollRequired.add(contract.getId());
         }
 
-        if (campaign.getCampaignOptions().getUseLeadership()) {
+        if (campaign.getCampaignOptions().isUseLeadership()) {
             int combat = 0;
             int proto = 0;
             int support = 0;
             for (Person p : campaign.getActivePersonnel()) {
-                if (p.getPrimaryRole().isDependentOrNone() || !p.getPrisonerStatus().isFree()) {
+                if (p.getPrimaryRole().isCivilian() || !p.getPrisonerStatus().isFree()) {
                     continue;
                 }
 
@@ -206,7 +206,7 @@ public class RetirementDefectionTracker {
                 target.addModifier(1, "Over 50");
             }
 
-            if (campaign.getCampaignOptions().getUseShareSystem()) {
+            if (campaign.getCampaignOptions().isUseShareSystem()) {
                 /* If this retirement roll is not being made at the end
                  * of a contract (e.g. >12 months since last roll), the
                  * share percentage should still apply. In the case of multiple
@@ -224,7 +224,7 @@ public class RetirementDefectionTracker {
                     target.addModifier(-((c.getSharesPct() - 20) / 10), "Shares");
                 }
             } else {
-                //Bonus payments handled by dialog
+                // Bonus payments handled by dialog
             }
 
             if (p.getPrimaryRole().isSoldier()) {
@@ -276,7 +276,7 @@ public class RetirementDefectionTracker {
                     unresolvedPersonnel.get(mission.getId()).add(id);
                 }
                 payouts.put(id, new Payout(campaign, campaign.getPerson(id),
-                        shareValue, false, campaign.getCampaignOptions().getSharesForAll()));
+                        shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
             }
         }
 
@@ -314,7 +314,7 @@ public class RetirementDefectionTracker {
             return false;
         }
         payouts.put(person.getId(), new Payout(campaign, person, getShareValue(campaign),
-                killed, campaign.getCampaignOptions().getSharesForAll()));
+                killed, campaign.getCampaignOptions().isSharesForAll()));
         if (null != contract) {
             unresolvedPersonnel.computeIfAbsent(contract.getId(), k -> new HashSet<>());
             unresolvedPersonnel.get(contract.getId()).add(person.getId());
@@ -569,30 +569,30 @@ public class RetirementDefectionTracker {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "retirementDefectionTracker");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "rollRequired", createCsv(rollRequired));
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "unresolvedPersonnel");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "retirementDefectionTracker");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rollRequired", createCsv(rollRequired));
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unresolvedPersonnel");
         for (Integer i : unresolvedPersonnel.keySet()) {
-            MekHqXmlUtil.writeSimpleXMLAttributedTag(pw, indent, "contract", "id", i, createCsv(unresolvedPersonnel.get(i)));
+            MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "contract", "id", i, createCsv(unresolvedPersonnel.get(i)));
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "unresolvedPersonnel");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unresolvedPersonnel");
 
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "payouts");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "payouts");
         for (UUID pid : payouts.keySet()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "payout", "id", pid);
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "weightClass", payouts.get(pid).getWeightClass());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "dependents", payouts.get(pid).getDependents());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "cbills", payouts.get(pid).getPayoutAmount());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "recruit", payouts.get(pid).hasRecruit());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "heir", payouts.get(pid).hasHeir());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "stolenUnit", payouts.get(pid).hasStolenUnit());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "stolenUnitId", payouts.get(pid).getStolenUnitId());
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "payout");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "payout", "id", pid);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weightClass", payouts.get(pid).getWeightClass());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dependents", payouts.get(pid).getDependents());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cbills", payouts.get(pid).getPayoutAmount());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruit", payouts.get(pid).hasRecruit());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "heir", payouts.get(pid).hasHeir());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stolenUnit", payouts.get(pid).hasStolenUnit());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stolenUnitId", payouts.get(pid).getStolenUnitId());
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payout");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "payouts");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payouts");
 
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lastRetirementRoll", lastRetirementRoll);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "retirementDefectionTracker");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRetirementRoll", lastRetirementRoll);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "retirementDefectionTracker");
     }
 
     public static RetirementDefectionTracker generateInstanceFromXML(Node wn, Campaign c) {
@@ -615,7 +615,7 @@ public class RetirementDefectionTracker {
                 }
 
                 if (wn2.getNodeName().equalsIgnoreCase("rollRequired")) {
-                    if (wn2.getTextContent().trim().length() > 0) {
+                    if (!wn2.getTextContent().isBlank()) {
                         String [] ids = wn2.getTextContent().split(",");
                         for (String id : ids) {
                             retVal.rollRequired.add(Integer.parseInt(id));
@@ -674,7 +674,7 @@ public class RetirementDefectionTracker {
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("lastRetirementRoll")) {
-                    retVal.setLastRetirementRoll(MekHqXmlUtil.parseDate(wn2.getTextContent().trim()));
+                    retVal.setLastRetirementRoll(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 }
             }
         } catch (Exception ex) {

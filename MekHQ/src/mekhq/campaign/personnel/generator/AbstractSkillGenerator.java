@@ -25,7 +25,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.Phenotype;
 
 import java.util.Objects;
 
@@ -202,14 +201,14 @@ public abstract class AbstractSkillGenerator {
      *         the primary role.
      */
     protected int getPhenotypeBonus(Person person) {
-        if (!person.isClanner()) {
+        if (!person.isClanPersonnel()) {
             return 0;
         }
 
         switch (person.getPrimaryRole()) {
             case MECHWARRIOR:
             case LAM_PILOT:
-                if (person.getPhenotype() == Phenotype.MECHWARRIOR) {
+                if (person.getPhenotype().isMechWarrior()) {
                     return 1;
                 }
                 break;
@@ -218,22 +217,22 @@ public abstract class AbstractSkillGenerator {
             case VTOL_PILOT:
             case VEHICLE_GUNNER:
             case VEHICLE_CREW:
-                if (person.getPhenotype() == Phenotype.VEHICLE) {
+                if (person.getPhenotype().isVehicle()) {
                     return 1;
                 }
                 break;
             case AEROSPACE_PILOT:
             case CONVENTIONAL_AIRCRAFT_PILOT:
-                if (person.getPhenotype() == Phenotype.AEROSPACE) {
+                if (person.getPhenotype().isAerospace()) {
                     return 1;
                 }
                 break;
             case PROTOMECH_PILOT:
-                if (person.getPhenotype() == Phenotype.PROTOMECH) {
+                if (person.getPhenotype().isProtoMech()) {
                     return 1;
                 }
             case BATTLE_ARMOUR:
-                if (person.getPhenotype() == Phenotype.ELEMENTAL) {
+                if (person.getPhenotype().isElemental()) {
                     return 1;
                 }
                 break;
@@ -241,7 +240,7 @@ public abstract class AbstractSkillGenerator {
             case VESSEL_GUNNER:
             case VESSEL_CREW:
             case VESSEL_NAVIGATOR:
-                if (person.getPhenotype() == Phenotype.NAVAL) {
+                if (person.getPhenotype().isNaval()) {
                     return 1;
                 }
             default:

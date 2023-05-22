@@ -18,7 +18,6 @@
  */
 package mekhq.gui.model;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Scenario;
@@ -44,7 +43,7 @@ public class ScenarioTableModel extends DataTableModel {
     public final static int N_COL          = 4;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.ScenarioTableModel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors

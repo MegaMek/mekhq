@@ -94,7 +94,7 @@ public class PartInventory {
      * @param countModifier modifier to display next to a count when formatted as a String.
      */
     public void setCountModifier(String countModifier) {
-        if (countModifier != null && countModifier.length() > 0) {
+        if (countModifier != null && !countModifier.isBlank()) {
             this.countModifier = " " + countModifier;
         }
     }

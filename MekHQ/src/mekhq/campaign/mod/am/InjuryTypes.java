@@ -25,10 +25,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
 import mekhq.campaign.log.MedicalLogEntry;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.personnel.Injury;
-import mekhq.campaign.personnel.InjuryType;
-import mekhq.campaign.personnel.Modifier;
-import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.*;
 import org.apache.logging.log4j.LogManager;
 
@@ -276,7 +273,7 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, Gender gender) {
-            return "Lost " + GenderDescriptors.HIS_HER.getDescriptor(gender) + " "
+            return "Lost " + GenderDescriptors.HIS_HER_THEIR.getDescriptor(gender) + " "
                     + loc.locationName();
         }
 
@@ -608,7 +605,7 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, Gender gender) {
-            return "A laceration on " + GenderDescriptors.HIS_HER.getDescriptor(gender) + " head";
+            return "A laceration on " + GenderDescriptors.HIS_HER_THEIR.getDescriptor(gender) + " head";
         }
 
         @Override
@@ -636,7 +633,7 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, Gender gender) {
-            return "A bruise on " + GenderDescriptors.HIS_HER.getDescriptor(gender) + " "
+            return "A bruise on " + GenderDescriptors.HIS_HER_THEIR.getDescriptor(gender) + " "
                     + loc.locationName();
         }
 
@@ -665,7 +662,7 @@ public final class InjuryTypes {
 
         @Override
         public String getFluffText(BodyLocation loc, int severity, Gender gender) {
-            return "Some cuts on " + GenderDescriptors.HIS_HER.getDescriptor(gender) + " "
+            return "Some cuts on " + GenderDescriptors.HIS_HER_THEIR.getDescriptor(gender) + " "
                     + loc.locationName();
         }
 

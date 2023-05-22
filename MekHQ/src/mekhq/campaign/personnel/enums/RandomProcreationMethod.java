@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
@@ -41,7 +40,7 @@ public enum RandomProcreationMethod {
     //region Constructors
     RandomProcreationMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -53,7 +52,7 @@ public enum RandomProcreationMethod {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isNone() {
         return this == NONE;
     }
@@ -61,7 +60,7 @@ public enum RandomProcreationMethod {
     public boolean isPercentage() {
         return this == PERCENTAGE;
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     public AbstractProcreation getMethod(final CampaignOptions options) {
         switch (this) {

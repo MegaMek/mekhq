@@ -20,8 +20,10 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.Version;
 import megamek.common.Compute;
-import mekhq.MekHqXmlUtil;
+import megamek.common.enums.SkillLevel;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -163,6 +165,11 @@ public class Skill {
         return cost;
     }
 
+    public SkillLevel getSkillLevel() {
+        // Returns the SkillLevel Enum value equivalent to the Experience Level Magic Number
+        return Skills.SKILL_LEVELS[getExperienceLevel() + 1];
+    }
+
     public int getExperienceLevel() {
         return type.getExperienceLevel(getLevel());
     }
@@ -177,14 +184,14 @@ public class Skill {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "skill");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "type", type.getName());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "level", level);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "bonus", bonus);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "skill");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "skill");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type.getName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "level", level);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonus", bonus);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
-    public static Skill generateInstanceFromXML(Node wn) {
+    public static Skill generateInstanceFromXML(final Node wn) {
         Skill retVal = null;
 
         try {
@@ -197,7 +204,11 @@ public class Skill {
                 Node wn2 = nl.item(x);
 
                 if (wn2.getNodeName().equalsIgnoreCase("type")) {
-                    retVal.type = SkillType.getType(wn2.getTextContent());
+                    String text = wn2.getTextContent();
+                    if ("Gunnery/Protomech".equals(text)) { // Renamed in 0.49.12
+                        text = "Gunnery/ProtoMech";
+                    }
+                    retVal.type = SkillType.getType(text);
                 } else if (wn2.getNodeName().equalsIgnoreCase("level")) {
                     retVal.level = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bonus")) {

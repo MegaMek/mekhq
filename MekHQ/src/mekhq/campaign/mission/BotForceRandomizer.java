@@ -29,7 +29,7 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -283,7 +283,7 @@ public class BotForceRandomizer {
         Gender gender = RandomGenderGenerator.generate();
         String[] crewNameArray = rng.generateGivenNameSurnameSplit(gender, faction.isClan(), faction.getShortName());
         String crewName = crewNameArray[0];
-        crewName += !StringUtility.isNullOrEmpty(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
+        crewName += !StringUtility.isNullOrBlank(crewNameArray[1]) ?  " " + crewNameArray[1] : "";
 
         Map<Integer, Map<String, String>> extraData = new HashMap<>();
         Map<String, String> innerMap = new HashMap<>();
@@ -331,7 +331,7 @@ public class BotForceRandomizer {
                     break;
             }
 
-            if (phenotype != Phenotype.NONE) {
+            if (!phenotype.isNone()) {
                 String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
                         campaign.getGameYear()).getName();
                 crewName += " " + bloodname;
@@ -502,18 +502,18 @@ public class BotForceRandomizer {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "botForceRandomizer");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "factionCode", getFactionCode());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quality", quality);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "skill", skill.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitType", unitType);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "lanceSize", lanceSize);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "focalWeightClass", focalWeightClass);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "forceMultiplier", forceMultiplier);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "balancingMethod", balancingMethod.name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "percentConventional", percentConventional);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "baChance", baChance);
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "botForceRandomizer");
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "botForceRandomizer");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "factionCode", getFactionCode());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quality", quality);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skill", skill.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitType", unitType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceSize", lanceSize);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "focalWeightClass", focalWeightClass);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceMultiplier", forceMultiplier);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "balancingMethod", balancingMethod.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentConventional", percentConventional);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baChance", baChance);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "botForceRandomizer");
     }
 
     public static BotForceRandomizer generateInstanceFromXML(Node wn, Campaign c, Version version) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -35,15 +34,25 @@ public enum FormerSpouseReason {
     //endregion Variable Declarations
 
     //region Constructors
-    FormerSpouseReason(String name) {
+    FormerSpouseReason(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     //endregion Constructors
 
+    //region Boolean Comparison Methods
+    public boolean isWidowed() {
+        return this == WIDOWED;
+    }
+
+    public boolean isDivorce() {
+        return this == DIVORCE;
+    }
+    //endregion Boolean Comparison Methods
+
     //region File I/O
-    public static FormerSpouseReason parseFromText(String text) {
+    public static FormerSpouseReason parseFromString(final String text) {
         try {
             return valueOf(text);
         } catch (Exception ignored) {
@@ -52,18 +61,18 @@ public enum FormerSpouseReason {
 
         try {
             switch (Integer.parseInt(text)) {
+                case 0:
+                    return WIDOWED;
                 case 1:
                     return DIVORCE;
-                case 0:
                 default:
-                    return WIDOWED;
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
-        LogManager.getLogger().error("Unable to parse the former spouse reason from string " + text
-                + ". Returning FormerSpouseReason.WIDOWED");
+        LogManager.getLogger().error("Unable to parse " + text + " into a FormerSpouseReason. Returning WIDOWED.");
         return WIDOWED;
     }
     //endregion File I/O

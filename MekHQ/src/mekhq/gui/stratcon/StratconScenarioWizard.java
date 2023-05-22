@@ -19,7 +19,6 @@
 package mekhq.gui.stratcon;
 
 import megamek.common.Minefield;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -51,7 +50,7 @@ public class StratconScenarioWizard extends JDialog {
     private StratconTrackState currentTrackState;
     private StratconCampaignState currentCampaignState;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     private Map<String, JList<Force>> availableForceLists = new HashMap<>();
     private Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
@@ -110,10 +109,9 @@ public class StratconScenarioWizard extends JDialog {
 
                 eligibleLeadershipUnits.sort(Comparator.comparing(Unit::getName));
 
-                int leadershipSkill =
-                        currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER, campaign);
+                int leadershipSkill = currentScenario.getBackingScenario().getLanceCommanderSkill(SkillType.S_LEADER, campaign);
 
-                if ((eligibleLeadershipUnits.size() > 0) && (leadershipSkill > 0)) {
+                if (!eligibleLeadershipUnits.isEmpty() && (leadershipSkill > 0)) {
                     setLeadershipUI(gbc, eligibleLeadershipUnits, leadershipSkill);
                     gbc.gridy++;
                 }

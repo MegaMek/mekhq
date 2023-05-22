@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
@@ -34,7 +35,7 @@ import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
@@ -64,6 +65,7 @@ public class AeroLifeSupport extends Part {
         }
     }
 
+    @Override
     public AeroLifeSupport clone() {
         AeroLifeSupport clone = new AeroLifeSupport(getUnitTonnage(), cost, fighter, campaign);
         clone.copyBaseData(this);
@@ -90,8 +92,8 @@ public class AeroLifeSupport extends Part {
     @Override
     public int getBaseTime() {
         int time = 0;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 if (isSalvaging()) {
                     time = 1200;
@@ -173,7 +175,7 @@ public class AeroLifeSupport extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -212,17 +214,11 @@ public class AeroLifeSupport extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<fighter>"
-                +fighter
-                +"</fighter>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<cost>"
-                + cost.toXmlString()
-                +"</cost>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fighter", fighter);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cost", cost);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -261,7 +257,7 @@ public class AeroLifeSupport extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ELECTRONICS;
     }
 

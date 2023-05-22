@@ -18,15 +18,15 @@
  */
 package mekhq.campaign.market;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import megamek.common.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.module.api.PersonnelMarketMethod;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Generation method for personnel market that adds a random number of recruits of a random type
@@ -48,7 +48,7 @@ public class PersonnelMarketRandom implements PersonnelMarketMethod {
 
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
         for (int i = 0; i < q; i++) {
-            int roll = Compute.randomInt(personnelRoles.length - PersonnelRole.getUnmarketableCount());
+            int roll = Compute.randomInt(personnelRoles.length - PersonnelRole.getCivilianCount());
             Person p = c.newPerson(personnelRoles[roll]);
             personnel.add(p);
         }
@@ -56,28 +56,11 @@ public class PersonnelMarketRandom implements PersonnelMarketMethod {
     }
 
     @Override
-    public List<Person> removePersonnelForDay(Campaign c, List<Person> current) {
-        List<Person> toRemove = new ArrayList<>();
-        for (Person p : current) {
-            int roll = Compute.d6(2);
-            if (p.getExperienceLevel(c, false) == SkillType.EXP_ELITE
-                && roll < c.getCampaignOptions().getPersonnelMarketRandomEliteRemoval()) {
-                toRemove.add(p);
-            } else if (p.getExperienceLevel(c, false) == SkillType.EXP_VETERAN
-                       && roll < c.getCampaignOptions().getPersonnelMarketRandomVeteranRemoval()) {
-                toRemove.add(p);
-            } else if (p.getExperienceLevel(c, false) == SkillType.EXP_REGULAR
-                       && roll < c.getCampaignOptions().getPersonnelMarketRandomRegularRemoval()) {
-                toRemove.add(p);
-            } else if (p.getExperienceLevel(c, false) == SkillType.EXP_GREEN
-                       && roll < c.getCampaignOptions().getPersonnelMarketRandomGreenRemoval()) {
-                toRemove.add(p);
-            } else if (p.getExperienceLevel(c, false) == SkillType.EXP_ULTRA_GREEN
-                       && roll < c.getCampaignOptions().getPersonnelMarketRandomUltraGreenRemoval()) {
-                toRemove.add(p);
-            }
-        }
-        return toRemove;
+    public List<Person> removePersonnelForDay(final Campaign campaign, final List<Person> current) {
+        return current.stream()
+                .filter(person -> campaign.getCampaignOptions().getPersonnelMarketRandomRemovalTargets()
+                        .get(person.getSkillLevel(campaign, false)) > Compute.d6(2))
+                .collect(Collectors.toList());
     }
 
     int generateRandomQuantity() {

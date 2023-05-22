@@ -58,6 +58,7 @@ import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.enums.MHQTabType;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -94,12 +95,13 @@ public class MekLabTab extends CampaignGuiTab {
 
     private JPanel shoppingPanel;
 
-    MekLabTab(CampaignGUI gui, String name) {
+    //region Constructors
+    public MekLabTab(CampaignGUI gui, String name) {
         super(gui, name);
         this.campaignGUI = gui;
-
         this.repaint();
     }
+    //endregion Constructors
 
     @Override
     public void initTab() {
@@ -189,8 +191,8 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.MEKLAB;
+    public MHQTabType tabType() {
+        return MHQTabType.MEK_LAB;
     }
 
     public Unit getUnit() {
@@ -235,9 +237,17 @@ public class MekLabTab extends CampaignGuiTab {
 
     public void resetUnit() {
         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortName());
+
+        if (mechSummary == null) {
+            LogManager.getLogger().error(String.format(
+                    "Cannot reset unit %s as it cannot be found in the cache.",
+                    unit.getEntity().getDisplayName()));
+            return;
+        }
+
         Entity entity;
         try {
-            entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
+            entity = new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName()).getEntity();
         } catch (EntityLoadingException ex) {
             LogManager.getLogger().error("", ex);
             return;

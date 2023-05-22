@@ -37,7 +37,7 @@ import org.apache.logging.log4j.LogManager;
 @AtBScenarioEnabled
 public class OfficerDuelBuiltInScenario extends AtBScenario {
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -48,7 +48,7 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Officer Duel";
+        return "Special Scenario: Officer Duel";
     }
 
     @Override
@@ -95,8 +95,8 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                      ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         setStart(startPos[Compute.randomInt(4)]);
         int enemyStart = getStart() + 4;
 
@@ -106,27 +106,36 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
 
         final AtBContract contract = getContract(campaign);
 
-        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
-            enemyEntities = new ArrayList<>();
-            final Entity en = getEntity(contract.getEnemyCode(), contract.getEnemySkill(),
-                    contract.getEnemyQuality(), UnitType.MEK,
-                    Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
+        for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
+            final Entity en;
+            if (weight == EntityWeightClass.WEIGHT_COLOSSAL) {
+                // Treat Colossal as a unique case, generating at that tier
+                en = getEntity(contract.getEnemyCode(), contract.getEnemySkill(),
+                        contract.getEnemyQuality(), UnitType.MEK, EntityWeightClass.WEIGHT_COLOSSAL,
+                        campaign);
+            } else {
+                // Generate up to a maximum of Assault
+                en = getEntity(contract.getEnemyCode(), contract.getEnemySkill(),
+                        contract.getEnemyQuality(), UnitType.MEK,
+                        Math.min(weight + 1, EntityWeightClass.WEIGHT_ASSAULT), campaign);
+            }
 
             if (en == null) {
-                LogManager.getLogger().warn("Failed to generate a mek for " + contract.getEnemyCode());
+                getSpecialScenarioEnemies().add(new ArrayList<>());
                 continue;
             }
 
-            if (weight == EntityWeightClass.WEIGHT_ASSAULT) {
+            if (weight >= EntityWeightClass.WEIGHT_ASSAULT) {
                 en.getCrew().setGunnery(en.getCrew().getGunnery() - 1);
                 en.getCrew().setPiloting(en.getCrew().getPiloting() - 1);
             }
 
+            enemyEntities = new ArrayList<>();
             enemyEntities.add(en);
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(contract, enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(contract, enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
     }
 
     @Override

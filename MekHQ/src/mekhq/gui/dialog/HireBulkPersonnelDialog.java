@@ -1,5 +1,4 @@
 /*
-/*
  * Copyright (c) 2010-2021 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
@@ -22,7 +21,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -68,11 +66,11 @@ public class HireBulkPersonnelDialog extends JDialog {
     private int maxAgeVal = 99;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
-    public HireBulkPersonnelDialog(Frame parent, boolean modal, Campaign c) {
-        super(parent, modal);
-        this.campaign = c;
+    public HireBulkPersonnelDialog(final JFrame frame, final boolean modal, final Campaign campaign) {
+        super(frame, modal);
+        this.campaign = campaign;
         initComponents();
         setLocationRelativeTo(getParent());
         setUserPreferences();
@@ -218,7 +216,7 @@ public class HireBulkPersonnelDialog extends JDialog {
             });
             ageRangePanel.add(minAge, newConstraints(0, 0));
 
-            ageRangePanel.add(new JLabel(resourceMap.getString("lblAgeRangeSeparator.text")), newConstraints(1, 0)); //$NON-NLS-1$
+            ageRangePanel.add(new JLabel(resourceMap.getString("lblAgeRangeSeparator.text")), newConstraints(1, 0));
 
             maxAge = new JSpinner(new SpinnerNumberModel(99, 0, 99, 1));
             ((JSpinner.DefaultEditor) maxAge.getEditor()).getTextField().setHorizontalAlignment(JTextField.CENTER);
@@ -254,11 +252,15 @@ public class HireBulkPersonnelDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HireBulkPersonnelDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(HireBulkPersonnelDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private void hire() {

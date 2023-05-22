@@ -21,7 +21,7 @@
 package mekhq.campaign.parts.equipment;
 
 import megamek.common.EquipmentType;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.apache.logging.log4j.LogManager;
@@ -54,30 +54,18 @@ public class InfantryWeaponPart extends EquipmentPart {
 
     @Override
     public MissingEquipmentPart getMissingPart() {
-        //shouldn't get here, but ok
+        // shouldn't get here, but ok
         return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, size, campaign, getTonnage());
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<equipmentNum>"
-                +equipmentNum
-                +"</equipmentNum>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<typeName>"
-                +MekHqXmlUtil.escape(type.getInternalName())
-                +"</typeName>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<equipTonnage>"
-                +equipTonnage
-                +"</equipTonnage>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<primary>"
-                +primary
-                +"</primary>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentNum", equipmentNum);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipTonnage", equipTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "primary", primary);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -108,7 +96,7 @@ public class InfantryWeaponPart extends EquipmentPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.WEAPON;
     }
 }

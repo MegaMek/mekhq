@@ -23,7 +23,7 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.MissingPart;
 import mekhq.campaign.parts.Part;
@@ -121,13 +121,13 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "size", size);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentNum", equipmentNum);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "size", size);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipTonnage", equipTonnage);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -209,7 +209,7 @@ public class MissingEquipmentPart extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         final Unit unit = getUnit();
         if ((unit != null) && (unit.isSalvage() || isTeamSalvaging())) {
             return null;

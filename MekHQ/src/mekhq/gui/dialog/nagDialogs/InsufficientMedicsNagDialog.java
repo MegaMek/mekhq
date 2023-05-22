@@ -34,12 +34,12 @@ public class InsufficientMedicsNagDialog extends AbstractMHQNagDialog {
     //endregion Constructors
 
     @Override
-    protected boolean checkNag(final Campaign campaign) {
+    protected boolean checkNag() {
         if (MekHQ.getMHQOptions().getNagDialogIgnore(getKey())) {
             return false;
         }
 
-        final int need = campaign.getMedicsNeed();
+        final int need = getCampaign().getMedicsNeed();
         if (need > 0) {
             setDescription(String.format(resources.getString("InsufficientMedicsNagDialog.text"), need));
             return true;

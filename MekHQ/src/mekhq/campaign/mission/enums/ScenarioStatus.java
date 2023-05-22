@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.mission.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -45,7 +44,7 @@ public enum ScenarioStatus {
     //region Constructors
     ScenarioStatus(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -132,8 +131,7 @@ public enum ScenarioStatus {
 
         }
 
-        LogManager.getLogger().error("Failed to parse text " + text + " into a ScenarioStatus, returning CURRENT.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a ScenarioStatus. Returning CURRENT.");
         return CURRENT;
     }
     //endregion File I/O

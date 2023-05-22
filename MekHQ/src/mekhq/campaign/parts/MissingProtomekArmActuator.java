@@ -23,7 +23,8 @@ package mekhq.campaign.parts;
 import megamek.common.CriticalSlot;
 import megamek.common.Protomech;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.apache.logging.log4j.LogManager;
@@ -80,13 +81,10 @@ public class MissingProtomekArmActuator extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<location>"
-                +location
-                +"</location>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "location", location);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -114,7 +112,7 @@ public class MissingProtomekArmActuator extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (null == unit) {
             return null;
         }
@@ -164,7 +162,7 @@ public class MissingProtomekArmActuator extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ACTUATOR;
     }
 }

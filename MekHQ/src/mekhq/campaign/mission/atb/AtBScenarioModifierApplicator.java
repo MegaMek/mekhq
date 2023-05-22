@@ -31,6 +31,7 @@ import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
@@ -111,11 +112,13 @@ public class AtBScenarioModifierApplicator {
         for (int x = 0; x < actualUnitsToRemove; x++) {
             int botForceIndex = Compute.randomInt(scenario.getNumBots());
             BotForce bf = scenario.getBotForce(botForceIndex);
+            ScenarioForceTemplate template = scenario.getBotForceTemplates().get(bf);
+            boolean subjectToRemoval = (template != null) && template.isSubjectToRandomRemoval();
 
             // only remove units from a bot force if it's on the affected team
             // AND if it has any units to remove
             if ((bf.getTeam() == ScenarioForceTemplate.TEAM_IDS.get(eventRecipient.ordinal()))
-                    && !bf.getFullEntityList(campaign).isEmpty()) {
+                    && !bf.getFullEntityList(campaign).isEmpty() && subjectToRemoval) {
                 int unitIndexToRemove = Compute.randomInt(bf.getFullEntityList(campaign).size());
                 bf.removeEntity(unitIndexToRemove);
             }
@@ -173,7 +176,7 @@ public class AtBScenarioModifierApplicator {
     public static void adjustSkill(AtBDynamicScenario scenario, Campaign campaign,
             ForceAlignment eventRecipient, int skillAdjustment) {
         // We want a non-none Skill Level
-        final SkillLevel adjustedSkill = SkillLevel.values()[MathUtility.clamp(
+        final SkillLevel adjustedSkill = Skills.SKILL_LEVELS[MathUtility.clamp(
                 scenario.getEffectiveOpforSkill().ordinal() + skillAdjustment,
                 SkillLevel.ULTRA_GREEN.ordinal(), SkillLevel.LEGENDARY.ordinal())];
         // fire up a skill generator set to the appropriate skill model
@@ -327,13 +330,16 @@ public class AtBScenarioModifierApplicator {
      * Applies an objective to the scenario.
      */
     public static void applyObjective(AtBDynamicScenario scenario, Campaign campaign, ScenarioObjective objective, EventTiming timing) {
-        // if we're doing this before force generation, just add the objective for future translation
-        scenario.getTemplate().scenarioObjectives.add(objective);
+        // Only apply objective if it isn't already added
+        if (!scenario.getTemplate().scenarioObjectives.contains(objective)) {
+            // if we're doing this before force generation, just add the objective for future translation
+            scenario.getTemplate().scenarioObjectives.add(objective);
 
-        // if we're doing it after, we have to translate it individually
-        if (timing == EventTiming.PostForceGeneration) {
-            ScenarioObjective actualObjective = AtBDynamicScenarioFactory.translateTemplateObjective(scenario, campaign, objective);
-            scenario.getScenarioObjectives().add(actualObjective);
+            // if we're doing it after, we have to translate it individually
+            if (timing == EventTiming.PostForceGeneration) {
+                ScenarioObjective actualObjective = AtBDynamicScenarioFactory.translateTemplateObjective(scenario, campaign, objective);
+                scenario.getScenarioObjectives().add(actualObjective);
+            }
         }
     }
 

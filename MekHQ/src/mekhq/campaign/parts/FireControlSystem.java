@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -33,7 +34,7 @@ import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.SkillType;
 
@@ -67,7 +68,7 @@ public class FireControlSystem extends Part {
             hits = ((Aero) unit.getEntity()).getFCSHits();
             if (checkForDestruction
                     && hits > priorHits
-                    && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 3) {
@@ -79,8 +80,8 @@ public class FireControlSystem extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship))  {
                 time = 120;
                 if (unit.getEntity().hasNavalC3()) {
@@ -108,8 +109,8 @@ public class FireControlSystem extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair time and difficulty
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair time and difficulty
             if (isSalvaging()) {
                 return 0;
             }
@@ -168,9 +169,9 @@ public class FireControlSystem extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (isSalvaging()) {
-            if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
+            if ((null != unit) && ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship))) {
                 // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
                 return "You cannot salvage a spacecraft FCS. You must scrap it instead.";
             }
@@ -216,13 +217,10 @@ public class FireControlSystem extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<cost>"
-                +cost.toXmlString()
-                +"</cost>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cost", cost);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

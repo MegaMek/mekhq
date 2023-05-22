@@ -23,8 +23,10 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.CampaignPreset;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
-import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.renderers.CampaignPresetRenderer;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -68,19 +70,23 @@ public class CampaignPresetPane extends AbstractMHQScrollPane {
         getPresets().setLayoutOrientation(JList.VERTICAL);
         getPresets().setCellRenderer(new CampaignPresetRenderer(getFrame()));
 
-        final JPanel panel = new JScrollablePanel(new GridLayout(1, 1));
-        panel.setName("campaignPresetPanel");
+        final AbstractMHQScrollablePanel panel = new DefaultMHQScrollablePanel(getFrame(),
+                "campaignPresetPanel", new GridLayout(1, 1));
         panel.add(getPresets());
 
         setViewportView(panel);
         setMinimumSize(new Dimension(350, 150));
         setPreferredSize(new Dimension(500, 400));
 
-        setPreferences();
+        try {
+            setPreferences();
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Error setting the Campaign Preset Pane's preferences. Keeping the created pane, but this is likely to cause some oddities.", ex);
+        }
     }
 
     @Override
-    protected void setCustomPreferences(final PreferencesNode preferences) {
+    protected void setCustomPreferences(final PreferencesNode preferences) throws Exception {
         super.setCustomPreferences(preferences);
         preferences.manage(new JListPreference(getPresets()));
     }

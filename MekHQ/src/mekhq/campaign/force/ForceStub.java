@@ -23,7 +23,7 @@ package mekhq.campaign.force;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.icons.LayeredForceIcon;
 import mekhq.campaign.icons.StandardForceIcon;
@@ -101,26 +101,26 @@ public class ForceStub {
 
     //region File I/O
     public void writeToXML(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "forceStub");
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forceStub");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         getForceIcon().writeToXML(pw, indent);
 
         if (!units.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "units");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "units");
             for (UnitStub ustub : units) {
-                ustub.writeToXml(pw, indent);
+                ustub.writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "units");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "units");
         }
 
         if (!subForces.isEmpty()) {
-            MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "subforces");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "subforces");
             for (ForceStub sub : subForces) {
                 sub.writeToXML(pw, indent);
             }
-            MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "subforces");
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "subforces");
         }
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, "forceStub");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forceStub");
     }
 
     public static ForceStub generateInstanceFromXML(final Node wn, final Version version) {

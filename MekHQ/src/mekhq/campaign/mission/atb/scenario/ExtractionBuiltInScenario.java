@@ -54,8 +54,8 @@ public class ExtractionBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int otherStart;
         int otherHome;
@@ -92,14 +92,14 @@ public class ExtractionBuiltInScenario extends AtBScenario {
             otherStart -= 8;
         }
 
-        if (allyEntities.size() > 0) {
+        if (!allyEntities.isEmpty()) {
             addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
         addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getEnemyHome(), enemyEntities), campaign);
 
-        ArrayList<Entity> otherForce = new ArrayList<Entity>();
+        ArrayList<Entity> otherForce = new ArrayList<>();
         addCivilianUnits(otherForce, 4, campaign);
 
         try {
@@ -120,8 +120,8 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 
                 addBotForce(bf, campaign);
             }
-        } catch (PrincessException e) {
-            LogManager.getLogger().error("", e);
+        } catch (PrincessException ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 

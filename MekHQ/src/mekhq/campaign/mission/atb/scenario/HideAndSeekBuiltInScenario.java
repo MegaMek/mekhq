@@ -18,8 +18,6 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import java.util.ArrayList;
-
 import megamek.common.Board;
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -30,6 +28,8 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+
+import java.util.ArrayList;
 
 @AtBScenarioEnabled
 public class HideAndSeekBuiltInScenario extends AtBScenario {
@@ -67,8 +67,8 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                      ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int playerHome;
 
@@ -93,7 +93,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
             }
         }
 
-        if (allyEntities.size() > 0) {
+        if (!allyEntities.isEmpty()) {
             addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 

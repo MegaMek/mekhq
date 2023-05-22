@@ -25,13 +25,12 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SpecialAbility;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
 import java.util.stream.Collectors;
 
 /**
@@ -45,9 +44,9 @@ public class SelectAbilitiesDialog extends JDialog {
     private List<String> spaNames;
     private boolean cancelled;
 
-    private Hashtable<String, SpecialAbility> allSPA;
+    private Map<String, SpecialAbility> allSPA;
 
-    public SelectAbilitiesDialog(JFrame parent, Vector<String> s, Hashtable<String, SpecialAbility> hash) {
+    public SelectAbilitiesDialog(JFrame parent, Vector<String> s, Map<String, SpecialAbility> hash) {
         super(parent, true);
         selected = s;
         allSPA = hash;
@@ -58,9 +57,8 @@ public class SelectAbilitiesDialog extends JDialog {
     }
 
     private void initComponents() {
-
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
+        btnOK = new JButton();
+        btnClose = new JButton();
 
         chkAbil = new ArrayList<>();
         spaNames = new ArrayList<>();
@@ -90,7 +88,7 @@ public class SelectAbilitiesDialog extends JDialog {
         panButtons.add(btnOK);
         panButtons.add(btnClose);
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Select Abilities");
         getContentPane().setLayout(new BorderLayout());
 
@@ -100,11 +98,15 @@ public class SelectAbilitiesDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SelectAbilitiesDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SelectAbilitiesDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private void done() {

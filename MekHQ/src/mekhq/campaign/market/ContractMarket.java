@@ -21,11 +21,12 @@
 package mekhq.campaign.market;
 
 import megamek.Version;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.market.enums.ContractMarketMethod;
@@ -177,7 +178,7 @@ public class ContractMarket {
                         inBackwater = false;
                     }
                 }
-            } else if (currentFactions.size() > 0) {
+            } else if (!currentFactions.isEmpty()) {
                 // Just one faction. Are there any others nearby?
                 Faction onlyFaction = currentFactions.iterator().next();
                 if (!onlyFaction.isPeriphery()) {
@@ -250,7 +251,7 @@ public class ContractMarket {
                     contracts.add(c);
                 }
             }
-            if (campaign.getCampaignOptions().getContractMarketReportRefresh()) {
+            if (campaign.getCampaignOptions().isContractMarketReportRefresh()) {
                 campaign.addReport("<a href='CONTRACT_MARKET'>Contract market updated</a>");
             }
         }
@@ -397,7 +398,7 @@ public class ContractMarket {
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
 
-        contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+        contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setAtBContractClauses(contract, unitRatingMod, campaign);
 
         contract.calculatePaymentMultiplier(campaign);
@@ -445,14 +446,15 @@ public class ContractMarket {
          * appear anywhere, but others should be limited to what's within a
          * jump. */
 
-        /*TODO: When MekHQ gets the capability of splitting the unit to
-         * different locations, this restriction can be lessened or lifted.
-         */
-        if (!contract.getEnemyCode().equals("REB") &&
-                !contract.getEnemyCode().equals("PIR")) {
+        // TODO : When MekHQ gets the capability of splitting the unit to different locations, this
+        // TODO : restriction can be lessened or lifted.
+        if (!contract.getEnemy().isRebelOrPirate()) {
             boolean factionValid = false;
             for (PlanetarySystem p : Systems.getInstance().getNearbySystems(campaign.getCurrentSystem(), 30)) {
-                if (factionValid) break;
+                if (factionValid) {
+                    break;
+                }
+
                 for (Faction f : p.getFactionSet(campaign.getLocalDate())) {
                     if (f.getShortName().equals(contract.getEnemyCode())) {
                         factionValid = true;
@@ -477,7 +479,7 @@ public class ContractMarket {
             contract.setAllySkill(SkillLevel.GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
-        contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+        contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
 
         contract.setCommandRights(ContractCommandRights.values()[Math.max(parent.getCommandRights().ordinal() - 1, 0)]);
         contract.setSalvageExchange(parent.isSalvageExchange());
@@ -531,7 +533,7 @@ public class ContractMarket {
         followup.setAllyQuality(contract.getAllyQuality());
         followup.setEnemySkill(contract.getEnemySkill());
         followup.setEnemyQuality(contract.getEnemyQuality());
-        followup.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+        followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setAtBContractClauses(followup, campaign.getUnitRatingMod(), campaign);
 
         followup.calculatePaymentMultiplier(campaign);
@@ -550,29 +552,24 @@ public class ContractMarket {
 
     protected AtBContractType findAtBMissionType(int unitRatingMod, boolean majorPower) {
         final AtBContractType[][] table = {
-            //col 0: IS Houses
-            {AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PIRATE_HUNTING,
+            // col 0: IS Houses
+            { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PIRATE_HUNTING,
                     AtBContractType.PLANETARY_ASSAULT, AtBContractType.OBJECTIVE_RAID, AtBContractType.OBJECTIVE_RAID,
                     AtBContractType.EXTRACTION_RAID, AtBContractType.RECON_RAID, AtBContractType.GARRISON_DUTY,
-                    AtBContractType.CADRE_DUTY, AtBContractType.RELIEF_DUTY},
-            //col 1: Others
-                {AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PLANETARY_ASSAULT,
+                    AtBContractType.CADRE_DUTY, AtBContractType.RELIEF_DUTY },
+            // col 1: Others
+                { AtBContractType.GUERRILLA_WARFARE, AtBContractType.RECON_RAID, AtBContractType.PLANETARY_ASSAULT,
                         AtBContractType.OBJECTIVE_RAID, AtBContractType.EXTRACTION_RAID, AtBContractType.PIRATE_HUNTING,
                         AtBContractType.SECURITY_DUTY, AtBContractType.OBJECTIVE_RAID, AtBContractType.GARRISON_DUTY,
-                        AtBContractType.CADRE_DUTY, AtBContractType.DIVERSIONARY_RAID}
+                        AtBContractType.CADRE_DUTY, AtBContractType.DIVERSIONARY_RAID }
         };
-        int roll = Compute.d6(2) + unitRatingMod - IUnitRating.DRAGOON_C;
-        if (roll > 12) {
-            roll = 12;
-        } else if (roll < 2) {
-            roll = 2;
-        }
+        int roll = MathUtility.clamp(Compute.d6(2) + unitRatingMod - IUnitRating.DRAGOON_C, 2, 12);
         return table[majorPower ? 0 : 1][roll - 2];
     }
 
     public void setAllyRating(AtBContract contract, boolean isAttacker, int year) {
         int mod = 0;
-        if (contract.getEnemyCode().equals("REB") || contract.getEnemyCode().equals("PIR")) {
+        if (contract.getEnemy().isRebelOrPirate()) {
             mod -= 1;
         }
 
@@ -608,8 +605,7 @@ public class ContractMarket {
 
     public void setEnemyRating(AtBContract contract, boolean isAttacker, int year) {
         int mod = 0;
-        if (contract.getEnemyCode().equals("REB") ||
-                contract.getEnemyCode().equals("PIR")) {
+        if (contract.getEnemy().isRebelOrPirate()) {
             mod -= 2;
         }
         if (contract.getContractType().isGuerrillaWarfare()) {
@@ -645,11 +641,17 @@ public class ContractMarket {
     }
 
     protected int getQualityRating(int roll) {
-        if (roll <= 5) return IUnitRating.DRAGOON_F;
-        if (roll <= 8) return IUnitRating.DRAGOON_D;
-        if (roll <= 10) return IUnitRating.DRAGOON_C;
-        if (roll == 11) return IUnitRating.DRAGOON_B;
-        return IUnitRating.DRAGOON_A;
+        if (roll <= 5) {
+            return IUnitRating.DRAGOON_F;
+        } else if (roll <= 8) {
+            return IUnitRating.DRAGOON_D;
+        } else if (roll <= 10) {
+            return IUnitRating.DRAGOON_C;
+        } else if (roll == 11) {
+            return IUnitRating.DRAGOON_B;
+        } else {
+            return IUnitRating.DRAGOON_A;
+        }
     }
 
     protected void setAtBContractClauses(AtBContract contract, int unitRatingMod, Campaign campaign) {
@@ -706,9 +708,13 @@ public class ContractMarket {
 
         if (Factions.getInstance().getFaction(contract.getEnemyCode()).isClan() &&
                 !Factions.getInstance().getFaction(contract.getEmployerCode()).isClan()) {
-            for (int i = 0; i < 4; i++)
-                if (i == CLAUSE_SALVAGE) mods.mods[i] -= 2;
-                else mods.mods[i] += 1;
+            for (int i = 0; i < 4; i++) {
+                if (i == CLAUSE_SALVAGE) {
+                    mods.mods[i] -= 2;
+                } else {
+                    mods.mods[i] += 1;
+                }
+            }
         } else {
             if (contract.getEnemySkill().isVeteranOrGreater()) {
                 mods.mods[Compute.randomInt(4)] += 1;
@@ -720,9 +726,9 @@ public class ContractMarket {
         }
 
         int[][] missionMods = {
-            {1, 0, 1, 0}, {0, 1, -1, -3}, {-3, 0, 2, 1}, {-2, 1, -1, -1},
-            {-2, 0, 2, 3}, {-1, 1, 1, 1}, {-2, 3, -2, -1}, {2, 2, -1, -1},
-            {0, 2, 2, 1}, {-1, 0, 1, 2}, {-1, -2, 1, -1}, {-1, -1, 2, 1}
+            { 1, 0, 1, 0 }, { 0, 1, -1, -3 }, { -3, 0, 2, 1 }, { -2, 1, -1, -1 },
+            { -2, 0, 2, 3 }, { -1, 1, 1, 1 }, { -2, 3, -2, -1 }, { 2, 2, -1, -1 },
+            { 0, 2, 2, 1 }, { -1, 0, 1, 2 }, { -1, -2, 1, -1 }, { -1, -1, 2, 1 }
         };
         for (int i = 0; i < 4; i++) {
             mods.mods[i] += missionMods[contract.getContractType().ordinal()][i];
@@ -805,35 +811,35 @@ public class ContractMarket {
 
     private void rollTransportClause(AtBContract contract, int mod) {
         int roll = Compute.d6(2) + mod;
-        if (roll < 2) contract.setTransportComp(0);
-        else if (roll < 6) contract.setTransportComp((20 + (roll - 2) * 5));
-        else if (roll < 10) contract.setTransportComp((45 + (roll - 6) * 5));
-        else contract.setTransportComp(100);
+        if (roll < 2) {
+            contract.setTransportComp(0);
+        } else if (roll < 6) {
+            contract.setTransportComp((20 + (roll - 2) * 5));
+        } else if (roll < 10) {
+            contract.setTransportComp((45 + (roll - 6) * 5));
+        } else {
+            contract.setTransportComp(100);
+        }
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "<contractMarket>");
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+1, "lastId", lastId);
-        for (Contract c : contracts) {
-            c.writeToXML(pw1, indent + 1);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastId", lastId);
+        for (final Contract contract : contracts) {
+            contract.writeToXML(pw, indent);
         }
-        for (Integer key : clauseMods.keySet()) {
+
+        for (final Integer key : clauseMods.keySet()) {
             if (!contractIds.containsKey(key)) {
                 continue;
             }
-            pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                    + "<clauseMods id=\"" + key + "\">");
-            String rerolls = "";
-            String mods = "";
-            for (int i = 0; i < CLAUSE_NUM; i++) {
-                rerolls += clauseMods.get(key).rerollsUsed[i] + ((i < CLAUSE_NUM - 1)?",":"");
-                mods += clauseMods.get(key).mods[i] + ((i < CLAUSE_NUM - 1)?",":"");
-            }
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "mods", mods);
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent+2, "rerollsUsed", rerolls);
-            pw1.println(MekHqXmlUtil.indentStr(indent+1) + "</clauseMods>");
+
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "clauseMods", "id", key);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mods", clauseMods.get(key).mods);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rerollsUsed", clauseMods.get(key).rerollsUsed);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "clauseMods");
         }
-        pw1.println(MekHqXmlUtil.indentStr(indent) + "</contractMarket>");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "contractMarket");
     }
 
     public static ContractMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {

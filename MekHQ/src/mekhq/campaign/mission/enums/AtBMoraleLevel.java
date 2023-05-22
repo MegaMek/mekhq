@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.mission.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -42,7 +41,7 @@ public enum AtBMoraleLevel {
     //region Constructors
     AtBMoraleLevel(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -113,8 +112,7 @@ public enum AtBMoraleLevel {
 
         }
 
-        LogManager.getLogger().error("Failed to parse text " + text + " into an AtBMoraleLevel, returning NORMAL.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into an AtBMoraleLevel. Returning NORMAL.");
         return NORMAL;
     }
     //endregion File I/O

@@ -18,17 +18,16 @@
  */
 package mekhq.gui.view;
 
-import java.time.LocalDate;
-import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.JScrollablePanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.time.LocalDate;
+import java.util.ResourceBundle;
 
 /**
  * A custom panel that gets filled in with goodies from a JumpPath record
@@ -38,21 +37,21 @@ public class JumpPathViewPanel extends JScrollablePanel {
     private JumpPath path;
     private Campaign campaign;
 
-    private javax.swing.JPanel pnlPath;
-    private javax.swing.JPanel pnlStats;
+    private JPanel pnlPath;
+    private JPanel pnlStats;
 
-    private javax.swing.JLabel lblJumps;
-    private javax.swing.JLabel txtJumps;
-    private javax.swing.JLabel lblTimeStart;
-    private javax.swing.JLabel txtTimeStart;
-    private javax.swing.JLabel lblTimeEnd;
-    private javax.swing.JLabel txtTimeEnd;
-    private javax.swing.JLabel lblRechargeTime;
-    private javax.swing.JLabel txtRechargeTime;
-    private javax.swing.JLabel lblTotalTime;
-    private javax.swing.JLabel txtTotalTime;
-    private javax.swing.JLabel lblCost;
-    private javax.swing.JLabel txtCost;
+    private JLabel lblJumps;
+    private JLabel txtJumps;
+    private JLabel lblTimeStart;
+    private JLabel txtTimeStart;
+    private JLabel lblTimeEnd;
+    private JLabel txtTimeEnd;
+    private JLabel lblRechargeTime;
+    private JLabel txtRechargeTime;
+    private JLabel lblTotalTime;
+    private JLabel txtTotalTime;
+    private JLabel lblCost;
+    private JLabel txtCost;
 
     public JumpPathViewPanel(JumpPath p, Campaign c) {
         super();
@@ -62,51 +61,50 @@ public class JumpPathViewPanel extends JScrollablePanel {
     }
 
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
 
-        pnlStats = new javax.swing.JPanel();
-        pnlPath = new javax.swing.JPanel();
+        pnlStats = new JPanel();
+        pnlPath = new JPanel();
 
-        setLayout(new java.awt.GridBagLayout());
+        setLayout(new GridBagLayout());
 
 
         pnlStats.setName("pnlStats");
         pnlStats.setBorder(BorderFactory.createTitledBorder("Summary"));
         fillStats();
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlStats, gridBagConstraints);
 
         pnlPath.setName("pnlPath");
         pnlPath.setBorder(BorderFactory.createTitledBorder("Full Path"));
         getPath();
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridheight = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(pnlPath, gridBagConstraints);
     }
 
     private void getPath() {
-        java.awt.GridBagConstraints gridBagConstraints;
-        pnlPath.setLayout(new java.awt.GridBagLayout());
+        GridBagConstraints gridBagConstraints;
+        pnlPath.setLayout(new GridBagLayout());
         int i = 0;
-        javax.swing.JLabel lblPlanet;
+        JLabel lblPlanet;
         LocalDate currentDate = campaign.getLocalDate();
         for (PlanetarySystem system : path.getSystems()) {
-            lblPlanet = new javax.swing.JLabel(system.getPrintableName(currentDate) + " (" + system.getRechargeTimeText(currentDate) + ")");
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            lblPlanet = new JLabel(system.getPrintableName(currentDate) + " (" + system.getRechargeTimeText(currentDate) + ")");
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = i;
             gridBagConstraints.gridwidth = 1;
@@ -114,9 +112,9 @@ public class JumpPathViewPanel extends JScrollablePanel {
             if (i >= (path.getSystems().size() - 1)) {
                 gridBagConstraints.weighty = 1.0;
             }
-            gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 0);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(0, 0, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlPath.add(lblPlanet, gridBagConstraints);
             i++;
         }
@@ -124,152 +122,152 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
     private void fillStats() {
         ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.JumpPathViewPanel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
-        lblJumps = new javax.swing.JLabel();
-        txtJumps = new javax.swing.JLabel();
-        lblTimeStart = new javax.swing.JLabel();
-        txtTimeStart = new javax.swing.JLabel();
-        lblTimeEnd = new javax.swing.JLabel();
-        txtTimeEnd = new javax.swing.JLabel();
-        lblRechargeTime = new javax.swing.JLabel();
-        txtRechargeTime = new javax.swing.JLabel();
-        lblTotalTime = new javax.swing.JLabel();
-        txtTotalTime = new javax.swing.JLabel();
-        lblCost = new javax.swing.JLabel();
-        txtCost = new javax.swing.JLabel();
+        lblJumps = new JLabel();
+        txtJumps = new JLabel();
+        lblTimeStart = new JLabel();
+        txtTimeStart = new JLabel();
+        lblTimeEnd = new JLabel();
+        txtTimeEnd = new JLabel();
+        lblRechargeTime = new JLabel();
+        txtRechargeTime = new JLabel();
+        lblTotalTime = new JLabel();
+        txtTotalTime = new JLabel();
+        lblCost = new JLabel();
+        txtCost = new JLabel();
 
         LocalDate currentDate = campaign.getLocalDate();
         String startName = (path.getFirstSystem() == null) ? "?" : path.getFirstSystem().getPrintableName(currentDate);
         String endName = (path.getLastSystem() == null) ? "?" : path.getLastSystem().getPrintableName(currentDate);
 
-        java.awt.GridBagConstraints gridBagConstraints;
-        pnlStats.setLayout(new java.awt.GridBagLayout());
+        GridBagConstraints gridBagConstraints;
+        pnlStats.setLayout(new GridBagLayout());
 
-        lblJumps.setName("lblJumps"); // NOI18N
+        lblJumps.setName("lblJumps");
         lblJumps.setText(resourceMap.getString("lblJumps1.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblJumps, gridBagConstraints);
 
-        txtJumps.setName("lblJumps2"); // NOI18N
+        txtJumps.setName("lblJumps2");
         txtJumps.setText("<html>" + path.getJumps() + " jumps" + "</html>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtJumps, gridBagConstraints);
 
-        lblTimeStart.setName("lblTimeStart"); // NOI18N
+        lblTimeStart.setName("lblTimeStart");
         lblTimeStart.setText(resourceMap.getString("lblTimeStart1.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTimeStart, gridBagConstraints);
 
-        txtTimeStart.setName("lblTimeStart2"); // NOI18N
+        txtTimeStart.setName("lblTimeStart2");
         txtTimeStart.setText("<html>" + Math.round(path.getStartTime(campaign.getLocation().getTransitTime())*100.0)/100.0 + " days from "+ startName + " to jump point" + "</html>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTimeStart, gridBagConstraints);
 
-        lblTimeEnd.setName("lblTimeEnd"); // NOI18N
+        lblTimeEnd.setName("lblTimeEnd");
         lblTimeEnd.setText(resourceMap.getString("lblTimeEnd1.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTimeEnd, gridBagConstraints);
 
-        txtTimeEnd.setName("lblTimeEnd2"); // NOI18N
+        txtTimeEnd.setName("lblTimeEnd2");
         txtTimeEnd.setText("<html>" + Math.round(path.getEndTime()*100.0)/100.0 + " days from final jump point to " + endName + "</html>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTimeEnd, gridBagConstraints);
 
-        lblRechargeTime.setName("lblRechargeTime1"); // NOI18N
+        lblRechargeTime.setName("lblRechargeTime1");
         lblRechargeTime.setText(resourceMap.getString("lblRechargeTime1.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblRechargeTime, gridBagConstraints);
 
-        txtRechargeTime.setName("lblRechargeTime2"); // NOI18N
+        txtRechargeTime.setName("lblRechargeTime2");
         txtRechargeTime.setText("<html>" + Math.round(path.getTotalRechargeTime(currentDate)*100.0)/100.0 + " days" + "</html>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtRechargeTime, gridBagConstraints);
 
-        lblTotalTime.setName("lblTotalTime1"); // NOI18N
+        lblTotalTime.setName("lblTotalTime1");
         lblTotalTime.setText(resourceMap.getString("lblTotalTime1.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(lblTotalTime, gridBagConstraints);
 
-        txtTotalTime.setName("lblTotalTime2"); // NOI18N
+        txtTotalTime.setName("lblTotalTime2");
         txtTotalTime.setText("<html>" + Math.round(path.getTotalTime(currentDate, campaign.getLocation().getTransitTime())*100.0)/100.0 + " days" + "</html>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
         gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtTotalTime, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().payForTransport()) {
-            lblCost.setName("lblCost1"); // NOI18N
+        if (campaign.getCampaignOptions().isPayForTransport()) {
+            lblCost.setName("lblCost1");
             lblCost.setText(resourceMap.getString("lblCost1.text"));
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = 6;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(lblCost, gridBagConstraints);
 
-            txtCost.setName("lblCost2"); // NOI18N
+            txtCost.setName("lblCost2");
             txtCost.setText("<html>" +
                     campaign.calculateCostPerJump(
                                 true,
-                                campaign.getCampaignOptions().useEquipmentContractBase())
+                                campaign.getCampaignOptions().isEquipmentContractBase())
                             .multipliedBy(path.getJumps())
                                 .toAmountAndSymbolString() + "</html>");
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = 6;
             gridBagConstraints.weightx = 0.5;
-            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtCost, gridBagConstraints);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,7 +28,9 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
-import mekhq.*;
+import mekhq.MekHQ;
+import mekhq.NullEntityException;
+import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
@@ -56,11 +58,9 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
-import mekhq.io.migration.CamouflageMigrator;
-import mekhq.io.migration.FactionMigrator;
-import mekhq.io.migration.ForceIconMigrator;
-import mekhq.io.migration.PersonMigrator;
+import mekhq.io.migration.*;
 import mekhq.module.atb.AtBEventProcessor;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.*;
@@ -99,13 +99,12 @@ public class CampaignXmlParser {
 
         try {
             // Using factory get an instance of document builder
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
-
             throw new CampaignXmlParseException(ex);
         }
 
@@ -117,6 +116,10 @@ public class CampaignXmlParser {
         campaignEle.normalize();
 
         final Version version = new Version(campaignEle.getAttribute("version"));
+        if (version.is("0.0.0")) {
+            throw new CampaignXmlParseException(String.format("Illegal version of %s failed to parse",
+                    campaignEle.getAttribute("version")));
+        }
 
         // Indicates whether or not new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading
@@ -219,10 +222,7 @@ public class CampaignXmlParser {
                     retVal.setCampaignOptions(CampaignOptions.generateCampaignOptionsFromXml(wn, version));
                 } else if (xn.equalsIgnoreCase("randomSkillPreferences")) {
                     retVal.setRandomSkillPreferences(RandomSkillPreferences.generateRandomSkillPreferencesFromXml(wn, version));
-                } /* We don't need this since info is processed above in the first iteration...
-                else if (xn.equalsIgnoreCase("info")) {
-                    processInfoNode(retVal, wn, version);
-                }*/ else if (xn.equalsIgnoreCase("parts")) {
+                } else if (xn.equalsIgnoreCase("parts")) {
                     processPartNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("personnel")) {
                     // TODO: Make this depending on campaign options
@@ -268,13 +268,13 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
-                    retVal.setShipSearchStart(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
+                    retVal.setShipSearchStart(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {
                     retVal.setShipSearchType(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("shipSearchResult")) {
                     retVal.setShipSearchResult(wn.getTextContent());
                 } else if (xn.equalsIgnoreCase("shipSearchExpiration")) {
-                    retVal.setShipSearchExpiration(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
+                    retVal.setShipSearchExpiration(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("customPlanetaryEvents")) {
                     updatePlanetaryEventsFromXML(wn);
                 }
@@ -304,6 +304,8 @@ public class CampaignXmlParser {
             FactionMigrator.migrateFactionCode(retVal);
         }
 
+        GameOptionsMigrator.migrate(version, retVal.getGameOptions());
+
         // We need to do a post-process pass to restore a number of references.
         // Fix any Person Id References
         PersonIdReference.fixPersonIdReferences(retVal);
@@ -312,6 +314,7 @@ public class CampaignXmlParser {
         cleanupGhostKills(retVal);
 
         // Update the Personnel Modules
+        retVal.setDeath(options.getRandomDeathMethod().getMethod(options));
         retVal.setDivorce(options.getRandomDivorceMethod().getMethod(options));
         retVal.setMarriage(options.getRandomMarriageMethod().getMethod(options));
         retVal.setProcreation(options.getRandomProcreationMethod().getMethod(options));
@@ -339,10 +342,10 @@ public class CampaignXmlParser {
         }
 
         // determine if we've missed any lances and add those back into the campaign
-        if (retVal.getCampaignOptions().getUseAtB()) {
+        if (options.isUseAtB()) {
             Hashtable<Integer, Lance> lances = retVal.getLances();
             for (Force f : retVal.getAllForces()) {
-                if ((f.getUnits().size() > 0) && (null == lances.get(f.getId()))) {
+                if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
                     lances.put(f.getId(), new Lance(f.getId(), retVal));
                     LogManager.getLogger().warn(String.format("Added missing Lance %s to AtB list", f.getName()));
                 }
@@ -350,14 +353,14 @@ public class CampaignXmlParser {
         }
 
         LogManager.getLogger().info(String.format("[Campaign Load] Force IDs set in %dms",
-            System.currentTimeMillis() - timestamp));
+                System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // Process parts...
         postProcessParts(retVal, version);
 
         LogManager.getLogger().info(String.format("[Campaign Load] Parts processed in %dms",
-            System.currentTimeMillis() - timestamp));
+                System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         for (Person psn : retVal.getPersonnel()) {
@@ -366,7 +369,7 @@ public class CampaignXmlParser {
         }
 
         LogManager.getLogger().info(String.format("[Campaign Load] Rank references fixed in %dms",
-            System.currentTimeMillis() - timestamp));
+                System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // Okay, Units, need their pilot references fixed.
@@ -382,17 +385,14 @@ public class CampaignXmlParser {
                 unit.getRefit().fixReferences(retVal);
 
                 unit.getRefit().reCalc();
-                if (!unit.getRefit().isCustomJob()
-                        && !unit.getRefit().kitFound()) {
-                    retVal.getShoppingList().addShoppingItemWithoutChecking(unit
-                            .getRefit());
+                if (!unit.getRefit().isCustomJob() && !unit.getRefit().kitFound()) {
+                    retVal.getShoppingList().addShoppingItemWithoutChecking(unit.getRefit());
                 }
             }
 
             // lets make sure the force id set actually corresponds to a force
             // TODO: we have some reports of force id relics - need to fix
-            if (unit.getForceId() > 0
-                    && null == retVal.getForce(unit.getForceId())) {
+            if ((unit.getForceId() > 0) && (retVal.getForce(unit.getForceId()) == null)) {
                 unit.setForceId(-1);
             }
 
@@ -419,11 +419,12 @@ public class CampaignXmlParser {
         });
 
         LogManager.getLogger().info(String.format("[Campaign Load] Pilot references fixed in %dms",
-            System.currentTimeMillis() - timestamp));
+                System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         retVal.getHangar().forEachUnit(unit -> {
-            // Some units have been incorrectly assigned a null C3UUID as a string. This should correct that by setting a new C3UUID
+            // Some units have been incorrectly assigned a null C3UUID as a string. This should
+            // correct that by setting a new C3UUID
             if ((unit.getEntity().hasC3() || unit.getEntity().hasC3i() || unit.getEntity().hasNavalC3())
                     && (unit.getEntity().getC3UUIDAsString() == null || unit.getEntity().getC3UUIDAsString().equals("null"))) {
                 unit.getEntity().setC3UUID();
@@ -433,7 +434,7 @@ public class CampaignXmlParser {
         retVal.refreshNetworks();
 
         LogManager.getLogger().info(String.format("[Campaign Load] C3 networks refreshed in %dms",
-            System.currentTimeMillis() - timestamp));
+                System.currentTimeMillis() - timestamp));
         timestamp = System.currentTimeMillis();
 
         // ok, once we are sure that campaign has been set for all units, we can
@@ -454,6 +455,7 @@ public class CampaignXmlParser {
                 }
             }
         });
+
         for (Unit unit : removeUnits) {
             retVal.removeUnit(unit.getId());
         }
@@ -480,16 +482,20 @@ public class CampaignXmlParser {
         if (!foundPersonnelMarket) {
             retVal.setPersonnelMarket(new PersonnelMarket(retVal));
         }
+
         if (!foundContractMarket) {
             retVal.setContractMarket(new ContractMarket());
         }
+
         if (!foundUnitMarket) {
             retVal.setUnitMarket(retVal.getCampaignOptions().getUnitMarketMethod().getUnitMarket());
         }
+
         if (null == retVal.getRetirementDefectionTracker()) {
             retVal.setRetirementDefectionTracker(new RetirementDefectionTracker());
         }
-        if (retVal.getCampaignOptions().getUseAtB()) {
+
+        if (retVal.getCampaignOptions().isUseAtB()) {
             retVal.setHasActiveContract();
             retVal.setAtBConfig(AtBConfiguration.loadFromXml());
             retVal.setAtBEventProcessor(new AtBEventProcessor(retVal));
@@ -502,7 +508,7 @@ public class CampaignXmlParser {
         // Sanity Checks
         fixupUnitTechProblems(retVal);
 
-        //unload any ammo bins in the warehouse
+        // unload any ammo bins in the warehouse
         List<AmmoBin> binsToUnload = new ArrayList<>();
         retVal.getWarehouse().forEachSparePart(prt -> {
             if (prt instanceof AmmoBin && !prt.isReservedForRefit() && ((AmmoBin) prt).getShotsNeeded() == 0) {
@@ -518,8 +524,8 @@ public class CampaignXmlParser {
         timestamp = System.currentTimeMillis();
 
 
-        //Check all parts that are reserved for refit and if the refit id unit
-        //is not refitting or is gone then unreserve
+        // Check all parts that are reserved for refit and if the refit id unit
+        // is not refitting or is gone then unreserve
         for (Part part : retVal.getWarehouse().getParts()) {
             if (part.isReservedForRefit()) {
                 Unit u = part.getRefitUnit();
@@ -582,8 +588,7 @@ public class CampaignXmlParser {
     }
 
     /**
-     * Pulled out purely for encapsulation. Makes the code neater and easier to
-     * read.
+     * Pulled out purely for encapsulation. Makes the code neater and easier to read.
      *
      * @param retVal The Campaign object that is being populated.
      * @param wni    The XML node we're working from.
@@ -605,7 +610,7 @@ public class CampaignXmlParser {
 
             try {
                 if (xn.equalsIgnoreCase("calendar")) {
-                    retVal.setLocalDate(MekHqXmlUtil.parseDate(wn.getTextContent().trim()));
+                    retVal.setLocalDate(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase(Camouflage.XML_TAG)) {
                     retVal.setCamouflage(Camouflage.parseFromXML(wn));
                 } else if (xn.equalsIgnoreCase("camoCategory")) {
@@ -1010,13 +1015,12 @@ public class CampaignXmlParser {
             }
 
             // If this file already exists then don't overwrite it or we will end up with a bunch of copies
-            String safeName = MhqFileUtil.escapeReservedCharacters(name);
+            String safeName = MHQXMLUtility.escape(name);
             String fileName = sCustomsDir + File.separator + safeName + ext;
             String fileNameCampaign = sCustomsDirCampaign + File.separator + safeName + ext;
 
-            // TODO: get a hash or something to validate and overwrite if we updated this
-            if ((new File(fileName)).exists()
-                    || (new File(fileNameCampaign)).exists()) {
+            // TODO : get a hash or something to validate and overwrite if we updated this
+            if ((new File(fileName)).exists() || (new File(fileNameCampaign)).exists()) {
                 return false;
             }
 
@@ -1107,15 +1111,15 @@ public class CampaignXmlParser {
                 Node wn3 = nl.item(y);
                 if (wn3.getNodeName().equalsIgnoreCase("entity")) {
                     try {
-                        final Entity entity = MekHqXmlUtil.parseSingleEntityMul((Element) wn3, null);
+                        final Entity entity = MHQXMLUtility.parseSingleEntityMul((Element) wn3, null);
                         if (entity == null) {
-                            String name = MekHqXmlUtil.getEntityNameFromXmlString(wn3);
+                            String name = MHQXMLUtility.getEntityNameFromXmlString(wn3);
                             if (!unitList.contains(name)) {
                                 unitList.add(name);
                             }
                         }
-                    } catch (Exception e) {
-                        LogManager.getLogger().error("Could not read entity from XML", e);
+                    } catch (Exception ex) {
+                        LogManager.getLogger().error("Could not read entity from XML", ex);
                     }
                 }
             }

@@ -18,6 +18,7 @@
  */
 package mekhq.gui.dialog.reportDialogs;
 
+import mekhq.MHQConstants;
 import mekhq.campaign.report.TransportReport;
 
 import javax.swing.*;
@@ -46,7 +47,7 @@ public class TransportReportDialog extends AbstractReportDialog {
         final JTextPane txtReport = new JTextPane();
         txtReport.setText(getTransportReport().getTransportDetails());
         txtReport.setName("txtReport");
-        txtReport.setFont(new Font("Courier New", Font.PLAIN, 12));
+        txtReport.setFont(new Font(MHQConstants.FONT_COURIER_NEW, Font.PLAIN, 12));
         txtReport.setEditable(false);
         txtReport.setCaretPosition(0);
         return txtReport;

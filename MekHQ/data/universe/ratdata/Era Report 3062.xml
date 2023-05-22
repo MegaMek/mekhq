@@ -1283,37 +1283,37 @@
 			<unitTypes>ProtoMek</unitTypes>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='3062 Comstar - Aerospace'>
+		<rat name='3062 ComStar - Aerospace'>
 			<factions>CS</factions>
 			<unitTypes>Aero</unitTypes>
 			<weightClasses>L</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='3062 Comstar - Assault'>
+		<rat name='3062 ComStar - Assault'>
 			<factions>CS</factions>
 			<unitTypes>Mek</unitTypes>
 			<weightClasses>A</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='3062 Comstar - Heavy'>
+		<rat name='3062 ComStar - Heavy'>
 			<factions>CS</factions>
 			<unitTypes>Mek</unitTypes>
 			<weightClasses>H</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='3062 Comstar - Light'>
+		<rat name='3062 ComStar - Light'>
 			<factions>CS</factions>
 			<unitTypes>Mek</unitTypes>
 			<weightClasses>L</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='3062 Comstar - Medium'>
+		<rat name='3062 ComStar - Medium'>
 			<factions>CS</factions>
 			<unitTypes>Mek</unitTypes>
 			<weightClasses>M</weightClasses>
 			<ratings>F,D,C,B,A</ratings>
 		</rat>
-		<rat name='3062 Comstar - Vehicle'>
+		<rat name='3062 ComStar - Vehicle'>
 			<factions>CS</factions>
 			<unitTypes>Tank,VTOL</unitTypes>
 			<weightClasses>L</weightClasses>

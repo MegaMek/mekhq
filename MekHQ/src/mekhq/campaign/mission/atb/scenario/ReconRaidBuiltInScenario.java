@@ -55,8 +55,8 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         int enemyStart;
         int playerHome;
 
@@ -81,7 +81,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
             }
         }
 
-        if (allyEntities.size() > 0) {
+        if (!allyEntities.isEmpty()) {
             addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
         }
 

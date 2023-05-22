@@ -29,7 +29,6 @@ import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -40,6 +39,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.PartsStoreDialog.PartsTableModel.PartProxy;
 import mekhq.gui.sorter.PartsDetailSorter;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -90,7 +90,7 @@ public class PartsStoreDialog extends JDialog {
     private JButton btnUseBonusPart;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     /** Creates new form PartsStoreDialog */
@@ -98,8 +98,8 @@ public class PartsStoreDialog extends JDialog {
         this(gui.getFrame(), modal, gui, gui.getCampaign(), true);
     }
 
-    /** Creates new form PartsStoreDialog */
-    public PartsStoreDialog(Frame frame, boolean modal, CampaignGUI gui, Campaign campaign, boolean add) {
+    public PartsStoreDialog(final JFrame frame, final boolean modal, final CampaignGUI gui,
+                            final Campaign campaign, final boolean add) {
         super(frame, modal);
         this.campaignGUI = gui;
         this.campaign = campaign;
@@ -113,14 +113,14 @@ public class PartsStoreDialog extends JDialog {
     }
 
     private void initComponents() {
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
         getContentPane().setLayout(new BorderLayout());
 
         partsTable = new JTable(partsModel);
-        partsTable.setName("partsTable"); // NOI18N
+        partsTable.setName("partsTable");
         partsSorter = new TableRowSorter<>(partsModel);
         partsSorter.setComparator(PartsTableModel.COL_DETAIL, new PartsDetailSorter());
         partsTable.setRowSorter(partsSorter);
@@ -133,43 +133,43 @@ public class PartsStoreDialog extends JDialog {
         partsTable.setIntercellSpacing(new Dimension(0, 0));
         partsTable.setShowGrid(false);
         JScrollPane scrollPartsTable = new JScrollPane();
-        scrollPartsTable.setName("scrollPartsTable"); // NOI18N
+        scrollPartsTable.setName("scrollPartsTable");
         scrollPartsTable.setViewportView(partsTable);
         getContentPane().add(scrollPartsTable, BorderLayout.CENTER);
 
         GridBagConstraints c = new GridBagConstraints();
         JPanel panFilter = new JPanel();
-        JLabel lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text")); // NOI18N
+        JLabel lblPartsChoice = new JLabel(resourceMap.getString("lblPartsChoice.text"));
         DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
         for (int i = 0; i < SG_NUM; i++) {
             partsGroupModel.addElement(getPartsGroupName(i));
         }
         choiceParts = new JComboBox<>(partsGroupModel);
-        choiceParts.setName("choiceParts"); // NOI18N
+        choiceParts.setName("choiceParts");
         choiceParts.setSelectedIndex(0);
         choiceParts.addActionListener(evt -> filterParts());
         panFilter.setLayout(new GridBagLayout());
         c.gridx = 0;
         c.gridy = 0;
         c.weightx = 0.0;
-        c.anchor = java.awt.GridBagConstraints.WEST;
+        c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(5,5,5,5);
         panFilter.add(lblPartsChoice, c);
         c.gridx = 1;
         c.weightx = 1.0;
         panFilter.add(choiceParts, c);
 
-        JLabel lblFilter = new JLabel(resourceMap.getString("lblFilter.text")); // NOI18N
-        lblFilter.setName("lblFilter"); // NOI18N
+        JLabel lblFilter = new JLabel(resourceMap.getString("lblFilter.text"));
+        lblFilter.setName("lblFilter");
         c.gridx = 0;
         c.gridy = 1;
         c.weightx = 0.0;
         panFilter.add(lblFilter, c);
-        txtFilter = new javax.swing.JTextField();
+        txtFilter = new JTextField();
         txtFilter.setText("");
-        txtFilter.setMinimumSize(new java.awt.Dimension(200, 28));
+        txtFilter.setMinimumSize(new Dimension(200, 28));
         txtFilter.setName("txtFilter");
-        txtFilter.setPreferredSize(new java.awt.Dimension(200, 28));
+        txtFilter.setPreferredSize(new Dimension(200, 28));
         txtFilter.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
@@ -253,7 +253,7 @@ public class PartsStoreDialog extends JDialog {
             //endregion Buy Bulk
 
             //region Bonus Part
-            if (campaign.getCampaignOptions().getUseAtB() && campaign.hasActiveContract()) {
+            if (campaign.getCampaignOptions().isUseAtB() && campaign.hasActiveContract()) {
                 btnUseBonusPart = new JButton(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
                 btnUseBonusPart.addActionListener(evt -> {
                     if (partsTable.getSelectedRowCount() > 0) {
@@ -356,23 +356,27 @@ public class PartsStoreDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PartsStoreDialog.class);
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(PartsStoreDialog.class);
 
-        choiceParts.setName("partsType");
-        preferences.manage(new JComboBoxPreference(choiceParts));
+            choiceParts.setName("partsType");
+            preferences.manage(new JComboBoxPreference(choiceParts));
 
-        partsTable.setName("partsTable");
-        preferences.manage(new JTablePreference(partsTable));
+            partsTable.setName("partsTable");
+            preferences.manage(new JTablePreference(partsTable));
 
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     public void filterParts() {
-        RowFilter<PartsTableModel, Integer> partsTypeFilter;
         final int nGroup = choiceParts.getSelectedIndex();
-        partsTypeFilter = new RowFilter<>() {
+        RowFilter<PartsTableModel, Integer> partsTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
@@ -386,15 +390,15 @@ public class PartsStoreDialog extends JDialog {
                     }
                 } // This MUST NOT be an else if
 
-                if ((txtFilter.getText().length() > 0)
+                if (!txtFilter.getText().isBlank()
                         && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
                         && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
-                } else if ((part.getTechBase() == Part.T_CLAN)
-                        && !campaign.getCampaignOptions().allowClanPurchases()) {
+                } else if (((part.getTechBase() == Part.T_CLAN) || part.isClan())
+                        && !campaign.getCampaignOptions().isAllowClanPurchases()) {
                     return false;
                 } else if ((part.getTechBase() == Part.T_IS)
-                        && !campaign.getCampaignOptions().allowISPurchases()
+                        && !campaign.getCampaignOptions().isAllowISPurchases()
                         // Hack to allow Clan access to SL tech but not post-Exodus tech
                         // until 3050.
                         && !(campaign.useClanTechBase() && (part.getIntroductionDate() > 2787)
@@ -407,7 +411,7 @@ public class PartsStoreDialog extends JDialog {
                 if (nGroup == SG_ALL) {
                     return true;
                 } else if (nGroup == SG_ARMOR) {
-                    return part instanceof Armor; // ProtomekAmor and BaArmor are derived from Armor
+                    return part instanceof Armor; // ProtoMekAmor and BaArmor are derived from Armor
                 } else if (nGroup == SG_SYSTEM) {
                     return (part instanceof MekLifeSupport)
                             || (part instanceof MekSensor)

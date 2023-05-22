@@ -25,9 +25,8 @@ import megamek.Version;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -76,8 +75,6 @@ public abstract class Part implements IPartWork, ITechnology {
     public static final int QUALITY_D = 3;
     public static final int QUALITY_E = 4;
     public static final int QUALITY_F = 5;
-
-    protected static final String NL = System.lineSeparator();
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
@@ -156,7 +153,7 @@ public abstract class Part implements IPartWork, ITechnology {
     private Part replacementPart;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public Part() {
         this(0, false, null);
@@ -224,7 +221,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     public String getQualityName() {
-        return getQualityName(getQuality(), campaign.getCampaignOptions().reverseQualityNames());
+        return getQualityName(getQuality(), campaign.getCampaignOptions().isReverseQualityNames());
     }
 
     public void setId(int id) {
@@ -249,32 +246,28 @@ public abstract class Part implements IPartWork, ITechnology {
 
     /**
      * Sticker price is the value of the part according to the rulebooks
-     * @return
+     * @return the part's sticker price
      */
     public abstract Money getStickerPrice();
 
     /**
-     * This is the actual value of the part as affected by any characteristics
-     * of the part itself
-     * @return
-     */
-    public Money getCurrentValue() {
-        return getStickerPrice();
-    }
-
-    /**
-     * This is the value of the part that may be affected by campaign options
-     * @return
+     * This is the value of the part that may be affected by characteristics and campaign options
+     * @return the part's actual value
      */
     public Money getActualValue() {
-        return adjustCostsForCampaignOptions(getCurrentValue());
+        return adjustCostsForCampaignOptions(getStickerPrice());
     }
 
     public boolean isPriceAdjustedForAmount() {
         return false;
     }
 
-    protected Money adjustCostsForCampaignOptions(@Nullable Money cost) {
+    /**
+     * Adjusts the cost of a part based on one's campaign options
+     * @param cost the part's base cost
+     * @return the part's cost adjusted for campaign options
+     */
+    public Money adjustCostsForCampaignOptions(@Nullable Money cost) {
         // if the part doesn't cost anything, no amount of multiplication will change it
         if ((cost == null) || cost.isZero()) {
             return Money.zero();
@@ -289,7 +282,10 @@ public abstract class Part implements IPartWork, ITechnology {
                 break;
             case T_BOTH:
             default:
-                cost = cost.multipliedBy(campaign.getCampaignOptions().getCommonPartPriceMultiplier());
+                cost = cost.multipliedBy(
+                                campaign
+                                        .getCampaignOptions()
+                                        .getCommonPartPriceMultiplier());
                 break;
         }
 
@@ -552,80 +548,82 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public abstract void writeToXML(final PrintWriter pw, int indent);
 
-    protected void writeToXmlBegin(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "id", id);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "name", name);
+    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         if (omniPodded) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "omniPodded", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "omniPodded", true);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitTonnage", unitTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitTonnage", unitTonnage);
         if (hits > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hits", hits);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hits", hits);
         }
 
         if (timeSpent > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "timeSpent", timeSpent);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeSpent", timeSpent);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mode", mode.name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mode", mode.name());
         if (tech != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techId", tech.getId());
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "skillMin", skillMin);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "skillMin", skillMin);
         if (unit != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "unitId", unit.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId());
         }
 
         if (workingOvertime) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "workingOvertime", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "workingOvertime", true);
         }
 
         if (shorthandedMod != 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "shorthandedMod", shorthandedMod);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shorthandedMod", shorthandedMod);
         }
 
         if (refitUnit != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "refitId", refitUnit.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "refitId", refitUnit.getId());
         }
 
         if (daysToArrival > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToArrival", daysToArrival);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToArrival", daysToArrival);
         }
 
         if (!brandNew) {
             // The default value for Part.brandNew is true. Only store the tag if the value is false.
             // The lack of tag in the save file will ALWAYS result in TRUE.
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "brandNew", false);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "brandNew", false);
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quantity", quantity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", quantity);
 
         if (daysToWait > 0) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
         }
 
         if (replacementPart != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "replacementId", replacementPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "replacementId", replacementPart.getId());
         }
 
         if (reservedBy != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "reserveId", reservedBy.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reserveId", reservedBy.getId());
         }
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "quality", quality);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quality", quality);
         if (isTeamSalvaging) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "isTeamSalvaging", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isTeamSalvaging", true);
         }
 
         if (parentPart != null) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "parentPartId", parentPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "parentPartId", parentPart.getId());
         }
 
         for (final Part childPart : childParts) {
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "childPartId", childPart.getId());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPartId", childPart.getId());
         }
+
+        return indent;
     }
 
-    protected void writeToXmlEnd(final PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXMLCloseTag(pw, indent, "part");
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "part");
     }
 
     public static Part generateInstanceFromXML(Node wn, Version version) {
@@ -633,7 +631,7 @@ public abstract class Part implements IPartWork, ITechnology {
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
 
-        //reverse compatibility checks
+        // reverse compatibility checks
         if (className.equalsIgnoreCase("mekhq.campaign.parts.MekEngine")) {
             className = "mekhq.campaign.parts.EnginePart";
         } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingMekEngine")) {
@@ -853,29 +851,29 @@ public abstract class Part implements IPartWork, ITechnology {
         if (tech != null) {
             if ((isClanTechBase()
                     || ((this instanceof MekLocation) && (getUnit() != null) && getUnit().getEntity().isClan()))
-                    && (!tech.isClanner()
+                    && (!tech.isClanPersonnel()
                     && !tech.getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
                 mods.addModifier(2, "Clan tech");
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
                 mods.addModifier(-1, "Weapon specialist");
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
-                    && (IPartWork.findCorrectRepairType(this) == PartRepairType.ARMOR)) {
+                    && IPartWork.findCorrectRepairType(this).isArmour()) {
                 mods.addModifier(-1, "Armor specialist");
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ELECTRONICS)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ENGINE)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GYRO)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
                 mods.addModifier(-1, "Internal specialist");
             }
 
@@ -907,29 +905,29 @@ public abstract class Part implements IPartWork, ITechnology {
 
         if (getUnit().getTech() != null) {
             if ((isClanTechBase() || ((this instanceof MekLocation) && getUnit().getEntity().isClan()))
-                    && (!getUnit().getTech().isClanner()
+                    && (!getUnit().getTech().isClanPersonnel()
                     && !getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_CLAN_TECH_KNOWLEDGE))) {
                 mods.addModifier(2, "Clan tech");
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
                 mods.addModifier(-1, "Weapon specialist");
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
-                    && (IPartWork.findCorrectRepairType(this) == PartRepairType.ARMOR)) {
+                    && IPartWork.findCorrectRepairType(this).isArmour()) {
                 mods.addModifier(-1, "Armor specialist");
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ELECTRONICS)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ENGINE)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GYRO)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
                 mods.addModifier(-1, "Internal specialist");
             }
 
@@ -942,7 +940,7 @@ public abstract class Part implements IPartWork, ITechnology {
             mods.addModifier(1, "prototype TSM");
         }
 
-        return getCampaign().getCampaignOptions().useQualityMaintenance()
+        return getCampaign().getCampaignOptions().isUseQualityMaintenance()
                 ? getQualityMods(mods, getUnit().getTech()) : mods;
     }
 
@@ -974,7 +972,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 qualityMod = -2;
                 break;
         }
-        mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().reverseQualityNames()));
+        mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().isReverseQualityNames()));
         if ((qualityMod > 0) &&
                 (null != tech) &&
                 tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
@@ -1024,13 +1022,13 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.GENERAL;
     }
 
     @Override
     public PartRepairType getRepairPartType() {
-        return getMassRepairOptionType();
+        return getMRMSOptionType();
     }
 
     @Override
@@ -1094,14 +1092,15 @@ public abstract class Part implements IPartWork, ITechnology {
         if (!StringUtils.isEmpty(getLocationName())) {
             sj.add(getLocationName());
         }
+
         if (isOmniPodded()) {
             sj.add("OmniPod");
         }
+
         if (includeRepairDetails) {
             sj.add(hits + " hit(s)");
-            if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
-                Money repairCost = getStickerPrice().multipliedBy(0.2);
-                sj.add(repairCost.toAmountAndSymbolString() + " to repair");
+            if (campaign.getCampaignOptions().isPayForRepairs() && (hits > 0)) {
+                sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
         }
         return sj.toString();
@@ -1114,12 +1113,12 @@ public abstract class Part implements IPartWork, ITechnology {
      * @return Human readable string.
      */
     public String getOrderTransitStringForDetails(PartInventory inventories) {
-        String inTransitString = inventories.getTransit() == 0 ? "" : inventories.transitAsString() + " in transit";
-        String onOrderString = inventories.getOrdered() == 0 ? "" : inventories.orderedAsString() + " on order";
-        String transitOrderSeparator = inTransitString.length() > 0 && onOrderString.length() > 0 ? ", " : "";
+        String inTransitString = (inventories.getTransit() == 0) ? "" : inventories.transitAsString() + " in transit";
+        String onOrderString = (inventories.getOrdered() == 0) ? "" : inventories.orderedAsString() + " on order";
+        String transitOrderSeparator = !inTransitString.isBlank() && !onOrderString.isBlank() ? ", " : "";
 
-        return (inTransitString.length() > 0 || onOrderString.length() > 0) ?
-                String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString) : "";
+        return (!inTransitString.isBlank() || !onOrderString.isBlank())
+                ? String.format("(%s%s%s)", inTransitString, transitOrderSeparator, onOrderString) : "";
     }
 
     @Override
@@ -1507,10 +1506,10 @@ public abstract class Part implements IPartWork, ITechnology {
         PartRepairType repairType = IPartWork.findCorrectRepairType(part);
 
         switch (repairType) {
-            case ARMOR:
+            case ARMOUR:
                 imgBase = "armor";
                 break;
-            case AMMO:
+            case AMMUNITION:
                 imgBase = "ammo";
                 break;
             case ACTUATOR:
@@ -1852,7 +1851,7 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         @Override
-        public String checkFixable() {
+        public @Nullable String checkFixable() {
             return null;
         }
 
@@ -1882,11 +1881,13 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         @Override
-        public void writeToXML(PrintWriter pw1, int indent) {
+        public void writeToXML(final PrintWriter pw, int indent) {
+
         }
 
         @Override
         protected void loadFieldsFromXmlNode(Node wn) {
+
         }
 
         @Override

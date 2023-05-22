@@ -20,19 +20,18 @@
  */
 package mekhq.gui.dialog;
 
-import java.awt.BorderLayout;
-import java.util.Objects;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-
-import megamek.common.util.EncodeControl;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.control.EditPersonnelLogControl;
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
@@ -62,7 +61,7 @@ public class EditPersonnelLogDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName(resourceMap.getString("dialog.name"));
@@ -81,10 +80,14 @@ public class EditPersonnelLogDialog extends JDialog {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelLogDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(EditPersonnelLogDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 }

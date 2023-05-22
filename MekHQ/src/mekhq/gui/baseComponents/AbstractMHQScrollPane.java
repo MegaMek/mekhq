@@ -19,7 +19,6 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.baseComponents.AbstractScrollPane;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
@@ -47,7 +46,7 @@ public abstract class AbstractMHQScrollPane extends AbstractScrollPane {
     protected AbstractMHQScrollPane(final JFrame frame, final String name,
                                     final int verticalScrollBarPolicy, final int horizontalScrollBarPolicy) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale()),
                 name, verticalScrollBarPolicy, horizontalScrollBarPolicy);
     }
 
@@ -63,9 +62,11 @@ public abstract class AbstractMHQScrollPane extends AbstractScrollPane {
 
     /**
      * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek
+     * @throws Exception if there's an issue initializing the preferences. Normally this means
+     * a component has <strong>not</strong> had its name value set.
      */
     @Override
-    protected void setPreferences() {
+    protected void setPreferences() throws Exception {
         setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

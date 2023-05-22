@@ -20,18 +20,7 @@
  */
 package mekhq.campaign.rating;
 
-import megamek.common.ASFBay;
-import megamek.common.Aero;
-import megamek.common.Bay;
-import megamek.common.BipedMech;
-import megamek.common.Crew;
-import megamek.common.Dropship;
-import megamek.common.Entity;
-import megamek.common.EntityMovementMode;
-import megamek.common.Jumpship;
-import megamek.common.MechBay;
-import megamek.common.Tank;
-import megamek.common.TechConstants;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Hangar;
@@ -41,15 +30,18 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
 
 /**
  * @author Deric Page (deric (dot) page (at) usa.net)
@@ -62,9 +54,6 @@ public class FieldManualMercRevDragoonsRatingTest {
     private List<Person> mockPersonnelList;
     private List<Person> mockActivePersonnelList;
 
-    private Person mockDoctor;
-    private Person mockTech;
-
     private Skill mockDoctorSkillRegular;
     private Skill mockDoctorSkillGreen;
     private Skill mockMedicSkill;
@@ -72,7 +61,7 @@ public class FieldManualMercRevDragoonsRatingTest {
     private Skill mockMechTechSkillRegular;
     private Skill mockAstechSkill;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         mockCampaign = mock(Campaign.class);
         mockHangar = mock(Hangar.class);
@@ -81,8 +70,8 @@ public class FieldManualMercRevDragoonsRatingTest {
         mockPersonnelList = new ArrayList<>();
         mockActivePersonnelList = new ArrayList<>();
 
-        mockDoctor = mock(Person.class);
-        mockTech = mock(Person.class);
+        Person mockDoctor = mock(Person.class);
+        Person mockTech = mock(Person.class);
 
         mockDoctorSkillRegular = mock(Skill.class);
         mockDoctorSkillGreen = mock(Skill.class);
@@ -133,7 +122,7 @@ public class FieldManualMercRevDragoonsRatingTest {
         when(mockCampaign.getNumberSecondaryAstechs()).thenCallRealMethod();
 
         CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockOptions.useQuirks()).thenReturn(false);
+        when(mockOptions.isUseQuirks()).thenReturn(false);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
     }
 
@@ -459,7 +448,6 @@ public class FieldManualMercRevDragoonsRatingTest {
         doReturn(null).when(testRating).getCommanderList();
         assertNull(testRating.getCommander());
     }
-
 
     @Test
     public void testGetTransportationDetails() {

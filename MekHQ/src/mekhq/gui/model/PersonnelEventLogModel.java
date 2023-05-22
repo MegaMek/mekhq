@@ -18,7 +18,6 @@
  */
 package mekhq.gui.model;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
@@ -41,7 +40,7 @@ public class PersonnelEventLogModel extends DataTableModel {
     private final int dateTextWidth;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PersonnelEventLogModel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public PersonnelEventLogModel() {
         data = new ArrayList<LogEntry>();

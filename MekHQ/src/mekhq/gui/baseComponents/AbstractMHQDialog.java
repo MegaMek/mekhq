@@ -19,7 +19,6 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.baseComponents.AbstractDialog;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
@@ -47,7 +46,7 @@ public abstract class AbstractMHQDialog extends AbstractDialog {
      */
     protected AbstractMHQDialog(final JFrame frame, final boolean modal, final String name, final String title) {
         this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), name, title);
+                MekHQ.getMHQOptions().getLocale()), name, title);
     }
 
     /**
@@ -61,10 +60,12 @@ public abstract class AbstractMHQDialog extends AbstractDialog {
     //endregion Constructors
 
     /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     * @throws Exception if there's an issue initializing the preferences. Normally this means
+     * a component has <strong>not</strong> had its name value set.
      */
     @Override
-    protected void setPreferences() {
+    protected void setPreferences() throws Exception {
         setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

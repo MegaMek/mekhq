@@ -22,7 +22,7 @@ import megamek.Version;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
@@ -476,41 +476,39 @@ public class AtBDynamicScenario extends AtBScenario {
 
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
-        indent++;
-
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
         if ((getTemplate() != null) && getStatus().isCurrent()) {
             getTemplate().Serialize(pw);
 
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectivePlayerUnitCountMultiplier", getEffectivePlayerUnitCountMultiplier());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectivePlayerBVMultiplier", getEffectivePlayerBVMultiplier());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "friendlyReinforcementDelayReduction", getFriendlyReinforcementDelayReduction());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "hostileReinforcementDelayReduction", getHostileReinforcementDelayReduction());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectiveOpforSkill", getEffectiveOpforSkill().name());
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "effectiveOpforQuality", getEffectiveOpforQuality());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectivePlayerUnitCountMultiplier", getEffectivePlayerUnitCountMultiplier());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectivePlayerBVMultiplier", getEffectivePlayerBVMultiplier());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "friendlyReinforcementDelayReduction", getFriendlyReinforcementDelayReduction());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hostileReinforcementDelayReduction", getHostileReinforcementDelayReduction());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectiveOpforSkill", getEffectiveOpforSkill().name());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "effectiveOpforQuality", getEffectiveOpforQuality());
 
             if (!playerUnitSwaps.isEmpty()) {
-                MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, PLAYER_UNIT_SWAPS_ELEMENT);
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, PLAYER_UNIT_SWAPS_ELEMENT);
 
                 // note: if you update the order in which data is stored here or anything else about it
                 // double check loadFieldsFromXmlNode
                 for (UUID unitID : playerUnitSwaps.keySet()) {
-                    MekHqXmlUtil.writeSimpleXMLOpenTag(pw, indent++, PLAYER_UNIT_SWAP_ELEMENT);
-                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
+                    MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, PLAYER_UNIT_SWAP_ELEMENT);
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_ID_ELEMENT, unitID);
 
                     BenchedEntityData benchedEntityData = playerUnitSwaps.get(unitID);
-                    MekHqXmlUtil.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
-                    pw.println(MekHqXmlUtil.writeEntityToXmlString(benchedEntityData.entity, indent, Collections.emptyList()));
-                    MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAP_ELEMENT);
+                    MHQXMLUtility.writeSimpleXMLTag(pw, indent, PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT, benchedEntityData.templateName);
+                    pw.println(MHQXMLUtility.writeEntityToXmlString(benchedEntityData.entity, indent, Collections.emptyList()));
+                    MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAP_ELEMENT);
                 }
 
-                MekHqXmlUtil.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAPS_ELEMENT);
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAPS_ELEMENT);
             }
-            MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "finalized", isFinalized());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "finalized", isFinalized());
         }
 
-        super.writeToXMLEnd(pw, --indent);
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -551,7 +549,7 @@ public class AtBDynamicScenario extends AtBScenario {
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT)) {
                                 benchedEntityData.templateName = dataNode.getTextContent();
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ENTITY_ELEMENT)) {
-                                benchedEntityData.entity = MekHqXmlUtil.parseSingleEntityMul((Element) dataNode, campaign.getGameOptions());
+                                benchedEntityData.entity = MHQXMLUtility.parseSingleEntityMul((Element) dataNode, campaign);
                             }
                         }
 

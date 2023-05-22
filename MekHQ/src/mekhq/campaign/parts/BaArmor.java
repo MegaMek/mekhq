@@ -98,8 +98,8 @@ public class BaArmor extends Armor implements IAcquisitionWork {
     }
 
     @Override
-    public Money getCurrentValue() {
-        return getPointCost().multipliedBy(amount);
+    public Money getActualValue() {
+        return adjustCostsForCampaignOptions(getPointCost().multipliedBy(amount));
     }
 
     @Override
@@ -114,13 +114,13 @@ public class BaArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public Money getStickerPrice() {
-        //always in 5-ton increments
+        // always in 5-ton increments
         return getPointCost().multipliedBy(5).multipliedBy(getPointsPerTon());
     }
 
     @Override
     public Money getBuyCost() {
-        return getStickerPrice();
+        return getActualValue();
     }
 
     @Override

@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -43,7 +42,7 @@ public enum ManeiDominiClass {
     //region Constructors
     ManeiDominiClass(final String name) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
     }
     //endregion Constructors
@@ -51,6 +50,33 @@ public enum ManeiDominiClass {
     //region Boolean Comparison Methods
     public boolean isNone() {
         return this == NONE;
+    }
+    public boolean isGhost() {
+        return this == GHOST;
+    }
+
+    public boolean isWraith() {
+        return this == WRAITH;
+    }
+
+    public boolean isBanshee() {
+        return this == BANSHEE;
+    }
+
+    public boolean isZombie() {
+        return this == ZOMBIE;
+    }
+
+    public boolean isPhantom() {
+        return this == PHANTOM;
+    }
+
+    public boolean isSpecter() {
+        return this == SPECTER;
+    }
+
+    public boolean isPoltergeist() {
+        return this == POLTERGEIST;
     }
     //endregion Boolean Comparison Methods
 
@@ -75,7 +101,6 @@ public enum ManeiDominiClass {
         }
 
         LogManager.getLogger().error("Unable to parse " + text + "into a ManeiDominiClass. Returning NONE.");
-
         return NONE;
     }
     //endregion File I/O

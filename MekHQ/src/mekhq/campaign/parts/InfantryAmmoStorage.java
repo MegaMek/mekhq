@@ -23,7 +23,7 @@ import megamek.common.EquipmentType;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import org.apache.logging.log4j.LogManager;
@@ -91,8 +91,8 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     @Override
-    public Money getCurrentValue() {
-        return getStickerPrice();
+    public Money getActualValue() {
+        return adjustCostsForCampaignOptions(getStickerPrice());
     }
 
     @Override
@@ -119,9 +119,9 @@ public class InfantryAmmoStorage extends AmmoStorage {
     }
 
     @Override
-    public void writeToXmlEnd(PrintWriter pw, int indent) {
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, "weaponType", weaponType.getInternalName());
-        super.writeToXmlEnd(pw, indent);
+    public void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weaponType", weaponType.getInternalName());
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override

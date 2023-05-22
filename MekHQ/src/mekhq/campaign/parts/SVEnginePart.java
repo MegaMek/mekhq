@@ -19,7 +19,8 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -138,16 +139,17 @@ public class SVEnginePart extends Part {
     private static final String NODE_ETYPE = "etype";
     private static final String NODE_TECH_RATING = "techRating";
     private static final String NODE_FUEL_TYPE = "fuelType";
+
     @Override
-    public void writeToXML(PrintWriter pw, int indent) {
-        writeToXmlBegin(pw, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ENGINE_TONNAGE, engineTonnage);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_ETYPE, etype);
-        MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_ENGINE_TONNAGE, engineTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_ETYPE, etype);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
         if (etype == Engine.COMBUSTION_ENGINE) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw, indent + 1, NODE_FUEL_TYPE, fuelType.name());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, NODE_FUEL_TYPE, fuelType.name());
         }
-        writeToXmlEnd(pw, indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -294,7 +296,7 @@ public class SVEnginePart extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -339,7 +341,7 @@ public class SVEnginePart extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ENGINE;
     }
 }

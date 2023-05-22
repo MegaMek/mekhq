@@ -21,7 +21,8 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.Unit;
@@ -86,21 +87,12 @@ public class Turret extends TankLocation {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<loc>"
-                +loc
-                +"</loc>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<damage>"
-                +damage
-                +"</damage>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<weight>"
-                +weight
-                +"</weight>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loc", loc);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "damage", damage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weight", weight);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -173,7 +165,7 @@ public class Turret extends TankLocation {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (null == unit) {
             return null;
         }

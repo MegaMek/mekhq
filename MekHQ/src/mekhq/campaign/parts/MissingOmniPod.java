@@ -19,7 +19,8 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.HeatSink;
@@ -71,22 +72,22 @@ public class MissingOmniPod extends MissingPart {
      * Exports class data to xml
      */
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.print(MekHqXmlUtil.indentStr(indent + 1) + "<partType tonnage='" + partType.getUnitTonnage()
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        pw.print(MHQXMLUtility.indentStr(indent) + "<partType tonnage='" + partType.getUnitTonnage()
             + "' type='");
         if (partType instanceof AeroHeatSink) {
-            pw1.print("AeroHeatSink' hsType='" + ((AeroHeatSink) partType).getType());
+            pw.print("AeroHeatSink' hsType='" + ((AeroHeatSink) partType).getType());
         } else if (partType instanceof EquipmentPart) {
-            pw1.print(((EquipmentPart) partType).getType().getInternalName());
+            pw.print(((EquipmentPart) partType).getType().getInternalName());
             if (partType instanceof MASC) {
-                pw1.print("' rating='" + ((MASC) partType).getEngineRating());
+                pw.print("' rating='" + ((MASC) partType).getEngineRating());
             }
         } else {
             LogManager.getLogger().info("MissingOmniPod partType is not EquipmentType");
         }
-        pw1.println("'/>");
-        writeToXmlEnd(pw1, indent);
+        pw.println("'/>");
+        writeToXMLEnd(pw, indent);
     }
 
 
@@ -182,7 +183,7 @@ public class MissingOmniPod extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 

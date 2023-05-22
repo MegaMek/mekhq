@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,47 +18,54 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
+import org.apache.logging.log4j.LogManager;
 
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * TODO : Add On Leave and AWOL implementations
+ * TODO : Add PoW, On Leave and AWOL implementations
  */
 public enum PersonnelStatus {
     //region Enum Declarations
-    ACTIVE("PersonnelStatus.ACTIVE.text", "PersonnelStatus.ACTIVE.toolTipText", "PersonnelStatus.ACTIVE.logText"),
-    MIA("PersonnelStatus.MIA.text", "PersonnelStatus.MIA.toolTipText", "PersonnelStatus.MIA.logText"),
-    //ON_LEAVE("PersonnelStatus.ON_LEAVE.text", "PersonnelStatus.ON_LEAVE.toolTipText", "PersonnelStatus.ON_LEAVE.logText"),
-    //AWOL("PersonnelStatus.AWOL.text", "PersonnelStatus.AWOL.toolTipText", "PersonnelStatus.AWOL.logText"),
-    RETIRED("PersonnelStatus.RETIRED.text", "PersonnelStatus.RETIRED.toolTipText", "PersonnelStatus.RETIRED.logText"),
-    DESERTED("PersonnelStatus.DESERTED.text", "PersonnelStatus.DESERTED.toolTipText", "PersonnelStatus.DESERTED.logText"),
-    KIA("PersonnelStatus.KIA.text", "PersonnelStatus.KIA.toolTipText", "PersonnelStatus.KIA.logText"),
-    HOMICIDE("PersonnelStatus.HOMICIDE.text", "PersonnelStatus.HOMICIDE.toolTipText", "PersonnelStatus.HOMICIDE.logText"),
-    WOUNDS("PersonnelStatus.WOUNDS.text", "PersonnelStatus.WOUNDS.toolTipText", "PersonnelStatus.WOUNDS.logText"),
-    DISEASE("PersonnelStatus.DISEASE.text", "PersonnelStatus.DISEASE.toolTipText", "PersonnelStatus.DISEASE.logText"),
-    ACCIDENTAL("PersonnelStatus.ACCIDENTAL.text", "PersonnelStatus.ACCIDENTAL.toolTipText", "PersonnelStatus.ACCIDENTAL.logText"),
-    NATURAL_CAUSES("PersonnelStatus.NATURAL_CAUSES.text", "PersonnelStatus.NATURAL_CAUSES.toolTipText", "PersonnelStatus.NATURAL_CAUSES.logText"),
-    OLD_AGE("PersonnelStatus.OLD_AGE.text", "PersonnelStatus.OLD_AGE.toolTipText", "PersonnelStatus.OLD_AGE.logText"),
-    MEDICAL_COMPLICATIONS("PersonnelStatus.MEDICAL_COMPLICATIONS.text", "PersonnelStatus.MEDICAL_COMPLICATIONS.toolTipText", "PersonnelStatus.MEDICAL_COMPLICATIONS.logText"),
-    PREGNANCY_COMPLICATIONS("PersonnelStatus.PREGNANCY_COMPLICATIONS.text", "PersonnelStatus.PREGNANCY_COMPLICATIONS.toolTipText", "PersonnelStatus.PREGNANCY_COMPLICATIONS.logText"),
-    UNDETERMINED("PersonnelStatus.UNDETERMINED.text", "PersonnelStatus.UNDETERMINED.toolTipText", "PersonnelStatus.UNDETERMINED.logText"),
-    SUICIDE("PersonnelStatus.SUICIDE.text", "PersonnelStatus.SUICIDE.toolTipText", "PersonnelStatus.SUICIDE.logText");
+    ACTIVE("PersonnelStatus.ACTIVE.text", "PersonnelStatus.ACTIVE.toolTipText", "PersonnelStatus.ACTIVE.reportText", "PersonnelStatus.ACTIVE.logText"),
+    MIA("PersonnelStatus.MIA.text", "PersonnelStatus.MIA.toolTipText", "PersonnelStatus.MIA.reportText", "PersonnelStatus.MIA.logText"),
+    POW("PersonnelStatus.POW.text", "PersonnelStatus.POW.toolTipText", "PersonnelStatus.POW.reportText", "PersonnelStatus.POW.logText"),
+    ON_LEAVE("PersonnelStatus.ON_LEAVE.text", "PersonnelStatus.ON_LEAVE.toolTipText", "PersonnelStatus.ON_LEAVE.reportText", "PersonnelStatus.ON_LEAVE.logText"),
+    AWOL("PersonnelStatus.AWOL.text", "PersonnelStatus.AWOL.toolTipText", "PersonnelStatus.AWOL.reportText", "PersonnelStatus.AWOL.logText"),
+    RETIRED("PersonnelStatus.RETIRED.text", "PersonnelStatus.RETIRED.toolTipText", "PersonnelStatus.RETIRED.reportText", "PersonnelStatus.RETIRED.logText"),
+    DESERTED("PersonnelStatus.DESERTED.text", "PersonnelStatus.DESERTED.toolTipText", "PersonnelStatus.DESERTED.reportText", "PersonnelStatus.DESERTED.logText"),
+    KIA("PersonnelStatus.KIA.text", "PersonnelStatus.KIA.toolTipText", "PersonnelStatus.KIA.reportText", "PersonnelStatus.KIA.logText"),
+    HOMICIDE("PersonnelStatus.HOMICIDE.text", "PersonnelStatus.HOMICIDE.toolTipText", "PersonnelStatus.HOMICIDE.reportText", "PersonnelStatus.HOMICIDE.logText"),
+    WOUNDS("PersonnelStatus.WOUNDS.text", "PersonnelStatus.WOUNDS.toolTipText", "PersonnelStatus.WOUNDS.reportText", "PersonnelStatus.WOUNDS.logText"),
+    DISEASE("PersonnelStatus.DISEASE.text", "PersonnelStatus.DISEASE.toolTipText", "PersonnelStatus.DISEASE.reportText", "PersonnelStatus.DISEASE.logText"),
+    ACCIDENTAL("PersonnelStatus.ACCIDENTAL.text", "PersonnelStatus.ACCIDENTAL.toolTipText", "PersonnelStatus.ACCIDENTAL.reportText", "PersonnelStatus.ACCIDENTAL.logText"),
+    NATURAL_CAUSES("PersonnelStatus.NATURAL_CAUSES.text", "PersonnelStatus.NATURAL_CAUSES.toolTipText", "PersonnelStatus.NATURAL_CAUSES.reportText", "PersonnelStatus.NATURAL_CAUSES.logText"),
+    OLD_AGE("PersonnelStatus.OLD_AGE.text", "PersonnelStatus.OLD_AGE.toolTipText", "PersonnelStatus.OLD_AGE.reportText", "PersonnelStatus.OLD_AGE.logText"),
+    MEDICAL_COMPLICATIONS("PersonnelStatus.MEDICAL_COMPLICATIONS.text", "PersonnelStatus.MEDICAL_COMPLICATIONS.toolTipText", "PersonnelStatus.MEDICAL_COMPLICATIONS.reportText", "PersonnelStatus.MEDICAL_COMPLICATIONS.logText"),
+    PREGNANCY_COMPLICATIONS("PersonnelStatus.PREGNANCY_COMPLICATIONS.text", "PersonnelStatus.PREGNANCY_COMPLICATIONS.toolTipText", "PersonnelStatus.PREGNANCY_COMPLICATIONS.reportText", "PersonnelStatus.PREGNANCY_COMPLICATIONS.logText"),
+    UNDETERMINED("PersonnelStatus.UNDETERMINED.text", "PersonnelStatus.UNDETERMINED.toolTipText", "PersonnelStatus.UNDETERMINED.reportText", "PersonnelStatus.UNDETERMINED.logText"),
+    SUICIDE("PersonnelStatus.SUICIDE.text", "PersonnelStatus.SUICIDE.toolTipText", "PersonnelStatus.SUICIDE.reportText", "PersonnelStatus.SUICIDE.logText");
     //endregion Enum Declarations
 
     //region Variable Declarations
     private final String name;
     private final String toolTipText;
+    private final String reportText;
     private final String logText;
     //endregion Variable Declarations
 
     //region Constructors
-    PersonnelStatus(final String name, final String toolTipText, final String logText) {
+    PersonnelStatus(final String name, final String toolTipText, final String reportText,
+                    final String logText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
+        this.reportText = resources.getString(reportText);
         this.logText = resources.getString(logText);
     }
     //endregion Constructors
@@ -68,12 +75,16 @@ public enum PersonnelStatus {
         return toolTipText;
     }
 
+    public String getReportText() {
+        return reportText;
+    }
+
     public String getLogText() {
         return logText;
     }
     //endregion Getters
 
-    //region Boolean Information Methods
+    //region Boolean Comparison Methods
     public boolean isActive() {
         return this == ACTIVE;
     }
@@ -82,12 +93,16 @@ public enum PersonnelStatus {
         return this == MIA;
     }
 
+    public boolean isPoW() {
+        return this == POW;
+    }
+
     public boolean isOnLeave() {
-        return false; //this == ON_LEAVE;
+        return this == ON_LEAVE;
     }
 
     public boolean isAWOL() {
-        return false; //this == AWOL;
+        return this == AWOL;
     }
 
     public boolean isRetired() {
@@ -143,6 +158,13 @@ public enum PersonnelStatus {
     }
 
     /**
+     * @return true if a person is currently absent from the core force, otherwise false
+     */
+    public boolean isAbsent() {
+        return isMIA() || isPoW() || isOnLeave() || isAWOL();
+    }
+
+    /**
      * @return true if a person is dead, otherwise false
      */
     public boolean isDead() {
@@ -157,8 +179,16 @@ public enum PersonnelStatus {
     public boolean isDeadOrMIA() {
         return isDead() || isMIA();
     }
-    //endregion Boolean Information Methods
+    //endregion Boolean Comparison Methods
 
+    public static List<PersonnelStatus> getImplementedStatuses() {
+        return Stream.of(values())
+                .filter(personnelStatus -> !personnelStatus.isPoW() && !personnelStatus.isOnLeave()
+                        && ! personnelStatus.isAWOL())
+                .collect(Collectors.toList());
+    }
+
+    //region File I/O
     /**
      * @param text containing the PersonnelStatus
      * @return the saved PersonnelStatus
@@ -172,6 +202,8 @@ public enum PersonnelStatus {
 
         try {
             switch (Integer.parseInt(text)) {
+                case 0:
+                    return ACTIVE;
                 case 1:
                     return RETIRED;
                 case 2:
@@ -179,14 +211,16 @@ public enum PersonnelStatus {
                 case 3:
                     return MIA;
                 default:
-                    return ACTIVE;
+                    break;
             }
         } catch (Exception ignored) {
 
         }
 
+        LogManager.getLogger().error("Unable to parse " + text + " into a PersonnelStatus. Returning ACTIVE.");
         return ACTIVE;
     }
+    //endregion File I/O
 
     @Override
     public String toString() {

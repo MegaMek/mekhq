@@ -18,9 +18,7 @@
  */
 package mekhq.gui.utilities;
 
-import java.awt.Composite;
-import java.awt.CompositeContext;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.ColorModel;
 import java.awt.image.DataBuffer;
 import java.awt.image.Raster;

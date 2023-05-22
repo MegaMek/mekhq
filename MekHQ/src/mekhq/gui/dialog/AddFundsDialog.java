@@ -3,11 +3,11 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.gui.utilities.JMoneyTextField;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,24 +24,23 @@ public class AddFundsDialog extends JDialog implements FocusListener {
     private MMComboBox<TransactionType> categoryCombo;
     private int closedType = JOptionPane.CLOSED_OPTION;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddFundsDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
-    /** Creates new form AlertPopup */
-    public AddFundsDialog(Frame parent, boolean modal) {
-        super(parent, modal);
+    public AddFundsDialog(final JFrame frame, final boolean modal) {
+        super(frame, modal);
         initComponents();
         setUserPreferences();
     }
 
     private void initComponents() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form"); // NOI18N
+        setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
         btnAddFunds = new JButton();
-        btnAddFunds.setText(resourceMap.getString("btnAddFunds.text")); // NOI18N
-        btnAddFunds.setActionCommand(resourceMap.getString("btnAddFunds.actionCommand")); // NOI18N
-        btnAddFunds.setName("btnAddFunds"); // NOI18N
+        btnAddFunds.setText(resourceMap.getString("btnAddFunds.text"));
+        btnAddFunds.setActionCommand(resourceMap.getString("btnAddFunds.actionCommand"));
+        btnAddFunds.setName("btnAddFunds");
         btnAddFunds.addActionListener(this::btnAddFundsActionPerformed);
 
         getContentPane().add(buildFieldsPanel(), BorderLayout.NORTH);
@@ -51,20 +50,24 @@ public class AddFundsDialog extends JDialog implements FocusListener {
         pack();
     }
 
+    @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
-        PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddFundsDialog.class);
-
-        this.setName("dialog");
-        preferences.manage(new JWindowPreference(this));
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(AddFundsDialog.class);
+            this.setName("dialog");
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to set user preferences", ex);
+        }
     }
 
     private JPanel buildFieldsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, 2, 2));
 
-        fundsQuantityField = new JMoneyTextField(() ->  btnAddFundsActionPerformed(null));
-        fundsQuantityField.setText(resourceMap.getString("fundsQuantityField.text")); // NOI18N
-        fundsQuantityField.setToolTipText(resourceMap.getString("fundsQuantityField.toolTipText")); // NOI18N
-        fundsQuantityField.setName("fundsQuantityField"); // NOI18N
+        fundsQuantityField = new JMoneyTextField();
+        fundsQuantityField.setText(resourceMap.getString("fundsQuantityField.text"));
+        fundsQuantityField.setToolTipText(resourceMap.getString("fundsQuantityField.toolTipText"));
+        fundsQuantityField.setName("fundsQuantityField");
         fundsQuantityField.setColumns(10);
         panel.add(fundsQuantityField);
 

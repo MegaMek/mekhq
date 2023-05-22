@@ -18,32 +18,23 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ResourceBundle;
-
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JViewport;
-import javax.swing.ScrollPaneConstants;
-
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ResourceBundle;
 
 /**
  * Displays interstellar map and contains transit controls.
@@ -57,14 +48,16 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     private JScrollPane scrollPlanetView;
     JSuggestField suggestPlanet;
 
-    MapTab(CampaignGUI gui, String tabName) {
+    //region Constructors
+    public MapTab(CampaignGUI gui, String tabName) {
         super(gui, tabName);
         MekHQ.registerHandler(this);
     }
+    //endregion Constructors
 
     @Override
-    public GuiTabType tabType() {
-        return GuiTabType.MAP;
+    public MHQTabType tabType() {
+        return MHQTabType.INTERSTELLAR_MAP;
     }
 
     /*
@@ -75,18 +68,18 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
         panMapView = new JPanel(new BorderLayout());
 
         JPanel panTopButtons = new JPanel(new GridBagLayout());
-        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")), //$NON-NLS-1$ ;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panTopButtons.add(new JLabel(resourceMap.getString("lblFindPlanet.text")),
                 gridBagConstraints);
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
@@ -97,35 +90,35 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
                 refreshPlanetView();
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(suggestPlanet, gridBagConstraints);
 
-        JButton btnCalculateJumpPath = new JButton(resourceMap.getString("btnCalculateJumpPath.text")); // NOI18N
-        btnCalculateJumpPath.setToolTipText(resourceMap.getString("btnCalculateJumpPath.toolTipText")); // NOI18N
+        JButton btnCalculateJumpPath = new JButton(resourceMap.getString("btnCalculateJumpPath.text"));
+        btnCalculateJumpPath.setToolTipText(resourceMap.getString("btnCalculateJumpPath.toolTipText"));
         btnCalculateJumpPath.addActionListener(ev -> calculateJumpPath());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(btnCalculateJumpPath, gridBagConstraints);
 
-        JButton btnBeginTransit = new JButton(resourceMap.getString("btnBeginTransit.text")); // NOI18N
-        btnBeginTransit.setToolTipText(resourceMap.getString("btnBeginTransit.toolTipText")); // NOI18N
+        JButton btnBeginTransit = new JButton(resourceMap.getString("btnBeginTransit.text"));
+        btnBeginTransit.setToolTipText(resourceMap.getString("btnBeginTransit.toolTipText"));
         btnBeginTransit.addActionListener(ev -> beginTransit());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 0.5;
         gridBagConstraints.weighty = 0.0;
         panTopButtons.add(btnBeginTransit, gridBagConstraints);
@@ -139,12 +132,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         panMapView.add(panMap, BorderLayout.CENTER);
 
         mapView = new JViewport();
-        mapView.setMinimumSize(new java.awt.Dimension(600,600));
+        mapView.setMinimumSize(new Dimension(600,600));
         mapView.setView(panMapView);
 
         scrollPlanetView = new JScrollPane();
-        scrollPlanetView.setMinimumSize(new java.awt.Dimension(400, 600));
-        scrollPlanetView.setPreferredSize(new java.awt.Dimension(400, 600));
+        scrollPlanetView.setMinimumSize(new Dimension(400, 600));
+        scrollPlanetView.setPreferredSize(new Dimension(400, 600));
         scrollPlanetView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPlanetView.setViewportView(null);
         splitMap = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, mapView, scrollPlanetView);
@@ -195,7 +188,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
-            javax.swing.SwingUtilities.invokeLater(() -> {
+            SwingUtilities.invokeLater(() -> {
                 scrollPlanetView.getVerticalScrollBar().setValue(0);
             });
             return;
@@ -203,7 +196,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         PlanetarySystem system = panMap.getSelectedSystem();
         if (null != system) {
             scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign()));
-            javax.swing.SwingUtilities.invokeLater(() -> {
+            SwingUtilities.invokeLater(() -> {
                 scrollPlanetView.getVerticalScrollBar().setValue(0);
             });
         }
@@ -213,7 +206,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         JumpPath path = panMap.getJumpPath();
         if (null != path && !path.isEmpty()) {
             scrollPlanetView.setViewportView(new JumpPathViewPanel(path, getCampaign()));
-            javax.swing.SwingUtilities.invokeLater(() -> {
+            SwingUtilities.invokeLater(() -> {
                 scrollPlanetView.getVerticalScrollBar().setValue(0);
             });
             return;
@@ -222,7 +215,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener {
         PlanetarySystem system = panMap.getSelectedSystem();
         if (null != system) {
             scrollPlanetView.setViewportView(new PlanetViewPanel(system, getCampaign(), pos));
-            javax.swing.SwingUtilities.invokeLater(() -> {
+            SwingUtilities.invokeLater(() -> {
                 scrollPlanetView.getVerticalScrollBar().setValue(0);
             });
         }

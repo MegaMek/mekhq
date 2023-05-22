@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,13 +16,26 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static mekhq.campaign.parts.equipment.EquipmentUtilities.*;
+import megamek.Version;
+import megamek.common.*;
+import megamek.common.weapons.bayweapons.BayWeapon;
+import mekhq.utilities.MHQXMLUtility;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.Quartermaster;
+import mekhq.campaign.Warehouse;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -31,37 +44,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.CriticalSlot;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.EquipmentTypeLookup;
-import megamek.common.MMRandom;
-import megamek.common.MMRoll;
-import megamek.common.Mech;
-import megamek.common.MiscType;
-import megamek.common.Mounted;
-import megamek.common.SmallCraft;
-import megamek.common.WeaponType;
-import megamek.common.weapons.bayweapons.BayWeapon;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.Quartermaster;
-import mekhq.campaign.Warehouse;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.unit.Unit;
+import static mekhq.campaign.parts.equipment.EquipmentUtilities.getEquipmentType;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class EquipmentPartTest {
     @Test
@@ -492,7 +477,7 @@ public class EquipmentPartTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -503,7 +488,7 @@ public class EquipmentPartTest {
         // Deserialize the EquipmentPart
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof EquipmentPart);
+        assertInstanceOf(EquipmentPart.class, deserializedPart);
 
         EquipmentPart deserialized = (EquipmentPart) deserializedPart;
 
@@ -572,7 +557,7 @@ public class EquipmentPartTest {
         verify(unit, times(1)).addPart(missingPartCaptor.capture());
 
         Part missingPart = missingPartCaptor.getValue();
-        assertTrue(missingPart instanceof MissingEquipmentPart);
+        assertInstanceOf(MissingEquipmentPart.class, missingPart);
 
         MissingEquipmentPart missingEquipmentPart = (MissingEquipmentPart) missingPart;
         assertTrue(missingEquipmentPart.getId() > 0);
@@ -637,7 +622,7 @@ public class EquipmentPartTest {
         verify(unit, times(1)).addPart(missingPartCaptor.capture());
 
         Part missingPart = missingPartCaptor.getValue();
-        assertTrue(missingPart instanceof MissingEquipmentPart);
+        assertInstanceOf(MissingEquipmentPart.class, missingPart);
 
         MissingEquipmentPart missingEquipmentPart = (MissingEquipmentPart) missingPart;
         assertTrue(missingEquipmentPart.getId() > 0);
@@ -1471,7 +1456,7 @@ public class EquipmentPartTest {
         Mounted notOurBay = mock(Mounted.class);
         when(notOurBay.getLocation()).thenReturn(location);
         when(notOurBay.getType()).thenReturn(bayWeaponType);
-        when(notOurBay.getBayWeapons()).thenReturn(new Vector<Integer>());
+        when(notOurBay.getBayWeapons()).thenReturn(new Vector<>());
 
         Mounted notABayWeapon = mock(Mounted.class);
         when(notABayWeapon.getLocation()).thenReturn(location);
@@ -1559,7 +1544,7 @@ public class EquipmentPartTest {
         Mounted notOurBay = mock(Mounted.class);
         when(notOurBay.getLocation()).thenReturn(location);
         when(notOurBay.getType()).thenReturn(bayWeaponType);
-        when(notOurBay.getBayWeapons()).thenReturn(new Vector<Integer>());
+        when(notOurBay.getBayWeapons()).thenReturn(new Vector<>());
 
         Mounted notABayWeapon = mock(Mounted.class);
         when(notABayWeapon.getLocation()).thenReturn(location);
@@ -1648,7 +1633,7 @@ public class EquipmentPartTest {
         Mounted notOurBay = mock(Mounted.class);
         when(notOurBay.getLocation()).thenReturn(location);
         when(notOurBay.getType()).thenReturn(bayWeaponType);
-        when(notOurBay.getBayWeapons()).thenReturn(new Vector<Integer>());
+        when(notOurBay.getBayWeapons()).thenReturn(new Vector<>());
 
         Mounted notABayWeapon = mock(Mounted.class);
         when(notABayWeapon.getLocation()).thenReturn(location);
@@ -1732,7 +1717,7 @@ public class EquipmentPartTest {
         Mounted notOurBay = mock(Mounted.class);
         when(notOurBay.getLocation()).thenReturn(location);
         when(notOurBay.getType()).thenReturn(bayWeaponType);
-        when(notOurBay.getBayWeapons()).thenReturn(new Vector<Integer>());
+        when(notOurBay.getBayWeapons()).thenReturn(new Vector<>());
 
         Mounted notABayWeapon = mock(Mounted.class);
         when(notABayWeapon.getLocation()).thenReturn(location);

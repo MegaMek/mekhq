@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,7 +32,7 @@ import megamek.common.Dropship;
 import megamek.common.Entity;
 import megamek.common.Jumpship;
 import megamek.common.TechAdvancement;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 
 /**
@@ -65,7 +66,7 @@ public class MissingAeroSensor extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -86,13 +87,10 @@ public class MissingAeroSensor extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<dropship>"
-                +dropship
-                +"</dropship>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dropship", dropship);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -136,7 +134,7 @@ public class MissingAeroSensor extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ELECTRONICS;
     }
 }

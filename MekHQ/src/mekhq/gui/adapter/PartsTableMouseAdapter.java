@@ -11,10 +11,10 @@ import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.dialog.MassRepairSalvageDialog;
+import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.PopupValueChoiceDialog;
 import mekhq.gui.model.PartsTableModel;
-import mekhq.service.MassRepairMassSalvageMode;
+import mekhq.service.enums.MRMSMode;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -84,7 +84,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             Money refundAmount = Money.zero();
             for (Part p : parts) {
                 if (null != p) {
-                    refundAmount = refundAmount.plus(p.getStickerPrice().multipliedBy(p.getQuantity())
+                    refundAmount = refundAmount.plus(p.getActualValue().multipliedBy(p.getQuantity())
                             .multipliedBy(gui.getCampaign().getCampaignOptions().getCancelledOrderRefundMultiplier()));
                     gui.getCampaign().getWarehouse().removePart(p);
                 }
@@ -106,7 +106,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.contains("SET_QUALITY")) {
             int q = -1;
-            boolean reverse = gui.getCampaign().getCampaignOptions().reverseQualityNames();
+            boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
             Object[] possibilities = { Part.getQualityName(Part.QUALITY_A, reverse),
                     Part.getQualityName(Part.QUALITY_B, reverse), Part.getQualityName(Part.QUALITY_C, reverse),
                     Part.getQualityName(Part.QUALITY_D, reverse), Part.getQualityName(Part.QUALITY_E, reverse),
@@ -136,10 +136,8 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
                     MekHQ.triggerEvent(new PartModeChangedEvent(p));
                 }
             }
-        } else if (command.contains("MASS_REPAIR")) {
-            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(gui.getFrame(), true, gui,
-                    MassRepairMassSalvageMode.WAREHOUSE);
-            dlg.setVisible(true);
+        } else if (command.contains("MRMS")) {
+            new MRMSDialog(gui.getFrame(), true, gui, MRMSMode.WAREHOUSE).setVisible(true);
         } else if (command.equalsIgnoreCase("DEPOD")) {
             for (Part p : parts) {
                 if (null != p) {
@@ -262,7 +260,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         }
         // **lets fill the pop up menu**//
         // sell part
-        if (gui.getCampaign().getCampaignOptions().canSellParts() && areAllPartsPresent(parts)) {
+        if (gui.getCampaign().getCampaignOptions().isSellParts() && areAllPartsPresent(parts)) {
             menu = new JMenu("Sell");
             if (areAllPartsAmmo(parts)) {
                 menuItem = new JMenuItem("Sell All Ammo of This Type");
@@ -345,7 +343,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menu);
 
             menuItem = new JMenuItem("Mass Repair");
-            menuItem.setActionCommand("MASS_REPAIR");
+            menuItem.setActionCommand("MRMS");
             menuItem.addActionListener(this);
             popup.add(menuItem);
         }
@@ -356,7 +354,7 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(menuItem);
         }
         menuItem = new JMenuItem("Export Parts");
-        menuItem.addActionListener(ev -> gui.miExportPartsActionPerformed(ev));
+        menuItem.addActionListener(ev -> gui.savePartsFile());
         menuItem.setEnabled(true);
         popup.add(menuItem);
 

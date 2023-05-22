@@ -100,7 +100,7 @@ public class StratconRulesManager {
 
             // if we haven't already used all the player forces and are required to randomly
             // generate a scenario
-            if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) <= targetNum)) {
+            if (!availableForceIDs.isEmpty() && (Compute.randomInt(100) < targetNum)) {
                 // pick random coordinates and force to drive the scenario
                 int x = Compute.randomInt(track.getWidth());
                 int y = Compute.randomInt(track.getHeight());
@@ -282,8 +282,8 @@ public class StratconRulesManager {
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around
         // the coords, depending on force role
-        // 2. if coords are a hostile facility, we get a facility mission
-        // 3. if coords are empty, we *may* get a mission
+        // 2. if coords are a hostile facility, we get a facility scenario
+        // 3. if coords are empty, we *may* get a scenario
 
         processForceDeployment(coords, forceID, campaign, track, sticky);
 
@@ -771,7 +771,7 @@ public class StratconRulesManager {
 
             if (scenarioAtFacility) {
                 modifierIDs = facility.getLocalModifiers();
-            } else if (facility.isVisible() || (Compute.randomInt(100) <= facility.getAggroRating())) {
+            } else if (facility.isVisible() || (Compute.randomInt(100) <= 75)) {
                 modifierIDs = facility.getSharedModifiers();
             }
 
@@ -1134,7 +1134,7 @@ public class StratconRulesManager {
      * Check if the unit's force (if one exists) has been deployed to a StratCon track
      */
     public static boolean isUnitDeployedToStratCon(Unit u) {
-        if (!u.getCampaign().getCampaignOptions().getUseStratCon()) {
+        if (!u.getCampaign().getCampaignOptions().isUseStratCon()) {
             return false;
         }
 
@@ -1574,7 +1574,7 @@ public class StratconRulesManager {
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
         // don't do any of this if StratCon isn't turned on
-        if (!ev.getCampaign().getCampaignOptions().getUseStratCon()) {
+        if (!ev.getCampaign().getCampaignOptions().isUseStratCon()) {
             return;
         }
         boolean isMonday = ev.getCampaign().getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY;

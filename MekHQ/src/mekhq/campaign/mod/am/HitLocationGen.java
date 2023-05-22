@@ -19,7 +19,7 @@
 package mekhq.campaign.mod.am;
 
 import megamek.codeUtilities.ObjectUtility;
-import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.BodyLocation;
 
 import java.util.Map.Entry;
 import java.util.NavigableMap;

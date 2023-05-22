@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2023 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,6 @@
  */
 package mekhq.gui.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
@@ -35,6 +34,7 @@ public enum PersonnelTabView {
     BIOGRAPHICAL("PersonnelTabView.BIOGRAPHICAL.text", "PersonnelTabView.BIOGRAPHICAL.toolTipText"),
     FLUFF("PersonnelTabView.FLUFF.text", "PersonnelTabView.FLUFF.toolTipText"),
     DATES("PersonnelTabView.DATES.text", "PersonnelTabView.DATES.toolTipText"),
+    FLAGS("PersonnelTabView.FLAGS.text", "PersonnelTabView.FLAGS.toolTipText"),
     OTHER("PersonnelTabView.OTHER.text", "PersonnelTabView.OTHER.toolTipText");
     //endregion Enum Declarations
 
@@ -46,7 +46,7 @@ public enum PersonnelTabView {
     //region Constructors
     PersonnelTabView(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -97,6 +97,10 @@ public enum PersonnelTabView {
 
     public boolean isDates() {
         return this == DATES;
+    }
+
+    public boolean isFlags() {
+        return this == FLAGS;
     }
 
     public boolean isOther() {

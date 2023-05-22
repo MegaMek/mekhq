@@ -19,7 +19,6 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.baseComponents.AbstractPanel;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
@@ -46,7 +45,7 @@ public abstract class AbstractMHQPanel extends AbstractPanel {
      */
     protected AbstractMHQPanel(final JFrame frame, final String name, final boolean isDoubleBuffered) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale()),
                 name, new FlowLayout(), isDoubleBuffered);
     }
 
@@ -66,7 +65,7 @@ public abstract class AbstractMHQPanel extends AbstractPanel {
     protected AbstractMHQPanel(final JFrame frame, final String name,
                                final LayoutManager layoutManager, final boolean isDoubleBuffered) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale()),
                 name, layoutManager, isDoubleBuffered);
     }
 
@@ -81,10 +80,12 @@ public abstract class AbstractMHQPanel extends AbstractPanel {
     //endregion Constructors
 
     /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     * @throws Exception if there's an issue initializing the preferences. Normally this means
+     * a component has <strong>not</strong> had its name value set.
      */
     @Override
-    protected void setPreferences() {
+    protected void setPreferences() throws Exception {
         setPreferences(MekHQ.getMHQPreferences().forClass(getClass()));
     }
 }

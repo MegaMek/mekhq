@@ -21,7 +21,8 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
@@ -153,7 +154,7 @@ public class GravDeck extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -192,11 +193,11 @@ public class GravDeck extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckType", deckType);
-        MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "deckNumber", deckNumber);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deckType", deckType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deckNumber", deckNumber);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -212,8 +213,8 @@ public class GravDeck extends Part {
                 } else if (wn2.getNodeName().equalsIgnoreCase("deckNumber")) {
                     deckNumber = Integer.parseInt(wn2.getTextContent());
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
     }

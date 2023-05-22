@@ -23,7 +23,7 @@ package mekhq.campaign.force;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
@@ -71,7 +71,6 @@ public class UnitStub {
 
     private String getUnitDescription(Unit u) {
         String name = "<font color='red'>No Crew</font>";
-        String uname;
         Person pp = u.getCommander();
         if (null != pp) {
             name = pp.getFullTitle();
@@ -80,20 +79,20 @@ public class UnitStub {
                 name = "<font color='red'>" + name + "</font>";
             }
         }
-        uname = "<i>" + u.getName() + "</i>";
+        String uname = "<i>" + u.getName() + "</i>";
         if (u.isDamaged()) {
             uname = "<font color='red'>" + uname + "</font>";
         }
         return "<html>" + name + ", " + uname + "</html>";
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent++, "unitStub");
-        if (!StringUtility.isNullOrEmpty(getDesc())) {
-            MekHqXmlUtil.writeSimpleXmlTag(pw1, indent, "desc", getDesc());
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "unitStub");
+        if (!StringUtility.isNullOrBlank(getDesc())) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", getDesc());
         }
-        getPortrait().writeToXML(pw1, indent);
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, --indent, "unitStub");
+        getPortrait().writeToXML(pw, indent);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "unitStub");
     }
 
     public static UnitStub generateInstanceFromXML(Node wn) {

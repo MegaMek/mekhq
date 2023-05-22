@@ -21,8 +21,9 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.verifier.TestEntity;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -154,16 +155,13 @@ public class EnginePart extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        // The engine is a MM object...
-        // And doesn't support XML serialization...
-        // But it's defined by 3 ints. So we'll save those here.
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineType>" + engine.getEngineType() + "</engineType>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineRating>" + engine.getRating() + "</engineRating>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<engineFlags>" + engine.getFlags() + "</engineFlags>");
-        pw1.println(MekHqXmlUtil.indentStr(indent + 1) + "<forHover>" + forHover + "</forHover>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "engineType", engine.getEngineType());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "engineRating", engine.getRating());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "engineFlags", engine.getFlags());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forHover", forHover);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -366,7 +364,7 @@ public class EnginePart extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (null == unit) {
             return null;
         }
@@ -476,7 +474,7 @@ public class EnginePart extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ENGINE;
     }
 }

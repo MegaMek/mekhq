@@ -21,18 +21,16 @@
  */
 package mekhq.gui.model;
 
-import java.awt.Component;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-
 import megamek.common.Entity;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A table model for displaying loot for scenarios and missions

@@ -120,11 +120,11 @@ public abstract class AbstractPersonnelGenerator {
     protected void generateName(Campaign campaign, Person person, Gender gender) {
         person.setGender((gender == Gender.RANDOMIZE) ? RandomGenderGenerator.generate() : gender);
 
-        String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
+        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames()
                 ? person.getOriginFaction().getShortName()
                 : RandomNameGenerator.getInstance().getChosenFaction();
 
-        String[] name = getNameGenerator().generateGivenNameSurnameSplit(person.getGender(), person.isClanner(),
+        String[] name = getNameGenerator().generateGivenNameSurnameSplit(person.getGender(), person.isClanPersonnel(),
                 factionCode);
         person.setGivenName(name[0]);
         person.setSurname(name[1]);
@@ -136,7 +136,7 @@ public abstract class AbstractPersonnelGenerator {
      * @param person The {@link Person} being generated.
      */
     protected void generateXp(Campaign campaign, Person person) {
-        if (campaign.getCampaignOptions().useDylansRandomXP()) {
+        if (campaign.getCampaignOptions().isUseDylansRandomXP()) {
             person.setXP(campaign, Utilities.generateRandomExp());
         }
     }
@@ -148,7 +148,7 @@ public abstract class AbstractPersonnelGenerator {
      */
     protected void generatePhenotype(Campaign campaign, Person person) {
         //check for clan phenotypes
-        if (person.isClanner()) {
+        if (person.isClanPersonnel()) {
             switch (person.getPrimaryRole()) {
                 case MECHWARRIOR:
                 case LAM_PILOT:

@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -32,7 +33,7 @@ import megamek.common.Entity;
 import megamek.common.SmallCraft;
 import megamek.common.TechAdvancement;
 import megamek.common.TechConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 
 /**
@@ -90,20 +91,11 @@ public class MissingSpacecraftEngine extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        // The engine is a MM object...
-        // And doesn't support XML serialization...
-        // But it's defined by 3 ints. So we'll save those here.
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<engineTonnage>"
-                +engineTonnage
-                +"</engineTonnage>");
-        pw1.println(MekHqXmlUtil.indentStr(indent+1)
-                +"<clan>"
-                +clan
-                +"</clan>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "engineTonnage", engineTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clan", clan);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -136,7 +128,7 @@ public class MissingSpacecraftEngine extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -157,7 +149,7 @@ public class MissingSpacecraftEngine extends MissingPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ENGINE;
     }
 }

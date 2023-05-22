@@ -24,8 +24,8 @@ import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import mekhq.MekHqXmlUtil;
-import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.utilities.MHQXMLUtility;
+import mekhq.campaign.personnel.BodyLocation;
 import mekhq.gui.utilities.MultiplyComposite;
 import org.apache.logging.log4j.LogManager;
 
@@ -83,7 +83,7 @@ public class Paperdoll extends Component {
     public void loadShapeData(InputStream is) throws JAXBException {
         JAXBContext context = JAXBContext.newInstance(OverlayLocDataList.class, OverlayLocData.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
-        Source inputSource = MekHqXmlUtil.createSafeXmlSource(is);
+        Source inputSource = MHQXMLUtility.createSafeXmlSource(is);
         OverlayLocDataList dataList = (OverlayLocDataList) unmarshaller.unmarshal(inputSource);
         if (null != dataList.locs) {
             dataList.locs.forEach(data -> {

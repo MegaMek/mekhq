@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,41 +16,41 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static mekhq.campaign.parts.AmmoUtilities.*;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.ParserConfigurationException;
-
-import mekhq.campaign.parts.enums.PartRepairType;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
+import megamek.Version;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.Mounted;
 import megamek.common.Protomech;
-import mekhq.MekHqXmlUtil;
-import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.utilities.MHQXMLUtility;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 public class AmmoBinTest {
     @Test
@@ -114,12 +114,12 @@ public class AmmoBinTest {
     }
 
     @Test
-    public void massRepairOptionTest() {
+    public void mrmsOptionTest() {
         Campaign mockCampaign = mock(Campaign.class);
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
         AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, ammoType.getShots(), false, false, mockCampaign);
 
-        assertEquals(PartRepairType.AMMO, ammoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMUNITION, ammoBin.getMRMSOptionType());
     }
 
     @Test
@@ -178,7 +178,7 @@ public class AmmoBinTest {
 
         // Grab the missing part via IAcquisitionWork
         IAcquisitionWork acquisitionPart = ammoBin.getAcquisitionWork();
-        assertTrue(acquisitionPart instanceof AmmoStorage);
+        assertInstanceOf(AmmoStorage.class, acquisitionPart);
 
         AmmoStorage ammoStorage = (AmmoStorage) acquisitionPart;
         assertEquals(ammoBin.getType(), ammoStorage.getType());
@@ -190,7 +190,7 @@ public class AmmoBinTest {
 
         // Check that we buy a ton, even if the bin is one shot
         acquisitionPart = ammoBin.getAcquisitionWork();
-        assertTrue(acquisitionPart instanceof AmmoStorage);
+        assertInstanceOf(AmmoStorage.class, acquisitionPart);
 
         ammoStorage = (AmmoStorage) acquisitionPart;
         assertEquals(ammoBin.getType(), ammoStorage.getType());
@@ -340,7 +340,7 @@ public class AmmoBinTest {
         int equipmentNum = 42;
         AmmoBin ammoBin = new AmmoBin(0, ammoType, equipmentNum, 0, false, false, mockCampaign);
 
-        // ... place the ammo bin on a Protomech unit ...
+        // ... place the ammo bin on a ProtoMech unit ...
         Unit mockUnit = mock(Unit.class);
         Protomech mockEntity = mock(Protomech.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
@@ -424,7 +424,8 @@ public class AmmoBinTest {
     public void ammoBinWriteToXmlTest() throws ParserConfigurationException, SAXException, IOException {
         AmmoType isSRM2InfernoAmmo = getAmmoType("ISSRM2 Inferno Ammo");
         Campaign mockCampaign = mock(Campaign.class);
-        AmmoBin ammoBin = new AmmoBin(0, isSRM2InfernoAmmo, 42, isSRM2InfernoAmmo.getShots() - 1, false, false, mockCampaign);
+        AmmoBin ammoBin = new AmmoBin(0, isSRM2InfernoAmmo, 42,
+                isSRM2InfernoAmmo.getShots() - 1, false, false, mockCampaign);
         ammoBin.setId(25);
 
         // Write the AmmoBin XML
@@ -437,7 +438,7 @@ public class AmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -448,7 +449,7 @@ public class AmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, deserializedPart);
 
         AmmoBin deserialized = (AmmoBin) deserializedPart;
 
@@ -477,7 +478,7 @@ public class AmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -488,7 +489,7 @@ public class AmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, deserializedPart);
 
         AmmoBin deserialized = (AmmoBin) deserializedPart;
 
@@ -518,7 +519,7 @@ public class AmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -529,7 +530,7 @@ public class AmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, deserializedPart);
 
         AmmoBin deserialized = (AmmoBin) deserializedPart;
 
@@ -558,7 +559,7 @@ public class AmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -569,7 +570,7 @@ public class AmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, deserializedPart);
 
         AmmoBin deserialized = (AmmoBin) deserializedPart;
 
@@ -644,7 +645,7 @@ public class AmmoBinTest {
         assertFalse(xml.isBlank());
 
         // Using factory get an instance of document builder
-        DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
         // Parse using builder to get DOM representation of the XML file
         Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
@@ -655,7 +656,7 @@ public class AmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, deserializedPart);
 
         AmmoBin deserialized = (AmmoBin) deserializedPart;
 
@@ -709,7 +710,7 @@ public class AmmoBinTest {
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             added = (AmmoStorage) part;
         }
 
@@ -739,7 +740,7 @@ public class AmmoBinTest {
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             added = (AmmoStorage) part;
         }
 
@@ -795,7 +796,7 @@ public class AmmoBinTest {
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             added = (AmmoStorage) part;
         }
 
@@ -828,7 +829,7 @@ public class AmmoBinTest {
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             added = (AmmoStorage) part;
         }
 

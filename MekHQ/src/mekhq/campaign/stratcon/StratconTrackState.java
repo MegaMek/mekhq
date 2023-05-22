@@ -23,14 +23,15 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 
 import java.time.LocalDate;
 import java.util.*;
 
 /**
- * Track-level state object for a stratcon campaign.
+ * Track-level state object for a StratCon campaign.
  * @author NickAragua
  */
 @XmlRootElement(name = "campaignTrack")
@@ -148,12 +149,31 @@ public class StratconTrackState {
         }
     }
 
+    public void removeScenario(int campaignScenarioID) {
+        if (getBackingScenariosMap().containsKey(campaignScenarioID)) {
+            removeScenario(getBackingScenariosMap().get(campaignScenarioID));
+        }
+    }
+    
     /**
      * Removes a StratconScenario from this track.
      */
     public void removeScenario(StratconScenario scenario) {
         scenarios.remove(scenario.getCoords());
         getBackingScenariosMap().remove(scenario.getBackingScenarioID());
+        Map<StratconCoords, StratconStrategicObjective> objectives = getObjectivesByCoords();
+        if (objectives.containsKey(scenario.getCoords())) {
+            StrategicObjectiveType objectiveType = objectives.get(scenario.getCoords()).getObjectiveType();
+            
+            switch (objectiveType) {
+                case RequiredScenarioVictory:
+                case SpecificScenarioVictory:
+                    objectives.remove(scenario.getCoords());
+                    break;
+                default:
+                    break;
+            }
+        }
 
         // any assigned forces get cleared out here as well.
         for (int forceID : scenario.getAssignedForces()) {
@@ -201,12 +221,12 @@ public class StratconTrackState {
     }
 
     /**
-     * Convenience function that determins if there are any forces
-     * deployed to the given coordinates.
+     * Convenience function that determines if there are any forces deployed to the given
+     * coordinates.
      */
     public boolean areAnyForceDeployedTo(StratconCoords coords) {
         return getAssignedCoordForces().containsKey(coords) &&
-                (getAssignedCoordForces().get(coords).size() > 0);
+                !getAssignedCoordForces().get(coords).isEmpty();
     }
 
     /**
@@ -254,7 +274,7 @@ public class StratconTrackState {
      */
     public void restoreReturnDates() {
         for (int forceID : getAssignedForceReturnDatesForStorage().keySet()) {
-            assignedForceReturnDates.put(forceID, MekHqXmlUtil.parseDate(getAssignedForceReturnDatesForStorage().get(forceID)));
+            assignedForceReturnDates.put(forceID, MHQXMLUtility.parseDate(getAssignedForceReturnDatesForStorage().get(forceID)));
         }
     }
 
@@ -403,10 +423,10 @@ public class StratconTrackState {
     }
 
     /**
-     * Whether or not this track has a facility on it that reveals the track.
+     * @return Whether or not this track has a facility on it that reveals the track.
      */
     public boolean hasActiveTrackReveal() {
-        return getFacilities().values().stream().anyMatch(facility -> facility.getRevealTrack());
+        return getFacilities().values().stream().anyMatch(StratconFacility::getRevealTrack);
     }
 
     /**

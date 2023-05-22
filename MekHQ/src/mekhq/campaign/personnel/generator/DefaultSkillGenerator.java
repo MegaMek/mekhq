@@ -51,7 +51,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         generateDefaultSkills(person, primaryRole, expLvl, bonus, mod);
 
-        if (!secondaryRole.isDependentOrNone()) {
+        if (!secondaryRole.isCivilian()) {
             generateDefaultSkills(person, secondaryRole, expLvl, bonus, mod);
         }
 
@@ -77,7 +77,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         }
 
         // roll artillery skill
-        if (campaign.getCampaignOptions().useArtillery()
+        if (campaign.getCampaignOptions().isUseArtillery()
                 && (primaryRole.isMechWarrior() || primaryRole.isVehicleGunner() || primaryRole.isSoldier())
                 && Utilities.rollProbability(rskillPrefs.getArtilleryProb())) {
             generateArtillerySkill(person, bonus);

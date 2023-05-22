@@ -32,7 +32,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.unit.Unit;
 
@@ -50,7 +51,7 @@ public class Hangar {
      *
      * @param unit The unit to add to the hangar.
      */
-    public void addUnit(Unit unit) {
+    public void addUnit(final @Nullable Unit unit) {
         if (unit == null) {
             return;
         }
@@ -68,7 +69,7 @@ public class Hangar {
      * @return The unit matching the unique identifier,
      *         otherwise null if that unit does not exist.
      */
-    public Unit getUnit(UUID id) {
+    public @Nullable Unit getUnit(UUID id) {
         return units.get(id);
     }
 
@@ -130,7 +131,7 @@ public class Hangar {
      * @return The first unit found which matches the predicate,
      *         otherwise null if no unit was found.
      */
-    public Unit findUnit(Predicate<Unit> predicate) {
+    public @Nullable Unit findUnit(final @Nullable Predicate<Unit> predicate) {
         if (predicate == null) {
             return null;
         }
@@ -152,13 +153,9 @@ public class Hangar {
         return null != units.remove(id);
     }
 
-    public void writeToXml(PrintWriter pw1, int indent, String tag) {
-        MekHqXmlUtil.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
-
-        forEachUnit(unit -> {
-            unit.writeToXML(pw1, indent + 1);
-        });
-
-        MekHqXmlUtil.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);
+    public void writeToXML(final PrintWriter pw, final int indent, final String tag) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, tag);
+        forEachUnit(unit -> unit.writeToXML(pw, indent + 1));
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, tag);
     }
 }

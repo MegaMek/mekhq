@@ -28,7 +28,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.MHQConstants;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.event.OptionsChangedEvent;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
@@ -134,7 +134,7 @@ public class RATManager extends AbstractUnitGenerator {
         DocumentBuilder db;
 
         try (FileInputStream fis = new FileInputStream(f)) {
-            db = MekHqXmlUtil.newSafeDocumentBuilder();
+            db = MHQXMLUtility.newSafeDocumentBuilder();
             xmlDoc = db.parse(fis);
         } catch (Exception ex) {
             LogManager.getLogger().error("While loading RAT info from " + f.getName() + ": ", ex);
@@ -208,57 +208,52 @@ public class RATManager extends AbstractUnitGenerator {
     public static void populateCollectionNames() {
         allCollections = new HashMap<>();
 
-        Document xmlDoc;
-        DocumentBuilder db;
-
         File dir = new File(MHQConstants.RATINFO_DIR);
-        FileInputStream fis;
-
         if (!dir.isDirectory()) {
             LogManager.getLogger().error("Ratinfo directory not found");
             return;
         }
+
         for (File f : dir.listFiles()) {
-            if (f.getName().endsWith(".xml")) {
-                try {
-                    fis = new FileInputStream(f);
-                    db = MekHqXmlUtil.newSafeDocumentBuilder();
-                    xmlDoc = db.parse(fis);
-                    fis.close();
-                } catch (Exception e) {
-                    LogManager.getLogger().error("While loading RAT info from " + f.getName() + ": ", e);
-                    continue;
-                }
-                Element elem = xmlDoc.getDocumentElement();
-                NodeList nl = elem.getChildNodes();
-                elem.normalize();
+            if (!f.getName().endsWith(".xml")) {
+                continue;
+            }
+            Document xmlDoc;
+            try (FileInputStream fis = new FileInputStream(f)) {
+                xmlDoc = MHQXMLUtility.newSafeDocumentBuilder().parse(fis);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("While loading RAT info from " + f.getName() + ": ", ex);
+                continue;
+            }
+            Element elem = xmlDoc.getDocumentElement();
+            NodeList nl = elem.getChildNodes();
+            elem.normalize();
 
-                String name;
-                List<Integer> eras = new ArrayList<>();
+            String name;
+            List<Integer> eras = new ArrayList<>();
 
-                if (elem.getAttributes().getNamedItem("source") != null) {
-                    name = elem.getAttributes().getNamedItem("source").getTextContent();
-                    for (int j = 0; j < nl.getLength(); j++) {
-                        Node eraNode = nl.item(j);
-                        if (eraNode.getNodeName().equalsIgnoreCase("era")) {
-                            String year = eraNode.getAttributes().getNamedItem("year").getTextContent();
-                            if (year != null) {
-                                try {
-                                    eras.add(Integer.parseInt(year));
-                                } catch (NumberFormatException ex) {
-                                    LogManager.getLogger().error("Could not parse year " + year + " in " + f.getName());
-                                }
-                            } else {
-                                LogManager.getLogger().error("year attribute not found for era in " + f.getName());
+            if (elem.getAttributes().getNamedItem("source") != null) {
+                name = elem.getAttributes().getNamedItem("source").getTextContent();
+                for (int j = 0; j < nl.getLength(); j++) {
+                    Node eraNode = nl.item(j);
+                    if (eraNode.getNodeName().equalsIgnoreCase("era")) {
+                        String year = eraNode.getAttributes().getNamedItem("year").getTextContent();
+                        if (year != null) {
+                            try {
+                                eras.add(Integer.parseInt(year));
+                            } catch (NumberFormatException ex) {
+                                LogManager.getLogger().error("Could not parse year " + year + " in " + f.getName());
                             }
+                        } else {
+                            LogManager.getLogger().error("year attribute not found for era in " + f.getName());
                         }
                     }
-                    fileNames.put(name, f.getName());
-                    Collections.sort(eras);
-                    allCollections.put(name, eras);
-                } else {
-                    LogManager.getLogger().error("source attribute not found for RAT data in " + f.getName());
                 }
+                fileNames.put(name, f.getName());
+                Collections.sort(eras);
+                allCollections.put(name, eras);
+            } else {
+                LogManager.getLogger().error("source attribute not found for RAT data in " + f.getName());
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 MegaMek team
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -16,16 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package mekhq.campaign.parts.equipment;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 
 import megamek.common.Aero;
 import megamek.common.EquipmentType;
@@ -36,10 +27,18 @@ import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.AeroHeatSink;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 public class MissingHeatSinkTest {
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void beforeAll() {
         EquipmentType.initializeTypes();
     }
 
@@ -94,7 +93,7 @@ public class MissingHeatSinkTest {
         verify(unit, times(1)).removePart(eq(missingHeatSink));
 
         Part addedPart = partCaptor.getValue();
-        assertTrue(addedPart instanceof HeatSink);
+        assertInstanceOf(HeatSink.class, addedPart);
 
         HeatSink addedHeatSink = (HeatSink) addedPart;
         assertEquals(unit, addedHeatSink.getUnit());

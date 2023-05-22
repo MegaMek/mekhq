@@ -18,13 +18,13 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
 import javax.swing.text.DefaultFormatter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ResourceBundle;
@@ -46,17 +46,19 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
      * the set xp command in MekHQView, I am going to refactor it into a
      * numeric value setter using a spinner.
      */
-    public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min) {
-        super(parent, modal);
+    public PopupValueChoiceDialog(final JFrame frame, final boolean modal, final String title,
+                                  final int current, final int min) {
+        super(frame, modal);
         model = new SpinnerNumberModel(current, min, null, 1);
         setTitle(title);
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(this);
     }
 
-    public PopupValueChoiceDialog(Frame parent, boolean modal, String title, int current, int min, int max) {
+    public PopupValueChoiceDialog(final JFrame parent, final boolean modal, final String title,
+                                  final int current, final int min, final int max) {
         super(parent, modal);
         model = new SpinnerNumberModel(current, min, max, 1);
         setTitle(title);
@@ -77,23 +79,23 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
         df.setCommitsOnValidEdit(true);
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PopupValueChoiceDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
 
-        btnDone.setText(resourceMap.getString("btnDone.text")); // NOI18N
-        btnDone.setName("btnDone"); // NOI18N
+        btnDone.setText(resourceMap.getString("btnDone.text"));
+        btnDone.setName("btnDone");
         btnDone.addActionListener(this::btnDoneActionPerformed);
 
-        btnCancel.setText(resourceMap.getString("btnCancel.text")); // NOI18N
-        btnCancel.setName("btnCancel"); // NOI18N
+        btnCancel.setText(resourceMap.getString("btnCancel.text"));
+        btnCancel.setName("btnCancel");
         btnCancel.addActionListener(this::btnCancelActionPerformed);
 
         pnlButton.setLayout(new GridLayout(0,2));
         pnlButton.add(btnDone);
         pnlButton.add(btnCancel);
 
-        value.setName("value"); // NOI18N
+        value.setName("value");
 
         getContentPane().setLayout(new BorderLayout());
 
@@ -115,11 +117,11 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     * @param args the command line arguments
     */
     public static void main(String[] args) {
-        java.awt.EventQueue.invokeLater(() -> {
+        EventQueue.invokeLater(() -> {
             PopupValueChoiceDialog dialog = new PopupValueChoiceDialog(new JFrame(), true, "Label", 0, 0, 1);
-            dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            dialog.addWindowListener(new WindowAdapter() {
                 @Override
-                public void windowClosing(WindowEvent e) {
+                public void windowClosing(WindowEvent evt) {
                     System.exit(0);
                 }
             });
@@ -132,34 +134,40 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     }
 
     @Override
-    public void windowActivated(WindowEvent arg0) {
+    public void windowActivated(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowClosed(WindowEvent arg0) {
+    public void windowClosed(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowClosing(WindowEvent arg0) {
-        if (arg0.getComponent() != this.btnDone) {
+    public void windowClosing(WindowEvent evt) {
+        if (evt.getComponent() != this.btnDone) {
             value.getModel().setValue(-1);
             this.setVisible(false);
         }
     }
 
     @Override
-    public void windowDeactivated(WindowEvent arg0) {
+    public void windowDeactivated(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowDeiconified(WindowEvent arg0) {
+    public void windowDeiconified(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowIconified(WindowEvent arg0) {
+    public void windowIconified(WindowEvent evt) {
+
     }
 
     @Override
-    public void windowOpened(WindowEvent arg0) {
+    public void windowOpened(WindowEvent evt) {
+
     }
 }

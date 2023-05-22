@@ -20,13 +20,15 @@
  */
 package mekhq.campaign.mission;
 
-import mekhq.MekHqXmlUtil;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.enums.ContractCommandRights;
+import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -43,7 +45,6 @@ import java.time.temporal.ChronoUnit;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Contract extends Mission {
-
     public final static int OH_NONE = 0;
     public final static int OH_HALF = 1;
     public final static int OH_FULL = 2;
@@ -331,7 +332,7 @@ public class Contract extends Mission {
         return baseAmount;
     }
 
-    protected void setBaseAmount(Money amount) {
+    public void setBaseAmount(Money amount) {
         baseAmount = amount;
     }
 
@@ -378,7 +379,7 @@ public class Contract extends Mission {
     @Override
     public void setSystemId(String n) {
         super.setSystemId(n);
-        cachedJumpPath = null;
+        setCachedJumpPath(null);
     }
 
     @Override
@@ -391,21 +392,24 @@ public class Contract extends Mission {
      * Gets the currently calculated jump path for this contract,
      * only recalculating if it's not valid any longer or hasn't been calculated yet.
      */
-    public JumpPath getJumpPath(Campaign c) {
+    public @Nullable JumpPath getJumpPath(Campaign c) {
         // if we don't have a cached jump path, or if the jump path's starting/ending point
         // no longer match the campaign's current location or contract's destination
-        if ((cachedJumpPath == null) ||
-                (cachedJumpPath.size() == 0) ||
-                !cachedJumpPath.getFirstSystem().equals(c.getCurrentSystem()) ||
-                !cachedJumpPath.getLastSystem().equals(getSystem())) {
-            cachedJumpPath = c.calculateJumpPath(c.getCurrentSystem(), getSystem());
+        if ((getCachedJumpPath() == null) || getCachedJumpPath().isEmpty()
+                || !getCachedJumpPath().getFirstSystem().equals(c.getCurrentSystem())
+                || !getCachedJumpPath().getLastSystem().equals(getSystem())) {
+            setCachedJumpPath(c.calculateJumpPath(c.getCurrentSystem(), getSystem()));
         }
 
+        return getCachedJumpPath();
+    }
+
+    public @Nullable JumpPath getCachedJumpPath() {
         return cachedJumpPath;
     }
 
-    public void setJumpPath(JumpPath path) {
-        cachedJumpPath = path;
+    public void setCachedJumpPath(final @Nullable JumpPath cachedJumpPath) {
+        this.cachedJumpPath = cachedJumpPath;
     }
 
     public Money getMonthlyPayOut() {
@@ -470,7 +474,7 @@ public class Contract extends Mission {
      */
     public Money getEstimatedPayrollExpenses(Campaign c) {
         Accountant accountant = c.getAccountant();
-        if (c.getCampaignOptions().usePeacetimeCost()) {
+        if (c.getCampaignOptions().isUsePeacetimeCost()) {
             return accountant.getPeacetimeCost();
         } else {
             return accountant.getPayRoll();
@@ -490,10 +494,10 @@ public class Contract extends Mission {
      * @return the total (2-way) estimated transportation fee from the player's current location to this contract's planet
      */
     public Money getTotalTransportationFees(Campaign c) {
-        if ((null != getSystem()) && c.getCampaignOptions().payForTransport()) {
+        if ((null != getSystem()) && c.getCampaignOptions().isPayForTransport()) {
             JumpPath jumpPath = getJumpPath(c);
 
-            boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
+            boolean campaignOps = c.getCampaignOptions().isEquipmentContractBase();
 
             return c.calculateCostPerJump(campaignOps, campaignOps).multipliedBy(jumpPath.getJumps()).multipliedBy(2);
         }
@@ -552,7 +556,7 @@ public class Contract extends Mission {
                 .multipliedBy(getLength())
                 .multipliedBy(paymentMultiplier);
 
-        //calculate overhead
+        // calculate overhead
         switch (overheadComp) {
             case OH_HALF:
                 overheadAmount = accountant.getOverheadExpenses()
@@ -566,74 +570,74 @@ public class Contract extends Mission {
                 overheadAmount = Money.zero();
         }
 
-        //calculate support amount
-        if (c.getCampaignOptions().usePeacetimeCost()
-                && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
+        // calculate support amount
+        if (c.getCampaignOptions().isUsePeacetimeCost()
+                && c.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
             supportAmount = accountant.getPeacetimeCost()
-                                .multipliedBy(getLength())
-                                .multipliedBy(straightSupport)
-                                .dividedBy(100);
+                    .multipliedBy(getLength())
+                    .multipliedBy(straightSupport)
+                    .dividedBy(100);
         } else {
             Money maintCosts = c.getHangar().getUnitCosts(u -> !u.isConventionalInfantry(),
                     Unit::getWeeklyMaintenanceCost);
             maintCosts = maintCosts.multipliedBy(4);
             supportAmount = maintCosts
-                                .multipliedBy(getLength())
-                                .multipliedBy(straightSupport)
-                                .dividedBy(100);
+                    .multipliedBy(getLength())
+                    .multipliedBy(straightSupport)
+                    .dividedBy(100);
         }
 
-        //calculate transportation costs
-        if (null != getSystem()) {
+        // calculate transportation costs
+        if (null != getSystem() && c.getCampaignOptions().isPayForTransport()) {
             JumpPath jumpPath = getJumpPath(c);
 
-            // FM:Mercs transport payments take into account owned transports and do not use CampaignOps dropship costs.
-            // CampaignOps doesn't care about owned transports and does use its own dropship costs.
-            boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
+            // FM:Mercs transport payments take into account owned transports and do not use CampaignOps DropShip costs.
+            // CampaignOps doesn't care about owned transports and does use its own DropShip costs.
+            boolean campaignOps = c.getCampaignOptions().isEquipmentContractBase();
             transportAmount = c.calculateCostPerJump(campaignOps, campaignOps)
-                                    .multipliedBy(jumpPath.getJumps())
-                                    .multipliedBy(2)
-                                    .multipliedBy(transportComp)
-                                    .dividedBy(100);
+                    .multipliedBy(jumpPath.getJumps())
+                    .multipliedBy(2)
+                    .multipliedBy(transportComp)
+                    .dividedBy(100);
         } else {
             transportAmount = Money.zero();
         }
 
-        //calculate transit amount for CO
-        if (c.getCampaignOptions().usePeacetimeCost()
-                && c.getCampaignOptions().getUnitRatingMethod().equals(mekhq.campaign.rating.UnitRatingMethod.CAMPAIGN_OPS)) {
-            //contract base * transport period * reputation * employer modifier
+        // calculate transit amount for CO
+        if (c.getCampaignOptions().isUsePeacetimeCost()
+                && c.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
+            // contract base * transport period * reputation * employer modifier
             transitAmount = accountant.getContractBase()
-                                    .multipliedBy(((getJumpPath(c).getJumps()) * 2.0) / 4.0)
-                                    .multipliedBy(c.getUnitRatingMod() * 0.2 + 0.5)
-                                    .multipliedBy(1.2);
+                    .multipliedBy(((getJumpPath(c).getJumps()) * 2.0) / 4.0)
+                    .multipliedBy(c.getUnitRatingMod() * 0.2 + 0.5)
+                    .multipliedBy(1.2);
         } else {
             transitAmount = Money.zero();
         }
 
         signingAmount = baseAmount
-                            .plus(overheadAmount)
-                            .plus(transportAmount)
-                            .plus(transitAmount)
-                            .plus(supportAmount)
-                            .multipliedBy(signBonus)
-                            .dividedBy(100);
+                .plus(overheadAmount)
+                .plus(transportAmount)
+                .plus(transitAmount)
+                .plus(supportAmount)
+                .multipliedBy(signBonus)
+                .dividedBy(100);
 
         if (mrbcFee) {
             feeAmount = baseAmount
-                            .plus(overheadAmount)
-                            .plus(transportAmount)
-                            .plus(transitAmount)
-                            .plus(supportAmount)
-                            .multipliedBy(getMrbcFeePercentage())
-                            .dividedBy(100);
+                    .plus(overheadAmount)
+                    .plus(transportAmount)
+                    .plus(transitAmount)
+                    .plus(supportAmount)
+                    .multipliedBy(getMrbcFeePercentage())
+                    .dividedBy(100);
         } else {
             feeAmount = Money.zero();
         }
 
         advanceAmount = getTotalAmountPlusFees()
-                            .multipliedBy(advancePct)
-                            .dividedBy(100);
+                .multipliedBy(advancePct)
+                .dividedBy(100);
 
         // only adjust the start date for travel if the start date is currently null
         boolean adjustStartDate = false;
@@ -653,33 +657,34 @@ public class Contract extends Mission {
     }
 
     @Override
-    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
-        super.writeToXMLBegin(pw, indent++);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "nMonths", nMonths);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "startDate", startDate);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "endDate", endDate);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "employer", employer);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "paymentMultiplier", paymentMultiplier);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "commandRights", getCommandRights().name());
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overheadComp", overheadComp);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvagePct", salvagePct);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvageExchange", salvageExchange);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "straightSupport", straightSupport);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "battleLossComp", battleLossComp);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportComp", transportComp);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "mrbcFee", mrbcFee);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "advancePct", advancePct);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "signBonus", signBonus);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "advanceAmount", advanceAmount);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "signingAmount", signingAmount);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transportAmount", transportAmount);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "transitAmount", transitAmount);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "overheadAmount", overheadAmount);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "supportAmount", supportAmount);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "baseAmount", baseAmount);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "feeAmount", feeAmount);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvagedByUnit", salvagedByUnit);
-        MekHqXmlUtil.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", salvagedByEmployer);
+    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
+        indent = super.writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nMonths", nMonths);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startDate", startDate);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "endDate", endDate);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employer", employer);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "paymentMultiplier", paymentMultiplier);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "commandRights", getCommandRights().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadComp", overheadComp);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagePct", salvagePct);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvageExchange", salvageExchange);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "straightSupport", straightSupport);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleLossComp", battleLossComp);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportComp", transportComp);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mrbcFee", mrbcFee);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advancePct", advancePct);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signBonus", signBonus);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "advanceAmount", advanceAmount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "signingAmount", signingAmount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transportAmount", transportAmount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitAmount", transitAmount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overheadAmount", overheadAmount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "supportAmount", supportAmount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseAmount", baseAmount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "feeAmount", feeAmount);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByUnit", salvagedByUnit);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", salvagedByEmployer);
+        return indent;
     }
 
     @Override
@@ -694,9 +699,9 @@ public class Contract extends Mission {
                 if (wn2.getNodeName().equalsIgnoreCase("employer")) {
                     employer = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("startDate")) {
-                    startDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    startDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("endDate")) {
-                    endDate = MekHqXmlUtil.parseDate(wn2.getTextContent().trim());
+                    endDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nMonths")) {
                     nMonths = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("paymentMultiplier")) {
@@ -742,8 +747,8 @@ public class Contract extends Mission {
                 } else if (wn2.getNodeName().equalsIgnoreCase("salvagedByEmployer")) {
                     salvagedByEmployer = Money.fromXmlString(wn2.getTextContent().trim());
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
     }

@@ -18,14 +18,6 @@
  */
 package mekhq.gui.adapter;
 
-import java.util.Optional;
-
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-
 import mekhq.MekHQ;
 import mekhq.campaign.event.ScenarioChangedEvent;
 import mekhq.campaign.mission.Mission;
@@ -33,6 +25,9 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
 import mekhq.gui.model.ScenarioTableModel;
+
+import javax.swing.*;
+import java.util.Optional;
 
 public class ScenarioTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations

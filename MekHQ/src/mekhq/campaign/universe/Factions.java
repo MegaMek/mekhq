@@ -21,7 +21,7 @@ package mekhq.campaign.universe;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.annotations.Nullable;
-import mekhq.MekHqXmlUtil;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
@@ -64,6 +64,10 @@ public class Factions {
         Factions.instance = instance;
     }
 
+    public Faction getDefaultFaction() {
+        return getFaction("MERC");
+    }
+
     public RATGenerator getRATGenerator() {
         return ratGenerator;
     }
@@ -93,15 +97,11 @@ public class Factions {
         }
     }
 
-    public Faction getFactionFromFullNameAndYear(String fname, int year) {
-        Faction faction = null;
-        for (Faction f : factions.values()) {
-            if (f.getFullName(year).equals(fname)) {
-                faction = f;
-                break;
-            }
-        }
-        return faction;
+    public Faction getFactionFromFullNameAndYear(final String factionName, final int year) {
+        return factions.values().stream()
+                .filter(faction -> faction.getFullName(year).equals(factionName))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -170,7 +170,7 @@ public class Factions {
 
         try (FileInputStream fis = new FileInputStream(factionsPath)) {
             // Using factory get an instance of document builder
-            DocumentBuilder db = MekHqXmlUtil.newSafeDocumentBuilder();
+            DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
 
             // Parse using builder to get DOM representation of the XML file
             xmlDoc = db.parse(fis);
