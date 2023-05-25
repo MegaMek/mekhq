@@ -429,18 +429,6 @@ windowsDistZip {
     dependsOn createMMLExe
 }
 
-windowsDistTar {
-    description = 'Creates Windows distribution packaged as a tar archive'
-    dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn stageMML
-    dependsOn createExe
-    dependsOn createMMExe
-    dependsOn createMMLExe
-    archiveExtension = 'tar.gz'
-    compression = Compression.GZIP
-}
-
 unixDistTar {
     description = 'Creates *nix distribution packaged as a tar ball'
     dependsOn stageFiles
@@ -449,33 +437,6 @@ unixDistTar {
     dependsOn startScripts
     archiveExtension = 'tar.gz'
     compression = Compression.GZIP
-}
-
-unixDistZip {
-    description = 'Creates *nix distribution packaged as a zip archive'
-    dependsOn createStartScripts
-    dependsOn startScripts
-    dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn stageMML
-}
-
-distTar {
-    description = 'Creates generic distribution packaged as a tar'
-    dependsOn createStartScripts
-    dependsOn startScripts
-    dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn stageMML
-}
-
-distZip {
-    description = 'Creates generic distribution packaged as a zip'
-    dependsOn createStartScripts
-    dependsOn startScripts
-    dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn stageMML
 }
 
 // The repository can only be cloned into an empty directory so we need to delete anything left over
