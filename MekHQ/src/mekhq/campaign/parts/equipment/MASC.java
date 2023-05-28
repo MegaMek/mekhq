@@ -70,7 +70,7 @@ public class MASC extends EquipmentPart {
             return 0;
         }
         //supercharger tonnage will need to be set by hand in parts store
-        if (TechConstants.isClan(type.getTechLevel(campaign.getGameYear()))) {
+        if (isClan()) {//TechConstants.isClan(type.getTechLevel(campaign.getGameYear()))) {
             return Math.round(getUnitTonnage() / 25.0f);
         }
         return Math.round(getUnitTonnage() / 20.0f);
