@@ -611,8 +611,10 @@ public class Campaign implements ITechManager {
             // TODO : mos zero should make ship available on retainer
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
-                MechSummary ms = unitGenerator.generate(getFactionCode(), shipSearchType, -1,
+                
+                MechSummary ms = getUnitGenerator().generate(getFactionCode(), shipSearchType, -1,
                         getGameYear(), getUnitRatingMod());
+                
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
