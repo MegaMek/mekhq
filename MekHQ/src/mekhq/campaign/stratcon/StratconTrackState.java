@@ -504,4 +504,14 @@ public class StratconTrackState {
     public String getTerrainTile(StratconCoords coords) {
         return terrainTypes.getOrDefault(coords, "");
     }
+
+    @XmlElementWrapper(name = "terrainTypes")
+    @XmlElement(name = "terrainType")
+    public Map<StratconCoords, String> getTerrainTypes() {
+        return terrainTypes;
+    }
+
+    public void setStrategicObjectives(Map<StratconCoords, String> terrainTypes) {
+        this.terrainTypes = terrainTypes;
+    }
 }

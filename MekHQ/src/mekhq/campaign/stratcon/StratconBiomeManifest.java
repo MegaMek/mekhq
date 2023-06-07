@@ -31,7 +31,7 @@ public class StratconBiomeManifest {
     /**
      * Gets the singleton biome manifest instance
      */
-    public static StratconBiomeManifest GetInstance() {
+    public static StratconBiomeManifest getInstance() {
         if (instance == null) {
             instance = load();
         }

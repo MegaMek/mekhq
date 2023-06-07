@@ -38,6 +38,7 @@ import java.util.List;
  */
 public class StratconContractInitializer {
     public static final int NUM_LANCES_PER_TRACK = 3;
+    public static final int ZERO_CELSIUS_IN_KELVIN = 273;
 
     /**
      * Initializes the campaign state given a contract, campaign and contract definition
@@ -209,7 +210,7 @@ public class StratconContractInitializer {
 
         // figure out track "average" temperature
         int tempVariation = Compute.randomInt(70) - 35;
-        retVal.setTemperature(planetaryTemp + tempVariation);
+        retVal.setTemperature(planetaryTemp + tempVariation + ZERO_CELSIUS_IN_KELVIN);
 
         // place terrain based on temperature
         StratconTerrainPlacer.InitializeTrackTerrain(retVal);

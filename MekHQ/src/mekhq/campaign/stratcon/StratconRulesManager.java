@@ -159,6 +159,7 @@ public class StratconRulesManager {
         // if not auto-assigning lances, we then back out the lance assignments.
         for (StratconScenario scenario : generatedScenarios) {
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
+            setScenarioParametersFromBiome(track, scenario);
             swapInPlayerUnits(scenario, campaign, Force.FORCE_NONE);
 
             if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
@@ -177,6 +178,31 @@ public class StratconRulesManager {
             }
         }
     }
+
+    /**
+     * Picks the scenario terrain based on the scenario coordinates' biome
+     */
+    private static void setScenarioParametersFromBiome(StratconTrackState track, StratconScenario scenario) {
+        StratconCoords coords = scenario.getCoords();
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
+        if (backingScenario.isUsingFixedMap()) {
+            return; // for now
+        }
+
+        String terrainType = track.getTerrainTile(coords);
+        var mapTypes = StratconBiomeManifest.getInstance().biomeMapTypes;
+
+        // don't have a map list for the given terrain, leave it alone
+        if(!mapTypes.containsKey(terrainType)) {
+            return;
+        }
+
+        var mapTypeList = mapTypes.get(terrainType).mapTypes;
+        backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+        backingScenario.setTemperature(track.getTemperature());
+    }
+
 
     /**
      * Worker function that looks through the scenario's templates and swaps in
@@ -293,6 +319,7 @@ public class StratconRulesManager {
         if (revealedScenario != null) {
             revealedScenario.addPrimaryForce(forceID);
             AtBDynamicScenarioFactory.finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
+            setScenarioParametersFromBiome(track, revealedScenario);
             commitPrimaryForces(campaign, revealedScenario, track);
             return;
         }
@@ -308,6 +335,7 @@ public class StratconRulesManager {
             // we deploy immediately in this case, since we deployed the force manually
             setScenarioDates(0, track, campaign, scenario);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
+            setScenarioParametersFromBiome(track, scenario);
 
             // if we wound up with a field scenario, we may sub in dropships carrying
             // units of the force in question
@@ -1304,7 +1332,7 @@ public class StratconRulesManager {
 
         int dataCenterModifier = track.getScenarioOddsAdjustment();
 
-        return track.getScenarioOdds() + moraleModifier + dataCenterModifier;
+        return 100;//track.getScenarioOdds() + moraleModifier + dataCenterModifier;
     }
 
     /**

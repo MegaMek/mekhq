@@ -82,6 +82,38 @@
     </biomes>
     <biomeMapTypes>
         <entry>
+            <key>Glacier</key>
+            <value>
+                <mapTypes>Icefield</mapTypes>
+                <mapTypes>IceRiver</mapTypes>
+                <mapTypes>IceOutpost</mapTypes>
+                <mapTypes>IceJagged</mapTypes>
+                <mapTypes>IceHills</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>Forest</key>
+            <value>
+                <mapTypes>Some-trees</mapTypes>
+                <mapTypes>Wooded-lake</mapTypes>
+                <mapTypes>Woods-medium</mapTypes>
+                <mapTypes>Wooded-hills</mapTypes>
+                <mapTypes>Woods-deep</mapTypes>
+                <mapTypes>Wooded-valley</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>Mountain</key>
+            <value>
+                <mapTypes>Mountain-lake</mapTypes>
+                <mapTypes>Cliffs-lake</mapTypes>
+                <mapTypes>Rubble-mountain</mapTypes>
+                <mapTypes>Cliffs</mapTypes>
+                <mapTypes>Mountain-medium</mapTypes>
+                <mapTypes>Mountain-high</mapTypes>
+            </value>
+        </entry>
+	<entry>
             <key>SnowField</key>
             <value>
                 <mapTypes>Snowfield</mapTypes>
@@ -92,13 +124,14 @@
             </value>
         </entry>
 	<entry>
-            <key>Glacier</key>
+            <key>Swamp</key>
             <value>
-                <mapTypes>Icefield</mapTypes>
-                <mapTypes>IceRiver</mapTypes>
-                <mapTypes>IceOutpost</mapTypes>
-                <mapTypes>IceJagged</mapTypes>
-                <mapTypes>IceHills</mapTypes>
+                <mapTypes>Muddy-swamp</mapTypes>
+                <mapTypes>Lake-marsh</mapTypes>
+                <mapTypes>Lake-high</mapTypes>
+                <mapTypes>Wooded-lake</mapTypes>
+                <mapTypes>Swamp</mapTypes>
+                <mapTypes>Wooded-swamp</mapTypes>
             </value>
         </entry>
     </biomeMapTypes>
