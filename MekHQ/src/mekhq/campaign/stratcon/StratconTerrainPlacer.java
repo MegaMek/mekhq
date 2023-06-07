@@ -34,21 +34,28 @@ public class StratconTerrainPlacer {
         // 3. "stripe" the other biomes:
         //      striping is "starting coordinate" (random track coord) and "ending coordinate"
         //      TODO: Maybe more than one of each biome?
-        int kelvinTemp = track.getTemperature() - StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-        StratconBiome biome = StratconBiomeManifest.getInstance().biomeMap.ceilingEntry(kelvinTemp).getValue();
+        //      TODO: Map category being displayed for some reason
+        int kelvinTemp = track.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+        try {
+            StratconBiome biome = StratconBiomeManifest.getInstance().biomeMap.floorEntry(kelvinTemp).getValue();
 
-        int baseTerrainIndex = Compute.randomInt(biome.allowedTerrainTypes.size());
+            int baseTerrainIndex = Compute.randomInt(biome.allowedTerrainTypes.size());
 
-        for (int x = 0; x < track.getWidth(); x++) {
-            for (int y = 0; y < track.getHeight(); y++) {
-                track.setTerrainTile(new StratconCoords(x, y), biome.allowedTerrainTypes.get(baseTerrainIndex));
+            for (int x = 0; x < track.getWidth(); x++) {
+                for (int y = 0; y < track.getHeight(); y++) {
+                    track.setTerrainTile(new StratconCoords(x, y), biome.allowedTerrainTypes.get(baseTerrainIndex));
+                }
+            }
+
+            for (int x = 0; x < biome.allowedTerrainTypes.size(); x++) {
+                if (x != baseTerrainIndex) {
+                    DrawStripe(track, biome.allowedTerrainTypes.get(x));
+                }
             }
         }
-
-        for(int x = 0; x < biome.allowedTerrainTypes.size(); x++) {
-            if (x != baseTerrainIndex) {
-                DrawStripe(track, biome.allowedTerrainTypes.get(x));
-            }
+        catch(Exception e) {
+            int alpha = 1;
+            throw e;
         }
     }
 

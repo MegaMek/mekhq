@@ -210,7 +210,7 @@ public class StratconContractInitializer {
 
         // figure out track "average" temperature
         int tempVariation = Compute.randomInt(70) - 35;
-        retVal.setTemperature(planetaryTemp + tempVariation + ZERO_CELSIUS_IN_KELVIN);
+        retVal.setTemperature(planetaryTemp + tempVariation);
 
         // place terrain based on temperature
         StratconTerrainPlacer.InitializeTrackTerrain(retVal);

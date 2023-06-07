@@ -124,6 +124,12 @@ public class StratconPanel extends JPanel implements ActionListener {
     public void selectTrack(StratconCampaignState campaignState, StratconTrackState track) {
         this.campaignState = campaignState;
         currentTrack = track;
+
+        // clear hex selection
+        boardState.selectedX = null;
+        boardState.selectedY = null;
+        infoArea.setText(buildSelectedHexInfo());
+
         repaint();
     }
 
