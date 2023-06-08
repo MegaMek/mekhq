@@ -298,10 +298,7 @@ public class MekLabTab extends CampaignGuiTab {
         testEntity.correctEntity(sb);
 
         int walk = entity.getOriginalWalkMP();
-        int run = entity.getRunMP();
-        if (entity instanceof Mech) {
-            run = ((Mech) entity).getOriginalRunMPwithoutMASC();
-        }
+        int run = entity.getRunMP(MPCalculationSetting.NO_MASC);
         int jump = entity.getOriginalJumpMP();
         int heat = entity.getHeatCapacity();
 

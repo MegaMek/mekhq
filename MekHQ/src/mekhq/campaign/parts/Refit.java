@@ -546,39 +546,28 @@ public class Refit extends Part implements IAcquisitionWork {
             }
 
             /*CHECK REFIT CLASS*/
+            // See Campaign Operations, page 211 as of third printing
             if (nPart instanceof MissingEnginePart) {
-                if (oldUnit.getEntity().getEngine().getRating() != newUnit.getEntity().getEngine().getRating()) {
-                    updateRefitClass(CLASS_D);
-                }
-                if (newUnit.getEntity().getEngine().getEngineType() != oldUnit.getEntity().getEngine().getEngineType()) {
-                    updateRefitClass(CLASS_F);
+                if (oldUnit.getEntity().getEngine().getRating() != newUnit.getEntity().getEngine().getRating() || newUnit.getEntity().getEngine().getEngineType() != oldUnit.getEntity().getEngine().getEngineType()) {
+                    updateRefitClass(customJob ? CLASS_E : CLASS_D);
                 }
                 if (((MissingEnginePart) nPart).getEngine().getSideTorsoCriticalSlots().length > 0) {
                     locationHasNewStuff[Mech.LOC_LT] = true;
                     locationHasNewStuff[Mech.LOC_RT] = true;
                 }
             } else if (nPart instanceof MissingMekGyro) {
-                updateRefitClass(CLASS_F);
+                updateRefitClass(CLASS_D);
             } else if (nPart instanceof MissingMekLocation) {
                 replacingLocations = true;
-                if (((Mech) newUnit.getEntity()).hasTSM(true) != ((Mech) oldUnit.getEntity()).hasTSM(true)) {
-                    updateRefitClass(CLASS_E);
-                } else {
-                    updateRefitClass(CLASS_F);
-                }
+
+                // If a location is being replaced, the internal structure or myomer must have been changed.
+                updateRefitClass(CLASS_F);
             } else if (nPart instanceof Armor) {
-                updateRefitClass(CLASS_C);
+                updateRefitClass(CLASS_A);
                 locationHasNewStuff[nPart.getLocation()] = true;
             } else if (nPart instanceof MissingMekCockpit) {
-                updateRefitClass(CLASS_F);
+                updateRefitClass(CLASS_E);
                 locationHasNewStuff[Mech.LOC_HEAD] = true;
-            }else if (nPart instanceof MissingMekActuator) {
-                if (isOmniRefit && nPart.isOmniPoddable()) {
-                    updateRefitClass(CLASS_OMNI);
-                } else {
-                    updateRefitClass(CLASS_D);
-                }
-                locationHasNewStuff[nPart.getLocation()] = true;
             } else if (nPart instanceof MissingInfantryMotiveType || nPart instanceof MissingInfantryArmorPart) {
                 updateRefitClass(CLASS_A);
             } else {
@@ -896,16 +885,16 @@ public class Refit extends Part implements IAcquisitionWork {
 
         //check for CASE
         //TODO: we still dont have to order the part, we need to get the CASE issues sorted out
-        for (int loc = 0; loc < newEntity.locations(); loc++) {
-            if ((newEntity.locationHasCase(loc) != oldUnit.getEntity().locationHasCase(loc)
-                    && !(newEntity.isClan() && newEntity instanceof Mech))
-                    || (newEntity instanceof Mech
-                            && ((Mech) newEntity).hasCASEII(loc) != ((Mech) oldUnit.getEntity()).hasCASEII(loc))) {
-                if (isOmniRefit) {
-                    updateRefitClass(CLASS_OMNI);
-                } else {
-                    time += 60;
-                    updateRefitClass(CLASS_E);
+        if (!oldUnit.getEntity().isClan()) { // Clan units always have CASE or CASE II everywhere
+            for (int loc = 0; loc < newEntity.locations(); loc++) {
+                // If the old location has neither kind of CASE and the new location has either, update the refit class
+                if (!(oldUnit.getEntity().locationHasCase(loc) || (oldUnit.getEntity() instanceof Mech && ((Mech) oldUnit.getEntity()).hasCASEII(loc))) && (newEntity.locationHasCase(loc) || (newEntity instanceof Mech && ((Mech) newEntity).hasCASEII(loc)))) {
+                    if (isOmniRefit) {
+                        updateRefitClass(CLASS_OMNI);
+                    } else {
+                        time += 60;
+                        updateRefitClass(CLASS_D);
+                    }
                 }
             }
         }

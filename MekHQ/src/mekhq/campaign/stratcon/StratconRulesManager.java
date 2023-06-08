@@ -799,7 +799,7 @@ public class StratconRulesManager {
 
             if (scenarioAtFacility) {
                 modifierIDs = facility.getLocalModifiers();
-            } else if (facility.isVisible() || (Compute.randomInt(100) <= facility.getAggroRating())) {
+            } else if (facility.isVisible() || (Compute.randomInt(100) <= 75)) {
                 modifierIDs = facility.getSharedModifiers();
             }
 

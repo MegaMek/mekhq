@@ -164,6 +164,10 @@ public class AtBDynamicScenarioFactory {
      * @param campaign Current campaign.
      */
     public static void finalizeScenario(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign) {
+        // if scenario already had bots, then we need to reset the briefing to remove text related to old scenario modifiers
+        if (scenario.getNumBots() > 0) {
+            scenario.setDesc(String.format("%s", scenario.getTemplate().detailedBriefing));
+        }
         // just in case, clear old bot forces.
         for (int x = scenario.getNumBots() - 1; x >= 0; x--) {
             scenario.removeBotForce(x);
