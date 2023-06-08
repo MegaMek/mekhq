@@ -100,6 +100,21 @@
                 <mapTypes>Wooded-hills</mapTypes>
                 <mapTypes>Woods-deep</mapTypes>
                 <mapTypes>Wooded-valley</mapTypes>
+                <mapTypes>Woods-river</mapTypes>
+                <mapTypes>Wooded-swamp</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>Hills</key>
+            <value>
+                <mapTypes>Hills</mapTypes>
+                <mapTypes>Hills-craters</mapTypes>
+                <mapTypes>Hills-pastoral</mapTypes>
+                <mapTypes>Hills-Residential</mapTypes>
+                <mapTypes>Hills-Residential2</mapTypes>
+                <mapTypes>Hills-River</mapTypes>
+                <mapTypes>Hills-RiverRoad</mapTypes>
+                <mapTypes>Light-craters</mapTypes>
             </value>
         </entry>
 	<entry>
@@ -111,6 +126,36 @@
                 <mapTypes>Cliffs</mapTypes>
                 <mapTypes>Mountain-medium</mapTypes>
                 <mapTypes>Mountain-high</mapTypes>
+                <mapTypes>Mountain-river</mapTypes>
+                <mapTypes>Mountain-RuinedTrenches</mapTypes>
+                <mapTypes>Mountain-TouristTown</mapTypes>
+                <mapTypes>Mountain-town</mapTypes>
+                <mapTypes>Heavy-craters</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>Plains</key>
+            <value>
+                <mapTypes>PlainsLake</mapTypes>
+                <mapTypes>PlainsOutpost</mapTypes>
+                <mapTypes>PlainsTown</mapTypes>
+                <mapTypes>Savannah</mapTypes>
+                <mapTypes>Town-ruin</mapTypes>
+                <mapTypes>Town-farming</mapTypes>
+                <mapTypes>Dust-bowl</mapTypes>
+		<mapTypes>River-huge</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>Sea</key>
+            <value>
+                <mapTypes>Sea-CoastalFort</mapTypes>
+                <mapTypes>Sea-CoastalRoads</mapTypes>
+                <mapTypes>Sea-Deltas</mapTypes>
+                <mapTypes>Sea-Fjord</mapTypes>
+                <mapTypes>Sea-MangroveCliffs</mapTypes>
+                <mapTypes>Sea-SaltwaterMarsh</mapTypes>
+                <mapTypes>Seaport</mapTypes>
             </value>
         </entry>
 	<entry>
@@ -124,6 +169,14 @@
             </value>
         </entry>
 	<entry>
+            <key>Steppe</key>
+            <value>
+                <mapTypes>SteppeGrass</mapTypes>
+                <mapTypes>SteppeSnow</mapTypes>
+                <mapTypes>SteppeOutpost</mapTypes>
+            </value>
+        </entry>
+	<entry>
             <key>Swamp</key>
             <value>
                 <mapTypes>Muddy-swamp</mapTypes>
@@ -132,6 +185,17 @@
                 <mapTypes>Wooded-lake</mapTypes>
                 <mapTypes>Swamp</mapTypes>
                 <mapTypes>Wooded-swamp</mapTypes>
+                <mapTypes>River-wetlands</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>Tundra</key>
+            <value>
+                <mapTypes>TundraRiverGrass</mapTypes>
+                <mapTypes>TundraRiverSnow</mapTypes>
+                <mapTypes>TundraRoad</mapTypes>
+                <mapTypes>TundraRoadSnow</mapTypes>
+                <mapTypes>TundraTownSnow</mapTypes>
             </value>
         </entry>
     </biomeMapTypes>
