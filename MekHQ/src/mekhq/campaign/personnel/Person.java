@@ -629,7 +629,7 @@ public class Person {
     public void migrateName(final String text) {
         // How this works:
         // Takes the input name, and splits it into individual parts.
-        // Then, it depends on whether the person is a Clanner or not.
+        // Then, it depends on whether the person is Clan or not.
         // For Clan names:
         // Takes the input name, and assumes that person does not have a surname
         // Bloodnames are assumed to have been assigned by MekHQ

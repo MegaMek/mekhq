@@ -17,7 +17,7 @@ FUTURE AMMENDMENTS (game developers)
 
 GENERAL RULES
 Clan units play by clan honor rules.  
-Once a clan unit picks an opponent, no other clan units may attack that unit. If the clan units are outnumbered, they may choose to take on more than one opponent at a time.  If there are more clanners then Strikers, the extra clanners will sit back and wait for the engaged clanners to die, unless fired upon.
+Once a clan unit picks an opponent, no other clan units may attack that unit. If the clan units are outnumbered, they may choose to take on more than one opponent at a time.  If there are more Clan Mekwarriors then Strikers, the extra Clan Mekwarriors will sit back and wait for the engaged Clan Mekwarriors to die, unless fired upon.
 Clan units must not initiate physical attacks.
 Clan units do not retreat to Inner Sphere units unless otherwise stated in the scenario.
 
@@ -61,7 +61,7 @@ SPECIAL RULES
 Recommend playing this scenario with Double-Blind option set to true (unless using bot as a player).
 Units may only exit the mapsheets off the north and south edges. The Pavement hexes on the South end the South map are non-play areas.   If a mech moves into one of these hexes (intentionally or unintentionally), it is considered out of play & should eject.  Do not place any mech on the Level 10 canyon walls.
 Clan mechs cannot retreat until they have line of sight with a Striker mech. They can only retreat off the north edge of the map.
-The scenario starts off with the two clan mechs finishing off a fallen Centurion. The clanners must not move north nor face any of the northern hexsides until a LOS is established with the Strikers.
+The scenario starts off with the two clan mechs finishing off a fallen Centurion. The Clan Mekwarriors must not move north nor face any of the northern hexsides until a LOS is established with the Strikers.
 The Banshee strafes the clan mechs just before the beginning of Turn 1.  The Strikes player should choose one of the clan mechs and attack it with both medium lasers, hitting on a 7 or better.  As the battle progresses, the fighter may turn around and strafe the battlefield up to three more times, during the Weapon Attack Phases of Turns 2, 4, and 6.  Resolve hit location for all these strafing attacks as if they originated from directly south of the target.
 
 MEGAMEK ADJUSTMENTS
@@ -222,7 +222,7 @@ The defenders win a decisive victory if all three 'Mechs escape off the south ed
 
 SPECIAL RULES
 Kristen Redmond says she alone will deal with all three Strikers.  No other mech may fire its weapons or move closer to the defenders than Kristen.  This restriction is lifted if Kristen's Mad Dog is destroyed or disabled.  The Mad Dog is considered disabled if all of its weapons, both arms, or one or both legs are destroyed; if it shuts down due to overheating; or if Kristen fails a Consciousness roll.
-Valten Ryder has decided to hold off the Clanners while the others get to the Kwaidan.  He may not begin to move south until the other two Striker mechs are at least halfway to the edge (Hexrow XX27 or farther).  Kristen will only fire at the Centurion while Val maintains a defensive posture.  Kristen may fire at any of the Strikers once Val begins to retreat.
+Valten Ryder has decided to hold off the Clan Mekwarriors while the others get to the Kwaidan.  He may not begin to move south until the other two Striker mechs are at least halfway to the edge (Hexrow XX27 or farther).  Kristen will only fire at the Centurion while Val maintains a defensive posture.  Kristen may fire at any of the Strikers once Val begins to retreat.
 
 MEGAMEK ADJUSTMENTS
 The map setup called for in the scenario is currently impossible to setup in MegaMek.  To compensate, all directions are shifted 90 degrees clockwise (West is now North, East is now South).
@@ -443,7 +443,7 @@ The Strikers benefit from an ecstatic level of morale during this scenario.  App
 
 MEGAMEK ADJUSTMENTS
 The map setup called for in the scenario is currently impossible to setup in MegaMek.  To compensate, all directions are shifted 90 degrees counter-clockwise (West is now South, East is now North).
-To reflect the morale bonus of the attackers, I have adjusted the attackers' Piloting & Gunnery Skills.  Though this bonus should be void at the loss of the Awesome, the Awesome will most likely make or break this scenario in order to proceed to the next scenario, thus it will most likely be in effect the entire game if the Strikers are to win. (A good clanner should like the challenge).
+To reflect the morale bonus of the attackers, I have adjusted the attackers' Piloting & Gunnery Skills.  Though this bonus should be void at the loss of the Awesome, the Awesome will most likely make or break this scenario in order to proceed to the next scenario, thus it will most likely be in effect the entire game if the Strikers are to win. (A good Clan Mekwarrior should like the challenge).
 Clan Enhanced Imaging neural implants are not incorporated into MegaMek.
 To reflect the initiative bonus of a Tactical Operation Center, The Awesome has a Tactical Genius pilot advantage (though whether or not it works is uncertain).
 While the information for the Strikers Air Support is provided in this scenario for (wishful thinking) future applications, the current version does not support this capability.  To compensate, I have assumed that 6 out of 8 medium lasers from the Banshee made there marks, one to each Clan 'Mech, using the Addition Damage option of the current scenario system.  Any effects these attacks have are legitimate, even if it kills the 'Mechs before start of game (if that ever happens, let me know).

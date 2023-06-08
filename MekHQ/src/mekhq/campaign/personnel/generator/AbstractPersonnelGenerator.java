@@ -205,7 +205,7 @@ public abstract class AbstractPersonnelGenerator {
      * @param campaign The {@link Campaign} which tracks the person.
      * @param person The {@link Person} being generated.
      * @param expLvl The experience level of {@code person}.
-     * @param isClanPersonnel A value indicating if {@code person} is a clanner.
+     * @param isClanPersonnel A value indicating if {@code person} is from the Clans.
      */
     protected void generateBirthday(Campaign campaign, Person person, int expLvl, boolean isClanPersonnel) {
         LocalDate birthday = campaign.getLocalDate();
