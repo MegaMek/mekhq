@@ -3564,7 +3564,7 @@ public class Unit implements ITechnology {
             entity.getCrew().setName(commander.getFullTitle(), 0);
             entity.getCrew().setNickname(commander.getCallsign(), 0);
             entity.getCrew().setGender(commander.getGender(), 0);
-            entity.getCrew().setClanner(commander.isClanner(), 0);
+            entity.getCrew().setClanPilot(commander.isClanPersonnel(), 0);
             entity.getCrew().setPortrait(commander.getPortrait().clone(), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
             entity.getCrew().setToughness(commander.getToughness(), 0);
@@ -3972,7 +3972,7 @@ public class Unit implements ITechnology {
         entity.getCrew().setName(p.getFullTitle(), slot);
         entity.getCrew().setNickname(p.getCallsign(), slot);
         entity.getCrew().setGender(p.getGender(), slot);
-        entity.getCrew().setClanner(p.isClanner(), slot);
+        entity.getCrew().setClanPilot(p.isClanPersonnel(), slot);
         entity.getCrew().setPortrait(p.getPortrait().clone(), slot);
         entity.getCrew().setHits(p.getHits(), slot);
         int gunnery = 7;

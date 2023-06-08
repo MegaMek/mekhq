@@ -509,7 +509,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panDemog.add(choicePhenotype, gridBagConstraints);
 
-        chkClan = new JCheckBox("Clanner");
+        chkClan = new JCheckBox("Clan Personnel");
         chkClan.setSelected(person.isClanPersonnel());
         chkClan.addItemListener(et -> backgroundChanged());
         gridBagConstraints = new GridBagConstraints();
