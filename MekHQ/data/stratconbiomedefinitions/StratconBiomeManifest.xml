@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Must Have -->
+<!-- Finish terrain type definitions -->
+<!-- Somewhere between -->
+<!-- Match up terrain type to megamek terrain tags -->
+<!-- Graphics for terrain types? -->
+<!-- Nice to Have -->
+<!-- add appropriate hill/mountain terrain type to each temp range -->
+<!-- modify "watery"/"dry" terrain type odds based on planetary water coverage -->
+<!-- add moon/mars/volcano extra-planetary terrain and rules for it -->
+<!-- volcano? -->
 <StratconBiomeManifest>
     <biomes>
         <allowedTemperatureLowerBound>0</allowedTemperatureLowerBound>
@@ -9,8 +19,6 @@
 	<allowedTerrainTypes>ColdHills</allowedTerrainTypes>
 	<allowedTerrainTypes>ColdMountain</allowedTerrainTypes>
 	<allowedTerrainTypes>FrozenSea</allowedTerrainTypes>
-<!-- add appropriate hill/mountain terrain type to each temp range -->
-<!-- modify "watery"/"dry" terrain type odds based on planetary water coverage -->
     </biomes>
     <biomes>
         <allowedTemperatureLowerBound>268</allowedTemperatureLowerBound>
@@ -81,6 +89,30 @@
 	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
     </biomes>
     <biomeMapTypes>
+	<entry>
+            <key>ArcticDesert</key>
+            <value>
+                <mapTypes>ArcticDesert</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>ColdForest</key>
+            <value>
+                <mapTypes>ColdForest</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>ColdHills</key>
+            <value>
+                <mapTypes>ColdHills</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>ColdMountain</key>
+            <value>
+                <mapTypes>ColdMountain</mapTypes>
+            </value>
+        </entry>
         <entry>
             <key>Glacier</key>
             <value>
@@ -102,6 +134,12 @@
                 <mapTypes>Wooded-valley</mapTypes>
                 <mapTypes>Woods-river</mapTypes>
                 <mapTypes>Wooded-swamp</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>FrozenSea</key>
+            <value>
+                <mapTypes>FrozenSea</mapTypes>
             </value>
         </entry>
 	<entry>
