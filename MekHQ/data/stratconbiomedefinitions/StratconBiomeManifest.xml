@@ -237,4 +237,14 @@
             </value>
         </entry>
     </biomeMapTypes>
+	<biomeImages>
+		<entry>
+			<key>Forest</key>
+			<value>data\images\hexes\saxarba\hf0.png</value>
+		</entry>
+		<entry>
+			<key>Plains</key>
+			<value>data\images\hexes\saxarba</value>
+		</entry>
+	</biomeImages>
 </StratconBiomeManifest>

@@ -20,6 +20,7 @@ import mekhq.campaign.stratcon.*;
 import mekhq.gui.stratcon.StratconScenarioWizard;
 import mekhq.gui.stratcon.TrackForceAssignmentUI;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,6 +30,8 @@ import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -335,7 +338,23 @@ public class StratconPanel extends JPanel implements ActionListener {
                     } else {
                         g2D.setColor(Color.DARK_GRAY);
                     }
+
                     g2D.fillPolygon(graphHex);
+
+                    // preserve and push the clip
+                    var clip = g2D.getClip();
+                    g2D.setClip(graphHex);
+
+                    // draw a hex image if we've got one
+                    BufferedImage biomeImage = getTerrainImage(currentTrack.getTerrainTile(new StratconCoords(x, y)));
+
+                    if (biomeImage != null) {
+                        // left-most and topmost point
+                        g2D.drawImage(biomeImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                    }
+
+                    // pop the clip
+                    g2D.setClip(clip);
 
                     // useful for graphics coords debugging
                     //g2D.setColor(Color.pink);
@@ -379,6 +398,25 @@ public class StratconPanel extends JPanel implements ActionListener {
         }
 
         return pointFound;
+    }
+
+    private BufferedImage getTerrainImage(String terrainType) {
+        String imageName = StratconBiomeManifest.getInstance().getBiomeImage(terrainType);
+
+        if (imageName == null) {
+            return null;
+        }
+
+        File biomeImageFile = new File(imageName);
+        BufferedImage biomeImage = null;
+
+        try {
+            biomeImage = ImageIO.read(biomeImageFile);
+        } catch (Exception e) {
+            return null;
+        }
+
+        return biomeImage;
     }
 
     /**

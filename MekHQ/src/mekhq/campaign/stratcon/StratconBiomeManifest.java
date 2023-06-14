@@ -26,6 +26,16 @@ public class StratconBiomeManifest {
     public TreeMap<Integer, StratconBiome> biomeMap = new TreeMap<>();
     public Map<String, MapTypeList> biomeMapTypes = new HashMap<>();
 
+    public Map<String, String> biomeImages = new HashMap<>();
+
+    public String getBiomeImage(String biomeType) {
+        if (biomeImages.containsKey(biomeType)) {
+            return biomeImages.get(biomeType);
+        }
+
+        return null;
+    }
+
     private static StratconBiomeManifest instance;
 
     /**
