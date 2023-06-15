@@ -401,6 +401,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     }
 
     private BufferedImage getTerrainImage(String terrainType) {
+        // TODO: Cache these
         String imageName = StratconBiomeManifest.getInstance().getBiomeImage(terrainType);
 
         if (imageName == null) {

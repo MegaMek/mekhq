@@ -239,12 +239,81 @@
     </biomeMapTypes>
 	<biomeImages>
 		<entry>
+			<key>ArcticDesert</key>
+			<value>data\images\hexes\saxarba\tundra_6.png</value>
+		</entry>
+		<entry>
+			<key>ColdForest</key>
+			<value>data\images\hexes\saxarba\snow_hf0.png</value>
+		</entry>
+		<entry>
+			<key>Desert</key>
+			<value>data\images\hexes\saxarba\sand_0.png</value>
+		</entry>
+		<entry>
 			<key>Forest</key>
 			<value>data\images\hexes\saxarba\hf0.png</value>
 		</entry>
 		<entry>
-			<key>Plains</key>
-			<value>data\images\hexes\saxarba</value>
+			<key>FrozenSea</key>
+			<value>data\images\hexes\saxarba\snow_-3.png</value>
 		</entry>
+		<entry>
+			<key>Factory</key>
+			<value>data\images\hexes\saxarba\heavy_industrial_a.png</value>
+		</entry>
+		<entry>
+			<key>Glacier</key>
+			<value>data\images\hexes\saxarba\ice.png</value>
+		</entry>
+		<entry>
+			<key>GrayLunar</key>
+			<value>data\images\hexes\saxarba\theme_lunar\base_lunar_0b.png</value>
+		</entry>
+		<entry>
+			<key>HotSea</key>
+			<value>data\images\hexes\saxarba\water\water_0.png</value>
+		</entry>
+		<entry>
+			<key>Jungle</key>
+			<value>data\images\hexes\saxarba\heavy_jungle_1.png</value>
+		</entry>
+		<entry>
+			<key>Mars</key>
+			<value>data\images\hexes\saxarba\theme_mars\base_mars_0.png</value>
+		</entry>
+		<entry>
+			<key>Plains</key>
+			<value>data\images\hexes\saxarba\plains_A0.png</value>
+		</entry>
+		<entry>
+			<key>Savannah</key>
+			<value>data\images\hexes\saxarba\plains_B3.png</value>
+		</entry>
+		<entry>
+			<key>Sea</key>
+			<value>data\images\hexes\saxarba\water\water_4.png</value>
+		</entry>
+		<entry>
+			<key>SnowField</key>
+			<value>data\images\hexes\saxarba\light_snow_b5.png</value>
+		</entry>
+		<entry>
+			<key>Steppe</key>
+			<value>data\images\hexes\saxarba\plains_A5.png</value>
+		</entry>
+		<entry>
+			<key>Swamp</key>
+			<value>data\images\hexes\saxarba\swamp_0.png</value>
+		</entry>
+		<entry>
+			<key>Tundra</key>
+			<value>data\images\hexes\saxarba\tundra_1.png</value>
+		</entry>
+		<entry>
+			<key>Volcano</key>
+			<value>data\images\hexes\saxarba\crust_0.png</value>
+		</entry>
+
 	</biomeImages>
 </StratconBiomeManifest>
