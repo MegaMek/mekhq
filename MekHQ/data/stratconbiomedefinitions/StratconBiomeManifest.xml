@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <!-- Must Have -->
 <!-- Finish terrain type definitions -->
+<!-- Urban/Military Base Terrain: Cold/Temperate/Hot Light/Military/City -->
 <!-- Somewhere between -->
 <!-- Match up terrain type to megamek terrain tags -->
-<!-- Graphics for terrain types? -->
+<!-- IN PROGRESS: Graphics for terrain types? -->
 <!-- Nice to Have -->
-<!-- add appropriate hill/mountain terrain type to each temp range -->
+<!-- DONE: add appropriate hill/mountain terrain type to each temp range -->
 <!-- modify "watery"/"dry" terrain type odds based on planetary water coverage -->
 <!-- add moon/mars/volcano extra-planetary terrain and rules for it -->
 <!-- volcano? -->
@@ -88,6 +89,26 @@
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
 	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
     </biomes>
+	<!-- Special biomes, one terrain type per -->
+    <biomes>
+        <allowedTemperatureLowerBound>90001</allowedTemperatureLowerBound>			<allowedTemperatureUpperBound>90002</allowedTemperatureUpperBound>
+	<allowedTerrainTypes>LightUrban</allowedTerrainTypes>
+	<allowedTerrainTypes>MediumUrban</allowedTerrainTypes>
+	<allowedTerrainTypes>HeavyUrban</allowedTerrainTypes>
+	<allowedTerrainTypes>Industrial</allowedTerrainTypes>
+    </biomes>
+    <biomes>
+        <allowedTemperatureLowerBound>90003</allowedTemperatureLowerBound>					<allowedTemperatureUpperBound>90004</allowedTemperatureUpperBound>
+	<allowedTerrainTypes>LunarPlains</allowedTerrainTypes>
+    </biomes>
+    <biomes>
+        <allowedTemperatureLowerBound>90005</allowedTemperatureLowerBound>							<allowedTemperatureUpperBound>90006</allowedTemperatureUpperBound>
+	<allowedTerrainTypes>MartianPlains</allowedTerrainTypes>
+    </biomes>
+    <biomes>
+        <allowedTemperatureLowerBound>90005</allowedTemperatureLowerBound>							<allowedTemperatureUpperBound>90006</allowedTemperatureUpperBound>
+	<allowedTerrainTypes>MilitaryBase</allowedTerrainTypes>
+    </biomes>
     <biomeMapTypes>
 	<entry>
             <key>ArcticDesert</key>
@@ -99,6 +120,13 @@
             <key>ColdForest</key>
             <value>
                 <mapTypes>ColdForest</mapTypes>
+		<mapTypes>Some-trees-snow</mapTypes>
+                <mapTypes>Wooded-lake-snow</mapTypes>
+                <mapTypes>Wooded-hills-snow</mapTypes>
+                <mapTypes>Woods-deep-snow</mapTypes>
+                <mapTypes>Wooded-valley-snow</mapTypes>
+                <mapTypes>Woods-river-snow</mapTypes>
+                <mapTypes>Wooded-tundra</mapTypes>
             </value>
         </entry>
 	<entry>
@@ -153,6 +181,7 @@
                 <mapTypes>Hills-River</mapTypes>
                 <mapTypes>Hills-RiverRoad</mapTypes>
                 <mapTypes>Light-craters</mapTypes>
+                <mapTypes>Wooded-hills</mapTypes>
             </value>
         </entry>
 	<entry>
