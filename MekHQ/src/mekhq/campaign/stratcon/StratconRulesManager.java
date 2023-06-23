@@ -185,8 +185,11 @@ public class StratconRulesManager {
     private static void setScenarioParametersFromBiome(StratconTrackState track, StratconScenario scenario) {
         StratconCoords coords = scenario.getCoords();
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        boolean isFacility = track.getFacility(scenario.getCoords()) != null;
 
-        if (backingScenario.isUsingFixedMap()) {
+        // for now, if we're using a fixed map or in a facility, don't replace the scenario
+        // TODO: facility spaces will always have a relevant biome
+        if (backingScenario.isUsingFixedMap() || isFacility) {
             return; // for now
         }
 
@@ -1575,6 +1578,8 @@ public class StratconRulesManager {
                         // with a facility defense, with the opfor coming directly from all hostiles
                         // assigned to this scenario
 
+                        // update the scenario's biome
+                        setScenarioParametersFromBiome(track, scenario);
                         scenario.setCurrentState(ScenarioState.UNRESOLVED);
                         return false;
                     } else {

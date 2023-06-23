@@ -73,7 +73,7 @@
         <allowedTemperatureLowerBound>308</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>317</allowedTemperatureUpperBound>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
-	<allowedTerrainTypes>HotForest</allowedTerrainTypes>
+        <allowedTerrainTypes>HotForest</allowedTerrainTypes>
         <allowedTerrainTypes>Jungle</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
@@ -114,6 +114,7 @@
             <key>ArcticDesert</key>
             <value>
                 <mapTypes>ArcticDesert</mapTypes>
+                <mapTypes>ArcticDesert-Rough</mapTypes>
             </value>
         </entry>
 	<entry>
@@ -122,7 +123,6 @@
                 <mapTypes>ColdForest</mapTypes>
 		<mapTypes>Some-trees-snow</mapTypes>
                 <mapTypes>Wooded-lake-snow</mapTypes>
-                <mapTypes>Wooded-hills-snow</mapTypes>
                 <mapTypes>Woods-deep-snow</mapTypes>
                 <mapTypes>Wooded-valley-snow</mapTypes>
                 <mapTypes>Woods-river-snow</mapTypes>
@@ -133,12 +133,30 @@
             <key>ColdHills</key>
             <value>
                 <mapTypes>ColdHills</mapTypes>
+                <mapTypes>Hills-craters-snow</mapTypes>
+                <mapTypes>Hills-snow-tundra</mapTypes>
+                <mapTypes>Hills-River-Snow</mapTypes>
+                <mapTypes>Hills-RiverRoad-Snow</mapTypes>
+                <mapTypes>Light-craters-snow</mapTypes>
+                <mapTypes>Wooded-hills-snow</mapTypes>
             </value>
         </entry>
 	<entry>
             <key>ColdMountain</key>
             <value>
                 <mapTypes>ColdMountain</mapTypes>
+                <mapTypes>ColdMountain-Rough</mapTypes>
+                <mapTypes>Mountain-lakes-snow</mapTypes>
+                <mapTypes>Cliffs-lakes-snow</mapTypes>
+                <mapTypes>Rubble-mountain-snow</mapTypes>
+                <mapTypes>Cliffs-snow</mapTypes>
+                <mapTypes>Mountain-medium-snow</mapTypes>
+                <mapTypes>Mountain-high-snow</mapTypes>
+                <mapTypes>Mountain-river-snow</mapTypes>
+                <mapTypes>Mountain-RuinedTrenches-snow</mapTypes>
+                <mapTypes>Mountain-TouristTown-snow</mapTypes>
+                <mapTypes>Mountain-town-snow</mapTypes>
+                <mapTypes>Heavy-craters-snow</mapTypes>
             </value>
         </entry>
         <entry>
@@ -263,6 +281,7 @@
                 <mapTypes>TundraRoad</mapTypes>
                 <mapTypes>TundraRoadSnow</mapTypes>
                 <mapTypes>TundraTownSnow</mapTypes>
+                <mapTypes>Wooded-tundra</mapTypes>
             </value>
         </entry>
     </biomeMapTypes>

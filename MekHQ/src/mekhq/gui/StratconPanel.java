@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public class StratconPanel extends JPanel implements ActionListener {
     public static final int HEX_X_RADIUS = 42;
-    public static final int HEX_Y_RADIUS = 37;
+    public static final int HEX_Y_RADIUS = 36;
 
     private static final String RCLICK_COMMAND_MANAGE_FORCES = "ManageForces";
     private static final String RCLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";

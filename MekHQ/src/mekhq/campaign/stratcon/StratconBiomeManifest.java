@@ -2,7 +2,6 @@ package mekhq.campaign.stratcon;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -10,7 +9,6 @@ import mekhq.MHQConstants;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 
-import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import java.io.File;
 import java.io.FileInputStream;
