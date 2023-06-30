@@ -816,9 +816,6 @@ public class Utilities {
     public static String getOptionDisplayName(IOption option) {
         String name = option.getDisplayableNameWithValue();
         name = name.replaceAll("\\(.+?\\)", "");
-        if (option.getType() == IOption.CHOICE) {
-            name += " - " + option.getValue();
-        }
         return name;
     }
 
