@@ -35,6 +35,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario track.
@@ -100,6 +101,8 @@ public class StratconPanel extends JPanel implements ActionListener {
     private TrackForceAssignmentUI assignmentUI;
 
     private JLabel infoArea;
+    
+    private Map<String, BufferedImage> imageCache = new HashMap<>();
 
     /**
      * Constructs a StratconPanel instance, given a parent campaign GUI and a pointer to an info area.
@@ -401,6 +404,10 @@ public class StratconPanel extends JPanel implements ActionListener {
     }
 
     private BufferedImage getTerrainImage(String terrainType) {
+        if (imageCache.containsKey(terrainType)) {
+            return imageCache.get(terrainType);
+        }
+        
         // TODO: Cache these
         String imageName = StratconBiomeManifest.getInstance().getBiomeImage(terrainType);
 
@@ -414,9 +421,11 @@ public class StratconPanel extends JPanel implements ActionListener {
         try {
             biomeImage = ImageIO.read(biomeImageFile);
         } catch (Exception e) {
+            LogManager.getLogger().error("Unable to load terrain tile image: " + imageName + " for terrain type '" + terrainType + "'");
             return null;
         }
 
+        imageCache.put(terrainType, biomeImage);        
         return biomeImage;
     }
 
