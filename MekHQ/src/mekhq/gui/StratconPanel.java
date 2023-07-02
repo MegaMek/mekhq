@@ -570,7 +570,18 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         g2D.drawLine((int) startX, (int) startY, (int) midPointX, (int) midPointY);
         g2D.drawLine((int) midPointX, (int) midPointY, (int) endPointX, (int) midPointY);
-        g2D.drawString(text, (int) endPointX, (int) midPointY);
+        
+        // draw gray rectangle
+        Color push = g2D.getColor();
+        g2D.setColor(Color.GRAY);
+        int rectYStart = (int) midPointY - g2D.getFontMetrics().getHeight();
+        int rectWidth = g2D.getFontMetrics().stringWidth(text) + 4;
+        
+        g2D.fillRect((int) endPointX, rectYStart, rectWidth, g2D.getFontMetrics().getHeight());
+        g2D.setColor(push);
+        g2D.drawRect((int) endPointX, rectYStart, rectWidth, g2D.getFontMetrics().getHeight());
+        
+        g2D.drawString(text, (int) endPointX + 2, (int) midPointY - 2);
 
         // register that we drew text off of this hex
         numIconsInHex.put(coords, ++verticalOffsetIndex);
