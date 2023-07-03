@@ -187,7 +187,11 @@ public class StratconRulesManager {
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         boolean isFacility = track.getFacility(scenario.getCoords()) != null;
 
-        backingScenario.setTemperature(track.getTemperature());
+        // for non-surface scenarios, we will skip the temperature update
+        if (backingScenario.getTerrainType() != Scenario.TER_LOW_ATMO &&
+                backingScenario.getTerrainType() != Scenario.TER_SPACE) {
+            backingScenario.setTemperature(track.getTemperature());
+        }
         
         // for now, if we're using a fixed map or in a facility, don't replace the scenario
         // TODO: facility spaces will always have a relevant biome
@@ -203,8 +207,11 @@ public class StratconRulesManager {
             return;
         }
 
-        var mapTypeList = mapTypes.get(terrainType).mapTypes;
-        backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+        // if we are in space, do not update the map; note that it's ok to do so in low atmo
+        if (backingScenario.getTerrainType() != Scenario.TER_SPACE) {
+            var mapTypeList = mapTypes.get(terrainType).mapTypes;
+            backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+        }
     }
 
 
