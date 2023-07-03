@@ -2,6 +2,7 @@
 <!-- Must Have -->
 <!-- Finish terrain type definitions -->
 <!-- Urban/Military Base Terrain: Cold/Temperate/Hot Light/Military/City -->
+<!-- Re-integrate possibility of non-facility urban combat --> 
 <!-- Fog of War -->
 <!-- Somewhere between -->
 <!-- Match up terrain type to megamek terrain tags -->
@@ -11,8 +12,10 @@
 <!-- modify "watery"/"dry" terrain type odds based on planetary water coverage -->
 <!-- add moon/mars/volcano extra-planetary terrain and rules for it -->
 <!-- volcano? -->
+<!-- scenarios not spawned as a result of player action will have wrong terrain type until finalized -->
 <StratconBiomeManifest>
     <biomes>
+	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>0</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>267</allowedTemperatureUpperBound>
         <allowedTerrainTypes>SnowField</allowedTerrainTypes>
@@ -23,6 +26,7 @@
 	<allowedTerrainTypes>FrozenSea</allowedTerrainTypes>
     </biomes>
     <biomes>
+	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>268</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>277</allowedTemperatureUpperBound>
         <allowedTerrainTypes>Tundra</allowedTerrainTypes>
@@ -35,16 +39,19 @@
 	<allowedTerrainTypes>ColdSea</allowedTerrainTypes>
     </biomes>
     <biomes>
+	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>278</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>287</allowedTemperatureUpperBound>
         <allowedTerrainTypes>Plains</allowedTerrainTypes>
         <allowedTerrainTypes>Forest</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
-        <allowedTerrainTypes>Desert</allowedTerrainTypes>				<allowedTerrainTypes>Hills</allowedTerrainTypes>
+        <allowedTerrainTypes>Desert</allowedTerrainTypes>				
+	<allowedTerrainTypes>Hills</allowedTerrainTypes>
 	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
 	<allowedTerrainTypes>Sea</allowedTerrainTypes>
     </biomes>
     <biomes>
+	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>288</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>297</allowedTemperatureUpperBound>
         <allowedTerrainTypes>Plains</allowedTerrainTypes>
@@ -56,6 +63,7 @@
 	<allowedTerrainTypes>Sea</allowedTerrainTypes>
     </biomes>
     <biomes>
+	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>298</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>307</allowedTemperatureUpperBound>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
@@ -71,6 +79,7 @@
 	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
     </biomes>
     <biomes>
+	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>308</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>317</allowedTemperatureUpperBound>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
@@ -83,6 +92,7 @@
 	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
     </biomes>
     <biomes>
+	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>318</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>90000</allowedTemperatureUpperBound>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
@@ -90,26 +100,32 @@
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
 	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
     </biomes>
-	<!-- Special biomes, one terrain type per -->
+    <!-- Terran biomes, but for facilities -->
     <biomes>
-        <allowedTemperatureLowerBound>90001</allowedTemperatureLowerBound>			<allowedTemperatureUpperBound>90002</allowedTemperatureUpperBound>
-	<allowedTerrainTypes>LightUrban</allowedTerrainTypes>
-	<allowedTerrainTypes>MediumUrban</allowedTerrainTypes>
-	<allowedTerrainTypes>HeavyUrban</allowedTerrainTypes>
-	<allowedTerrainTypes>Industrial</allowedTerrainTypes>
+	<biomeCategory>TerranFacility</biomeCategory>
+        <allowedTemperatureLowerBound>0</allowedTemperatureLowerBound>
+        <allowedTemperatureUpperBound>267</allowedTemperatureUpperBound>
+        <allowedTerrainTypes>FrozenFacility</allowedTerrainTypes>
     </biomes>
     <biomes>
-        <allowedTemperatureLowerBound>90003</allowedTemperatureLowerBound>					<allowedTemperatureUpperBound>90004</allowedTemperatureUpperBound>
-	<allowedTerrainTypes>LunarPlains</allowedTerrainTypes>
+	<biomeCategory>TerranFacility</biomeCategory>
+        <allowedTemperatureLowerBound>268</allowedTemperatureLowerBound>
+        <allowedTemperatureUpperBound>277</allowedTemperatureUpperBound>
+        <allowedTerrainTypes>ColdFacility</allowedTerrainTypes>
     </biomes>
     <biomes>
-        <allowedTemperatureLowerBound>90005</allowedTemperatureLowerBound>							<allowedTemperatureUpperBound>90006</allowedTemperatureUpperBound>
-	<allowedTerrainTypes>MartianPlains</allowedTerrainTypes>
+	<biomeCategory>TerranFacility</biomeCategory>
+        <allowedTemperatureLowerBound>278</allowedTemperatureLowerBound>
+        <allowedTemperatureUpperBound>297</allowedTemperatureUpperBound>
+        <allowedTerrainTypes>TemperateFacility</allowedTerrainTypes>
     </biomes>
     <biomes>
-        <allowedTemperatureLowerBound>90005</allowedTemperatureLowerBound>							<allowedTemperatureUpperBound>90006</allowedTemperatureUpperBound>
-	<allowedTerrainTypes>MilitaryBase</allowedTerrainTypes>
+	<biomeCategory>TerranFacility</biomeCategory>
+        <allowedTemperatureLowerBound>298</allowedTemperatureLowerBound>
+        <allowedTemperatureUpperBound>90000</allowedTemperatureUpperBound>
+        <allowedTerrainTypes>HotFacility</allowedTerrainTypes>
     </biomes>
+    <!-- Theoretically: Lunar/Facility, Martian/Facility, Purple/Facility -->
     <biomeMapTypes>
 	<entry>
             <key>ArcticDesert</key>
@@ -252,6 +268,12 @@
                 <mapTypes>SnowOutpost</mapTypes>
                 <mapTypes>SnowCoast</mapTypes>
                 <mapTypes>SnowHill</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>Savannah</key>
+            <value>
+                <mapTypes>Savannah</mapTypes>
             </value>
         </entry>
 	<entry>

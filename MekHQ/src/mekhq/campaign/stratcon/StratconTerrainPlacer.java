@@ -36,7 +36,7 @@ public class StratconTerrainPlacer {
         //      TODO: Maybe more than one of each biome?
         //      TODO: Map category being displayed for some reason
         int kelvinTemp = track.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
-        StratconBiome biome = StratconBiomeManifest.getInstance().biomeMap.floorEntry(kelvinTemp).getValue();
+        StratconBiome biome = StratconBiomeManifest.getInstance().getTempMap("Terran").floorEntry(kelvinTemp).getValue();
 
         int baseTerrainIndex = Compute.randomInt(biome.allowedTerrainTypes.size());
 

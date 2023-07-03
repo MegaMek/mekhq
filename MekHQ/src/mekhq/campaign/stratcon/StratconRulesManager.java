@@ -181,6 +181,7 @@ public class StratconRulesManager {
 
     /**
      * Picks the scenario terrain based on the scenario coordinates' biome
+     * Note that "finalizeScenario" currently wipes out temperature/map info so this method must be called afterward.
      */
     public static void setScenarioParametersFromBiome(StratconTrackState track, StratconScenario scenario) {
         StratconCoords coords = scenario.getCoords();
@@ -200,7 +201,7 @@ public class StratconRulesManager {
         }
 
         String terrainType = track.getTerrainTile(coords);
-        var mapTypes = StratconBiomeManifest.getInstance().biomeMapTypes;
+        var mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
 
         // don't have a map list for the given terrain, leave it alone
         if(!mapTypes.containsKey(terrainType)) {

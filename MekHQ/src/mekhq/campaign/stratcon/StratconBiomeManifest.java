@@ -5,6 +5,7 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
 import mekhq.MHQConstants;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +15,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.*;
 
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlAccessorType(XmlAccessType.NONE)
 public class StratconBiomeManifest {
     public static final String FOG_OF_WAR = "FogOfWar";
     
@@ -22,12 +23,28 @@ public class StratconBiomeManifest {
         public List<String> mapTypes = new ArrayList<>();
     }
 
-    public List<StratconBiome> biomes = new ArrayList<>();
-    public TreeMap<Integer, StratconBiome> biomeMap = new TreeMap<>();
-    public Map<String, MapTypeList> biomeMapTypes = new HashMap<>();
+    @XmlElement(name="biomes")
+    private List<StratconBiome> biomes = new ArrayList<>();
+    @XmlElement(name="biomeMapTypes")
+    private Map<String, MapTypeList> biomeMapTypes = new HashMap<>();
+    @XmlElement(name="biomeImages")
+    private Map<String, String> biomeImages = new HashMap<>();
+    
+    // derived fields, populated at load time
+    private Map<String, TreeMap<Integer, StratconBiome>> biomeTempMap = new HashMap<>();
+    private Map<String, List<StratconBiome>> biomeCategoryMap = new HashMap<>();
 
-    public Map<String, String> biomeImages = new HashMap<>();
-
+    public TreeMap<Integer, StratconBiome> getTempMap(String category) {
+        return biomeTempMap.get(category);
+    }
+    
+    public Map<String, MapTypeList> getBiomeMapTypes() {
+        return biomeMapTypes;
+    }
+    
+    /**
+     * Get the file path for the hex image corresponding to the given terrain type
+     */
     public String getBiomeImage(String biomeType) {
         if (biomeImages.containsKey(biomeType)) {
             return biomeImages.get(biomeType);
@@ -35,7 +52,7 @@ public class StratconBiomeManifest {
 
         return null;
     }
-
+    
     private static StratconBiomeManifest instance;
 
     /**
@@ -70,7 +87,19 @@ public class StratconBiomeManifest {
         }
 
         for (StratconBiome biome : resultingManifest.biomes) {
-            resultingManifest.biomeMap.put(biome.allowedTemperatureLowerBound, biome);
+            // initialize mapping of biome category to temp map
+            if (!resultingManifest.biomeTempMap.containsKey(biome.biomeCategory)) {
+                resultingManifest.biomeTempMap.put(biome.biomeCategory, new TreeMap<Integer, StratconBiome>());
+            }
+            
+            resultingManifest.biomeTempMap.get(biome.biomeCategory).put(biome.allowedTemperatureLowerBound, biome);
+            
+            // initialize mapping of biome category to list of biomes
+            if (!resultingManifest.biomeCategoryMap.containsKey(biome.biomeCategory)) {
+                resultingManifest.biomeCategoryMap.put(biome.biomeCategory, new ArrayList<StratconBiome>());
+            }
+            
+            resultingManifest.biomeCategoryMap.get(biome.biomeCategory).add(biome);
         }
 
         return resultingManifest;
