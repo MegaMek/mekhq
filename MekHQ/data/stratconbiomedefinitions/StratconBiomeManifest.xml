@@ -2,6 +2,7 @@
 <!-- Must Have -->
 <!-- Finish terrain type definitions -->
 <!-- Urban/Military Base Terrain: Cold/Temperate/Hot Light/Military/City -->
+<!-- Fog of War -->
 <!-- Somewhere between -->
 <!-- Match up terrain type to megamek terrain tags -->
 <!-- IN PROGRESS: Graphics for terrain types? -->
@@ -288,80 +289,93 @@
 	<biomeImages>
 		<entry>
 			<key>ArcticDesert</key>
-			<value>data\images\hexes\saxarba\tundra_6.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Arctic_Desert.png</value>
 		</entry>
 		<entry>
 			<key>ColdForest</key>
-			<value>data\images\hexes\saxarba\snow_hf0.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Cold_Forest.png</value>
 		</entry>
 		<entry>
 			<key>Desert</key>
-			<value>data\images\hexes\saxarba\sand_0.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Desert.png</value>
+		</entry>
+		<entry>
+			<key>FogOfWar</key>
+			<value>data\images\hexes\transparent\heavy_smoke.png</value>
 		</entry>
 		<entry>
 			<key>Forest</key>
-			<value>data\images\hexes\saxarba\hf0.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Forest.png</value>
 		</entry>
 		<entry>
 			<key>FrozenSea</key>
-			<value>data\images\hexes\saxarba\snow_-3.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Frozen_Sea.png</value>
 		</entry>
 		<entry>
 			<key>Factory</key>
-			<value>data\images\hexes\saxarba\heavy_industrial_a.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Factory.png</value>
 		</entry>
 		<entry>
 			<key>Glacier</key>
-			<value>data\images\hexes\saxarba\ice.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Glacier.png</value>
 		</entry>
 		<entry>
 			<key>GrayLunar</key>
-			<value>data\images\hexes\saxarba\theme_lunar\base_lunar_0b.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Gray_Luna.png</value>
+		</entry>
+		<entry>
+			<key>Hills</key>
+			<value>data\images\hexes\stratcon\Stratcon_Hills.png</value>
 		</entry>
 		<entry>
 			<key>HotSea</key>
-			<value>data\images\hexes\saxarba\water\water_0.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Hot_Sea.png</value>
 		</entry>
 		<entry>
 			<key>Jungle</key>
-			<value>data\images\hexes\saxarba\heavy_jungle_1.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Jungle.png</value>
+		</entry>
+		<entry>
+			<key>Mountain</key>
+			<value>data\images\hexes\stratcon\Stratcon_Mountains.png</value>
 		</entry>
 		<entry>
 			<key>Mars</key>
-			<value>data\images\hexes\saxarba\theme_mars\base_mars_0.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Mars.png</value>
 		</entry>
 		<entry>
 			<key>Plains</key>
-			<value>data\images\hexes\saxarba\plains_A0.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Plains.png</value>
 		</entry>
 		<entry>
 			<key>Savannah</key>
-			<value>data\images\hexes\saxarba\plains_B3.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Savannah.png</value>
 		</entry>
 		<entry>
 			<key>Sea</key>
-			<value>data\images\hexes\saxarba\water\water_4.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Sea.png</value>
 		</entry>
 		<entry>
 			<key>SnowField</key>
-			<value>data\images\hexes\saxarba\light_snow_b5.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Snowfield.png</value>
 		</entry>
 		<entry>
 			<key>Steppe</key>
-			<value>data\images\hexes\saxarba\plains_A5.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Steppe.png</value>
 		</entry>
 		<entry>
 			<key>Swamp</key>
-			<value>data\images\hexes\saxarba\swamp_0.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Swamp.png</value>
 		</entry>
 		<entry>
 			<key>Tundra</key>
-			<value>data\images\hexes\saxarba\tundra_1.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Tundra.png</value>
 		</entry>
 		<entry>
 			<key>Volcano</key>
-			<value>data\images\hexes\saxarba\crust_0.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Volcanic.png</value>
 		</entry>
+
 
 	</biomeImages>
 </StratconBiomeManifest>

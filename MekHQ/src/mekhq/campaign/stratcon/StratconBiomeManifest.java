@@ -16,6 +16,8 @@ import java.util.*;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class StratconBiomeManifest {
+    public static final String FOG_OF_WAR = "FogOfWar";
+    
     public static class MapTypeList {
         public List<String> mapTypes = new ArrayList<>();
     }

@@ -332,16 +332,11 @@ public class StratconPanel extends JPanel implements ActionListener {
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 if (drawHexType == DrawHexType.Outline) {
-                    g2D.setColor(new Color(0, 0, 0));
+                    g2D.setColor(Color.BLACK);
                     g2D.drawPolygon(graphHex);
                 } else if (drawHexType == DrawHexType.Hex) {
-
-                    if (trackRevealed || currentTrack.isGmRevealed() || currentTrack.coordsRevealed(x, y)) {
-                        g2D.setColor(Color.LIGHT_GRAY);
-                    } else {
-                        g2D.setColor(Color.DARK_GRAY);
-                    }
-
+                    // note: this polygon fill is necessary for click detection, so it must be left here
+                    //g2D.setColor(Color.DARK_GRAY);
                     g2D.fillPolygon(graphHex);
 
                     // preserve and push the clip
@@ -352,10 +347,17 @@ public class StratconPanel extends JPanel implements ActionListener {
                     BufferedImage biomeImage = getTerrainImage(currentTrack.getTerrainTile(new StratconCoords(x, y)));
 
                     if (biomeImage != null) {
-                        // left-most and topmost point
-                        g2D.drawImage(biomeImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                        // left-most and topmost point; experimentally adjusted to avoid empty space in the top left
+                        g2D.drawImage(biomeImage, null, graphHex.xpoints[1] - 2, graphHex.ypoints[0] - 2);
                     }
 
+                    if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
+                        BufferedImage fogOfWarLayerImage = getTerrainImage(StratconBiomeManifest.FOG_OF_WAR);
+                        if (fogOfWarLayerImage != null) {
+                            g2D.drawImage(fogOfWarLayerImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                        }
+                    }
+                    
                     // pop the clip
                     g2D.setClip(clip);
 
@@ -708,6 +710,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         infoBuilder.append("Average Temperature: ");
         infoBuilder.append(currentTrack.getTemperature());
         infoBuilder.append("&deg;C<br/>");
+        infoBuilder.append("Terrain Type: ");
+        infoBuilder.append(currentTrack.getTerrainTile(boardState.getSelectedCoords()));
+        infoBuilder.append("<br/>");
 
         boolean coordsRevealed = currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {

@@ -182,11 +182,13 @@ public class StratconRulesManager {
     /**
      * Picks the scenario terrain based on the scenario coordinates' biome
      */
-    private static void setScenarioParametersFromBiome(StratconTrackState track, StratconScenario scenario) {
+    public static void setScenarioParametersFromBiome(StratconTrackState track, StratconScenario scenario) {
         StratconCoords coords = scenario.getCoords();
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         boolean isFacility = track.getFacility(scenario.getCoords()) != null;
 
+        backingScenario.setTemperature(track.getTemperature());
+        
         // for now, if we're using a fixed map or in a facility, don't replace the scenario
         // TODO: facility spaces will always have a relevant biome
         if (backingScenario.isUsingFixedMap() || isFacility) {
@@ -203,7 +205,6 @@ public class StratconRulesManager {
 
         var mapTypeList = mapTypes.get(terrainType).mapTypes;
         backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
-        backingScenario.setTemperature(track.getTemperature());
     }
 
 
