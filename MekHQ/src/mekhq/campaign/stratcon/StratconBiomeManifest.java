@@ -89,14 +89,14 @@ public class StratconBiomeManifest {
         for (StratconBiome biome : resultingManifest.biomes) {
             // initialize mapping of biome category to temp map
             if (!resultingManifest.biomeTempMap.containsKey(biome.biomeCategory)) {
-                resultingManifest.biomeTempMap.put(biome.biomeCategory, new TreeMap<Integer, StratconBiome>());
+                resultingManifest.biomeTempMap.put(biome.biomeCategory, new TreeMap<>());
             }
             
             resultingManifest.biomeTempMap.get(biome.biomeCategory).put(biome.allowedTemperatureLowerBound, biome);
             
             // initialize mapping of biome category to list of biomes
             if (!resultingManifest.biomeCategoryMap.containsKey(biome.biomeCategory)) {
-                resultingManifest.biomeCategoryMap.put(biome.biomeCategory, new ArrayList<StratconBiome>());
+                resultingManifest.biomeCategoryMap.put(biome.biomeCategory, new ArrayList<>());
             }
             
             resultingManifest.biomeCategoryMap.get(biome.biomeCategory).add(biome);
