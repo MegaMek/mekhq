@@ -6535,6 +6535,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             options.setLimitByYear(limitByYearBox.isSelected());
             options.setDisallowExtinctStuff(disallowExtinctStuffBox.isSelected());
+            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_IGNORE_EXTINCT).setValue(!disallowExtinctStuffBox.isSelected());
             options.setAllowClanPurchases(allowClanPurchasesBox.isSelected());
             options.setAllowISPurchases(allowISPurchasesBox.isSelected());
             options.setAllowCanonOnly(allowCanonOnlyBox.isSelected());
