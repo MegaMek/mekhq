@@ -30,6 +30,7 @@ import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Collections;
@@ -336,19 +337,15 @@ public class StratconPanel extends JPanel implements ActionListener {
                     g2D.drawPolygon(graphHex);
                 } else if (drawHexType == DrawHexType.Hex) {
                     // note: this polygon fill is necessary for click detection, so it must be left here
-                    //g2D.setColor(Color.DARK_GRAY);
+                    g2D.setColor(Color.DARK_GRAY);
                     g2D.fillPolygon(graphHex);
-
-                    // preserve and push the clip
-                    var clip = g2D.getClip();
-                    g2D.setClip(graphHex);
 
                     // draw a hex image if we've got one
                     BufferedImage biomeImage = getTerrainImage(currentTrack.getTerrainTile(new StratconCoords(x, y)));
 
                     if (biomeImage != null) {
                         // left-most and topmost point; experimentally adjusted to avoid empty space in the top left
-                        g2D.drawImage(biomeImage, null, graphHex.xpoints[1] - 2, graphHex.ypoints[0] - 2);
+                        g2D.drawImage(biomeImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                     }
 
                     if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
@@ -358,9 +355,6 @@ public class StratconPanel extends JPanel implements ActionListener {
                         }
                     }
                     
-                    // pop the clip
-                    g2D.setClip(clip);
-
                     // useful for graphics coords debugging
                     //g2D.setColor(Color.pink);
                     //g2D.drawString(graphHex.getBounds().getX() + ", " + graphHex.getBounds().getY(), (int) graphHex.getBounds().getX(), (int) graphHex.getBounds().getY());
@@ -404,7 +398,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         return pointFound;
     }
-
+    
     private BufferedImage getTerrainImage(String terrainType) {
         if (imageCache.containsKey(terrainType)) {
             return imageCache.get(terrainType);
@@ -426,9 +420,17 @@ public class StratconPanel extends JPanel implements ActionListener {
             LogManager.getLogger().error("Unable to load terrain tile image: " + imageName + " for terrain type '" + terrainType + "'");
             return null;
         }
+        
+        double xScale = HEX_X_RADIUS * 2.0 / biomeImage.getWidth();
+        double yScale = HEX_Y_RADIUS * 2.0 / biomeImage.getHeight();
+        BufferedImage scaledBiomeImage = new BufferedImage(HEX_X_RADIUS * 2, HEX_Y_RADIUS * 2, BufferedImage.TYPE_INT_ARGB);
+        AffineTransform at = new AffineTransform();
+        at.scale(xScale, yScale);
+        AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+        scaledBiomeImage = scaleOp.filter(biomeImage, scaledBiomeImage);
 
-        imageCache.put(terrainType, biomeImage);        
-        return biomeImage;
+        imageCache.put(terrainType, scaledBiomeImage);        
+        return scaledBiomeImage;
     }
 
     /**

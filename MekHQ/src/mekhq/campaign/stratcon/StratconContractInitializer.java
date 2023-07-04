@@ -208,8 +208,9 @@ public class StratconContractInitializer {
         retVal.setScenarioOdds(scenarioOdds);
         retVal.setDeploymentTime(deploymentTime);
 
-        // figure out track "average" temperature
-        int tempVariation = Compute.randomInt(70) - 35;
+        // figure out track "average" temperature; this is the equatorial temperature with
+        // a random number between 10 and -40 added to it: equator is about as hot as it gets with some exceptions
+        int tempVariation = Compute.randomInt(51) - 40;
         retVal.setTemperature(planetaryTemp + tempVariation);
 
         // place terrain based on temperature
