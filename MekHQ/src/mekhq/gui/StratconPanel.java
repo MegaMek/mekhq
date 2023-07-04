@@ -36,6 +36,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -339,19 +340,34 @@ public class StratconPanel extends JPanel implements ActionListener {
                     // note: this polygon fill is necessary for click detection, so it must be left here
                     g2D.setColor(Color.DARK_GRAY);
                     g2D.fillPolygon(graphHex);
+                    StratconCoords currentCoords = new StratconCoords(x, y);
 
                     // draw a hex image if we've got one
-                    BufferedImage biomeImage = getTerrainImage(currentTrack.getTerrainTile(new StratconCoords(x, y)));
+                    BufferedImage biomeImage = getImage(currentTrack.getTerrainTile(currentCoords), ImageType.TerrainTile);
 
                     if (biomeImage != null) {
                         // left-most and topmost point; experimentally adjusted to avoid empty space in the top left
                         g2D.drawImage(biomeImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                     }
 
+                    // draw fog of war if applicable
                     if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
-                        BufferedImage fogOfWarLayerImage = getTerrainImage(StratconBiomeManifest.FOG_OF_WAR);
+                        BufferedImage fogOfWarLayerImage = getImage(StratconBiomeManifest.FOG_OF_WAR, ImageType.TerrainTile);
                         if (fogOfWarLayerImage != null) {
                             g2D.drawImage(fogOfWarLayerImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                        }
+                    }
+                    
+                    // draw facility graphics if applicable
+                    StratconFacility facility = currentTrack.getFacility(currentCoords);
+
+                    if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
+                        BufferedImage facilityImage = this.getImage(facility.getFacilityType().name(), ImageType.Facility);
+
+                        // draw the image if we can find one. 
+                        // Note: we track our current position using the facility marker, so it cannot be removed entirely
+                        if (facilityImage != null) {
+                            g2D.drawImage(facilityImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                         }
                     }
                     
@@ -399,38 +415,49 @@ public class StratconPanel extends JPanel implements ActionListener {
         return pointFound;
     }
     
-    private BufferedImage getTerrainImage(String terrainType) {
-        if (imageCache.containsKey(terrainType)) {
-            return imageCache.get(terrainType);
+    /**
+     * Retrieves a buffered image from a file given a key into the config file (StratconBiomeManifest.xml)
+     */
+    private BufferedImage getImage(String imageKey, ImageType imageType) {
+        if (imageCache.containsKey(imageKey)) {
+            return imageCache.get(imageKey);
         }
         
-        // TODO: Cache these
-        String imageName = StratconBiomeManifest.getInstance().getBiomeImage(terrainType);
+        String imageName = null;
+        
+        switch (imageType) {
+            case TerrainTile:
+                imageName = StratconBiomeManifest.getInstance().getBiomeImage(imageKey);
+                break;
+            case Facility:
+                imageName = StratconBiomeManifest.getInstance().getFacilityImage(imageKey);
+                break;
+        }
 
         if (imageName == null) {
             return null;
         }
 
         File biomeImageFile = new File(imageName);
-        BufferedImage biomeImage = null;
+        BufferedImage image = null;
 
         try {
-            biomeImage = ImageIO.read(biomeImageFile);
+            image = ImageIO.read(biomeImageFile);
         } catch (Exception e) {
-            LogManager.getLogger().error("Unable to load terrain tile image: " + imageName + " for terrain type '" + terrainType + "'");
+            LogManager.getLogger().error("Unable to load image: " + imageName + " with ID '" + imageKey + "'");
             return null;
         }
         
-        double xScale = HEX_X_RADIUS * 2.0 / biomeImage.getWidth();
-        double yScale = HEX_Y_RADIUS * 2.0 / biomeImage.getHeight();
-        BufferedImage scaledBiomeImage = new BufferedImage(HEX_X_RADIUS * 2, HEX_Y_RADIUS * 2, BufferedImage.TYPE_INT_ARGB);
+        double xScale = HEX_X_RADIUS * 2.0 / image.getWidth();
+        double yScale = HEX_Y_RADIUS * 2.0 / image.getHeight();
+        BufferedImage scaledImage = new BufferedImage(HEX_X_RADIUS * 2, HEX_Y_RADIUS * 2, BufferedImage.TYPE_INT_ARGB);
         AffineTransform at = new AffineTransform();
         at.scale(xScale, yScale);
         AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-        scaledBiomeImage = scaleOp.filter(biomeImage, scaledBiomeImage);
+        scaledImage = scaleOp.filter(image, scaledImage);
 
-        imageCache.put(terrainType, scaledBiomeImage);        
-        return scaledBiomeImage;
+        imageCache.put(imageKey, scaledImage);        
+        return scaledImage;
     }
 
     /**
@@ -511,7 +538,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.GREEN : Color.RED);
-                    g2D.drawPolygon(facilityMarker);
+                    //g2D.drawPolygon(facilityMarker);                    
                     drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
                 }
 

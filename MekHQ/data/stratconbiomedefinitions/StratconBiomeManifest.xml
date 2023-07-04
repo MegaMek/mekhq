@@ -37,6 +37,7 @@
 	<allowedTerrainTypes>ColdHills</allowedTerrainTypes>
 	<allowedTerrainTypes>ColdMountain</allowedTerrainTypes>
 	<allowedTerrainTypes>ColdSea</allowedTerrainTypes>
+	<allowedTerrainTypes>ColdUrban</allowedTerrainTypes>
     </biomes>
     <biomes>
 	<biomeCategory>Terran</biomeCategory>
@@ -49,6 +50,7 @@
 	<allowedTerrainTypes>Hills</allowedTerrainTypes>
 	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
 	<allowedTerrainTypes>Sea</allowedTerrainTypes>
+	<allowedTerrainTypes>Urban</allowedTerrainTypes>
     </biomes>
     <biomes>
 	<biomeCategory>Terran</biomeCategory>
@@ -61,6 +63,7 @@
 	<allowedTerrainTypes>Hills</allowedTerrainTypes>
 	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
 	<allowedTerrainTypes>Sea</allowedTerrainTypes>
+	<allowedTerrainTypes>Urban</allowedTerrainTypes>
     </biomes>
     <biomes>
 	<biomeCategory>Terran</biomeCategory>
@@ -77,6 +80,7 @@
 	<allowedTerrainTypes>HotMountain</allowedTerrainTypes>
 	<allowedTerrainTypes>Sea</allowedTerrainTypes>
 	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
+	<allowedTerrainTypes>Urban</allowedTerrainTypes>
     </biomes>
     <biomes>
 	<biomeCategory>Terran</biomeCategory>
@@ -90,6 +94,7 @@
 	<allowedTerrainTypes>Hills</allowedTerrainTypes>
 	<allowedTerrainTypes>Mountain</allowedTerrainTypes>
 	<allowedTerrainTypes>HotSea</allowedTerrainTypes>
+	<allowedTerrainTypes>HotUrban</allowedTerrainTypes>
     </biomes>
     <biomes>
 	<biomeCategory>Terran</biomeCategory>
@@ -397,7 +402,12 @@
 			<key>Volcano</key>
 			<value>data\images\hexes\stratcon\Stratcon_Volcanic.png</value>
 		</entry>
-
-
 	</biomeImages>
+
+	<facilityImages>
+		<entry>
+			<key>Default</key>
+			<value>data\images\hexes\saxarba\building_single\legacy_tower2.png</value>
+		</entry>
+	</facilityImages>
 </StratconBiomeManifest>

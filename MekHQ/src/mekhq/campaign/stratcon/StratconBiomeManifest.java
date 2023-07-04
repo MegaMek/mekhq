@@ -18,6 +18,12 @@ import java.util.*;
 @XmlAccessorType(XmlAccessType.NONE)
 public class StratconBiomeManifest {
     public static final String FOG_OF_WAR = "FogOfWar";
+    public static final String DEFAULT = "Default";
+    
+    public enum ImageType {
+        TerrainTile,
+        Facility
+    }
     
     public static class MapTypeList {
         public List<String> mapTypes = new ArrayList<>();
@@ -29,6 +35,8 @@ public class StratconBiomeManifest {
     private Map<String, MapTypeList> biomeMapTypes = new HashMap<>();
     @XmlElement(name="biomeImages")
     private Map<String, String> biomeImages = new HashMap<>();
+    @XmlElement(name="facilityImages")
+    private Map<String, String> facilityImages = new HashMap<>();
     
     // derived fields, populated at load time
     private Map<String, TreeMap<Integer, StratconBiome>> biomeTempMap = new HashMap<>();
@@ -50,6 +58,25 @@ public class StratconBiomeManifest {
             return biomeImages.get(biomeType);
         }
 
+        LogManager.getLogger().warn("Biome image not defined in data\\stratconbiomedefinitions\\StratconBiomeManifest.xml: " + biomeType);
+        return null;
+    }
+    
+    /**
+     * Get the file path for the facility image corresponding to the given facility type
+     * Returns default facility if specific facility type is not defined.
+     */
+    public String getFacilityImage(String facilityType) {
+        if (facilityImages.containsKey(facilityType)) {
+            return facilityImages.get(facilityType);
+        }
+        
+        if (facilityImages.containsKey(DEFAULT)) {
+            return facilityImages.get(DEFAULT);
+        }
+        
+        LogManager.getLogger().warn("Default facility image not defined in data\\stratconbiomedefinitions\\StratconBiomeManifest.xml.");
+        
         return null;
     }
     
