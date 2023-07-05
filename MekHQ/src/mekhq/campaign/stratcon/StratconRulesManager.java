@@ -1362,7 +1362,7 @@ public class StratconRulesManager {
 
         int dataCenterModifier = track.getScenarioOddsAdjustment();
 
-        return 100;//track.getScenarioOdds() + moraleModifier + dataCenterModifier;
+        return track.getScenarioOdds() + moraleModifier + dataCenterModifier;
     }
 
     /**
