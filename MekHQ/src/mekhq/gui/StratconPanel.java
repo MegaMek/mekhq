@@ -314,7 +314,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         // a) apply the current transform to it, prior to drawing all the hexes
         // b) subtract an additional Y_RADIUS x 2 (Y_DIAMETER)
         // this gets us the point within the clicked hex
-        // it's probably finicky, so any major changes to the rendering mechanism will likely break the detection
+        // it's probably finicky, so any major changes to the rendering mechanism will likely break click detection
         if (clickedPoint != null) {
             translatedClickedPoint = (Point) clickedPoint.clone();
 
@@ -333,6 +333,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
+                StratconCoords currentCoords = new StratconCoords(x, y);
+                
                 if (drawHexType == DrawHexType.Outline) {
                     g2D.setColor(Color.BLACK);
                     //g2D.drawPolygon(graphHex);
@@ -340,7 +342,6 @@ public class StratconPanel extends JPanel implements ActionListener {
                     // note: this polygon fill is necessary for click detection, so it must be left here
                     g2D.setColor(Color.DARK_GRAY);
                     g2D.fillPolygon(graphHex);
-                    StratconCoords currentCoords = new StratconCoords(x, y);
 
                     // draw a hex image if we've got one
                     BufferedImage biomeImage = getImage(currentTrack.getTerrainTile(currentCoords), ImageType.TerrainTile);
@@ -396,12 +397,17 @@ public class StratconPanel extends JPanel implements ActionListener {
                     }
                 }
 
+                // here we draw the coordinate labels
                 if (drawHexType == DrawHexType.Hex) {
-                    g2D.setColor(Color.ORANGE);
-                    //g2D.drawString(currentTrack.getTerrainTile(new StratconCoords(x, y)),
-                    //        graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + (yRadius * 2 / 3));
                     g2D.setColor(Color.GREEN);
-                    g2D.drawString(x + "," + y, graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + yRadius);
+                    
+                    Font pushFont = g2D.getFont();
+                    Font newFont = pushFont.deriveFont(Font.BOLD, pushFont.getSize());
+                    g2D.setFont(newFont);
+                    
+                    g2D.drawString(currentCoords.toString(), graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + ((int) (g2D.getFontMetrics().getHeight() / 1.25)));
+                    
+                    g2D.setFont(pushFont);
                 }
 
                 int[] downwardVector = getDownwardYVector();

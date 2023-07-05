@@ -39,6 +39,10 @@ public class StratconBiomeManifest {
     public static final String FOG_OF_WAR = "FogOfWar";
     public static final String DEFAULT = "Default";
     
+    // these constants will eventually be driven by planetary or track data
+    public static final String TERRAN_BIOME = "Terran";
+    public static final String TERRAN_FACILITY_BIOME = "TerranFacility";
+    
     public enum ImageType {
         TerrainTile,
         Facility

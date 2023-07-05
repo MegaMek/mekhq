@@ -39,6 +39,7 @@
 	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>278</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>287</allowedTemperatureUpperBound>
+	<allowedTerrainTypes>Badlands</allowedTerrainTypes>
         <allowedTerrainTypes>Plains</allowedTerrainTypes>
         <allowedTerrainTypes>Forest</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
@@ -52,6 +53,7 @@
 	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>288</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>297</allowedTemperatureUpperBound>
+	<allowedTerrainTypes>Badlands</allowedTerrainTypes>
         <allowedTerrainTypes>Plains</allowedTerrainTypes>
         <allowedTerrainTypes>Forest</allowedTerrainTypes>
         <allowedTerrainTypes>Swamp</allowedTerrainTypes>
@@ -65,6 +67,7 @@
 	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>298</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>307</allowedTemperatureUpperBound>
+	<allowedTerrainTypes>Badlands</allowedTerrainTypes>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
         <allowedTerrainTypes>Forest</allowedTerrainTypes>
         <allowedTerrainTypes>HotForest</allowedTerrainTypes>
@@ -85,6 +88,7 @@
 	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>308</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>317</allowedTemperatureUpperBound>
+	<allowedTerrainTypes>Badlands</allowedTerrainTypes>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
         <allowedTerrainTypes>HotForest</allowedTerrainTypes>
         <allowedTerrainTypes>Jungle</allowedTerrainTypes>
@@ -103,6 +107,7 @@
 	<biomeCategory>Terran</biomeCategory>
         <allowedTemperatureLowerBound>318</allowedTemperatureLowerBound>
         <allowedTemperatureUpperBound>90000</allowedTemperatureUpperBound>
+	<allowedTerrainTypes>Badlands</allowedTerrainTypes>
         <allowedTerrainTypes>Savannah</allowedTerrainTypes>
         <allowedTerrainTypes>Jungle</allowedTerrainTypes>
         <allowedTerrainTypes>Desert</allowedTerrainTypes>
@@ -112,7 +117,7 @@
 	<allowedTerrainTypes>HotMountainDry</allowedTerrainTypes>
 	<allowedTerrainTypes>HotMountainWet</allowedTerrainTypes>
     </biomes>
-    <!-- Terran biomes, but for facilities -->
+    <!-- Generic facility biomes for defaults -->
     <biomes>
 	<biomeCategory>TerranFacility</biomeCategory>
         <allowedTemperatureLowerBound>0</allowedTemperatureLowerBound>
@@ -144,6 +149,22 @@
             <value>
                 <mapTypes>ArcticDesert</mapTypes>
                 <mapTypes>ArcticDesert-Rough</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>Badlands</key>
+            <value>
+                <mapTypes>Dust-bowl</mapTypes>
+                <mapTypes>Light-craters</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>ColdFacility</key>
+            <value>
+                <mapTypes>ColdSeaCoastalFort</mapTypes>
+                <mapTypes>CityCold</mapTypes>
+                <mapTypes>TownCold</mapTypes>
+                <mapTypes>BaseCold</mapTypes>
             </value>
         </entry>
 	<entry>
@@ -224,6 +245,14 @@
                 <mapTypes>Wooded-valley</mapTypes>
                 <mapTypes>Woods-river</mapTypes>
                 <mapTypes>Wooded-swamp</mapTypes>
+                <mapTypes>Town-wooded</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>FrozenFacility</key>
+            <value>
+                <mapTypes>BaseCold</mapTypes>
+                <mapTypes>IceOutpost</mapTypes>
             </value>
         </entry>
 	<entry>
@@ -260,6 +289,15 @@
                 <mapTypes>Hills-RiverRoad</mapTypes>
                 <mapTypes>Light-craters</mapTypes>
                 <mapTypes>Wooded-hills</mapTypes>
+            </value>
+        </entry>
+	<entry>
+            <key>HotFacility</key>
+            <value>
+                <mapTypes>BaseHotDesert</mapTypes>
+                <mapTypes>BaseHotJungle</mapTypes>
+                <mapTypes>CityHotDesert</mapTypes>
+                <mapTypes>CityHotJungle</mapTypes>
             </value>
         </entry>
 	<entry>
@@ -378,6 +416,7 @@
                 <mapTypes>SteppeGrass</mapTypes>
                 <mapTypes>SteppeSnow</mapTypes>
                 <mapTypes>SteppeOutpost</mapTypes>
+                <mapTypes>Town-farming</mapTypes>
             </value>
         </entry>
 	<entry>
@@ -402,7 +441,21 @@
                 <mapTypes>TundraTownSnow</mapTypes>
                 <mapTypes>Wooded-tundra</mapTypes>
             </value>
-        </entry>	
+        </entry>
+	<entry>
+            <key>TemperateFacility</key>
+            <value>
+                <mapTypes>City-dense</mapTypes>
+                <mapTypes>City-high</mapTypes>
+                <mapTypes>Fortress-City</mapTypes>
+                <mapTypes>Town-concrete</mapTypes>
+                <mapTypes>Town-generic</mapTypes>
+                <mapTypes>Town-ruin</mapTypes>
+                <mapTypes>PlainsOutpost</mapTypes>
+		<mapTypes>PlainsTown</mapTypes>
+                <mapTypes>Town-wooded</mapTypes>
+            </value>
+        </entry>
 	<entry>
             <key>Urban</key>
             <value>
@@ -412,6 +465,7 @@
                 <mapTypes>Fortress-City</mapTypes>
                 <mapTypes>Town-generic</mapTypes>
                 <mapTypes>Town-ruin</mapTypes>
+		<mapTypes>Seaport</mapTypes>
             </value>
         </entry>
     </biomeMapTypes>
@@ -419,6 +473,10 @@
 		<entry>
 			<key>ArcticDesert</key>
 			<value>data\images\hexes\stratcon\Stratcon_Arctic_Desert.png</value>
+		</entry>
+		<entry>
+			<key>Badlands</key>
+			<value>data\images\hexes\stratcon\Stratcon_Cold_Mars.png</value>
 		</entry>
 		<entry>
 			<key>ColdForest</key>

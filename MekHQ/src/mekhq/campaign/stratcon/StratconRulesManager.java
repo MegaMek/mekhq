@@ -186,7 +186,6 @@ public class StratconRulesManager {
     public static void setScenarioParametersFromBiome(StratconTrackState track, StratconScenario scenario) {
         StratconCoords coords = scenario.getCoords();
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
-        boolean isFacility = track.getFacility(scenario.getCoords()) != null;
 
         // for non-surface scenarios, we will skip the temperature update
         if (backingScenario.getTerrainType() != Scenario.TER_LOW_ATMO &&
@@ -196,11 +195,30 @@ public class StratconRulesManager {
         
         // for now, if we're using a fixed map or in a facility, don't replace the scenario
         // TODO: facility spaces will always have a relevant biome
-        if (backingScenario.isUsingFixedMap() || isFacility) {
+        if (backingScenario.isUsingFixedMap()) {
             return; // for now
         }
 
-        String terrainType = track.getTerrainTile(coords);
+        StratconFacility facility = track.getFacility(scenario.getCoords());
+        String terrainType;
+        
+        // facilities have their own terrain lists
+        if (facility != null) {
+            int kelvinTemp = track.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+            StratconBiome facilityBiome;
+            
+            // if facility doesn't have a biome temp map, use the default one
+            if (facility.getBiomes().isEmpty()) {
+                facilityBiome = StratconBiomeManifest.getInstance().getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
+                        .floorEntry(kelvinTemp).getValue();
+            } else {
+                facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
+            }
+            terrainType = facilityBiome.allowedTerrainTypes.get(Compute.randomInt(facilityBiome.allowedTerrainTypes.size()));
+        } else {
+            terrainType = track.getTerrainTile(coords);
+        }
+        
         var mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
 
         // don't have a map list for the given terrain, leave it alone
