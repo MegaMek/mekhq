@@ -335,7 +335,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 if (drawHexType == DrawHexType.Outline) {
                     g2D.setColor(Color.BLACK);
-                    g2D.drawPolygon(graphHex);
+                    //g2D.drawPolygon(graphHex);
                 } else if (drawHexType == DrawHexType.Hex) {
                     // note: this polygon fill is necessary for click detection, so it must be left here
                     g2D.setColor(Color.DARK_GRAY);
@@ -398,8 +398,8 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if (drawHexType == DrawHexType.Hex) {
                     g2D.setColor(Color.ORANGE);
-                    g2D.drawString(currentTrack.getTerrainTile(new StratconCoords(x, y)),
-                            graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + (yRadius * 2 / 3));
+                    //g2D.drawString(currentTrack.getTerrainTile(new StratconCoords(x, y)),
+                    //        graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + (yRadius * 2 / 3));
                     g2D.setColor(Color.GREEN);
                     g2D.drawString(x + "," + y, graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + yRadius);
                 }

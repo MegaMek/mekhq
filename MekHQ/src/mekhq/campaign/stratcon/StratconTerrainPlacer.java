@@ -17,6 +17,8 @@
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
 package mekhq.campaign.stratcon;
+import java.util.HashSet;
+import java.util.Set;
 import megamek.common.Compute;
 import megamek.common.Coords;
 
@@ -46,6 +48,24 @@ public class StratconTerrainPlacer {
             }
         }
 
+        // the following code is useful for quickly displaying all possible (Terran) terrain types on a newly generated track
+        // unclean, but a pain enough to reproduce that I've left it here
+        /*int x = 0;
+        int y = 0;
+        Set<String> terrainTypes = new HashSet<>();
+        for (StratconBiome testBiome : StratconBiomeManifest.getInstance().getTempMap("Terran").values()) {
+            terrainTypes.addAll(testBiome.allowedTerrainTypes);
+        }
+        
+        for (String biomeName : terrainTypes) {
+            track.setTerrainTile(new StratconCoords(x, y), biomeName);
+            x++;
+            if (x >= track.getWidth()) {
+                x = 0;
+                y++;
+            }
+        }*/
+        
         for (int x = 0; x < biome.allowedTerrainTypes.size(); x++) {
             if (x != baseTerrainIndex) {
                 DrawStripe(track, biome.allowedTerrainTypes.get(x));

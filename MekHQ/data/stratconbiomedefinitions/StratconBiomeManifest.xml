@@ -425,12 +425,24 @@
 			<value>data\images\hexes\stratcon\Stratcon_Cold_Forest.png</value>
 		</entry>
 		<entry>
+			<key>ColdHills</key>
+			<value>data\images\hexes\stratcon\Stratcon_Cold_Hills.png</value>
+		</entry>
+		<entry>
+			<key>ColdSea</key>
+			<value>data\images\hexes\stratcon\Stratcon_Cold_Sea.png</value>
+		</entry>
+		<entry>
+			<key>ColdUrban</key>
+			<value>data\images\hexes\stratcon\Stratcon_Urban_Cold.png</value>
+		</entry>
+		<entry>
 			<key>Desert</key>
 			<value>data\images\hexes\stratcon\Stratcon_Desert.png</value>
 		</entry>
 		<entry>
 			<key>FogOfWar</key>
-			<value>data\images\hexes\transparent\heavy_smoke.png</value>
+			<value>data\images\hexes\stratcon\Fog_Of_War.png</value>
 		</entry>
 		<entry>
 			<key>Forest</key>
@@ -457,16 +469,24 @@
 			<value>data\images\hexes\stratcon\Stratcon_Hills.png</value>
 		</entry>
 		<entry>
+			<key>HotForest</key>
+			<value>data\images\hexes\stratcon\Stratcon_Jungle.png</value>
+		</entry>
+		<entry>
 			<key>HotHillsDry</key>
-			<value>data\images\hexes\stratcon\Stratcon_Hills.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Hot_Hills_Dry.png</value>
 		</entry>
 		<entry>
 			<key>HotHillsWet</key>
-			<value>data\images\hexes\stratcon\Stratcon_Hills.png</value>
+			<value>data\images\hexes\stratcon\Stratcon_Hot_Hills_Wet.png</value>
 		</entry>
 		<entry>
 			<key>HotSea</key>
 			<value>data\images\hexes\stratcon\Stratcon_Hot_Sea.png</value>
+		</entry>
+		<entry>
+			<key>HotUrban</key>
+			<value>data\images\hexes\stratcon\Stratcon_Urban_Hot.png</value>
 		</entry>
 		<entry>
 			<key>Jungle</key>
@@ -475,6 +495,18 @@
 		<entry>
 			<key>Mountain</key>
 			<value>data\images\hexes\stratcon\Stratcon_Mountains.png</value>
+		</entry>
+		<entry>
+			<key>HotMountainWet</key>
+			<value>data\images\hexes\stratcon\Stratcon_Mountains.png</value>
+		</entry>
+		<entry>
+			<key>HotMountainDry</key>
+			<value>data\images\hexes\stratcon\Stratcon_Hot_Mountain.png</value>
+		</entry>
+		<entry>
+			<key>ColdMountain</key>
+			<value>data\images\hexes\stratcon\Stratcon_Cold_Mountain.png</value>
 		</entry>
 		<entry>
 			<key>Mars</key>
@@ -507,6 +539,10 @@
 		<entry>
 			<key>Tundra</key>
 			<value>data\images\hexes\stratcon\Stratcon_Tundra.png</value>
+		</entry>
+		<entry>
+			<key>Urban</key>
+			<value>data\images\hexes\stratcon\Stratcon_Urban_Temperate.png</value>
 		</entry>
 		<entry>
 			<key>Volcano</key>
