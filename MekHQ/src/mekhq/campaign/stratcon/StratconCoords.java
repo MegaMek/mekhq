@@ -88,4 +88,11 @@ public class StratconCoords extends Coords {
     public String toString() {
         return String.format("%s, %s", getX(), getY());
     }
+    
+    /**
+     * Returns a tabletop battletech-like coordinate string
+     */
+    public String toBTString() {
+        return String.format("%02d%02d", getX(), getY());
+    }
 }

@@ -193,14 +193,9 @@ public class StratconScenario implements IStratconDisplayable {
             .append(currentState.getScenarioStateName())
             .append("<br/>");
 
-        stateBuilder.append("Terrain: ");
-        if ((backingScenario.getTerrainType() >= 0) &&
-                (backingScenario.getTerrainType() < AtBScenario.terrainTypes.length)) {
-            stateBuilder.append(AtBScenario.terrainTypes[backingScenario.getTerrainType()])
-                .append(" : ")
-                .append(backingScenario.getMap());
-        }
-        stateBuilder.append("<br/>");
+        stateBuilder.append("Terrain: ")
+                .append(backingScenario.getMap())
+                .append("<br/>");
 
         if (deploymentDate != null) {
             stateBuilder.append("Deployment Date: ")

@@ -242,6 +242,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRATCON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.xml";
     public static final String STRATCON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.xml";
     public static final String STRATCON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
+
+    public static final String STRATCON_BIOME_MANIFEST_PATH = "./data/stratconbiomedefinitions/StratconBiomeManifest.xml";
     public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.xml";
     public static final String ALLIED_FACILITY_SCENARIO = "Allied Facility.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_GROUND_UNITS = "PrimaryAlliesGround.xml";

@@ -461,26 +461,28 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
      * @return the row at which we wind up after doing all this
      */
     private int fillPlanetSideStats(GridBagConstraints gridBagConstraints, ResourceBundle resourceMap, int y) {
-        chkReroll[REROLL_TERRAIN] = new JCheckBox();
-        lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = y;
-        gridBagConstraints.gridwidth = 1;
-        panStats.add(lblTerrain, gridBagConstraints);
-
-        if (scenario.getStatus().isCurrent()) {
-            gridBagConstraints.gridx = 1;
+        if (scenario.getScenarioType() != AtBScenario.DYNAMIC) {
+            chkReroll[REROLL_TERRAIN] = new JCheckBox();
+            lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
+            gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
-            panStats.add(chkReroll[REROLL_TERRAIN], gridBagConstraints);
-            chkReroll[REROLL_TERRAIN].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollTerrain());
-            chkReroll[REROLL_TERRAIN].addItemListener(checkBoxListener);
-        }
+            panStats.add(lblTerrain, gridBagConstraints);
 
-        lblTerrainDesc.setText(AtBScenario.terrainTypes[scenario.getTerrainType()]);
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = y++;
-        panStats.add(lblTerrainDesc, gridBagConstraints);
+            if (scenario.getStatus().isCurrent()) {
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = y;
+                gridBagConstraints.gridwidth = 1;
+                panStats.add(chkReroll[REROLL_TERRAIN], gridBagConstraints);
+                chkReroll[REROLL_TERRAIN].setVisible(scenario.getRerollsRemaining() > 0 && scenario.canRerollTerrain());
+                chkReroll[REROLL_TERRAIN].addItemListener(checkBoxListener);
+            }
+
+            lblTerrainDesc.setText(AtBScenario.terrainTypes[scenario.getTerrainType()]);
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = y++;
+            panStats.add(lblTerrainDesc, gridBagConstraints);
+        }
 
         lblMap.setText(resourceMap.getString("lblMap.text"));
         gridBagConstraints.gridx = 0;

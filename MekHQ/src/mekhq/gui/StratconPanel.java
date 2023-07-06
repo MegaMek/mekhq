@@ -20,6 +20,7 @@ import mekhq.campaign.stratcon.*;
 import mekhq.gui.stratcon.StratconScenarioWizard;
 import mekhq.gui.stratcon.TrackForceAssignmentUI;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -29,9 +30,15 @@ import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import megamek.common.util.ImageUtil;
+import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario track.
@@ -39,7 +46,7 @@ import java.util.Map;
  */
 public class StratconPanel extends JPanel implements ActionListener {
     public static final int HEX_X_RADIUS = 42;
-    public static final int HEX_Y_RADIUS = 37;
+    public static final int HEX_Y_RADIUS = 36;
 
     private static final String RCLICK_COMMAND_MANAGE_FORCES = "ManageForces";
     private static final String RCLICK_COMMAND_MANAGE_SCENARIO = "ManageScenario";
@@ -97,6 +104,8 @@ public class StratconPanel extends JPanel implements ActionListener {
     private TrackForceAssignmentUI assignmentUI;
 
     private JLabel infoArea;
+    
+    private Map<String, BufferedImage> imageCache = new HashMap<>();
 
     /**
      * Constructs a StratconPanel instance, given a parent campaign GUI and a pointer to an info area.
@@ -124,6 +133,12 @@ public class StratconPanel extends JPanel implements ActionListener {
     public void selectTrack(StratconCampaignState campaignState, StratconTrackState track) {
         this.campaignState = campaignState;
         currentTrack = track;
+
+        // clear hex selection
+        boardState.selectedX = null;
+        boardState.selectedY = null;
+        infoArea.setText(buildSelectedHexInfo());
+
         repaint();
     }
 
@@ -300,7 +315,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         // a) apply the current transform to it, prior to drawing all the hexes
         // b) subtract an additional Y_RADIUS x 2 (Y_DIAMETER)
         // this gets us the point within the clicked hex
-        // it's probably finicky, so any major changes to the rendering mechanism will likely break the detection
+        // it's probably finicky, so any major changes to the rendering mechanism will likely break click detection
         if (clickedPoint != null) {
             translatedClickedPoint = (Point) clickedPoint.clone();
 
@@ -314,23 +329,54 @@ public class StratconPanel extends JPanel implements ActionListener {
             //g2D.setColor(Color.ORANGE);
             //g2D.drawString(translatedClickedPoint.getX() + ", " + translatedClickedPoint.getY(), (int) clickedPoint.getX(), (int) clickedPoint.getY());
         }
+        
+        Font pushFont = g2D.getFont();
+        Font newFont = pushFont.deriveFont(Font.BOLD, pushFont.getSize());
+        g2D.setFont(newFont);
 
         boolean trackRevealed = currentTrack.hasActiveTrackReveal();
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
+                StratconCoords currentCoords = new StratconCoords(x, y);
+                
                 if (drawHexType == DrawHexType.Outline) {
-                    g2D.setColor(new Color(0, 0, 0));
-                    g2D.drawPolygon(graphHex);
+                    g2D.setColor(Color.BLACK);
+                    //g2D.drawPolygon(graphHex);
                 } else if (drawHexType == DrawHexType.Hex) {
-
-                    if (trackRevealed || currentTrack.isGmRevealed() || currentTrack.coordsRevealed(x, y)) {
-                        g2D.setColor(Color.LIGHT_GRAY);
-                    } else {
-                        g2D.setColor(Color.DARK_GRAY);
-                    }
+                    // note: this polygon fill is necessary for click detection, so it must be left here
+                    g2D.setColor(Color.DARK_GRAY);
                     g2D.fillPolygon(graphHex);
 
+                    // draw a hex image if we've got one
+                    BufferedImage biomeImage = getImage(currentTrack.getTerrainTile(currentCoords), ImageType.TerrainTile);
+
+                    if (biomeImage != null) {
+                        // left-most and topmost point; experimentally adjusted to avoid empty space in the top left
+                        g2D.drawImage(biomeImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                    }
+
+                    // draw fog of war if applicable
+                    if (!trackRevealed && !currentTrack.coordsRevealed(x, y)) {
+                        BufferedImage fogOfWarLayerImage = getImage(StratconBiomeManifest.FOG_OF_WAR, ImageType.TerrainTile);
+                        if (fogOfWarLayerImage != null) {
+                            g2D.drawImage(fogOfWarLayerImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                        }
+                    }
+                    
+                    // draw facility graphics if applicable
+                    StratconFacility facility = currentTrack.getFacility(currentCoords);
+
+                    if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
+                        BufferedImage facilityImage = this.getImage(facility.getFacilityType().name(), ImageType.Facility);
+
+                        // draw the image if we can find one. 
+                        // Note: we track our current position using the facility marker, so it cannot be removed entirely
+                        if (facilityImage != null) {
+                            g2D.drawImage(facilityImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
+                        }
+                    }
+                    
                     // useful for graphics coords debugging
                     //g2D.setColor(Color.pink);
                     //g2D.drawString(graphHex.getBounds().getX() + ", " + graphHex.getBounds().getY(), (int) graphHex.getBounds().getX(), (int) graphHex.getBounds().getY());
@@ -356,9 +402,10 @@ public class StratconPanel extends JPanel implements ActionListener {
                     }
                 }
 
+                // here we draw the coordinate labels
                 if (drawHexType == DrawHexType.Hex) {
                     g2D.setColor(Color.GREEN);
-                    g2D.drawString(x + "," + y, graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + yRadius);
+                    g2D.drawString(currentCoords.toBTString(), graphHex.xpoints[0] + (xRadius / 5), graphHex.ypoints[0] + ((int) (g2D.getFontMetrics().getHeight() / 1.25)));
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -368,8 +415,49 @@ public class StratconPanel extends JPanel implements ActionListener {
             int[] translationVector = getRightAndUpVector(x % 2 == 0);
             graphHex.translate(translationVector[0], translationVector[1]);
         }
+        
+        g2D.setFont(pushFont);
 
         return pointFound;
+    }
+    
+    /**
+     * Retrieves a buffered image from a file given a key into the config file (StratconBiomeManifest.xml)
+     */
+    private BufferedImage getImage(String imageKey, ImageType imageType) {
+        if (imageCache.containsKey(imageKey)) {
+            return imageCache.get(imageKey);
+        }
+        
+        String imageName = null;
+        
+        switch (imageType) {
+            case TerrainTile:
+                imageName = StratconBiomeManifest.getInstance().getBiomeImage(imageKey);
+                break;
+            case Facility:
+                imageName = StratconBiomeManifest.getInstance().getFacilityImage(imageKey);
+                break;
+        }
+
+        if (imageName == null) {
+            return null;
+        }
+
+        File biomeImageFile = new File(imageName);
+        BufferedImage image = null;
+
+        try {
+            image = ImageIO.read(biomeImageFile);
+        } catch (Exception e) {
+            LogManager.getLogger().error("Unable to load image: " + imageName + " with ID '" + imageKey + "'");
+            return null;
+        }
+        
+        BufferedImage scaledImage = ImageUtil.getScaledImage(image, HEX_X_RADIUS * 2, HEX_Y_RADIUS * 2);
+
+        imageCache.put(imageKey, scaledImage);        
+        return scaledImage;
     }
 
     /**
@@ -450,7 +538,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.GREEN : Color.RED);
-                    g2D.drawPolygon(facilityMarker);
+                    //g2D.drawPolygon(facilityMarker);                    
                     drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
                 }
 
@@ -522,7 +610,18 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         g2D.drawLine((int) startX, (int) startY, (int) midPointX, (int) midPointY);
         g2D.drawLine((int) midPointX, (int) midPointY, (int) endPointX, (int) midPointY);
-        g2D.drawString(text, (int) endPointX, (int) midPointY);
+        
+        // draw gray rectangle
+        Color push = g2D.getColor();
+        g2D.setColor(Color.GRAY);
+        int rectYStart = (int) midPointY - g2D.getFontMetrics().getHeight();
+        int rectWidth = g2D.getFontMetrics().stringWidth(text) + 4;
+        
+        g2D.fillRect((int) endPointX, rectYStart, rectWidth, g2D.getFontMetrics().getHeight());
+        g2D.setColor(push);
+        g2D.drawRect((int) endPointX, rectYStart, rectWidth, g2D.getFontMetrics().getHeight());
+        
+        g2D.drawString(text, (int) endPointX + 2, (int) midPointY - 2);
 
         // register that we drew text off of this hex
         numIconsInHex.put(coords, ++verticalOffsetIndex);
@@ -636,6 +735,13 @@ public class StratconPanel extends JPanel implements ActionListener {
     private String buildSelectedHexInfo() {
         StringBuilder infoBuilder = new StringBuilder();
         infoBuilder.append("<html><br/>");
+
+        infoBuilder.append("Average Temperature: ");
+        infoBuilder.append(currentTrack.getTemperature());
+        infoBuilder.append("&deg;C<br/>");
+        infoBuilder.append("Terrain Type: ");
+        infoBuilder.append(currentTrack.getTerrainTile(boardState.getSelectedCoords()));
+        infoBuilder.append("<br/>");
 
         boolean coordsRevealed = currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {

@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * This represents a facility in the StratCon context
@@ -67,6 +68,9 @@ public class StratconFacility implements Cloneable {
     //TODO: post-MVP
     //private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
     private boolean isStrategicObjective;
+    private List<StratconBiome> biomes = new ArrayList<>();
+    
+    private transient TreeMap<Integer, StratconBiome> biomeTempMap = new TreeMap<>();
 
     /**
      * A temporary variable used to track situations where changing the ownership of this facility
@@ -88,11 +92,13 @@ public class StratconFacility implements Cloneable {
         clone.scenarioOddsModifier = scenarioOddsModifier;
         clone.weeklySPModifier = weeklySPModifier;
         clone.preventAerospace = preventAerospace;
+        clone.biomes = new ArrayList<>(biomes);
+        ReconstructTransientData(clone);
         return clone;
     }
 
     /**
-     * Copies data from the source facility to here. Does not copy transient or cosmetic data.
+     * Copies data from the source facility to here. Does cosmetic data. Reconstructs file-driven transient data.
      */
     public void copyRulesDataFrom(StratconFacility facility) {
         setCapturedDefinition(facility.getCapturedDefinition());
@@ -103,6 +109,8 @@ public class StratconFacility implements Cloneable {
         setScenarioOddsModifier(facility.getScenarioOddsModifier());
         setWeeklySPModifier(facility.getWeeklySPModifier());
         setPreventAerospace(facility.preventAerospace());
+        setBiomes(new ArrayList<>(facility.getBiomes()));
+        ReconstructTransientData(this);
     }
 
     public ForceAlignment getOwner() {
@@ -183,6 +191,14 @@ public class StratconFacility implements Cloneable {
         this.isStrategicObjective = isStrategicObjective;
     }
 
+    public List<StratconBiome> getBiomes() {
+        return biomes;
+    }
+
+    public void setBiomes(List<StratconBiome> biomes) {
+        this.biomes = biomes;
+    }
+
     public void incrementOwnershipChangeScore() {
         ownershipChangeScore++;
     }
@@ -236,6 +252,13 @@ public class StratconFacility implements Cloneable {
     }
 
     /**
+     * Returns the biome temperature map (note: temperature mapping is in kelvins but stored in celsius)
+     */
+    public TreeMap<Integer, StratconBiome> getBiomeTempMap() {
+        return biomeTempMap;
+    }
+    
+    /**
      * Attempt to deserialize an instance of a StratconFacility from the passed-in file name
      * @return Possibly an instance of a StratconFacility
      */
@@ -258,8 +281,16 @@ public class StratconFacility implements Cloneable {
         } catch (Exception e) {
             LogManager.getLogger().error(String.format("Error Deserializing Facility %s", fileName), e);
         }
+       
+        ReconstructTransientData(resultingFacility);
 
         return resultingFacility;
+    }
+    
+    private static void ReconstructTransientData(StratconFacility facility) {
+        for (StratconBiome biome : facility.getBiomes()) {
+            facility.getBiomeTempMap().put(biome.allowedTemperatureLowerBound, biome);
+        }
     }
 
     public boolean preventAerospace() {

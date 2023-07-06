@@ -6,4 +6,28 @@
         <owner>Opposing</owner>
         <sharedModifiers>EnemyMechReinforcements.xml</sharedModifiers>
         <visible>false</visible>
+<biomes>
+	<biomeCategory>TerranFacility</biomeCategory>
+        <allowedTemperatureLowerBound>0</allowedTemperatureLowerBound>
+        <allowedTemperatureUpperBound>267</allowedTemperatureUpperBound>
+        <allowedTerrainTypes>FrozenFacility</allowedTerrainTypes>
+    </biomes>
+    <biomes>
+	<biomeCategory>TerranFacility</biomeCategory>
+        <allowedTemperatureLowerBound>268</allowedTemperatureLowerBound>
+        <allowedTemperatureUpperBound>277</allowedTemperatureUpperBound>
+        <allowedTerrainTypes>ColdFacility</allowedTerrainTypes>
+    </biomes>
+    <biomes>
+	<biomeCategory>TerranFacility</biomeCategory>
+        <allowedTemperatureLowerBound>278</allowedTemperatureLowerBound>
+        <allowedTemperatureUpperBound>297</allowedTemperatureUpperBound>
+        <allowedTerrainTypes>TemperateFacility</allowedTerrainTypes>
+    </biomes>
+    <biomes>
+	<biomeCategory>TerranFacility</biomeCategory>
+        <allowedTemperatureLowerBound>298</allowedTemperatureLowerBound>
+        <allowedTemperatureUpperBound>90000</allowedTemperatureUpperBound>
+        <allowedTerrainTypes>HotFacility</allowedTerrainTypes>
+    </biomes>
 </StratconFacility>
