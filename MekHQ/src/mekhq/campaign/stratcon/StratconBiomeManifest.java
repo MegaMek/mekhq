@@ -134,6 +134,7 @@ public class StratconBiomeManifest {
             }
         } catch (Exception e) {
             LogManager.getLogger().error("Error Deserializing Facility Manifest", e);
+            return null;
         }
 
         for (StratconBiome biome : resultingManifest.biomes) {

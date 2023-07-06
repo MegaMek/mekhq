@@ -405,7 +405,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                     Font newFont = pushFont.deriveFont(Font.BOLD, pushFont.getSize());
                     g2D.setFont(newFont);
                     
-                    g2D.drawString(currentCoords.toString(), graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + ((int) (g2D.getFontMetrics().getHeight() / 1.25)));
+                    g2D.drawString(currentCoords.toBTString(), graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + ((int) (g2D.getFontMetrics().getHeight() / 1.25)));
                     
                     g2D.setFont(pushFont);
                 }

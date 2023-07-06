@@ -355,7 +355,7 @@ public class StratconTab extends CampaignGuiTab {
                         break;
                 }
                 if (coordsRevealed && displayCoordinateData) {
-                    sb.append(" at ").append(objective.getObjectiveCoords().toString())
+                    sb.append(" at ").append(objective.getObjectiveCoords().toBTString())
                         .append(" on ").append(track.getDisplayableName());
                 }
 
