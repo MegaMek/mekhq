@@ -2518,7 +2518,7 @@ public class AtBDynamicScenarioFactory {
 
             // hack: make rocket launcher pods available before 3055
             if ((validBombChoices[x] == BombType.B_RL) ||
-                    BombType.get(typeName).isAvailableIn(year)) {
+                    BombType.get(typeName).isAvailableIn(year, false)) {
                 actualValidBombChoices.add(validBombChoices[x]);
             }
         }
