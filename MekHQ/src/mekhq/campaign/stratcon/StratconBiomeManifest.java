@@ -40,11 +40,27 @@ public class StratconBiomeManifest {
     public static final String DEFAULT = "Default";
     
     // these constants will eventually be driven by planetary or track data
+    /**
+     * The "Terran" default biome bucket, used as one of the possible arguments for calls to getTempMap()
+     */
     public static final String TERRAN_BIOME = "Terran";
+    
+    /**
+     * The "TerranFacility" default biome bucket, used as one of the possible arguments for calls to getTempMap()
+     */
     public static final String TERRAN_FACILITY_BIOME = "TerranFacility";
     
+    /**
+     * This enum is used to determine whether an image being retrieved is a terrain tile or a facility
+     */
     public enum ImageType {
+        /**
+         * Image name is retrieved using getBiomeImage()
+         */
         TerrainTile,
+        /**
+         * Image name is retrieved using getFacilityImage()
+         */
         Facility
     }
     

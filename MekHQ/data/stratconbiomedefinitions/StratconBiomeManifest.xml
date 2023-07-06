@@ -1,14 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!-- Must Have -->
-<!-- Urban/Military Base Terrain: Cold/Temperate/Hot Light/Military/City -->
-<!-- Somewhere between -->
-<!-- Match up terrain type to megamek terrain tags -->
-<!-- IN PROGRESS: Graphics for terrain types? -->
-<!-- Nice to Have -->
-<!-- modify "watery"/"dry" terrain type odds based on planetary water coverage -->
-<!-- add moon/mars/volcano extra-planetary terrain and rules for it -->
-<!-- volcano? -->
-<!-- WONTFIX: scenarios not spawned as a result of player action will have wrong terrain type until finalized -->
 <StratconBiomeManifest>
     <biomes>
 	<biomeCategory>Terran</biomeCategory>

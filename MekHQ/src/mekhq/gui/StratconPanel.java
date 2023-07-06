@@ -36,6 +36,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import megamek.common.util.ImageUtil;
 import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
 import org.apache.logging.log4j.LogManager;
 
@@ -328,6 +329,10 @@ public class StratconPanel extends JPanel implements ActionListener {
             //g2D.setColor(Color.ORANGE);
             //g2D.drawString(translatedClickedPoint.getX() + ", " + translatedClickedPoint.getY(), (int) clickedPoint.getX(), (int) clickedPoint.getY());
         }
+        
+        Font pushFont = g2D.getFont();
+        Font newFont = pushFont.deriveFont(Font.BOLD, pushFont.getSize());
+        g2D.setFont(newFont);
 
         boolean trackRevealed = currentTrack.hasActiveTrackReveal();
 
@@ -400,14 +405,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 // here we draw the coordinate labels
                 if (drawHexType == DrawHexType.Hex) {
                     g2D.setColor(Color.GREEN);
-                    
-                    Font pushFont = g2D.getFont();
-                    Font newFont = pushFont.deriveFont(Font.BOLD, pushFont.getSize());
-                    g2D.setFont(newFont);
-                    
-                    g2D.drawString(currentCoords.toBTString(), graphHex.xpoints[0] + (xRadius / 4), graphHex.ypoints[0] + ((int) (g2D.getFontMetrics().getHeight() / 1.25)));
-                    
-                    g2D.setFont(pushFont);
+                    g2D.drawString(currentCoords.toBTString(), graphHex.xpoints[0] + (xRadius / 5), graphHex.ypoints[0] + ((int) (g2D.getFontMetrics().getHeight() / 1.25)));
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -417,6 +415,8 @@ public class StratconPanel extends JPanel implements ActionListener {
             int[] translationVector = getRightAndUpVector(x % 2 == 0);
             graphHex.translate(translationVector[0], translationVector[1]);
         }
+        
+        g2D.setFont(pushFont);
 
         return pointFound;
     }
@@ -454,13 +454,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             return null;
         }
         
-        double xScale = HEX_X_RADIUS * 2.0 / image.getWidth();
-        double yScale = HEX_Y_RADIUS * 2.0 / image.getHeight();
-        BufferedImage scaledImage = new BufferedImage(HEX_X_RADIUS * 2, HEX_Y_RADIUS * 2, BufferedImage.TYPE_INT_ARGB);
-        AffineTransform at = new AffineTransform();
-        at.scale(xScale, yScale);
-        AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
-        scaledImage = scaleOp.filter(image, scaledImage);
+        BufferedImage scaledImage = ImageUtil.getScaledImage(image, HEX_X_RADIUS * 2, HEX_Y_RADIUS * 2);
 
         imageCache.put(imageKey, scaledImage);        
         return scaledImage;
