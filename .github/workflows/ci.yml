@@ -30,7 +30,7 @@ jobs:
 
     steps:
     # Checkout the Pull Request source and put it in: ./mekhq
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         path: mekhq
 
@@ -71,7 +71,7 @@ jobs:
 
     # Checkout the latest MegaMek source and put it in: ./megamek
     - name: Checkout MegaMek
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
 #        repository: ${{ steps.find_mm.outputs.mmRepo }}
 #        ref:  ${{ steps.find_mm.outputs.mmBranch }}
@@ -107,7 +107,7 @@ jobs:
 
     # Checkout the latest MegaMekLab source and put it in: ./megameklab
     - name: Checkout MegaMekLab
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
 #        repository: ${{ steps.find_mml.outputs.mmlRepo }}
 #        ref: ${{ steps.find_mml.outputs.mmlBranch }}
