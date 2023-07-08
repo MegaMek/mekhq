@@ -74,7 +74,7 @@ jobs:
         build-root-directory: mekhq
 
     - name: Upload Test Logs on Failure
-      uses: actions/upload-artifact@v2.2.4
+      uses: actions/upload-artifact@v3
       if: failure()
       with:
         name: ${{ matrix.os }}-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}-maven-ci-failure-logs
