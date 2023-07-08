@@ -342,7 +342,14 @@ public class StratconPanel extends JPanel implements ActionListener {
                 
                 if (drawHexType == DrawHexType.Outline) {
                     g2D.setColor(Color.BLACK);
-                    //g2D.drawPolygon(graphHex);
+                    
+                    // for legacy campaigns with no terrain data or if there's an un/poorly-defined terrain type
+                    // we'll retain drawing a hex outline
+                    BufferedImage biomeImage = getImage(currentTrack.getTerrainTile(currentCoords), ImageType.TerrainTile);
+                    
+                    if (biomeImage == null) {
+                        g2D.drawPolygon(graphHex);
+                    }
                 } else if (drawHexType == DrawHexType.Hex) {
                     // note: this polygon fill is necessary for click detection, so it must be left here
                     g2D.setColor(Color.DARK_GRAY);
