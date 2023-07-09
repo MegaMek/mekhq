@@ -137,7 +137,7 @@ task mmJarLibDir (type: Jar, dependsOn: compileMM) {
     outputs.file jarLocation
 }
 
-task compileMML (type: GradleBuild) {
+task compileMML (type: GradleBuild, dependsOn: compileMM) {
     description = 'Compiles the MML directory for packaging in a Jar'
 
     buildName = "mhq-compile-mml"
@@ -163,7 +163,12 @@ task mmlJar (type: Jar, dependsOn: compileMML) {
     outputs.file jarLocation
 }
 
+compileJava.dependsOn 'compileMM'
+compileJava.dependsOn 'compileMML'
+
 jar {
+    dependsOn mmJar
+    dependsOn mmlJar
     archiveFileName = "MekHQ.jar"
     manifest {
         attributes "Main-Class" : mainClassName
