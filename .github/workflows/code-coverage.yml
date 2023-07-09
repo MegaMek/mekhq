@@ -87,7 +87,7 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: clean build --stacktrace --scan
+        arguments: clean build --no-build-cache --stacktrace --scan
         build-root-directory: mekhq
       
     # If the build step fails, try to upload any test logs in case it was a unit test failure.
