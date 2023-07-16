@@ -38,6 +38,11 @@ import java.util.*;
 public class StratconBiomeManifest {
     public static final String FOG_OF_WAR = "FogOfWar";
     public static final String DEFAULT = "Default";
+    public static final String HEX_SELECTED = "HexSelected";
+    public static final String FACILITY_HOSTILE = "FacilityHostile";
+    public static final String FACILITY_ALLIED = "FacilityAllied";
+    public static final String FORCE_FRIENDLY = "ForceFriendly";
+    public static final String FORCE_HOSTILE = "ForceHostile";
     
     // these constants will eventually be driven by planetary or track data
     /**
