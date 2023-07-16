@@ -574,7 +574,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 StratconFacility facility = currentTrack.getFacility(currentCoords);             
                 
                 if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
-                    g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.GREEN : Color.RED);
+                    g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.CYAN : Color.RED);
                     
                     BufferedImage facilityImage = getFacilityImage(facility);
 
@@ -618,7 +618,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 if (currentTrack.getAssignedCoordForces().containsKey(currentCoords)) {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {
-                        g2D.setColor(Color.CYAN);
+                        g2D.setColor(Color.GREEN);
                         
                         BufferedImage forceImage = getImage(StratconBiomeManifest.FORCE_FRIENDLY, ImageType.TerrainTile);
                         if (forceImage != null) {
