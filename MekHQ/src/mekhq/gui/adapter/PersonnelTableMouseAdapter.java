@@ -2083,8 +2083,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             cbMenuItem.setName("miClanPersonnel");
             cbMenuItem.setSelected(person.isClanPersonnel());
             cbMenuItem.addActionListener(evt -> {
-                final boolean marriageable = !person.isMarriageable();
-                Stream.of(selected).forEach(p -> p.setMarriageable(marriageable));
+                final boolean clanPersonnel = !person.isClanPersonnel();
+                Stream.of(selected).forEach(p -> p.setClanPersonnel(clanPersonnel));
             });
             menu.add(cbMenuItem);
         }
