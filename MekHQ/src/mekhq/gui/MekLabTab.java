@@ -460,10 +460,26 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private abstract static class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource {
+
+        private boolean refreshRequired = false;
         @Override
         public abstract Entity getEntity();
 
         abstract void setTechFaction(int techFaction);
+
+
+        @Override
+        public void scheduleRefresh() {
+            refreshRequired = true;
+            SwingUtilities.invokeLater(this::performRefresh);
+        }
+
+        private void performRefresh() {
+            if (refreshRequired) {
+                refreshRequired = false;
+                refreshAll();
+            }
+        }
     }
 
     private class AeroPanel extends EntityPanel {
