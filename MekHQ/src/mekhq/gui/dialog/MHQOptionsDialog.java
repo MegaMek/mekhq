@@ -102,6 +102,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private ColourSelectorButton optionPregnantBackground;
     private ColourSelectorButton optionPaidRetirementForeground;
     private ColourSelectorButton optionPaidRetirementBackground;
+    private ColourSelectorButton optionStratConHexCoordForeground;
     //endregion Colors
 
     //region Fonts
@@ -468,6 +469,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPaidRetirementForeground = new ColourSelectorButton(resources.getString("optionPaidRetirementForeground.text"));
 
         optionPaidRetirementBackground = new ColourSelectorButton(resources.getString("optionPaidRetirementBackground.text"));
+
+        optionStratConHexCoordForeground = new ColourSelectorButton(resources.getString("optionStratConHexCoordForeground.text"));
         //endregion Create Graphical Components
 
         //region Layout
@@ -529,6 +532,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(optionPaidRetirementForeground)
                                 .addComponent(optionPaidRetirementBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionStratConHexCoordForeground))
         );
 
         layout.setHorizontalGroup(
@@ -581,6 +586,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionPaidRetirementForeground)
                                 .addComponent(optionPaidRetirementBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionStratConHexCoordForeground))
         );
         //endregion Layout
 
@@ -1068,7 +1075,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setPregnantBackground(optionPregnantBackground.getColour());
         MekHQ.getMHQOptions().setPaidRetirementForeground(optionPaidRetirementForeground.getColour());
         MekHQ.getMHQOptions().setPaidRetirementBackground(optionPaidRetirementBackground.getColour());
-
+        MekHQ.getMHQOptions().setStratConHexCoordForeground(optionStratConHexCoordForeground.getColour());
         MekHQ.getMHQOptions().setMedicalViewDialogHandwritingFont(comboMedicalViewDialogHandwritingFont.getFont().getFamily());
 
         MekHQ.getMHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
@@ -1171,6 +1178,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPregnantBackground.setColour(MekHQ.getMHQOptions().getPregnantBackground());
         optionPaidRetirementForeground.setColour(MekHQ.getMHQOptions().getPaidRetirementForeground());
         optionPaidRetirementBackground.setColour(MekHQ.getMHQOptions().getPaidRetirementBackground());
+        optionStratConHexCoordForeground.setColour(MekHQ.getMHQOptions().getStratConHexCoordForeground());
 
         comboMedicalViewDialogHandwritingFont.setSelectedItem(new FontDisplay(MekHQ.getMHQOptions().getMedicalViewDialogHandwritingFont()));
 
