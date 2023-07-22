@@ -452,11 +452,11 @@ public final class MHQOptions extends SuiteOptions {
     }
 
     public Color getStratConHexCoordForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.STRATCON_HEXT_COORD_FOREGROUND, Color.GREEN.getRGB()));
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
     }
 
     public void setStratConHexCoordForeground(Color value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.STRATCON_HEXT_COORD_FOREGROUND, value.getRGB());
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, value.getRGB());
     }
     //endregion Colours
 

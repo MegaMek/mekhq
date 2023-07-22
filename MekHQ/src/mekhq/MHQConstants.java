@@ -113,7 +113,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String PREGNANT_BACKGROUND = "pregnantBackground";
     public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
     public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
-    public static final String STRATCON_HEXT_COORD_FOREGROUND = "stratconHexCoordForeground";
+    public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     //endregion Colours
 
     //region Fonts
