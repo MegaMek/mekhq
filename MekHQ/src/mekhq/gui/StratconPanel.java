@@ -13,6 +13,7 @@
 */
 package mekhq.gui;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
@@ -413,7 +414,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
                 // here we draw the coordinate labels
                 if (drawHexType == DrawHexType.Hex) {
-                    g2D.setColor(Color.GREEN);
+                    g2D.setColor(MekHQ.getMHQOptions().getStratConHexCoordForeground());
                     g2D.drawString(currentCoords.toBTString(), graphHex.xpoints[0] + (HEX_X_RADIUS / 5), graphHex.ypoints[0] + ((int) (g2D.getFontMetrics().getHeight() / 1.25)));
                 }
 

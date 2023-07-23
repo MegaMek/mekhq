@@ -450,6 +450,14 @@ public final class MHQOptions extends SuiteOptions {
     public void setPaidRetirementBackground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PAID_RETIREMENT_BACKGROUND, value.getRGB());
     }
+
+    public Color getStratConHexCoordForeground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
+    }
+
+    public void setStratConHexCoordForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, value.getRGB());
+    }
     //endregion Colours
 
     //region Fonts
