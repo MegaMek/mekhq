@@ -5,6 +5,6 @@
         <owner>Allied</owner>
 	<localModifiers>Veterans.xml</localModifiers>
 	<localModifiers>GoodEquipment.xml</localModifiers>
-	<localModifiers>EnemyTurrets.xml</localModifiers>
+	<localModifiers>AlliedTurrets.xml</localModifiers>
         <visible>true</visible>
 </StratconFacility>
