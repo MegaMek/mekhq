@@ -11,6 +11,7 @@ VERSION HISTORY:
     the terrain influences the map presets used for tactical battles; temperature is passed to megamek (may be hot!)
 + PR #3724: "Clan Personnel" special flag now correctly sets the person's clan status
 + PR #3731: Fix nightly build from a missed method rename in MegaMek. 
++ Issue #3713: allied turrets have upgraded network security; defeat in evacuation scenarios results in facility capture instead of destruction
 
 0.49.13 (2023-05-23 2000 UTC)
 + Data: updates to the Stratcon FAQ now version 2.3 in docs\atb folder.
