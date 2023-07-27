@@ -43,7 +43,7 @@
                     <howMuch>1</howMuch>
                 </successEffect>
 		<successEffect>
-                    <effectType>FacilityRemoved</effectType>
+                    <effectType>FacilityRemains</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </successEffect>
@@ -55,7 +55,7 @@
                     <howMuch>1</howMuch>
                 </failureEffect>
 		<failureEffect>
-                    <effectType>FacilityRemoved</effectType>
+                    <effectType>FacilityCaptured</effectType>
                     <effectScaling>Fixed</effectScaling>
                     <howMuch>1</howMuch>
                 </failureEffect>
