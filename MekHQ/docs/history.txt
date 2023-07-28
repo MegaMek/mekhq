@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ---------------
-0.49.14-SNAPSHOT
+0.49.14 (2023-07-28 2100 UTC)
 + PR #3676: Gradle build fixes 
 + Issue #3682: Prevent NPE when changing bot config
 + Issue #3683 - fix issue preventing loading saved campaigns containing MASC
