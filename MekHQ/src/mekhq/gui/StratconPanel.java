@@ -379,6 +379,12 @@ public class StratconPanel extends JPanel implements ActionListener {
                         if (fogOfWarLayerImage != null) {
                             g2D.drawImage(fogOfWarLayerImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                         }
+                        
+                        // needs a little more contrast between revealed and un-revealed hexes
+                        var push = g2D.getComposite();
+                        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
+                        g2D.fillPolygon(graphHex);
+                        g2D.setComposite(push);
                     }
                     
                     // useful for graphics coords debugging
