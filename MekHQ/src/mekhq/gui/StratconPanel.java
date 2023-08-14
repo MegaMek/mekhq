@@ -382,7 +382,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                         
                         // needs a little more contrast between revealed and un-revealed hexes
                         var push = g2D.getComposite();
-                        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .5f));
+                        g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
                         g2D.fillPolygon(graphHex);
                         g2D.setComposite(push);
                     }
