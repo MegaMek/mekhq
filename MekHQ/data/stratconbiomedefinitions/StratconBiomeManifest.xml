@@ -462,251 +462,251 @@
 	<biomeImages>
 		<entry>
 			<key>ArcticDesert</key>
-			<value>data\images\stratcon\Stratcon_Arctic_Desert.png</value>
+			<value>data/images/stratcon/Stratcon_Arctic_Desert.png</value>
 		</entry>
 		<entry>
 			<key>Badlands</key>
-			<value>data\images\stratcon\Stratcon_Cold_Mars.png</value>
+			<value>data/images/stratcon/Stratcon_Mars.png</value>
 		</entry>
 		<entry>
 			<key>ColdForest</key>
-			<value>data\images\stratcon\Stratcon_Cold_Forest.png</value>
+			<value>data/images/stratcon/Stratcon_Cold_Forest.png</value>
 		</entry>
 		<entry>
 			<key>ColdHills</key>
-			<value>data\images\stratcon\Stratcon_Cold_Hills.png</value>
+			<value>data/images/stratcon/Stratcon_Cold_Hills.png</value>
 		</entry>
 		<entry>
 			<key>ColdSea</key>
-			<value>data\images\stratcon\Stratcon_Cold_Sea.png</value>
+			<value>data/images/stratcon/Stratcon_Cold_Sea.png</value>
 		</entry>
 		<entry>
 			<key>ColdUrban</key>
-			<value>data\images\stratcon\Stratcon_Urban_Cold.png</value>
+			<value>data/images/stratcon/Stratcon_Urban_Cold.png</value>
 		</entry>
 		<entry>
 			<key>Desert</key>
-			<value>data\images\stratcon\Stratcon_Desert.png</value>
+			<value>data/images/stratcon/Stratcon_Desert.png</value>
 		</entry>
 		<entry>
 			<key>FogOfWar</key>
-			<value>data\images\stratcon\Stratcon_Fog_of_War.png</value>
+			<value>data/images/stratcon/Stratcon_Fog_of_War.png</value>
 		</entry>
 		<entry>
 			<key>ForceHostile</key>
-			<value>data\images\stratcon\SelectedHex\Stratcon_Force_Presence_Hostile_Red.png</value>
+			<value>data/images/stratcon/SelectedHex/Stratcon_Force_Presence_Hostile_Red.png</value>
 		</entry>
 		<entry>
 			<key>ForceFriendly</key>
-			<value>data\images\stratcon\SelectedHex\Stratcon_Force_Presence_Friendly_Green.png</value>
+			<value>data/images/stratcon/SelectedHex/Stratcon_Force_Presence_Friendly_Green.png</value>
 		</entry>
 		<entry>
 			<key>Forest</key>
-			<value>data\images\stratcon\Stratcon_Forest.png</value>
+			<value>data/images/stratcon/Stratcon_Forest.png</value>
 		</entry>
 		<entry>
 			<key>FrozenSea</key>
-			<value>data\images\stratcon\Stratcon_Frozen_Sea.png</value>
+			<value>data/images/stratcon/Stratcon_Frozen_Sea.png</value>
 		</entry>
 		<entry>
 			<key>Factory</key>
-			<value>data\images\stratcon\Stratcon_Factory.png</value>
+			<value>data/images/stratcon/Stratcon_Factory.png</value>
 		</entry>
 		<entry>
 			<key>Glacier</key>
-			<value>data\images\stratcon\Stratcon_Glacier.png</value>
+			<value>data/images/stratcon/Stratcon_Glacier.png</value>
 		</entry>
 		<entry>
 			<key>GrayLunar</key>
-			<value>data\images\stratcon\Stratcon_Gray_Luna.png</value>
+			<value>data/images/stratcon/Stratcon_Gray_Luna.png</value>
 		</entry>
 		<entry>
 			<key>HexSelected</key>
-			<value>data\images\stratcon\SelectedHex\Stratcon_Selected_Hex_White.png</value>
+			<value>data/images/stratcon/SelectedHex/Stratcon_Selected_Hex_White.png</value>
 		</entry>
 		<entry>
 			<key>Hills</key>
-			<value>data\images\stratcon\Stratcon_Hills.png</value>
+			<value>data/images/stratcon/Stratcon_Hills.png</value>
 		</entry>
 		<entry>
 			<key>HotForest</key>
-			<value>data\images\stratcon\Stratcon_Jungle.png</value>
+			<value>data/images/stratcon/Stratcon_Jungle.png</value>
 		</entry>
 		<entry>
 			<key>HotHillsDry</key>
-			<value>data\images\stratcon\Stratcon_Hot_Hills_Dry.png</value>
+			<value>data/images/stratcon/Stratcon_Hot_Hills_Dry.png</value>
 		</entry>
 		<entry>
 			<key>HotHillsWet</key>
-			<value>data\images\stratcon\Stratcon_Hot_Hills_Wet.png</value>
+			<value>data/images/stratcon/Stratcon_Hot_Hills_Wet.png</value>
 		</entry>
 		<entry>
 			<key>HotSea</key>
-			<value>data\images\stratcon\Stratcon_Hot_Sea.png</value>
+			<value>data/images/stratcon/Stratcon_Hot_Sea.png</value>
 		</entry>
 		<entry>
 			<key>HotUrban</key>
-			<value>data\images\stratcon\Stratcon_Urban_Hot.png</value>
+			<value>data/images/stratcon/Stratcon_Urban_Hot.png</value>
 		</entry>
 		<entry>
 			<key>Jungle</key>
-			<value>data\images\stratcon\Stratcon_Jungle.png</value>
+			<value>data/images/stratcon/Stratcon_Jungle.png</value>
 		</entry>
 		<entry>
 			<key>Mountain</key>
-			<value>data\images\stratcon\Stratcon_Mountains.png</value>
+			<value>data/images/stratcon/Stratcon_Mountains.png</value>
 		</entry>
 		<entry>
 			<key>HotMountainWet</key>
-			<value>data\images\stratcon\Stratcon_Mountains.png</value>
+			<value>data/images/stratcon/Stratcon_Mountains.png</value>
 		</entry>
 		<entry>
 			<key>HotMountainDry</key>
-			<value>data\images\stratcon\Stratcon_Hot_Mountain.png</value>
+			<value>data/images/stratcon/Stratcon_Hot_Mountain.png</value>
 		</entry>
 		<entry>
 			<key>ColdMountain</key>
-			<value>data\images\stratcon\Stratcon_Cold_Mountain.png</value>
+			<value>data/images/stratcon/Stratcon_Cold_Mountain.png</value>
 		</entry>
 		<entry>
 			<key>Mars</key>
-			<value>data\images\stratcon\Stratcon_Mars.png</value>
+			<value>data/images/stratcon/Stratcon_Mars.png</value>
 		</entry>
 		<entry>
 			<key>Plains</key>
-			<value>data\images\stratcon\Stratcon_Plains.png</value>
+			<value>data/images/stratcon/Stratcon_Plains.png</value>
 		</entry>
 		<entry>
 			<key>Savannah</key>
-			<value>data\images\stratcon\Stratcon_Savannah.png</value>
+			<value>data/images/stratcon/Stratcon_Savannah.png</value>
 		</entry>
 		<entry>
 			<key>Sea</key>
-			<value>data\images\stratcon\Stratcon_Sea.png</value>
+			<value>data/images/stratcon/Stratcon_Sea.png</value>
 		</entry>
 		<entry>
 			<key>SnowField</key>
-			<value>data\images\stratcon\Stratcon_Snowfield.png</value>
+			<value>data/images/stratcon/Stratcon_Snowfield.png</value>
 		</entry>
 		<entry>
 			<key>Steppe</key>
-			<value>data\images\stratcon\Stratcon_Steppe.png</value>
+			<value>data/images/stratcon/Stratcon_Steppe.png</value>
 		</entry>
 		<entry>
 			<key>Swamp</key>
-			<value>data\images\stratcon\Stratcon_Swamp.png</value>
+			<value>data/images/stratcon/Stratcon_Swamp.png</value>
 		</entry>
 		<entry>
 			<key>Tundra</key>
-			<value>data\images\stratcon\Stratcon_Tundra.png</value>
+			<value>data/images/stratcon/Stratcon_Tundra.png</value>
 		</entry>
 		<entry>
 			<key>Urban</key>
-			<value>data\images\stratcon\Stratcon_Urban_Temperate.png</value>
+			<value>data/images/stratcon/Stratcon_Urban_Temperate.png</value>
 		</entry>
 		<entry>
 			<key>Volcano</key>
-			<value>data\images\stratcon\Stratcon_Volcanic.png</value>
+			<value>data/images/stratcon/Stratcon_Volcanic.png</value>
 		</entry>
 	</biomeImages>
 
 	<facilityImages>
 		<entry>
 			<key>FacilityAlliedAirBase</key>
-			<value>data\images\stratcon\Bases\Stratcon_Airbase_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Airbase_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedArtilleryBase</key>
-			<value>data\images\stratcon\Bases\Stratcon_Base_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedDefault</key>
-			<value>data\images\stratcon\Bases\Stratcon_Base_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedMekBase</key>
-			<value>data\images\stratcon\Bases\Stratcon_Base_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedTankBase</key>
-			<value>data\images\stratcon\Bases\Stratcon_Base_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedSupplyDepot</key>
-			<value>data\images\stratcon\Bases\Stratcon_Factory_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Factory_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedDataCenter</key>
-			<value>data\images\stratcon\Bases\Stratcon_Comms_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedIndustrialFacility</key>
-			<value>data\images\stratcon\Bases\Stratcon_Factory_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Factory_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedCommandCenter</key>
-			<value>data\images\stratcon\Bases\Stratcon_Comms_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedEarlyWarningSystem</key>
-			<value>data\images\stratcon\Bases\Stratcon_Comms_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedOrbitalDefense</key>
-			<value>data\images\stratcon\Bases\Stratcon_Comms_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Allied.png</value>
 		</entry>
 		<entry>
 			<key>FacilityAlliedBaseOfOperations</key>
-			<value>data\images\stratcon\Bases\Stratcon_Fortress_Real_Allied.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Fortress_Real_Allied.png</value>
 		</entry>
 		<!-- Hostile facility images start here -->
 		<entry>
 			<key>FacilityHostileAirBase</key>
-			<value>data\images\stratcon\Bases\Stratcon_Airbase_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Airbase_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileArtilleryBase</key>
-			<value>data\images\stratcon\Bases\Stratcon_Base_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileDefault</key>
-			<value>data\images\stratcon\Bases\Stratcon_Base_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileMekBase</key>
-			<value>data\images\stratcon\Bases\Stratcon_Base_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileTankBase</key>
-			<value>data\images\stratcon\Bases\Stratcon_Base_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Base_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileSupplyDepot</key>
-			<value>data\images\stratcon\Bases\Stratcon_Factory_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Factory_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileDataCenter</key>
-			<value>data\images\stratcon\Bases\Stratcon_Comms_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileIndustrialFacility</key>
-			<value>data\images\stratcon\Bases\Stratcon_Factory_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Factory_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileCommandCenter</key>
-			<value>data\images\stratcon\Bases\Stratcon_Comms_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileEarlyWarningSystem</key>
-			<value>data\images\stratcon\Bases\Stratcon_Comms_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileOrbitalDefense</key>
-			<value>data\images\stratcon\Bases\Stratcon_Comms_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Comms_Real_Hostile.png</value>
 		</entry>
 		<entry>
 			<key>FacilityHostileBaseOfOperations</key>
-			<value>data\images\stratcon\Bases\Stratcon_Fortress_Real_Hostile.png</value>
+			<value>data/images/stratcon/Bases/Stratcon_Fortress_Real_Hostile.png</value>
 		</entry>
 	</facilityImages>
 </StratconBiomeManifest>

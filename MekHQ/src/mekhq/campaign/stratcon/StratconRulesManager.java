@@ -207,8 +207,8 @@ public class StratconRulesManager {
             int kelvinTemp = track.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
             StratconBiome facilityBiome;
             
-            // if facility doesn't have a biome temp map, use the default one
-            if (facility.getBiomes().isEmpty()) {
+            // if facility doesn't have a biome temp map or no entry for the current temperature, use the default one
+            if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
                 facilityBiome = StratconBiomeManifest.getInstance().getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
                         .floorEntry(kelvinTemp).getValue();
             } else {
