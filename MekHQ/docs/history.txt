@@ -8,6 +8,7 @@ VERSION HISTORY:
  - fix missing badlands image
  - definition file paths are now linux-friendly
 + Issue #3725: Improve performance when searching for parts using "planetary acquisition"
++ Issue #2854: Implemented CamOps errata for avionics repair times
 
 0.49.14 (2023-07-28 2100 UTC)
 + PR #3676: Gradle build fixes 
