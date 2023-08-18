@@ -60,8 +60,12 @@ public class MissingAvionics extends MissingPart {
                 time = 600;
             }
             return time;
+	// CamOps, 3rd printing, page 207: 80 hours for Large Craft, 8 hours otherwise
+        } else if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
+            return 4800;
+        } else {
+            return 480;
         }
-        return 4800;
     }
 
     @Override
