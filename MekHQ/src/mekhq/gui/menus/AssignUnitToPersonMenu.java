@@ -411,7 +411,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
                     
-                    SkillLevel skillLevel = null;
+                    SkillLevel skillLevel = SkillLevel.NONE;
                     // determine skill level based on unit and person's role 
                     if (isSmallCraftOrJumpShip) {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVesselGunner());
