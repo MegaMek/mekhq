@@ -59,6 +59,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
         allowedYear = campaign.getGameYear();
         canonOnly = campaign.getCampaignOptions().isAllowCanonOnly();
         gameTechLevel = campaign.getCampaignOptions().getTechLevel();
+        eraBasedTechLevel = campaign.getCampaignOptions().isVariableTechLevel();
 
         if (campaign.getCampaignOptions().isAllowClanPurchases() && campaign.getCampaignOptions().isAllowISPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_IS_CLAN;
