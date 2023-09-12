@@ -55,7 +55,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
         // from there.
         for (Part part : unit.getParts()) {
             if ((part instanceof InfantryAmmoBin)
-                    && (((InfantryAmmoBin) part).getType().getMunitionType() == AmmoType.M_INFERNO)) {
+                    && (((InfantryAmmoBin) part).getType().getMunitionType().contains(AmmoType.Munitions.M_INFERNO))) {
                 WeaponRow row = new WeaponRow((InfantryAmmoBin) part);
                 rows.add(row);
                 panMain.add(row);

@@ -612,10 +612,10 @@ public class Campaign implements ITechManager {
             // TODO : mos zero should make ship available on retainer
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
-                
+
                 MechSummary ms = getUnitGenerator().generate(getFactionCode(), shipSearchType, -1,
                         getGameYear(), getUnitRatingMod());
-                
+
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
@@ -2340,7 +2340,7 @@ public class Campaign implements ITechManager {
                             continue;
                         }
                     }
-                    
+
                     // if we didn't find everything on this planet, then add to the remaining list
                     if (shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
                         // if we can't afford it, then don't keep searching for it on other planets
@@ -2422,11 +2422,11 @@ public class Campaign implements ITechManager {
      */
     public PartAcquisitionResult findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
         TargetRoll target = getTargetForAcquisition(acquisition, person);
-        
+
         String impossibleSentencePrefix = person == null ? "Can't search for " : person.getFullName() + " can't search for ";
         String failedSentencePrefix = person == null ? "No contacts available for " : person.getFullName() + " is unable to find contacts for ";
         String succeededSentencePrefix = person == null ? "Possible contact for " : person.getFullName() + " has found a contact for ";
-                
+
         // if it's already impossible, don't bother with the rest
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -2435,7 +2435,7 @@ public class Campaign implements ITechManager {
             }
             return PartAcquisitionResult.PartInherentFailure;
         }
-        
+
         target = system.getPrimaryPlanet().getAcquisitionMods(target, getLocalDate(), getCampaignOptions(), getFaction(),
                 acquisition.getTechBase() == Part.T_CLAN);
 
@@ -5081,7 +5081,8 @@ public class Campaign implements ITechManager {
                             partAvailabilityLog.append(";(gauss ammo): -1");
                             break;
                     }
-                    if (((megamek.common.AmmoType) et).getMunitionType() == megamek.common.AmmoType.M_STANDARD) {
+                    if (EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(
+                            ((megamek.common.AmmoType) et).getMunitionType())){
                         partAvailability--;
                         partAvailabilityLog.append(";(standard ammo): -1");
                     }
