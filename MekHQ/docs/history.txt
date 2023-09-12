@@ -10,6 +10,7 @@ VERSION HISTORY:
 + Issue #3725: Improve performance when searching for parts using "planetary acquisition"
 + Issue #2854: Implemented CamOps errata for avionics repair times
 + PR #3756: Tech level filtering in the unit selector dialog has been corrected
++ Issue #3747: Unable to Assign Pilots to Tripod Mechs
 
 0.49.14 (2023-07-28 2100 UTC)
 + PR #3676: Gradle build fixes 
