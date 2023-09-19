@@ -124,7 +124,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
      */
     public boolean isSameAmmoType(AmmoType otherAmmoType) {
         return getType().equalsAmmoTypeOnly(otherAmmoType)
-            && (getType().getMunitionType().contains(otherAmmoType.getMunitionType()))
+            && (getType().getMunitionType().containsAll(otherAmmoType.getMunitionType()))
             && (getType().getRackSize() == otherAmmoType.getRackSize());
     }
 
