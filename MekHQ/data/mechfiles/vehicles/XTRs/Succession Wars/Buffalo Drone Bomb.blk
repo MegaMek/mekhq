@@ -13,11 +13,11 @@ LargeSupportTank
 </UnitType>
 
 <Name>
-Buffalo Drone Bomb
+Buffalo 
 </Name>
 
 <model>
-
+BFFL Drone Bomb
 </model>
 
 <mul id:>
@@ -105,7 +105,7 @@ Cargo Container (10 tons)
 </Rear Equipment>
 
 <source>
-XTRO Succession Wars - Succession Wars - Age of War
+XTR: Succession Wars
 </source>
 
 <tonnage>

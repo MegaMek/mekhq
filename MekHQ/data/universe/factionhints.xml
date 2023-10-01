@@ -551,6 +551,10 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 		<!-- start date is a guess based on conquest beginning late January 3080 -->
 		<parties>CGS,NC,UC</parties>
 	</alliance>
+	<alliance name="Scorpion Empire" start="3141-03-03">
+		<!-- start date is based on the Hanseatic Crusade PDF stating the war started January 3rd of 3040 and lasted 15 months -->
+		<parties>CGS,NC,UC,HL</parties>
+	</alliance>
 
 	<war name="Second Dominion-Combine War" start="3098-07-01" end="3101-06-30">
 		<parties>CGB,DC</parties>

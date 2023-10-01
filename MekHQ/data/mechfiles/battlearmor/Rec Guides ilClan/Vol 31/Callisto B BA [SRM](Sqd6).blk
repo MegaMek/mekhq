@@ -13,11 +13,11 @@ BattleArmor
 </UnitType>
 
 <Name>
-Callisto Battle Armor B
+Callisto Battle Armor
 </Name>
 
 <Model>
-[SRM](Sqd6)
+B [SRM](Sqd6)
 </Model>
 
 <mul id:>
@@ -85,7 +85,7 @@ BABattleClaw:LA
 </Trooper 6 Equipment>
 
 <source>
-Rec Guide:ilClan #31 - Dark Age
+Rec Guide:ilClan #31
 </source>
 
 <chassis>
