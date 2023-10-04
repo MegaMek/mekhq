@@ -157,7 +157,7 @@ public class MekLocation extends Part {
         // superheavy flag is set if weight is more than 100
         // assume movement mode is biped or tripod (technically mechs can have other movement modes but 
         // that doesn't affect structure weight); currently impossible to tell whether a "loose" left leg is for a biped or tripod.        
-        EntityMovementMode movementMode = getLoc() == Mech.LOC_CLEG ? EntityMovementMode.TRIPOD : EntityMovementMode.BIPED;                
+        EntityMovementMode movementMode = (getLoc() == Mech.LOC_CLEG) ? EntityMovementMode.TRIPOD : EntityMovementMode.BIPED;                
         
         double tonnage = Structure.getWeightStructure(structureType, getUnitTonnage(), Ceil.HALFTON, 
                 (getUnitTonnage() > 100), movementMode);
