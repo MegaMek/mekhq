@@ -235,7 +235,7 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 	</war>
 
 	<!-- Aurigan Civil War: setting for HBS' BattleTech game. The dates are very roughly estimated based on descriptions in game and in the sourcebook. That means they are semi-canon, and should be updated if possible. Ulysses Update: Changed these to match the planetary control dates better in MHQ to help contract generation. -->
-	<war name="Aurigan Civil War" start="3025-01-01" end ="3025-12-30">
+	<war name="Aurigan Civil War" start="3025-01-25" end ="3025-12-30">
 		<parties>ARC,ARD</parties>
 		<parties start="3025-05-09" end="3025-08-15">ARC,TC</parties>
 	</war>
