@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ---------------
-0.49.15-SNAPSHOT
+0.49.15 (2023-10-21 1530 UTC)
 + PR #3735: Maintenance cost shown in whole C-Bills
 + Issue #3741: Stratcon fixes
  - Improve contrast between revealed/unrevealed hexes
