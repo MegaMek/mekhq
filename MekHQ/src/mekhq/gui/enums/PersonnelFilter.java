@@ -75,9 +75,9 @@ public enum PersonnelFilter {
   DEPENDENT("PersonnelFilter.DEPENDENT.text", "PersonnelFilter.DEPENDENT.toolTipText"),
   //endregion Standard Personnel Filters
 
-  KIDS("PersonnelFilter.KIDS.text", "PersonnelFilter.KIDS.toolTipText"),
   //region Expanded Personnel Tab Filters
   FOUNDER("PersonnelFilter.FOUNDER.text", "PersonnelFilter.FOUNDER.toolTipText", false, false),
+  KIDS("PersonnelFilter.KIDS.text", "PersonnelFilter.KIDS.toolTipText"),
   PRISONER("PersonnelFilter.PRISONER.text", "PersonnelFilter.PRISONER.toolTipText", false, false),
   INACTIVE("PersonnelFilter.INACTIVE.text", "PersonnelFilter.INACTIVE.toolTipText", false, false),
   MIA("PersonnelFilter.MIA.text", "PersonnelFilter.MIA.toolTipText", false, false),
@@ -469,12 +469,12 @@ public enum PersonnelFilter {
       case ADMINISTRATOR_HR:
         return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
             ? person.getPrimaryRole().isAdministratorHR() : person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
-      case KIDS:
-        return person.isChild(currentDate);
       case DEPENDENT:
         return active && person.getPrimaryRole().isDependent();
       case FOUNDER:
         return person.isFounder();
+      case KIDS:
+        return person.isChild(currentDate);
       case PRISONER:
         return person.getPrisonerStatus().isCurrentPrisoner() || person.getPrisonerStatus().isBondsman();
       case INACTIVE:
