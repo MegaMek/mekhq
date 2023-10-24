@@ -84,7 +84,7 @@ public final class PersonnelTab extends CampaignGuiTab {
   @Override
   public void initTab() {
     final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-        MekHQ.getMHQOptions().getLocale());
+            MekHQ.getMHQOptions().getLocale());
     GridBagConstraints gridBagConstraints;
 
     setLayout(new GridBagLayout());
@@ -207,7 +207,7 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     JScrollPane scrollPersonnelTable = new JScrollPane(personnelTable);
     splitPersonnel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollPersonnelTable,
-        scrollPersonnelView);
+            scrollPersonnelView);
     splitPersonnel.setOneTouchExpandable(true);
     splitPersonnel.setResizeWeight(1.0);
     splitPersonnel.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshPersonnelView());
@@ -276,7 +276,7 @@ public final class PersonnelTab extends CampaignGuiTab {
 
   public void filterPersonnel() {
     final PersonnelFilter filter = (choicePerson.getSelectedItem() == null)
-        ? PersonnelFilter.ACTIVE : choicePerson.getSelectedItem();
+            ? PersonnelFilter.ACTIVE : choicePerson.getSelectedItem();
     personnelSorter.setRowFilter(new RowFilter<>() {
       @Override
       public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
@@ -287,7 +287,7 @@ public final class PersonnelTab extends CampaignGuiTab {
 
   private void changePersonnelView() {
     final PersonnelTabView view = (choicePersonView.getSelectedItem() == null)
-        ? PersonnelTabView.GENERAL : choicePersonView.getSelectedItem();
+            ? PersonnelTabView.GENERAL : choicePersonView.getSelectedItem();
     final XTableColumnModel columnModel = (XTableColumnModel) getPersonnelTable().getColumnModel();
     getPersonnelTable().setRowHeight(15);
 
@@ -297,7 +297,7 @@ public final class PersonnelTab extends CampaignGuiTab {
       tableColumn.setCellRenderer(getPersonModel().getRenderer(choicePersonView.getSelectedItem()));
       tableColumn.setPreferredWidth(column.getWidth());
       columnModel.setColumnVisible(tableColumn,
-          column.isVisible(getCampaign(), view, getPersonnelTable()));
+              column.isVisible(getCampaign(), view, getPersonnelTable()));
     }
   }
 
