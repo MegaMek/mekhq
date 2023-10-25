@@ -3573,6 +3573,11 @@ public class Campaign implements ITechManager {
             return;
         }
 
+        Force force = getForceFor(person);
+        if (force != null) {
+            force.updateCommander(this);
+        }
+        
         person.getGenealogy().clearGenealogyLinks();
 
         final Unit unit = person.getUnit();
@@ -4804,6 +4809,12 @@ public class Campaign implements ITechManager {
         if (null != u) {
             u.resetPilotAndEntity();
         }
+        
+        Force force = getForceFor(p);
+        if (force != null) {
+            force.updateCommander(this);
+        }
+        
         MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
