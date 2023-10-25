@@ -280,7 +280,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelSorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
-                return filter.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()));
+                return filter.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()), getCampaignGui().getCampaign().getLocalDate());
             }
         });
     }

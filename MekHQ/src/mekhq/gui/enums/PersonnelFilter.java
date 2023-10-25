@@ -22,6 +22,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -62,7 +63,7 @@ public enum PersonnelFilter {
     ASTECH("PersonnelFilter.ASTECH.text", "PersonnelFilter.ASTECH.toolTipText", false, true),
     MEDICAL("PersonnelFilter.MEDICAL.text", "PersonnelFilter.MEDICAL.toolTipText", true, false),
     DOCTOR("PersonnelFilter.DOCTOR.text", "PersonnelFilter.DOCTOR.toolTipText", false, true),
-    MEDIC("PersonnelFilter.MEDIC.text", "PersonnelFilter.MEDIC.toolTipText",  false, true),
+    MEDIC("PersonnelFilter.MEDIC.text", "PersonnelFilter.MEDIC.toolTipText", false, true),
     ADMINISTRATOR("PersonnelFilter.ADMINISTRATOR.text", "PersonnelFilter.ADMINISTRATOR.toolTipText", true, false),
     ADMINISTRATOR_COMMAND("PersonnelFilter.ADMINISTRATOR_COMMAND.text", "PersonnelFilter.ADMINISTRATOR_COMMAND.toolTipText", false, true),
     ADMINISTRATOR_LOGISTICS("PersonnelFilter.ADMINISTRATOR_LOGISTICS.text", "PersonnelFilter.ADMINISTRATOR_LOGISTICS.toolTipText", false, true),
@@ -73,6 +74,7 @@ public enum PersonnelFilter {
 
     //region Expanded Personnel Tab Filters
     FOUNDER("PersonnelFilter.FOUNDER.text", "PersonnelFilter.FOUNDER.toolTipText", false, false),
+    KIDS("PersonnelFilter.KIDS.text", "PersonnelFilter.KIDS.toolTipText"),
     PRISONER("PersonnelFilter.PRISONER.text", "PersonnelFilter.PRISONER.toolTipText", false, false),
     INACTIVE("PersonnelFilter.INACTIVE.text", "PersonnelFilter.INACTIVE.toolTipText", false, false),
     MIA("PersonnelFilter.MIA.text", "PersonnelFilter.MIA.toolTipText", false, false),
@@ -348,7 +350,7 @@ public enum PersonnelFilter {
         return Arrays.asList(values());
     }
 
-    public boolean getFilteredInformation(final Person person) {
+    public boolean getFilteredInformation(final Person person, LocalDate currentDate) {
         final boolean active = person.getStatus().isActive() && !person.getPrisonerStatus().isCurrentPrisoner();
         switch (this) {
             case ALL:
@@ -468,6 +470,8 @@ public enum PersonnelFilter {
                 return active && person.getPrimaryRole().isDependent();
             case FOUNDER:
                 return person.isFounder();
+            case KIDS:
+                return person.isChild(currentDate);
             case PRISONER:
                 return person.getPrisonerStatus().isCurrentPrisoner() || person.getPrisonerStatus().isBondsman();
             case INACTIVE:
