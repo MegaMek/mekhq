@@ -399,12 +399,13 @@ public class Force {
         
         // safety check: if the person is no longer assigned to a unit or the force, 
         // then they're not really the highest ranked person in the force.
-        if ((highestRankPerson.getUnit() == null) ||
-                (highestRankPerson.getUnit().getForceId() == Force.FORCE_NONE)) {
+        if ((highestRankPerson != null) && 
+                ((highestRankPerson.getUnit() == null) ||
+                (highestRankPerson.getUnit().getForceId() == Force.FORCE_NONE))) {
             highestRankPerson = null;
         }
         
-        for (UUID uid : getAllUnits(false)) {
+        for (UUID uid : getUnits()) {
             Unit u = c.getUnit(uid);
             if (null != u) {
                 Person p = u.getCommander();
