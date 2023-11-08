@@ -88,6 +88,9 @@ public class CustomizeScenarioDialog extends JDialog {
             scenario = s;
             newScenario = false;
         }
+        if (newScenario) {
+            scenario.setStatus(ScenarioStatus.NEW);
+        }
         campaign = c;
         if (scenario.getDate() == null) {
             scenario.setDate(campaign.getLocalDate());
