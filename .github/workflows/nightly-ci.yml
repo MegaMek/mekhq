@@ -78,7 +78,7 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
-        arguments: clean build -x test --continue --stacktrace --scan
+        arguments: clean build -x test --continue --stacktrace --max-workers=1 --scan
         build-root-directory: mekhq
 
     - name: Upload Test Logs on Failure
