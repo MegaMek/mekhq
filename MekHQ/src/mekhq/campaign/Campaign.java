@@ -5658,6 +5658,7 @@ public class Campaign implements ITechManager {
         entity.setHullDown(false);
         entity.heat = 0;
         entity.heatBuildup = 0;
+        entity.underwaterRounds = 0;
         entity.setTransportId(Entity.NONE);
         entity.resetTransporter();
         entity.setDeployRound(0);
