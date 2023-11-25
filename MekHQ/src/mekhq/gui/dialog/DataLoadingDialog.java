@@ -71,7 +71,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
         super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
         this.application = application;
         this.campaignFile = campaignFile;
-        this.task = new Task();
+        this.task = new Task(this);
         getTask().addPropertyChangeListener(this);
         initialize();
         getTask().execute();
@@ -191,6 +191,10 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
      * Main task. This is executed in a background thread.
      */
     private class Task extends SwingWorker<Campaign, Campaign> {
+        JDialog dialog;
+        public Task(JDialog dialog) {
+            this.dialog = dialog;
+        }
         /**
          * This uses the following stages of loading:
          * 0 : Basics
@@ -261,7 +265,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 campaign = new Campaign();
 
                 // Campaign Preset
-                final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(getFrame());
+                final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(dialog, getFrame());
                 if (presetSelectionDialog.showDialog().isCancelled()) {
                     return null;
                 }
@@ -270,7 +274,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 // Date
                 final LocalDate date = ((preset == null) || (preset.getDate() == null))
                         ? campaign.getLocalDate() : preset.getDate();
-                final DateChooser dc = new DateChooser(getFrame(), date);
+                final DateChooser dc = new DateChooser(dialog, date);
                 dc.setLocationRelativeTo(getFrame());
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() != DateChooser.OK_OPTION) {
@@ -288,7 +292,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 setVisible(false);
 
                 // Campaign Options
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), campaign, true);
+                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(dialog, getFrame(), campaign, true);
                 optionsDialog.setLocationRelativeTo(getFrame());
                 optionsDialog.applyPreset(preset);
                 if (optionsDialog.showDialog().isCancelled()) {

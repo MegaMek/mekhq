@@ -32,8 +32,16 @@ public class CampaignPresetSelectionDialog extends AbstractMHQButtonDialog {
     //endregion Variable Declarations
 
     //region Constructors
-    public CampaignPresetSelectionDialog(final JFrame parent) {
-        super(parent, "CampaignPresetSelectionDialog", "CampaignPresetSelectionDialog.title");
+    public CampaignPresetSelectionDialog(final JFrame parentFrame) {
+        super(parentFrame, "CampaignPresetSelectionDialog", "CampaignPresetSelectionDialog.title");
+        initialize();
+    }
+
+    /**
+     * Allows dialog to be constructed using a dialog as owner
+     */
+    public CampaignPresetSelectionDialog(final JDialog parentDialog, final JFrame parentFrame) {
+        super(parentDialog, parentFrame, "CampaignPresetSelectionDialog", "CampaignPresetSelectionDialog.title");
         initialize();
     }
     //endregion Constructors

@@ -53,6 +53,18 @@ public class CampaignOptionsDialog extends AbstractMHQValidationButtonDialog {
         this.startup = startup;
         initialize();
     }
+
+    /**
+     * Allows dialog to be constructed with an owner being another dialog
+     */
+    public CampaignOptionsDialog(final JDialog owner, final JFrame frame, final Campaign campaign, final boolean startup) {
+        super(owner, frame, true, ResourceBundle.getBundle("mekhq.resources.CampaignOptionsDialog",
+                        MekHQ.getMHQOptions().getLocale()),
+                "CampaignOptionsDialog", "CampaignOptionsDialog.title");
+        this.campaign = campaign;
+        this.startup = startup;
+        initialize();
+    }
     //endregion Constructors
 
     //region Getters/Setters
