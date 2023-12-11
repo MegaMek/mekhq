@@ -310,13 +310,6 @@ class GameThread extends Thread implements CloseClientListener {
         } catch (IOException e) {
             LogManager.getLogger().error("Error saving custom weapon orders!", e);
         }
-
-        try {
-            QuirksHandler.saveCustomQuirksList();
-        } catch (Exception e) {
-            LogManager.getLogger().error("Error saving quirks override!", e);
-        }
-
         stop = true;
     }
 
