@@ -22,7 +22,6 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.MechSummaryCache;
-import megamek.common.QuirksHandler;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import mekhq.MHQStaticDirectoryManager;
@@ -242,8 +241,6 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
             //region Progress 5
             setProgress(5);
-            QuirksHandler.initQuirksList();
-
             while (!MechSummaryCache.getInstance().isInitialized()) {
                 try {
                     Thread.sleep(50);
