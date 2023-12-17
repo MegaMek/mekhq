@@ -18,11 +18,14 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.MMConstants;
+import megamek.client.ui.Messages;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
 import megamek.client.ui.swing.ColourSelectorButton;
 import megamek.client.ui.swing.CommonSettingsDialog;
+import megamek.client.ui.swing.HelpDialog;
 import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
 import mekhq.MHQOptionsChangedEvent;
@@ -31,11 +34,15 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -906,6 +913,16 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         userDirChooser.addActionListener(e -> CommonSettingsDialog.fileChooseUserDir(txtUserDir, getFrame()));
         userDirChooser.setToolTipText(resources.getString("userDirChooser.title"));
 
+        JButton userDirHelp = new JButton("Help");
+        try {
+            String helpTitle = Messages.getString("UserDirHelpDialog.title");
+            URL helpFile = new File(MMConstants.USER_DIR_README_FILE).toURI().toURL();
+            userDirHelp.addActionListener(e -> new HelpDialog(helpTitle, helpFile, getFrame()).setVisible(true));
+        } catch (MalformedURLException e) {
+            LogManager.getLogger().error("Could not find the user data directory readme file at "
+                    + MMConstants.USER_DIR_README_FILE);
+        }
+
         final JLabel lblStartGameDelay = new JLabel(resources.getString("lblStartGameDelay.text"));
         lblStartGameDelay.setToolTipText(resources.getString("lblStartGameDelay.toolTipText"));
         lblStartGameDelay.setName("lblStartGameDelay");
@@ -978,7 +995,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblUserDir)
                                 .addComponent(txtUserDir)
-                                .addComponent(userDirChooser, GroupLayout.DEFAULT_SIZE,
+                                .addComponent(userDirChooser)
+                                .addComponent(userDirHelp, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblStartGameDelay)
@@ -1010,7 +1028,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblUserDir)
                                 .addComponent(txtUserDir)
-                                .addComponent(userDirChooser))
+                                .addComponent(userDirChooser)
+                                .addComponent(userDirHelp))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay))
