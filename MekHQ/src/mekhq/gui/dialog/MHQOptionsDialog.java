@@ -22,6 +22,8 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
 import megamek.client.ui.swing.ColourSelectorButton;
+import megamek.client.ui.swing.CommonSettingsDialog;
+import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
@@ -144,6 +146,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     //endregion Nag Tab
 
     //region Miscellaneous
+    private JTextField txtUserDir;
     private JSpinner spnStartGameDelay;
     private JSpinner spnStartGameClientDelay;
     private JSpinner spnStartGameClientRetryCount;
@@ -891,6 +894,18 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
     private JPanel createMiscellaneousTab() {
         // Create Panel Components
+        final JLabel lblUserDir = new JLabel(resources.getString("lblUserDir.text"));
+        lblUserDir.setToolTipText(resources.getString("lblUserDir.toolTipText"));
+        lblUserDir.setName("lblUserDir");
+
+        txtUserDir = new JTextField(20);
+        txtUserDir.setToolTipText(resources.getString("lblUserDir.toolTipText"));
+        txtUserDir.setName("txtUserDir");
+
+        JButton userDirChooser = new JButton("...");
+        userDirChooser.addActionListener(e -> CommonSettingsDialog.fileChooseUserDir(txtUserDir, getFrame()));
+        userDirChooser.setToolTipText(resources.getString("userDirChooser.title"));
+
         final JLabel lblStartGameDelay = new JLabel(resources.getString("lblStartGameDelay.text"));
         lblStartGameDelay.setToolTipText(resources.getString("lblStartGameDelay.toolTipText"));
         lblStartGameDelay.setName("lblStartGameDelay");
@@ -961,6 +976,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblUserDir)
+                                .addComponent(txtUserDir)
+                                .addComponent(userDirChooser, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
@@ -987,6 +1007,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblUserDir)
+                                .addComponent(txtUserDir)
+                                .addComponent(userDirChooser))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay))
@@ -1104,6 +1128,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
 
+        PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
+        PreferenceManager.getInstance().save();
         MekHQ.getMHQOptions().setStartGameDelay((Integer) spnStartGameDelay.getValue());
         MekHQ.getMHQOptions().setStartGameClientDelay((Integer) spnStartGameClientDelay.getValue());
         MekHQ.getMHQOptions().setStartGameClientRetryCount((Integer) spnStartGameClientRetryCount.getValue());
@@ -1210,6 +1236,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
 
+        txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
         spnStartGameClientDelay.setValue(MekHQ.getMHQOptions().getStartGameClientDelay());
         spnStartGameClientRetryCount.setValue(MekHQ.getMHQOptions().getStartGameClientRetryCount());
