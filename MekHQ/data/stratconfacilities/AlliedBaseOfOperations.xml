@@ -6,5 +6,7 @@
 	<localModifiers>Veterans.xml</localModifiers>
 	<localModifiers>GoodEquipment.xml</localModifiers>
 	<localModifiers>AlliedTurrets.xml</localModifiers>
+	<localModifiers>AlliedOfficerMech.xml</localModifiers>	
+        <sharedModifiers>AlliedOfficerMech.xml</sharedModifiers>		
         <visible>true</visible>
 </StratconFacility>
