@@ -23,10 +23,11 @@ package mekhq.campaign.personnel.ranks;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
+import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -118,6 +119,15 @@ public class Ranks {
                 continue;
             }
             final List<RankSystem> rankSystems = loadRankSystemsFromFile(new File(type.getFilePath()), type);
+            if (type.isUserData()) {
+                String userDir = PreferenceManager.getClientPreferences().getUserDir();
+                if (!userDir.isBlank() && new File(userDir).isDirectory()) {
+                    File userDirRanks = new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH);
+                    if (userDirRanks.exists()) {
+                        rankSystems.addAll(loadRankSystemsFromFile(new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH), type));
+                    }
+                }
+            }
             for (final RankSystem rankSystem : rankSystems) {
                 if (rankValidator.validate(rankSystem, true)) {
                     getRankSystems().put(rankSystem.getCode(), rankSystem);
