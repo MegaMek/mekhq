@@ -254,10 +254,7 @@ public class MHQXMLUtility extends MMXMLUtility {
         return retVal.toString();
     }
 
-    private static String getBombChoiceString(IBomber bomber, int indentLvl) {
-        StringBuilder retVal = new StringBuilder();
-
-        int[] bombChoices = bomber.getBombChoices();
+    private static void compileBombChoices(int[] bombChoices, StringBuilder retVal, int indentLvl, boolean isInternal) {
         if (bombChoices.length > 0) {
             retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<bombs>\n");
             for (int type = 0; type < BombType.B_NUM; type++) {
@@ -267,11 +264,21 @@ public class MHQXMLUtility extends MMXMLUtility {
                     retVal.append(typeName);
                     retVal.append("\" load=\"");
                     retVal.append(bombChoices[type]);
+                    retVal.append((isInternal) ? "\" Internal=\"true" : "\" Internal=\"false");
                     retVal.append("\"/>\n");
                 }
             }
             retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</bombs>\n");
         }
+
+    }
+    private static String getBombChoiceString(IBomber bomber, int indentLvl) {
+        StringBuilder retVal = new StringBuilder();
+
+        int[] bombChoices = bomber.getIntBombChoices();
+        compileBombChoices(bombChoices, retVal, indentLvl, true);
+        bombChoices = bomber.getExtBombChoices();
+        compileBombChoices(bombChoices, retVal, indentLvl, false);
 
         return retVal.toString();
     }

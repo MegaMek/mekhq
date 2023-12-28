@@ -86,6 +86,7 @@ public class BombsDialog extends JDialog implements ActionListener {
             typeMax[type] = availBombs[type] + bombChoices[type];
         }
 
+        // BombChoicePanel takes care of managing internal and external stores, so we don't need to here.
         bombPanel = new BombChoicePanel(bomber, campaign.getGameOptions().booleanOption("at2_nukes"),
                 true, typeMax);
 
@@ -127,6 +128,7 @@ public class BombsDialog extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
+            // internal and external choices are applied by bombPanel; here we only care about the totals.
             bombPanel.applyChoice();
             int[] newLoadout = bombPanel.getChoice();
 
