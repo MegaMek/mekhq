@@ -18,10 +18,15 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.MMConstants;
+import megamek.client.ui.Messages;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
 import megamek.client.ui.swing.ColourSelectorButton;
+import megamek.client.ui.swing.CommonSettingsDialog;
+import megamek.client.ui.swing.HelpDialog;
+import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
@@ -29,11 +34,15 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -144,6 +153,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     //endregion Nag Tab
 
     //region Miscellaneous
+    private JTextField txtUserDir;
     private JSpinner spnStartGameDelay;
     private JSpinner spnStartGameClientDelay;
     private JSpinner spnStartGameClientRetryCount;
@@ -891,6 +901,28 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
     private JPanel createMiscellaneousTab() {
         // Create Panel Components
+        final JLabel lblUserDir = new JLabel(resources.getString("lblUserDir.text"));
+        lblUserDir.setToolTipText(resources.getString("lblUserDir.toolTipText"));
+        lblUserDir.setName("lblUserDir");
+
+        txtUserDir = new JTextField(20);
+        txtUserDir.setToolTipText(resources.getString("lblUserDir.toolTipText"));
+        txtUserDir.setName("txtUserDir");
+
+        JButton userDirChooser = new JButton("...");
+        userDirChooser.addActionListener(e -> CommonSettingsDialog.fileChooseUserDir(txtUserDir, getFrame()));
+        userDirChooser.setToolTipText(resources.getString("userDirChooser.title"));
+
+        JButton userDirHelp = new JButton("Help");
+        try {
+            String helpTitle = Messages.getString("UserDirHelpDialog.title");
+            URL helpFile = new File(MMConstants.USER_DIR_README_FILE).toURI().toURL();
+            userDirHelp.addActionListener(e -> new HelpDialog(helpTitle, helpFile, getFrame()).setVisible(true));
+        } catch (MalformedURLException e) {
+            LogManager.getLogger().error("Could not find the user data directory readme file at "
+                    + MMConstants.USER_DIR_README_FILE);
+        }
+
         final JLabel lblStartGameDelay = new JLabel(resources.getString("lblStartGameDelay.text"));
         lblStartGameDelay.setToolTipText(resources.getString("lblStartGameDelay.toolTipText"));
         lblStartGameDelay.setName("lblStartGameDelay");
@@ -961,6 +993,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblUserDir)
+                                .addComponent(txtUserDir)
+                                .addComponent(userDirChooser)
+                                .addComponent(userDirHelp, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
@@ -987,6 +1025,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblUserDir)
+                                .addComponent(txtUserDir)
+                                .addComponent(userDirChooser)
+                                .addComponent(userDirHelp))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay))
@@ -1104,6 +1147,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
 
+        PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
+        PreferenceManager.getInstance().save();
         MekHQ.getMHQOptions().setStartGameDelay((Integer) spnStartGameDelay.getValue());
         MekHQ.getMHQOptions().setStartGameClientDelay((Integer) spnStartGameClientDelay.getValue());
         MekHQ.getMHQOptions().setStartGameClientRetryCount((Integer) spnStartGameClientRetryCount.getValue());
@@ -1210,6 +1255,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
 
+        txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
         spnStartGameClientDelay.setValue(MekHQ.getMHQOptions().getStartGameClientDelay());
         spnStartGameClientRetryCount.setValue(MekHQ.getMHQOptions().getStartGameClientRetryCount());
