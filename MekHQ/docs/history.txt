@@ -1,6 +1,6 @@
 VERSION HISTORY:
 ---------------
-0.49.16-SNAPSHOT
+0.49.16 (2023-12-30 2200 UTC)
 + PR #3771: Add "children" filter to personnel tab
 + PR #3780: Support for Beast Mounted Infantry
 
