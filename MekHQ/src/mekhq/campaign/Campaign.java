@@ -5683,17 +5683,23 @@ public class Campaign implements ITechManager {
             IBomber bomber = (IBomber) entity;
             List<Mounted> mountedBombs = bomber.getBombs();
             if (!mountedBombs.isEmpty()) {
-                // This should return an int[] filled with 0's
-                int[] bombChoices = bomber.getBombChoices();
+                // These should return an int[] filled with 0's
+                int[] intBombChoices = bomber.getIntBombChoices();
+                int[] extBombChoices = bomber.getExtBombChoices();
                 for (Mounted m : mountedBombs) {
                     if (!(m.getType() instanceof BombType)) {
                         continue;
                     }
                     if (m.getBaseShotsLeft() == 1) {
-                        bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                        if (m.isInternalBomb()) {
+                            intBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                        } else {
+                            extBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                        }
                     }
                 }
-                bomber.setBombChoices(bombChoices);
+                bomber.setIntBombChoices(intBombChoices);
+                bomber.setExtBombChoices(extBombChoices);
                 bomber.clearBombs();
             }
         }
