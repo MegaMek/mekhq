@@ -1,27 +1,7 @@
 <!-- This is *all* possible scenario modifiers -->
 <scenarioModifierManifest>
 	<modifiers>
-		<modifier>		
-			SuperiorEquipment.xml
-		</modifier>
-		<modifier>
-			Elites.xml
-		</modifier>
-		<modifier>
-			ArmednArmored.xml
-		</modifier>	
-		<modifier>
-			EnemyOfficerMech.xml
-		</modifier>
-		<modifier>
-			EnemyCommanderMech.xml
-		</modifier>
-		<modifier>		
-			EnemyAirPatrol.xml
-		</modifier>
-		<modifier>
-			EnemyMechPatrol.xml
-		</modifier>
+	
 		<!-- Fixed scenario modifiers suitable for specific scenario types go here -->
 
 
