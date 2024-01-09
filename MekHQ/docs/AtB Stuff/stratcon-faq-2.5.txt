@@ -1,8 +1,14 @@
-StratCon reference and FAQ (v2.4 - March 12, 2023).
+StratCon reference and FAQ (v2.5 - January 7, 2024).
 
 ============
 BASICS AND SETUP
 ============
+**** Double check your Java version!  You need 11 or 17 to play MHQ!  This is a common source of issues.
+
+**** If you dont have them, buy at least Battlemech Manual, or Total Warfare and Campaign Operations.  PDF versions are available online if you dont have the physical books.
+
+**** Before you start StratCon, you should read the Official AtB TT Rules xcel spreadsheet "Campaign System" Tab and CampaignAnon's Against the Bot Starter Guide pdf.  They are located in the docs folder.  StratCon is a an extra layer on top of the AtB rules, and by learning those you will be learning the foundations of StratCon.
+
 
 * To activate StratCon, go to the AtB tab in Campaign Options and check "Use StratCon" at the very bottom.  You may have to scroll down some.
 * At the same time on the same tab, you should change battle intensity.  The StratCon version of MekHQ is meant to be played with battle intensity set to 0. Go to the Against the Bot tab in the campaign options and do this change. You can leave it as is, but you'll have all the regular AtB random battles spawning besides the StratCon ones.
@@ -14,7 +20,17 @@ BASICS AND SETUP
 SCENARIOS IN STRATCON MODE
 =====================
 
-* StratCon will generate scenarios based on the mission. If such a scenario happens, it will be displayed in the Briefing room AND the "AtB Campaign State" tab (as a red square).
+* StratCon now has the capability to generate a substantially greater variety of terrain. A few highlights:
+
+    Each track has an average temperature (based on average planetary temperature +/- 35)
+    The track's temperature determines the available biomes (a cold track will have cold biomes, a hot track will have hot biomes)
+    The biome of a hex on a track determines the map generator preset used to generate maps for that hex
+    For the first time, map themes are used to give a distinct visual look to many of the maps
+    Expect to see jungles, deserts, frozen wastelands and many others
+    Facilities can now spawn with reinforced buildings that are tough to destroy, so you might need to bring the big guns.  
+
+
+* StratCon will generate scenarios based on the Contract. If such a scenario happens, it will be displayed in the Briefing room AND the "AtB Campaign State" tab (as a red icon).
 
 * If a scenario appears only in the Briefing tab, then it's a legacy or special scenario (e.g. cache, big battle), and you can ignore it if you wish (you would need to GM-remove it).
 
@@ -26,7 +42,9 @@ SCENARIOS IN STRATCON MODE
 
 * The game will still spawn Special Scenarios randomly, like Duels, Star League Cashes, Base Defense, Big Battles, etc. These don't appear on the map, and the deployment must be done through the TO&E.
 
-* If you have even just a couple of Aerospace units, the game might spawn Aerospace or DropShip scenarios.
+* StratCon scenarios can spawn Mechs, vehicles, VTOLs, conventional infantry, battle armor, conventional fighters (with bombs or missiles), AeroSpace Fighters (with even MORE bombs or missiles), Dropships (and hotdrops), on and off-board Artillery, and even wet navy units.  Be prepared.  
+
+* If you have even just a couple of Aerospace units, the game will spawn Aerospace or DropShip scenarios.
 
 * On most contracts, random VP-giving scenarios might pop-up, so you can lose or ignore some and still end up with a positive balance.
 
@@ -34,7 +52,11 @@ SCENARIOS IN STRATCON MODE
 
 * "My non-combat lance got dragged into battle!!" - The game sometimes ignores the non-combat flag (even for DropShips). Just don't use non-combat flag with StratCon, as it'll cause issues.
 
-* Evacuate Scenario during a Garrison contract: Game logic always leads to facility removal, regardless of result. Workaround: you can re-add the facility (as allied or enemy controlled) using GM mode, if scenario results suggest it. If it's a contract objective, you have to restore it in the same hex.
+* "The Enemy has 80 units and I have 4!!" - Stratcon normally pulls a lance/star unit from your TO&E to form as the seed unit for a new scenario.  BUT if you have units in your Main TO&E tree that are freestanding it can pull those units as seed, or it will use your whole TO&E BV as a seed.  Common offenders are Dropships and Jumpships, etc.  Make sure everything under your TO&E is in a subforce.  It might be best just to remove Dropships and Jumpships completely.  
+
+* "The Enemy has 80 units and I have 4, again!!"  If you ever feel outnumbered or outmatched, assign your force to the scenario, right click on it in the briefing tab, edit, and regnerate bot forces.  It will tailor the new force to the BV of your assigned force.  You may still be outmatched (as sometimes that is intentional and it will require reinforcements) - but it should be better.  
+
+* Evacuate Scenario during a Garrison contract: If you lose the facility, it will be under enemy control.  You can try to attack and recapture it.  If you dont, you will fail the contract.  If there is a bug with this, you can right click on hex and GM add it again. If it's a contract objective, you have to restore it in the same hex.
 
 * Skipping scenarios.
 Under integrated or house command, or if the liaison is coming along for the ride, you will lose a VP.
@@ -56,7 +78,7 @@ Your Contract Score is no longer the sole metric of your success.
 
 * Under Independent command, you're only responsible for completing strategic objectives.
 
-* Stratcon contract VP's are only awarded for "required by employer" scenarios, and will show "deployment required by contract / -1 VP if lost/ignored; +1 VP if won" and are NOT necessarily Contract Objectives.  There is a screenshot sticky in the Stratcon channel for an example.
+* Stratcon contract VP's are only awarded for "required by employer" scenarios, and will show "deployment required by contract / -1 VP if lost/ignored; +1 VP if won" and are NOT necessarily Contract Objectives.  There is a screenshot sticky in the Stratcon channel for an example.  
 
 * The information about whether a scenario gives VP/SP is stated in red on the scenario description in the StratCon tab. "Scenario Victory Points" stated in the briefing tab are internal, meant for the game to find the effect (if any) of the battle.  So, VP discussed in a post-battle resolution screen and VP on the StratCon campaign tab are NOT the same.  The ones on the campaign tab are the only ones that count toward final contract score.
 
@@ -71,9 +93,9 @@ THE STRATCON HEX GRID
 
 * Your "base", if you would have such a thing, is abstracted. It does not appear on the Track, though there might be allied Strategic Objectives (places such as a supply or tank depot).
 
-* Unscouted hexes are dark grey. Scouted hexes are light grey. (See below how to scout)
+* Unscouted hexes are shaded grey. Scouted hexes are light grey. If it is hard to tell, you can click on the hex and it will say recon complete/recon incomplete.(See below how to scout)
 
-* Allied facilities are displayed as green squares. Hostile facilities as red squares.  They provide the following Bonuses to Allies or Enemies.  You should take out hostile bases quickly.
+* Allied facilities are displayed as cyan icons. Hostile facilities as red icons.  They provide the following Bonuses to Allies or Enemies.  Usually in the form of a modifier added to a battle.  They will apply this modifier to a battle approximately 60% of the time - EVEN IF YOU HAVE NOT FOUND THEM ON THE MAP YET.  You should scout and take out hostile bases quickly.
 	* Mech/Tank/Air/Arty base - Adds an allied or enemy reinforcement of the listed type to scenarios.  Enemy bases of this type should be taken out quickly.
 	* Supply Depot - Allied = 1SP/week.  Hostile = 5% bonus to Opfor BV budget in scenarios.
 	* Data Center - Allied = Shows the entire Map.  Hostile = Increase scenario odds and adds a enemy mech scout force to scenarios.
@@ -83,9 +105,9 @@ THE STRATCON HEX GRID
 	* Oribital Defense - Hostile = Prevents Aerospace and adds an enemy Officer mech to scenarios.
 	* Base of Operations - More and better defenders.  Allied = losing this means a contract loss.  Enemy = Adds enemy commander mech to scenarios.  Enemy loss reduces contract activity.    
  
-* Your forces currently deployed to the track are cyan circles.
+* Your forces currently deployed to the track are cyan icons.
 
-* Pending scenarios against hostile forces are concentric red squares.
+* Pending scenarios against hostile forces are red icons.
 
 
 ============
@@ -101,6 +123,8 @@ HOW TO SCOUT
 * Every time you send a Lance to scout or engage a scenario, it will be unavailable (including for repairs) for a duration equal to the "Deployment Period" that's listed in the right pane. If you click on the relevant hex, the pane will show return dates.
 
 * In theory, this should be the same for wounded warriors and salvaged units. As of 49.0, however, they teleport back to base immediately.
+
+* TIP:  Because of their Role, scouts will trigger a lot of scenarios.  You should have other fast-but-beefy lances (something that moves at least 5/8) or Aerospace that can reinforce them when your scouts get in over their head.  Because they totally will.
 
 
 =======================
@@ -141,6 +165,8 @@ Multiply the above percentages by the BV of your primary force (the lance that g
 
 The intention here is that, as the unit gets better, it will face tougher opposition, while giving a bit of a break to starting units. This mechanism may not produce very fair results for very low BV forces, so there is no expectation of a balanced scenario for four squads of foot rifle infantry. For very high BV forces, you are likely to see excessive numbers of hostile units.
 
+Modifiers can be randomly rolled or added to a scenario by a allied or enemy facility.  Some of the modifiers are helpful.  Some are very hard.  Example 8 Pirate Aircraft or Overwhelming Enemy Ground Reinforcements can be difficult.  Reinforce as necessary, or take a loss.  Pick your battles.  Or if you want to cheat just start the battle and remove that force in the MegaMek lobby.  You can and will see enemy ASF, Artillery, and Infantry.  You should probably invest in some of your own.
+
 If the OpFor is too large, not present, not based on TO&E, unwinnable scenario: right-click scenario in the Briefing Tab, "Edit", and click "Regenerate Bot Forces". The modifiers will be the same. The not-present OpFor issue might not be solved this way. OpFor can also get higher BV, but you can always regenerate forces again.
 
 
@@ -161,31 +187,34 @@ Some scenario resolution logic is broken. A common example is needing to keep bo
 
 #1: Leadership lets you bring extra auxiliary units for free (where an "auxiliary unit" is any unit of a different type than the majority of the lance and of lower BV than the lowest-BV unit in the lance)
 So: give your lance leaders leadership points, and keep some lower-BV units (tanks, aerospace fighters, whatever) around so you can bring extra stuff to a fight
+NOTE:  This is bugged and your bonus unit may appear on other battles when it should not.  You can save and reload MHQ after your battle with the bonus unit, and undeploy it as necessary after that and it wont appear on new battles after that.
 
 #2: Keep some lances on the "fight" role or keep some support/victory points. That way, if a fight seems unfair, you can bring an extra lance or two in.
 
 #3: On Independent and Liaison command rights, you're expected to complete the strategic objectives. On Liaison+ command, you're expected to maintain positive campaign VP.
 
 #4: If you have a lance on 'defend' role, keep some extra infantry/battle armour around, you can deploy those "for free" if that lance gets into a scenario (the number is dependent on lance leader tactics skill).
+NOTE:  This is bugged and your bonus unit may appear on other battles when it should not.  You can save and reload MHQ after your battle with the bonus unit, and undeploy it as necessary after that and it wont appear on new battles after that.
 
 #5: Take out or capture hostile facilities (especially "[unit type] base") ASAP, as they will add extra guaranteed lances of hostile reinforcements into a fight on that track. But if you can capture and hold them, then you get allied buddies coming in to help you instead.
 
 #6: Pay attention to scenario objectives - some scenarios you'll have an easier time with if you don't try to destroy everything. For example, the "pursuit" or "breakthrough" scenarios are best done at night with fast, jump-capable units (or hell, VTOLs). For facilities you're trying to take out, you can just destroy the turrets and bug out if you can't take the garrison.
 
 * There's too many enemy reinforcements! *
-Might be a hostile facility or three on the track. Better do some recon and take them out, or, even better, capture them so you can use them. Or, you might just be having bad luck - each scenario can receive up to three modifiers.
+Might be a hostile facility or three on the track. Better do some recon and take them out, or, even better, capture them so you can use them. Or, you might just be having bad luck - each scenario can receive up to three modifiers PLUS modifiers added by facilities.  You should deal with the facilities quickly.
 
 * Ground control*
-By default, you control the terrain at the end if you've met the threshold to rout the enemy ground forces.
+By default, you control the terrain at the end if you've met the threshold to rout the enemy ground forces.  On scenarios where you have to flee the map, you do not, UNLESS you turn and destroy x% of the enemy.
 
 * Disabling Turrets *
 There is no direct sure-fire way to go about disabling turrets. You have two choices:
 - Shoot at the buildings and hope to get lucky. Each shot that is over the damage threshold can disable the turret's crew or weapon, which does the trick. However, your bot ally will likely keep firing at turret buildings... Also, setting turret buildings on fire may "help".
 - Eliminate the stated % of the ground enemy forces. Once that's achieved, you're considered to have routed the forces and able to take control of the turrets.
+- Some of the new facilities are built on Reinforced buildings that take a lot of damage to destroy.  Make sure you pay attention to the map type and if there are heavy buildings you should bring some big guns.
 
 * Base/objective attacks and capture*
 That one's a bit tricky. 
-- To capture the base you need to *preserve* ALL the turrets. As explained above, your best bet is to NOT shoot at the turrets (though crew/weapon-disabled turrets count as preserved), then rout the indicated % of forces. That's very hard if you have bot allies as they love to shoot and kick buildings; a trick is to give all allied bots all non-turret enemies as strategic targets and set their aggression level lower.
+- To capture the base you need to leave 75% of the turrets intact with 75% of opfor destroyed.  As explained above, your best bet is to NOT shoot at the turrets (though crew/weapon-disabled turrets count as preserved), then rout the indicated % of forces. That's very hard if you have bot allies as they love to shoot and kick buildings; a trick is to give all allied bots all non-turret enemies as strategic targets and set their aggression level lower.
 - To destroy the base, you need to destroy or disable ALL Turrets. You don't actually need to rout the ground forces.
 - To recon the base, you need to scan all turrets. You might want to tweak allied bots as above. Jump jets are a must. Note that if you get a base Recon scenario, you're not bound to stick to recon and can still go for a capture or destroy. You might consider the scenario a failure, though, I guess.
 
