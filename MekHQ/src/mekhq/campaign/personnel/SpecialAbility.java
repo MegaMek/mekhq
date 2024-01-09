@@ -551,9 +551,10 @@ public class SpecialAbility {
             return false;
         }
 
+        // Should only apply to Large Ship-mounted weapons
         if (wt.getAtClass() == WeaponType.CLASS_NONE ||
                 wt.getAtClass() == WeaponType.CLASS_POINT_DEFENSE ||
-                wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER) {
+                (wt.getAtClass() >= WeaponType.CLASS_CAPITAL_LASER && wt.getAtClass() <= WeaponType.CLASS_TELE_MISSILE)) {
             return false;
         }
 
