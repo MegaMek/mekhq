@@ -72,6 +72,16 @@ public abstract class AbstractMHQValidationButtonDialog extends AbstractValidati
                                                 final String title) {
         super(frame, modal, resources, name, title);
     }
+
+    /**
+     * This creates an AbstractMHQValidationButtonDialog using the specified resource bundle. This
+     * is not recommended by default. Allows a JDialog to be specified as parent.
+     */
+    protected AbstractMHQValidationButtonDialog(final JDialog dialog, final JFrame frame, final boolean modal,
+                                                final ResourceBundle resources, final String name,
+                                                final String title) {
+        super(dialog, frame, modal, resources, name, title);
+    }
     //endregion Constructors
 
     /**
