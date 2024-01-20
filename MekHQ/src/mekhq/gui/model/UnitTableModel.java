@@ -124,7 +124,7 @@ public class UnitTableModel extends DataTableModel {
             case COL_QUIRKS:
                 return "Quirks";
             case COL_RSTATUS:
-                return "Repair Status";
+                return "Mode";
             default:
                 return "?";
         }
@@ -145,7 +145,7 @@ public class UnitTableModel extends DataTableModel {
             case COL_COST:
             case COL_STATUS:
             case COL_RSTATUS:
-                return 80;
+                return 40;
             default:
                 return 20;
         }
