@@ -546,8 +546,8 @@ public class MHQXMLUtility extends MMXMLUtility {
 
     public static String getEntityNameFromXmlString(Node node) {
         NamedNodeMap attrs = node.getAttributes();
-        String chassis = attrs.getNamedItem("chassis").getTextContent();
-        String model = attrs.getNamedItem("model").getTextContent();
+        String chassis = attrs.getNamedItem(MULParser.ATTR_CHASSIS ).getTextContent();
+        String model = attrs.getNamedItem(MULParser.ATTR_MODEL).getTextContent();
         return chassis + " " + model;
     }
 
