@@ -105,46 +105,46 @@ public class MHQXMLUtility extends MMXMLUtility {
         StringBuilder retVal = new StringBuilder();
 
         // Start writing this entity to the file.
-        retVal.append(MHQXMLUtility.indentStr(indentLvl)).append("<entity chassis=\"")
-                .append(escape(tgtEnt.getChassis())).append("\" model=\"").append(escape(tgtEnt.getModel()))
-                .append("\" type=\"").append(escape(tgtEnt.getMovementModeAsString())).append("\" commander=\"")
-                .append(tgtEnt.isCommander()).append("\" externalId=\"").append(tgtEnt.getExternalIdAsString());
+        retVal.append(MHQXMLUtility.indentStr(indentLvl)).append("<" + MULParser.ELE_ENTITY + " " + MULParser.ATTR_CHASSIS + "=\"")
+                .append(escape(tgtEnt.getChassis())).append("\" " + MULParser.ATTR_MODEL + "=\"").append(escape(tgtEnt.getModel()))
+                .append("\" " + MULParser.ATTR_TYPE + "=\"").append(escape(tgtEnt.getMovementModeAsString())).append("\" " + MULParser.ATTR_COMMANDER + "=\"")
+                .append(tgtEnt.isCommander()).append("\" " + MULParser.ATTR_EXT_ID + "=\"").append(tgtEnt.getExternalIdAsString());
 
         if (tgtEnt.countQuirks() > 0) {
-            retVal.append("\" quirks=\"").append(escape(tgtEnt.getQuirkList("::")));
+            retVal.append("\" " + MULParser.ATTR_QUIRKS + "=\"").append(escape(tgtEnt.getQuirkList("::")));
         }
         if (tgtEnt.getC3Master() != null) {
-            retVal.append("\" c3MasterIs=\"")
+            retVal.append("\" " + MULParser.ATTR_C3MASTERIS + "=\"")
                     .append(tgtEnt.getGame().getEntity(tgtEnt.getC3Master().getId()).getC3UUIDAsString());
         }
         if (tgtEnt.hasC3() || tgtEnt.hasC3i() || tgtEnt.hasNavalC3()) {
-            retVal.append("\" c3UUID=\"").append(tgtEnt.getC3UUIDAsString());
+            retVal.append("\" " + MULParser.ATTR_C3UUID + "=\"").append(tgtEnt.getC3UUIDAsString());
         }
 
         if (!tgtEnt.getCamouflage().hasDefaultCategory()) {
-            retVal.append("\" camoCategory=\"").append(escape(tgtEnt.getCamouflage().getCategory()));
+            retVal.append("\" " + MULParser.ATTR_CAMO_CATEGORY + "=\"").append(escape(tgtEnt.getCamouflage().getCategory()));
         }
 
         if (!tgtEnt.getCamouflage().hasDefaultFilename()) {
-            retVal.append("\" camoFileName=\"").append(escape(tgtEnt.getCamouflage().getFilename()));
+            retVal.append("\" " + MULParser.ATTR_CAMO_FILENAME + "=\"").append(escape(tgtEnt.getCamouflage().getFilename()));
         }
 
         if (tgtEnt.getDeployRound() > 0) {
-            retVal.append(String.format("\" %s=\"%d", MULParser.DEPLOYMENT, tgtEnt.getDeployRound()));
+            retVal.append(String.format("\" %s=\"%d", MULParser.ATTR_DEPLOYMENT, tgtEnt.getDeployRound()));
         }
 
         if (tgtEnt instanceof Infantry) {
-            retVal.append(String.format("\" %s=\"%d", MULParser.INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadCount()));
+            retVal.append(String.format("\" %s=\"%d", MULParser.ATTR_INF_SQUAD_NUM, ((Infantry) tgtEnt).getSquadCount()));
         }
 
-        retVal.append(String.format("\" %s=\"%d", MULParser.ALTITUDE, tgtEnt.getAltitude()));
+        retVal.append(String.format("\" %s=\"%d", MULParser.ATTR_ALTITUDE, tgtEnt.getAltitude()));
 
         if (tgtEnt.isOffBoard()) {
-            retVal.append("\" offboard=\"");
+            retVal.append("\" " + MULParser.ATTR_OFFBOARD + "=\"");
             retVal.append(String.valueOf(tgtEnt.isOffBoard()));
-            retVal.append("\" offboard_distance=\"");
+            retVal.append("\" " + MULParser.ATTR_OFFBOARD_DISTANCE + "=\"");
             retVal.append(String.valueOf(tgtEnt.getOffBoardDistance()));
-            retVal.append("\" offboard_direction=\"");
+            retVal.append("\" " + MULParser.ATTR_OFFBOARD_DIRECTION + "=\"");
             retVal.append(String.valueOf(tgtEnt.getOffBoardDirection().getValue()));
         }
 
@@ -171,15 +171,15 @@ public class MHQXMLUtility extends MMXMLUtility {
             Aero a = (Aero) tgtEnt;
 
             // SI
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<structural integrity=\"").append(a.getSI())
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_SI + " " + MULParser.ATTR_INTEGRITY + "=\"").append(a.getSI())
                     .append("\"/>\n");
 
             // Heat sinks
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<heat sinks=\"").append(a.getHeatSinks())
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_HEAT + " " + MULParser.ATTR_SINK + "=\"").append(a.getHeatSinks())
                     .append("\"/>\n");
 
             // Fuel
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<fuel left=\"").append(a.getFuel())
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_FUEL + " " + MULParser.ATTR_LEFT + "=\"").append(a.getFuel())
                     .append("\"/>\n");
 
             // TODO: dropship docking collars, bays
@@ -189,11 +189,11 @@ public class MHQXMLUtility extends MMXMLUtility {
                 Jumpship j = (Jumpship) a;
 
                 // KF integrity
-                retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<KF integrity=\"")
+                retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_KF + " " + MULParser.ATTR_INTEGRITY + "=\"")
                         .append(j.getKFIntegrity()).append("\"/>\n");
 
                 // KF sail integrity
-                retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<sail integrity=\"")
+                retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_SAIL + " " + MULParser.ATTR_INTEGRITY + "=\"")
                         .append(j.getSailIntegrity()).append("\"/>\n");
             }
 
@@ -215,23 +215,23 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         // Write the Naval C3 Data if needed
         if (tgtEnt.hasNavalC3()) {
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<nc3set>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_NC3 + ">\n");
             Iterator<Entity> nc3List = list.iterator();
             while (nc3List.hasNext()) {
                 final Entity nc3Entity = nc3List.next();
 
                 if (nc3Entity.onSameC3NetworkAs(tgtEnt, true)) {
-                    retVal.append(MHQXMLUtility.indentStr(indentLvl + 2)).append("<nc3_link link=\"");
+                    retVal.append(MHQXMLUtility.indentStr(indentLvl + 2)).append("<" + MULParser.ELE_NC3LINK + " " + MULParser.ATTR_LINK + "=\"");
                     retVal.append(nc3Entity.getC3UUIDAsString());
                     retVal.append("\"/>\n");
                 }
             }
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</nc3set>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</" + MULParser.ELE_NC3 + ">\n");
         }
 
         // Write the C3i Data if needed
         if (tgtEnt.hasC3i()) {
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<c3iset>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_C3I + ">\n");
 
             Iterator<Entity> c3iList = list.iterator();
             while (c3iList.hasNext()) {
@@ -239,16 +239,16 @@ public class MHQXMLUtility extends MMXMLUtility {
 
                 if (C3iEntity.onSameC3NetworkAs(tgtEnt, true)) {
                     retVal.append(MHQXMLUtility.indentStr(indentLvl + 2))
-                            .append("<c3i_link link=\"")
+                            .append("<" + MULParser.ELE_C3ILINK + " " + MULParser.ATTR_LINK + "=\"")
                             .append(C3iEntity.getC3UUIDAsString())
                             .append("\"/>\n");
                 }
             }
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</c3iset>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</" + MULParser.ELE_C3I + ">\n");
         }
 
         // Finish writing this entity to the file.
-        retVal.append(MHQXMLUtility.indentStr(indentLvl)).append("</entity>");
+        retVal.append(MHQXMLUtility.indentStr(indentLvl)).append("</" + MULParser.ELE_ENTITY + ">");
 
         // Okay, return whatever we've got!
         return retVal.toString();
@@ -256,19 +256,19 @@ public class MHQXMLUtility extends MMXMLUtility {
 
     private static void compileBombChoices(int[] bombChoices, StringBuilder retVal, int indentLvl, boolean isInternal) {
         if (bombChoices.length > 0) {
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<bombs>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("<" + MULParser.ELE_BOMBS + ">\n");
             for (int type = 0; type < BombType.B_NUM; type++) {
                 if (bombChoices[type] > 0) {
                     String typeName = BombType.getBombInternalName(type);
-                    retVal.append(MHQXMLUtility.indentStr(indentLvl + 2)).append("<bomb type=\"");
+                    retVal.append(MHQXMLUtility.indentStr(indentLvl + 2)).append("<" + MULParser.ELE_BOMB + " " + MULParser.ATTR_TYPE + "=\"");
                     retVal.append(typeName);
-                    retVal.append("\" load=\"");
+                    retVal.append("\" " + MULParser.ATTR_LOAD + "=\"");
                     retVal.append(bombChoices[type]);
-                    retVal.append((isInternal) ? "\" Internal=\"true" : "\" Internal=\"false");
+                    retVal.append((isInternal) ? "\" " + MULParser.ATTR_INTERNAL + "=\"true" : "\" " + MULParser.ATTR_INTERNAL + "=\"false");
                     retVal.append("\"/>\n");
                 }
             }
-            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</bombs>\n");
+            retVal.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</" + MULParser.ELE_BOMBS + ">\n");
         }
 
     }
@@ -291,58 +291,58 @@ public class MHQXMLUtility extends MMXMLUtility {
      * @return The generated crit string.
      */
     private static String getAeroCritString(Aero a, int indentLvl) {
-        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<acriticals";
+        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_AEROCRIT + "";
         String critVal = "";
 
         // crits
         if (a.getAvionicsHits() > 0) {
-            critVal = critVal.concat(" avionics=\"");
+            critVal = critVal.concat(" " + MULParser.ATTR_AVIONICS + "=\"");
             critVal = critVal.concat(Integer.toString(a.getAvionicsHits()));
             critVal = critVal.concat("\"");
         }
 
         if (a.getSensorHits() > 0) {
-            critVal = critVal.concat(" sensors=\"");
+            critVal = critVal.concat(" " + MULParser.ATTR_SENSORS + "=\"");
             critVal = critVal.concat(Integer.toString(a.getSensorHits()));
             critVal = critVal.concat("\"");
         }
 
         if (a.getEngineHits() > 0) {
-            critVal = critVal.concat(" engine=\"");
+            critVal = critVal.concat(" " + MULParser.ATTR_ENGINE + "=\"");
             critVal = critVal.concat(Integer.toString(a.getEngineHits()));
             critVal = critVal.concat("\"");
         }
 
         if (a.getFCSHits() > 0) {
-            critVal = critVal.concat(" fcs=\"");
+            critVal = critVal.concat(" " + MULParser.ATTR_FCS + "=\"");
             critVal = critVal.concat(Integer.toString(a.getFCSHits()));
             critVal = critVal.concat("\"");
         }
 
         if (a.getCICHits() > 0) {
-            critVal = critVal.concat(" cic=\"");
+            critVal = critVal.concat(" " + MULParser.ATTR_CIC + "=\"");
             critVal = critVal.concat(Integer.toString(a.getCICHits()));
             critVal = critVal.concat("\"");
         }
 
         if (a.getLeftThrustHits() > 0) {
-            critVal = critVal.concat(" leftThrust=\"");
+            critVal = critVal.concat(" " + MULParser.ATTR_LEFT_THRUST + "=\"");
             critVal = critVal.concat(Integer.toString(a.getLeftThrustHits()));
             critVal = critVal.concat("\"");
         }
 
         if (a.getRightThrustHits() > 0) {
-            critVal = critVal.concat(" rightThrust=\"");
+            critVal = critVal.concat(" " + MULParser.ATTR_RIGHT_THRUST + "=\"");
             critVal = critVal.concat(Integer.toString(a.getRightThrustHits()));
             critVal = critVal.concat("\"");
         }
 
         if (!a.hasLifeSupport()) {
-            critVal = critVal.concat(" lifeSupport=\"none\"");
+            critVal = critVal.concat(" " + MULParser.ATTR_LIFE_SUPPORT + "=\"" + MULParser.VALUE_NONE + "\"");
         }
 
         if (a.isGearHit()) {
-            critVal = critVal.concat(" gear=\"none\"");
+            critVal = critVal.concat(" " + MULParser.ATTR_GEAR + "=\"" + MULParser.VALUE_NONE + "\"");
         }
 
         if (!critVal.isBlank()) {
@@ -364,7 +364,7 @@ public class MHQXMLUtility extends MMXMLUtility {
      * @return The generated string.
      */
     private static String getTurretLockedString(Tank e, int indentLvl) {
-        String retval = MHQXMLUtility.indentStr(indentLvl) + "<turretlock direction=\"";
+        String retval = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TURRETLOCK + " " + MULParser.ATTR_DIRECTION + "=\"";
         retval = retval.concat(Integer.toString(e.getSecondaryFacing()));
         retval = retval.concat("\"/>\n");
 
@@ -400,9 +400,9 @@ public class MHQXMLUtility extends MMXMLUtility {
         retVal = retVal.concat("\"/>\n");
 
         // save any motive hits
-        retVal = retVal.concat(MHQXMLUtility.indentStr(indentLvl) + "<motive damage=\"");
+        retVal = retVal.concat(MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_MOTIVE + " " + MULParser.ATTR_MDAMAGE + "=\"");
         retVal = retVal.concat(Integer.toString(e.getMotiveDamage()));
-        retVal = retVal.concat("\" penalty=\"");
+        retVal = retVal.concat("\" " + MULParser.ATTR_MPENALTY + "=\"");
         retVal = retVal.concat(Integer.toString(e.getMotivePenalty()));
         retVal = retVal.concat("\"/>\n");
 
@@ -418,18 +418,18 @@ public class MHQXMLUtility extends MMXMLUtility {
      */
     private static String getTankCritString(Tank e, int indentLvl) {
 
-        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<tcriticals";
+        String retVal = MHQXMLUtility.indentStr(indentLvl) + "<" + MULParser.ELE_TANKCRIT + "";
         String critVal = "";
 
         // crits
         if (e.getSensorHits() > 0) {
-            critVal = critVal.concat(" sensors=\"");
+            critVal = critVal.concat(" " + MULParser.ATTR_SENSORS + "=\"");
             critVal = critVal.concat(Integer.toString(e.getSensorHits()));
             critVal = critVal.concat("\"");
         }
         if (e.isEngineHit()) {
-            critVal = critVal.concat(" engine=\"");
-            critVal = critVal.concat("hit");
+            critVal = critVal.concat(" " + MULParser.ATTR_ENGINE + "=\"");
+            critVal = critVal.concat( MULParser.VALUE_HIT);
             critVal = critVal.concat("\"");
         }
 
@@ -464,37 +464,37 @@ public class MHQXMLUtility extends MMXMLUtility {
         String retVal = MHQXMLUtility.writeEntityToXmlString(tgtEnt, indentLvl, list);
 
         StringBuilder crew = new StringBuilder(MHQXMLUtility.indentStr(indentLvl + 1));
-        crew.append("<crew crewType=\"").append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
-                .append("\" size=\"").append(tgtEnt.getCrew().getSize());
+        crew.append("<" + MULParser.ELE_CREW + " " + MULParser.ATTR_CREWTYPE + "=\"").append(tgtEnt.getCrew().getCrewType().toString().toLowerCase())
+                .append("\" " + MULParser.ATTR_SIZE + "=\"").append(tgtEnt.getCrew().getSize());
         if (tgtEnt.getCrew().getInitBonus() != 0) {
-            crew.append("\" initB=\"").append(tgtEnt.getCrew().getInitBonus());
+            crew.append("\" " + MULParser.ATTR_INITB + "=\"").append(tgtEnt.getCrew().getInitBonus());
         }
         if (tgtEnt.getCrew().getCommandBonus() != 0) {
-            crew.append("\" commandB=\"").append(tgtEnt.getCrew().getCommandBonus());
+            crew.append("\" " + MULParser.ATTR_COMMANDB + "=\"").append(tgtEnt.getCrew().getCommandBonus());
         }
         if (tgtEnt instanceof Mech) {
-            crew.append("\" autoeject=\"").append(((Mech) tgtEnt).isAutoEject());
+            crew.append("\" " + MULParser.ATTR_AUTOEJECT + "=\"").append(((Mech) tgtEnt).isAutoEject());
         }
-        crew.append("\" ejected=\"").append(tgtEnt.getCrew().isEjected()).append("\">\n");
+        crew.append("\" " + MULParser.ATTR_EJECTED + "=\"").append(tgtEnt.getCrew().isEjected()).append("\">\n");
 
         for (int pos = 0; pos < tgtEnt.getCrew().getSlotCount(); pos++) {
-            crew.append(MHQXMLUtility.indentStr(indentLvl + 2)).append("<crewMember slot=\"")
-                    .append(pos).append("\" name=\"").append(MHQXMLUtility.escape(tgtEnt.getCrew().getName(pos)))
-                    .append("\" nick=\"").append(MHQXMLUtility.escape(tgtEnt.getCrew().getNickname(pos)))
-                    .append("\" gender=\"").append(tgtEnt.getCrew().getGender(pos).name())
-                    .append("\" gunnery=\"").append(tgtEnt.getCrew().getGunnery(pos))
-                    .append("\" piloting=\"").append(tgtEnt.getCrew().getPiloting(pos));
+            crew.append(MHQXMLUtility.indentStr(indentLvl + 2)).append("<" + MULParser.ELE_CREWMEMBER + " " + MULParser.ATTR_SLOT + "=\"")
+                    .append(pos).append("\" " + MULParser.ATTR_NAME + "=\"").append(MHQXMLUtility.escape(tgtEnt.getCrew().getName(pos)))
+                    .append("\" " + MULParser.ATTR_NICK + "=\"").append(MHQXMLUtility.escape(tgtEnt.getCrew().getNickname(pos)))
+                    .append("\" " + MULParser.ATTR_GENDER + "=\"").append(tgtEnt.getCrew().getGender(pos).name())
+                    .append("\" " + MULParser.ATTR_GUNNERY + "=\"").append(tgtEnt.getCrew().getGunnery(pos))
+                    .append("\" " + MULParser.ATTR_PILOTING + "=\"").append(tgtEnt.getCrew().getPiloting(pos));
 
             if (tgtEnt.getCrew().getToughness(pos) != 0) {
-                crew.append("\" toughness=\"").append(tgtEnt.getCrew().getToughness(pos));
+                crew.append("\" " + MULParser.ATTR_TOUGH + "=\"").append(tgtEnt.getCrew().getToughness(pos));
             }
             if (tgtEnt.getCrew().isDead(pos) || tgtEnt.getCrew().getHits(pos) >= Crew.DEATH) {
-                crew.append("\" hits=\"Dead");
+                crew.append("\" " + MULParser.ATTR_HITS + "=\"" + MULParser.VALUE_DEAD + "");
             } else if (tgtEnt.getCrew().getHits(pos) > 0) {
-                crew.append("\" hits=\"").append(tgtEnt.getCrew().getHits(pos));
+                crew.append("\" " + MULParser.ATTR_HITS + "=\"").append(tgtEnt.getCrew().getHits(pos));
             }
 
-            crew.append("\" externalId=\"").append(tgtEnt.getCrew().getExternalIdAsString(pos));
+            crew.append("\" " + MULParser.ATTR_EXT_ID + "=\"").append(tgtEnt.getCrew().getExternalIdAsString(pos));
 
             String extraData = tgtEnt.getCrew().writeExtraDataToXMLLine(pos);
             if (!StringUtility.isNullOrBlank(extraData)) {
@@ -503,7 +503,7 @@ public class MHQXMLUtility extends MMXMLUtility {
 
             crew.append("\"/>\n");
         }
-        crew.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</crew>\n");
+        crew.append(MHQXMLUtility.indentStr(indentLvl + 1)).append("</" + MULParser.ELE_CREW + ">\n");
 
         pw.println(retVal.replaceFirst(">", ">\n" + crew + "\n"));
     }
