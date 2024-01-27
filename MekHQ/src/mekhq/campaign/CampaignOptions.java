@@ -417,6 +417,7 @@ public class CampaignOptions {
     private int contractSearchRadius;
     private boolean variableContractLength;
     private boolean contractMarketReportRefresh;
+    private int contractMaxSalvagePercentage;
     //endregion Markets Tab
 
     //region RATs Tab
@@ -916,6 +917,7 @@ public class CampaignOptions {
         setContractSearchRadius(800);
         setVariableContractLength(true);
         setContractMarketReportRefresh(true);
+        setContractMaxSalvagePercentage(100);
         //endregion Markets Tab
 
         //region RATs Tab
@@ -2546,6 +2548,14 @@ public class CampaignOptions {
     public void setContractMarketReportRefresh(final boolean contractMarketReportRefresh) {
         this.contractMarketReportRefresh = contractMarketReportRefresh;
     }
+
+    public int getContractMaxSalvagePercentage() {
+        return contractMaxSalvagePercentage;
+    }
+
+    public void setContractMaxSalvagePercentage(final int contractMaxSalvagePercentage) {
+        this.contractMaxSalvagePercentage = contractMaxSalvagePercentage;
+    }
     //endregion Contract Market
     //endregion Markets Tab
 
@@ -3795,6 +3805,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractSearchRadius", getContractSearchRadius());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "variableContractLength", isVariableContractLength());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMarketReportRefresh", isContractMarketReportRefresh());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractMaxSalvagePercentage", getContractMaxSalvagePercentage());
         //endregion Contract Market
         //endregion Markets Tab
 
@@ -4562,6 +4573,8 @@ public class CampaignOptions {
                     retVal.setVariableContractLength(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketReportRefresh")) {
                     retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("contractMaxSalvagePercentage")) {
+                    retVal.setContractMaxSalvagePercentage(Integer.parseInt(wn2.getTextContent().trim()));
                 //endregion Contract Market
                 //endregion Markets Tab
 

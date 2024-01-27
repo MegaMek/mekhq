@@ -454,6 +454,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnContractSearchRadius;
     private JCheckBox chkVariableContractLength;
     private JCheckBox chkContractMarketReportRefresh;
+    private JSpinner spnContractMaxSalvagePercentage;
     //endregion Markets Tab
 
     //region RATs Tab
@@ -5632,6 +5633,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel createContractMarketPanel() {
         // Initialize Labels Used in ActionListeners
         final JLabel lblContractSearchRadius = new JLabel();
+        final JLabel lblCoontractMaxSalvagePercentage = new JLabel();
 
         // Create Panel Components
         final JLabel lblContractMarketMethod = new JLabel(resources.getString("lblContractMarketMethod.text"));
@@ -5662,6 +5664,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             spnContractSearchRadius.setEnabled(enabled);
             chkVariableContractLength.setEnabled(enabled);
             chkContractMarketReportRefresh.setEnabled(enabled);
+            spnContractMaxSalvagePercentage.setEnabled(enabled);
         });
         comboContractMarketMethod.setEnabled(false); // TODO : AbstractContractMarket : Remove line
 
@@ -5681,9 +5684,18 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkContractMarketReportRefresh.setToolTipText(resources.getString("chkContractMarketReportRefresh.toolTipText"));
         chkContractMarketReportRefresh.setName("chkContractMarketReportRefresh");
 
+        lblCoontractMaxSalvagePercentage.setText(resources.getString("lblContractMaxSalvagePercentage.text"));
+        lblCoontractMaxSalvagePercentage.setToolTipText(resources.getString("lblContractMaxSalvagePercentage.toolTipText"));
+        lblCoontractMaxSalvagePercentage.setName("lblContractSearchRadius");
+
+        spnContractMaxSalvagePercentage = new JSpinner(new SpinnerNumberModel(100, 0, 100, 10));
+        spnContractMaxSalvagePercentage.setToolTipText(resources.getString("lblContractMaxSalvagePercentage.toolTipText"));
+        spnContractMaxSalvagePercentage.setName("spnContractMaxSalvagePercentage");
+
         // Programmatically Assign Accessibility Labels
         lblContractMarketMethod.setLabelFor(comboContractMarketMethod);
         lblContractSearchRadius.setLabelFor(spnContractSearchRadius);
+        lblCoontractMaxSalvagePercentage.setLabelFor(spnContractMaxSalvagePercentage);
 
         // Layout the UI
         contractMarketPanel = new JDisableablePanel("contractMarketPanel");
@@ -5704,6 +5716,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnContractSearchRadius, Alignment.LEADING))
                         .addComponent(chkVariableContractLength)
                         .addComponent(chkContractMarketReportRefresh)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblCoontractMaxSalvagePercentage)
+                                .addComponent(spnContractMaxSalvagePercentage, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -5716,6 +5731,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnContractSearchRadius))
                         .addComponent(chkVariableContractLength)
                         .addComponent(chkContractMarketReportRefresh)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblCoontractMaxSalvagePercentage)
+                                .addComponent(spnContractMaxSalvagePercentage))
         );
 
         return contractMarketPanel;
@@ -6334,6 +6352,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnContractSearchRadius.setValue(options.getContractSearchRadius());
         chkVariableContractLength.setSelected(options.isVariableContractLength());
         chkContractMarketReportRefresh.setSelected(options.isContractMarketReportRefresh());
+        spnContractMaxSalvagePercentage.setValue(options.getContractMaxSalvagePercentage());
         //endregion Markets Tab
 
         //region RATs Tab
@@ -6771,6 +6790,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setContractSearchRadius((Integer) spnContractSearchRadius.getValue());
             options.setVariableContractLength(chkVariableContractLength.isSelected());
             options.setContractMarketReportRefresh(chkContractMarketReportRefresh.isSelected());
+            options.setContractMaxSalvagePercentage((Integer) spnContractMaxSalvagePercentage.getValue());
             //endregion Markets Tab
 
             //region RATs Tab
