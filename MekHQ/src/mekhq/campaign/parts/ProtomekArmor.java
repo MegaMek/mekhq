@@ -26,6 +26,7 @@ import java.util.Objects;
 import megamek.common.EquipmentType;
 import megamek.common.Protomech;
 import megamek.common.TechAdvancement;
+import megamek.common.equipment.ArmorType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -54,18 +55,18 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public double getTonnage() {
-        return EquipmentType.getProtomechArmorWeightPerPoint(type) * amount;
+        return ArmorType.of(type, true).getWeightPerPoint() * amount;
     }
 
     @Override
     public Money getActualValue() {
         return adjustCostsForCampaignOptions(
-                Money.of(amount * EquipmentType.getProtomechArmorCostPerPoint(type)));
+                Money.of(amount * ArmorType.of(type, true).getWeightPerPoint()));
     }
 
     @Override
     public double getTonnageNeeded() {
-        return amountNeeded / EquipmentType.getProtomechArmorWeightPerPoint(type);
+        return amountNeeded / ArmorType.of(type, true).getWeightPerPoint();
     }
 
     @Override
@@ -77,7 +78,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
     @Override
     public Money getStickerPrice() {
         // always in 5-ton increments
-        return Money.of(5.0 / EquipmentType.getProtomechArmorWeightPerPoint(type) * getArmorPointsPerTon()
+        return Money.of(5.0 / ArmorType.of(type, true).getWeightPerPoint() * getArmorPointsPerTon()
                 * EquipmentType.getProtomechArmorCostPerPoint(type));
     }
 
@@ -117,7 +118,7 @@ public class ProtomekArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public double getArmorPointsPerTon() {
-        return 1.0 / EquipmentType.getProtomechArmorWeightPerPoint(type);
+        return 1.0 / ArmorType.of(type, true).getWeightPerPoint();
     }
 
     @Override
