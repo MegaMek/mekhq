@@ -1297,7 +1297,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             Collections.sort(awardsOfSet);
 
             for (Award award : awardsOfSet) {
-                if (!award.canBeAwarded(selected)) {
+                if (oneSelected && !award.canBeAwarded(selected)) {
                     continue;
                 }
 
