@@ -452,7 +452,7 @@ public class Finances {
                         transaction.getType(),
                         transaction.getDescription(),
                         transaction.getAmount(),
-                        runningTotal.toAmountAndNameString());
+                        runningTotal.toAmountAndSymbolString());
             }
 
             csvPrinter.flush();
