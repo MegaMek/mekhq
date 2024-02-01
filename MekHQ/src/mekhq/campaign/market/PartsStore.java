@@ -425,26 +425,13 @@ public class PartsStore {
 
     private void stockArmor(Campaign c) {
         int amount;
-        for (int at = 0; at < EquipmentType.armorNames.length; at++) {
-            ArmorType is = ArmorType.of(at, false);
-            if (null != is) {
-                if (is.hasFlag(MiscType.F_BA_EQUIPMENT)) {
-                    amount = (int)(5 * BaArmor.getPointsPerTon(at, false));
-                    parts.add(new BaArmor(0, amount, at, -1, false, c));
-                } else {
-                    amount = (int)(5.0 * is.getPointsPerTon());
-                    parts.add(new Armor(0, at, amount, -1, false, false, c));
-                }
-            }
-            ArmorType clan = ArmorType.of(at, true);
-            if ((null != clan) && (is != clan)) {
-                if (clan.hasFlag(MiscType.F_BA_EQUIPMENT)) {
-                    amount = (int)(5 * BaArmor.getPointsPerTon(at, true));
-                    parts.add(new BaArmor(0, amount, at, -1, true, c));
-                } else {
-                    amount = (int) (5.0 * clan.getPointsPerTon());
-                    parts.add(new Armor(0, at, amount, -1, false, true, c));
-                }
+        for (ArmorType armor : ArmorType.allArmorTypes()) {
+            if (armor.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+                amount = (int) (5 * armor.getWeightPerPoint());
+                parts.add(new BaArmor(0, amount, armor.getArmorType(), -1, armor.isClan(), c));
+            } else {
+                amount = (int) (5.0 * armor.getPointsPerTon());
+                parts.add(new Armor(0, armor.getArmorType(), amount, -1, false, armor.isClan(), c));
             }
         }
         parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_STANDARD, 100, -1, true, c));

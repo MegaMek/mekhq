@@ -63,7 +63,7 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = clan;
         this.name = "Armor";
         if (type > -1) {
-            this.name += " (" + EquipmentType.armorNames[type] + ')';
+            this.name += " (" + ArmorType.of(type, clan).getName() + ')';
         }
     }
 
@@ -568,7 +568,7 @@ public class Armor extends Part implements IAcquisitionWork {
     public String scrap() {
         remove(false);
         skillMin = SkillType.EXP_GREEN;
-        return EquipmentType.armorNames[type] + " armor scrapped.";
+        return ArmorType.of(type, clan).getName() + " armor scrapped.";
     }
 
     @Override
@@ -620,7 +620,7 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = cl;
         this.name = "Armor";
         if (type > -1) {
-            this.name += " (" + EquipmentType.armorNames[type] + ')';
+            this.name += " (" + ArmorType.of(type, clan).getName() + ')';
         }
     }
 
