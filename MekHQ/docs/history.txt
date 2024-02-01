@@ -7,6 +7,7 @@ MEKHQ VERSION HISTORY:
 + Fix #3540: Manually set TO&E force commander
 + PR #3818: MUL parser updates
 + PR #3816: Show if unit is in repair or salvage mode in repair bay. 
++ PR #3823: Rework of the internal representation of Armor
 
 0.49.17 (2023-12-31 1900 UTC)
 + No code added
