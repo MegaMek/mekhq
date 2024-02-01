@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.ArmorType;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -84,7 +85,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public double getTonnageNeeded() {
-        double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, isClanTechBase());
+        double armorPerTon = ArmorType.of(type, isClanTechBase()).getPointsPerTon();
         if (type == EquipmentType.T_ARMOR_HARDENED) {
             armorPerTon = 8.0;
         }
@@ -247,8 +248,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
         // this roundabout method is actually necessary to avoid rounding
         // weirdness. Yeah, it's dumb.
-        double armorPointMultiplier = EquipmentType.getArmorPointMultiplier(getType(), isClanTechBase());
-        double armorPerTon = 16.0 * armorPointMultiplier;
+        double armorPerTon = ArmorType.of(getType(), isClan()).getPointsPerTon();
         if (getType() == EquipmentType.T_ARMOR_HARDENED) {
             armorPerTon = 8.0;
         }
@@ -508,11 +508,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public double getArmorPointsPerTon() {
-        double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, clan);
-        if (type == EquipmentType.T_ARMOR_HARDENED) {
-            armorPerTon = 8.0;
-        }
-        return armorPerTon;
+        return ArmorType.of(type, clan).getPointsPerTon();
     }
 
     public Part getNewPart() {

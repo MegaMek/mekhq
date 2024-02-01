@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 import java.util.Objects;
 
 import megamek.common.EquipmentType;
+import megamek.common.equipment.ArmorType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -43,7 +44,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
 
 
     public static double getPointsPerTon(int t, boolean isClan) {
-        return 1.0/EquipmentType.getBaArmorWeightPerPoint(t, isClan);
+        return 1.0 / ArmorType.of(t, isClan).getWeightPerPoint();
     }
 
     public BaArmor() {
@@ -64,7 +65,7 @@ public class BaArmor extends Armor implements IAcquisitionWork {
 
     @Override
     public double getTonnage() {
-        return EquipmentType.getBaArmorWeightPerPoint(type, clan) * amount;
+        return ArmorType.of(type, clan).getWeightPerPoint() * amount;
     }
 
     public Money getPointCost() {
