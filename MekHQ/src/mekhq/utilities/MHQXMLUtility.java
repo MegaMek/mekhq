@@ -106,7 +106,7 @@ public class MHQXMLUtility extends MMXMLUtility {
 
         // Start writing this entity to the file.
         retVal.append(MHQXMLUtility.indentStr(indentLvl)).append("<" + MULParser.ELE_ENTITY + " " + MULParser.ATTR_CHASSIS + "=\"")
-                .append(escape(tgtEnt.getChassis())).append("\" " + MULParser.ATTR_MODEL + "=\"").append(escape(tgtEnt.getModel()))
+                .append(escape(tgtEnt.getFullChassis())).append("\" " + MULParser.ATTR_MODEL + "=\"").append(escape(tgtEnt.getModel()))
                 .append("\" " + MULParser.ATTR_TYPE + "=\"").append(escape(tgtEnt.getMovementModeAsString())).append("\" " + MULParser.ATTR_COMMANDER + "=\"")
                 .append(tgtEnt.isCommander()).append("\" " + MULParser.ATTR_EXT_ID + "=\"").append(tgtEnt.getExternalIdAsString());
 
