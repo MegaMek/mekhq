@@ -154,6 +154,7 @@ public class Money implements Comparable<Money> {
         return CurrencyManager.getInstance().getUiAmountAndSymbolPrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
 
+    @Deprecated
     public String toAmountAndNameString() {
         return CurrencyManager.getInstance().getUiAmountAndNamePrinter().print(getWrapped().toMoney(RoundingMode.HALF_EVEN));
     }
