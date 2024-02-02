@@ -560,7 +560,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         addTab(resources.getString("suppliesAndAcquisitionsPanel.title"), createSuppliesAndAcquisitionsTab());
         addTab(resources.getString("techLimitsPanel.title"), createTechLimitsTab());
         addTab(resources.getString("personnelPanel.title"), createPersonnelTab());
-        addTab(resources.getString("financesPanel.title"), createFinancesTab());
+        addTab(resources.getString("financesPanel.title"), createFinancesTab(campaign.getCampaignOptions().isReverseQualityNames()));
         addTab(resources.getString("mercenaryPanel.title"), createMercenaryTab());
         addTab(resources.getString("experiencePanel.title"), createExperienceTab());
         addTab(resources.getString("skillsPanel.title"), createSkillsTab());
@@ -906,6 +906,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(reverseQualityNames, gridBagConstraints);
+
+        reverseQualityNames.addActionListener(evt -> {
+            if (reverseQualityNames.isSelected()) {
+                recreateUPVMSpinners(true);
+            } else {
+                recreateUPVMSpinners(false);
+            }
+        });
 
         useUnofficialMaintenance = new JCheckBox(resources.getString("useUnofficialMaintenance.text"));
         useUnofficialMaintenance.setToolTipText(resources.getString("useUnofficialMaintenance.toolTipText"));
@@ -1415,7 +1423,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return new JScrollPane(panTech);
     }
 
-    private JScrollPane createFinancesTab() {
+    private JScrollPane createFinancesTab(boolean reverseQualities) {
         int gridy = 0;
 
         AbstractMHQScrollablePanel panFinances = new DefaultMHQScrollablePanel(getFrame(),
@@ -1623,7 +1631,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 20;
-        panFinances.add(createPriceModifiersPanel(), gridBagConstraints);
+        panFinances.add(createPriceModifiersPanel(reverseQualities), gridBagConstraints);
 
         return new JScrollPane(panFinances);
     }
@@ -5221,7 +5229,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     //endregion Personnel Tab
 
     //region Finances Tab
-    private JPanel createPriceModifiersPanel() {
+    private JPanel createPriceModifiersPanel(boolean reverseQualities) {
         // Create Panel Components
         final JLabel lblCommonPartPriceMultiplier = new JLabel(resources.getString("lblCommonPartPriceMultiplier.text"));
         lblCommonPartPriceMultiplier.setToolTipText(resources.getString("lblCommonPartPriceMultiplier.toolTipText"));
@@ -5271,7 +5279,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnMixedTechUnitPriceMultiplier.setToolTipText(resources.getString("lblMixedTechUnitPriceMultiplier.toolTipText"));
         spnMixedTechUnitPriceMultiplier.setName("spnMixedTechUnitPriceMultiplier");
 
-        final JPanel usedPartsValueMultipliersPanel = createUsedPartsValueMultipliersPanel();
+        final JPanel usedPartsValueMultipliersPanel = createUsedPartsValueMultipliersPanel(reverseQualities);
 
         final JLabel lblDamagedPartsValueMultiplier = new JLabel(resources.getString("lblDamagedPartsValueMultiplier.text"));
         lblDamagedPartsValueMultiplier.setToolTipText(resources.getString("lblDamagedPartsValueMultiplier.toolTipText"));
@@ -5388,14 +5396,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return panel;
     }
 
-    private JPanel createUsedPartsValueMultipliersPanel() {
+    private JPanel createUsedPartsValueMultipliersPanel(boolean reverseQualities) {
         final JPanel panel = new JPanel(new GridLayout(0, 2));
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("usedPartsValueMultipliersPanel.title")));
         panel.setName("usedPartsValueMultipliersPanel");
 
         spnUsedPartPriceMultipliers = new JSpinner[Part.QUALITY_F + 1];
         for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
-            final String qualityLevel = Part.getQualityName(i, false);
+            final String qualityLevel = Part.getQualityName(i, reverseQualities);
 
             final JLabel label = new JLabel(qualityLevel);
             label.setToolTipText(resources.getString("lblUsedPartPriceMultiplier.toolTipText"));
@@ -7112,6 +7120,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         });
         panSpecialAbilities.revalidate();
         panSpecialAbilities.repaint();
+    }
+
+    public void recreateUPVMSpinners(boolean reverseQualities) {
+        int financesTabIndex = indexOfTab(resources.getString("financesPanel.title"));
+        removeTabAt(financesTabIndex);
+        insertTab(resources.getString("financesPanel.title"), null, createFinancesTab(reverseQualities), null, financesTabIndex);
     }
 
     private void enableAtBComponents(JPanel panel, boolean enabled) {
