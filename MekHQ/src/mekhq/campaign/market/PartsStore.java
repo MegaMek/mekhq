@@ -434,7 +434,7 @@ public class PartsStore {
                 parts.add(new Armor(0, armor.getArmorType(), amount, -1, false, armor.isClan(), c));
             }
         }
-        parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_STANDARD, 100, -1, true, c));
+        parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_STANDARD_PROTOMEK, 100, -1, true, c));
         parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_EDP, 66, -1, true, c));
     }
 
