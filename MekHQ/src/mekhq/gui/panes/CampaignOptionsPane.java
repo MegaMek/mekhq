@@ -909,9 +909,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         reverseQualityNames.addActionListener(evt -> {
             if (reverseQualityNames.isSelected()) {
-                recreateUPVMSpinners(true);
+                recreateFinancesPanel(true);
             } else {
-                recreateUPVMSpinners(false);
+                recreateFinancesPanel(false);
             }
         });
 
@@ -7122,7 +7122,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panSpecialAbilities.repaint();
     }
 
-    public void recreateUPVMSpinners(boolean reverseQualities) {
+    /**
+     * Recreates the finances panel to reverse the qualities labels.
+     * @param reverseQualities boolean for if the qualities are reversed.
+     */
+    private void recreateFinancesPanel(boolean reverseQualities) {
         int financesTabIndex = indexOfTab(resources.getString("financesPanel.title"));
         removeTabAt(financesTabIndex);
         insertTab(resources.getString("financesPanel.title"), null, createFinancesTab(reverseQualities), null, financesTabIndex);
