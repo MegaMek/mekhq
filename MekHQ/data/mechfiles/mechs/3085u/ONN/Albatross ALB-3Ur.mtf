@@ -1,6 +1,5 @@
-Version:1.0
-Albatross
-ALB-3Ur
+chassis:Albatross
+model:ALB-3Ur
 mul id:28
 
 Config:Biped
@@ -8,6 +7,13 @@ TechBase:Inner Sphere
 Era:3076
 source:TRO: 3085
 Rules Level:2
+role:Brawler
+
+
+
+quirk:easy_maintain
+quirk:imp_target_long
+
 
 Mass:95
 Engine:380 XL Engine

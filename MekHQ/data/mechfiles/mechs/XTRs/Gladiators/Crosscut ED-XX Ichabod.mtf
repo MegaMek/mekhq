@@ -1,12 +1,12 @@
-Version:1.1
-Crosscut
-ED-XX 'Ichabod'
+chassis:Crosscut
+model:ED-XX 'Ichabod'
 mul id:744
 
 Config:Biped
 TechBase:Inner Sphere
 Era:3075
 Rules Level:4
+role:Ambusher
 Source:XTR: Gladiators
 
 Mass:30

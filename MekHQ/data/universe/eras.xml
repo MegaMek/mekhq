@@ -6,25 +6,23 @@ Name: The display name for the era.
 End: The end date for the era. This can be in the formats "yyyy-MM-dd", "yyyy-MM" (assuming first day of the month), and "yyyy" (assuming first day of the year). One era should have this value missing, which will put it as the final era. For the canon dates, these will be one year after their end date in the MUL, as that will swapover on the first day of the new era.
 Flag: The internal flags for the base eras. You can have multiple flag fields (multiple lines each with a single flag) per custom era, which isn't used in base MekHQ, but allows one to customize things.
 
-Note that internal use of this setup is minimal at best, at least as of 0.49.3.
--->
 <eras>
 	<era>
 		<code>PSF</code>
 		<name>Pre-Spaceflight</name>
-		<end>1951</end>
+		<end>1950</end>
 		<flag>PRE_SPACEFLIGHT</flag>
 	</era>
 	<era>
 		<code>ESF</code>
 		<name>Early Spaceflight</name>
-		<end>2005</end>
+		<end>2004</end>
 		<flag>EARLY_SPACEFLIGHT</flag>
 	</era>
 	<era>
 		<code>AOW</code>
 		<name>Age of War</name>
-		<end>2571</end>
+		<end>2570</end>
 		<flag>AGE_OF_WAR</flag>
 		<mulid>9</mulid>
 	</era>

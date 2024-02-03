@@ -36,6 +36,10 @@ KRV-2
 IS Level 2
 </type>
 
+<role>
+Brawler
+</role>
+
 <motion_type>
 Tracked
 </motion_type>
@@ -114,4 +118,11 @@ XTR: Primitives III
 <fuel>
 0.0
 </fuel>
+
+
+<quirks>
+easy_maintain
+hard_pilot
+obsolete
+</quirks>
 

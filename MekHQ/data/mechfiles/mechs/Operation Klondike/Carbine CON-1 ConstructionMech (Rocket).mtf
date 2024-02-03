@@ -1,12 +1,12 @@
-Version:1.1
-Carbine
-CON-1 ConstructionMech (RL)
+chassis:Carbine
+model:CON-1 ConstructionMech (RL)
 mul id:462
 
 Config:Biped
 TechBase:Inner Sphere
 Era:2801
 Rules Level:4
+role:Ambusher
 Source:Record Sheets: Vehicle Annex - IndustrialMechs & Exoskeletons
 
 Mass:30
