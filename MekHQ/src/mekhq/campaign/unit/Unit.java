@@ -26,6 +26,7 @@ import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.ArmorType;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -1173,7 +1174,7 @@ public class Unit implements ITechnology {
                 partsValue = partsValue.plus(200.0 * js.getFuel() / js.getFuelPerTon());
 
                 // armor
-                partsValue = partsValue.plus(js.getArmorWeight(js.locations()) * EquipmentType.getArmorCost(js.getArmorType(0)));
+                partsValue = partsValue.plus(js.getArmorWeight(js.locations()) * ArmorType.forEntity(js).getCost());
 
                 // heat sinks
                 Money sinkCost = Money.of(2000.0 + 4000.0 * js.getHeatType());// == HEAT_DOUBLE ? 6000 : 2000

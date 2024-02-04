@@ -63,7 +63,7 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = clan;
         this.name = "Armor";
         if (type > -1) {
-            this.name += " (" + EquipmentType.armorNames[type] + ')';
+            this.name += " (" + ArmorType.of(type, clan).getName() + ')';
         }
     }
 
@@ -81,7 +81,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public Money getActualValue() {
-        return adjustCostsForCampaignOptions(Money.of(getTonnage() * EquipmentType.getArmorCost(type)));
+        return adjustCostsForCampaignOptions(Money.of(getTonnage() * ArmorType.of(type, clan).getCost()));
     }
 
     public double getTonnageNeeded() {
@@ -93,13 +93,13 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public Money getValueNeeded() {
-        return adjustCostsForCampaignOptions(Money.of(getTonnageNeeded() * EquipmentType.getArmorCost(type)));
+        return adjustCostsForCampaignOptions(Money.of(getTonnageNeeded() * ArmorType.of(type, clan).getCost()));
     }
 
     @Override
     public Money getStickerPrice() {
         // always in 5-ton increments
-        return Money.of(5 * EquipmentType.getArmorCost(type));
+        return Money.of(5 * ArmorType.of(type, clan).getCost());
     }
 
     @Override
@@ -568,7 +568,7 @@ public class Armor extends Part implements IAcquisitionWork {
     public String scrap() {
         remove(false);
         skillMin = SkillType.EXP_GREEN;
-        return EquipmentType.armorNames[type] + " armor scrapped.";
+        return ArmorType.of(type, clan).getName() + " armor scrapped.";
     }
 
     @Override
@@ -620,7 +620,7 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = cl;
         this.name = "Armor";
         if (type > -1) {
-            this.name += " (" + EquipmentType.armorNames[type] + ')';
+            this.name += " (" + ArmorType.of(type, clan).getName() + ')';
         }
     }
 
