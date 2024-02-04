@@ -401,7 +401,7 @@ public class Force {
         // then they're not really the highest ranked person in the force.
         if ((highestRankPerson != null) && 
                 ((highestRankPerson.getUnit() == null) ||
-                (highestRankPerson.getUnit().getForceId() == Force.FORCE_NONE))) {
+                (!getUnits().contains(highestRankPerson.getUnit().getId())))) {
             highestRankPerson = null;
         }
         
