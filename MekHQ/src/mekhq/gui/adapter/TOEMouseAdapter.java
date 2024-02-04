@@ -911,7 +911,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 
                 // still in the multiple selection block
                 List<UUID> eligibleCommanders = force.getEligibleCommanders(gui.getCampaign());
-                if (eligibleCommanders.size() > 0) {                
+                if (!eligibleCommanders.isEmpty()) {                
                     menuItem = new JScrollableMenu("setCommanderMenu", "Set Commander");
                     
                     for (UUID personID : eligibleCommanders) {
