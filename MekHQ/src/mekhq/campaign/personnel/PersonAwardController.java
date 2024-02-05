@@ -108,12 +108,18 @@ public class PersonAwardController {
         final Award award;
         if (hasAward(setName, awardName)) {
             award = getAward(setName, awardName);
+
+            if (!award.canBeAwarded(person)) {
+                LogManager.getLogger().info("Award not stackable, returning.");
+                return;
+            }
         } else {
             award = AwardsFactory.getInstance().generateNew(setName, awardName);
             if (award == null) {
                 LogManager.getLogger().error("Cannot award a null award, returning.");
                 return;
             }
+
             awards.add(award);
         }
 

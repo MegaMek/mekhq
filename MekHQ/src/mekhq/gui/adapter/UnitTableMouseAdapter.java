@@ -176,43 +176,32 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_SUPPLY_COST)) { // Single Unit only
             new MonthlyUnitCostReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SET_QUALITY)) {
-            int q;
-            Object[] possibilities = { "F", "E", "D", "C", "B", "A" }; // TODO : this probably shouldn't be inline
-            String quality = (String) JOptionPane.showInputDialog(gui.getFrame(),
-                    "Choose the new quality level", "Set Quality",
-                    JOptionPane.PLAIN_MESSAGE, null, possibilities, "F");
-
-            // showInputDialog returns null when cancel is clicked, so we set a default here
-            if (quality == null) {
-                quality = "CANCELED";
-            }
-
-            switch (quality) {
-                case "A":
-                    q = 0;
+            // TODO : Duplicated in PartsTableMouseAdapter#actionPerformed
+            int q = -1;
+            boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
+            Object[] possibilities = {
+                Part.getQualityName(Part.QUALITY_A, reverse),
+                Part.getQualityName(Part.QUALITY_B, reverse),
+                Part.getQualityName(Part.QUALITY_C, reverse),
+                Part.getQualityName(Part.QUALITY_D, reverse),
+                Part.getQualityName(Part.QUALITY_E, reverse),
+                Part.getQualityName(Part.QUALITY_F, reverse)
+            };
+            String quality = (String) JOptionPane.showInputDialog(gui.getFrame(), "Choose the new quality level",
+                "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
+                Part.getQualityName(Part.QUALITY_D, reverse));
+            for (int i = 0; i < possibilities.length; i++) {
+                if (possibilities[i].equals(quality)) {
+                    q = i;
                     break;
-                case "B":
-                    q = 1;
-                    break;
-                case "C":
-                    q = 2;
-                    break;
-                case "D":
-                    q = 3;
-                    break;
-                case "E":
-                    q = 4;
-                    break;
-                case "F":
-                    q = 5;
-                    break;
-                default:
-                    q = -1;
-                    break;
+                }
             }
             if (q != -1) {
                 for (Unit unit : units) {
-                    unit.setQuality(q);
+                    if (unit != null) {
+                        unit.setQuality(q);
+                        MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                    }
                 }
             }
         } else if (command.equals(COMMAND_SELL)) {

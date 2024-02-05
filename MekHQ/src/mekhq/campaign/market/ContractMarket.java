@@ -131,7 +131,7 @@ public class ContractMarket {
                     rollCommandClause(c, clauseMods.get(c.getId()).mods[clause]);
                     break;
                 case CLAUSE_SALVAGE:
-                    rollSalvageClause(c, clauseMods.get(c.getId()).mods[clause]);
+                    rollSalvageClause(c, clauseMods.get(c.getId()).mods[clause], campaign.getCampaignOptions().getContractMaxSalvagePercentage());
                     break;
                 case CLAUSE_TRANSPORT:
                     rollTransportClause(c, clauseMods.get(c.getId()).mods[clause]);
@@ -759,7 +759,7 @@ public class ContractMarket {
         } else {
             contract.setCommandRights(ContractCommandRights.INTEGRATED);
         }
-        rollSalvageClause(contract, mods.mods[CLAUSE_SALVAGE]);
+        rollSalvageClause(contract, mods.mods[CLAUSE_SALVAGE], campaign.getCampaignOptions().getContractMaxSalvagePercentage());
         rollSupportClause(contract, mods.mods[CLAUSE_SUPPORT]);
         rollTransportClause(contract, mods.mods[CLAUSE_TRANSPORT]);
     }
@@ -777,7 +777,7 @@ public class ContractMarket {
         }
     }
 
-    private void rollSalvageClause(AtBContract contract, int mod) {
+    private void rollSalvageClause(AtBContract contract, int mod, int contractMaxSalvagePercentage) {
         contract.setSalvageExchange(false);
         int roll = Math.min(Compute.d6(2) + mod, 13);
         if (roll < 2) {
@@ -788,9 +788,9 @@ public class ContractMarket {
             do {
                 r = Compute.d6(2);
             } while (r < 4);
-            contract.setSalvagePct(Math.min((r - 3) * 10, 100));
+            contract.setSalvagePct(Math.min((r - 3) * 10, contractMaxSalvagePercentage));
         } else {
-            contract.setSalvagePct(Math.min((roll - 3) * 10, 100));
+            contract.setSalvagePct(Math.min((roll - 3) * 10, contractMaxSalvagePercentage));
         }
     }
 
