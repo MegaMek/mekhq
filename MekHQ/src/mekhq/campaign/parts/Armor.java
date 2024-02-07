@@ -240,7 +240,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return EquipmentType.getArmorTechAdvancement(type, clan);
+        return ArmorType.of(type, clan).getTechAdvancement();
     }
 
     public double getArmorWeight(int points) {
