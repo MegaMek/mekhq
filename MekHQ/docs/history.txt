@@ -7,7 +7,7 @@ MEKHQ VERSION HISTORY:
 + Fix #3540: Manually set TO&E force commander
 + PR #3818: MUL parser updates
 + PR #3816: Show if unit is in repair or salvage mode in repair bay. 
-+ PR #3823, #3827: Rework of the internal representation of Armor
++ PR #3823, #3827, #3833: Rework of the internal representation of Armor
 + PR #3826: Adaptation to Mek Clan name separation in MM
 + Fix #3740: Consistent messaging in Daily Activity Log: ComStar bill vs. C-Bill
 + PR #3821: Add max contract salvage percentage to campaign options
