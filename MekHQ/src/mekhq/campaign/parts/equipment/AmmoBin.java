@@ -22,6 +22,7 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoMounted;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -260,7 +261,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     public void loadBin() {
-        Mounted mounted = getMounted();
+        AmmoMounted mounted = (AmmoMounted) getMounted();
         if (mounted == null) {
             return;
         }

@@ -20,6 +20,7 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.Version;
 import megamek.common.*;
+import megamek.common.equipment.AmmoMounted;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -132,8 +133,8 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted )mockMounted);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
         doAnswer(invocation -> {
@@ -709,10 +710,10 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and try to load it when the warehouse is empty.
@@ -746,10 +747,10 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add ammo of the wrong type to the warehouse ...
@@ -790,10 +791,10 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add just enough ammo of the right type to the warehouse ...
@@ -833,10 +834,10 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add more than enough ammo of the right type to the warehouse ...
@@ -878,7 +879,7 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getOriginalShots()).thenReturn(weaponType.getShots() * clips);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
@@ -895,7 +896,7 @@ public class InfantryAmmoBinTest {
             return null;
         }).when(mockMounted).setShotsLeft(anyInt());
 
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add just enough ammo of both types to the warehouse ...
@@ -944,7 +945,7 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getOriginalShots()).thenReturn(weaponType.getShots() * clips);
         when(mockMounted.getBaseShotsLeft()).thenReturn(weaponType.getShots() * clips);
@@ -961,7 +962,7 @@ public class InfantryAmmoBinTest {
             return null;
         }).when(mockMounted).setShotsLeft(anyInt());
 
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add just enough ammo of the new type to the warehouse ...
@@ -1031,10 +1032,10 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and try to load it when the warehouse is empty.
@@ -1068,10 +1069,10 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add ammo of the wrong type to the warehouse ...
@@ -1112,10 +1113,10 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add just enough ammo of the right type to the warehouse ...
@@ -1155,10 +1156,10 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add more than enough ammo of the right type to the warehouse ...
@@ -1200,7 +1201,7 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
         doAnswer(invocation -> {
@@ -1216,7 +1217,7 @@ public class InfantryAmmoBinTest {
             return null;
         }).when(mockMounted).setShotsLeft(anyInt());
 
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add just enough ammo of both types to the warehouse ...
@@ -1265,7 +1266,7 @@ public class InfantryAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Infantry mockEntity = mock(Infantry.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getOriginalShots()).thenReturn(weaponType.getShots() * clips);
         when(mockMounted.getBaseShotsLeft()).thenReturn(weaponType.getShots() * clips);
@@ -1282,7 +1283,7 @@ public class InfantryAmmoBinTest {
             return null;
         }).when(mockMounted).setShotsLeft(anyInt());
 
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add just enough ammo of the new type to the warehouse ...
