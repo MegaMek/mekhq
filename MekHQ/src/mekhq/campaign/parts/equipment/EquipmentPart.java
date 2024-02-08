@@ -667,7 +667,7 @@ public class EquipmentPart extends Part {
             return;
         }
 
-        Mounted weaponBay = null;
+        Mounted<?> weaponBay = null;
         for (Mounted m : unit.getEntity().getWeaponBayList()) {
             if (m.getLocation() != weapon.getLocation()) {
                 continue;
