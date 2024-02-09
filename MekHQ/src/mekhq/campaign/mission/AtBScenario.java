@@ -303,14 +303,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public void setLightConditions() {
         setLight(PlanetaryConditions.L_DAY);
 
-        int roll = Compute.randomInt(10) + 1;
-        if (roll < 6) {
+        int roll = Compute.randomInt(1000) + 1;
+        if (roll < 601) {
             setLight(PlanetaryConditions.L_DAY);
-        } else if (roll < 8) {
+        } else if (roll < 801) {
             setLight(PlanetaryConditions.L_DUSK);
-        } else if (roll == 8) {
+        } else if (roll < 901) {
             setLight(PlanetaryConditions.L_FULL_MOON);
-        } else if (roll == 9) {
+        } else if (roll < 1000) {
             setLight(PlanetaryConditions.L_MOONLESS);
         } else {
             setLight(PlanetaryConditions.L_PITCH_BLACK);
