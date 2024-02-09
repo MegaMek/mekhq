@@ -22,6 +22,7 @@ import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.Mounted;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.WeaponMounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.parts.Part;
@@ -105,7 +106,7 @@ public class AdjustLargeCraftAmmoActionTest {
         ammo.add(bin0);
         when(entity.getAmmo()).thenReturn(ammo);
         int bayEquipmentNum = 18;
-        Mounted<?> bay = mock(Mounted.class);
+        WeaponMounted bay = mock(WeaponMounted.class);
         doReturn(bay).when(entity).getBayByAmmo(eq(bin0));
         doReturn(bayEquipmentNum).when(entity).getEquipmentNum(eq(bay));
         when(unit.getEntity()).thenReturn(entity);
@@ -200,7 +201,7 @@ public class AdjustLargeCraftAmmoActionTest {
         ammo.add(bin0);
         when(entity.getAmmo()).thenReturn(ammo);
         int bayEquipmentNum = 18;
-        Mounted<?> bay = mock(Mounted.class);
+        WeaponMounted bay = mock(WeaponMounted.class);
         doReturn(bay).when(entity).getBayByAmmo(eq(bin0));
         doReturn(bayEquipmentNum).when(entity).getEquipmentNum(eq(bay));
         when(unit.getEntity()).thenReturn(entity);
