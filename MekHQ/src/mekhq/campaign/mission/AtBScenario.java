@@ -416,7 +416,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         int roll = Compute.randomInt(100) + 1;
 
-        if (roll < 20) {
+        if (roll < 30) {
             weather = PlanetaryConditions.WE_NONE;
         } else if (roll < 40) {
             weather = PlanetaryConditions.WE_LIGHT_RAIN;
@@ -448,9 +448,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         int roll = Compute.randomInt(100) + 1;
 
-        if (roll < 20) {
+        if (roll < 78) {
             weather = PlanetaryConditions.WE_NONE;
-        } else if (roll < 80) {
+        } else if (roll < 82) {
             weather = PlanetaryConditions.WE_LIGHT_RAIN;
         } else if (roll < 86) {
             weather = PlanetaryConditions.WE_MOD_RAIN;
