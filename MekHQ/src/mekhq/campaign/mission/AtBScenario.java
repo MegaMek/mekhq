@@ -300,7 +300,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setTerrainType(terrainChart[Compute.d6(2) - 2]);
     }
 
-    public static int rollLightConditon() {
+    private int rollLightCondition() {
         int light;
 
         int roll = Compute.randomInt(1000) + 1;
@@ -320,7 +320,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setLightConditions() {
-        setLight(rollLightConditon());
+        setLight(rollLightCondition());
     }
 
     private int rollWindCondition() {
