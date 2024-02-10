@@ -708,7 +708,7 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario for which to set lighting conditions.
      */
     private static void setLightConditions(AtBDynamicScenario scenario) {
-        scenario.setLight(AtBScenario.setLightCond());
+        scenario.setLight(AtBScenario.rollLightConditon());
     }
 
     /**
@@ -717,66 +717,15 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario for which to set weather conditions.
      */
     private static void setWeather(AtBDynamicScenario scenario) {
-        int weather = PlanetaryConditions.WE_NONE;
-        int wind = PlanetaryConditions.WI_NONE;
-        int fog = PlanetaryConditions.FOG_NONE;
-
         // weather is irrelevant in these situations.
         if (scenario.getTerrainType() == AtBScenario.TER_SPACE ||
                 scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
             return;
         }
 
-        int roll = Compute.randomInt(10) + 1;
-        int r2 = Compute.d6();
-        if (roll < 6) {
-            return;
-        } else if (roll == 6) {
-            if (r2 < 4) {
-                weather = PlanetaryConditions.WE_LIGHT_RAIN;
-            } else if (r2 < 6) {
-                weather = PlanetaryConditions.WE_MOD_RAIN;
-            } else {
-                weather = PlanetaryConditions.WE_HEAVY_RAIN;
-            }
-        } else if (roll == 7) {
-            if (r2 < 4) {
-                weather = PlanetaryConditions.WE_LIGHT_SNOW;
-            } else if (r2 < 6) {
-                weather = PlanetaryConditions.WE_MOD_SNOW;
-            } else {
-                weather = PlanetaryConditions.WE_HEAVY_SNOW;
-            }
-        } else if (roll == 8) {
-            if (r2 < 4) {
-                wind = PlanetaryConditions.WI_LIGHT_GALE;
-            } else if (r2 < 6) {
-                wind = PlanetaryConditions.WI_MOD_GALE;
-            } else {
-                wind = PlanetaryConditions.WI_STRONG_GALE;
-            }
-        } else if (roll == 9) {
-            if (r2 == 1) {
-                wind = PlanetaryConditions.WI_STORM;
-            } else if (r2 == 2) {
-                weather = PlanetaryConditions.WE_DOWNPOUR;
-            } else if (r2 == 3) {
-                weather = PlanetaryConditions.WE_SLEET;
-            } else if (r2 == 4) {
-                weather = PlanetaryConditions.WE_ICE_STORM;
-            } else if (r2 == 5) {
-                // tornadoes are classified as wind rather than weather.
-                wind = PlanetaryConditions.WI_TORNADO_F13;
-            } else if (r2 == 6) {
-                wind = PlanetaryConditions.WI_TORNADO_F4;
-            }
-        } else {
-            if (r2 < 5) {
-                fog = PlanetaryConditions.FOG_LIGHT;
-            } else {
-                fog = PlanetaryConditions.FOG_HEAVY;
-            }
-        }
+        int weather = AtBScenario.rollWeatherCondition();
+        int wind = AtBScenario.rollWindCondition();
+        int fog = AtBScenario.rollFogCondition();
 
         if (!WeatherRestriction.IsWeatherRestricted(weather, scenario.getAtmosphere(), scenario.getTemperature())) {
             scenario.setWeather(weather);

@@ -300,7 +300,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setTerrainType(terrainChart[Compute.d6(2) - 2]);
     }
 
-    public static int setLightCond() {
+    public static int rollLightConditon() {
         int light;
 
         int roll = Compute.randomInt(1000) + 1;
@@ -320,63 +320,85 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setLightConditions() {
-        setLight(setLightCond());
+        setLight(rollLightConditon());
+    }
+
+    public static int rollWindCondition() {
+        int wind;
+
+        int roll = Compute.randomInt(100) + 1;
+
+        if (roll < 61) {
+            wind = PlanetaryConditions.WI_NONE;
+        } else if (roll < 80) {
+            wind = PlanetaryConditions.WI_LIGHT_GALE;
+        } else if (roll < 90) {
+            wind = PlanetaryConditions.WI_MOD_GALE;
+        } else if (roll < 94) {
+            wind = PlanetaryConditions.WI_STRONG_GALE;
+        } else if (roll < 97) {
+            wind = PlanetaryConditions.WI_STORM;
+        } else if (roll < 99) {
+            wind = PlanetaryConditions.WI_TORNADO_F13;
+        } else {
+            wind = PlanetaryConditions.WI_TORNADO_F4;
+        }
+
+        return wind;
+    }
+
+    public static int rollWeatherCondition() {
+        int weather;
+
+        int roll = Compute.randomInt(100) + 1;
+
+        if (roll < 50) {
+            weather = PlanetaryConditions.WE_NONE;
+        } else if (roll < 60) {
+            weather = PlanetaryConditions.WE_LIGHT_RAIN;
+        } else if (roll < 68) {
+            weather = PlanetaryConditions.WE_MOD_RAIN;
+        } else if (roll < 74) {
+            weather = PlanetaryConditions.WE_HEAVY_RAIN;
+        } else if (roll < 76) {
+            weather = PlanetaryConditions.WE_GUSTING_RAIN;
+        } else if (roll < 78) {
+            weather = PlanetaryConditions.WE_DOWNPOUR;
+        } else if (roll < 82) {
+            weather = PlanetaryConditions.WE_LIGHT_SNOW;
+        } else if (roll < 90) {
+            weather = PlanetaryConditions.WE_MOD_SNOW;
+        } else if (roll < 94) {
+            weather = PlanetaryConditions.WE_HEAVY_SNOW;
+        } else if (roll < 98) {
+            weather = PlanetaryConditions.WE_SLEET;
+        } else {
+            weather = PlanetaryConditions.WE_ICE_STORM;
+        }
+
+        return weather;
+    }
+
+    public static int rollFogCondition() {
+        int fog;
+
+        int roll = Compute.randomInt(100) + 1;
+
+        if (roll < 80) {
+            fog = PlanetaryConditions.FOG_NONE;
+        } else if (roll < 90) {
+            fog = PlanetaryConditions.FOG_LIGHT;
+        } else {
+            fog = PlanetaryConditions.FOG_HEAVY;
+        }
+
+        return fog;
     }
 
     public void setWeather() {
-        setWeather(PlanetaryConditions.WE_NONE);
-        setWind(PlanetaryConditions.WI_NONE);
-        setFog(PlanetaryConditions.FOG_NONE);
-
-        int roll = Compute.randomInt(10) + 1;
-        int r2 = Compute.d6();
-        if (roll == 6) {
-            if (r2 < 4) {
-                setWeather(PlanetaryConditions.WE_LIGHT_RAIN);
-            } else if (r2 < 6) {
-                setWeather(PlanetaryConditions.WE_MOD_RAIN);
-            } else {
-                setWeather(PlanetaryConditions.WE_HEAVY_RAIN);
-            }
-        } else if (roll == 7) {
-            if (r2 < 4) {
-                setWeather(PlanetaryConditions.WE_LIGHT_SNOW);
-            } else if (r2 < 6) {
-                setWeather(PlanetaryConditions.WE_MOD_SNOW);
-            } else {
-                setWeather(PlanetaryConditions.WE_HEAVY_SNOW);
-            }
-        } else if (roll == 8) {
-            if (r2 < 4) {
-                setWind(PlanetaryConditions.WI_LIGHT_GALE);
-            } else if (r2 < 6) {
-                setWind(PlanetaryConditions.WI_MOD_GALE);
-            } else {
-                setWind(PlanetaryConditions.WI_STRONG_GALE);
-            }
-        } else if (roll == 9) {
-            if (r2 == 1) {
-                setWind(PlanetaryConditions.WI_STORM);
-            } else if (r2 == 2) {
-                setWeather(PlanetaryConditions.WE_DOWNPOUR);
-            } else if (r2 == 3) {
-                setWeather(PlanetaryConditions.WE_SLEET);
-            } else if (r2 == 4) {
-                setWeather(PlanetaryConditions.WE_ICE_STORM);
-            } else if (r2 == 5) {
-                // tornadoes are classified as wind rather than weather.
-                setWind(PlanetaryConditions.WI_TORNADO_F13);
-            } else if (r2 == 6) {
-                setWind(PlanetaryConditions.WI_TORNADO_F4);
-            }
-        } else if (roll > 9) {
-            if (r2 < 5) {
-                setFog(PlanetaryConditions.FOG_LIGHT);
-            } else {
-                setFog(PlanetaryConditions.FOG_HEAVY);
-            }
-        }
-        // roll < 6 can be ignored, as it would just return nothing
+        setWeather(rollWeatherCondition());
+        setWind(rollWindCondition());
+        setFog(rollFogCondition());
     }
 
     public void setPlanetaryConditions(Mission mission, Campaign campaign) {
