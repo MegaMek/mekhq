@@ -396,9 +396,21 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setWeather() {
-        setWeather(rollWeatherCondition());
-        setWind(rollWindCondition());
-        setFog(rollFogCondition());
+        int weather = AtBScenario.rollWeatherCondition();
+        int wind = AtBScenario.rollWindCondition();
+        int fog = AtBScenario.rollFogCondition();
+
+        if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
+            setWeather(weather);
+        }
+
+        if (!WeatherRestriction.IsWindRestricted(wind, getAtmosphere(), getTemperature())) {
+            setWind(wind);
+        }
+
+        if (!WeatherRestriction.IsFogRestricted(fog, getAtmosphere(), getTemperature())) {
+            setFog(fog);
+        }
     }
 
     public void setPlanetaryConditions(Mission mission, Campaign campaign) {
