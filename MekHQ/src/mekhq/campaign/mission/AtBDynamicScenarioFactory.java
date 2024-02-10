@@ -708,22 +708,7 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario for which to set lighting conditions.
      */
     private static void setLightConditions(AtBDynamicScenario scenario) {
-        int roll = Compute.randomInt(10) + 1;
-        int light;
-
-        if (roll < 6) {
-            light = PlanetaryConditions.L_DAY;
-        } else if (roll < 8) {
-            light = PlanetaryConditions.L_DUSK;
-        } else if (roll == 8) {
-            light = PlanetaryConditions.L_FULL_MOON;
-        } else if (roll == 9) {
-            light = PlanetaryConditions.L_MOONLESS;
-        } else {
-            light = PlanetaryConditions.L_PITCH_BLACK;
-        }
-
-        scenario.setLight(light);
+        scenario.setLight(AtBScenario.setLightCond());
     }
 
     /**

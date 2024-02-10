@@ -300,21 +300,27 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setTerrainType(terrainChart[Compute.d6(2) - 2]);
     }
 
-    public void setLightConditions() {
-        setLight(PlanetaryConditions.L_DAY);
+    public static int setLightCond() {
+        int light;
 
         int roll = Compute.randomInt(1000) + 1;
         if (roll < 601) {
-            setLight(PlanetaryConditions.L_DAY);
+            light = PlanetaryConditions.L_DAY;
         } else if (roll < 801) {
-            setLight(PlanetaryConditions.L_DUSK);
+            light = PlanetaryConditions.L_DUSK;
         } else if (roll < 901) {
-            setLight(PlanetaryConditions.L_FULL_MOON);
+            light = PlanetaryConditions.L_FULL_MOON;
         } else if (roll < 1000) {
-            setLight(PlanetaryConditions.L_MOONLESS);
+            light = PlanetaryConditions.L_MOONLESS;
         } else {
-            setLight(PlanetaryConditions.L_PITCH_BLACK);
+            light = PlanetaryConditions.L_PITCH_BLACK;
         }
+
+        return light;
+    }
+
+    public void setLightConditions() {
+        setLight(setLightCond());
     }
 
     public void setWeather() {
