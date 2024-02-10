@@ -723,21 +723,7 @@ public class AtBDynamicScenarioFactory {
             return;
         }
 
-        int weather = AtBScenario.rollWeatherCondition();
-        int wind = AtBScenario.rollWindCondition();
-        int fog = AtBScenario.rollFogCondition();
-
-        if (!WeatherRestriction.IsWeatherRestricted(weather, scenario.getAtmosphere(), scenario.getTemperature())) {
-            scenario.setWeather(weather);
-        }
-
-        if (!WeatherRestriction.IsWindRestricted(wind, scenario.getAtmosphere(), scenario.getTemperature())) {
-            scenario.setWind(wind);
-        }
-
-        if (!WeatherRestriction.IsFogRestricted(fog, scenario.getAtmosphere(), scenario.getTemperature())) {
-            scenario.setFog(fog);
-        }
+        scenario.setWeather();
     }
 
     /**

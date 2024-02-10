@@ -323,7 +323,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setLight(rollLightConditon());
     }
 
-    public static int rollWindCondition() {
+    private int rollWindCondition() {
         int wind;
 
         int roll = Compute.randomInt(100) + 1;
@@ -347,7 +347,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return wind;
     }
 
-    public static int rollWeatherCondition() {
+    private int rollWeatherCondition() {
         int weather;
 
         int roll = Compute.randomInt(100) + 1;
@@ -379,7 +379,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return weather;
     }
 
-    public static int rollFogCondition() {
+    private int rollFogCondition() {
         int fog;
 
         int roll = Compute.randomInt(100) + 1;
@@ -396,9 +396,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setWeather() {
-        int weather = AtBScenario.rollWeatherCondition();
-        int wind = AtBScenario.rollWindCondition();
-        int fog = AtBScenario.rollFogCondition();
+        int weather = rollWeatherCondition();
+        int wind = rollWindCondition();
+        int fog = rollFogCondition();
 
         if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
             setWeather(weather);
