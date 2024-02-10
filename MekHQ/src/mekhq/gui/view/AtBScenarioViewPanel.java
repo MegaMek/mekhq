@@ -79,6 +79,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private JLabel lblWindDesc = new JLabel();
     private JLabel lblFog = new JLabel();
     private JLabel lblFogDesc = new JLabel();
+    private JLabel lblBlowingSand = new JLabel();
+    private JLabel lblBlowingSandDesc = new JLabel();
 
     private JLabel lblTemp = new JLabel();
 
@@ -597,6 +599,20 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         panStats.add(lblFogDesc, gridBagConstraints);
         lblFog.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
         lblFogDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+
+        lblBlowingSand.setText(resourceMap.getString("lblBlowingSand.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        panStats.add(lblBlowingSand, gridBagConstraints);
+
+        String blowingSandDesc = scenario.getBlowingSand() ? PlanetaryConditions.MSG_NAME_BLOWINGSAND_TRUE : PlanetaryConditions.MSG_NAME_BLOWINGSAND_FALSE;
+        lblBlowingSandDesc.setText(blowingSandDesc);
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y++;
+        panStats.add(lblBlowingSandDesc, gridBagConstraints);
+        lblBlowingSand.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+        lblBlowingSandDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
 
         lblTemp.setText(resourceMap.getString("lblTemperature.text"));
         gridBagConstraints.gridx = 0;

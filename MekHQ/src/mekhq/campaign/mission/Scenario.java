@@ -361,6 +361,9 @@ public class Scenario {
     public void setBlowingSand(boolean blow) {
         this.blowingSand = blow;
     }
+    public boolean getBlowingSand() {
+        return blowingSand;
+    }
 
     public boolean canWindShiftDirection() { return shiftWindDirection; }
 

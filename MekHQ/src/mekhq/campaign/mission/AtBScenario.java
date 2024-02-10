@@ -347,7 +347,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return wind;
     }
 
-    private int rollWeatherCondition() {
+    private int rollWeatherStandardCondition() {
         int weather;
 
         int roll = Compute.randomInt(100) + 1;
@@ -379,6 +379,102 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return weather;
     }
 
+    private int rollWeatherWetCondition() {
+        int weather;
+
+        int roll = Compute.randomInt(100) + 1;
+
+        if (roll < 20) {
+            weather = PlanetaryConditions.WE_NONE;
+        } else if (roll < 40) {
+            weather = PlanetaryConditions.WE_LIGHT_RAIN;
+        } else if (roll < 50) {
+            weather = PlanetaryConditions.WE_MOD_RAIN;
+        } else if (roll < 60) {
+            weather = PlanetaryConditions.WE_HEAVY_RAIN;
+        } else if (roll < 70) {
+            weather = PlanetaryConditions.WE_GUSTING_RAIN;
+        } else if (roll < 76) {
+            weather = PlanetaryConditions.WE_DOWNPOUR;
+        } else if (roll < 82) {
+            weather = PlanetaryConditions.WE_LIGHT_SNOW;
+        } else if (roll < 90) {
+            weather = PlanetaryConditions.WE_MOD_SNOW;
+        } else if (roll < 94) {
+            weather = PlanetaryConditions.WE_HEAVY_SNOW;
+        } else if (roll < 98) {
+            weather = PlanetaryConditions.WE_SLEET;
+        } else {
+            weather = PlanetaryConditions.WE_ICE_STORM;
+        }
+
+        return weather;
+    }
+
+    private int rollWeatherSnowyCondition() {
+        int weather;
+
+        int roll = Compute.randomInt(100) + 1;
+
+        if (roll < 20) {
+            weather = PlanetaryConditions.WE_NONE;
+        } else if (roll < 40) {
+            weather = PlanetaryConditions.WE_LIGHT_RAIN;
+        } else if (roll < 46) {
+            weather = PlanetaryConditions.WE_MOD_RAIN;
+        } else if (roll < 52) {
+            weather = PlanetaryConditions.WE_HEAVY_RAIN;
+        } else if (roll < 56) {
+            weather = PlanetaryConditions.WE_GUSTING_RAIN;
+        } else if (roll < 60) {
+            weather = PlanetaryConditions.WE_DOWNPOUR;
+        } else if (roll < 64) {
+            weather = PlanetaryConditions.WE_LIGHT_SNOW;
+        } else if (roll < 76) {
+            weather = PlanetaryConditions.WE_MOD_SNOW;
+        } else if (roll < 90) {
+            weather = PlanetaryConditions.WE_HEAVY_SNOW;
+        } else if (roll < 96) {
+            weather = PlanetaryConditions.WE_SLEET;
+        } else {
+            weather = PlanetaryConditions.WE_ICE_STORM;
+        }
+
+        return weather;
+    }
+
+    private int rollWeatherDryCondition() {
+        int weather;
+
+        int roll = Compute.randomInt(100) + 1;
+
+        if (roll < 20) {
+            weather = PlanetaryConditions.WE_NONE;
+        } else if (roll < 80) {
+            weather = PlanetaryConditions.WE_LIGHT_RAIN;
+        } else if (roll < 86) {
+            weather = PlanetaryConditions.WE_MOD_RAIN;
+        } else if (roll < 90) {
+            weather = PlanetaryConditions.WE_HEAVY_RAIN;
+        } else if (roll < 92) {
+            weather = PlanetaryConditions.WE_GUSTING_RAIN;
+        } else if (roll < 93) {
+            weather = PlanetaryConditions.WE_DOWNPOUR;
+        } else if (roll < 94) {
+            weather = PlanetaryConditions.WE_LIGHT_SNOW;
+        } else if (roll < 97) {
+            weather = PlanetaryConditions.WE_MOD_SNOW;
+        } else if (roll < 98) {
+            weather = PlanetaryConditions.WE_HEAVY_SNOW;
+        } else if (roll < 99) {
+            weather = PlanetaryConditions.WE_SLEET;
+        } else {
+            weather = PlanetaryConditions.WE_ICE_STORM;
+        }
+
+        return weather;
+    }
+
     private int rollFogCondition() {
         int fog;
 
@@ -395,10 +491,51 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return fog;
     }
 
+    private boolean rollBlowingSand() {
+        boolean blowingSand = false;
+
+        int roll = Compute.randomInt(100) + 1;
+
+        if (roll < 60) {
+            blowingSand = true;
+        }
+
+        return blowingSand;
+    }
+
     public void setWeather() {
-        int weather = rollWeatherCondition();
+        int weather = PlanetaryConditions.WE_NONE;
+        int fog = PlanetaryConditions.FOG_NONE;
+
+        if (getTerrainType() == TER_LIGHTURBAN
+                || getTerrainType() == TER_FLATLANDS
+                || getTerrainType() == TER_WOODED
+                || getTerrainType() == TER_HEAVYURBAN) {
+            weather = rollWeatherStandardCondition();
+            fog = rollFogCondition();
+            setBlowingSand(false);
+        } else if (getTerrainType() == TER_COASTAL
+                || getTerrainType() == TER_WETLANDS) {
+            weather = rollWeatherWetCondition();
+            fog = rollFogCondition();
+            setBlowingSand(false);
+        } else if (getTerrainType() == TER_HILLS
+                || getTerrainType() == TER_MOUNTAINS) {
+            weather = rollWeatherSnowyCondition();
+            fog = rollFogCondition();
+            setBlowingSand(false);
+        } else if (getTerrainType() == TER_BADLANDS) {
+            weather = rollWeatherDryCondition();
+            if (weather == PlanetaryConditions.WE_NONE && rollBlowingSand()) {
+                setBlowingSand(true);
+            }
+        } else {
+            weather = rollWeatherStandardCondition();
+            fog = rollFogCondition();
+            setBlowingSand(false);
+        }
+
         int wind = rollWindCondition();
-        int fog = rollFogCondition();
 
         if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
             setWeather(weather);

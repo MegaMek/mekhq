@@ -452,6 +452,15 @@ public class ScenarioViewPanel extends JScrollablePanel {
         rightGbc.gridy++;
         pnlMap.add(lblFogDesc, rightGbc);
 
+        JLabel lblBlowingSand = new JLabel(resourceMap.getString("lblFog.text"));
+        leftGbc.gridy++;
+        pnlMap.add(lblBlowingSand, leftGbc);
+
+        String blowingSandDesc = scenario.getBlowingSand() ? PlanetaryConditions.MSG_NAME_BLOWINGSAND_TRUE : PlanetaryConditions.MSG_NAME_BLOWINGSAND_FALSE;
+        JLabel lblBlowingSandDesc = new JLabel(blowingSandDesc);
+        rightGbc.gridy++;
+        pnlMap.add(lblBlowingSandDesc, rightGbc);
+
         JLabel lblTemperature = new JLabel(resourceMap.getString("lblTemperature.text"));
         leftGbc.gridy++;
         pnlMap.add(lblTemperature, leftGbc);
