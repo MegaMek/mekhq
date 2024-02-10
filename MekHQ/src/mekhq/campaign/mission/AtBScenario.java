@@ -402,14 +402,21 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
         if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
             setWeather(weather);
+        } else {
+            setWeather(PlanetaryConditions.WE_NONE);
         }
+
 
         if (!WeatherRestriction.IsWindRestricted(wind, getAtmosphere(), getTemperature())) {
             setWind(wind);
+        } else {
+            setWind(PlanetaryConditions.WI_NONE);
         }
 
         if (!WeatherRestriction.IsFogRestricted(fog, getAtmosphere(), getTemperature())) {
             setFog(fog);
+        } else {
+            setFog(PlanetaryConditions.FOG_NONE);
         }
     }
 
