@@ -551,9 +551,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int weather = PlanetaryConditions.WE_NONE;
         int fog = PlanetaryConditions.FOG_NONE;
         boolean blowingSand = false;
-        int temp = getTemperature();
-        boolean extremeHeat = PlanetaryConditions.isExtremeTemperature(temp) && (temp > 0);
-        boolean extremeCold = PlanetaryConditions.isExtremeTemperature(temp) && (temp < 0);
+        boolean extremeHeat = PlanetaryConditions.isExtremeTemperature(getTemperature()) && (getTemperature() > 0);
+        boolean extremeCold = PlanetaryConditions.isExtremeTemperature(getTemperature()) && (getTemperature() < 0);
+        boolean moderateGaleRestricted = WeatherRestriction.IsWindRestricted(PlanetaryConditions.WI_MOD_GALE, getAtmosphere(), getTemperature());
+
+        int wind = rollWindCondition();
 
         switch (getTerrainType()) {
             case TER_HILLS:
@@ -571,6 +573,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     if (weather == PlanetaryConditions.WE_NONE
                             && fog == PlanetaryConditions.FOG_NONE
                             && extremeHeat
+                            && !moderateGaleRestricted
                             && rollBlowingSand()) {
                         blowingSand = true;
                     }
@@ -594,6 +597,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case TER_BADLANDS:
                 weather = rollWeatherDryCondition();
                 if (weather == PlanetaryConditions.WE_NONE
+                        && !moderateGaleRestricted
                         && rollBlowingSand()) {
                     blowingSand = true;
                 }
@@ -603,10 +607,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 fog = rollFoggyCondition();
         }
 
-        int wind = rollWindCondition();
-
         setWeather(weather);
-        setWind(wind);
+        if (blowingSand && wind < PlanetaryConditions.WI_MOD_GALE) {
+            setWind(PlanetaryConditions.WI_MOD_GALE);
+        } else {
+            setWind(wind);
+        }
         setFog(fog);
         setBlowingSand(blowingSand);
     }
