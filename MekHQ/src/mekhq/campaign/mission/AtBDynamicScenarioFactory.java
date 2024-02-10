@@ -708,7 +708,7 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario for which to set lighting conditions.
      */
     private static void setLightConditions(AtBDynamicScenario scenario) {
-        scenario.setLight(AtBScenario.rollLightConditon());
+        scenario.setLightConditions();
     }
 
     /**
