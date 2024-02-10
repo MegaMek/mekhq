@@ -513,7 +513,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 || getTerrainType() == TER_HEAVYURBAN) {
             weather = rollWeatherStandardCondition();
             fog = rollFogCondition();
-            setBlowingSand(false);
+            int temp = getTemperature();
+            if (weather == PlanetaryConditions.WE_NONE
+                    && fog == PlanetaryConditions.FOG_NONE
+                    && PlanetaryConditions.isExtremeTemperature(temp) && (temp > 0)
+                    && rollBlowingSand()) {
+                setBlowingSand(true);
+            } else {
+                setBlowingSand(false);
+            }
         } else if (getTerrainType() == TER_COASTAL
                 || getTerrainType() == TER_WETLANDS) {
             weather = rollWeatherWetCondition();
@@ -528,6 +536,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             weather = rollWeatherDryCondition();
             if (weather == PlanetaryConditions.WE_NONE && rollBlowingSand()) {
                 setBlowingSand(true);
+            } else {
+                setBlowingSand(false);
             }
         } else {
             weather = rollWeatherStandardCondition();
