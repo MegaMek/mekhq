@@ -475,7 +475,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return weather;
     }
 
-    private int rollFogCondition() {
+    private int rollFoggyCondition() {
         int fog;
 
         int roll = Compute.randomInt(100) + 1;
@@ -483,6 +483,22 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (roll < 80) {
             fog = PlanetaryConditions.FOG_NONE;
         } else if (roll < 90) {
+            fog = PlanetaryConditions.FOG_LIGHT;
+        } else {
+            fog = PlanetaryConditions.FOG_HEAVY;
+        }
+
+        return fog;
+    }
+
+    private int rollFoggierCondition() {
+        int fog;
+
+        int roll = Compute.randomInt(100) + 1;
+
+        if (roll < 60) {
+            fog = PlanetaryConditions.FOG_NONE;
+        } else if (roll < 80) {
             fog = PlanetaryConditions.FOG_LIGHT;
         } else {
             fog = PlanetaryConditions.FOG_HEAVY;
@@ -506,45 +522,54 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     public void setWeather() {
         int weather = PlanetaryConditions.WE_NONE;
         int fog = PlanetaryConditions.FOG_NONE;
+        boolean blowingSand = false;
+        int temp = getTemperature();
+        boolean extremeHeat = PlanetaryConditions.isExtremeTemperature(temp) && (temp > 0);
+        boolean extremeCold = PlanetaryConditions.isExtremeTemperature(temp) && (temp < 0);
 
-        if (getTerrainType() == TER_LIGHTURBAN
-                || getTerrainType() == TER_FLATLANDS
-                || getTerrainType() == TER_WOODED
-                || getTerrainType() == TER_HEAVYURBAN) {
-            weather = rollWeatherStandardCondition();
-            fog = rollFogCondition();
-            int temp = getTemperature();
-            if (weather == PlanetaryConditions.WE_NONE
-                    && fog == PlanetaryConditions.FOG_NONE
-                    && PlanetaryConditions.isExtremeTemperature(temp) && (temp > 0)
-                    && rollBlowingSand()) {
-                setBlowingSand(true);
-            } else {
-                setBlowingSand(false);
-            }
-        } else if (getTerrainType() == TER_COASTAL
-                || getTerrainType() == TER_WETLANDS) {
-            weather = rollWeatherWetCondition();
-            fog = rollFogCondition();
-            setBlowingSand(false);
-        } else if (getTerrainType() == TER_HILLS
-                || getTerrainType() == TER_MOUNTAINS) {
-            weather = rollWeatherSnowyCondition();
-            fog = rollFogCondition();
-            setBlowingSand(false);
-        } else if (getTerrainType() == TER_BADLANDS) {
-            weather = rollWeatherDryCondition();
-            if (weather == PlanetaryConditions.WE_NONE && rollBlowingSand()) {
-                setBlowingSand(true);
-            } else {
-                setBlowingSand(false);
-            }
-        } else {
-            weather = rollWeatherStandardCondition();
-            fog = rollFogCondition();
-            setBlowingSand(false);
+        switch (getTerrainType()) {
+            case TER_HILLS:
+            case TER_LIGHTURBAN:
+            case TER_FLATLANDS:
+            case TER_WOODED:
+            case TER_HEAVYURBAN:
+                if (extremeCold) {
+                    weather = rollWeatherSnowyCondition();
+                    fog = rollFoggyCondition();
+
+                } else {
+                    weather = rollWeatherStandardCondition();
+                    fog = rollFoggyCondition();
+                    if (weather == PlanetaryConditions.WE_NONE
+                            && fog == PlanetaryConditions.FOG_NONE
+                            && extremeHeat
+                            && rollBlowingSand()) {
+                        blowingSand = true;
+                    }
+                }
+                break;
+            case TER_COASTAL:
+            case TER_WETLANDS:
+                weather = rollWeatherWetCondition();
+                fog = rollFoggierCondition();
+                break;
+            case TER_MOUNTAINS:
+                weather = rollWeatherSnowyCondition();
+                fog = rollFoggyCondition();
+                break;
+            case TER_BADLANDS:
+                weather = rollWeatherDryCondition();
+                if (weather == PlanetaryConditions.WE_NONE
+                        & rollBlowingSand()) {
+                    blowingSand = true;
+                }
+                break;
+            default:
+                weather = rollWeatherStandardCondition();
+                fog = rollFoggyCondition();
         }
 
+        setBlowingSand(blowingSand);
         int wind = rollWindCondition();
 
         if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
