@@ -158,6 +158,8 @@ public class AtBGameThread extends GameThread {
                 planetaryConditions.setFog(scenario.getFog());
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
                 planetaryConditions.setGravity(scenario.getGravity());
+                planetaryConditions.setEMI(scenario.usesEMI());
+                planetaryConditions.setBlowingSand(scenario.usesBlowingSand());
                 planetaryConditions.setTemperature(scenario.getTemperature());
                 client.sendPlanetaryConditions(planetaryConditions);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
