@@ -442,7 +442,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private boolean rollBlowingSand() {
         int[] odds = new int[]{60,40};
-        return rollCondition(odds) == 1;
+        boolean moderateGaleRestricted = WeatherRestriction.IsWindRestricted(PlanetaryConditions.WI_MOD_GALE, getAtmosphere(), getTemperature());
+        return !moderateGaleRestricted && rollCondition(odds) == 1;
     }
 
     public void setWeather() {
@@ -451,7 +452,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean blowingSand = false;
         boolean extremeHeat = PlanetaryConditions.isExtremeTemperature(getTemperature()) && (getTemperature() > 0);
         boolean extremeCold = PlanetaryConditions.isExtremeTemperature(getTemperature()) && (getTemperature() < 0);
-        boolean moderateGaleRestricted = WeatherRestriction.IsWindRestricted(PlanetaryConditions.WI_MOD_GALE, getAtmosphere(), getTemperature());
 
         int wind = rollWindCondition();
 
@@ -470,7 +470,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     if (weather == PlanetaryConditions.WE_NONE
                             && fog == PlanetaryConditions.FOG_NONE
                             && extremeHeat
-                            && !moderateGaleRestricted
                             && rollBlowingSand()) {
                         blowingSand = true;
                     }
@@ -493,7 +492,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case TER_BADLANDS:
                 weather = rollWeatherDryCondition();
                 if (weather == PlanetaryConditions.WE_NONE
-                        && !moderateGaleRestricted
                         && rollBlowingSand()) {
                     blowingSand = true;
                 }
