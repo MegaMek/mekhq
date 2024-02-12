@@ -351,7 +351,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     private int rollWeatherStandardCondition() {
-        int[] odds = new int[]{69,7,4,4,2,1,6,2,1,2,1,1};
+        int[] odds = new int[]{69,7,4,4,2,1,6,2,1,1,2,1};
         int weather = rollCondition(odds);
 
         if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
@@ -366,7 +366,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     private int rollWeatherWetCondition() {
-        int[] odds = new int[]{47,12,10,8,6,4,6,2,1,2,1,1};
+        int[] odds = new int[]{47,12,10,8,6,4,6,2,1,1,2,1};
         int weather = rollCondition(odds);
 
         if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
