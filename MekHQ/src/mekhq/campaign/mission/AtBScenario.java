@@ -322,7 +322,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private int rollLightCondition() {
         int[] odds = new int[]{600,200,100,99,1};
-        return rollCondition(odds);
+        int light = rollCondition(odds);
+
+        if (light < PlanetaryConditions.L_DAY || light > PlanetaryConditions.L_PITCH_BLACK) {
+            return PlanetaryConditions.L_DAY;
+        }
+
+        return light;
     }
 
     public void setLightConditions() {
@@ -332,6 +338,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private int rollWindCondition() {
         int[] odds = new int[]{70,10,10,4,3,2,1};
         int wind = rollCondition(odds);
+
+        if (wind < PlanetaryConditions.WI_NONE || wind > PlanetaryConditions.WI_TORNADO_F4) {
+            return PlanetaryConditions.WI_NONE;
+        }
 
         if (!WeatherRestriction.IsWindRestricted(wind, getAtmosphere(), getTemperature())) {
             return wind;
@@ -344,6 +354,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int[] odds = new int[]{70,7,4,4,2,1,6,2,1,2,1};
         int weather = rollCondition(odds);
 
+        if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
+            return PlanetaryConditions.WE_NONE;
+        }
+
         if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
             return weather;
         } else {
@@ -354,6 +368,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private int rollWeatherWetCondition() {
         int[] odds = new int[]{48,12,10,8,6,4,6,2,1,2,1};
         int weather = rollCondition(odds);
+
+        if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
+            return PlanetaryConditions.WE_NONE;
+        }
 
         if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
             return weather;
@@ -366,6 +384,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int[] odds = new int[]{40,7,4,4,2,1,12,10,8,6,6};
         int weather = rollCondition(odds);
 
+        if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
+            return PlanetaryConditions.WE_NONE;
+        }
+
         if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
             return weather;
         } else {
@@ -376,6 +398,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private int rollWeatherDryCondition() {
         int[] odds = new int[]{88,2,1,1,1,1,2,1,1,1,1};
         int weather = rollCondition(odds);
+
+        if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
+            return PlanetaryConditions.WE_NONE;
+        }
 
         if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
             return weather;
@@ -388,6 +414,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int[] odds = new int[]{90,5,5};
         int fog = rollCondition(odds);
 
+        if (fog < PlanetaryConditions.FOG_NONE || fog > PlanetaryConditions.FOG_HEAVY) {
+            return PlanetaryConditions.FOG_NONE;
+        }
+
         if (!WeatherRestriction.IsFogRestricted(fog, getAtmosphere(), getTemperature())) {
             return fog;
         } else {
@@ -398,6 +428,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     private int rollFoggierCondition() {
         int[] odds = new int[]{60,20,20};
         int fog = rollCondition(odds);
+
+        if (fog < PlanetaryConditions.FOG_NONE || fog > PlanetaryConditions.FOG_HEAVY) {
+            return PlanetaryConditions.FOG_NONE;
+        }
 
         if (!WeatherRestriction.IsFogRestricted(fog, getAtmosphere(), getTemperature())) {
             return fog;
