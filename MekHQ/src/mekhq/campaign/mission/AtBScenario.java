@@ -440,7 +440,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
-    private boolean rollBlowingSand() {
+    private boolean rollBlowingSandCondition() {
+        int[] odds = new int[]{60,40};
+        boolean moderateGaleRestricted = WeatherRestriction.IsWindRestricted(PlanetaryConditions.WI_MOD_GALE, getAtmosphere(), getTemperature());
+        return !moderateGaleRestricted && rollCondition(odds) == 1;
+    }
+
+    private boolean rollBlowingSandHeavyCondition() {
         int[] odds = new int[]{60,40};
         boolean moderateGaleRestricted = WeatherRestriction.IsWindRestricted(PlanetaryConditions.WI_MOD_GALE, getAtmosphere(), getTemperature());
         return !moderateGaleRestricted && rollCondition(odds) == 1;
@@ -450,8 +456,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int weather = PlanetaryConditions.WE_NONE;
         int fog = PlanetaryConditions.FOG_NONE;
         boolean blowingSand = false;
-        boolean extremeHeat = PlanetaryConditions.isExtremeTemperature(getTemperature()) && (getTemperature() > 0);
-        boolean extremeCold = PlanetaryConditions.isExtremeTemperature(getTemperature()) && (getTemperature() < 0);
 
         int wind = rollWindCondition();
 
@@ -461,29 +465,18 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case TER_FLATLANDS:
             case TER_WOODED:
             case TER_HEAVYURBAN:
-                if (extremeCold) {
-                    weather = rollWeatherSnowyCondition();
-                    fog = rollFoggyCondition();
-                } else {
-                    weather = rollWeatherStandardCondition();
-                    fog = rollFoggyCondition();
-                    if (weather == PlanetaryConditions.WE_NONE
-                            && fog == PlanetaryConditions.FOG_NONE
-                            && extremeHeat
-                            && rollBlowingSand()) {
-                        blowingSand = true;
-                    }
+                weather = rollWeatherStandardCondition();
+                fog = rollFoggyCondition();
+                if (weather == PlanetaryConditions.WE_NONE
+                        && fog == PlanetaryConditions.FOG_NONE
+                        && rollBlowingSandCondition()) {
+                    blowingSand = true;
                 }
                 break;
             case TER_COASTAL:
             case TER_WETLANDS:
-                if (extremeCold) {
-                    weather = rollWeatherSnowyCondition();
-                    fog = rollFoggierCondition();
-                } else {
-                    weather = rollWeatherWetCondition();
-                    fog = rollFoggierCondition();
-                }
+                weather = rollWeatherWetCondition();
+                fog = rollFoggierCondition();
                 break;
             case TER_MOUNTAINS:
                 weather = rollWeatherSnowyCondition();
@@ -492,7 +485,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case TER_BADLANDS:
                 weather = rollWeatherDryCondition();
                 if (weather == PlanetaryConditions.WE_NONE
-                        && rollBlowingSand()) {
+                        && rollBlowingSandHeavyCondition()) {
                     blowingSand = true;
                 }
                 break;
