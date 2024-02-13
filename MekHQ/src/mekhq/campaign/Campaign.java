@@ -39,6 +39,7 @@ import megamek.common.util.BuildingBlock;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.Quartermaster.PartAcquisitionResult;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.*;
@@ -611,8 +612,10 @@ public class Campaign implements ITechManager {
             // TODO : mos zero should make ship available on retainer
             if (roll >= target.getValue()) {
                 report.append("<br/>Search successful. ");
-                MechSummary ms = unitGenerator.generate(getFactionCode(), shipSearchType, -1,
+
+                MechSummary ms = getUnitGenerator().generate(getFactionCode(), shipSearchType, -1,
                         getGameYear(), getUnitRatingMod());
+
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
                 }
@@ -2297,7 +2300,7 @@ public class Campaign implements ITechManager {
 
             String personTitle = person.getHyperlinkedFullTitle() + " ";
 
-            for (PlanetarySystem system: systems) {
+            for (PlanetarySystem system : systems) {
                 if (currentList.isEmpty()) {
                     // Nothing left to shop for!
                     break;
@@ -2316,7 +2319,8 @@ public class Campaign implements ITechManager {
                     }
 
                     if (shoppingItem.getDaysToWait() <= 0) {
-                        if (findContactForAcquisition(shoppingItem, person, system)) {
+                        PartAcquisitionResult result = findContactForAcquisition(shoppingItem, person, system);
+                        if (result == PartAcquisitionResult.Success) {
                             int transitTime = calculatePartTransitTime(system);
                             int totalQuantity = 0;
                             while (shoppingItem.getQuantity() > 0
@@ -2331,8 +2335,12 @@ public class Campaign implements ITechManager {
                                         + system.getPrintableName(currentDate)
                                         + ". Delivery in " + transitTime + " days.</b></font>");
                             }
+                        } else if (result == PartAcquisitionResult.PartInherentFailure) {
+                            shelvedItems.add(shoppingItem);
+                            continue;
                         }
                     }
+
                     // if we didn't find everything on this planet, then add to the remaining list
                     if (shoppingItem.getQuantity() > 0 || shoppingItem.getDaysToWait() > 0) {
                         // if we can't afford it, then don't keep searching for it on other planets
@@ -2412,31 +2420,45 @@ public class Campaign implements ITechManager {
      * @param system - The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may be null if the user is not using planetary acquisition.
      * @return true if your target roll succeeded.
      */
-    public boolean findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
+    public PartAcquisitionResult findContactForAcquisition(IAcquisitionWork acquisition, Person person, PlanetarySystem system) {
         TargetRoll target = getTargetForAcquisition(acquisition, person);
+
+        String impossibleSentencePrefix = person == null ? "Can't search for " : person.getFullName() + " can't search for ";
+        String failedSentencePrefix = person == null ? "No contacts available for " : person.getFullName() + " is unable to find contacts for ";
+        String succeededSentencePrefix = person == null ? "Possible contact for " : person.getFullName() + " has found a contact for ";
+
+        // if it's already impossible, don't bother with the rest
+        if (target.getValue() == TargetRoll.IMPOSSIBLE) {
+            if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
+                addReport("<font color='red'><b>" + impossibleSentencePrefix + acquisition.getAcquisitionName()
+                        + " on " + system.getPrintableName(getLocalDate()) + " because:</b></font> " + target.getDesc());
+            }
+            return PartAcquisitionResult.PartInherentFailure;
+        }
+
         target = system.getPrimaryPlanet().getAcquisitionMods(target, getLocalDate(), getCampaignOptions(), getFaction(),
                 acquisition.getTechBase() == Part.T_CLAN);
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='red'><b>Can't search for " + acquisition.getAcquisitionName()
+                addReport("<font color='red'><b>" + impossibleSentencePrefix + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + " because:</b></font> " + target.getDesc());
             }
-            return false;
+            return PartAcquisitionResult.PlanetSpecificFailure;
         }
         if (Compute.d6(2) < target.getValue()) {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='red'><b>No contacts available for " + acquisition.getAcquisitionName()
+                addReport("<font color='red'><b>" + failedSentencePrefix + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + "</b></font>");
             }
-            return false;
+            return PartAcquisitionResult.PlanetSpecificFailure;
         } else {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='green'>Possible contact for " + acquisition.getAcquisitionName()
+                addReport("<font color='green'>" + succeededSentencePrefix + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + "</font>");
             }
-            return true;
+            return PartAcquisitionResult.Success;
         }
     }
 
@@ -3551,6 +3573,11 @@ public class Campaign implements ITechManager {
             return;
         }
 
+        Force force = getForceFor(person);
+        if (force != null) {
+            force.updateCommander(this);
+        }
+        
         person.getGenealogy().clearGenealogyLinks();
 
         final Unit unit = person.getUnit();
@@ -4782,6 +4809,12 @@ public class Campaign implements ITechManager {
         if (null != u) {
             u.resetPilotAndEntity();
         }
+        
+        Force force = getForceFor(p);
+        if (force != null) {
+            force.updateCommander(this);
+        }
+        
         MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
@@ -5059,7 +5092,8 @@ public class Campaign implements ITechManager {
                             partAvailabilityLog.append(";(gauss ammo): -1");
                             break;
                     }
-                    if (((megamek.common.AmmoType) et).getMunitionType() == megamek.common.AmmoType.M_STANDARD) {
+                    if (EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(
+                            ((megamek.common.AmmoType) et).getMunitionType())){
                         partAvailability--;
                         partAvailabilityLog.append(";(standard ammo): -1");
                     }
@@ -5635,6 +5669,7 @@ public class Campaign implements ITechManager {
         entity.setHullDown(false);
         entity.heat = 0;
         entity.heatBuildup = 0;
+        entity.underwaterRounds = 0;
         entity.setTransportId(Entity.NONE);
         entity.resetTransporter();
         entity.setDeployRound(0);
@@ -5659,17 +5694,23 @@ public class Campaign implements ITechManager {
             IBomber bomber = (IBomber) entity;
             List<Mounted> mountedBombs = bomber.getBombs();
             if (!mountedBombs.isEmpty()) {
-                // This should return an int[] filled with 0's
-                int[] bombChoices = bomber.getBombChoices();
+                // These should return an int[] filled with 0's
+                int[] intBombChoices = bomber.getIntBombChoices();
+                int[] extBombChoices = bomber.getExtBombChoices();
                 for (Mounted m : mountedBombs) {
                     if (!(m.getType() instanceof BombType)) {
                         continue;
                     }
                     if (m.getBaseShotsLeft() == 1) {
-                        bombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                        if (m.isInternalBomb()) {
+                            intBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                        } else {
+                            extBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
+                        }
                     }
                 }
-                bomber.setBombChoices(bombChoices);
+                bomber.setIntBombChoices(intBombChoices);
+                bomber.setExtBombChoices(extBombChoices);
                 bomber.clearBombs();
             }
         }

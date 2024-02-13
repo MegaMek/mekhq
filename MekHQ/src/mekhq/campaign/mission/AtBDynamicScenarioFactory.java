@@ -114,8 +114,7 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        boolean planetsideScenario = template.mapParameters.getMapLocation() == MapLocation.AllGroundTerrain ||
-                template.mapParameters.getMapLocation() == MapLocation.SpecificGroundTerrain;
+        boolean planetsideScenario = template.isPlanetSurface();
 
         // set lighting conditions if the user wants to play with them and is on a ground map
         // theoretically some lighting conditions apply to space maps as well, but requires additional work to implement properly
@@ -2518,7 +2517,7 @@ public class AtBDynamicScenarioFactory {
 
             // hack: make rocket launcher pods available before 3055
             if ((validBombChoices[x] == BombType.B_RL) ||
-                    BombType.get(typeName).isAvailableIn(year)) {
+                    BombType.get(typeName).isAvailableIn(year, false)) {
                 actualValidBombChoices.add(validBombChoices[x]);
             }
         }

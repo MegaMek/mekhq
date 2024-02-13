@@ -1,0 +1,46 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>Opfor Mercenary Skirmishers with veteran markings are in the area. Don't get flanked.</additionalBriefingText>
+	<allowedMapLocations>
+		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
+		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
+	</allowedMapLocations>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<forceDefinition>
+		<actualDeploymentZone>-1</actualDeploymentZone>
+		<allowAeroBombs>false</allowAeroBombs>
+		<allowedUnitType>0</allowedUnitType>
+		<arrivalTurn>3</arrivalTurn>
+		<canReinforceLinked>false</canReinforceLinked>
+		<contributesToBV>false</contributesToBV>
+		<contributesToMapSize>true</contributesToMapSize>
+		<contributesToUnitCount>false</contributesToUnitCount>
+		<deployOffboard>false</deployOffboard>
+		<deploymentZones>
+			<deploymentZone>1</deploymentZone>
+			<deploymentZone>2</deploymentZone>
+			<deploymentZone>3</deploymentZone>
+			<deploymentZone>4</deploymentZone>
+			<deploymentZone>5</deploymentZone>
+			<deploymentZone>6</deploymentZone>
+			<deploymentZone>7</deploymentZone>
+			<deploymentZone>8</deploymentZone>
+			<deploymentZone>9</deploymentZone>
+		</deploymentZones>
+		<destinationZone>5</destinationZone>
+		<fixedUnitCount>4</fixedUnitCount>
+		<forceAlignment>2</forceAlignment>
+		<forceName>Enemy Merc Skirmishers</forceName>
+		<generationMethod>5</generationMethod>
+			<fixedMul>MercSkirm.mul</fixedMul>	
+		<generationOrder>1</generationOrder>
+		<maxWeightClass>4</maxWeightClass>			
+		<retreatThreshold>50</retreatThreshold>
+		<startingAltitude>0</startingAltitude>
+		<objectiveLinkedForces>
+			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+		</objectiveLinkedForces>
+		<syncDeploymentType>None</syncDeploymentType>
+		<useArtillery>false</useArtillery>
+	</forceDefinition>
+</AtBScenarioModifier>

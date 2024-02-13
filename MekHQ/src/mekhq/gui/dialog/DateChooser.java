@@ -73,7 +73,21 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
     private JFormattedTextField dateField;
 
     /**
-     * Constructor for DateChooser
+     * Constructor for DateChooser which has parent dialog
+     *
+     * @param parentDialog
+     *            JDialog istance. Dialog that owns this
+     * @param d
+     *            LocalDate instance that will be the initial date for
+     *            this dialog
+     */
+    public DateChooser(JDialog parentDialog, LocalDate d) {
+        super(parentDialog, "Date Chooser", true);
+        init(parentDialog, d);
+    }
+
+    /**
+     * Constructor for DateChooser which does not have a parent dialog
      *
      * @param owner
      *            JFrame instance, owner of DateChooser dialog
@@ -83,6 +97,12 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
      */
     public DateChooser(JFrame owner, LocalDate d) {
         super(owner, "Date Chooser", true);
+        init(owner, d);
+    }
+
+    private void init(Component owner, LocalDate d) {
+
+
         date = d;
         workingDate = date;
 

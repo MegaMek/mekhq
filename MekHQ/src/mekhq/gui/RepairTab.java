@@ -218,7 +218,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             column.setCellRenderer(servicedUnitModel.getRenderer(false));
             if ((i != UnitTableModel.COL_NAME) && (i != UnitTableModel.COL_TYPE)
                     && (i != UnitTableModel.COL_STATUS) && (i != UnitTableModel.COL_REPAIR)
-                    && (i != UnitTableModel.COL_SITE)) {
+                    && (i != UnitTableModel.COL_SITE) && (i != UnitTableModel.COL_RSTATUS)) {
                 ((XTableColumnModel) servicedUnitTable.getColumnModel()).setColumnVisible(column, false);
             }
         }

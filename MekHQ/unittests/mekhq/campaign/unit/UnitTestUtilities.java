@@ -60,7 +60,7 @@ public final class UnitTestUtilities {
         try {
             InputStream in = new ByteArrayInputStream(TestUtilities.Decode(base64));
             IMechLoader loader;
-            
+
             BuildingBlock bb = new BuildingBlock(in);
             if (bb.exists("UnitType")) {
                 String sType = bb.getDataAsString("UnitType")[0];
@@ -85,8 +85,10 @@ public final class UnitTestUtilities {
                     loader = new BLKLargeSupportTankFile(bb);
                 } else if (sType.equals("SupportVTOL")) {
                     loader = new BLKSupportVTOLFile(bb);
+                } else if (sType.equals("AeroSpaceFighter")) {
+                    loader = new BLKAeroSpaceFighterFile(bb);
                 } else if (sType.equals("Aero")) {
-                    loader = new BLKAeroFile(bb);
+                    loader = new BLKAeroSpaceFighterFile(bb);
                 } else if (sType.equals("FixedWingSupport")) {
                     loader = new BLKFixedWingSupportFile(bb);
                 } else if (sType.equals("ConvFighter")) {

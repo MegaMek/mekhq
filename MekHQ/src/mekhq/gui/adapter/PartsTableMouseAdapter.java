@@ -107,10 +107,14 @@ public class PartsTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.contains("SET_QUALITY")) {
             int q = -1;
             boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
-            Object[] possibilities = { Part.getQualityName(Part.QUALITY_A, reverse),
-                    Part.getQualityName(Part.QUALITY_B, reverse), Part.getQualityName(Part.QUALITY_C, reverse),
-                    Part.getQualityName(Part.QUALITY_D, reverse), Part.getQualityName(Part.QUALITY_E, reverse),
-                    Part.getQualityName(Part.QUALITY_F, reverse) };
+            Object[] possibilities = {
+                Part.getQualityName(Part.QUALITY_A, reverse),
+                Part.getQualityName(Part.QUALITY_B, reverse),
+                Part.getQualityName(Part.QUALITY_C, reverse),
+                Part.getQualityName(Part.QUALITY_D, reverse),
+                Part.getQualityName(Part.QUALITY_E, reverse),
+                Part.getQualityName(Part.QUALITY_F, reverse)
+            };
             String quality = (String) JOptionPane.showInputDialog(gui.getFrame(), "Choose the new quality level",
                     "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
                     Part.getQualityName(Part.QUALITY_D, reverse));

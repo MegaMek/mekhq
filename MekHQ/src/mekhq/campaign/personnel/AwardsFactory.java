@@ -21,7 +21,9 @@ package mekhq.campaign.personnel;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
+import megamek.client.ui.swing.CommonSettingsDialog;
 import megamek.common.annotations.Nullable;
+import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.AwardSet;
@@ -55,8 +57,9 @@ public class AwardsFactory {
 
     private AwardsFactory() {
         awardsMap = new HashMap<>();
-
-        loadAwards();
+        loadAwards(MHQConstants.AWARDS_DIRECTORY_PATH);
+        String userDir = PreferenceManager.getClientPreferences().getUserDir();
+        loadAwards(new File(userDir, MHQConstants.AWARDS_DIRECTORY_PATH).toString());
     }
 
     public static AwardsFactory getInstance() {
@@ -147,17 +150,10 @@ public class AwardsFactory {
     /**
      * Generates the "blueprint" awards by reading the data from XML sources.
      */
-    private void loadAwards() {
-        File dir = new File(MHQConstants.AWARDS_DIRECTORY_PATH);
-        File[] files = dir.listFiles((dir1, filename) -> filename.endsWith(".xml"));
-
-        if (files == null) {
-            return;
-        }
-
-        for (File file : files) {
+    private void loadAwards(String path) {
+        for (String file : CommonSettingsDialog.filteredFilesWithSubDirs(new File(path), ".xml")) {
             try (InputStream inputStream = new FileInputStream(file)) {
-                loadAwardsFromStream(inputStream, file.getName());
+                loadAwardsFromStream(inputStream, new File(file).getName());
             } catch (IOException e) {
                 LogManager.getLogger().error("", e);
             }

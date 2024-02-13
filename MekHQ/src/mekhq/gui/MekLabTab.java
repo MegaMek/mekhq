@@ -298,10 +298,7 @@ public class MekLabTab extends CampaignGuiTab {
         testEntity.correctEntity(sb);
 
         int walk = entity.getOriginalWalkMP();
-        int run = entity.getRunMP();
-        if (entity instanceof Mech) {
-            run = ((Mech) entity).getOriginalRunMPwithoutMASC();
-        }
+        int run = entity.getRunMP(MPCalculationSetting.NO_MASC);
         int jump = entity.getOriginalJumpMP();
         int heat = entity.getHeatCapacity();
 
@@ -463,10 +460,26 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private abstract static class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource {
+
+        private boolean refreshRequired = false;
         @Override
         public abstract Entity getEntity();
 
         abstract void setTechFaction(int techFaction);
+
+
+        @Override
+        public void scheduleRefresh() {
+            refreshRequired = true;
+            SwingUtilities.invokeLater(this::performRefresh);
+        }
+
+        private void performRefresh() {
+            if (refreshRequired) {
+                refreshRequired = false;
+                refreshAll();
+            }
+        }
     }
 
     private class AeroPanel extends EntityPanel {

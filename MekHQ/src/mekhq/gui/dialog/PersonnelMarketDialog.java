@@ -419,7 +419,7 @@ public class PersonnelMarketDialog extends JDialog {
         sorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
-                return nGroup.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()));
+                return nGroup.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()), hqView.getCampaign().getLocalDate());
             }
         });
     }

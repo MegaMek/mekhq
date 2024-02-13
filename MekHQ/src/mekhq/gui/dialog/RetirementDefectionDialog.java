@@ -590,7 +590,7 @@ public class RetirementDefectionDialog extends JDialog {
                         && !rdTracker.getRetirees(contract).contains(person.getId())) {
                     return false;
                 } else {
-                    return nGroup.getFilteredInformation(person);
+                    return nGroup.getFilteredInformation(person, hqView.getCampaign().getLocalDate());
                 }
             }
         });

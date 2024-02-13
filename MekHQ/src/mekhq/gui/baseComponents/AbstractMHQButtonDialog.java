@@ -28,9 +28,9 @@ import java.util.ResourceBundle;
  * This is the Base Dialog for a dialog with buttons in MegaMek. It extends Base Dialog, and adds a
  * button panel with base Ok and Cancel buttons. It also includes an enum tracker for the result of
  * the dialog.
- *
+ * <p>
  * Inheriting classes must call initialize() in their constructors and override createCenterPane()
- *
+ * <p>
  * The resources associated with this dialog need to contain at least the following keys:
  * - "Ok.text" - text for the ok button
  * - "Ok.toolTipText" - toolTipText for the ok button
@@ -39,12 +39,17 @@ import java.util.ResourceBundle;
  */
 public abstract class AbstractMHQButtonDialog extends AbstractButtonDialog {
     //region Constructors
+
     /**
      * This creates a modal AbstractMHQButtonDialog using the default MHQ resource bundle. This is
      * the normal constructor to use for an AbstractMHQButtonDialog.
      */
     protected AbstractMHQButtonDialog(final JFrame frame, final String name, final String title) {
         this(frame, true, name, title);
+    }
+
+    protected AbstractMHQButtonDialog(final JDialog dialog, final JFrame frame, final String name, final String title) {
+        this(dialog, frame, true, name, title);
     }
 
     /**
@@ -57,6 +62,12 @@ public abstract class AbstractMHQButtonDialog extends AbstractButtonDialog {
                 MekHQ.getMHQOptions().getLocale()), name, title);
     }
 
+    protected AbstractMHQButtonDialog(final JDialog dialog, final JFrame frame, final boolean modal, final String name,
+                                      final String title) {
+        this(dialog, frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI",
+                MekHQ.getMHQOptions().getLocale()), name, title);
+    }
+
     /**
      * This creates an AbstractMHQButtonDialog using the specified resource bundle. This is not
      * recommended by default.
@@ -65,12 +76,19 @@ public abstract class AbstractMHQButtonDialog extends AbstractButtonDialog {
                                       final String name, final String title) {
         super(frame, modal, resources, name, title);
     }
+
+    protected AbstractMHQButtonDialog(final JDialog dialog, final JFrame frame, final boolean modal, final ResourceBundle resources,
+                                      final String name, final String title) {
+        super(dialog, frame, modal, resources, name, title);
+    }
+    //endregion Constructors
     //endregion Constructors
 
     /**
      * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     *
      * @throws Exception if there's an issue initializing the preferences. Normally this means
-     * a component has <strong>not</strong> had its name value set.
+     *                   a component has <strong>not</strong> had its name value set.
      */
     @Override
     protected void setPreferences() throws Exception {

@@ -159,6 +159,7 @@ public class StratconRulesManager {
         // if not auto-assigning lances, we then back out the lance assignments.
         for (StratconScenario scenario : generatedScenarios) {
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
+            setScenarioParametersFromBiome(track, scenario);
             swapInPlayerUnits(scenario, campaign, Force.FORCE_NONE);
 
             if (!autoAssignLances && !scenario.ignoreForceAutoAssignment()) {
@@ -177,6 +178,61 @@ public class StratconRulesManager {
             }
         }
     }
+
+    /**
+     * Picks the scenario terrain based on the scenario coordinates' biome
+     * Note that "finalizeScenario" currently wipes out temperature/map info so this method must be called afterward.
+     */
+    public static void setScenarioParametersFromBiome(StratconTrackState track, StratconScenario scenario) {
+        StratconCoords coords = scenario.getCoords();
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
+        // for non-surface scenarios, we will skip the temperature update
+        if (backingScenario.getTerrainType() != Scenario.TER_LOW_ATMO &&
+                backingScenario.getTerrainType() != Scenario.TER_SPACE) {
+            backingScenario.setTemperature(track.getTemperature());
+        }
+        
+        // for now, if we're using a fixed map or in a facility, don't replace the scenario
+        // TODO: facility spaces will always have a relevant biome
+        if (backingScenario.isUsingFixedMap()) {
+            return; // for now
+        }
+
+        StratconFacility facility = track.getFacility(scenario.getCoords());
+        String terrainType;
+        
+        // facilities have their own terrain lists
+        if (facility != null) {
+            int kelvinTemp = track.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+            StratconBiome facilityBiome;
+            
+            // if facility doesn't have a biome temp map or no entry for the current temperature, use the default one
+            if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
+                facilityBiome = StratconBiomeManifest.getInstance().getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
+                        .floorEntry(kelvinTemp).getValue();
+            } else {
+                facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
+            }
+            terrainType = facilityBiome.allowedTerrainTypes.get(Compute.randomInt(facilityBiome.allowedTerrainTypes.size()));
+        } else {
+            terrainType = track.getTerrainTile(coords);
+        }
+        
+        var mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+
+        // don't have a map list for the given terrain, leave it alone
+        if(!mapTypes.containsKey(terrainType)) {
+            return;
+        }
+
+        // if we are in space, do not update the map; note that it's ok to do so in low atmo
+        if (backingScenario.getTerrainType() != Scenario.TER_SPACE) {
+            var mapTypeList = mapTypes.get(terrainType).mapTypes;
+            backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+        }
+    }
+
 
     /**
      * Worker function that looks through the scenario's templates and swaps in
@@ -293,6 +349,7 @@ public class StratconRulesManager {
         if (revealedScenario != null) {
             revealedScenario.addPrimaryForce(forceID);
             AtBDynamicScenarioFactory.finalizeScenario(revealedScenario.getBackingScenario(), contract, campaign);
+            setScenarioParametersFromBiome(track, revealedScenario);
             commitPrimaryForces(campaign, revealedScenario, track);
             return;
         }
@@ -308,6 +365,7 @@ public class StratconRulesManager {
             // we deploy immediately in this case, since we deployed the force manually
             setScenarioDates(0, track, campaign, scenario);
             AtBDynamicScenarioFactory.finalizeScenario(scenario.getBackingScenario(), contract, campaign);
+            setScenarioParametersFromBiome(track, scenario);
 
             // if we wound up with a field scenario, we may sub in dropships carrying
             // units of the force in question
@@ -1547,6 +1605,8 @@ public class StratconRulesManager {
                         // with a facility defense, with the opfor coming directly from all hostiles
                         // assigned to this scenario
 
+                        // update the scenario's biome
+                        setScenarioParametersFromBiome(track, scenario);
                         scenario.setCurrentState(ScenarioState.UNRESOLVED);
                         return false;
                     } else {

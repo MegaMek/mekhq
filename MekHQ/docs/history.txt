@@ -1,6 +1,55 @@
-VERSION HISTORY:
+MEKHQ VERSION HISTORY:
 ---------------
-0.49.13-SNAPSHOT
+0.49.18-SNAPSHOT
++ PR #3805: Adaptations for the Internal Bomb Bay quirk
++ PR #3801: New StratCon Scenario Modifiers (Thanks Thom293)
++ PR #3788: Adjust campaign creation dialogs to have correct jdialod owner
++ Fix #3540: Manually set TO&E force commander
++ PR #3818: MUL parser updates
++ PR #3816: Show if unit is in repair or salvage mode in repair bay. 
++ PR #3823, #3827, #3833: Rework of the internal representation of Armor
++ PR #3826: Adaptation to Mek Clan name separation in MM
++ Fix #3740: Consistent messaging in Daily Activity Log: ComStar bill vs. C-Bill
++ PR #3821: Add max contract salvage percentage to campaign options
++ Fix #3763: Reversing quality names in unit set quality GM menu
++ FIx #3194: Awarding non-stackable medals to multiple people 
++ Issue #3781: Force commanders can be picked from among highest-ranking individuals
+
+0.49.17 (2023-12-31 1900 UTC)
++ No code added
+
+0.49.16 (2023-12-30 2200 UTC)
++ PR #3771: Add "children" filter to personnel tab
++ PR #3780: Support for Beast Mounted Infantry
+
+0.49.15 (2023-10-21 1530 UTC)
++ PR #3735: Maintenance cost shown in whole C-Bills
++ Issue #3741: Stratcon fixes
+ - Improve contrast between revealed/unrevealed hexes
+ - Generate scenario using default temp mappings when facility-specific mappings aren't present
+ - fix missing badlands image
+ - definition file paths are now linux-friendly
++ Issue #3725: Improve performance when searching for parts using "planetary acquisition"
++ Issue #2854: Implemented CamOps errata for avionics repair times
++ PR #3756: Tech level filtering in the unit selector dialog has been corrected
++ Issue #3747: Unable to Assign Pilots to Tripod Mechs
++ PR #3766: weight calculation for spare mech locations
++ PR #3768: Arano Restoration Campaign - Planetary Control
+
+0.49.14 (2023-07-28 2100 UTC)
++ PR #3676: Gradle build fixes 
++ Issue #3682: Prevent NPE when changing bot config
++ Issue #3683 - fix issue preventing loading saved campaigns containing MASC
++ Issue #3621 - prevent NPE completing ship search immediately after loading campaign
++ PR #3692: Adaptations to MM's #4474 (BV calculation and reports update)
++ Issue #3402, #3715: Only hostile units are now displayed on the killboard during scenario resolution, Stratcon fixes
++ PR #3694: New StratCon feature - tracks now have individual terrain hexes (with graphics) and average temperatures; 
+    the terrain influences the map presets used for tactical battles; temperature is passed to megamek (may be hot!)
++ PR #3724: "Clan Personnel" special flag now correctly sets the person's clan status
++ PR #3731: Fix nightly build from a missed method rename in MegaMek. 
++ Issue #3713: allied turrets have upgraded network security; defeat in evacuation scenarios results in facility capture instead of destruction
+
+0.49.13 (2023-05-23 2000 UTC)
 + Data: updates to the Stratcon FAQ now version 2.3 in docs\atb folder.
 + PR #3618: Campaign Options: Properly Disable Retirement and Dependent Options On Preset Load
 + PR #3619: Campaign Options: Properly Disable Contract Market Pane based on AtB Selection

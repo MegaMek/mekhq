@@ -21,6 +21,7 @@
 package mekhq.campaign.market;
 
 import megamek.common.*;
+import megamek.common.equipment.ArmorType;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.TestEntity;
 import megamek.common.weapons.InfantryAttack;
@@ -424,31 +425,16 @@ public class PartsStore {
 
     private void stockArmor(Campaign c) {
         int amount;
-        for (int at = 0; at < EquipmentType.armorNames.length; at++) {
-            String name = EquipmentType.getArmorTypeName(at, false);
-            EquipmentType is = EquipmentType.get(name);
-            if (null != is) {
-                if (is.hasFlag(MiscType.F_BA_EQUIPMENT)) {
-                    amount = (int)(5 * BaArmor.getPointsPerTon(at, false));
-                    parts.add(new BaArmor(0, amount, at, -1, false, c));
-                } else {
-                    amount = (int)(5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(at, false));
-                    parts.add(new Armor(0, at, amount, -1, false, false, c));
-                }
-            }
-            name = EquipmentType.getArmorTypeName(at, true);
-            EquipmentType clan = EquipmentType.get(name);
-            if ((null != clan) && (is != clan)) {
-                if (clan.hasFlag(MiscType.F_BA_EQUIPMENT)) {
-                    amount = (int)(5 * BaArmor.getPointsPerTon(at, true));
-                    parts.add(new BaArmor(0, amount, at, -1, true, c));
-                } else {
-                    amount = (int) (5.0 * 16.0 * EquipmentType.getArmorPointMultiplier(at, true));
-                    parts.add(new Armor(0, at, amount, -1, false, true, c));
-                }
+        for (ArmorType armor : ArmorType.allArmorTypes()) {
+            if (armor.hasFlag(MiscType.F_BA_EQUIPMENT)) {
+                amount = (int) (5 * armor.getWeightPerPoint());
+                parts.add(new BaArmor(0, amount, armor.getArmorType(), -1, armor.isClan(), c));
+            } else {
+                amount = (int) (5.0 * armor.getPointsPerTon());
+                parts.add(new Armor(0, armor.getArmorType(), amount, -1, false, armor.isClan(), c));
             }
         }
-        parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_STANDARD, 100, -1, true, c));
+        parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_STANDARD_PROTOMEK, 100, -1, true, c));
         parts.add(new ProtomekArmor(0, EquipmentType.T_ARMOR_EDP, 66, -1, true, c));
     }
 

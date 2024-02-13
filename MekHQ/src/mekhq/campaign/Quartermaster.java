@@ -40,6 +40,12 @@ import java.util.Objects;
  * Manages machines and materiel for a campaign.
  */
 public class Quartermaster {
+    public enum PartAcquisitionResult {
+        PartInherentFailure,
+        PlanetSpecificFailure,
+        Success
+    }
+    
     private final Campaign campaign;
 
     /**

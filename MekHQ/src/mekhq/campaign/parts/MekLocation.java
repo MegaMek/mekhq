@@ -23,6 +23,8 @@ package mekhq.campaign.parts;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.verifier.Structure;
+import megamek.common.verifier.TestEntity.Ceil;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -32,6 +34,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
+
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -149,8 +152,41 @@ public class MekLocation extends Part {
 
     @Override
     public double getTonnage() {
-        // TODO : how much should this weigh?
-        return 0;
+        // use MegaMek's implementation of internal structure weight calculation
+        // assume rounding to nearest half-ton
+        // superheavy flag is set if weight is more than 100
+        // assume movement mode is biped or tripod (technically mechs can have other movement modes but 
+        // that doesn't affect structure weight); currently impossible to tell whether a "loose" left leg is for a biped or tripod.        
+        EntityMovementMode movementMode = (getLoc() == Mech.LOC_CLEG) ? EntityMovementMode.TRIPOD : EntityMovementMode.BIPED;                
+        
+        double tonnage = Structure.getWeightStructure(structureType, getUnitTonnage(), Ceil.HALFTON, 
+                (getUnitTonnage() > 100), movementMode);
+        
+        // determine the weight of the location; 
+        // if it's a "strange" location, then the rest of this is pointless.
+        switch (loc) {
+        case Mech.LOC_HEAD:
+            tonnage *= 0.05;
+            break;
+        case Mech.LOC_CT:
+            tonnage *= 0.25;
+            break;
+        case Mech.LOC_LT:
+        case Mech.LOC_RT:
+            tonnage *= 0.15;
+            break;
+        case Mech.LOC_LARM:
+        case Mech.LOC_RARM:
+        case Mech.LOC_LLEG:
+        case Mech.LOC_RLEG:
+        case Mech.LOC_CLEG:
+            tonnage *= 0.1;
+            break;
+        default:
+            return 0;
+        }
+        
+        return tonnage;
     }
 
     @Override

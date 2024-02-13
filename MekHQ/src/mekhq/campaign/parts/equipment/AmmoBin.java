@@ -38,6 +38,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.util.EnumSet;
 import java.util.Objects;
 
 /**
@@ -117,7 +118,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
             if (unit.getEntity() instanceof Protomech) {
                 // If protomechs are using alternate munitions then cut in half
-                if (getType().getMunitionType() != AmmoType.M_STANDARD) {
+                if (!EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(getType().getMunitionType())){
                     fullShots = fullShots / 2;
                 }
             }
@@ -235,7 +236,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     // FIXME: does not take into account BombType
     @Deprecated
-    public long getMunitionType() {
+    public EnumSet<AmmoType.Munitions> getMunitionType() {
         return getType().getMunitionType();
     }
 

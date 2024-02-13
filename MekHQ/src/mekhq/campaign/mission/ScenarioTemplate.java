@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 
 /**
  * This is the root data structure for organizing information related to a scenario template.
@@ -153,6 +154,14 @@ public class ScenarioTemplate implements Cloneable {
         }
 
         return retVal;
+    }
+    
+    /**
+     * Is this template for a ground-side scenario?
+     */
+    public boolean isPlanetSurface() {
+        return mapParameters.getMapLocation() == MapLocation.AllGroundTerrain ||
+                mapParameters.getMapLocation() == MapLocation.SpecificGroundTerrain;
     }
 
     /**

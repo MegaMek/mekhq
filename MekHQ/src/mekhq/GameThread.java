@@ -88,10 +88,10 @@ class GameThread extends Thread implements CloseClientListener {
         client.addCloseClientListener(this);
 
         if (swingGui != null) {
-            for (Client client2 : swingGui.getBots().values()) {
+            for (Client client2 : swingGui.getLocalBots().values()) {
                 client2.die();
             }
-            swingGui.getBots().clear();
+            swingGui.getLocalBots().clear();
         }
         createController();
         swingGui = new ClientGUI(client, controller);
@@ -209,9 +209,9 @@ class GameThread extends Thread implements CloseClientListener {
             for (int i = 0; i < scenario.getNumBots(); i++) {
                 BotForce bf = scenario.getBotForce(i);
                 String name = bf.getName();
-                if (swingGui.getBots().containsKey(name)) {
+                if (swingGui.getLocalBots().containsKey(name)) {
                     int append = 2;
-                    while (swingGui.getBots().containsKey(name + append)) {
+                    while (swingGui.getLocalBots().containsKey(name + append)) {
                         append++;
                     }
                     name += append;
@@ -223,7 +223,7 @@ class GameThread extends Thread implements CloseClientListener {
                 } catch (Exception e) {
                     LogManager.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
                 }
-                swingGui.getBots().put(name, botClient);
+                swingGui.getLocalBots().put(name, botClient);
 
                 // chill out while bot is created and connects to megamek
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
@@ -310,13 +310,6 @@ class GameThread extends Thread implements CloseClientListener {
         } catch (IOException e) {
             LogManager.getLogger().error("Error saving custom weapon orders!", e);
         }
-
-        try {
-            QuirksHandler.saveCustomQuirksList();
-        } catch (Exception e) {
-            LogManager.getLogger().error("Error saving quirks override!", e);
-        }
-
         stop = true;
     }
 

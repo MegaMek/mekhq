@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.ArmorType;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -62,7 +63,7 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = clan;
         this.name = "Armor";
         if (type > -1) {
-            this.name += " (" + EquipmentType.armorNames[type] + ')';
+            this.name += " (" + ArmorType.of(type, clan).getName() + ')';
         }
     }
 
@@ -80,11 +81,11 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public Money getActualValue() {
-        return adjustCostsForCampaignOptions(Money.of(getTonnage() * EquipmentType.getArmorCost(type)));
+        return adjustCostsForCampaignOptions(Money.of(getTonnage() * ArmorType.of(type, clan).getCost()));
     }
 
     public double getTonnageNeeded() {
-        double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, isClanTechBase());
+        double armorPerTon = ArmorType.of(type, isClanTechBase()).getPointsPerTon();
         if (type == EquipmentType.T_ARMOR_HARDENED) {
             armorPerTon = 8.0;
         }
@@ -92,13 +93,13 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public Money getValueNeeded() {
-        return adjustCostsForCampaignOptions(Money.of(getTonnageNeeded() * EquipmentType.getArmorCost(type)));
+        return adjustCostsForCampaignOptions(Money.of(getTonnageNeeded() * ArmorType.of(type, clan).getCost()));
     }
 
     @Override
     public Money getStickerPrice() {
         // always in 5-ton increments
-        return Money.of(5 * EquipmentType.getArmorCost(type));
+        return Money.of(5 * ArmorType.of(type, clan).getCost());
     }
 
     @Override
@@ -239,7 +240,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return EquipmentType.getArmorTechAdvancement(type, clan);
+        return ArmorType.of(type, clan).getTechAdvancement();
     }
 
     public double getArmorWeight(int points) {
@@ -247,8 +248,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
         // this roundabout method is actually necessary to avoid rounding
         // weirdness. Yeah, it's dumb.
-        double armorPointMultiplier = EquipmentType.getArmorPointMultiplier(getType(), isClanTechBase());
-        double armorPerTon = 16.0 * armorPointMultiplier;
+        double armorPerTon = ArmorType.of(getType(), isClan()).getPointsPerTon();
         if (getType() == EquipmentType.T_ARMOR_HARDENED) {
             armorPerTon = 8.0;
         }
@@ -508,11 +508,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public double getArmorPointsPerTon() {
-        double armorPerTon = 16.0 * EquipmentType.getArmorPointMultiplier(type, clan);
-        if (type == EquipmentType.T_ARMOR_HARDENED) {
-            armorPerTon = 8.0;
-        }
-        return armorPerTon;
+        return ArmorType.of(type, clan).getPointsPerTon();
     }
 
     public Part getNewPart() {
@@ -572,7 +568,7 @@ public class Armor extends Part implements IAcquisitionWork {
     public String scrap() {
         remove(false);
         skillMin = SkillType.EXP_GREEN;
-        return EquipmentType.armorNames[type] + " armor scrapped.";
+        return ArmorType.of(type, clan).getName() + " armor scrapped.";
     }
 
     @Override
@@ -624,7 +620,7 @@ public class Armor extends Part implements IAcquisitionWork {
         this.clan = cl;
         this.name = "Armor";
         if (type > -1) {
-            this.name += " (" + EquipmentType.armorNames[type] + ')';
+            this.name += " (" + ArmorType.of(type, clan).getName() + ')';
         }
     }
 

@@ -487,6 +487,7 @@ public class StratconScenarioWizard extends JDialog {
             // if we've already generated forces and applied modifiers, no need to do it twice
             if (!currentScenario.getBackingScenario().isFinalized()) {
                 AtBDynamicScenarioFactory.finalizeScenario(currentScenario.getBackingScenario(), currentCampaignState.getContract(), campaign);
+                StratconRulesManager.setScenarioParametersFromBiome(currentTrackState, currentScenario);
             }
 
             StratconRulesManager.commitPrimaryForces(campaign, currentScenario, currentTrackState);

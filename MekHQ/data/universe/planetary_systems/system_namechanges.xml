@@ -1212,4 +1212,19 @@
       </event>
     </planet>
   </system>
+   <system>
+    <id>Stonarboi (Almotacen 3150+)</id>
+    <planet>
+      <sysPos>4</sysPos>
+      <event>
+        <date>0000-01-01</date>
+        <name>Stonarboi</name>
+      </event>
+      <event>
+        <date>3150-01-01</date>
+        <name>Almotacen</name>
+        <message>Stonarboi renamed to Almotacen</message>
+      </event>
+    </planet>
+  </system>
 </systems>

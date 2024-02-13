@@ -234,12 +234,7 @@ public class ResolveScenarioTracker {
             }
             // Kill credit automatically assigned only if they can't escape
             if (!e.canEscape()) {
-                Entity killer = victoryEvent.getEntity(e.getKillerId());
-                if ((null != killer) && !"-1".equals(killer.getExternalIdAsString())) {
-                    killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-                } else {
-                    killCredits.put(e.getDisplayName(), "None");
-                }
+                appendKillCredit(e);
             }
         }
 
@@ -281,12 +276,8 @@ public class ResolveScenarioTracker {
                     }
                 }
             }
-            Entity killer = victoryEvent.getEntity(e.getKillerId());
-            if ((null != killer) && !"-1".equals(killer.getExternalIdAsString())) {
-                killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-            } else {
-                killCredits.put(e.getDisplayName(), "None");
-            }
+
+            appendKillCredit(e);
         }
 
         //add retreated units
@@ -376,12 +367,8 @@ public class ResolveScenarioTracker {
                     potentialSalvage.add(nu);
                 }
             }
-            Entity killer = victoryEvent.getEntity(e.getKillerId());
-            if ((null != killer) && !"-1".equals(killer.getExternalIdAsString())) {
-                killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-            } else {
-                killCredits.put(e.getDisplayName(), "None");
-            }
+
+            appendKillCredit(e);
         }
         //If a unit in a bay was destroyed, add it. We still need to deal with the crew
         for (Enumeration<Entity> iter = victoryEvent.getGraveyardEntities(); iter.hasMoreElements();) {
@@ -399,6 +386,24 @@ public class ResolveScenarioTracker {
             }
         }
         checkStatusOfPersonnel();
+    }
+
+    /**
+     * Worker function that, where appropriate, appends kill credit to the local killCredits tracker
+     */
+    private void appendKillCredit(Entity e) {
+        // no need to add kill credits for player or allied units
+        if (!e.getOwner().isEnemyOf(client.getLocalPlayer())) {
+            return;
+        }
+
+        Entity killer = victoryEvent.getEntity(e.getKillerId());
+
+        if ((null != killer) && !"-1".equals(killer.getExternalIdAsString())) {
+            killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
+        } else {
+            killCredits.put(e.getDisplayName(), "None");
+        }
     }
 
     private UnitStatus processAlliedUnit(Entity e) {
@@ -1470,7 +1475,7 @@ public class ResolveScenarioTracker {
         if (prisonerRansoms.isGreaterThan(Money.zero())) {
             getCampaign().getFinances().credit(TransactionType.RANSOM, getCampaign().getLocalDate(),
                     prisonerRansoms, "Prisoner ransoms for " + getScenario().getName());
-            getCampaign().addReport(prisonerRansoms.toAmountAndNameString()
+            getCampaign().addReport(prisonerRansoms.toAmountAndSymbolString()
                     + " has been credited to your account for prisoner ransoms following "
                     + getScenario().getName() + ".");
         }
@@ -1570,7 +1575,7 @@ public class ResolveScenarioTracker {
             if (unitRansoms.isGreaterThan(Money.zero())) {
                 getCampaign().getFinances().credit(TransactionType.SALVAGE, getCampaign().getLocalDate(),
                         unitRansoms, "Unit ransoms for " + getScenario().getName());
-                getCampaign().addReport(unitRansoms.toAmountAndNameString()
+                getCampaign().addReport(unitRansoms.toAmountAndSymbolString()
                         + " has been credited to your account from unit ransoms following "
                         + getScenario().getName() + ".");
                 if (isContract) {
