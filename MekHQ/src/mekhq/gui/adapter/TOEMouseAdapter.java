@@ -104,6 +104,10 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
 
     private static final String COMMAND_ADD_LANCE_TECH = "ADD_LANCE_TECH|FORCE|";
     private static final String COMMAND_REMOVE_LANCE_TECH = "REMOVE_LANCE_TECH|FORCE|";
+    
+    // Commander-Related
+    private static final String SET_LANCE_COMMANDER = "SET_LANCE_COMMANDER";
+    private static final String COMMAND_SET_LANCE_COMMANDER = "SET_LANCE_COMMANDER|FORCE|";
 
     // Icons and Descriptions
     private static final String CHANGE_CAMO = "CHANGE_CAMO";
@@ -267,6 +271,11 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 MekHQ.triggerEvent(new OrganizationChangedEvent(singleForce));
+            }
+        } else if (command.contains(TOEMouseAdapter.SET_LANCE_COMMANDER)) {
+            if (null != singleForce) {
+                singleForce.setForceCommanderID(UUID.fromString(target));
+                gui.getTOETab().refreshForceView();
             }
         } else if (command.contains(TOEMouseAdapter.ASSIGN_TO_SHIP)) {
             Unit ship = gui.getCampaign().getUnit(UUID.fromString(target));
@@ -899,6 +908,23 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 }
                 JMenuHelpers.addMenuIfNonEmpty(menu, unsorted);
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+                
+                // still in the multiple selection block
+                List<UUID> eligibleCommanders = force.getEligibleCommanders(gui.getCampaign());
+                if (!eligibleCommanders.isEmpty()) {                
+                    menuItem = new JScrollableMenu("setCommanderMenu", "Set Commander");
+                    
+                    for (UUID personID : eligibleCommanders) {
+                        Person person = gui.getCampaign().getPerson(personID);
+                        
+                        JMenuItem commanderOption = new JMenuItem(person.getFullTitle() + " (" + person.getRoleDesc() + ")");
+                        commanderOption.setActionCommand(COMMAND_SET_LANCE_COMMANDER + personID + "|" + forceIds);
+                        commanderOption.addActionListener(this);
+                        menuItem.add(commanderOption);
+                    }
+                    
+                    popup.add(menuItem);
+                }
             }
 
             menu = new JMenu("Force Icon");
