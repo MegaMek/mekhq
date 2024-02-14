@@ -230,6 +230,7 @@ public class StratconRulesManager {
         if (backingScenario.getTerrainType() != Scenario.TER_SPACE) {
             var mapTypeList = mapTypes.get(terrainType).mapTypes;
             backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+            backingScenario.setWeather();
         }
     }
 

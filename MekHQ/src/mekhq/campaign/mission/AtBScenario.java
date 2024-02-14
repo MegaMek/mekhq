@@ -321,7 +321,58 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     private int rollLightCondition() {
-        int[] odds = new int[]{600,200,100,99,1};
+        int[] odds;
+
+        switch (getMap()) {
+            case "City-dense":
+            case "City-high":
+            case "Cliffs":
+            case "Cliffs-lake":
+            case "Dust-bowl":
+            case "Fortress-city":
+            case "Heavy-craters":
+            case "Hills":
+            case "Hills-craters":
+            case "Lake-high":
+            case "Lake-marsh":
+            case "Light-craters":
+            case "Mountain-high":
+            case "Mountain-lake":
+            case "Mountain-medium":
+            case "Muddy-swamp":
+            case "River-huge":
+            case "River-wetlands":
+            case "Rocky-valley":
+            case "Rubble-mountain":
+            case "Rubble-river":
+            case "Sandy-hills":
+            case "Sandy-river":
+            case "Sandy-valley":
+            case "Savannah":
+            case "Seaport":
+            case "Some-trees":
+            case "Swamp":
+            case "Town-concrete":
+            case "Town-farming":
+            case "Town-generic":
+            case "Town-hills":
+            case "Town-mining":
+            case "Town-mountain":
+            case "Town-ruin":
+            case "Town-wooded":
+            case "Wooded-hills":
+            case "Wooded-lake":
+            case "Wooded-swamp":
+            case "Wooded-valley":
+            case "Woods-deep":
+            case "Woods-medium":
+            case "Woods-river":
+                odds = new int[]{600,200,100,99,1};
+                break;
+            default:
+                return PlanetaryConditions.L_DAY;
+        }
+
         int light = rollCondition(odds);
 
         if (light < PlanetaryConditions.L_DAY || light > PlanetaryConditions.L_PITCH_BLACK) {
@@ -336,7 +387,60 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     private int rollWindCondition() {
-        int[] odds = new int[]{70,10,10,4,3,2,1};
+        int[] odds;
+
+        switch (getMap()) {
+            case "City-dense":
+            case "City-high":
+            case "Fortress-city":
+            case "Hills":
+            case "Lake-marsh":
+            case "Mountain-medium":
+            case "Muddy-swamp":
+            case "River-wetlands":
+            case "Sandy-hills":
+            case "Sandy-valley":
+            case "Some-trees":
+            case "Swamp":
+            case "Town-concrete":
+            case "Town-farming":
+            case "Town-generic":
+            case "Town-hills":
+            case "Town-mining":
+            case "Town-mountain":
+            case "Town-ruin":
+            case "Town-wooded":
+            case "Wooded-hills":
+            case "Wooded-lake":
+            case "Wooded-swamp":
+            case "Wooded-valley":
+            case "Woods-deep":
+            case "Woods-medium":
+            case "Woods-river":
+                odds = new int[]{70,10,10,4,3,2,1};
+                break;
+            case "Cliffs":
+            case "Cliffs-lake":
+            case "Dust-bowl":
+            case "Heavy-craters":
+            case "Hills-craters":
+            case "Lake-high":
+            case "Light-craters":
+            case "Mountain-high":
+            case "Mountain-lake":
+            case "River-huge":
+            case "Rocky-valley":
+            case "Rubble-mountain":
+            case "Rubble-river":
+            case "Sandy-river":
+            case "Savannah":
+            case "Seaport":
+                odds = new int[]{50,15,15,9,5,4,2};
+                break;
+            default:
+                return PlanetaryConditions.WI_NONE;
+        }
+
         int wind = rollCondition(odds);
 
         if (wind < PlanetaryConditions.WI_NONE || wind > PlanetaryConditions.WI_TORNADO_F4) {
@@ -350,8 +454,65 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
-    private int rollWeatherStandardCondition() {
-        int[] odds = new int[]{69,7,4,4,2,1,6,2,1,1,2,1};
+    private int rollWeatherCondition() {
+        int[] odds;
+
+        switch (getMap()) {
+            case "City-dense":
+            case "City-high":
+            case "Fortress-city":
+            case "Hills":
+            case "Sandy-hills":
+            case "Sandy-valley":
+            case "Savannah":
+            case "Some-trees":
+            case "Town-concrete":
+            case "Town-farming":
+            case "Town-generic":
+            case "Town-hills":
+            case "Town-ruin":
+            case "Town-wooded":
+            case "Wooded-hills":
+            case "Wooded-valley":
+            case "Woods-deep":
+            case "Woods-medium":
+                odds = new int[]{69,7,4,4,2,1,6,2,1,1,2,1};
+                break;
+            case "Cliffs-lake":
+            case "Lake-marsh":
+            case "Lake-high":
+            case "Muddy-swamp":
+            case "River-huge":
+            case "River-wetlands":
+            case "Rubble-river":
+            case "Sandy-river":
+            case "Seaport":
+            case "Swamp":
+            case "Wooded-lake":
+            case "Woods-river":
+            case "Wooded-swamp":
+                odds = new int[]{47,12,10,8,6,4,6,2,1,1,2,1};
+                break;
+            case "Mountain-high":
+            case "Mountain-lake":
+            case "Mountain-medium":
+            case "Town-mining":
+            case "Town-mountain":
+                odds = new int[]{41,6,3,3,1,1,12,10,8,6,6,3};
+                break;
+            case "Cliffs":
+            case "Dust-bowl":
+            case "Heavy-craters":
+            case "Hills-craters":
+            case "Light-craters":
+            case "Rocky-valley":
+            case "Rubble-mountain":
+                odds = new int[]{87,2,1,1,1,1,2,1,1,1,1,1};
+                break;
+            default:
+                return PlanetaryConditions.WE_NONE;
+        }
+
         int weather = rollCondition(odds);
 
         if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
@@ -365,53 +526,54 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
-    private int rollWeatherWetCondition() {
-        int[] odds = new int[]{47,12,10,8,6,4,6,2,1,1,2,1};
-        int weather = rollCondition(odds);
+    private int rollFogCondition() {
+        int[] odds;
 
-        if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
-            return PlanetaryConditions.WE_NONE;
+        switch (getMap()) {
+            case "City-dense":
+            case "City-high":
+            case "Fortress-city":
+            case "Hills":
+            case "Mountain-high":
+            case "Mountain-medium":
+            case "Sandy-hills":
+            case "Sandy-valley":
+            case "Savannah":
+            case "Some-trees":
+            case "Town-concrete":
+            case "Town-farming":
+            case "Town-generic":
+            case "Town-hills":
+            case "Town-mining":
+            case "Town-mountain":
+            case "Town-ruin":
+            case "Town-wooded":
+            case "Wooded-hills":
+            case "Wooded-valley":
+            case "Woods-deep":
+            case "Woods-medium":
+                odds = new int[]{90,5,5};
+                break;
+            case "Cliffs-lake":
+            case "Lake-marsh":
+            case "Lake-high":
+            case "Mountain-lake":
+            case "Muddy-swamp":
+            case "River-huge":
+            case "River-wetlands":
+            case "Rubble-river":
+            case "Sandy-river":
+            case "Seaport":
+            case "Swamp":
+            case "Wooded-lake":
+            case "Woods-river":
+            case "Wooded-swamp":
+                odds = new int[]{60,20,20};
+                break;
+            default:
+                return PlanetaryConditions.FOG_NONE;
         }
 
-        if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
-            return weather;
-        } else {
-            return PlanetaryConditions.WE_NONE;
-        }
-    }
-
-    private int rollWeatherSnowyCondition() {
-        int[] odds = new int[]{41,6,3,3,1,1,12,10,8,6,6,3};
-        int weather = rollCondition(odds);
-
-        if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
-            return PlanetaryConditions.WE_NONE;
-        }
-
-        if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
-            return weather;
-        } else {
-            return PlanetaryConditions.WE_NONE;
-        }
-    }
-
-    private int rollWeatherDryCondition() {
-        int[] odds = new int[]{87,2,1,1,1,1,2,1,1,1,1,1};
-        int weather = rollCondition(odds);
-
-        if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
-            return PlanetaryConditions.WE_NONE;
-        }
-
-        if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
-            return weather;
-        } else {
-            return PlanetaryConditions.WE_NONE;
-        }
-    }
-
-    private int rollFoggyCondition() {
-        int[] odds = new int[]{90,5,5};
         int fog = rollCondition(odds);
 
         if (fog < PlanetaryConditions.FOG_NONE || fog > PlanetaryConditions.FOG_HEAVY) {
@@ -425,81 +587,58 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
-    private int rollFoggierCondition() {
-        int[] odds = new int[]{60,20,20};
-        int fog = rollCondition(odds);
+    private boolean rollBlowingSandCondition(int wind, int weather, int fog) {
+        int[] odds;
+        boolean moderateGaleRestricted = WeatherRestriction.IsWindRestricted(PlanetaryConditions.WI_MOD_GALE, getAtmosphere(), getTemperature());
 
-        if (fog < PlanetaryConditions.FOG_NONE || fog > PlanetaryConditions.FOG_HEAVY) {
-            return PlanetaryConditions.FOG_NONE;
+        if (weather != PlanetaryConditions.WE_NONE
+                && fog != PlanetaryConditions.FOG_NONE
+                && wind < PlanetaryConditions.WI_MOD_GALE
+                && !moderateGaleRestricted) {
+            return false;
         }
 
-        if (!WeatherRestriction.IsFogRestricted(fog, getAtmosphere(), getTemperature())) {
-            return fog;
-        } else {
-            return PlanetaryConditions.FOG_NONE;
+        switch (getMap()) {
+            case "City-dense":
+            case "City-high":
+            case "Fortress-city":
+            case "Hills":
+            case "Sandy-hills":
+            case "Sandy-valley":
+            case "Savannah":
+            case "Town-concrete":
+            case "Town-farming":
+            case "Town-generic":
+            case "Town-hills":
+            case "Town-mining":
+            case "Town-mountain":
+            case "Town-ruin":
+                odds = new int[]{90,10};
+                break;
+            case "Cliffs":
+            case "Dust-bowl":
+            case "Heavy-craters":
+            case "Hills-craters":
+            case "Light-craters":
+            case "Rocky-valley":
+            case "Rubble-mountain":
+                odds = new int[]{40,60};
+                break;
+            default:
+                return false;
         }
-    }
 
-    private boolean rollBlowingSandCondition() {
-        int[] odds = new int[]{60,40};
-        boolean moderateGaleRestricted = WeatherRestriction.IsWindRestricted(PlanetaryConditions.WI_MOD_GALE, getAtmosphere(), getTemperature());
-        return !moderateGaleRestricted && rollCondition(odds) == 1;
-    }
-
-    private boolean rollBlowingSandHeavyCondition() {
-        int[] odds = new int[]{60,40};
-        boolean moderateGaleRestricted = WeatherRestriction.IsWindRestricted(PlanetaryConditions.WI_MOD_GALE, getAtmosphere(), getTemperature());
-        return !moderateGaleRestricted && rollCondition(odds) == 1;
+        return rollCondition(odds) == 1;
     }
 
     public void setWeather() {
-        int weather = PlanetaryConditions.WE_NONE;
-        int fog = PlanetaryConditions.FOG_NONE;
-        boolean blowingSand = false;
-
         int wind = rollWindCondition();
+        int weather = rollWeatherCondition();
+        int fog = rollFogCondition();
+        boolean blowingSand = rollBlowingSandCondition(wind, weather, fog);
 
-        switch (getTerrainType()) {
-            case TER_HILLS:
-            case TER_LIGHTURBAN:
-            case TER_FLATLANDS:
-            case TER_WOODED:
-            case TER_HEAVYURBAN:
-                weather = rollWeatherStandardCondition();
-                fog = rollFoggyCondition();
-                if (weather == PlanetaryConditions.WE_NONE
-                        && fog == PlanetaryConditions.FOG_NONE
-                        && rollBlowingSandCondition()) {
-                    blowingSand = true;
-                }
-                break;
-            case TER_COASTAL:
-            case TER_WETLANDS:
-                weather = rollWeatherWetCondition();
-                fog = rollFoggierCondition();
-                break;
-            case TER_MOUNTAINS:
-                weather = rollWeatherSnowyCondition();
-                fog = rollFoggyCondition();
-                break;
-            case TER_BADLANDS:
-                weather = rollWeatherDryCondition();
-                if (weather == PlanetaryConditions.WE_NONE
-                        && rollBlowingSandHeavyCondition()) {
-                    blowingSand = true;
-                }
-                break;
-            default:
-                weather = rollWeatherStandardCondition();
-                fog = rollFoggyCondition();
-        }
-
+        setWind(wind);
         setWeather(weather);
-        if (blowingSand && wind < PlanetaryConditions.WI_MOD_GALE) {
-            setWind(PlanetaryConditions.WI_MOD_GALE);
-        } else {
-            setWind(wind);
-        }
         setFog(fog);
         setBlowingSand(blowingSand);
     }

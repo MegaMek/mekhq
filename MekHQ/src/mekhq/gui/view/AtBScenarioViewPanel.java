@@ -484,17 +484,6 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = y++;
             panStats.add(lblTerrainDesc, gridBagConstraints);
-        } else {
-            lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.gridwidth = 1;
-            panStats.add(lblTerrain, gridBagConstraints);
-
-            lblTerrainDesc.setText(AtBScenario.terrainTypes[scenario.getTerrainType()]);
-            gridBagConstraints.gridx = 2;
-            gridBagConstraints.gridy = y++;
-            panStats.add(lblTerrainDesc, gridBagConstraints);
         }
 
         lblMap.setText(resourceMap.getString("lblMap.text"));
