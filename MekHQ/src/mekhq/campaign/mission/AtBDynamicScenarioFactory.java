@@ -717,12 +717,6 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario for which to set weather conditions.
      */
     private static void setWeather(AtBDynamicScenario scenario) {
-        // weather is irrelevant in these situations.
-        if (scenario.getTerrainType() == AtBScenario.TER_SPACE ||
-                scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
-            return;
-        }
-
         scenario.setWeather();
     }
 

@@ -363,12 +363,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Woods-deep":
             case "Woods-medium":
             case "Woods-river":
+                // standard
                 odds = new int[]{600,200,100,99,1};
                 break;
             case "Cliffs":
             case "Heavy-craters":
             case "Hills-craters":
             case "Light-craters":
+                // dark
                 odds = new int[]{50,20,10,10,10};
                 break;
             default:
@@ -382,10 +384,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
 
         return light;
-    }
-
-    public void setLightConditions() {
-        setLight(rollLightCondition());
     }
 
     private int rollWindCondition() {
@@ -419,6 +417,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Woods-deep":
             case "Woods-medium":
             case "Woods-river":
+                // standard
                 odds = new int[]{70,10,10,4,3,2,1};
                 break;
             case "Cliffs":
@@ -437,6 +436,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Sandy-river":
             case "Savannah":
             case "Seaport":
+                // high
                 odds = new int[]{50,15,15,9,5,4,2};
                 break;
             default:
@@ -478,11 +478,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Wooded-valley":
             case "Woods-deep":
             case "Woods-medium":
+                // standard
                 odds = new int[]{69,7,4,4,2,1,6,2,1,1,2,1};
                 break;
             case "Cliffs-lake":
-            case "Lake-marsh":
             case "Lake-high":
+            case "Lake-marsh":
             case "Muddy-swamp":
             case "River-huge":
             case "River-wetlands":
@@ -491,8 +492,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Seaport":
             case "Swamp":
             case "Wooded-lake":
-            case "Woods-river":
             case "Wooded-swamp":
+            case "Woods-river":
+                // wet
                 odds = new int[]{47,12,10,8,6,4,6,2,1,1,2,1};
                 break;
             case "Mountain-high":
@@ -500,6 +502,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Mountain-medium":
             case "Town-mining":
             case "Town-mountain":
+                // snowy
                 odds = new int[]{41,6,3,3,1,1,12,10,8,6,6,3};
                 break;
             case "Cliffs":
@@ -509,6 +512,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Light-craters":
             case "Rocky-valley":
             case "Rubble-mountain":
+                // dry
                 odds = new int[]{87,2,1,1,1,1,2,1,1,1,1,1};
                 break;
             default:
@@ -554,11 +558,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Wooded-valley":
             case "Woods-deep":
             case "Woods-medium":
+                // standard
                 odds = new int[]{90,5,5};
                 break;
             case "Cliffs-lake":
-            case "Lake-marsh":
             case "Lake-high":
+            case "Lake-marsh":
             case "Mountain-lake":
             case "Muddy-swamp":
             case "River-huge":
@@ -568,8 +573,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Seaport":
             case "Swamp":
             case "Wooded-lake":
-            case "Woods-river":
             case "Wooded-swamp":
+            case "Woods-river":
+                // heavy
                 odds = new int[]{60,20,20};
                 break;
             default:
@@ -606,6 +612,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Fortress-city":
             case "Hills":
             case "Sandy-hills":
+            case "Sandy-river":
             case "Sandy-valley":
             case "Savannah":
             case "Town-concrete":
@@ -615,6 +622,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Town-mining":
             case "Town-mountain":
             case "Town-ruin":
+                // standard
                 odds = new int[]{90,10};
                 break;
             case "Cliffs":
@@ -624,6 +632,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Light-craters":
             case "Rocky-valley":
             case "Rubble-mountain":
+                // heavy
                 odds = new int[]{40,60};
                 break;
             default:
@@ -633,7 +642,17 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return rollCondition(odds) == 1;
     }
 
+    public void setLightConditions() {
+        setLight(rollLightCondition());
+    }
+
     public void setWeather() {
+        // weather is irrelevant in these situations.
+        if (getTerrainType() == AtBScenario.TER_SPACE ||
+                getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+            return;
+        }
+
         int wind = rollWindCondition();
         int weather = rollWeatherCondition();
         int fog = rollFogCondition();
