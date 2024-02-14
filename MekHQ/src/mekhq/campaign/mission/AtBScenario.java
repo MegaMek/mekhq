@@ -326,16 +326,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         switch (getMap()) {
             case "City-dense":
             case "City-high":
-            case "Cliffs":
             case "Cliffs-lake":
             case "Dust-bowl":
             case "Fortress-city":
-            case "Heavy-craters":
             case "Hills":
-            case "Hills-craters":
             case "Lake-high":
             case "Lake-marsh":
-            case "Light-craters":
             case "Mountain-high":
             case "Mountain-lake":
             case "Mountain-medium":
@@ -368,6 +364,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Woods-medium":
             case "Woods-river":
                 odds = new int[]{600,200,100,99,1};
+                break;
+            case "Cliffs":
+            case "Heavy-craters":
+            case "Hills-craters":
+            case "Light-craters":
+                odds = new int[]{50,20,10,10,10};
                 break;
             default:
                 return PlanetaryConditions.L_DAY;
