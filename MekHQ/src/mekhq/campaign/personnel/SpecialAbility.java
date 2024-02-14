@@ -62,7 +62,7 @@ import java.util.Map.Entry;
  */
 public class SpecialAbility {
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
-    private static final String PREREQ_MISC_CLANPILOT = "clanpilot";
+    private static final String PREREQ_MISC_CLANPILOT = "clanperson";
 
     private static Map<String, SpecialAbility> specialAbilities = new HashMap<>();
     private static Map<String, SpecialAbility> defaultSpecialAbilities = new HashMap<>();
