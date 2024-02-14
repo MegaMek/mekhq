@@ -1913,7 +1913,7 @@ public class ResolveScenarioTracker {
         public UnitStatus(Unit unit) {
             this.unit = unit;
             this.name = unit.getName();
-            chassis = unit.getEntity().getChassis();
+            chassis = unit.getEntity().getFullChassis();
             model = unit.getEntity().getModel();
             //assume its a total loss until we find something that says otherwise
             totalLoss = true;

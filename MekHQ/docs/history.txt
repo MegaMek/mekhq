@@ -12,9 +12,11 @@ MEKHQ VERSION HISTORY:
 + Fix #3740: Consistent messaging in Daily Activity Log: ComStar bill vs. C-Bill
 + PR #3821: Add max contract salvage percentage to campaign options
 + Fix #3763: Reversing quality names in unit set quality GM menu
-+ FIx #3194: Awarding non-stackable medals to multiple people 
++ Fix #3194: Awarding non-stackable medals to multiple people 
 + Issue #3781: Force commanders can be picked from among highest-ranking individuals
-
++ Fix #3843: Fix chassis lookup
++ Fix #3842: Can't load prefab campaigns  
+ 
 0.49.17 (2023-12-31 1900 UTC)
 + No code added
 
