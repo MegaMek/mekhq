@@ -197,11 +197,13 @@ public final class TOETab extends CampaignGuiTab {
     @Subscribe
     public void personChanged(PersonChangedEvent ev) {
         orgTree.repaint();
+        orgRefreshScheduler.schedule();
     }
 
     @Subscribe
     public void personRemoved(PersonRemovedEvent ev) {
         orgTree.repaint();
+        orgRefreshScheduler.schedule();
     }
 
     @Subscribe
