@@ -374,7 +374,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{50,20,10,10,10};
                 break;
             default:
-                return PlanetaryConditions.L_DAY;
+                if (isUsingFixedMap()) {
+                    // fixed
+                    odds = new int[]{600, 200, 100, 99, 1};
+                } else {
+                    return PlanetaryConditions.L_DAY;
+                }
         }
 
         int light = rollCondition(odds);
@@ -440,7 +445,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{50,15,15,9,5,4,2};
                 break;
             default:
-                return PlanetaryConditions.WI_NONE;
+                if (isUsingFixedMap()) {
+                    // fixed
+                    odds = new int[]{70,10,10,4,3,2,1};
+                } else {
+                    return PlanetaryConditions.WI_NONE;
+                }
         }
 
         int wind = rollCondition(odds);
@@ -516,7 +526,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{87,2,1,1,1,1,2,1,1,1,1,1};
                 break;
             default:
-                return PlanetaryConditions.WE_NONE;
+                if (isUsingFixedMap()) {
+                    // fixed
+                    odds = new int[]{69,7,4,4,2,1,6,2,1,1,2,1};
+                } else {
+                    return PlanetaryConditions.WE_NONE;
+                }
         }
 
         int weather = rollCondition(odds);
@@ -579,7 +594,12 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{60,20,20};
                 break;
             default:
-                return PlanetaryConditions.FOG_NONE;
+                if (isUsingFixedMap()) {
+                    // fixed
+                    odds = new int[]{90,5,5};
+                } else {
+                    return PlanetaryConditions.FOG_NONE;
+                }
         }
 
         int fog = rollCondition(odds);
@@ -636,7 +656,77 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{40,60};
                 break;
             default:
-                return false;
+                if (isUsingFixedMap()) {
+                    // fixed
+                    odds = new int[]{90,10};
+                } else {
+                    return false;
+                }
+        }
+
+        return rollCondition(odds) == 1;
+    }
+
+    private boolean rollEMICondition() {
+        int[] odds;
+
+        switch (getMap()) {
+            case "City-dense":
+            case "City-high":
+            case "Fortress-city":
+            case "Hills":
+            case "Lake-high":
+            case "Lake-marsh":
+            case "Muddy-swamp":
+            case "River-huge":
+            case "River-wetlands":
+            case "Sandy-hills":
+            case "Sandy-river":
+            case "Sandy-valley":
+            case "Savannah":
+            case "Seaport":
+            case "Some-trees":
+            case "Swamp":
+            case "Town-concrete":
+            case "Town-farming":
+            case "Town-generic":
+            case "Town-hills":
+            case "Town-wooded":
+            case "Wooded-hills":
+            case "Wooded-lake":
+            case "Wooded-swamp":
+            case "Wooded-valley":
+            case "Woods-deep":
+            case "Woods-medium":
+            case "Woods-river":
+                // standard
+                odds = new int[]{999,1};
+                break;
+            case "Cliffs":
+            case "Cliffs-lake":
+            case "Dust-bowl":
+            case "Heavy-craters":
+            case "Hills-craters":
+            case "Light-craters":
+            case "Mountain-high":
+            case "Mountain-lake":
+            case "Mountain-medium":
+            case "Rocky-valley":
+            case "Rubble-mountain":
+            case "Rubble-river":
+            case "Town-mining":
+            case "Town-mountain":
+            case "Town-ruin":
+                // heavy
+                odds = new int[]{90,10};
+                break;
+            default:
+                if (isUsingFixedMap()) {
+                    // fixed
+                    odds = new int[]{999,1};
+                } else {
+                    return false;
+                }
         }
 
         return rollCondition(odds) == 1;
@@ -657,11 +747,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int weather = rollWeatherCondition();
         int fog = rollFogCondition();
         boolean blowingSand = rollBlowingSandCondition(wind, weather, fog);
+        boolean emi = rollEMICondition();
 
         setWind(wind);
         setWeather(weather);
         setFog(fog);
         setBlowingSand(blowingSand);
+        setEMI(emi);
     }
 
     public void setPlanetaryConditions(Mission mission, Campaign campaign) {

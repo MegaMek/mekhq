@@ -81,6 +81,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private JLabel lblFogDesc = new JLabel();
     private JLabel lblBlowingSand = new JLabel();
     private JLabel lblBlowingSandDesc = new JLabel();
+    private JLabel lblEMI = new JLabel();
+    private JLabel lblEMIDesc = new JLabel();
 
     private JLabel lblTemp = new JLabel();
 
@@ -614,6 +616,20 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         lblBlowingSand.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
         lblBlowingSandDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
 
+        lblEMI.setText(resourceMap.getString("lblEMI.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.gridwidth = 1;
+        panStats.add(lblEMI, gridBagConstraints);
+
+        String emiDesc = scenario.getEMI() ? PlanetaryConditions.MSG_NAME_EMI_TRUE : PlanetaryConditions.MSG_NAME_EMI_FALSE;
+        lblEMIDesc.setText(emiDesc);
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = y++;
+        panStats.add(lblEMIDesc, gridBagConstraints);
+        lblEMI.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+        lblEMIDesc.setVisible(campaign.getCampaignOptions().isUseWeatherConditions());
+
         lblTemp.setText(resourceMap.getString("lblTemperature.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
@@ -800,6 +816,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             lblFogDesc.setText(PlanetaryConditions.getFogDisplayableName(scenario.getFog()));
             String blowingSandDesc = scenario.getBlowingSand() ? PlanetaryConditions.MSG_NAME_BLOWINGSAND_TRUE : PlanetaryConditions.MSG_NAME_BLOWINGSAND_FALSE;
             lblBlowingSandDesc.setText(blowingSandDesc);
+            String emiDesc = scenario.getEMI() ? PlanetaryConditions.MSG_NAME_EMI_TRUE : PlanetaryConditions.MSG_NAME_EMI_FALSE;
+            lblEMIDesc.setText(emiDesc);
         }
         btnReroll.setText(scenario.getRerollsRemaining() +
                 " Reroll" + ((scenario.getRerollsRemaining() == 1)?"":"s") +

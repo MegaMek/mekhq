@@ -354,6 +354,10 @@ public class Scenario {
         this.emi = emi;
     }
 
+    public boolean getEMI() {
+        return emi;
+    }
+
     public boolean usesBlowingSand() {
         return blowingSand;
     }
@@ -361,6 +365,7 @@ public class Scenario {
     public void setBlowingSand(boolean blow) {
         this.blowingSand = blow;
     }
+
     public boolean getBlowingSand() {
         return blowingSand;
     }
