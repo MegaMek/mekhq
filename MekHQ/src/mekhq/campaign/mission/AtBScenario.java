@@ -322,8 +322,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private int rollLightCondition() {
         int[] odds;
+        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
 
-        switch (getMap()) {
+        switch (mapType) {
+            case "Fixed":
             case "City-dense":
             case "City-high":
             case "Cliffs-lake":
@@ -374,12 +376,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{50,20,10,10,10};
                 break;
             default:
-                if (isUsingFixedMap()) {
-                    // fixed
-                    odds = new int[]{600, 200, 100, 99, 1};
-                } else {
-                    return PlanetaryConditions.L_DAY;
-                }
+                return PlanetaryConditions.L_DAY;
         }
 
         int light = rollCondition(odds);
@@ -393,8 +390,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private int rollWindCondition() {
         int[] odds;
+        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
 
-        switch (getMap()) {
+        switch (mapType) {
+            case "Fixed":
             case "City-dense":
             case "City-high":
             case "Fortress-city":
@@ -445,12 +444,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{50,15,15,9,5,4,2};
                 break;
             default:
-                if (isUsingFixedMap()) {
-                    // fixed
-                    odds = new int[]{70,10,10,4,3,2,1};
-                } else {
-                    return PlanetaryConditions.WI_NONE;
-                }
+                return PlanetaryConditions.WI_NONE;
         }
 
         int wind = rollCondition(odds);
@@ -468,8 +462,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private int rollWeatherCondition() {
         int[] odds;
+        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
 
-        switch (getMap()) {
+        switch (mapType) {
+            case "Fixed":
             case "City-dense":
             case "City-high":
             case "Fortress-city":
@@ -526,12 +522,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{87,2,1,1,1,1,2,1,1,1,1,1};
                 break;
             default:
-                if (isUsingFixedMap()) {
-                    // fixed
-                    odds = new int[]{69,7,4,4,2,1,6,2,1,1,2,1};
-                } else {
-                    return PlanetaryConditions.WE_NONE;
-                }
+                return PlanetaryConditions.WE_NONE;
         }
 
         int weather = rollCondition(odds);
@@ -549,8 +540,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private int rollFogCondition() {
         int[] odds;
+        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
 
-        switch (getMap()) {
+        switch (mapType) {
+            case "Fixed":
             case "City-dense":
             case "City-high":
             case "Fortress-city":
@@ -594,12 +587,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{60,20,20};
                 break;
             default:
-                if (isUsingFixedMap()) {
-                    // fixed
-                    odds = new int[]{90,5,5};
-                } else {
-                    return PlanetaryConditions.FOG_NONE;
-                }
+                return PlanetaryConditions.FOG_NONE;
         }
 
         int fog = rollCondition(odds);
@@ -616,17 +604,17 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     private boolean rollBlowingSandCondition(int wind, int weather, int fog) {
-        int[] odds;
-        boolean moderateGaleRestricted = WeatherRestriction.IsWindRestricted(PlanetaryConditions.WI_MOD_GALE, getAtmosphere(), getTemperature());
-
         if (weather != PlanetaryConditions.WE_NONE
                 && fog != PlanetaryConditions.FOG_NONE
-                && wind < PlanetaryConditions.WI_MOD_GALE
-                && !moderateGaleRestricted) {
+                && wind < PlanetaryConditions.WI_MOD_GALE) {
             return false;
         }
 
-        switch (getMap()) {
+        int[] odds;
+        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
+
+        switch (mapType) {
+            case "Fixed":
             case "City-dense":
             case "City-high":
             case "Fortress-city":
@@ -656,12 +644,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{40,60};
                 break;
             default:
-                if (isUsingFixedMap()) {
-                    // fixed
-                    odds = new int[]{90,10};
-                } else {
-                    return false;
-                }
+                return false;
         }
 
         return rollCondition(odds) == 1;
@@ -669,8 +652,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private boolean rollEMICondition() {
         int[] odds;
+        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
 
-        switch (getMap()) {
+        switch (mapType) {
+            case "Fixed":
             case "City-dense":
             case "City-high":
             case "Fortress-city":
@@ -717,16 +702,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "Town-mining":
             case "Town-mountain":
             case "Town-ruin":
-                // heavy
+                // high
                 odds = new int[]{90,10};
                 break;
             default:
-                if (isUsingFixedMap()) {
-                    // fixed
-                    odds = new int[]{999,1};
-                } else {
-                    return false;
-                }
+                return false;
         }
 
         return rollCondition(odds) == 1;
