@@ -456,7 +456,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlMap.add(lblBlowingSand, leftGbc);
 
-        String blowingSandDesc = scenario.getBlowingSand() ? PlanetaryConditions.MSG_NAME_BLOWINGSAND_TRUE : PlanetaryConditions.MSG_NAME_BLOWINGSAND_FALSE;
+        String blowingSandDesc = PlanetaryConditions.getSandBlowingDisplayableValue(scenario.getBlowingSand());
         JLabel lblBlowingSandDesc = new JLabel(blowingSandDesc);
         rightGbc.gridy++;
         pnlMap.add(lblBlowingSandDesc, rightGbc);
@@ -465,7 +465,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlMap.add(lblEMI, leftGbc);
 
-        String emiDesc = scenario.getEMI() ? PlanetaryConditions.MSG_NAME_EMI_TRUE : PlanetaryConditions.MSG_NAME_EMI_FALSE;
+        String emiDesc = PlanetaryConditions.getEMIDisplayableValue(scenario.getEMI());
         JLabel lblEMIDesc = new JLabel(emiDesc);
         rightGbc.gridy++;
         pnlMap.add(lblEMIDesc, rightGbc);
