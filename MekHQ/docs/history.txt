@@ -16,7 +16,8 @@ MEKHQ VERSION HISTORY:
 + Issue #3781: Force commanders can be picked from among highest-ranking individuals
 + Fix #3843: Fix chassis lookup
 + Fix #3842: Can't load prefab campaigns  
- 
++ PR #3849: StratCon Heavy Battles, by PhoenixHeart.
+
 0.49.17 (2023-12-31 1900 UTC)
 + No code added
 
