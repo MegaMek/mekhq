@@ -35,9 +35,6 @@ import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
-import mekhq.campaign.stratcon.StratconBiome;
-import mekhq.campaign.stratcon.StratconBiomeManifest;
-import mekhq.campaign.stratcon.StratconContractInitializer;
 
 @AtBScenarioEnabled
 public class BaseAttackBuiltInScenario extends AtBScenario {

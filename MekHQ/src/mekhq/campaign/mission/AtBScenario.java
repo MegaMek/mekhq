@@ -1690,8 +1690,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean spawnBattleArmor = !opForOwnsPlanet &&
                 Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForLocalUnitChance() / 2;
 
-        boolean isTurretAppropriateTerrain = (getTerrainType().toUpperCase().contains("URBAN"));
-        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || (getTerrainType().toUpperCase().contains("WOOD"));
+        boolean isTurretAppropriateTerrain = (getTerrainType().toUpperCase().contains("URBAN")
+        || getTerrainType().toUpperCase().contains("FACILITY"));
+        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || (getTerrainType().toUpperCase().contains("FOREST"));
 
         ArrayList<Entity> scrubs = new ArrayList<>();
         // don't bother spawning turrets if there won't be anything to put them on

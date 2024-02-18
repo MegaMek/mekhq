@@ -230,8 +230,8 @@ public class StratconRulesManager {
             // TODO: facility spaces will always have a relevant biome
             if (!backingScenario.isUsingFixedMap()) {
                 backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
-                backingScenario.setWeather();
             }
+            backingScenario.setWeather();
         }
     }
 
