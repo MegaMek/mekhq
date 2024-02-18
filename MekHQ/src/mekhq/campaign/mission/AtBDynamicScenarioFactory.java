@@ -52,6 +52,9 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.stratcon.StratconBiome;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
@@ -465,7 +468,7 @@ public class AtBDynamicScenarioFactory {
             }
 
             setStartingAltitude(generatedLance, forceTemplate.getStartingAltitude());
-            correctNonAeroFlyerBehavior(generatedLance, scenario.getTerrainType());
+            correctNonAeroFlyerBehavior(generatedLance, scenario.getBoardType());
 
             // if force contributes to map size, increment the generated "lance" count
             if (forceTemplate.getContributesToMapSize()) {
@@ -726,26 +729,40 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario to work on.
      */
     public static void setTerrain(AtBDynamicScenario scenario) {
-        int terrainIndex;
-
         // if we are allowing all terrain types, then pick one from the list
         // otherwise, pick one from the allowed ones
         if (scenario.getTemplate().mapParameters.getMapLocation() == ScenarioMapParameters.MapLocation.AllGroundTerrain) {
-            terrainIndex = Compute.randomInt(AtBScenario.terrainTypes.length);
-            scenario.setTerrainType(terrainIndex);
+            scenario.setBoardType(AtBScenario.T_GROUND);
+            StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
+            int kelvinTemp = scenario.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+            List<String> allowedTerrain = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_BIOME)
+                    .floorEntry(kelvinTemp).getValue().allowedTerrainTypes;
+
+            int terrainIndex = Compute.randomInt(allowedTerrain.size());
+            scenario.setTerrainType(allowedTerrain.get(terrainIndex));
             scenario.setMapFile();
         } else if (scenario.getTemplate().mapParameters.getMapLocation() == ScenarioMapParameters.MapLocation.Space) {
-            scenario.setTerrainType(AtBScenario.TER_SPACE);
+            scenario.setBoardType(AtBScenario.T_SPACE);
+            scenario.setTerrainType("Space");
         } else if (scenario.getTemplate().mapParameters.getMapLocation() == ScenarioMapParameters.MapLocation.LowAtmosphere) {
+            scenario.setBoardType(AtBScenario.T_ATMOSPHERE);
             // low atmosphere actually makes use of the terrain, so we generate some here as well
-            terrainIndex = Compute.randomInt(AtBScenario.terrainTypes.length);
-            scenario.setTerrainType(terrainIndex);
+            scenario.setTerrain();
             scenario.setMapFile();
-
-            // but then we set the terrain to low atmosphere
-            scenario.setTerrainType(AtBScenario.TER_LOW_ATMO);
         } else {
-            terrainIndex = Compute.randomInt(scenario.getTemplate().mapParameters.allowedTerrainTypes.size());
+            StratconBiomeManifest biomeManifest =  StratconBiomeManifest.getInstance();
+            int kelvinTemp = scenario.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+            List<String> allowedFacility = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
+                    .floorEntry(kelvinTemp).getValue().allowedTerrainTypes;
+            List<String> allowedTerrain = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_BIOME)
+                    .floorEntry(kelvinTemp).getValue().allowedTerrainTypes;
+            List<String> allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
+            // try to filter on temp
+            allowedTerrain.addAll(allowedFacility);
+            allowedTemplate.retainAll(allowedTerrain);
+            allowedTemplate = allowedTemplate.size() > 0 ? allowedTemplate : scenario.getTemplate().mapParameters.allowedTerrainTypes;
+
+            int terrainIndex = Compute.randomInt(allowedTemplate.size());
             scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
             scenario.setMapFile();
         }
@@ -760,7 +777,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The current campaign
      */
     private static void setPlanetaryConditions(AtBDynamicScenario scenario, AtBContract mission, Campaign campaign) {
-        if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+        if (scenario.getBoardType() == AtBScenario.T_SPACE) {
             return;
         }
 
@@ -2359,10 +2376,10 @@ public class AtBDynamicScenarioFactory {
      * This method contains various hacks intended to put "special units"
      * such as LAMs, VTOLs and WIGEs into a reasonable state that the bot can use
      */
-    private static void correctNonAeroFlyerBehavior(List<Entity> entityList, int terrainType) {
+    private static void correctNonAeroFlyerBehavior(List<Entity> entityList, int boardType) {
         for (Entity entity : entityList) {
-            boolean inSpace = terrainType == AtBScenario.TER_SPACE;
-            boolean inAtmo = terrainType == AtBScenario.TER_LOW_ATMO;
+            boolean inSpace = boardType == AtBScenario.T_SPACE;
+            boolean inAtmo = boardType == AtBScenario.T_ATMOSPHERE;
 
             // hack for land-air mechs
             if (entity instanceof LandAirMech) {

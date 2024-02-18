@@ -55,29 +55,12 @@ public class Scenario {
     //region Variable Declarations
     public static final int S_DEFAULT_ID = -1;
 
-    /** terrain types **/
-    public static final int TER_LOW_ATMO = -2;
-    public static final int TER_SPACE = -1;
-    public static final int TER_HILLS = 0;
-    public static final int TER_BADLANDS = 1;
-    public static final int TER_WETLANDS = 2;
-    public static final int TER_LIGHTURBAN = 3;
-    public static final int TER_FLATLANDS = 4;
-    public static final int TER_WOODED = 5;
-    public static final int TER_HEAVYURBAN = 6;
-    public static final int TER_COASTAL = 7;
-    public static final int TER_MOUNTAINS = 8;
-    public static final String[] terrainTypes = {"Hills", "Badlands", "Wetlands",
-            "Light Urban", "Flatlands", "Wooded", "Heavy Urban", "Coastal",
-            "Mountains"
-    };
-
-
-    public static final int[] terrainChart = {
-            TER_HILLS, TER_BADLANDS, TER_WETLANDS, TER_LIGHTURBAN,
-            TER_HILLS, TER_FLATLANDS, TER_WOODED, TER_HEAVYURBAN,
-            TER_COASTAL, TER_WOODED, TER_MOUNTAINS
-    };
+    // MapBoardType
+    public static final int T_GROUND = 0;
+    public static final int T_ATMOSPHERE = 1;
+    public static final int T_SPACE = 2;
+    private static final String[] typeNames = { "Ground", "Low Atmosphere", "Space" };
+    private int boardType = T_GROUND;
 
     private String name;
     private String desc;
@@ -107,7 +90,7 @@ public class Scenario {
     private Map<String, Entity> externalIDLookup;
 
     /** map generation variables **/
-    private int terrainType;
+    private String terrainType;
     private int mapSizeX;
     private int mapSizeY;
     private String map;
@@ -130,6 +113,8 @@ public class Scenario {
 
     /** player starting position **/
     private int start;
+
+    private boolean hasTrack;
 
     //Stores combinations of units and the transports they are assigned to
     private Map<UUID, List<UUID>> playerTransportLinkages;
@@ -167,7 +152,7 @@ public class Scenario {
         shiftWindStrength = false;
         maxWindStrength = PlanetaryConditions.WI_TORNADO_F4;
         minWindStrength = PlanetaryConditions.WI_NONE;
-
+        hasTrack = false;
     }
 
     public String getName() {
@@ -233,7 +218,7 @@ public class Scenario {
         this.cloaked = cloaked;
     }
 
-    public int getTerrainType() {
+    public String getTerrainType() {
         return terrainType;
     }
 
@@ -245,8 +230,16 @@ public class Scenario {
         this.start = start;
     }
 
-    public void setTerrainType(int terrainType) {
+    public void setTerrainType(String terrainType) {
         this.terrainType = terrainType;
+    }
+
+    public void setBoardType(int terrainType) {
+        this.boardType = boardType;
+    }
+
+    public int getBoardType() {
+        return boardType;
     }
 
     public int getMapSizeX() {
@@ -812,6 +805,7 @@ public class Scenario {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasTrack", hasTrack);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mapSize", mapSizeX, mapSizeY);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "map", map);
@@ -946,8 +940,12 @@ public class Scenario {
                     retVal.deploymentLimit =  ScenarioDeploymentLimit.generateInstanceFromXML(wn2, c, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
                     retVal.setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("boardType")) {
+                    retVal.boardType = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
-                    retVal.terrainType = Integer.parseInt(wn2.getTextContent());
+                    retVal.terrainType = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("hasTrack")) {
+                    retVal.hasTrack = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
                     String[] xy = wn2.getTextContent().split(",");
                     retVal.mapSizeX = Integer.parseInt(xy[0]);
@@ -1019,5 +1017,13 @@ public class Scenario {
     public boolean isFriendlyUnit(Entity entity, Campaign campaign) {
         return getForces(campaign).getUnits().stream().
                 anyMatch(unitID -> unitID.equals(UUID.fromString(entity.getExternalIdAsString())));
+    }
+
+    public boolean getHasTrack() {
+        return hasTrack;
+    }
+
+    public void setHasTrack(boolean b) {
+        hasTrack = b;
     }
 }

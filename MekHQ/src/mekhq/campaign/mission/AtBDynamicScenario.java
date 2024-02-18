@@ -19,9 +19,11 @@
 package mekhq.campaign.mission;
 
 import megamek.Version;
+import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Lance;
@@ -38,6 +40,7 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Data structure intended to hold data relevant to AtB Dynamic Scenarios (AtB 3.0)
@@ -562,11 +565,6 @@ public class AtBDynamicScenario extends AtBScenario {
         }
 
         super.loadFieldsFromXmlNode(wn, version, campaign);
-    }
-
-    @Override
-    public void setTerrain() {
-        AtBDynamicScenarioFactory.setTerrain(this);
     }
 
     @Override

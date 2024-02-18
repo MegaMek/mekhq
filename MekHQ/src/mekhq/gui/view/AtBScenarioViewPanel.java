@@ -321,9 +321,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             panStats.add(lblForceDesc, gridBagConstraints);
         }
 
-        if (scenario.getTerrainType() == Scenario.TER_SPACE) {
+        if (scenario.getBoardType() == Scenario.T_SPACE) {
             y = fillSpaceStats(gridBagConstraints, resourceMap, y);
-        } else if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+        } else if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
             y = fillLowAtmoStats(gridBagConstraints, resourceMap, y);
         } else {
             y = fillPlanetSideStats(gridBagConstraints, resourceMap, y);
@@ -482,7 +482,19 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 chkReroll[REROLL_TERRAIN].addItemListener(checkBoxListener);
             }
 
-            lblTerrainDesc.setText(AtBScenario.terrainTypes[scenario.getTerrainType()]);
+            lblTerrainDesc.setText(scenario.getTerrainType());
+            gridBagConstraints.gridx = 2;
+            gridBagConstraints.gridy = y++;
+            panStats.add(lblTerrainDesc, gridBagConstraints);
+        } else {
+            lblTerrain.setText(resourceMap.getString("lblTerrain.text"));
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.gridwidth = 1;
+            panStats.add(lblTerrain, gridBagConstraints);
+
+            String hasTrack = scenario.getHasTrack() ? " \u2606" : "";
+            lblTerrainDesc.setText(scenario.getTerrainType() + hasTrack);
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = y++;
             panStats.add(lblTerrainDesc, gridBagConstraints);
@@ -786,7 +798,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             scenario.setMapFile();
             scenario.useReroll();
             chkReroll[REROLL_TERRAIN].setSelected(false);
-            lblTerrainDesc.setText(AtBScenario.terrainTypes[scenario.getTerrainType()]);
+            lblTerrainDesc.setText(scenario.getTerrainType());
             lblMapDesc.setText(scenario.getMap());
         }
         if (chkReroll[REROLL_MAP] != null && chkReroll[REROLL_MAP].isSelected()) {

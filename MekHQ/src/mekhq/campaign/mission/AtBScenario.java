@@ -42,6 +42,7 @@ import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.utilities.MHQXMLUtility;
@@ -54,6 +55,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -298,7 +300,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setTerrain() {
-        setTerrainType(terrainChart[Compute.d6(2) - 2]);
+        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
+        setTerrainType(keys.get(Compute.randomInt(keys.size())));
     }
 
     private int rollCondition(int[] odds) {
@@ -322,9 +326,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private int rollLightCondition() {
         int[] odds;
-        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
+        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
-        switch (mapType) {
+        switch (terrainType) {
             case "Fixed":
             case "City-dense":
             case "City-high":
@@ -390,56 +394,45 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private int rollWindCondition() {
         int[] odds;
-        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
+        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
-        switch (mapType) {
-            case "Fixed":
-            case "City-dense":
-            case "City-high":
-            case "Fortress-city":
+        switch (terrainType) {
+            case "ColdFacility":
+            case "ColdForest":
+            case "ColdHills":
+            case "ColdMountain":
+            case "ColdUrban":
+            case "Forest":
+            case "FrozenFacility":
             case "Hills":
-            case "Lake-marsh":
-            case "Mountain-medium":
-            case "Muddy-swamp":
-            case "River-wetlands":
-            case "Sandy-hills":
-            case "Sandy-valley":
-            case "Some-trees":
+            case "HotFacility":
+            case "HotForest":
+            case "HotHillsDry":
+            case "HotHillsWet":
+            case "HotMountainsDry":
+            case "HotMountainsWet":
+            case "HotUrban":
+            case "Jungle":
+            case "Mountain":
+            case "Steppe":
             case "Swamp":
-            case "Town-concrete":
-            case "Town-farming":
-            case "Town-generic":
-            case "Town-hills":
-            case "Town-mining":
-            case "Town-mountain":
-            case "Town-ruin":
-            case "Town-wooded":
-            case "Wooded-hills":
-            case "Wooded-lake":
-            case "Wooded-swamp":
-            case "Wooded-valley":
-            case "Woods-deep":
-            case "Woods-medium":
-            case "Woods-river":
+            case "TemperateFacility":
+            case "Urban":
                 // standard
                 odds = new int[]{70,10,10,4,3,2,1};
                 break;
-            case "Cliffs":
-            case "Cliffs-lake":
-            case "Dust-bowl":
-            case "Heavy-craters":
-            case "Hills-craters":
-            case "Lake-high":
-            case "Light-craters":
-            case "Mountain-high":
-            case "Mountain-lake":
-            case "River-huge":
-            case "Rocky-valley":
-            case "Rubble-mountain":
-            case "Rubble-river":
-            case "Sandy-river":
+            case "ArcticDesert":
+            case "Badlands":
+            case "ColdSea":
+            case "Desert":
+            case "FrozenSea":
+            case "Glacier":
+            case "HotSea":
+            case "Plains":
             case "Savannah":
-            case "Seaport":
+            case "Sea":
+            case "SnowField":
+            case "Tundra":
                 // high
                 odds = new int[]{50,15,15,9,5,4,2};
                 break;
@@ -462,62 +455,50 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private int rollWeatherCondition() {
         int[] odds;
-        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
+        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
-        switch (mapType) {
-            case "Fixed":
-            case "City-dense":
-            case "City-high":
-            case "Fortress-city":
+        switch (terrainType) {
+            case "Forest":
             case "Hills":
-            case "Sandy-hills":
-            case "Sandy-valley":
+            case "HotFacility":
+            case "HotForest":
+            case "HotUrban":
+            case "Mountain":
+            case "Plains":
             case "Savannah":
-            case "Some-trees":
-            case "Town-concrete":
-            case "Town-farming":
-            case "Town-generic":
-            case "Town-hills":
-            case "Town-ruin":
-            case "Town-wooded":
-            case "Wooded-hills":
-            case "Wooded-valley":
-            case "Woods-deep":
-            case "Woods-medium":
+            case "Steppe":
+            case "TemperateFacility":
+            case "Urban":
                 // standard
                 odds = new int[]{69,7,4,4,2,1,6,2,1,1,2,1};
                 break;
-            case "Cliffs-lake":
-            case "Lake-high":
-            case "Lake-marsh":
-            case "Muddy-swamp":
-            case "River-huge":
-            case "River-wetlands":
-            case "Rubble-river":
-            case "Sandy-river":
-            case "Seaport":
+            case "HotHillsWet":
+            case "HotMountainsWet":
+            case "HotSea":
+            case "Jungle":
+            case "Sea":
             case "Swamp":
-            case "Wooded-lake":
-            case "Wooded-swamp":
-            case "Woods-river":
                 // wet
                 odds = new int[]{47,12,10,8,6,4,6,2,1,1,2,1};
                 break;
-            case "Mountain-high":
-            case "Mountain-lake":
-            case "Mountain-medium":
-            case "Town-mining":
-            case "Town-mountain":
+            case "ColdFacility":
+            case "ColdForest":
+            case "ColdHills":
+            case "ColdMountain":
+            case "ColdSea":
+            case "ColdUrban":
+            case "FrozenFacility":
+            case "FrozenSea":
+            case "SnowField":
+            case "Tundra":
                 // snowy
                 odds = new int[]{41,6,3,3,1,1,12,10,8,6,6,3};
                 break;
-            case "Cliffs":
-            case "Dust-bowl":
-            case "Heavy-craters":
-            case "Hills-craters":
-            case "Light-craters":
-            case "Rocky-valley":
-            case "Rubble-mountain":
+            case "ArcticDesert":
+            case "Badlands":
+            case "Desert":
+            case "HotHillsDry":
+            case "HotMountainsDry":
                 // dry
                 odds = new int[]{87,2,1,1,1,1,2,1,1,1,1,1};
                 break;
@@ -540,49 +521,40 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private int rollFogCondition() {
         int[] odds;
-        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
+        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
-        switch (mapType) {
-            case "Fixed":
-            case "City-dense":
-            case "City-high":
-            case "Fortress-city":
+        switch (terrainType) {
+            case "Forest":
+            case "Glacier":
             case "Hills":
-            case "Mountain-high":
-            case "Mountain-medium":
-            case "Sandy-hills":
-            case "Sandy-valley":
+            case "HotFacility":
+            case "HotForest":
+            case "HotUrban":
+            case "Mountain":
+            case "Plains":
             case "Savannah":
-            case "Some-trees":
-            case "Town-concrete":
-            case "Town-farming":
-            case "Town-generic":
-            case "Town-hills":
-            case "Town-mining":
-            case "Town-mountain":
-            case "Town-ruin":
-            case "Town-wooded":
-            case "Wooded-hills":
-            case "Wooded-valley":
-            case "Woods-deep":
-            case "Woods-medium":
+            case "Steppe":
+            case "TemperateFacility":
+            case "Urban":
                 // standard
                 odds = new int[]{90,5,5};
                 break;
-            case "Cliffs-lake":
-            case "Lake-high":
-            case "Lake-marsh":
-            case "Mountain-lake":
-            case "Muddy-swamp":
-            case "River-huge":
-            case "River-wetlands":
-            case "Rubble-river":
-            case "Sandy-river":
-            case "Seaport":
+            case "ColdFacility":
+            case "ColdForest":
+            case "ColdHills":
+            case "ColdMountain":
+            case "ColdSea":
+            case "ColdUrban":
+            case "FrozenFacility":
+            case "FrozenSea":
+            case "HotHillsWet":
+            case "HotMountainsWet":
+            case "HotSea":
+            case "Jungle":
+            case "Sea":
+            case "SnowField":
             case "Swamp":
-            case "Wooded-lake":
-            case "Wooded-swamp":
-            case "Woods-river":
+            case "Tundra":
                 // heavy
                 odds = new int[]{60,20,20};
                 break;
@@ -605,41 +577,42 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private boolean rollBlowingSandCondition(int wind, int weather, int fog) {
         if (weather != PlanetaryConditions.WE_NONE
-                && fog != PlanetaryConditions.FOG_NONE
-                && wind < PlanetaryConditions.WI_MOD_GALE) {
+                || fog != PlanetaryConditions.FOG_NONE
+                || wind < PlanetaryConditions.WI_MOD_GALE) {
             return false;
         }
 
         int[] odds;
-        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
+        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
-        switch (mapType) {
-            case "Fixed":
-            case "City-dense":
-            case "City-high":
-            case "Fortress-city":
+        switch (terrainType) {
+            case "ColdFacility":
+            case "ColdForest":
+            case "ColdHills":
+            case "ColdMountain":
+            case "ColdUrban":
+            case "Forest":
+            case "FrozenFacility":
             case "Hills":
-            case "Sandy-hills":
-            case "Sandy-river":
-            case "Sandy-valley":
-            case "Savannah":
-            case "Town-concrete":
-            case "Town-farming":
-            case "Town-generic":
-            case "Town-hills":
-            case "Town-mining":
-            case "Town-mountain":
-            case "Town-ruin":
+            case "HotFacility":
+            case "HotForest":
+            case "HotHillsWet":
+            case "HotMountainsWet":
+            case "HotUrban":
+            case "Jungle":
+            case "Mountain":
+            case "Steppe":
+            case "Swamp":
+            case "TemperateFacility":
+            case "Urban":
                 // standard
                 odds = new int[]{90,10};
                 break;
-            case "Cliffs":
-            case "Dust-bowl":
-            case "Heavy-craters":
-            case "Hills-craters":
-            case "Light-craters":
-            case "Rocky-valley":
-            case "Rubble-mountain":
+            case "ArcticDesert":
+            case "Badlands":
+            case "Desert":
+            case "HotHillsDry":
+            case "HotMountainsDry":
                 // heavy
                 odds = new int[]{40,60};
                 break;
@@ -652,56 +625,28 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private boolean rollEMICondition() {
         int[] odds;
-        String mapType = isUsingFixedMap() ? "Fixed" : getMap();
+        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
-        switch (mapType) {
-            case "Fixed":
-            case "City-dense":
-            case "City-high":
-            case "Fortress-city":
+        switch (terrainType) {
+            case "Forest":
             case "Hills":
-            case "Lake-high":
-            case "Lake-marsh":
-            case "Muddy-swamp":
-            case "River-huge":
-            case "River-wetlands":
-            case "Sandy-hills":
-            case "Sandy-river":
-            case "Sandy-valley":
+            case "HotFacility":
+            case "HotForest":
+            case "HotUrban":
+            case "Mountain":
+            case "Plains":
             case "Savannah":
-            case "Seaport":
-            case "Some-trees":
-            case "Swamp":
-            case "Town-concrete":
-            case "Town-farming":
-            case "Town-generic":
-            case "Town-hills":
-            case "Town-wooded":
-            case "Wooded-hills":
-            case "Wooded-lake":
-            case "Wooded-swamp":
-            case "Wooded-valley":
-            case "Woods-deep":
-            case "Woods-medium":
-            case "Woods-river":
+            case "Steppe":
+            case "TemperateFacility":
+            case "Urban":
                 // standard
                 odds = new int[]{999,1};
                 break;
-            case "Cliffs":
-            case "Cliffs-lake":
-            case "Dust-bowl":
-            case "Heavy-craters":
-            case "Hills-craters":
-            case "Light-craters":
-            case "Mountain-high":
-            case "Mountain-lake":
-            case "Mountain-medium":
-            case "Rocky-valley":
-            case "Rubble-mountain":
-            case "Rubble-river":
-            case "Town-mining":
-            case "Town-mountain":
-            case "Town-ruin":
+            case "ArcticDesert":
+            case "Badlands":
+            case "Desert":
+            case "HotHillsDry":
+            case "HotMountainsDry":
                 // high
                 odds = new int[]{90,10};
                 break;
@@ -718,8 +663,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public void setWeather() {
         // weather is irrelevant in these situations.
-        if (getTerrainType() == AtBScenario.TER_SPACE ||
-                getTerrainType() == AtBScenario.TER_LOW_ATMO) {
+        if (getBoardType() == AtBScenario.T_SPACE ||
+                getBoardType() == AtBScenario.T_ATMOSPHERE) {
             return;
         }
 
@@ -794,36 +739,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return (5 * getLanceCount()) + getMapSizeY();
     }
 
-    public void setMapFile() {
-        final String[][] maps = {
-            {"Sandy-hills", "Hills-craters", "Hills",
-                "Wooded-hills", "Cliffs", "Town-hills"}, //hills
-            {"Sandy-valley", "Rocky-valley", "Light-craters",
-                "Heavy-craters", "Rubble-mountain", "Cliffs"}, //badlands
-            {"Muddy-swamp", "Lake-marsh", "Lake-high",
-                "Wooded-lake", "Swamp", "Wooded-swamp"}, //wetlands
-            {"Town-mining", "Town-wooded", "Town-generic",
-                "Town-farming", "Town-ruin", "Town-mountain"}, //light urban
-            {"Savannah", "Dust-bowl", "Sandy-hills",
-                "Town-ruin", "Town-generic", "Some-trees"}, //flatlands
-            {"Some-trees", "Wooded-lake", "Woods-medium",
-                "Wooded-hills", "Woods-deep", "Wooded-valley"}, //wooded
-            {"Fortress-city", "Fortress-city", "Town-concrete",
-                "Town-concrete", "City-high", "City-dense"}, //heavy urban
-            {"River-huge", "Woods-river", "Sandy-river",
-                "Rubble-river", "Seaport", "River-wetlands"}, //coastal
-            {"Mountain-lake", "Cliffs-lake", "Rubble-mountain",
-                "Cliffs", "Mountain-medium", "Mountain-high"} //mountains
-        };
-
-        int actualTerrainType = getTerrainType();
-
-        // we want to make sure the terrain type we pick is in bounds,
-        if ((getTerrainType() < 0) || (getTerrainType() >= maps.length)) {
-            actualTerrainType = Compute.randomInt(maps.length);
+    public void setMapFile(String terrainType) {
+        Map<String, StratconBiomeManifest.MapTypeList> biomeMapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        StratconBiomeManifest.MapTypeList value = biomeMapTypes.get(terrainType);
+        if (value != null) {
+            List<String> mapTypeList = value.mapTypes;
+            setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+        } else {
+            setMap("Savannah");
         }
+    }
 
-        setMap(maps[actualTerrainType][Compute.d6() - 1]);
+    public void setMapFile() {
+        setMapFile(getTerrainType());
     }
 
     public boolean canRerollTerrain() {
@@ -1726,8 +1654,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 en.setDeployRound(deployRound);
             });
 
-            boolean isAeroMap = getTerrainType() == TER_LOW_ATMO ||
-                    getTerrainType() == TER_SPACE;
+            boolean isAeroMap = getBoardType() == T_SPACE || getBoardType() == T_ATMOSPHERE;
 
             AtBDynamicScenarioFactory.populateAeroBombs(aircraft, campaign, !isAeroMap);
 
@@ -1763,8 +1690,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean spawnBattleArmor = !opForOwnsPlanet &&
                 Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForLocalUnitChance() / 2;
 
-        boolean isTurretAppropriateTerrain = (getTerrainType() == TER_HEAVYURBAN) || (getTerrainType() == TER_LIGHTURBAN);
-        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || (getTerrainType() == TER_WOODED);
+        boolean isTurretAppropriateTerrain = (getTerrainType().toUpperCase().contains("URBAN"));
+        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || (getTerrainType().toUpperCase().contains("WOOD"));
 
         ArrayList<Entity> scrubs = new ArrayList<>();
         // don't bother spawning turrets if there won't be anything to put them on

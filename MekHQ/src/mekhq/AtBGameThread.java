@@ -121,13 +121,15 @@ public class AtBGameThread extends GameThread {
                 mapSettings.getBoardsSelectedVector().clear();
 
                 // if the scenario is taking place in space, do space settings instead
-                if (scenario.getTerrainType() == Scenario.TER_SPACE) {
+                if (scenario.getBoardType() == Scenario.T_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
-                    mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", "")); // TODO : remove inline file type
+                    String board = scenario.getMap().replace(".board", ""); // TODO : remove inline file type
+                    board = board.replace("\\", "/");
+                    mapSettings.getBoardsSelectedVector().add(board);
 
-                    if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+                    if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
                 } else {
@@ -138,7 +140,7 @@ public class AtBGameThread extends GameThread {
                         LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);  // TODO : Remove inline file path
                     }
 
-                    if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+                    if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
 

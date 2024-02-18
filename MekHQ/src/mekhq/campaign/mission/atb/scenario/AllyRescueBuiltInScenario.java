@@ -18,16 +18,17 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import megamek.common.Board;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+import mekhq.campaign.stratcon.StratconBiome;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratcon.StratconContractInitializer;
+import mekhq.campaign.stratcon.StratconFacility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
     @Override
     public void setMapFile() {
         setMap("Ally-rescue");
-        setTerrainType(TER_LIGHTURBAN);
+        setTerrainType("Urban");
     }
 
     @Override

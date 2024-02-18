@@ -26,6 +26,9 @@ import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconBiome;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 
@@ -69,7 +72,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
     @Override
     public void setMapFile() {
         setMap("Brian-cache");
-        setTerrainType(TER_LIGHTURBAN);
+        setTerrainType("Urban");
     }
 
     @Override

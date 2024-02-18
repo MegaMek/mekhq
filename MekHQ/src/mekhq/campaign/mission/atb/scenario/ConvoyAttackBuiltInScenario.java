@@ -68,7 +68,7 @@ public class ConvoyAttackBuiltInScenario extends AtBScenario {
     @Override
     public void setMapFile() {
         setMap("Convoy");
-        setTerrainType(TER_WOODED);
+        setTerrainType("Forest");
     }
 
     @Override

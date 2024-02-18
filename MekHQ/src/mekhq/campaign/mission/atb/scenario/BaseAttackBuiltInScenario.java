@@ -35,6 +35,9 @@ import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+import mekhq.campaign.stratcon.StratconBiome;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratcon.StratconContractInitializer;
 
 @AtBScenarioEnabled
 public class BaseAttackBuiltInScenario extends AtBScenario {
@@ -59,7 +62,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
     @Override
     public void setTerrain() {
-        setTerrainType((Compute.d6() < 4) ? TER_LIGHTURBAN : TER_HEAVYURBAN);
+        setTerrainType("Urban");
     }
 
     @Override

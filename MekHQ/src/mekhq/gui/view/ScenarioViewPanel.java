@@ -387,9 +387,9 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlMap.add(lblTerrain, leftGbc);
 
         JLabel lblTerrainDesc = new JLabel();
-        if (scenario.getTerrainType() == Scenario.TER_SPACE) {
+        if (scenario.getBoardType() == Scenario.T_SPACE) {
             lblTerrainDesc.setText("Space");
-        } else if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+        } else if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
             lblTerrainDesc.setText("Low Atmosphere");
         } else {
             lblTerrainDesc.setText("Ground");
@@ -397,7 +397,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         rightGbc.gridy++;
         pnlMap.add(lblTerrainDesc, rightGbc);
 
-        if (scenario.getTerrainType() != Scenario.TER_SPACE) {
+        if (scenario.getBoardType() != Scenario.T_SPACE) {
             JLabel lblMap = new JLabel(resourceMap.getString("lblMap.text"));
             leftGbc.gridy++;
             pnlMap.add(lblMap, leftGbc);
@@ -415,7 +415,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         rightGbc.gridy++;
         pnlMap.add(lblMapSizeDesc, rightGbc);
 
-        if (scenario.getTerrainType() == Scenario.TER_SPACE) {
+        if (scenario.getBoardType() == Scenario.T_SPACE) {
             // if a space scenario return here as the rest is all planet based information
             return;
         }
