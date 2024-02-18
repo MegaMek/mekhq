@@ -141,7 +141,9 @@ class GameThread extends Thread implements CloseClientListener {
                         mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                         mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                     } else if (scenario.isUsingFixedMap()) {
-                        mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
+                        String board = scenario.getMap().replace(".board", ""); // TODO : remove inline file type
+                        board = board.replace("\\", "/");
+                        mapSettings.getBoardsSelectedVector().add(board);
 
                         if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
                             mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
