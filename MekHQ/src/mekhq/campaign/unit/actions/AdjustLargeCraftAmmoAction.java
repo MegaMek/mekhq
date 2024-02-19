@@ -24,6 +24,7 @@ import java.util.Map;
 
 import megamek.common.AmmoType;
 import megamek.common.Mounted;
+import megamek.common.equipment.AmmoMounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
@@ -52,7 +53,7 @@ public class AdjustLargeCraftAmmoAction implements IUnitAction {
             }
         }
 
-        for (Mounted m : unit.getEntity().getAmmo()) {
+        for (AmmoMounted m : unit.getEntity().getAmmo()) {
             int eqNum = unit.getEntity().getEquipmentNum(m);
             LargeCraftAmmoBin part = ammoParts.get(eqNum);
             if (null == part) {

@@ -21,6 +21,7 @@ package mekhq.campaign.parts.equipment;
 import megamek.common.AmmoType;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.WeaponMounted;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
@@ -37,7 +38,7 @@ import java.util.Objects;
 public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     private int bayEqNum;
 
-    private transient Mounted bay;
+    private transient WeaponMounted bay;
 
     public MissingLargeCraftAmmoBin() {
         this(0, null, -1, 1.0, null);
@@ -53,7 +54,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
      * @return The <code>Mounted</code> of the unit's <code>Entity</code> that contains this ammo bin,
      *         or null if there is no unit or the ammo bin is not in any bay.
      */
-    public @Nullable Mounted getBay() {
+    public @Nullable WeaponMounted getBay() {
         if (getUnit() == null) {
             return null;
         } else if (bay != null) {
@@ -61,15 +62,16 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
         }
 
         if (bayEqNum >= 0) {
-            Mounted m = getUnit().getEntity().getEquipment(bayEqNum);
-            if ((m != null) && m.getBayAmmo().contains(equipmentNum)) {
+            WeaponMounted m = (WeaponMounted) getUnit().getEntity().getEquipment(bayEqNum);
+
+            if (getUnit().getEntity().whichBay(equipmentNum) == m) {
                 bay = m;
                 return bay;
             }
         }
 
-        for (Mounted m : getUnit().getEntity().getWeaponBayList()) {
-            if (m.getBayAmmo().contains(equipmentNum)) {
+        for (WeaponMounted m : getUnit().getEntity().getWeaponBayList()) {
+            if (getUnit().getEntity().whichBay(equipmentNum) == m) {
                 return m;
             }
         }
@@ -82,7 +84,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
      * Sets the bay for this ammo bin. Does not check whether the ammo bin is actually in the bay.
      * @param bay
      */
-    public void setBay(Mounted bay) {
+    public void setBay(WeaponMounted bay) {
         if (null != unit) {
             bayEqNum = unit.getEntity().getEquipmentNum(bay);
             this.bay = bay;
@@ -96,7 +98,7 @@ public class MissingLargeCraftAmmoBin extends MissingAmmoBin {
     public void setBay(int bayEqNum) {
         this.bayEqNum = bayEqNum;
         if (null != unit) {
-            bay = unit.getEntity().getEquipment(bayEqNum);
+            bay = (WeaponMounted) unit.getEntity().getEquipment(bayEqNum);
         }
     }
 

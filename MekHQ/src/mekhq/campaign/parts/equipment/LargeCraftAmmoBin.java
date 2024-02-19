@@ -23,6 +23,7 @@ import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.WeaponMounted;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -82,15 +83,15 @@ public class LargeCraftAmmoBin extends AmmoBin {
         }
 
         if (bayEqNum >= 0) {
-            Mounted m = getUnit().getEntity().getEquipment(bayEqNum);
-            if ((m != null) && m.getBayAmmo().contains(equipmentNum)) {
+            WeaponMounted m = (WeaponMounted) getUnit().getEntity().getEquipment(bayEqNum);
+            if (getUnit().getEntity().whichBay(equipmentNum) == m) {
                 bay = m;
                 return bay;
             }
         }
 
-        for (Mounted m : getUnit().getEntity().getWeaponBayList()) {
-            if (m.getBayAmmo().contains(equipmentNum)) {
+        for (WeaponMounted m : getUnit().getEntity().getWeaponBayList()) {
+            if (getUnit().getEntity().whichBay(equipmentNum) == m) {
                 return m;
             }
         }
