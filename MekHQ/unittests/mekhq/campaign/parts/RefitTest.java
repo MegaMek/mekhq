@@ -33,6 +33,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,6 +77,11 @@ public class RefitTest {
 
     @Mock
     private Warehouse mockWarehouse;
+
+    @BeforeAll
+    static void before() {
+        EquipmentType.initializeTypes();
+    }
 
     @BeforeEach
     public void beforeEach() {
