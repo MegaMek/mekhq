@@ -472,7 +472,7 @@
             <skill>Tech/BA</skill>
             <skill>Tech/Vessel</skill>
         </skillPrereq>
-        <miscPrereq>clanner:false</miscPrereq>
+        <miscPrereq>clanperson:false</miscPrereq>
     </ability>
     <ability>
         <lookupName>tech_weapon_specialist</lookupName>

@@ -62,7 +62,7 @@ import java.util.Map.Entry;
  */
 public class SpecialAbility {
     // Keys for miscellaneous prerequisites (i.e. not skill or ability)
-    private static final String PREREQ_MISC_CLANNER = "clanner";
+    private static final String PREREQ_MISC_CLANPILOT = "clanperson";
 
     private static Map<String, SpecialAbility> specialAbilities = new HashMap<>();
     private static Map<String, SpecialAbility> defaultSpecialAbilities = new HashMap<>();
@@ -151,11 +151,11 @@ public class SpecialAbility {
             }
         }
 
-        return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
-                || (p.isClanPersonnel() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
+        return !prereqMisc.containsKey(PREREQ_MISC_CLANPILOT)
+                || (p.isClanPersonnel() == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANPILOT)));
     }
 
-    public boolean isEligible(boolean isClanner, Skills skills, PersonnelOptions options) {
+    public boolean isEligible(boolean isClanPilot, Skills skills, PersonnelOptions options) {
         for (SkillPrereq sp : prereqSkills) {
             if (!sp.qualifies(skills)) {
                 return false;
@@ -176,8 +176,8 @@ public class SpecialAbility {
             }
         }
 
-        return !prereqMisc.containsKey(PREREQ_MISC_CLANNER)
-                || (isClanner == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANNER)));
+        return !prereqMisc.containsKey(PREREQ_MISC_CLANPILOT)
+                || (isClanPilot == Boolean.parseBoolean(prereqMisc.get(PREREQ_MISC_CLANPILOT)));
     }
 
     public boolean isEligible(int unitType) {

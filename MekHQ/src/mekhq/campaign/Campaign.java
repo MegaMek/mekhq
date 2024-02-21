@@ -1423,7 +1423,7 @@ public class Campaign implements ITechManager {
      * @param ignoreDice If true, skips the random roll and assigns a Bloodname automatically
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
-        // if a non-clanner or a clanner without a phenotype is here, we can just return
+        // if person is non-clan or does not have a phenotype
         if (!person.isClanPersonnel() || person.getPhenotype().isNone()) {
             return;
         }
