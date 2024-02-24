@@ -252,7 +252,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                 //noinspection UnnecessaryContinue
                 continue;
             } else if ((u.getEntity().getEntityType() &
-                        Entity.ETYPE_AERO) == Entity.ETYPE_AERO) {
+                        Entity.ETYPE_AEROSPACEFIGHTER) == Entity.ETYPE_AEROSPACEFIGHTER) {
                 totalAero++;
             } else if ((u.getEntity().getEntityType() &
                         Entity.ETYPE_DROPSHIP) == Entity.ETYPE_DROPSHIP) {

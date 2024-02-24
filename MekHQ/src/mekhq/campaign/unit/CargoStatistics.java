@@ -93,7 +93,7 @@ public class CargoStatistics {
         int ds = stats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int sc = stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int cf = stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int asf = stats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int asf = stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
         int inf = stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
         int ba = stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
         int lv = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true);

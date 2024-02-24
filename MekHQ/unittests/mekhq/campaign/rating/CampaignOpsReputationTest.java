@@ -1383,7 +1383,7 @@ public class CampaignOpsReputationTest {
         mockCorsair1Pilot = mock(Person.class);
         mockCorsair1Tech = mock(Person.class);
 
-        when(mockCorsair1.getEntityType()).thenReturn(Entity.ETYPE_AERO);
+        when(mockCorsair1.getEntityType()).thenReturn(Entity.ETYPE_AEROSPACEFIGHTER);
         when(mockCorsair1.getUnitType()).thenCallRealMethod();
         when(mockCorsairUnit1.getEntity()).thenReturn(mockCorsair1);
         when(mockCorsair1Pilot.isAdministrator()).thenReturn(false);
@@ -1419,7 +1419,7 @@ public class CampaignOpsReputationTest {
         mockCorsair2Pilot = mock(Person.class);
         mockCorsair2Tech = mock(Person.class);
 
-        when(mockCorsair2.getEntityType()).thenReturn(Entity.ETYPE_AERO);
+        when(mockCorsair2.getEntityType()).thenReturn(Entity.ETYPE_AEROSPACEFIGHTER);
         when(mockCorsair2.getUnitType()).thenCallRealMethod();
         when(mockCorsairUnit2.getEntity()).thenReturn(mockCorsair2);
         when(mockCorsair2Pilot.isAdministrator()).thenReturn(false);

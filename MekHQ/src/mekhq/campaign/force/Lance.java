@@ -165,7 +165,7 @@ public class Lance {
                 if (null != entity) {
                     if ((entity.getEntityType() & Entity.ETYPE_MECH) != 0) {
                         armor += 1;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AERO) != 0) {
+                    } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
                         other += 0.5;
                     } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
                         armor += 0.5;
@@ -499,7 +499,7 @@ public class Lance {
                         } else {
                             weight += entity.getWeight();
                         }
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AERO) != 0) {
+                    } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
                         if (c.getFaction().isClan()) {
                             weight += entity.getWeight() * 0.5;
                         } else {
