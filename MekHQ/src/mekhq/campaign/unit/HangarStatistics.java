@@ -53,11 +53,11 @@ public class HangarStatistics {
     /**
      * Tally all used bay types and return a hashmap of ETYPE : Count
      * @param inTransit
-     * @param lv
      * @return
      */
     public HashMap<Long, Integer> tallyBaysByType(boolean inTransit) {
         HashMap<Long, Integer> hashMap = new HashMap<>();
+
         for (Unit unit : getHangar().getUnits()) {
             if (!inTransit && !unit.isPresent()) {
                 continue;
