@@ -329,53 +329,42 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
         switch (terrainType) {
-            case "Fixed":
-            case "City-dense":
-            case "City-high":
-            case "Cliffs-lake":
-            case "Dust-bowl":
-            case "Fortress-city":
+            case "ArcticDesert":
+            case "Badlands":
+            case "ColdFacility":
+            case "ColdForest":
+            case "ColdHills":
+            case "ColdSea":
+            case "ColdUrban":
+            case "Desert":
+            case "Forest":
+            case "FrozenFacility":
+            case "FrozenSea":
             case "Hills":
-            case "Lake-high":
-            case "Lake-marsh":
-            case "Mountain-high":
-            case "Mountain-lake":
-            case "Mountain-medium":
-            case "Muddy-swamp":
-            case "River-huge":
-            case "River-wetlands":
-            case "Rocky-valley":
-            case "Rubble-mountain":
-            case "Rubble-river":
-            case "Sandy-hills":
-            case "Sandy-river":
-            case "Sandy-valley":
+            case "HotFacility":
+            case "HotForest":
+            case "HotHillsDry":
+            case "HotHillsWet":
+            case "HotSea":
+            case "HotUrban":
+            case "Jungle":
+            case "Plains":
             case "Savannah":
-            case "Seaport":
-            case "Some-trees":
+            case "Sea":
+            case "SnowField":
+            case "Steppe":
             case "Swamp":
-            case "Town-concrete":
-            case "Town-farming":
-            case "Town-generic":
-            case "Town-hills":
-            case "Town-mining":
-            case "Town-mountain":
-            case "Town-ruin":
-            case "Town-wooded":
-            case "Wooded-hills":
-            case "Wooded-lake":
-            case "Wooded-swamp":
-            case "Wooded-valley":
-            case "Woods-deep":
-            case "Woods-medium":
-            case "Woods-river":
+            case "TemperateFacility":
+            case "Tundra":
+            case "Urban":
                 // standard
                 odds = new int[]{600,200,100,99,1};
                 break;
-            case "Cliffs":
-            case "Heavy-craters":
-            case "Hills-craters":
-            case "Light-craters":
+            case "ColdMountain":
+            case "Glacier":
+            case "HotMountainsDry":
+            case "HotMountainsWet":
+            case "Mountain":
                 // dark
                 odds = new int[]{50,20,10,10,10};
                 break;
