@@ -396,7 +396,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
             filteredPersonnel = personnel.stream()
                     .filter(person -> (isSmallCraftOrJumpShip && person.hasRole(PersonnelRole.VESSEL_GUNNER)) ||
                             (isTank && person.hasRole(PersonnelRole.VEHICLE_GUNNER)) ||
-                            (isSuperHeavyMech && person.getPrimaryRole().isMechWarriorGrouping()
+                            ((isSuperHeavyMech || isTripod) && person.getPrimaryRole().isMechWarriorGrouping()
                                 || person.getSecondaryRole().isMechWarriorGrouping()))
                     .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
