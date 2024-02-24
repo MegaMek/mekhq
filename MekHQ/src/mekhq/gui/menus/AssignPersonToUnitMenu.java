@@ -225,7 +225,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 // Pilot Menu
                 if (unit.canTakeMoreDrivers()) {
                     // Pilot Menu - Solo Pilot and VTOL Pilot Assignment
-                    if (singlePerson && (unit.usesSoloPilot() || (entity instanceof VTOL))) {
+                    if (singlePerson && (unit.usesSoloPilot() || (entity instanceof VTOL) || entity.isSuperHeavy() || entity.isTripodMek())) {
                         final boolean valid;
                         if (entity instanceof Mech) {
                             valid = areAllBattleMechPilots;
