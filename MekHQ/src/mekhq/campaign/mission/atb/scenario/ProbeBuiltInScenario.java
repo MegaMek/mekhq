@@ -57,9 +57,7 @@ public class ProbeBuiltInScenario extends AtBScenario {
         List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
         do {
             setTerrainType(keys.get(Compute.randomInt(keys.size())));
-        } while (getTerrainType() == "Urban"
-                || getTerrainType() == "ColdUrban"
-                || getTerrainType() == "HotUrban");
+        } while (getTerrainType().toUpperCase().contains("URBAN"));
     }
 
     @Override

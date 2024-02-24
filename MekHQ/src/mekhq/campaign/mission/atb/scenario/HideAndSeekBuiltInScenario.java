@@ -58,11 +58,11 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
         List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
         do {
             setTerrainType(keys.get(Compute.randomInt(keys.size())));
-        } while (getTerrainType() == "ColdSea"
-                || getTerrainType() == "FrozenSea"
-                || getTerrainType() == "HotSea"
-                || getTerrainType() == "Plains"
-                || getTerrainType() == "Savannah");
+        } while (getTerrainType().equals("ColdSea")
+                || getTerrainType().equals("FrozenSea")
+                || getTerrainType().equals("HotSea")
+                || getTerrainType().equals("Plains")
+                || getTerrainType().equals("Savannah"));
     }
 
     @Override

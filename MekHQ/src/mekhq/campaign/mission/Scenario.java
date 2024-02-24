@@ -234,7 +234,7 @@ public class Scenario {
         this.terrainType = terrainType;
     }
 
-    public void setBoardType(int terrainType) {
+    public void setBoardType(int boardType) {
         this.boardType = boardType;
     }
 
