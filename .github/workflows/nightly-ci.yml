@@ -76,7 +76,7 @@ jobs:
 
     # Include --stacktrace to make some build failures easier to figure out.
     - name: Build with Gradle
-      uses: gradle/actions/gradle-build-action@v3
+      uses: gradle/actions/setup-gradle@v3
       with:
         arguments: clean build -x test --continue --stacktrace --max-workers=1 --scan
         build-root-directory: mekhq
