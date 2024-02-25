@@ -85,7 +85,7 @@ jobs:
     # Output Variables:
     #    - buildScanUri
     - name: Build with Gradle
-      uses: gradle/actions/gradle-build-action@v3
+      uses: gradle/actions/setup-gradle@v3
       with:
         arguments: clean build --no-build-cache --info --stacktrace --max-workers=1 --scan
         build-root-directory: mekhq
