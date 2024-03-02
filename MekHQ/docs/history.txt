@@ -2,6 +2,7 @@ MEKHQ VERSION HISTORY:
 ---------------
 0.49.19-SNAPSHOT
 + PR #3845: Adaptations for Adding Clan Personnel Tracking to MegaMek
++ Fix #3775: Non-superheavy Tripods can now be assigned crews; pilots can now be assigned to SH and Tripods in the personnel tab
 
 0.49.18 (2024-02-17 1800 UTC)
 + PR #3805: Adaptations for the Internal Bomb Bay quirk

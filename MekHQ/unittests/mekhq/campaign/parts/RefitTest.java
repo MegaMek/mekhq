@@ -33,6 +33,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,6 +77,11 @@ public class RefitTest {
 
     @Mock
     private Warehouse mockWarehouse;
+
+    @BeforeAll
+    static void before() {
+        EquipmentType.initializeTypes();
+    }
 
     @BeforeEach
     public void beforeEach() {
@@ -157,7 +163,7 @@ public class RefitTest {
         // Locust 1V to 1E Class D refit steps (in no particular order):
         // 1. Remove excess Machine Gun (LA) [120 mins]
         // 2. Remove excess Machine Gun (RA) [120 mins]
-        // 3. Remove Machine Gun Ammo Bin (CT) [120 mins]
+        // 3. Remove Machine Gun Ammo [Full] Bin (CT) [120 mins]
         // 4. Move Medium Laser (CT) to (RA) [120 mins]
         // 5. Add Medium Laser to (LA) [120 mins]
         // 6. Add Small Laser to (RA) [120 mins]
@@ -191,7 +197,7 @@ public class RefitTest {
                 .filter(p -> (p instanceof EquipmentPart) && p.getName().equals("Machine Gun"))
                 .count());
         assertEquals(1, removedParts.stream()
-                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo Bin"))
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo [Full] Bin"))
                 .count());
 
         // All of the new parts should be from the old unit
@@ -540,7 +546,7 @@ public class RefitTest {
         // 5. Add Medium Laser (RA) [120 mins]
         // 6. Add Machine Gun (LA) [120 mins]
         // 7. Add Machine Gun (RA) [120 mins]
-        // 8. Add Machine Gun Ammo Bin to (CT) [120 mins]
+        // 8. Add Machine Gun Ammo [Full] Bin to (CT) [120 mins]
         // 9. Add 16 points of armor to 10 locations (except the HD).
         // a. Add 1 point to (LA) [5 mins]
         // b. Add 1 point to (RA) [5 mins]
@@ -601,7 +607,7 @@ public class RefitTest {
                 .filter(p -> (p instanceof MissingEquipmentPart) && p.getName().equals("Machine Gun"))
                 .count());
         assertEquals(1, shoppingCart.stream()
-                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo Bin"))
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo [Full] Bin"))
                 .count());
 
         // We should have 16 points of standard armor on order
@@ -767,7 +773,7 @@ public class RefitTest {
                 .filter(p -> (p instanceof EquipmentPart) && p.getName().equals("Machine Gun"))
                 .count());
         assertEquals(1, removedParts.stream()
-                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo Bin"))
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo [Full] Bin"))
                 .count());
 
         // All of the new parts (except ammo bins) should be from the old unit
