@@ -26,7 +26,8 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.EntityWeightClass;
-import megamek.common.enums.SkillLevel;
+import megamek.common.enums.*;
+import megamek.common.enums.Atmosphere;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
 import mekhq.MHQConstants;
@@ -222,11 +223,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
         }
 
-        light = PlanetaryConditions.L_DAY;
-        weather = PlanetaryConditions.WE_NONE;
-        wind = PlanetaryConditions.WI_NONE;
-        fog = PlanetaryConditions.FOG_NONE;
-        atmosphere = PlanetaryConditions.ATMO_STANDARD;
+        light = Light.DAY;
+        weather = Weather.CLEAR;
+        wind = Wind.CALM;
+        fog = Fog.FOG_NONE;
+        atmosphere = Atmosphere.STANDARD;
         gravity = (float) 1.0;
         deploymentDelay = 0;
         setDate(date);
@@ -324,7 +325,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return condition;
     }
 
-    private int rollLightCondition() {
+    private Light rollLightCondition() {
         int[] odds;
         String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
@@ -369,19 +370,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{50,20,10,10,10};
                 break;
             default:
-                return PlanetaryConditions.L_DAY;
+                return Light.DAY;
         }
 
-        int light = rollCondition(odds);
-
-        if (light < PlanetaryConditions.L_DAY || light > PlanetaryConditions.L_PITCH_BLACK) {
-            return PlanetaryConditions.L_DAY;
-        }
+        Light light = Light.getLight(rollCondition(odds));
 
         return light;
     }
 
-    private int rollWindCondition() {
+    private Wind rollWindCondition() {
         int[] odds;
         String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
@@ -426,23 +423,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{50,15,15,9,5,4,2};
                 break;
             default:
-                return PlanetaryConditions.WI_NONE;
+                return Wind.CALM;
         }
 
-        int wind = rollCondition(odds);
+        Wind wind = Wind.getWind(rollCondition(odds));
 
-        if (wind < PlanetaryConditions.WI_NONE || wind > PlanetaryConditions.WI_TORNADO_F4) {
-            return PlanetaryConditions.WI_NONE;
-        }
-
-        if (!WeatherRestriction.IsWindRestricted(wind, getAtmosphere(), getTemperature())) {
+        if (!WeatherRestriction.IsWindRestricted(wind.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
             return wind;
         } else {
-            return PlanetaryConditions.WI_NONE;
+            return Wind.CALM;
         }
     }
 
-    private int rollWeatherCondition() {
+    private Weather rollWeatherCondition() {
         int[] odds;
         String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
@@ -465,6 +458,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             case "HotMountainsWet":
             case "HotSea":
             case "Jungle":
+                // hot wet
+                odds = new int[]{47,16,12,10,8,5,1,0,0,0,1,0};
+                break;
             case "Sea":
             case "Swamp":
                 // wet
@@ -492,23 +488,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{87,2,1,1,1,1,2,1,1,1,1,1};
                 break;
             default:
-                return PlanetaryConditions.WE_NONE;
+                return Weather.CLEAR;
         }
 
-        int weather = rollCondition(odds);
+        Weather weather = Weather.getWeather(rollCondition(odds));
 
-        if (weather < PlanetaryConditions.WE_NONE || weather > PlanetaryConditions.WE_ICE_STORM) {
-            return PlanetaryConditions.WE_NONE;
-        }
-
-        if (!WeatherRestriction.IsWeatherRestricted(weather, getAtmosphere(), getTemperature())) {
+        if (!WeatherRestriction.IsWeatherRestricted(weather.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
             return weather;
         } else {
-            return PlanetaryConditions.WE_NONE;
+            return Weather.CLEAR;
         }
     }
 
-    private int rollFogCondition() {
+    private Fog rollFogCondition() {
         int[] odds;
         String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
@@ -548,29 +540,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{60,20,20};
                 break;
             default:
-                return PlanetaryConditions.FOG_NONE;
+                return Fog.FOG_NONE;
         }
 
-        int fog = rollCondition(odds);
+        Fog fog = Fog.getFog(rollCondition(odds));
 
-        if (fog < PlanetaryConditions.FOG_NONE || fog > PlanetaryConditions.FOG_HEAVY) {
-            return PlanetaryConditions.FOG_NONE;
-        }
-
-        if (!WeatherRestriction.IsFogRestricted(fog, getAtmosphere(), getTemperature())) {
+        if (!WeatherRestriction.IsFogRestricted(fog.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
             return fog;
         } else {
-            return PlanetaryConditions.FOG_NONE;
+            return Fog.FOG_NONE;
         }
     }
 
-    private boolean rollBlowingSandCondition(int wind, int weather, int fog) {
-        if (weather != PlanetaryConditions.WE_NONE
-                || fog != PlanetaryConditions.FOG_NONE
-                || wind < PlanetaryConditions.WI_MOD_GALE) {
-            return false;
-        }
-
+    private BlowingSand rollBlowingSandCondition() {
         int[] odds;
         String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
@@ -606,13 +588,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{40,60};
                 break;
             default:
-                return false;
+                return BlowingSand.BLOWING_SAND_NONE;
         }
 
-        return rollCondition(odds) == 1;
+        return rollCondition(odds) == 1 ? BlowingSand.BLOWING_SAND : BlowingSand.BLOWING_SAND_NONE;
     }
 
-    private boolean rollEMICondition() {
+    private EMI rollEMICondition() {
         int[] odds;
         String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
 
@@ -640,10 +622,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 odds = new int[]{90,10};
                 break;
             default:
-                return false;
+                return EMI.EMI_NONE;
         }
 
-        return rollCondition(odds) == 1;
+        if (getAtmosphere().isDenserThan(Atmosphere.THIN)) {
+            return rollCondition(odds) == 1 ? EMI.EMI : EMI.EMI_NONE;
+        } else {
+            return EMI.EMI_NONE;
+        }
     }
 
     public void setLightConditions() {
@@ -657,12 +643,18 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return;
         }
 
-        int wind = rollWindCondition();
-        int weather = rollWeatherCondition();
-        int fog = rollFogCondition();
-        boolean blowingSand = rollBlowingSandCondition(wind, weather, fog);
-        boolean emi = rollEMICondition();
+        Wind wind = rollWindCondition();
+        Weather weather = rollWeatherCondition();
+        Fog fog = rollFogCondition();
+        BlowingSand blowingSand = rollBlowingSandCondition();
+        EMI emi = rollEMICondition();
 
+        int temp = getTemperature();
+        temp = PlanetaryConditions.setTempFromWeather(weather, temp);
+        wind = PlanetaryConditions.setWindFromWeather(weather, wind);
+        wind = PlanetaryConditions.setWindFromBlowingSand(blowingSand, wind);
+
+        setModifiedTemperature(temp);
         setWind(wind);
         setWeather(weather);
         setFog(fog);
@@ -676,7 +668,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             //assume primary planet for now
             Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
-                setAtmosphere(ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere()));
+                setAtmosphere(Atmosphere.getAtmosphere(ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere().ordinal())));
                 setGravity(ObjectUtility.nonNull(p.getGravity(), getGravity()).floatValue());
             }
         }

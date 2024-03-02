@@ -28,6 +28,7 @@ import megamek.common.IStartingPositions;
 import megamek.common.MapSettings;
 import megamek.common.PlanetaryConditions;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.*;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
@@ -97,19 +98,20 @@ public class Scenario {
     private boolean usingFixedMap;
 
     /** planetary conditions parameters **/
-    protected int light;
-    protected int weather;
-    protected int wind;
-    protected int fog;
-    protected int atmosphere;
+    protected Light light;
+    protected Weather weather;
+    protected Wind wind;
+    protected Fog fog;
+    protected Atmosphere atmosphere;
     private int temperature;
+    private int modifiedTemperature;
     protected float gravity;
-    private boolean emi;
-    private boolean blowingSand;
+    private EMI emi;
+    private BlowingSand blowingSand;
     private boolean shiftWindDirection;
     private boolean shiftWindStrength;
-    private int maxWindStrength;
-    private int minWindStrength;
+    private Wind maxWindStrength;
+    private Wind minWindStrength;
 
     /** player starting position **/
     private int start;
@@ -139,19 +141,19 @@ public class Scenario {
         botForcesStubs = new ArrayList<>();
         externalIDLookup = new HashMap<>();
 
-        light = PlanetaryConditions.L_DAY;
-        weather = PlanetaryConditions.WE_NONE;
-        wind = PlanetaryConditions.WI_NONE;
-        fog = PlanetaryConditions.FOG_NONE;
-        atmosphere = PlanetaryConditions.ATMO_STANDARD;
+        light = Light.DAY;
+        weather = Weather.CLEAR;
+        wind = Wind.CALM;
+        fog = Fog.FOG_NONE;
+        atmosphere = Atmosphere.STANDARD;
         temperature = 25;
         gravity = (float) 1.0;
-        emi = false;
-        blowingSand = false;
+        emi = EMI.EMI_NONE;
+        blowingSand = BlowingSand.BLOWING_SAND_NONE;
         shiftWindDirection = false;
         shiftWindStrength = false;
-        maxWindStrength = PlanetaryConditions.WI_TORNADO_F4;
-        minWindStrength = PlanetaryConditions.WI_NONE;
+        maxWindStrength = Wind.TORNADO_F4;
+        minWindStrength = Wind.CALM;
         hasTrack = false;
     }
 
@@ -283,43 +285,43 @@ public class Scenario {
         this.usingFixedMap = usingFixedMap;
     }
 
-    public int getLight() {
+    public Light getLight() {
         return light;
     }
 
-    public void setLight(int light) {
+    public void setLight(Light light) {
         this.light = light;
     }
 
-    public int getWeather() {
+    public Weather getWeather() {
         return weather;
     }
 
-    public void setWeather(int weather) {
+    public void setWeather(Weather weather) {
         this.weather = weather;
     }
 
-    public int getWind() {
+    public Wind getWind() {
         return wind;
     }
 
-    public void setWind(int wind) {
+    public void setWind(Wind wind) {
         this.wind = wind;
     }
 
-    public int getFog() {
+    public Fog getFog() {
         return fog;
     }
 
-    public void setFog(int fog) {
+    public void setFog(Fog fog) {
         this.fog = fog;
     }
 
-    public int getAtmosphere() {
+    public Atmosphere getAtmosphere() {
         return atmosphere;
     }
 
-    public void setAtmosphere(int atmosphere) {
+    public void setAtmosphere(Atmosphere atmosphere) {
         this.atmosphere = atmosphere;
     }
 
@@ -331,6 +333,14 @@ public class Scenario {
         this.temperature = temperature;
     }
 
+    public int getModifiedTemperature() {
+        return modifiedTemperature;
+    }
+
+    public void setModifiedTemperature(int modifiedTemperature) {
+        this.modifiedTemperature = modifiedTemperature;
+    }
+
     public float getGravity() {
         return gravity;
     }
@@ -339,27 +349,19 @@ public class Scenario {
         this.gravity = gravity;
     }
 
-    public boolean usesEMI() {
-        return emi;
-    }
-
-    public void setEMI(boolean emi) {
+    public void setEMI(EMI emi) {
         this.emi = emi;
     }
 
-    public boolean getEMI() {
+    public EMI getEMI() {
         return emi;
     }
 
-    public boolean usesBlowingSand() {
-        return blowingSand;
-    }
-
-    public void setBlowingSand(boolean blow) {
+    public void setBlowingSand(BlowingSand blow) {
         this.blowingSand = blow;
     }
 
-    public boolean getBlowingSand() {
+    public BlowingSand getBlowingSand() {
         return blowingSand;
     }
 
@@ -371,13 +373,13 @@ public class Scenario {
 
     public void setShiftWindStrength(boolean b) { this.shiftWindStrength = b; }
 
-    public int getMaxWindStrength() { return maxWindStrength; }
+    public Wind getMaxWindStrength() { return maxWindStrength; }
 
-    public void setMaxWindStrength(int strength) { this.maxWindStrength = strength; }
+    public void setMaxWindStrength(Wind strength) { this.maxWindStrength = strength; }
 
-    public int getMinWindStrength() { return minWindStrength; }
+    public Wind getMinWindStrength() { return minWindStrength; }
 
-    public void setMinWindStrength(int strength) { this.minWindStrength = strength; }
+    public void setMinWindStrength(Wind strength) { this.minWindStrength = strength; }
 
     public ScenarioDeploymentLimit getDeploymentLimit() {
         return deploymentLimit;
@@ -809,19 +811,19 @@ public class Scenario {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mapSize", mapSizeX, mapSizeY);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "map", map);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "light", light);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weather", weather);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wind", wind);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fog", fog);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "light", light.ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weather", weather.ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wind", wind.ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fog", fog.ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temperature", temperature);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atmosphere", atmosphere);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atmosphere", atmosphere.ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gravity", gravity);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "emi", emi);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "blowingSand", blowingSand);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "emi", emi.ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "blowingSand", blowingSand.ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shiftWindDirection", shiftWindDirection);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shiftWindStrength", shiftWindStrength);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxWindStrength", maxWindStrength);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minWindStrength", minWindStrength);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxWindStrength", maxWindStrength.ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minWindStrength", minWindStrength.ordinal());
         return indent;
     }
 
@@ -955,31 +957,33 @@ public class Scenario {
                 }  else if (wn2.getNodeName().equalsIgnoreCase("start")) {
                     retVal.start = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("light")) {
-                    retVal.light = Integer.parseInt(wn2.getTextContent());
+                    retVal.light = Light.getLight(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("weather")) {
-                    retVal.weather = Integer.parseInt(wn2.getTextContent());
+                    retVal.weather = Weather.getWeather(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("wind")) {
-                    retVal.wind = Integer.parseInt(wn2.getTextContent());
+                    retVal.wind = Wind.getWind(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fog")) {
-                    retVal.fog = Integer.parseInt(wn2.getTextContent());
+                    retVal.fog = Fog.getFog(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("atmosphere")) {
-                    retVal.atmosphere = Integer.parseInt(wn2.getTextContent());
+                    retVal.atmosphere = Atmosphere.getAtmosphere(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("temperature")) {
                     retVal.temperature = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
                     retVal.gravity = Float.parseFloat(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("emi")) {
-                    retVal.emi = Boolean.parseBoolean(wn2.getTextContent());
+                    EMI emi =  Boolean.parseBoolean(wn2.getTextContent()) ? EMI.EMI : EMI.EMI_NONE;
+                    retVal.emi = emi;
                 } else if (wn2.getNodeName().equalsIgnoreCase("blowingSand")) {
-                    retVal.blowingSand = Boolean.parseBoolean(wn2.getTextContent());
+                    BlowingSand blowingSand =  Boolean.parseBoolean(wn2.getTextContent()) ? BlowingSand.BLOWING_SAND : BlowingSand.BLOWING_SAND_NONE;
+                    retVal.blowingSand = blowingSand;
                 } else if (wn2.getNodeName().equalsIgnoreCase("shiftWindDirection")) {
                     retVal.shiftWindDirection = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("shiftWindStrength")) {
                     retVal.shiftWindStrength = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("maxWindStrength")) {
-                    retVal.maxWindStrength = Integer.parseInt(wn2.getTextContent());
+                    retVal.maxWindStrength = Wind.getWind(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("minWindStrength")) {
-                    retVal.minWindStrength = Integer.parseInt(wn2.getTextContent());
+                    retVal.minWindStrength = Wind.getWind(Integer.parseInt(wn2.getTextContent()));
                 }
 
             }

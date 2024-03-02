@@ -25,6 +25,10 @@ import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
 import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
+import megamek.common.enums.Fog;
+import megamek.common.enums.Light;
+import megamek.common.enums.Weather;
+import megamek.common.enums.Wind;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -57,14 +61,14 @@ public class AceDuelBuiltInScenario extends AtBScenario {
 
     @Override
     public void setLightConditions() {
-        setLight(PlanetaryConditions.L_DAY);
+        setLight(Light.DAY);
     }
 
     @Override
     public void setWeather() {
-        setWeather(PlanetaryConditions.WE_NONE);
-        setWind(PlanetaryConditions.WI_NONE);
-        setFog(PlanetaryConditions.FOG_NONE);
+        setWeather(Weather.CLEAR);
+        setWind(Wind.CALM);
+        setFog(Fog.FOG_NONE);
     }
 
     @Override

@@ -649,8 +649,8 @@ public class Planet {
     }
 
     public String getPressureName(LocalDate when) {
-        Integer currentPressure = getPressure(when);
-        return null != currentPressure ? PlanetaryConditions.getAtmosphereDisplayableName(currentPressure) : "unknown";
+        megamek.common.enums.Atmosphere currentPressure = megamek.common.enums.Atmosphere.getAtmosphere(getPressure(when));
+        return null != currentPressure ? currentPressure.toString() : "unknown";
     }
 
     public Atmosphere getAtmosphere(LocalDate when) {

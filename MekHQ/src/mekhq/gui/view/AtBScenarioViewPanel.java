@@ -26,6 +26,7 @@ import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.IStartingPositions;
 import megamek.common.PlanetaryConditions;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Atmosphere;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
@@ -558,7 +559,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             chkReroll[REROLL_LIGHT].addItemListener(checkBoxListener);
         }
 
-        lblLightDesc.setText(PlanetaryConditions.getLightDisplayableName(scenario.getLight()));
+        lblLightDesc.setText(scenario.getLight().toString());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblLightDesc, gridBagConstraints);
@@ -581,7 +582,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             chkReroll[REROLL_WEATHER].addItemListener(checkBoxListener);
         }
 
-        lblWeatherDesc.setText(PlanetaryConditions.getWeatherDisplayableName(scenario.getWeather()));
+        lblWeatherDesc.setText(scenario.getWeather().toString());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblWeatherDesc, gridBagConstraints);
@@ -594,7 +595,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblWind, gridBagConstraints);
 
-        lblWindDesc.setText(PlanetaryConditions.getWindDisplayableName(scenario.getWind()));
+        lblWindDesc.setText(scenario.getWind().toString());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblWindDesc, gridBagConstraints);
@@ -607,7 +608,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblFog, gridBagConstraints);
 
-        lblFogDesc.setText(PlanetaryConditions.getFogDisplayableName(scenario.getFog()));
+        lblFogDesc.setText(scenario.getFog().toString());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblFogDesc, gridBagConstraints);
@@ -620,7 +621,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblBlowingSand, gridBagConstraints);
 
-        String blowingSandDesc = PlanetaryConditions.getSandBlowingDisplayableValue(scenario.getBlowingSand());
+        String blowingSandDesc = scenario.getBlowingSand().toString();
         lblBlowingSandDesc.setText(blowingSandDesc);
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
@@ -634,7 +635,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblEMI, gridBagConstraints);
 
-        String emiDesc = PlanetaryConditions.getEMIDisplayableValue(scenario.getEMI());
+        String emiDesc = scenario.getEMI().toString();
         lblEMIDesc.setText(emiDesc);
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
@@ -648,7 +649,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblTemp, gridBagConstraints);
 
-        lblTempDesc.setText(PlanetaryConditions.getTemperatureDisplayableName(scenario.getTemperature()));
+        lblTempDesc.setText(PlanetaryConditions.getTemperatureDisplayableName(scenario.getModifiedTemperature()));
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblTempDesc, gridBagConstraints);
@@ -674,12 +675,12 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         gridBagConstraints.gridwidth = 1;
         panStats.add(lblAtmosphere, gridBagConstraints);
 
-        lblAtmosphereDesc.setText(PlanetaryConditions.getAtmosphereDisplayableName(scenario.getAtmosphere()));
+        lblAtmosphereDesc.setText(scenario.getAtmosphere().toString());
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y++;
         panStats.add(lblAtmosphereDesc, gridBagConstraints);
-        lblAtmosphere.setVisible(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD);
-        lblAtmosphereDesc.setVisible(scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD);
+        lblAtmosphere.setVisible(scenario.getAtmosphere() != Atmosphere.STANDARD);
+        lblAtmosphereDesc.setVisible(scenario.getAtmosphere() != Atmosphere.STANDARD);
 
         return y;
     }
@@ -817,18 +818,19 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             scenario.setLightConditions();
             scenario.useReroll();
             chkReroll[REROLL_LIGHT].setSelected(false);
-            lblLightDesc.setText(PlanetaryConditions.getLightDisplayableName(scenario.getLight()));
+            lblLightDesc.setText(scenario.getLight().toString());
         }
         if (chkReroll[REROLL_WEATHER] != null && chkReroll[REROLL_WEATHER].isSelected()) {
             scenario.setWeather();
             scenario.useReroll();
             chkReroll[REROLL_WEATHER].setSelected(false);
-            lblWeatherDesc.setText(PlanetaryConditions.getWeatherDisplayableName(scenario.getWeather()));
-            lblWindDesc.setText(PlanetaryConditions.getWindDisplayableName(scenario.getWind()));
-            lblFogDesc.setText(PlanetaryConditions.getFogDisplayableName(scenario.getFog()));
-            String blowingSandDesc = PlanetaryConditions.getSandBlowingDisplayableValue(scenario.getBlowingSand());
+            lblWeatherDesc.setText(scenario.getWeather().toString());
+            lblWindDesc.setText(scenario.getWind().toString());
+            lblFogDesc.setText(scenario.getFog().toString());
+            lblTempDesc.setText(PlanetaryConditions.getTemperatureDisplayableName(scenario.getModifiedTemperature()));
+            String blowingSandDesc = scenario.getBlowingSand().toString();
             lblBlowingSandDesc.setText(blowingSandDesc);
-            String emiDesc = PlanetaryConditions.getEMIDisplayableValue(scenario.getEMI());
+            String emiDesc = scenario.getEMI().toString();
             lblEMIDesc.setText(emiDesc);
         }
         btnReroll.setText(scenario.getRerollsRemaining() +

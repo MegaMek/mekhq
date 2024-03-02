@@ -175,17 +175,17 @@ class GameThread extends Thread implements CloseClientListener {
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
                 planetaryConditions.setWeather(scenario.getWeather());
-                planetaryConditions.setWindStrength(scenario.getWind());
+                planetaryConditions.setWind(scenario.getWind());
                 planetaryConditions.setFog(scenario.getFog());
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
-                planetaryConditions.setTemperature(scenario.getTemperature());
+                planetaryConditions.setTemperature(scenario.getModifiedTemperature());
                 planetaryConditions.setGravity(scenario.getGravity());
-                planetaryConditions.setEMI(scenario.usesEMI());
-                planetaryConditions.setBlowingSand(scenario.usesBlowingSand());
+                planetaryConditions.setEMI(scenario.getEMI());
+                planetaryConditions.setBlowingSand(scenario.getBlowingSand());
                 planetaryConditions.setShiftingWindDirection(scenario.canWindShiftDirection());
                 planetaryConditions.setShiftingWindStrength(scenario.canWindShiftStrength());
-                planetaryConditions.setMaxWindStrength(scenario.getMaxWindStrength());
-                planetaryConditions.setMinWindStrength(scenario.getMinWindStrength());
+                planetaryConditions.setWindMax(scenario.getMaxWindStrength());
+                planetaryConditions.setWindMin(scenario.getMinWindStrength());
 
                 client.sendPlanetaryConditions(planetaryConditions);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());

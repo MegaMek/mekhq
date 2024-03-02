@@ -156,13 +156,13 @@ public class AtBGameThread extends GameThread {
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
                 planetaryConditions.setWeather(scenario.getWeather());
-                planetaryConditions.setWindStrength(scenario.getWind());
+                planetaryConditions.setWind(scenario.getWind());
                 planetaryConditions.setFog(scenario.getFog());
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
                 planetaryConditions.setGravity(scenario.getGravity());
-                planetaryConditions.setEMI(scenario.usesEMI());
-                planetaryConditions.setBlowingSand(scenario.usesBlowingSand());
-                planetaryConditions.setTemperature(scenario.getTemperature());
+                planetaryConditions.setEMI(scenario.getEMI());
+                planetaryConditions.setBlowingSand(scenario.getBlowingSand());
+                planetaryConditions.setTemperature(scenario.getModifiedTemperature());
                 client.sendPlanetaryConditions(planetaryConditions);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
