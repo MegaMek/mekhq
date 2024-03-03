@@ -119,22 +119,22 @@ public class AtBDynamicScenarioFactory {
 
         boolean planetsideScenario = template.isPlanetSurface();
 
+        setTerrain(scenario);
+
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
+            setPlanetaryConditions(scenario, contract, campaign);
+        }
+
         // set lighting conditions if the user wants to play with them and is on a ground map
         // theoretically some lighting conditions apply to space maps as well, but requires additional work to implement properly
         if (campaign.getCampaignOptions().isUseLightConditions() && planetsideScenario) {
             setLightConditions(scenario);
         }
 
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
-            setPlanetaryConditions(scenario, contract, campaign);
-        }
-
         // set weather conditions if the user wants to play with them and is on a ground map
         if (campaign.getCampaignOptions().isUseWeatherConditions() && planetsideScenario) {
             setWeather(scenario);
         }
-
-        setTerrain(scenario);
 
         // apply a default "reinforcements" force template if a scenario-specific one does not already exist
         if (!template.getScenarioForces().containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {

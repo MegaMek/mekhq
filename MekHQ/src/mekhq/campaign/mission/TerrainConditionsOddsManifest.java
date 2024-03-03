@@ -490,7 +490,7 @@ public class TerrainConditionsOddsManifest  {
     }
 
     private Map<String, Integer> oddsForTerrain(String type, String terrainType) {
-        terrainType = terrainType.isEmpty() ? "Hills" : terrainType;
+        terrainType = terrainType == null ? "Hills" : terrainType;
 
         for (TerrainConditionsOdds entry : TCO) {
             if (entry.type.equals(type) && entry.terrain.contains(terrainType)) {

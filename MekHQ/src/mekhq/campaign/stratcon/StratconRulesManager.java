@@ -231,6 +231,7 @@ public class StratconRulesManager {
             if (!backingScenario.isUsingFixedMap()) {
                 backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
             }
+            backingScenario.setLightConditions();
             backingScenario.setWeather();
         }
     }
