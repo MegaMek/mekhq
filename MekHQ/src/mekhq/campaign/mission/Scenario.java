@@ -939,7 +939,7 @@ public class Scenario {
                         retVal.addBotForce(bf, c);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioDeploymentLimit")) {
-                    retVal.deploymentLimit =  ScenarioDeploymentLimit.generateInstanceFromXML(wn2, c, version);
+                    retVal.deploymentLimit = ScenarioDeploymentLimit.generateInstanceFromXML(wn2, c, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("usingFixedMap")) {
                     retVal.setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("boardType")) {
@@ -971,10 +971,10 @@ public class Scenario {
                 } else if (wn2.getNodeName().equalsIgnoreCase("gravity")) {
                     retVal.gravity = Float.parseFloat(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("emi")) {
-                    EMI emi =  Boolean.parseBoolean(wn2.getTextContent()) ? EMI.EMI : EMI.EMI_NONE;
+                    EMI emi = Boolean.parseBoolean(wn2.getTextContent()) ? EMI.EMI : EMI.EMI_NONE;
                     retVal.emi = emi;
                 } else if (wn2.getNodeName().equalsIgnoreCase("blowingSand")) {
-                    BlowingSand blowingSand =  Boolean.parseBoolean(wn2.getTextContent()) ? BlowingSand.BLOWING_SAND : BlowingSand.BLOWING_SAND_NONE;
+                    BlowingSand blowingSand = Boolean.parseBoolean(wn2.getTextContent()) ? BlowingSand.BLOWING_SAND : BlowingSand.BLOWING_SAND_NONE;
                     retVal.blowingSand = blowingSand;
                 } else if (wn2.getNodeName().equalsIgnoreCase("shiftWindDirection")) {
                     retVal.shiftWindDirection = Boolean.parseBoolean(wn2.getTextContent());

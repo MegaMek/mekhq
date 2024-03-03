@@ -72,7 +72,7 @@ public class ScenarioMapParameters implements Cloneable {
     @XmlElement(name="allowedTerrainType")
     public List<String> allowedTerrainTypes = new ArrayList<>();
 
-    public List<String>  getAllowedTerrainType() {
+    public List<String> getAllowedTerrainType() {
         return allowedTerrainTypes;
     }
 

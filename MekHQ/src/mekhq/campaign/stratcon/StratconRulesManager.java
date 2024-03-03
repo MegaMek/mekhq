@@ -186,7 +186,7 @@ public class StratconRulesManager {
     public static void setScenarioParametersFromBiome(StratconTrackState track, StratconScenario scenario) {
         StratconCoords coords = scenario.getCoords();
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
-        StratconBiomeManifest biomeManifest =  StratconBiomeManifest.getInstance();
+        StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
 
         // for non-surface scenarios, we will skip the temperature update
         if (backingScenario.getBoardType() != Scenario.T_SPACE &&

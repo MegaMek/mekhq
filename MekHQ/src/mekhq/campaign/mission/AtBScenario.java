@@ -180,7 +180,6 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     protected final transient ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
             MekHQ.getMHQOptions().getLocale());
 
-
     private static TerrainConditionsOddsManifest TCO;
     private static StratconBiomeManifest SB;
     //endregion Variable Declarations

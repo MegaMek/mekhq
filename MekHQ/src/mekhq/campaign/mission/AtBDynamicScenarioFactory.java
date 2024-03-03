@@ -750,7 +750,7 @@ public class AtBDynamicScenarioFactory {
             scenario.setTerrain();
             scenario.setMapFile();
         } else {
-            StratconBiomeManifest biomeManifest =  StratconBiomeManifest.getInstance();
+            StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
             int kelvinTemp = scenario.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
             List<String> allowedFacility = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
                     .floorEntry(kelvinTemp).getValue().allowedTerrainTypes;
