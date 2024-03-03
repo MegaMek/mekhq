@@ -57,7 +57,6 @@ import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * @author Neoancient
@@ -180,6 +179,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     protected final transient ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
             MekHQ.getMHQOptions().getLocale());
+
+
+    private static TerrainConditionsOddsManifest TCO;
+    private static StratconBiomeManifest SB;
     //endregion Variable Declarations
 
     public AtBScenario () {
@@ -197,6 +200,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         deploymentDelay = 0;
         lanceCount = 0;
         rerollsRemaining = 0;
+        TCO = TerrainConditionsOddsManifest.getInstance();
+        SB = StratconBiomeManifest.getInstance();
     }
 
     public void initialize(Campaign c, Lance lance, boolean attacker, LocalDate date) {
@@ -301,339 +306,13 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setTerrain() {
-        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
         List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
         setTerrainType(keys.get(Compute.randomInt(keys.size())));
     }
 
-    private int rollCondition(int[] odds) {
-        int condition = 0;
-        int sum = IntStream.of(odds).sum();
-        int rollingSum = 0;
-        int roll = Compute.randomInt(sum);
-
-        for (int i = 0; i < odds.length;  i++) {
-            if (odds[i] > 0) {
-                rollingSum += odds[i];
-                if (roll < rollingSum) {
-                    condition = i;
-                    break;
-                }
-            }
-        }
-
-        return condition;
-    }
-
-    private Light rollLightCondition() {
-        int[] odds;
-        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
-
-        switch (terrainType) {
-            case "ArcticDesert":
-            case "Badlands":
-            case "ColdFacility":
-            case "ColdForest":
-            case "ColdHills":
-            case "ColdSea":
-            case "ColdUrban":
-            case "Desert":
-            case "Forest":
-            case "FrozenFacility":
-            case "FrozenSea":
-            case "Hills":
-            case "HotFacility":
-            case "HotForest":
-            case "HotHillsDry":
-            case "HotHillsWet":
-            case "HotSea":
-            case "HotUrban":
-            case "Jungle":
-            case "Plains":
-            case "Savannah":
-            case "Sea":
-            case "SnowField":
-            case "Steppe":
-            case "Swamp":
-            case "TemperateFacility":
-            case "Tundra":
-            case "Urban":
-                // standard
-                odds = new int[]{600,200,100,99,1};
-                break;
-            case "ColdMountain":
-            case "Glacier":
-            case "HotMountainsDry":
-            case "HotMountainsWet":
-            case "Mountain":
-                // dark
-                odds = new int[]{50,20,10,10,10};
-                break;
-            default:
-                return Light.DAY;
-        }
-
-        Light light = Light.getLight(rollCondition(odds));
-
-        return light;
-    }
-
-    private Wind rollWindCondition() {
-        int[] odds;
-        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
-
-        switch (terrainType) {
-            case "ColdFacility":
-            case "ColdForest":
-            case "ColdHills":
-            case "ColdMountain":
-            case "ColdUrban":
-            case "Forest":
-            case "FrozenFacility":
-            case "Hills":
-            case "HotFacility":
-            case "HotForest":
-            case "HotHillsDry":
-            case "HotHillsWet":
-            case "HotMountainsDry":
-            case "HotMountainsWet":
-            case "HotUrban":
-            case "Jungle":
-            case "Mountain":
-            case "Steppe":
-            case "Swamp":
-            case "TemperateFacility":
-            case "Urban":
-                // standard
-                odds = new int[]{70,10,10,4,3,2,1};
-                break;
-            case "ArcticDesert":
-            case "Badlands":
-            case "ColdSea":
-            case "Desert":
-            case "FrozenSea":
-            case "Glacier":
-            case "HotSea":
-            case "Plains":
-            case "Savannah":
-            case "Sea":
-            case "SnowField":
-            case "Tundra":
-                // high
-                odds = new int[]{50,15,15,9,5,4,2};
-                break;
-            default:
-                return Wind.CALM;
-        }
-
-        Wind wind = Wind.getWind(rollCondition(odds));
-
-        if (!WeatherRestriction.IsWindRestricted(wind.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
-            return wind;
-        } else {
-            return Wind.CALM;
-        }
-    }
-
-    private Weather rollWeatherCondition() {
-        int[] odds;
-        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
-
-        switch (terrainType) {
-            case "Forest":
-            case "Hills":
-            case "HotFacility":
-            case "HotForest":
-            case "HotUrban":
-            case "Mountain":
-            case "Plains":
-            case "Savannah":
-            case "Steppe":
-            case "TemperateFacility":
-            case "Urban":
-                // standard
-                odds = new int[]{69,7,4,4,2,1,6,2,1,1,2,1};
-                break;
-            case "HotHillsWet":
-            case "HotMountainsWet":
-            case "HotSea":
-            case "Jungle":
-                // hot wet
-                odds = new int[]{47,16,12,10,8,5,1,0,0,0,1,0};
-                break;
-            case "Sea":
-            case "Swamp":
-                // wet
-                odds = new int[]{47,12,10,8,6,4,6,2,1,1,2,1};
-                break;
-            case "ColdFacility":
-            case "ColdForest":
-            case "ColdHills":
-            case "ColdMountain":
-            case "ColdSea":
-            case "ColdUrban":
-            case "FrozenFacility":
-            case "FrozenSea":
-            case "SnowField":
-            case "Tundra":
-                // snowy
-                odds = new int[]{41,6,3,3,1,1,12,10,8,6,6,3};
-                break;
-            case "ArcticDesert":
-            case "Badlands":
-            case "Desert":
-            case "HotHillsDry":
-            case "HotMountainsDry":
-                // dry
-                odds = new int[]{87,2,1,1,1,1,2,1,1,1,1,1};
-                break;
-            default:
-                return Weather.CLEAR;
-        }
-
-        Weather weather = Weather.getWeather(rollCondition(odds));
-
-        if (!WeatherRestriction.IsWeatherRestricted(weather.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
-            return weather;
-        } else {
-            return Weather.CLEAR;
-        }
-    }
-
-    private Fog rollFogCondition() {
-        int[] odds;
-        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
-
-        switch (terrainType) {
-            case "Forest":
-            case "Glacier":
-            case "Hills":
-            case "HotFacility":
-            case "HotForest":
-            case "HotUrban":
-            case "Mountain":
-            case "Plains":
-            case "Savannah":
-            case "Steppe":
-            case "TemperateFacility":
-            case "Urban":
-                // standard
-                odds = new int[]{90,5,5};
-                break;
-            case "ColdFacility":
-            case "ColdForest":
-            case "ColdHills":
-            case "ColdMountain":
-            case "ColdSea":
-            case "ColdUrban":
-            case "FrozenFacility":
-            case "FrozenSea":
-            case "HotHillsWet":
-            case "HotMountainsWet":
-            case "HotSea":
-            case "Jungle":
-            case "Sea":
-            case "SnowField":
-            case "Swamp":
-            case "Tundra":
-                // heavy
-                odds = new int[]{60,20,20};
-                break;
-            default:
-                return Fog.FOG_NONE;
-        }
-
-        Fog fog = Fog.getFog(rollCondition(odds));
-
-        if (!WeatherRestriction.IsFogRestricted(fog.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
-            return fog;
-        } else {
-            return Fog.FOG_NONE;
-        }
-    }
-
-    private BlowingSand rollBlowingSandCondition() {
-        int[] odds;
-        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
-
-        switch (terrainType) {
-            case "ColdFacility":
-            case "ColdForest":
-            case "ColdHills":
-            case "ColdMountain":
-            case "ColdUrban":
-            case "Forest":
-            case "FrozenFacility":
-            case "Hills":
-            case "HotFacility":
-            case "HotForest":
-            case "HotHillsWet":
-            case "HotMountainsWet":
-            case "HotUrban":
-            case "Jungle":
-            case "Mountain":
-            case "Steppe":
-            case "Swamp":
-            case "TemperateFacility":
-            case "Urban":
-                // standard
-                odds = new int[]{90,10};
-                break;
-            case "ArcticDesert":
-            case "Badlands":
-            case "Desert":
-            case "HotHillsDry":
-            case "HotMountainsDry":
-                // heavy
-                odds = new int[]{40,60};
-                break;
-            default:
-                return BlowingSand.BLOWING_SAND_NONE;
-        }
-
-        return rollCondition(odds) == 1 ? BlowingSand.BLOWING_SAND : BlowingSand.BLOWING_SAND_NONE;
-    }
-
-    private EMI rollEMICondition() {
-        int[] odds;
-        String terrainType = getTerrainType() == null  ? "Hills" : getTerrainType();
-
-        switch (terrainType) {
-            case "Forest":
-            case "Hills":
-            case "HotFacility":
-            case "HotForest":
-            case "HotUrban":
-            case "Mountain":
-            case "Plains":
-            case "Savannah":
-            case "Steppe":
-            case "TemperateFacility":
-            case "Urban":
-                // standard
-                odds = new int[]{999,1};
-                break;
-            case "ArcticDesert":
-            case "Badlands":
-            case "Desert":
-            case "HotHillsDry":
-            case "HotMountainsDry":
-                // high
-                odds = new int[]{90,10};
-                break;
-            default:
-                return EMI.EMI_NONE;
-        }
-
-        if (getAtmosphere().isDenserThan(Atmosphere.THIN)) {
-            return rollCondition(odds) == 1 ? EMI.EMI : EMI.EMI_NONE;
-        } else {
-            return EMI.EMI_NONE;
-        }
-    }
-
     public void setLightConditions() {
-        setLight(rollLightCondition());
+        setLight(TCO.rollLightCondition(getTerrainType()));
     }
 
     public void setWeather() {
@@ -643,11 +322,31 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             return;
         }
 
-        Wind wind = rollWindCondition();
-        Weather weather = rollWeatherCondition();
-        Fog fog = rollFogCondition();
-        BlowingSand blowingSand = rollBlowingSandCondition();
-        EMI emi = rollEMICondition();
+        Wind wind = TCO.rollWindCondition(getTerrainType());
+
+        if (WeatherRestriction.IsWindRestricted(wind.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
+            wind = Wind.CALM;
+        }
+
+        Weather weather = TCO.rollWeatherCondition(getTerrainType());
+
+        if (WeatherRestriction.IsWeatherRestricted(weather.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
+            weather = Weather.CLEAR;
+        }
+
+        Fog fog = TCO.rollFogCondition(getTerrainType());
+
+        if (WeatherRestriction.IsFogRestricted(fog.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
+            fog = Fog.FOG_NONE;
+        }
+
+        BlowingSand blowingSand = TCO.rollBlowingSandCondition(getTerrainType());
+
+        if (getAtmosphere().isLighterThan(Atmosphere.TRACE)) {
+            blowingSand = BlowingSand.BLOWING_SAND_NONE;
+        }
+
+        EMI emi = TCO.rollEMICondition(getTerrainType());
 
         int temp = getTemperature();
         temp = PlanetaryConditions.setTempFromWeather(weather, temp);
@@ -721,8 +420,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setMapFile(String terrainType) {
-        Map<String, StratconBiomeManifest.MapTypeList> biomeMapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
-        StratconBiomeManifest.MapTypeList value = biomeMapTypes.get(terrainType);
+        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
+        StratconBiomeManifest.MapTypeList value = mapTypes.get(terrainType);
         if (value != null) {
             List<String> mapTypeList = value.mapTypes;
             setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
