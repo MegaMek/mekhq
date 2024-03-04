@@ -119,11 +119,11 @@ public class AtBDynamicScenarioFactory {
 
         boolean planetsideScenario = template.isPlanetSurface();
 
-        setTerrain(scenario);
-
         if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
             setPlanetaryConditions(scenario, contract, campaign);
         }
+
+        setTerrain(scenario);
 
         // set lighting conditions if the user wants to play with them and is on a ground map
         // theoretically some lighting conditions apply to space maps as well, but requires additional work to implement properly
