@@ -185,7 +185,7 @@ public class RetirementDefectionTracker {
             }
 
             if (campaign.getFaction().isPirate()) {
-                target.addModifier(2, "Pirate");
+                target.addModifier(1, "Pirate");
             }
 
             if (p.getRank().isOfficer()) {
