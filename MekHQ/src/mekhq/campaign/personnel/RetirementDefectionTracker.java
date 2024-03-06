@@ -177,7 +177,7 @@ public class RetirementDefectionTracker {
                     "Experience");
             /* Retirement rolls are made before the contract status is set */
             if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
-                target.addModifier(1, "Failed mission");
+                target.addModifier( 1, "Failed mission");
             }
 
             if (campaign.getCampaignOptions().isTrackUnitFatigue() && (campaign.getFatigueLevel() >= 10)) {
