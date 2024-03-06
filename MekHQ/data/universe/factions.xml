@@ -10,6 +10,9 @@ Joshua Bartz (Bonepart)
 Modified 21-MAR-2021
 Justin 'Windchild' Bowen
 
+Modified MAR-2024
+Illiani CBT
+
 
 This file defines the factions used by MekHQ. Keep in mind that the faction shortnames are used by the planets.xml file, so if you remove a faction here, you need to remove all references to it in that file. Not all of the factions listed here are available to play by default. To add a faction as playable, just add the playable tag.
 
@@ -95,7 +98,7 @@ successor - unimplemented tag describing another faction code as the specified f
     </faction>
     <faction>
         <shortname>Alf</shortname>
-        <fullname>Alfrik</fullname>
+        <fullname>Alfik</fullname>
         <colorRGB>103,169,57</colorRGB>
         <tags>is,minor</tags>
         <start>2200</start> <!-- estimated -->
