@@ -30,7 +30,7 @@ class StartupScreenPanelTest {
 
     @Test
     void testSaveFilterNotAllowClientSettingsXML(){
-        String fileName = PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase();
+        String fileName = PreferenceManager.DEFAULT_CFG_FILE_NAME;
         boolean allowed = StartupScreenPanel.saveFilter.accept(dir, fileName);
         assertFalse(allowed);
     }
