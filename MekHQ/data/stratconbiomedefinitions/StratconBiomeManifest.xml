@@ -167,6 +167,7 @@
                 <mapTypes>Wooded-valley-snow</mapTypes>
                 <mapTypes>Woods-river-snow</mapTypes>
                 <mapTypes>Wooded-tundra</mapTypes>
+                <mapTypes>RuralHomesteadsCold</mapTypes>				
             </value>
         </entry>
 	<entry>
@@ -215,6 +216,7 @@
                 <mapTypes>ColdSeaCoastalFort</mapTypes>
                 <mapTypes>CityCold</mapTypes>
                 <mapTypes>TownCold</mapTypes>
+                <mapTypes>RuralHomesteadsCold</mapTypes>				
             </value>
         </entry>
 	<entry>
@@ -222,6 +224,7 @@
             <value>
                 <mapTypes>Desert</mapTypes>
                 <mapTypes>TownHotDesert</mapTypes>
+                <mapTypes>RuralHomesteadsHotDesert</mapTypes>				
             </value>
         </entry>
 	<entry>
@@ -294,6 +297,7 @@
             <key>HotForest</key>
             <value>
                 <mapTypes>ForestHot</mapTypes>
+                <mapTypes>RuralHomesteadsHotJungle</mapTypes>				
             </value>
         </entry>
 	<entry>
@@ -334,13 +338,15 @@
                 <mapTypes>CityHotJungle</mapTypes>
                 <mapTypes>TownHotJungle</mapTypes>
                 <mapTypes>TownHotJungle</mapTypes>
+                <mapTypes>RuralHomesteadsHotDesert</mapTypes>				
             </value>
         </entry>
 	<entry>
             <key>Jungle</key>
             <value>
                 <mapTypes>Jungle</mapTypes>
-		<mapTypes>TownHotJungle</mapTypes>
+        		<mapTypes>TownHotJungle</mapTypes>
+                <mapTypes>RuralHomesteadsHotJungle</mapTypes>		
             </value>
         </entry>
 	<entry>
