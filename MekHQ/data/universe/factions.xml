@@ -10,6 +10,9 @@ Joshua Bartz (Bonepart)
 Modified 21-MAR-2021
 Justin 'Windchild' Bowen
 
+Modified MAR-2024
+IllianiCBT
+
 This file defines the factions used by MekHQ. Keep in mind that the faction shortnames are used by the planets.xml file, so if you remove a faction here, you need to remove all references to it in that file. Not all of the factions listed here are available to play by default. To add a faction as playable, just add the playable tag.
 
 Here is a description of what goes in each faction tag
@@ -94,7 +97,7 @@ successor - unimplemented tag describing another faction code as the specified f
     </faction>
     <faction>
         <shortname>Alf</shortname>
-        <fullname>Alfrik</fullname>
+        <fullname>Alfik</fullname>
         <colorRGB>103,169,57</colorRGB>
         <tags>is,minor</tags>
         <start>2200</start> <!-- estimated -->
@@ -1058,7 +1061,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <start>3078</start>
         <end>3139</end>
     </faction>
-        <faction>
+    <faction>
         <shortname>DT</shortname>
         <fullname>Duchy of Tamarind</fullname>
         <startingPlanet>Tamarind</startingPlanet>
@@ -1083,7 +1086,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <shortname>CEI</shortname>
         <fullname>Escorpión Imperio</fullname>
         <altNamesByYear year='3141'>Scorpion Empire</altNamesByYear>
-		<!-- Per Hanseatic Crusade PDF, the Empire was formed at the end of the war, in 3141 -->
+        <!-- Per Hanseatic Crusade PDF, the Empire was formed at the end of the war, in 3141 -->
         <alternativeFactionCodes>CGS,NC,UC</alternativeFactionCodes>
         <startingPlanet>Granada</startingPlanet>
         <eraMods>1,1,1,1,2,3,2,2,1</eraMods>
@@ -1185,7 +1188,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <layeredForceIconLogoFilename>Hanseatic League.png</layeredForceIconLogoFilename>
         <tags>deep_periphery,playable</tags>
         <start>2891</start>
-		<end>3141</end>
+        <end>3141</end>
     </faction>
     <faction>
         <shortname>IP</shortname>
@@ -1919,7 +1922,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <layeredForceIconLogoFilename>Umayyad Caliphate.png</layeredForceIconLogoFilename>
         <tags>deep_periphery</tags>
         <start>2830</start>
-		<end>3080</end>
+        <end>3080</end>
     </faction>
     <faction>
         <shortname>REB</shortname>
@@ -2066,9 +2069,9 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>periphery,minor</tags>
         <start>3148</start>
     </faction>
-	
-	<!-- Tamar Rising Factions -->
-	<faction>
+
+    <!-- Tamar Rising Factions -->
+    <faction>
         <shortname>AML</shortname>
         <fullname>Alyina Mercantile League</fullname>
         <startingPlanet>Alyina</startingPlanet>
@@ -2076,7 +2079,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>clan,minor</tags>
         <start>3151</start>
     </faction>
-	<faction>
+    <faction>
         <shortname>NTamP</shortname>
         <fullname>Tamar Pact</fullname>
         <startingPlanet>Arcturus</startingPlanet>
@@ -2084,7 +2087,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3151</start>
     </faction>
-	<faction>
+    <faction>
         <shortname>VSM</shortname>
         <fullname>Vesper Marches</fullname>
         <startingPlanet>Melissia</startingPlanet>
@@ -2092,7 +2095,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3151</start>
     </faction>
-	<faction>
+    <faction>
         <shortname>ARL</shortname>
         <fullname>Arc Royal Liberty Coalition</fullname>
         <startingPlanet>Arc-Royal</startingPlanet>
@@ -2100,7 +2103,7 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3151</start>
     </faction>
-	<faction>
+    <faction>
         <shortname>MalC</shortname>
         <fullname>Malthus Confederation</fullname>
         <startingPlanet>Dustball</startingPlanet>
@@ -2108,9 +2111,9 @@ successor - unimplemented tag describing another faction code as the specified f
         <tags>is,minor</tags>
         <start>3151</start>
     </faction>
-	
-	<!-- Dominions Divided Factions -->
-	<faction>
+
+    <!-- Dominions Divided Factions -->
+    <faction>
         <shortname>IoS</shortname>
         <fullname>Isle of Skye</fullname>
         <startingPlanet>Skye</startingPlanet>
