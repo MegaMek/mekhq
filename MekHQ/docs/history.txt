@@ -21,6 +21,8 @@ MEKHQ VERSION HISTORY:
 + Fix #3843: Fix chassis lookup
 + Fix #3842: Can't load prefab campaigns  
 + PR #3849: StratCon Heavy Battles, by PhoenixHeart.
++ Fix: #3848: Unable to assign Aerospace units to a transport in the TO&E
++ Fix: #3856: Display bug in 'Basic Unit Information', doesn't show aerospace units 
 
 0.49.17 (2023-12-31 1900 UTC)
 + No code added
