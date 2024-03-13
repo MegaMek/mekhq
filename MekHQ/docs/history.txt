@@ -3,6 +3,13 @@ MEKHQ VERSION HISTORY:
 0.49.19-SNAPSHOT
 + PR #3845: Adaptations for Adding Clan Personnel Tracking to MegaMek
 + Fix #3775: Non-superheavy Tripods can now be assigned crews; pilots can now be assigned to SH and Tripods in the personnel tab
++ Fix: #3848: Unable to assign Aerospace units to a transport in the TO&E
++ Fix: #3856: Display bug in 'Basic Unit Information', doesn't show aerospace units
++ Fix: #3815: StratCon Modifier BadEvent is broken and doesnt do anything
++ PR: #3874: Fixes MegaMek #4464 - StratCon Mapgen Fix
++ PR: #3866: Fixed Typo and Removed Indents
++ Data: #3865: 499 new callsigns 
++ PR: #3878: Interstellar Map Hiring Hall Highlight
 
 0.49.18 (2024-02-17 1800 UTC)
 + PR #3805: Adaptations for the Internal Bomb Bay quirk
@@ -21,8 +28,8 @@ MEKHQ VERSION HISTORY:
 + Fix #3843: Fix chassis lookup
 + Fix #3842: Can't load prefab campaigns  
 + PR #3849: StratCon Heavy Battles, by PhoenixHeart.
-+ Fix: #3848: Unable to assign Aerospace units to a transport in the TO&E
-+ Fix: #3856: Display bug in 'Basic Unit Information', doesn't show aerospace units 
+
+
 
 0.49.17 (2023-12-31 1900 UTC)
 + No code added
