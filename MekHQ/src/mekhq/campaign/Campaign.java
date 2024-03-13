@@ -3577,7 +3577,7 @@ public class Campaign implements ITechManager {
         if (force != null) {
             force.updateCommander(this);
         }
-        
+
         person.getGenealogy().clearGenealogyLinks();
 
         final Unit unit = person.getUnit();
@@ -4523,7 +4523,7 @@ public class Campaign implements ITechManager {
         int nMech = stats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
         int nLVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
         int nHVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
-        int nAero = stats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int nAero = stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
         int nSC = stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int nCF = stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
         int nBA = stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
@@ -4544,7 +4544,7 @@ public class Campaign implements ITechManager {
         int noDS = Math.max(nDropship - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
         int noSC = Math.max(nSC - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int noCF = Math.max(nCF - stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(nAero - stats.getOccupiedBays(Entity.ETYPE_AERO), 0);
+        int noASF = Math.max(nAero - stats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
         int nolv = Math.max(nLVee - stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = Math.max(nHVee - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int noinf = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
@@ -4809,12 +4809,12 @@ public class Campaign implements ITechManager {
         if (null != u) {
             u.resetPilotAndEntity();
         }
-        
+
         Force force = getForceFor(p);
         if (force != null) {
             force.updateCommander(this);
         }
-        
+
         MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
