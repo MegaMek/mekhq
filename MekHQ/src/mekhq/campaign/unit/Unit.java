@@ -1283,8 +1283,9 @@ public class Unit implements ITechnology {
         switch (unitType) {
             case UnitType.MEK:
                 return getCurrentMechCapacity();
-            case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
             case UnitType.CONV_FIGHTER:
+            case UnitType.AERO:
                 // Return a small craft slot if no ASF slots exist
                 if (getCurrentASFCapacity() > 0) {
                     return getCurrentASFCapacity();
@@ -1347,8 +1348,9 @@ public class Unit implements ITechnology {
             case UnitType.MEK:
                 setMechCapacity(Math.min((getCurrentMechCapacity() + amount), getMechCapacity()));
                 break;
-            case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
             case UnitType.CONV_FIGHTER:
+            case UnitType.AERO:
                 // Use the assigned bay number to determine if we need to update ASF or Small Craft capacity
                 Bay aeroBay = getEntity().getBayById(bayNumber);
                 if (aeroBay != null) {
@@ -3420,7 +3422,7 @@ public class Unit implements ITechnology {
             return UIManager.getColor(type + ".Foreground");
         }
     }
-    
+
     public Color determineBackgroundColor(String type) {
         if (isDeployed()) {
             return MekHQ.getMHQOptions().getDeployedBackground();
@@ -3446,7 +3448,7 @@ public class Unit implements ITechnology {
             return UIManager.getColor(type + ".Background");
         }
     }
-    
+
     /**
      * Determines which crew member is considered the unit commander. For solo-piloted units there is
      * only one option, but units with multiple crew (vehicles, aerospace vessels, infantry) use the following
