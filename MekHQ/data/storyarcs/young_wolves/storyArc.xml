@@ -14,7 +14,7 @@ This is the story of a Trinary of young Wolf warriors eager to write their own l
 This is a story arc in active development. Try at your own risk!
   </description>
   <storyLoadingType>START_NEW</storyLoadingType>
-  <startingPointId>e940b4b7-730f-4201-b9aa-bb0049df6f32</startingPointId>
+  <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
   <customStringVariables>
     <customStringVariable>
       <key>first_impressions</key>
@@ -926,7 +926,7 @@ This is a story arc in active development. Try at your own risk!
       <title>A Mutiny</title>
       <question>
         Hello {commander}. I am glad to see it is you returning. Unfortunately, we have a bit of a situation here. After hearing the results of the trial, Ella was able to convince a few other warriors that it would be better to die in battle here against the Falcons than to go into exile with Khan Phelan. They were able to exit with their mechs before I was aware of the plan.
-        
+
         *As she says this, you begin to hear the sounds of heavy weapons fire in the distance. The Falcons are likely enraged by this perceived violation of the truce. Going after these warriors would be suicide.*
       </question>
       <choice id="fools">Those damn fools! Their fate is sealed. Prepare for liftoff.</choice>
@@ -954,7 +954,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Suicidal Desertion</title>
       <question>
         Hello {commander}. I am glad to see it is you returning. Unfortunately, we have a bit of a situation here. After hearing the results of the trial, Ella attempted to convince other warriors that it would be better to die in battle here against the Falcons than to go into exile with Khan Phelan. She was not able to convince anyone else to join her, but she was able to exit with her mech before I was aware of her plans.
-        
+
         *As she says this, you begin to hear the sounds of heavy weapons fire in the distance. The Falcons are likely enraged by this perceived violation of the truce. Going after Ella would be suicide.*
       </question>
       <choice id="fool">What a damn fool! Her fate is sealed. Prepare for liftoff.</choice>
@@ -1415,7 +1415,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Onward to Exile</title>
       <narrative>
         Greetings, {commanderRank}. A jumpship is waiting at the nadir point to carry us to Morges. Please, prepare for acceleration.
-        
+
         I for one will be proud to stand with Khan Phelan's Wolves.
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
@@ -1429,7 +1429,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Welome to Morges</title>
       <narrative>
         Welcome to Morges, {commander}. We are entering orbit and I am trying to raise communication with--
-        
+
         Wait! I have an urgent incoming communication directly from Khan Phelan. I am routing it directly to you.
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
@@ -1768,10 +1768,10 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="narr_phelan_help" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>319cd061-56cb-49ae-b86b-4df55defddb7</id>
       <narrative>
-        {commanderRank}! Boy, am I glad to see you. 
-        
-        *Sounds of explosion cut off any communication momentarily*. 
-        
+        {commanderRank}! Boy, am I glad to see you.
+
+        *Sounds of explosion cut off any communication momentarily*.
+
         We have been giving these Falcons a hard time, but in desperation, they have thrown most everything they have left at us and some units have penetrated the front lines in an unorthodox headhunter attack. My command star is now under heavy assault. I need you to combat drop on my position and hit these *stravag* Falcons from behind. You can thank me later for saving a few of these birds for you to chew on!
       </narrative>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
@@ -1811,7 +1811,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Well-Bargained and Done</title>
       <narrative>
         Excellent! You will not be disappointed {commander}. What with my combat experience and tactical brilliance, we will soon have these Jade Falcon surats (ooh that was fun to say!) running. I daresay we will have this campaign wrapped up in no time and our glory will be--
-        
+
         *You cut the mike, questioning what you have done.*
       </narrative>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddPersonStoryTrigger">
@@ -1861,7 +1861,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Well-Bargained and Done</title>
       <narrative>
         But, of course. That is the customary way, after all. I assure you it will not take you long to realize the advantages that could accrue should you decide to cut my bondcord. My tactical expertise is quite extensive. I feel that it would be best, perhaps, if I serve in a capacity that would put me in close proximity to you so that I could share my wealth of tactical and strategic knowledge. Something like an adie-de-camp, quaiff? Yes, I think that would be most bene--
-        
+
         *You cut the mike, questioning what you have done.*
       </narrative>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddPersonStoryTrigger">
@@ -1912,9 +1912,9 @@ This is a story arc in active development. Try at your own risk!
       <title>A Disappointed Solamha</title>
       <narrative>
         *He looks quite deflated.*
-        
+
         Well, I understand, I suppose. Many in the clans have not realized the vast expertise to be found among the more mature members. Why, I myself have a wealth of strategic and tactical knowledge. Do you know that I have read the entirety of Sun-Tzu Art of War as well as Musashi's Book of Five Rings? Why, you may want to reconsider once you hear---
-        
+
         *You cut the mike, feeling strongly that you made the right decision.*
       </narrative>
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
@@ -1966,7 +1966,7 @@ This is a story arc in active development. Try at your own risk!
       <title>Death of a Warrior</title>
       <narrative>
         As the battle abruptly dies out, you look at the battered remains of Mathius's mech. There is no movement from the crushed cockpit. It appears that Mathius did not survive the trial.
-        
+
         You stand for a moment in contemplation as your weapons cycle and cool. You note movement out of the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and instead their mechs have formed something like a circle of equals. Slowly, they bow their heads in recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word, they salute your mech and withdraw.
 
         As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the *Moonhowler*.
