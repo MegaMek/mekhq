@@ -16,9 +16,9 @@ SupportVTOL
 Trireme Infantry Transport
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 3309
@@ -31,6 +31,10 @@ Trireme Infantry Transport
 <type>
 IS Level 2
 </type>
+
+<role>
+None
+</role>
 
 <motion_type>
 VTOL
@@ -91,7 +95,7 @@ battlearmorbay:4.5:1
 </barrating>
 
 <source>
-TRO 3085 - Early Republic
+TRO: 3085
 </source>
 
 <tonnage>

@@ -25,16 +25,20 @@ S-2B
 </mul id:>
 
 <year>
-2571
+2525
 </year>
 
 <originalBuildYear>
-2571
+2525
 </originalBuildYear>
 
 <type>
 IS Level 2
 </type>
+
+<role>
+Fast Dogfighter
+</role>
 
 <motion_type>
 Aerodyne
@@ -99,7 +103,7 @@ IS Ammo MG - Full
 </Fuselage Equipment>
 
 <source>
-Field Report 2765 DCMS - Age of War
+Field Report 2765 DCMS
 </source>
 
 <tonnage>

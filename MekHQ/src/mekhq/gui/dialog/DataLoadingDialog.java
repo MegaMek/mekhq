@@ -22,7 +22,6 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.MechSummaryCache;
-import megamek.common.QuirksHandler;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import mekhq.MHQStaticDirectoryManager;
@@ -33,8 +32,11 @@ import mekhq.campaign.CampaignFactory;
 import mekhq.campaign.CampaignPreset;
 import mekhq.campaign.event.OptionsChangedEvent;
 import mekhq.campaign.finances.CurrencyManager;
+import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.personnel.Bloodname;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryArcStub;
@@ -78,7 +80,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
         this.application = application;
         this.campaignFile = campaignFile;
         this.storyArcStub = stub;
-        this.task = new Task();
+        this.task = new Task(this);
         getTask().addPropertyChangeListener(this);
         initialize();
         getTask().execute();
@@ -178,10 +180,10 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 progressBar.setString(resources.getString("loadingUnits.text"));
                 break;
             case 6:
-                progressBar.setString(resources.getString("loadingCampaign.text"));
+                progressBar.setString(resources.getString((getCampaignFile() == null) ? "initializingNewCampaign.text" : "loadingCampaign.text"));
                 break;
             case 7:
-                progressBar.setString(resources.getString("applyingLoadedCampaign.text"));
+                progressBar.setString(resources.getString((getCampaignFile() == null) ? "applyingNewCampaign.text" : "applyingLoadedCampaign.text"));
                 break;
             default:
                 progressBar.setString(resources.getString("Error.text"));
@@ -198,6 +200,10 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
      * Main task. This is executed in a background thread.
      */
     private class Task extends SwingWorker<Campaign, Campaign> {
+        JDialog dialog;
+        public Task(JDialog dialog) {
+            this.dialog = dialog;
+        }
         /**
          * This uses the following stages of loading:
          * 0 : Basics
@@ -217,9 +223,12 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
             setProgress(0);
             CurrencyManager.getInstance().loadCurrencies();
             Eras.initializeEras();
+            FinancialInstitutions.initializeFinancialInstitutions();
             InjuryTypes.registerAll(); // TODO : Isolate into an actual module
             Ranks.initializeRankSystems();
             RATManager.populateCollectionNames();
+            SkillType.initializeTypes();
+            SpecialAbility.initializeSPA();
             //endregion Progress 0
 
             //region Progress 1
@@ -246,8 +255,6 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
             //region Progress 5
             setProgress(5);
-            QuirksHandler.initQuirksList();
-
             while (!MechSummaryCache.getInstance().isInitialized()) {
                 try {
                     Thread.sleep(50);
@@ -265,7 +272,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 campaign = new Campaign();
 
                 // Campaign Preset
-                final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(getFrame());
+                final CampaignPresetSelectionDialog presetSelectionDialog = new CampaignPresetSelectionDialog(dialog, getFrame());
                 if (presetSelectionDialog.showDialog().isCancelled()) {
                     return null;
                 }
@@ -274,7 +281,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 // Date
                 final LocalDate date = ((preset == null) || (preset.getDate() == null))
                         ? campaign.getLocalDate() : preset.getDate();
-                final DateChooser dc = new DateChooser(getFrame(), date);
+                final DateChooser dc = new DateChooser(dialog, date);
                 dc.setLocationRelativeTo(getFrame());
                 // user can either choose a date or cancel by closing
                 if (dc.showDateChooser() != DateChooser.OK_OPTION) {
@@ -292,7 +299,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 setVisible(false);
 
                 // Campaign Options
-                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(getFrame(), campaign, true);
+                CampaignOptionsDialog optionsDialog = new CampaignOptionsDialog(dialog, getFrame(), campaign, true);
                 optionsDialog.setLocationRelativeTo(getFrame());
                 optionsDialog.applyPreset(preset);
                 if (optionsDialog.showDialog().isCancelled()) {
@@ -326,7 +333,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 campaign.setGMMode((preset == null) || preset.isGM());
 
                 // AtB
-                if (campaign.getCampaignOptions().getUseAtB()) {
+                if (campaign.getCampaignOptions().isUseAtB()) {
                     campaign.initAtB(true);
                 }
                 //endregion Progress 7

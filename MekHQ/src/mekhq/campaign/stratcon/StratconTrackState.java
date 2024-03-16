@@ -25,6 +25,7 @@ import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -57,6 +58,8 @@ public class StratconTrackState {
     private Set<StratconCoords> revealedCoords;
     private List<StratconStrategicObjective> strategicObjectives;
 
+    private Map<StratconCoords, String> terrainTypes;
+
     // don't serialize this
     private transient Map<Integer, StratconScenario> backingScenarioMap;
     private transient Map<StratconCoords, StratconStrategicObjective> specificStrategicObjectives;
@@ -64,6 +67,8 @@ public class StratconTrackState {
     private int scenarioOdds;
     private int deploymentTime;
     private int requiredLanceCount;
+
+    private int temperature;
 
     public StratconTrackState() {
         facilities = new HashMap<>();
@@ -75,6 +80,7 @@ public class StratconTrackState {
         revealedCoords = new HashSet<>();
         stickyForces = new HashSet<>();
         strategicObjectives = new ArrayList<>();
+        terrainTypes = new HashMap<>();
     }
 
     public String getDisplayableName() {
@@ -148,12 +154,31 @@ public class StratconTrackState {
         }
     }
 
+    public void removeScenario(int campaignScenarioID) {
+        if (getBackingScenariosMap().containsKey(campaignScenarioID)) {
+            removeScenario(getBackingScenariosMap().get(campaignScenarioID));
+        }
+    }
+    
     /**
      * Removes a StratconScenario from this track.
      */
     public void removeScenario(StratconScenario scenario) {
         scenarios.remove(scenario.getCoords());
         getBackingScenariosMap().remove(scenario.getBackingScenarioID());
+        Map<StratconCoords, StratconStrategicObjective> objectives = getObjectivesByCoords();
+        if (objectives.containsKey(scenario.getCoords())) {
+            StrategicObjectiveType objectiveType = objectives.get(scenario.getCoords()).getObjectiveType();
+            
+            switch (objectiveType) {
+                case RequiredScenarioVictory:
+                case SpecificScenarioVictory:
+                    objectives.remove(scenario.getCoords());
+                    break;
+                default:
+                    break;
+            }
+        }
 
         // any assigned forces get cleared out here as well.
         for (int forceID : scenario.getAssignedForces()) {
@@ -462,5 +487,31 @@ public class StratconTrackState {
 
     public void addStrategicObjective(StratconStrategicObjective strategicObjective) {
         getStrategicObjectives().add(strategicObjective);
+    }
+
+    public int getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(int temp) {
+        temperature = temp;
+    }
+
+    public void setTerrainTile(StratconCoords coords, String terrainTypeName) {
+        terrainTypes.put(coords, terrainTypeName);
+    }
+
+    public String getTerrainTile(StratconCoords coords) {
+        return terrainTypes.getOrDefault(coords, "");
+    }
+
+    @XmlElementWrapper(name = "terrainTypes")
+    @XmlElement(name = "terrainType")
+    public Map<StratconCoords, String> getTerrainTypes() {
+        return terrainTypes;
+    }
+
+    public void setStrategicObjectives(Map<StratconCoords, String> terrainTypes) {
+        this.terrainTypes = terrainTypes;
     }
 }

@@ -25,14 +25,13 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Entity;
 import megamek.common.UnitType;
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.gui.adapter.UnitTableMouseAdapter;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.sorter.*;
 import mekhq.gui.view.UnitViewPanel;
@@ -71,7 +70,7 @@ public final class HangarTab extends CampaignGuiTab {
     private TableRowSorter<UnitTableModel> unitSorter;
 
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     //region Constructors
     public HangarTab(CampaignGUI gui, String name) {
@@ -82,8 +81,8 @@ public final class HangarTab extends CampaignGuiTab {
     //endregion Constructors
 
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.HANGAR;
+    public MHQTabType tabType() {
+        return MHQTabType.HANGAR;
     }
 
     /*
@@ -370,7 +369,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_SITE), false);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), getCampaign().getCampaignOptions().useQuirks());
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_QUIRKS), getCampaign().getCampaignOptions().isUseQuirks());
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_RSTATUS), false);
         } else if (view == UV_STATUS) {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_NAME), true);
@@ -387,7 +386,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_FORCE), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
-            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), getCampaign().getCampaignOptions().payForMaintain());
+            columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN), getCampaign().getCampaignOptions().isPayForMaintain());
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_REPAIR), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_PARTS), true);

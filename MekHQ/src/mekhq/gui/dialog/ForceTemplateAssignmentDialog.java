@@ -19,7 +19,6 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.DeploymentChangedEvent;
 import mekhq.campaign.force.Force;
@@ -53,11 +52,12 @@ public class ForceTemplateAssignmentDialog extends JDialog {
     private Vector<Unit> currentUnitVector;
     private CampaignGUI campaignGUI;
 
+    // FIXME : Unlocalized text
     private static final String DEPLOY_TRANSPORTED_DIALOG_TEXT = " is a transport with units assigned to it. \n" + "Would you also like to deploy these units?";
     private static final String DEPLOY_TRANSPORTED_DIALOG_TITLE = "Also deploy transported units?";
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ForceTemplateAssignmentDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public ForceTemplateAssignmentDialog(CampaignGUI gui, Vector<Force> assignedForces, Vector<Unit> assignedUnits, AtBDynamicScenario scenario) {
         currentForceVector = assignedForces;
@@ -236,11 +236,19 @@ public class ForceTemplateAssignmentDialog extends JDialog {
                 unit.getName() +  ForceTemplateAssignmentDialog.DEPLOY_TRANSPORTED_DIALOG_TEXT,
                 ForceTemplateAssignmentDialog.DEPLOY_TRANSPORTED_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
         if (optionChoice == JOptionPane.YES_OPTION) {
-            for (Unit cargo : unit.getTransportedUnits()) {
-                currentScenario.removeUnit(cargo.getId());
-                currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
-                cargo.setScenarioId(currentScenario.getId());
-                MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
+            deployTransportedUnits(unit);
+        }
+    }
+
+    private void deployTransportedUnits(final Unit unit) {
+        for (final Unit cargo : unit.getTransportedUnits()) {
+            currentScenario.removeUnit(cargo.getId());
+            currentScenario.addUnit(cargo.getId(), templateList.getSelectedValue().getForceName());
+            cargo.setScenarioId(currentScenario.getId());
+            MekHQ.triggerEvent(new DeploymentChangedEvent(cargo, currentScenario));
+
+            if (cargo.hasTransportedUnits()) {
+                deployTransportedUnits(cargo);
             }
         }
     }

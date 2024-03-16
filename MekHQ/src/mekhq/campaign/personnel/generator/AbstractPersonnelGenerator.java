@@ -120,7 +120,7 @@ public abstract class AbstractPersonnelGenerator {
     protected void generateName(Campaign campaign, Person person, Gender gender) {
         person.setGender((gender == Gender.RANDOMIZE) ? RandomGenderGenerator.generate() : gender);
 
-        String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
+        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames()
                 ? person.getOriginFaction().getShortName()
                 : RandomNameGenerator.getInstance().getChosenFaction();
 
@@ -136,7 +136,7 @@ public abstract class AbstractPersonnelGenerator {
      * @param person The {@link Person} being generated.
      */
     protected void generateXp(Campaign campaign, Person person) {
-        if (campaign.getCampaignOptions().useDylansRandomXP()) {
+        if (campaign.getCampaignOptions().isUseDylansRandomXP()) {
             person.setXP(campaign, Utilities.generateRandomExp());
         }
     }
@@ -205,11 +205,11 @@ public abstract class AbstractPersonnelGenerator {
      * @param campaign The {@link Campaign} which tracks the person.
      * @param person The {@link Person} being generated.
      * @param expLvl The experience level of {@code person}.
-     * @param isClanner A value indicating if {@code person} is a clanner.
+     * @param isClanPersonnel A value indicating if {@code person} is from the Clans.
      */
-    protected void generateBirthday(Campaign campaign, Person person, int expLvl, boolean isClanner) {
+    protected void generateBirthday(Campaign campaign, Person person, int expLvl, boolean isClanPersonnel) {
         LocalDate birthday = campaign.getLocalDate();
-        birthday = birthday.minusYears(Utilities.getAgeByExpLevel(expLvl, isClanner));
+        birthday = birthday.minusYears(Utilities.getAgeByExpLevel(expLvl, isClanPersonnel));
 
         // choose a random day and month
         int nDays = birthday.isLeapYear() ? 366 : 365;

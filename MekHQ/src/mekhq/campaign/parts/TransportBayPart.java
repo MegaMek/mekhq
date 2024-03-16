@@ -22,6 +22,7 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -175,7 +176,7 @@ public class TransportBayPart extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -206,11 +207,11 @@ public class TransportBayPart extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "bayNumber", bayNumber);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "size", size);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bayNumber", bayNumber);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "size", size);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

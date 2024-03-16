@@ -16,9 +16,9 @@ Aero
 Persepolis
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 4806
@@ -35,6 +35,10 @@ Persepolis
 <type>
 Clan Level 3
 </type>
+
+<role>
+Dogfighter
+</role>
 
 <motion_type>
 Aerodyne
@@ -142,7 +146,7 @@ TARGETING:Omicron XX
 </systemManufacturers>
 
 <source>
-TRO Prototypes - Jihad
+TRO: Prototypes
 </source>
 
 <tonnage>

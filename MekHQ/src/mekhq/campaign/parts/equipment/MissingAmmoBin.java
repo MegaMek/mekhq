@@ -144,19 +144,17 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     @Override
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         if (oneShot) {
-            MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "oneShot", oneShot);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "oneShot", oneShot);
         }
 
-        super.writeToXmlEnd(pw1, indent);
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn) {
-
         NodeList nl = wn.getChildNodes();
-
         for (int x = 0; x < nl.getLength(); x++) {
             Node wn2 = nl.item(x);
             if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
@@ -168,7 +166,7 @@ public class MissingAmmoBin extends MissingEquipmentPart {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
-        return PartRepairType.AMMO;
+    public PartRepairType getMRMSOptionType() {
+        return PartRepairType.AMMUNITION;
     }
 }

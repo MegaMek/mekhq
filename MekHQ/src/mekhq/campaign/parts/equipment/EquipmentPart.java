@@ -148,13 +148,13 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipmentNum", equipmentNum);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "typeName", type.getInternalName());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "size", size);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "equipTonnage", equipTonnage);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentNum", equipmentNum);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "size", size);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipTonnage", equipTonnage);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -383,7 +383,7 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (isSalvaging()) {
             return null;
         }

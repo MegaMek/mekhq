@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Special Mission: Allied Traitors</name>
+    <name>Special Scenario: Allied Traitors</name>
     <shortBriefing></shortBriefing>
     <detailedBriefing>One of your officer MechWarriors has been isolated and must conduct operations on their own.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>

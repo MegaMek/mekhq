@@ -23,10 +23,11 @@ package mekhq.campaign.personnel.ranks;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
+import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.RankSystemType;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -92,19 +93,20 @@ public class Ranks {
             path += ".xml";
             file = new File(path);
         }
+        int indent = 0;
         try (OutputStream fos = new FileOutputStream(file);
              OutputStream bos = new BufferedOutputStream(fos);
              OutputStreamWriter osw = new OutputStreamWriter(bos, StandardCharsets.UTF_8);
              PrintWriter pw = new PrintWriter(osw)) {
             // Then save it out to that file.
             pw.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-            pw.println("<rankSystems version=\"" + MHQConstants.VERSION + "\">");
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "rankSystems", "version", MHQConstants.VERSION);
             for (final RankSystem rankSystem : rankSystems) {
-                rankSystem.writeToXML(pw, 1, true);
+                rankSystem.writeToXML(pw, indent, true);
             }
-            MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw, 0, "rankSystems");
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "rankSystems");
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -117,6 +119,15 @@ public class Ranks {
                 continue;
             }
             final List<RankSystem> rankSystems = loadRankSystemsFromFile(new File(type.getFilePath()), type);
+            if (type.isUserData()) {
+                String userDir = PreferenceManager.getClientPreferences().getUserDir();
+                if (!userDir.isBlank() && new File(userDir).isDirectory()) {
+                    File userDirRanks = new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH);
+                    if (userDirRanks.exists()) {
+                        rankSystems.addAll(loadRankSystemsFromFile(new File(userDir + "/" + MHQConstants.RANKS_FILE_PATH), type));
+                    }
+                }
+            }
             for (final RankSystem rankSystem : rankSystems) {
                 if (rankValidator.validate(rankSystem, true)) {
                     getRankSystems().put(rankSystem.getCode(), rankSystem);

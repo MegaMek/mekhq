@@ -66,7 +66,7 @@ import java.util.UUID;
 public class AtBContract extends Contract {
     public static final int EVT_NOEVENT = -1;
     public static final int EVT_BONUSROLL = 0;
-    public static final int EVT_SPECIALMISSION = 1;
+    public static final int EVT_SPECIAL_SCENARIO = 1;
     public static final int EVT_CIVILDISTURBANCE = 2;
     public static final int EVT_SPORADICUPRISINGS = 3;
     public static final int EVT_REBELLION = 4;
@@ -117,7 +117,8 @@ public class AtBContract extends Contract {
 
     /* lasts for a month, then removed at next events roll */
     protected boolean priorLogisticsFailure;
-    /* If the date is non-null, there will be a special mission or big battle
+    /**
+     * If the date is non-null, there will be a special scenario or big battle
      * on that date, but the scenario is not generated until the other battle
      * rolls for the week.
      */
@@ -200,7 +201,7 @@ public class AtBContract extends Contract {
                     break;
                 case UnitType.CONV_FIGHTER:
                 case UnitType.AERO:
-                    if (campaign.getCampaignOptions().getUseAero()) {
+                    if (campaign.getCampaignOptions().isUseAero()) {
                         numUnits += campaign.getFaction().isClan() ? 0.5 : 1;
                     }
                     break;
@@ -271,7 +272,7 @@ public class AtBContract extends Contract {
             requiredLances = 1;
         } else {
             requiredLances = Math.max(getEffectiveNumUnits(campaign) / 6, 1);
-            if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().getAdjustPaymentForStrategy()) {
+            if (requiredLances > maxDeployedLances && campaign.getCampaignOptions().isAdjustPaymentForStrategy()) {
                 multiplier *= (double) maxDeployedLances / (double) requiredLances;
                 requiredLances = maxDeployedLances;
             }
@@ -421,11 +422,8 @@ public class AtBContract extends Contract {
         int battles = 0;
         boolean earlySuccess = false;
         for (Scenario s : getCompletedScenarios()) {
-            /*
-             * Special Missions get no points for victory and and only -1
-             * for defeat.
-             */
-            if ((s instanceof AtBScenario) && ((AtBScenario) s).isSpecialMission()) {
+            // Special Scenarios get no points for victory and only -1 for defeat.
+            if ((s instanceof AtBScenario) && ((AtBScenario) s).isSpecialScenario()) {
                 if (s.getStatus().isOverallDefeat()) {
                     score--;
                 }
@@ -444,7 +442,7 @@ public class AtBContract extends Contract {
                         battles++;
                         break;
                     case MARGINAL_DEFEAT:
-                        //special mission defeat
+                        // special scenario defeat
                         score--;
                         break;
                     default:
@@ -482,7 +480,7 @@ public class AtBContract extends Contract {
         int roll = Compute.d6();
         switch (roll) {
             case 1: /* 1d6 dependents */
-                if (c.getCampaignOptions().getRandomDependentMethod().isAtB()
+                if (c.getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
                         && c.getCampaignOptions().isUseRandomDependentAddition()) {
                     number = Compute.d6();
                     c.addReport("Bonus: " + number + " dependent" + ((number > 1) ? "s" : ""));
@@ -571,10 +569,10 @@ public class AtBContract extends Contract {
                     c.addReport("<b>Special Event:</b> ");
                     doBonusRoll(c);
                     break;
-                case EVT_SPECIALMISSION:
-                    c.addReport("<b>Special Event:</b> Special mission this month");
+                case EVT_SPECIAL_SCENARIO:
+                    c.addReport("<b>Special Event:</b> Special scenario this month");
                     specialEventScenarioDate = getRandomDayOfMonth(c.getLocalDate());
-                    specialEventScenarioType = getContractType().generateSpecialMissionType(c);
+                    specialEventScenarioType = getContractType().generateSpecialScenarioType(c);
                     break;
                 case EVT_CIVILDISTURBANCE:
                     c.addReport("<b>Special Event:</b> Civil disturbance<br />Next enemy morale roll gets +1 modifier");
@@ -673,10 +671,12 @@ public class AtBContract extends Contract {
                     break;
             }
         }
-        /* If the campaign somehow gets past the scheduled date (such as by
+
+        /*
+         * If the campaign somehow gets past the scheduled date (such as by
          * changing the date in the campaign options), ignore it rather
          * than generating a new scenario in the past. The event will still be
-         * available (if the campaign date is restored) until another special mission
+         * available (if the campaign date is restored) until another special scenario
          * or big battle event is rolled.
          */
         if ((specialEventScenarioDate != null)
@@ -689,7 +689,7 @@ public class AtBContract extends Contract {
                         specialEventScenarioDate);
 
                 c.addScenario(s, this);
-                if (c.getCampaignOptions().getUsePlanetaryConditions()) {
+                if (c.getCampaignOptions().isUsePlanetaryConditions()) {
                     s.setPlanetaryConditions(this, c);
                 }
                 s.setForces(c);
@@ -766,8 +766,8 @@ public class AtBContract extends Contract {
     }
 
     @Override
-    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
-        super.writeToXMLBegin(pw, indent++);
+    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
+        indent = super.writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "employerCode", getEmployerCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enemyCode", getEnemyCode());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractType", getContractType().name());
@@ -821,6 +821,8 @@ public class AtBContract extends Contract {
         if (stratconCampaignState != null) {
             stratconCampaignState.Serialize(pw);
         }
+
+        return indent;
     }
 
     @Override
@@ -1147,7 +1149,7 @@ public class AtBContract extends Contract {
 
     @Override
     public void acceptContract(Campaign campaign) {
-        if (campaign.getCampaignOptions().getUseStratCon()) {
+        if (campaign.getCampaignOptions().isUseStratCon()) {
             StratconContractInitializer.initializeCampaignState(this, campaign,
                     StratconContractDefinition.getContractDefinition(getContractType()));
         }

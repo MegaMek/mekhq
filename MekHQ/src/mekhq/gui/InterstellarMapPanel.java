@@ -21,6 +21,8 @@ package mekhq.gui;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.annotations.Nullable;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.universe.*;
@@ -400,18 +402,48 @@ public class InterstellarMapPanel extends JPanel {
                 now = campaign.getLocalDate();
 
                 Arc2D.Double arc = new Arc2D.Double();
-                // first get the jump diameter for selected planet
-                if (null != selectedSystem && conf.scale > conf.showPlanetNamesThreshold) {
-                    double x = map2scrX(selectedSystem.getX());
-                    double y = map2scrY(selectedSystem.getY());
-                    double z = map2scrX(selectedSystem.getX() + 30);
-                    double jumpRadius = (z - x);
-                    g2.setPaint(Color.DARK_GRAY);
-                    arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
-                    g2.fill(arc);
+
+                // Draw auras around selected planet
+                if (selectedSystem != null) {
+                    final double x = map2scrX(selectedSystem.getX());
+                    final double y = map2scrY(selectedSystem.getY());
+                    // Contract Search Radius Aura
+                    if (!campaign.getCampaignOptions().getContractMarketMethod().isNone()
+                            && MekHQ.getMHQOptions().getInterstellarMapShowContractSearchRadius()) {
+                        final double z = map2scrX(selectedSystem.getX()
+                                + campaign.getCampaignOptions().getContractSearchRadius());
+                        final double contractSearchRadius = z - x;
+                        g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapContractSearchRadiusColour());
+                        arc.setArcByCenter(x, y, contractSearchRadius, 0, 360, Arc2D.OPEN);
+                        g2.fill(arc);
+                    }
+
+                    // Acquisition Search Radius Aura
+                    if (campaign.getCampaignOptions().isUsePlanetaryAcquisition()
+                            && MekHQ.getMHQOptions().getInterstellarMapShowPlanetaryAcquisitionRadius()
+                            && (conf.scale > MekHQ.getMHQOptions().getInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom())) {
+                        final double z = map2scrX(selectedSystem.getX()
+                                + (MHQConstants.MAX_JUMP_RADIUS * campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition()));
+                        final double contractSearchRadius = z - x;
+                        g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapPlanetaryAcquisitionRadiusColour());
+                        arc.setArcByCenter(x, y, contractSearchRadius, 0, 360, Arc2D.OPEN);
+                        g2.fill(arc);
+                    }
+
+                    // Jump Radius Aura
+                    if (MekHQ.getMHQOptions().getInterstellarMapShowJumpRadius()
+                            && (conf.scale > MekHQ.getMHQOptions().getInterstellarMapShowJumpRadiusMinimumZoom())) {
+                        final double z = map2scrX(selectedSystem.getX() + MHQConstants.MAX_JUMP_RADIUS);
+                        final double jumpRadius = z - x;
+                        g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapJumpRadiusColour());
+                        arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
+                        g2.fill(arc);
+                    }
+
+                    // Don't override HPG Network drawing
                     if (optHPGNetwork.isSelected()) {
-                        z = map2scrX(selectedSystem.getX() + 50);
-                        jumpRadius = (z - x);
+                        final double z = map2scrX(selectedSystem.getX() + 50);
+                        final double jumpRadius = z - x;
                         g2.setPaint(darkCyan);
                         g2.setStroke(dotted);
                         arc.setArcByCenter(x, y, jumpRadius, 0, 360, Arc2D.OPEN);
@@ -657,10 +689,10 @@ public class InterstellarMapPanel extends JPanel {
                                         arc.setArcByCenter(x, y, size + 3, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
                                         g2.fill(arc);
                                     }
-                                    if (campaign.getCampaignOptions().getUseAtB()
+                                    if (campaign.getCampaignOptions().isUseAtB()
                                             && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getLocalDate())) {
-                                        g2.setPaint(new Color(192, 192, 192));
-                                        arc.setArcByCenter(x, y, size + 2, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
+                                        g2.setPaint(new Color(248, 150, 60));
+                                        arc.setArcByCenter(x, y, size + 4, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
                                         g2.fill(arc);
                                     }
                                     g2.setPaint(faction.getColor());

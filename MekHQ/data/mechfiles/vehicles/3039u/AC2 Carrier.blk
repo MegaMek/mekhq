@@ -16,9 +16,9 @@ Tank
 AC/2 Carrier
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 5
@@ -31,6 +31,10 @@ AC/2 Carrier
 <type>
 IS Level 1
 </type>
+
+<role>
+Sniper
+</role>
 
 <motion_type>
 Tracked
@@ -76,7 +80,7 @@ Autocannon/2
 </Rear Equipment>
 
 <source>
-TRO 3039 - Age of War
+TRO: 3039
 </source>
 
 <tonnage>

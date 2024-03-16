@@ -111,13 +111,13 @@ public class Kill {
         return retVal;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        MHQXMLUtility.writeSimpleXMLOpenIndentedLine(pw1, indent++, "kill");
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "pilotId", pilotId);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "killed", killed);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "killer", killer);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "date", MHQXMLUtility.saveFormattedDate(date));
-        MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw1, --indent, "kill");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "kill");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pilotId", pilotId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killed", killed);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killer", killer);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "kill");
     }
 
     @Override

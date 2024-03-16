@@ -157,7 +157,6 @@ public enum WorkTime {
         }
 
         LogManager.getLogger().error("Unable to parse " + text + " into a WorkTime. Returning NORMAL.");
-
         return NORMAL;
     }
     //endregion File I/O

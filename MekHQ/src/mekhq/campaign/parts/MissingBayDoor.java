@@ -18,6 +18,7 @@
  */
 package mekhq.campaign.parts;
 
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.Node;
 
 import megamek.common.Entity;
@@ -83,7 +84,7 @@ public class MissingBayDoor extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 

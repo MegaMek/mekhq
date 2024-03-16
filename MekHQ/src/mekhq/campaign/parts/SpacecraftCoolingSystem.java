@@ -21,6 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import megamek.common.verifier.TestAdvancedAerospace;
 import megamek.common.verifier.TestSmallCraft;
 import mekhq.utilities.MHQXMLUtility;
@@ -202,12 +203,12 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public MissingPart getMissingPart() {
-        //No missing part for this. Just heatsinks to go inside it.
+        // No missing part for this. Just heatsinks to go inside it.
         return null;
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (isSalvaging() && (engineSinks >= currentSinks)) {
             return "All remaining heat sinks are built-in and cannot be salvaged.";
         }
@@ -262,21 +263,12 @@ public class SpacecraftCoolingSystem extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<sinkType>"
-                +sinkType
-                +"</sinkType>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<sinksNeeded>"
-                +sinksNeeded
-                +"</sinksNeeded>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<currentSinks>"
-                +currentSinks
-                +"</currentSinks>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sinkType", sinkType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sinksNeeded", sinksNeeded);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "currentSinks", currentSinks);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

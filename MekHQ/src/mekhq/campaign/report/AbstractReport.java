@@ -21,7 +21,6 @@
  */
 package mekhq.campaign.report;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 
@@ -35,7 +34,7 @@ public abstract class AbstractReport {
     private final Campaign campaign;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Reports",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors

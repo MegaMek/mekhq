@@ -27,7 +27,7 @@ public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenera
     @Override
     public boolean generateSpecialAbilities(final Campaign campaign, final Person person,
                                             final int expLvl) {
-        if (campaign.getCampaignOptions().useAbilities()) {
+        if (campaign.getCampaignOptions().isUseAbilities()) {
             SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
             singleSpecialAbilityGenerator.setSkillPreferences(getSkillPreferences());
 
@@ -43,7 +43,7 @@ public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenera
             // Based on the AtB rules, veteran recruits gain one and elite recruits gain two
             // additional special abilities. Further, these are converted to edge if they cannot be
             // generated.
-            if (campaign.getCampaignOptions().getUseAtB() && (expLvl >= SkillType.EXP_VETERAN)) {
+            if (campaign.getCampaignOptions().isUseAtB() && (expLvl >= SkillType.EXP_VETERAN)) {
                 // If we have more than 0 remaining abilities we can skip trying to generate after
                 // deciding on the number of further rolls and just convert it into edge
                 final boolean instantEdgeConversion = numAbilities != 0;
@@ -69,7 +69,7 @@ public class DefaultSpecialAbilityGenerator extends AbstractSpecialAbilityGenera
 
                 // If edge is enabled and there are any leftover abilities that cannot be generated
                 // we assign edge
-                if (campaign.getCampaignOptions().useEdge() && (instantEdgeConversion || (numAbilities > 0))) {
+                if (campaign.getCampaignOptions().isUseEdge() && (instantEdgeConversion || (numAbilities > 0))) {
                     person.changeEdge(numAbilities);
                 }
             }

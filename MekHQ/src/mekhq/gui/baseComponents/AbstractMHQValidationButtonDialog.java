@@ -19,7 +19,6 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.baseComponents.AbstractValidationButtonDialog;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
@@ -61,7 +60,7 @@ public abstract class AbstractMHQValidationButtonDialog extends AbstractValidati
     protected AbstractMHQValidationButtonDialog(final JFrame frame, final boolean modal,
                                                 final String name, final String title) {
         this(frame, modal, ResourceBundle.getBundle("mekhq.resources.GUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl()), name, title);
+                MekHQ.getMHQOptions().getLocale()), name, title);
     }
 
     /**
@@ -72,6 +71,16 @@ public abstract class AbstractMHQValidationButtonDialog extends AbstractValidati
                                                 final ResourceBundle resources, final String name,
                                                 final String title) {
         super(frame, modal, resources, name, title);
+    }
+
+    /**
+     * This creates an AbstractMHQValidationButtonDialog using the specified resource bundle. This
+     * is not recommended by default. Allows a JDialog to be specified as parent.
+     */
+    protected AbstractMHQValidationButtonDialog(final JDialog dialog, final JFrame frame, final boolean modal,
+                                                final ResourceBundle resources, final String name,
+                                                final String title) {
+        super(dialog, frame, modal, resources, name, title);
     }
     //endregion Constructors
 

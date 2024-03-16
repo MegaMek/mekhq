@@ -35,7 +35,7 @@ import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 @AtBScenarioEnabled
 public class AlliedTraitorsBuiltInScenario extends AtBScenario {
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -46,7 +46,7 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Allied Traitors";
+        return "Special Scenario: Allied Traitors";
     }
 
     @Override
@@ -55,12 +55,12 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-                                      ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         setStart(Board.START_CENTER);
         int enemyStart = Board.START_CENTER;
 
-        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+        for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
             enemyEntities = new ArrayList<>();
             enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
                     getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
@@ -68,11 +68,11 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
             enemyEntities.add(getEntity(getContract(campaign).getEmployerCode(), getContract(campaign).getAllySkill(),
                     getContract(campaign).getAllyQuality(), UnitType.MEK, weight, campaign));
 
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
         addBotForce(
-                new BotForce(getContract(campaign).getAllyBotName(), 2, enemyStart, getSpecMissionEnemies().get(0)), campaign);
+                new BotForce(getContract(campaign).getAllyBotName(), 2, enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
     }
 
     @Override

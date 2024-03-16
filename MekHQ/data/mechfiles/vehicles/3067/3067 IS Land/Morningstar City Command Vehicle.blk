@@ -12,9 +12,9 @@ Tank
 <Name>
 Morningstar City Command Vehicle
 </Name>
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 4671
@@ -57,6 +57,10 @@ ISC3MasterComputer
 <type>
 IS Level 2
 </type>
+
+<role>
+Skirmisher
+</role>
 <year>
 3065
 </year>
@@ -72,3 +76,7 @@ IS Level 2
 <motion_type>
 Wheeled
 </motion_type>
+
+<source>
+TRO: 3067
+</source>

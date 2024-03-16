@@ -23,6 +23,7 @@ package mekhq.campaign.rating;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -93,7 +94,7 @@ public interface IUnitRating {
      *
      * @return
      */
-    String getAverageExperience();
+    SkillLevel getAverageExperience();
 
     /**
      * Returns the Unit Rating score for the force's commander.

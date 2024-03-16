@@ -20,6 +20,7 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.Version;
 import megamek.common.AmmoType;
+import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
@@ -35,10 +36,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 public class BattleArmorAmmoBinTest {
@@ -135,7 +133,7 @@ public class BattleArmorAmmoBinTest {
         // Deserialize the BattleArmorAmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof BattleArmorAmmoBin);
+        assertInstanceOf(BattleArmorAmmoBin.class, deserializedPart);
 
         BattleArmorAmmoBin deserialized = (BattleArmorAmmoBin) deserializedPart;
 
@@ -175,7 +173,7 @@ public class BattleArmorAmmoBinTest {
         // Deserialize the BattleArmorAmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof BattleArmorAmmoBin);
+        assertInstanceOf(BattleArmorAmmoBin.class, deserializedPart);
 
         BattleArmorAmmoBin deserialized = (BattleArmorAmmoBin) deserializedPart;
 
@@ -216,7 +214,7 @@ public class BattleArmorAmmoBinTest {
         // Deserialize the BattleArmorAmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof BattleArmorAmmoBin);
+        assertInstanceOf(BattleArmorAmmoBin.class, deserializedPart);
 
         BattleArmorAmmoBin deserialized = (BattleArmorAmmoBin) deserializedPart;
 
@@ -256,7 +254,7 @@ public class BattleArmorAmmoBinTest {
         // Deserialize the BattleArmorAmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof BattleArmorAmmoBin);
+        assertInstanceOf(BattleArmorAmmoBin.class, deserializedPart);
 
         BattleArmorAmmoBin deserialized = (BattleArmorAmmoBin) deserializedPart;
 

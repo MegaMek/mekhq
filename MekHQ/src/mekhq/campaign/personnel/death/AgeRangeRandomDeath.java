@@ -34,8 +34,8 @@ public class AgeRangeRandomDeath extends AbstractDeath {
     //endregion Variable Declarations
 
     //region Constructors
-    public AgeRangeRandomDeath(final CampaignOptions options) {
-        super(RandomDeathMethod.AGE_RANGE, options);
+    public AgeRangeRandomDeath(final CampaignOptions options, final boolean initializeCauses) {
+        super(RandomDeathMethod.AGE_RANGE, options, initializeCauses);
         adjustRangeValues(options);
     }
     //endregion Constructors

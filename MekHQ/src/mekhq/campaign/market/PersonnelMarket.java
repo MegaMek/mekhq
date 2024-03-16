@@ -66,7 +66,7 @@ public class PersonnelMarket {
 
     public PersonnelMarket(Campaign c) {
         generatePersonnelForDay(c);
-        setType(c.getCampaignOptions().getPersonnelMarketType());
+        setType(c.getCampaignOptions().getPersonnelMarketName());
         MekHQ.registerHandler(this);
     }
 
@@ -83,7 +83,7 @@ public class PersonnelMarket {
 
     @Subscribe
     public void handleCampaignOptionsEvent(OptionsChangedEvent ev) {
-        setType(ev.getOptions().getPersonnelMarketType());
+        setType(ev.getOptions().getPersonnelMarketName());
     }
 
     /*
@@ -106,7 +106,7 @@ public class PersonnelMarket {
             }
         }
 
-        if (updated && c.getCampaignOptions().getPersonnelMarketReportRefresh()) {
+        if (updated && c.getCampaignOptions().isPersonnelMarketReportRefresh()) {
             c.addReport("<a href='PERSONNEL_MARKET'>Personnel market updated</a>");
         }
     }
@@ -207,7 +207,7 @@ public class PersonnelMarket {
         }
 
         if (null != method) {
-            method.writeToXml(pw, indent);
+            method.writeToXML(pw, indent);
         }
 
         if (paidRecruitment) {
@@ -227,7 +227,7 @@ public class PersonnelMarket {
         try {
             // Instantiate the correct child class, and call its parsing function.
             retVal = new PersonnelMarket();
-            retVal.setType(c.getCampaignOptions().getPersonnelMarketType());
+            retVal.setType(c.getCampaignOptions().getPersonnelMarketName());
 
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
@@ -312,8 +312,8 @@ public class PersonnelMarket {
             return Entity.ETYPE_MECH;
         } else if ((mostTypes & Entity.ETYPE_TANK) != 0) {
             return Entity.ETYPE_TANK;
-        } else if ((mostTypes & Entity.ETYPE_AERO) != 0) {
-            return Entity.ETYPE_AERO;
+        } else if ((mostTypes & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
+            return Entity.ETYPE_AEROSPACEFIGHTER;
         } else if ((mostTypes & Entity.ETYPE_BATTLEARMOR) != 0) {
             return Entity.ETYPE_BATTLEARMOR;
         } else if ((mostTypes & Entity.ETYPE_INFANTRY) != 0) {
@@ -337,7 +337,7 @@ public class PersonnelMarket {
         int ds = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int sc = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int cf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
         int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) + hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
         int inf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
         int ba = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
@@ -381,7 +381,7 @@ public class PersonnelMarket {
             retval = retval | Entity.ETYPE_CONV_FIGHTER;
         }
         if (most == asf) {
-            retval = retval | Entity.ETYPE_AERO;
+            retval = retval | Entity.ETYPE_AEROSPACEFIGHTER;
         }
         if (most == vee) {
             retval = retval | Entity.ETYPE_TANK;

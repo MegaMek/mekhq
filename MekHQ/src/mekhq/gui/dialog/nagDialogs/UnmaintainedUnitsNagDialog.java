@@ -35,8 +35,8 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     //endregion Constructors
 
     @Override
-    protected boolean checkNag(final Campaign campaign) {
+    protected boolean checkNag() {
         return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && campaign.getHangar().getUnitsStream().anyMatch(Unit::isUnmaintained);
+                && getCampaign().getHangar().getUnitsStream().anyMatch(Unit::isUnmaintained);
     }
 }

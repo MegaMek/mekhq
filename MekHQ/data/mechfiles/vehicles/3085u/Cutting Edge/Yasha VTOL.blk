@@ -16,9 +16,9 @@ VTOL
 Yasha VTOL
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 3612
@@ -60,12 +60,16 @@ ISCASE
 IS Level 2
 </type>
 
+<role>
+Scout
+</role>
+
 <year>
 3085
 </year>
 
 <source>
-Dark Age
+TRO: 3085
 </source>
 
 <internal_type>

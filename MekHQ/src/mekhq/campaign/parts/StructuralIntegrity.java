@@ -117,13 +117,13 @@ public class StructuralIntegrity extends Part {
 
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
-        writeToXmlBegin(pw, indent++);
+        indent = writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pointsNeeded", pointsNeeded);
-        writeToXmlEnd(pw, --indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 

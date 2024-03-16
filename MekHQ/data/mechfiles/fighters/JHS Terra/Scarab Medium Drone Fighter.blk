@@ -16,9 +16,9 @@ Aero
 Scarab Medium Drone Fighter
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 2812
@@ -35,6 +35,10 @@ Scarab Medium Drone Fighter
 <type>
 IS Level 4
 </type>
+
+<role>
+Fast Dogfighter
+</role>
 
 <motion_type>
 Aerodyne
@@ -107,7 +111,7 @@ ImprovedSmartRoboticControlSystem
 </Fuselage Equipment>
 
 <source>
-JHS Terra - Jihad
+Jihad Hot Spots: Terra
 </source>
 
 <tonnage>

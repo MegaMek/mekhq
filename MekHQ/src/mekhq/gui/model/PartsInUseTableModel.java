@@ -1,6 +1,15 @@
 package mekhq.gui.model;
 
-import java.awt.Component;
+import mekhq.MekHQ;
+import mekhq.campaign.parts.PartInUse;
+import mekhq.gui.utilities.MekHqTableCellRenderer;
+
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -9,23 +18,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Set;
-
-import javax.swing.AbstractCellEditor;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JButton;
-import javax.swing.JTable;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.border.Border;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumnModel;
-
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.parts.PartInUse;
-import mekhq.gui.utilities.MekHqTableCellRenderer;
 
 public class PartsInUseTableModel extends DataTableModel {
     private static final DecimalFormat FORMATTER = new DecimalFormat();
@@ -46,7 +38,7 @@ public class PartsInUseTableModel extends DataTableModel {
     public final static int COL_BUTTON_GMADD_BULK  = 9;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsInUseTableModel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public PartsInUseTableModel () {
         data = new ArrayList<PartInUse>();

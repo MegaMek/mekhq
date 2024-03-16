@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,22 +18,17 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
 /**
- * This is used to track the relationship type between related personnel
+ * This is used to determine the relationship type between related personnel
  */
 public enum FamilialRelationshipType {
     //region Enum Declarations
     // Direct Line
-    GREAT_GRANDPARENT("FamilialRelationshipType.GRANDPARENT.MALE.text",
-            "FamilialRelationshipType.GRANDPARENT.FEMALE.text",
-            "FamilialRelationshipType.GRANDPARENT.OTHER.text"),
     GRANDPARENT("FamilialRelationshipType.GRANDPARENT.MALE.text",
             "FamilialRelationshipType.GRANDPARENT.FEMALE.text",
             "FamilialRelationshipType.GRANDPARENT.OTHER.text"),
@@ -52,17 +47,14 @@ public enum FamilialRelationshipType {
     GRANDCHILD("FamilialRelationshipType.GRANDCHILD.MALE.text",
             "FamilialRelationshipType.GRANDCHILD.FEMALE.text",
             "FamilialRelationshipType.GRANDCHILD.OTHER.text"),
-    GREAT_GRANDCHILD("FamilialRelationshipType.GRANDCHILD.MALE.text",
-            "FamilialRelationshipType.GRANDCHILD.FEMALE.text",
-            "FamilialRelationshipType.GRANDCHILD.OTHER.text"),
 
     // Relatives
-    GREAT_GRANDAUNT_GREAT_GRANDUNCLE("FamilialRelationshipType.GRANDAUNT_GRANDUNCLE.MALE.text",
-            "FamilialRelationshipType.GRANDAUNT_GRANDUNCLE.FEMALE.text"),
-    GREAT_AUNT_GREAT_UNCLE("FamilialRelationshipType.AUNT_UNCLE.MALE.text",
-            "FamilialRelationshipType.AUNT_UNCLE.FEMALE.text"),
-    AUNT_UNCLE("FamilialRelationshipType.AUNT_UNCLE.MALE.text",
-            "FamilialRelationshipType.AUNT_UNCLE.FEMALE.text"),
+    GRANDPIBLING("FamilialRelationshipType.GRANDPIBLING.MALE.text",
+            "FamilialRelationshipType.GRANDPIBLING.FEMALE.text",
+            "FamilialRelationshipType.GRANDPIBLING.OTHER.text"),
+    PIBLING("FamilialRelationshipType.PIBLING.MALE.text",
+            "FamilialRelationshipType.PIBLING.FEMALE.text",
+            "FamilialRelationshipType.PIBLING.OTHER.text"),
     COUSIN("FamilialRelationshipType.COUSIN.text"),
     NIBLING("FamilialRelationshipType.NIBLING.MALE.text",
             "FamilialRelationshipType.NIBLING.FEMALE.text",
@@ -103,7 +95,7 @@ public enum FamilialRelationshipType {
     private final String other; // Genderless form of the relationship type, like Parent for Parent
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -111,33 +103,106 @@ public enum FamilialRelationshipType {
         this(neutral, neutral, neutral);
     }
 
-    FamilialRelationshipType(final String masculine, final String feminine) {
-        this(masculine, feminine, null);
-    }
-
     /**
      * @param masculine the masculine form of the relationship type
      * @param feminine the feminine form of the relationship type
      * @param other the non-gendered form of the relationship type
      */
-    FamilialRelationshipType(final String masculine, final String feminine,
-                             final @Nullable String other) {
+    FamilialRelationshipType(final String masculine, final String feminine, final String other) {
         this.masculine = resources.getString(masculine);
         this.feminine = resources.getString(feminine);
-        this.other = (other != null) ? resources.getString(other) : "";
+        this.other = resources.getString(other);
     }
     //endregion Constructors
 
+    //region Boolean Comparison Methods
+    // Direct Line
+    public boolean isGrandparent() {
+        return this == GRANDPARENT;
+    }
+
+    public boolean isParent() {
+        return this == PARENT;
+    }
+
+    public boolean isSibling() {
+        return this == SIBLING;
+    }
+
+    public boolean isHalfSibling() {
+        return this == HALF_SIBLING;
+    }
+
+    public boolean isChild() {
+        return this == CHILD;
+    }
+
+    public boolean isGrandchild() {
+        return this == GRANDCHILD;
+    }
+
+    // Relatives
+    public boolean isGrandpibling() {
+        return this == GRANDPIBLING;
+    }
+
+    public boolean isPibling() {
+        return this == PIBLING;
+    }
+
+    public boolean isCousin() {
+        return this == COUSIN;
+    }
+
+    public boolean isNibling() {
+        return this == NIBLING;
+    }
+
+    // Family-in-law Relationships
+    public boolean isSpouse() {
+        return this == SPOUSE;
+    }
+
+    public boolean isDivorce() {
+        return this == DIVORCE;
+    }
+
+    public boolean isWidow() {
+        return this == WIDOW;
+    }
+
+    public boolean isPartner() {
+        return this == PARTNER;
+    }
+
+    public boolean isParentInLaw() {
+        return this == PARENT_IN_LAW;
+    }
+
+    public boolean isSiblingInLaw() {
+        return this == SIBLING_IN_LAW;
+    }
+
+    public boolean isChildInLaw() {
+        return this == CHILD_IN_LAW;
+    }
+
+    // Stepfamily Relationships
+    public boolean isStepparent() {
+        return this == STEPPARENT;
+    }
+
+    public boolean isStepsibling() {
+        return this == STEPSIBLING;
+    }
+
+    public boolean isStepchild() {
+        return this == STEPCHILD;
+    }
+    //endregion Boolean Comparison Methods
+
     public String getTypeName(final Gender gender) {
         return getTypeName(gender, 0, false);
-    }
-
-    public String getTypeName(final Gender gender, final int numGreats) {
-        return getTypeName(gender, numGreats, false);
-    }
-
-    public String getTypeName(final Gender gender, final boolean adopted) {
-        return getTypeName(gender, 0, adopted);
     }
 
     /**
@@ -145,7 +210,7 @@ public enum FamilialRelationshipType {
      * gender of the relative
      * @param gender the relative's gender
      * @param numGreats how many greats to add to the front of the relationship type
-     * @param adopted whether or not the relative was adopted
+     * @param adopted whether the relative was adopted
      * @return the FamilialRelationshipType name
      */
     public String getTypeName(final Gender gender, final int numGreats, final boolean adopted) {

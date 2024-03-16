@@ -339,13 +339,9 @@ public class Warehouse {
         return true;
     }
 
-    public void writeToXml(PrintWriter pw1, int indent, String tag) {
-        MHQXMLUtility.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
-
-        forEachPart(part -> {
-            part.writeToXML(pw1, indent + 1);
-        });
-
-        MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);
+    public void writeToXML(final PrintWriter pw, final int indent, final String tag) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, tag);
+        forEachPart(part -> part.writeToXML(pw, indent + 1));
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, tag);
     }
 }

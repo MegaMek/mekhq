@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -65,7 +66,7 @@ public class CombatInformationCenter extends Part {
             hits = ((Aero) unit.getEntity()).getCICHits();
             if (checkForDestruction
                     && hits > priorHits
-                    && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 3) {
@@ -77,8 +78,8 @@ public class CombatInformationCenter extends Part {
     @Override
     public int getBaseTime() {
         int time;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             time = 120;
             if (unit != null && unit.getEntity().hasNavalC3()) {
                 time *= 2;
@@ -98,8 +99,8 @@ public class CombatInformationCenter extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair time and difficulty
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair time and difficulty
             if (hits == 1) {
                 return 1;
             }
@@ -154,7 +155,7 @@ public class CombatInformationCenter extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (isSalvaging()) {
             // FCS/CIC computers are designed for and built into the ship. Can't salvage and use somewhere else
             return "You cannot salvage a spacecraft CIC. You must scrap it instead.";
@@ -198,13 +199,10 @@ public class CombatInformationCenter extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<cost>"
-                +cost.toXmlString()
-                +"</cost>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cost", cost);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

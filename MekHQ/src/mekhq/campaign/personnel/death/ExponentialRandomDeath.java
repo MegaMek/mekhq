@@ -30,8 +30,8 @@ public class ExponentialRandomDeath extends AbstractDeath {
     //endregion Variable Declarations
 
     //region Constructors
-    public ExponentialRandomDeath(final CampaignOptions options) {
-        super(RandomDeathMethod.EXPONENTIAL, options);
+    public ExponentialRandomDeath(final CampaignOptions options, final boolean initializeCauses) {
+        super(RandomDeathMethod.EXPONENTIAL, options, initializeCauses);
         setMale(options.getExponentialRandomDeathMaleValues());
         setFemale(options.getExponentialRandomDeathFemaleValues());
     }

@@ -24,7 +24,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -85,11 +84,10 @@ public class ChooseRefitDialog extends JDialog {
     private void initComponents() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ChooseRefitDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
         setTitle(resourceMap.getString("title.text") + " " + unit.getName());
 
-        GridBagConstraints gridBagConstraints;
         getContentPane().setLayout(new GridBagLayout());
 
         refitTable = new JTable(refitModel);
@@ -110,30 +108,30 @@ public class ChooseRefitDialog extends JDialog {
         scrRefitTable = new JScrollPane();
         scrRefitTable.setViewportView(refitTable);
         scrRefitTable.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("refitTable.title")));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(scrRefitTable, gridBagConstraints);
 
         scrShoppingList = new JScrollPane();
         scrShoppingList.setBorder(BorderFactory.createCompoundBorder(
                  BorderFactory.createTitledBorder(resourceMap.getString("shoppingList.title")),
                  BorderFactory.createEmptyBorder(5,5,5,5)));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        scrShoppingList.setMinimumSize(new java.awt.Dimension(300, 200));
-        scrShoppingList.setPreferredSize(new java.awt.Dimension(300, 200));
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        scrShoppingList.setMinimumSize(new Dimension(300, 200));
+        scrShoppingList.setPreferredSize(new Dimension(300, 200));
         getContentPane().add(scrShoppingList, gridBagConstraints);
 
         txtOldUnit = new JTextPane();
@@ -145,18 +143,18 @@ public class ChooseRefitDialog extends JDialog {
         MechView mv = new MechView(unit.getEntity(), false, true, true, true);
         txtOldUnit.setText("<div style='font: 12pt monospaced'>" + mv.getMechReadout() + "</div>");
         scrOldUnit = new JScrollPane(txtOldUnit);
-        scrOldUnit.setMinimumSize(new java.awt.Dimension(300, 400));
-        scrOldUnit.setPreferredSize(new java.awt.Dimension(300, 400));
-        javax.swing.SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        scrOldUnit.setMinimumSize(new Dimension(300, 400));
+        scrOldUnit.setPreferredSize(new Dimension(300, 400));
+        SwingUtilities.invokeLater(() -> scrOldUnit.getVerticalScrollBar().setValue(0));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(scrOldUnit, gridBagConstraints);
 
         txtNewUnit = new JTextPane();
@@ -166,8 +164,8 @@ public class ChooseRefitDialog extends JDialog {
                  BorderFactory.createTitledBorder(resourceMap.getString("txtNewUnit.title")),
                  BorderFactory.createEmptyBorder(5,5,5,5)));
         scrNewUnit = new JScrollPane(txtNewUnit);
-        scrNewUnit.setMinimumSize(new java.awt.Dimension(300, 400));
-        scrNewUnit.setPreferredSize(new java.awt.Dimension(300, 400));
+        scrNewUnit.setMinimumSize(new Dimension(300, 400));
+        scrNewUnit.setPreferredSize(new Dimension(300, 400));
         gridBagConstraints.gridx = 2;
         getContentPane().add(scrNewUnit, gridBagConstraints);
 
@@ -175,35 +173,35 @@ public class ChooseRefitDialog extends JDialog {
         btnOK = new JButton(resourceMap.getString("btnOK.text"));
         btnOK.setEnabled(false);
         btnOK.addActionListener(evt -> confirm());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panBtn.add(btnOK, gridBagConstraints);
 
         btnClose = new JButton(resourceMap.getString("btnClose.text"));
         btnClose.addActionListener(evt -> cancel());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panBtn.add(btnClose, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(panBtn, gridBagConstraints);
 
         pack();

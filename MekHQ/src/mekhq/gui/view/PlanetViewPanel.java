@@ -18,35 +18,22 @@
  */
 package mekhq.gui.view;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.RenderingHints;
+import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.SocioIndustrialData;
+import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.utilities.MarkdownRenderer;
+
+import javax.swing.*;
+import javax.swing.text.DefaultCaret;
+import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.text.DefaultCaret;
-
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.SocioIndustrialData;
-import mekhq.gui.baseComponents.JScrollablePanel;
-import mekhq.gui.utilities.MarkdownRenderer;
-import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * A custom panel that gets filled in with goodies from a Planet record
@@ -63,7 +50,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     private Image planetIcon = null;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public PlanetViewPanel(PlanetarySystem s, Campaign c) {
         this(s, c, 0);

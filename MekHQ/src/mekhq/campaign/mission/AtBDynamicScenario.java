@@ -476,8 +476,6 @@ public class AtBDynamicScenario extends AtBScenario {
 
     @Override
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {
-        indent++;
-
         // if we have a scenario template and haven't played the scenario out yet, serialize the template
         // in its current state
         if ((getTemplate() != null) && getStatus().isCurrent()) {
@@ -510,7 +508,7 @@ public class AtBDynamicScenario extends AtBScenario {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "finalized", isFinalized());
         }
 
-        super.writeToXMLEnd(pw, --indent);
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -551,7 +549,7 @@ public class AtBDynamicScenario extends AtBScenario {
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT)) {
                                 benchedEntityData.templateName = dataNode.getTextContent();
                             } else if (dataNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ENTITY_ELEMENT)) {
-                                benchedEntityData.entity = MHQXMLUtility.parseSingleEntityMul((Element) dataNode, campaign.getGameOptions());
+                                benchedEntityData.entity = MHQXMLUtility.parseSingleEntityMul((Element) dataNode, campaign);
                             }
                         }
 

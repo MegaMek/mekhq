@@ -2,6 +2,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 
@@ -127,7 +128,7 @@ public class QuadVeeGear extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (null == unit) {
             return null;
         }
@@ -180,9 +181,9 @@ public class QuadVeeGear extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

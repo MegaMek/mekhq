@@ -22,7 +22,6 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.log.LogEntry;
@@ -48,20 +47,20 @@ public class HistoricalDailyReportDialog extends JDialog {
     private JLabel cacheInfoLabel;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HistoricalDailyReportDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     /**
      * HistoricalDailyReportDialog - opens a dialog that shows a history of the daily log
-     * @param owner - the Frame owner
-     * @param gui - a CampaignGUI object
+     * @param frame the JFrame
+     * @param gui the CampaignGUI object
      */
-    public HistoricalDailyReportDialog (Frame owner, CampaignGUI gui) {
-        super(owner, true);
+    public HistoricalDailyReportDialog(final JFrame frame, final CampaignGUI gui) {
+        super(frame, true);
         this.gui = gui;
         this.setPreferredSize(new Dimension(650,500));
         initComponents();
 
-        setLocationRelativeTo(owner);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 

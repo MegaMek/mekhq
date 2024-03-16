@@ -16,9 +16,9 @@ Tank
 Mithras Light Tank
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 2193
@@ -31,6 +31,10 @@ Mithras Light Tank
 <type>
 Clan Level 2
 </type>
+
+<role>
+Striker
+</role>
 
 <motion_type>
 Tracked
@@ -84,7 +88,7 @@ CLUltraAC2
 </Turret Equipment>
 
 <source>
-Succession Wars
+TRO: 3060
 </source>
 
 <tonnage>

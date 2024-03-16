@@ -42,18 +42,18 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
     //region Personnel
     /**
      * Set based on greater than instead of the greater than or equal to of AtB
-     * @param campaign the campaign to use in generating the commanding officer's rank
+     * @param faction the faction to use in generating the commanding officer's rank
      * @param tracker the commanding officer's tracker
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
     @Override
-    protected void generateCommandingOfficerRank(final Campaign campaign,
+    protected void generateCommandingOfficerRank(final Faction faction,
                                                  final CompanyGenerationPersonTracker tracker,
                                                  final int numMechWarriors) {
         if (numMechWarriors > 36) {
-            tracker.getPerson().setRank(Rank.RWO_MAX + (campaign.getFaction().isComStarOrWoB() ? 7 : 8));
+            tracker.getPerson().setRank(Rank.RWO_MAX + (faction.isComStarOrWoB() ? 7 : 8));
         } else if (numMechWarriors > 12) {
-            tracker.getPerson().setRank(Rank.RWO_MAX + (campaign.getFaction().isComStarOrWoB() ? 7 : 5));
+            tracker.getPerson().setRank(Rank.RWO_MAX + (faction.isComStarOrWoB() ? 7 : 5));
         } else if (numMechWarriors > 4) {
             tracker.getPerson().setRank(Rank.RWO_MAX + 4);
         } else {
@@ -64,7 +64,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
 
     //region Units
     /**
-     * This generates Clan 'Mechs differently, so you can get any of the quality ratings for clanners.
+     * This generates Clan 'Mechs differently, so you can get any of the quality ratings for Clan Pilots.
      *
      * @param campaign the campaign to generate for
      * @param parameters the parameters to use in generation
@@ -77,7 +77,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
                                                         final Faction faction) {
         if (parameters.isStarLeague()) {
             if (faction.isClan()) {
-                // Clanners generate using the Keshik Table if they roll A*, otherwise they roll on
+                // Clan Pilots generate using the Keshik Table if they roll A*, otherwise they roll on
                 // the Front Line tables
                 parameters.setQuality((parameters.getQuality() == IUnitRating.DRAGOON_ASTAR)
                         ? IUnitRating.DRAGOON_ASTAR : IUnitRating.DRAGOON_B);
@@ -88,7 +88,7 @@ public class WindchildCompanyGenerator extends AbstractCompanyGenerator {
                 return generateMechSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }
         } else {
-            // Clanners Generate from 2nd Line (or lesser) Tables (core AtB is just 2nd Line,
+            // Clan Pilots Generate from 2nd Line (or lesser) Tables (core AtB is just 2nd Line,
             // but this is more interesting)
             if (faction.isClan() && (parameters.getQuality() > IUnitRating.DRAGOON_C)) {
                 parameters.setQuality(IUnitRating.DRAGOON_C);

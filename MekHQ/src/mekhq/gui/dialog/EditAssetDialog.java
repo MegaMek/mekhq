@@ -23,7 +23,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.enums.FinancialTerm;
@@ -50,14 +49,14 @@ public class EditAssetDialog extends JDialog {
     boolean cancelled;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditAssetDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
-    public EditAssetDialog(Frame parent, Asset a) {
-        super(parent, true);
-        this.asset = a;
+    public EditAssetDialog(final JFrame frame, final Asset asset) {
+        super(frame, true);
+        this.asset = asset;
         cancelled = false;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 

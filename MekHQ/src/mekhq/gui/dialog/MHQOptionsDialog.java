@@ -18,10 +18,15 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.MMConstants;
+import megamek.client.ui.Messages;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.comboBoxes.FontComboBox;
 import megamek.client.ui.displayWrappers.FontDisplay;
 import megamek.client.ui.swing.ColourSelectorButton;
+import megamek.client.ui.swing.CommonSettingsDialog;
+import megamek.client.ui.swing.HelpDialog;
+import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
@@ -29,11 +34,15 @@ import mekhq.campaign.universe.enums.CompanyGenerationMethod;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.enums.ForceIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -47,18 +56,29 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox chkCompanyGeneratorStartup;
     private JCheckBox chkShowCompanyGenerator;
 
-    //region Command Center Display
+    //region Command Center Tab
     private JCheckBox optionCommandCenterUseUnitMarket;
     private JCheckBox optionCommandCenterMRMS;
-    //endregion Command Center Display
+    //endregion Command Center Tab
 
-    //region Personnel Tab Display Options
+    //region Interstellar Map Tab
+    private JCheckBox chkInterstellarMapShowJumpRadius;
+    private JSpinner spnInterstellarMapShowJumpRadiusMinimumZoom;
+    private ColourSelectorButton btnInterstellarMapJumpRadiusColour;
+    private JCheckBox chkInterstellarMapShowPlanetaryAcquisitionRadius;
+    private JSpinner spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom;
+    private ColourSelectorButton btnInterstellarMapPlanetaryAcquisitionRadiusColour;
+    private JCheckBox chkInterstellarMapShowContractSearchRadius;
+    private ColourSelectorButton btnInterstellarMapContractSearchRadiusColour;
+    //endregion Interstellar Map Tab
+
+    //region Personnel Tab
     private JComboBox<PersonnelFilterStyle> optionPersonnelFilterStyle;
     private JCheckBox optionPersonnelFilterOnPrimaryRole;
-    //endregion Personnel Tab Display Options
+    //endregion Personnel Tab
     //endregion Display
 
-    //region Colors
+    //region Colours
     private ColourSelectorButton optionDeployedForeground;
     private ColourSelectorButton optionDeployedBackground;
     private ColourSelectorButton optionBelowContractMinimumForeground;
@@ -91,6 +111,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private ColourSelectorButton optionPregnantBackground;
     private ColourSelectorButton optionPaidRetirementForeground;
     private ColourSelectorButton optionPaidRetirementBackground;
+    private ColourSelectorButton optionStratConHexCoordForeground;
     //endregion Colors
 
     //region Fonts
@@ -132,6 +153,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     //endregion Nag Tab
 
     //region Miscellaneous
+    private JTextField txtUserDir;
     private JSpinner spnStartGameDelay;
     private JSpinner spnStartGameClientDelay;
     private JSpinner spnStartGameClientRetryCount;
@@ -170,6 +192,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     }
 
     private JPanel createDisplayTab() {
+        // Initialize Components Used in ActionListeners
+        final JLabel lblInterstellarMapShowJumpRadiusMinimumZoom = new JLabel();
+        final JLabel lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom = new JLabel();
+
         // Create Panel Components
         JLabel labelDisplayDateFormat = new JLabel(resources.getString("labelDisplayDateFormat.text"));
         JLabel labelDisplayDateFormatExample = new JLabel();
@@ -200,7 +226,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         chkShowCompanyGenerator.setToolTipText(resources.getString("chkShowCompanyGenerator.toolTipText"));
         chkShowCompanyGenerator.setName("chkShowCompanyGenerator");
 
-        //region Command Center Display
+        //region Command Center Tab
         JLabel labelCommandCenterDisplay = new JLabel(resources.getString("labelCommandCenterDisplay.text"));
 
         optionCommandCenterUseUnitMarket = new JCheckBox(resources.getString("optionCommandCenterUseUnitMarket.text"));
@@ -208,9 +234,68 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         optionCommandCenterMRMS = new JCheckBox(resources.getString("optionCommandCenterMRMS.text"));
         optionCommandCenterMRMS.setToolTipText(resources.getString("optionCommandCenterMRMS.toolTipText"));
-        //endregion Command Center Display
+        //endregion Command Center Tab
 
-        //region Personnel Tab Display Options
+        //region Interstellar Map Tab
+        final JLabel lblInterstellarMapTab = new JLabel(resources.getString("lblInterstellarMapTab.text"));
+        lblInterstellarMapTab.setName("lblInterstellarMapTab");
+
+        chkInterstellarMapShowJumpRadius = new JCheckBox(resources.getString("chkInterstellarMapShowJumpRadius.text"));
+        chkInterstellarMapShowJumpRadius.setToolTipText(resources.getString("chkInterstellarMapShowJumpRadius.toolTipText"));
+        chkInterstellarMapShowJumpRadius.setName("chkInterstellarMapShowJumpRadius");
+        chkInterstellarMapShowJumpRadius.addActionListener(evt -> {
+            final boolean selected = chkInterstellarMapShowJumpRadius.isSelected();
+            lblInterstellarMapShowJumpRadiusMinimumZoom.setEnabled(selected);
+            spnInterstellarMapShowJumpRadiusMinimumZoom.setEnabled(selected);
+            btnInterstellarMapJumpRadiusColour.setEnabled(selected);
+        });
+
+        lblInterstellarMapShowJumpRadiusMinimumZoom.setText(resources.getString("lblInterstellarMapShowJumpRadiusMinimumZoom.text"));
+        lblInterstellarMapShowJumpRadiusMinimumZoom.setToolTipText(resources.getString("lblInterstellarMapShowJumpRadiusMinimumZoom.toolTipText"));
+        lblInterstellarMapShowJumpRadiusMinimumZoom.setName("lblInterstellarMapShowJumpRadiusMinimumZoom");
+
+        spnInterstellarMapShowJumpRadiusMinimumZoom = new JSpinner(new SpinnerNumberModel(3d, 0d, 10d, 0.5));
+        spnInterstellarMapShowJumpRadiusMinimumZoom.setToolTipText(resources.getString("lblInterstellarMapShowJumpRadiusMinimumZoom.toolTipText"));
+        spnInterstellarMapShowJumpRadiusMinimumZoom.setName("spnInterstellarMapShowJumpRadiusMinimumZoom");
+
+        btnInterstellarMapJumpRadiusColour = new ColourSelectorButton(resources.getString("btnInterstellarMapJumpRadiusColour.text"));
+        btnInterstellarMapJumpRadiusColour.setToolTipText(resources.getString("btnInterstellarMapJumpRadiusColour.toolTipText"));
+        btnInterstellarMapJumpRadiusColour.setName("btnInterstellarMapJumpRadiusColour");
+
+        chkInterstellarMapShowPlanetaryAcquisitionRadius = new JCheckBox(resources.getString("chkInterstellarMapShowPlanetaryAcquisitionRadius.text"));
+        chkInterstellarMapShowPlanetaryAcquisitionRadius.setToolTipText(resources.getString("chkInterstellarMapShowPlanetaryAcquisitionRadius.toolTipText"));
+        chkInterstellarMapShowPlanetaryAcquisitionRadius.setName("chkInterstellarMapShowPlanetaryAcquisitionRadius");
+        chkInterstellarMapShowPlanetaryAcquisitionRadius.addActionListener(evt -> {
+            final boolean selected = chkInterstellarMapShowPlanetaryAcquisitionRadius.isSelected();
+            lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setEnabled(selected);
+            spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setEnabled(selected);
+            btnInterstellarMapPlanetaryAcquisitionRadiusColour.setEnabled(selected);
+        });
+
+        lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setText(resources.getString("lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.text"));
+        lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setToolTipText(resources.getString("lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.toolTipText"));
+        lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setName("lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom");
+
+        spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom = new JSpinner(new SpinnerNumberModel(2d, 0d, 10d, 0.5));
+        spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setToolTipText(resources.getString("lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.toolTipText"));
+        spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setName("spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom");
+
+        btnInterstellarMapPlanetaryAcquisitionRadiusColour = new ColourSelectorButton(resources.getString("btnInterstellarMapPlanetaryAcquisitionRadiusColour.text"));
+        btnInterstellarMapPlanetaryAcquisitionRadiusColour.setToolTipText(resources.getString("btnInterstellarMapPlanetaryAcquisitionRadiusColour.toolTipText"));
+        btnInterstellarMapPlanetaryAcquisitionRadiusColour.setName("btnInterstellarMapPlanetaryAcquisitionRadiusColour");
+
+        chkInterstellarMapShowContractSearchRadius = new JCheckBox(resources.getString("chkInterstellarMapShowContractSearchRadius.text"));
+        chkInterstellarMapShowContractSearchRadius.setToolTipText(resources.getString("chkInterstellarMapShowContractSearchRadius.toolTipText"));
+        chkInterstellarMapShowContractSearchRadius.setName("chkInterstellarMapShowContractSearchRadius");
+        chkInterstellarMapShowContractSearchRadius.addActionListener(evt ->
+                btnInterstellarMapContractSearchRadiusColour.setEnabled(chkInterstellarMapShowContractSearchRadius.isSelected()));
+
+        btnInterstellarMapContractSearchRadiusColour = new ColourSelectorButton(resources.getString("btnInterstellarMapContractSearchRadiusColour.text"));
+        btnInterstellarMapContractSearchRadiusColour.setToolTipText(resources.getString("btnInterstellarMapContractSearchRadiusColour.toolTipText"));
+        btnInterstellarMapContractSearchRadiusColour.setName("btnInterstellarMapContractSearchRadiusColour");
+        //endregion Interstellar Map Tab
+
+        //region Personnel Tab
         JLabel labelPersonnelDisplay = new JLabel(resources.getString("labelPersonnelDisplay.text"));
 
         JLabel labelPersonnelFilterStyle = new JLabel(resources.getString("optionPersonnelFilterStyle.text"));
@@ -231,7 +316,19 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         });
 
         optionPersonnelFilterOnPrimaryRole = new JCheckBox(resources.getString("optionPersonnelFilterOnPrimaryRole.text"));
-        //endregion Personnel Tab Display Options
+        //endregion Personnel Tab
+
+        // Programmatically Assign Accessibility Labels
+        lblInterstellarMapShowJumpRadiusMinimumZoom.setLabelFor(spnInterstellarMapShowJumpRadiusMinimumZoom);
+        lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setLabelFor(spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom);
+
+        // Disable Panel Portions by Default
+        chkInterstellarMapShowJumpRadius.setSelected(true);
+        chkInterstellarMapShowJumpRadius.doClick();
+        chkInterstellarMapShowPlanetaryAcquisitionRadius.setSelected(true);
+        chkInterstellarMapShowPlanetaryAcquisitionRadius.doClick();
+        chkInterstellarMapShowContractSearchRadius.setSelected(true);
+        chkInterstellarMapShowContractSearchRadius.doClick();
 
         // Layout the UI
         JPanel body = new JPanel();
@@ -257,6 +354,19 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(labelCommandCenterDisplay)
                         .addComponent(optionCommandCenterUseUnitMarket)
                         .addComponent(optionCommandCenterMRMS)
+                        .addComponent(lblInterstellarMapTab)
+                        .addComponent(chkInterstellarMapShowJumpRadius)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblInterstellarMapShowJumpRadiusMinimumZoom)
+                                .addComponent(spnInterstellarMapShowJumpRadiusMinimumZoom, GroupLayout.Alignment.TRAILING))
+                        .addComponent(btnInterstellarMapJumpRadiusColour)
+                        .addComponent(chkInterstellarMapShowPlanetaryAcquisitionRadius)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom)
+                                .addComponent(spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom, GroupLayout.Alignment.TRAILING))
+                        .addComponent(btnInterstellarMapPlanetaryAcquisitionRadiusColour)
+                        .addComponent(chkInterstellarMapShowContractSearchRadius)
+                        .addComponent(btnInterstellarMapContractSearchRadiusColour)
                         .addComponent(labelPersonnelDisplay)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(labelPersonnelFilterStyle)
@@ -281,6 +391,19 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(labelCommandCenterDisplay)
                         .addComponent(optionCommandCenterUseUnitMarket)
                         .addComponent(optionCommandCenterMRMS)
+                        .addComponent(lblInterstellarMapTab)
+                        .addComponent(chkInterstellarMapShowJumpRadius)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblInterstellarMapShowJumpRadiusMinimumZoom)
+                                .addComponent(spnInterstellarMapShowJumpRadiusMinimumZoom))
+                        .addComponent(btnInterstellarMapJumpRadiusColour)
+                        .addComponent(chkInterstellarMapShowPlanetaryAcquisitionRadius)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom)
+                                .addComponent(spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom))
+                        .addComponent(btnInterstellarMapPlanetaryAcquisitionRadiusColour)
+                        .addComponent(chkInterstellarMapShowContractSearchRadius)
+                        .addComponent(btnInterstellarMapContractSearchRadiusColour)
                         .addComponent(labelPersonnelDisplay)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(labelPersonnelFilterStyle)
@@ -356,6 +479,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPaidRetirementForeground = new ColourSelectorButton(resources.getString("optionPaidRetirementForeground.text"));
 
         optionPaidRetirementBackground = new ColourSelectorButton(resources.getString("optionPaidRetirementBackground.text"));
+
+        optionStratConHexCoordForeground = new ColourSelectorButton(resources.getString("optionStratConHexCoordForeground.text"));
         //endregion Create Graphical Components
 
         //region Layout
@@ -417,6 +542,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                 .addComponent(optionPaidRetirementForeground)
                                 .addComponent(optionPaidRetirementBackground, GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionStratConHexCoordForeground))
         );
 
         layout.setHorizontalGroup(
@@ -469,6 +596,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionPaidRetirementForeground)
                                 .addComponent(optionPaidRetirementBackground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionStratConHexCoordForeground))
         );
         //endregion Layout
 
@@ -772,6 +901,28 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
     private JPanel createMiscellaneousTab() {
         // Create Panel Components
+        final JLabel lblUserDir = new JLabel(resources.getString("lblUserDir.text"));
+        lblUserDir.setToolTipText(resources.getString("lblUserDir.toolTipText"));
+        lblUserDir.setName("lblUserDir");
+
+        txtUserDir = new JTextField(20);
+        txtUserDir.setToolTipText(resources.getString("lblUserDir.toolTipText"));
+        txtUserDir.setName("txtUserDir");
+
+        JButton userDirChooser = new JButton("...");
+        userDirChooser.addActionListener(e -> CommonSettingsDialog.fileChooseUserDir(txtUserDir, getFrame()));
+        userDirChooser.setToolTipText(resources.getString("userDirChooser.title"));
+
+        JButton userDirHelp = new JButton("Help");
+        try {
+            String helpTitle = Messages.getString("UserDirHelpDialog.title");
+            URL helpFile = new File(MMConstants.USER_DIR_README_FILE).toURI().toURL();
+            userDirHelp.addActionListener(e -> new HelpDialog(helpTitle, helpFile, getFrame()).setVisible(true));
+        } catch (MalformedURLException e) {
+            LogManager.getLogger().error("Could not find the user data directory readme file at "
+                    + MMConstants.USER_DIR_README_FILE);
+        }
+
         final JLabel lblStartGameDelay = new JLabel(resources.getString("lblStartGameDelay.text"));
         lblStartGameDelay.setToolTipText(resources.getString("lblStartGameDelay.toolTipText"));
         lblStartGameDelay.setName("lblStartGameDelay");
@@ -842,6 +993,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblUserDir)
+                                .addComponent(txtUserDir)
+                                .addComponent(userDirChooser)
+                                .addComponent(userDirHelp, GroupLayout.DEFAULT_SIZE,
+                                        GroupLayout.DEFAULT_SIZE, 40))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
@@ -868,6 +1025,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblUserDir)
+                                .addComponent(txtUserDir)
+                                .addComponent(userDirChooser)
+                                .addComponent(userDirHelp))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblStartGameDelay)
                                 .addComponent(spnStartGameDelay))
@@ -904,11 +1066,26 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setHistoricalDailyLog(optionHistoricalDailyLog.isSelected());
         MekHQ.getMHQOptions().setCompanyGeneratorStartup(chkCompanyGeneratorStartup.isSelected());
         MekHQ.getMHQOptions().setShowCompanyGenerator(chkShowCompanyGenerator.isSelected());
+
+        // Command Center Tab
         MekHQ.getMHQOptions().setCommandCenterUseUnitMarket(optionCommandCenterUseUnitMarket.isSelected());
         MekHQ.getMHQOptions().setCommandCenterMRMS(optionCommandCenterMRMS.isSelected());
+
+        // Interstellar Map Tab
+        MekHQ.getMHQOptions().setInterstellarMapShowJumpRadius(chkInterstellarMapShowJumpRadius.isSelected());
+        MekHQ.getMHQOptions().setInterstellarMapShowJumpRadiusMinimumZoom((Double) spnInterstellarMapShowJumpRadiusMinimumZoom.getValue());
+        MekHQ.getMHQOptions().setInterstellarMapJumpRadiusColour(btnInterstellarMapJumpRadiusColour.getColour());
+        MekHQ.getMHQOptions().setInterstellarMapShowPlanetaryAcquisitionRadius(chkInterstellarMapShowPlanetaryAcquisitionRadius.isSelected());
+        MekHQ.getMHQOptions().setInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom((Double) spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.getValue());
+        MekHQ.getMHQOptions().setInterstellarMapPlanetaryAcquisitionRadiusColour(btnInterstellarMapPlanetaryAcquisitionRadiusColour.getColour());
+        MekHQ.getMHQOptions().setInterstellarMapShowContractSearchRadius(chkInterstellarMapShowContractSearchRadius.isSelected());
+        MekHQ.getMHQOptions().setInterstellarMapContractSearchRadiusColour(btnInterstellarMapContractSearchRadiusColour.getColour());
+
+        // Personnel Tab
         MekHQ.getMHQOptions().setPersonnelFilterStyle((PersonnelFilterStyle) Objects.requireNonNull(optionPersonnelFilterStyle.getSelectedItem()));
         MekHQ.getMHQOptions().setPersonnelFilterOnPrimaryRole(optionPersonnelFilterOnPrimaryRole.isSelected());
 
+        // Colours
         MekHQ.getMHQOptions().setDeployedForeground(optionDeployedForeground.getColour());
         MekHQ.getMHQOptions().setDeployedBackground(optionDeployedBackground.getColour());
         MekHQ.getMHQOptions().setBelowContractMinimumForeground(optionBelowContractMinimumForeground.getColour());
@@ -941,7 +1118,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setPregnantBackground(optionPregnantBackground.getColour());
         MekHQ.getMHQOptions().setPaidRetirementForeground(optionPaidRetirementForeground.getColour());
         MekHQ.getMHQOptions().setPaidRetirementBackground(optionPaidRetirementBackground.getColour());
-
+        MekHQ.getMHQOptions().setStratConHexCoordForeground(optionStratConHexCoordForeground.getColour());
         MekHQ.getMHQOptions().setMedicalViewDialogHandwritingFont(comboMedicalViewDialogHandwritingFont.getFont().getFamily());
 
         MekHQ.getMHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
@@ -970,6 +1147,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
 
+        PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
+        PreferenceManager.getInstance().save();
         MekHQ.getMHQOptions().setStartGameDelay((Integer) spnStartGameDelay.getValue());
         MekHQ.getMHQOptions().setStartGameClientDelay((Integer) spnStartGameClientDelay.getValue());
         MekHQ.getMHQOptions().setStartGameClientRetryCount((Integer) spnStartGameClientRetryCount.getValue());
@@ -986,11 +1165,32 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionHistoricalDailyLog.setSelected(MekHQ.getMHQOptions().getHistoricalDailyLog());
         chkCompanyGeneratorStartup.setSelected(MekHQ.getMHQOptions().getCompanyGeneratorStartup());
         chkShowCompanyGenerator.setSelected(MekHQ.getMHQOptions().getShowCompanyGenerator());
+
+        // Command Center Tab
         optionCommandCenterUseUnitMarket.setSelected(MekHQ.getMHQOptions().getCommandCenterUseUnitMarket());
         optionCommandCenterMRMS.setSelected(MekHQ.getMHQOptions().getCommandCenterMRMS());
+
+        // Interstellar Map Tab
+        if (chkInterstellarMapShowJumpRadius.isSelected() != MekHQ.getMHQOptions().getInterstellarMapShowJumpRadius()) {
+            chkInterstellarMapShowJumpRadius.doClick();
+        }
+        spnInterstellarMapShowJumpRadiusMinimumZoom.setValue(MekHQ.getMHQOptions().getInterstellarMapShowJumpRadiusMinimumZoom());
+        btnInterstellarMapJumpRadiusColour.setColour(MekHQ.getMHQOptions().getInterstellarMapJumpRadiusColour());
+        if (chkInterstellarMapShowPlanetaryAcquisitionRadius.isSelected() != MekHQ.getMHQOptions().getInterstellarMapShowPlanetaryAcquisitionRadius()) {
+            chkInterstellarMapShowPlanetaryAcquisitionRadius.doClick();
+        }
+        spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom.setValue(MekHQ.getMHQOptions().getInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom());
+        btnInterstellarMapPlanetaryAcquisitionRadiusColour.setColour(MekHQ.getMHQOptions().getInterstellarMapPlanetaryAcquisitionRadiusColour());
+        if (chkInterstellarMapShowContractSearchRadius.isSelected() != MekHQ.getMHQOptions().getInterstellarMapShowContractSearchRadius()) {
+            chkInterstellarMapShowContractSearchRadius.doClick();
+        }
+        btnInterstellarMapContractSearchRadiusColour.setColour(MekHQ.getMHQOptions().getInterstellarMapContractSearchRadiusColour());
+
+        // Personnel Tab
         optionPersonnelFilterStyle.setSelectedItem(MekHQ.getMHQOptions().getPersonnelFilterStyle());
         optionPersonnelFilterOnPrimaryRole.setSelected(MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole());
 
+        // Colours
         optionDeployedForeground.setColour(MekHQ.getMHQOptions().getDeployedForeground());
         optionDeployedBackground.setColour(MekHQ.getMHQOptions().getDeployedBackground());
         optionBelowContractMinimumForeground.setColour(MekHQ.getMHQOptions().getBelowContractMinimumForeground());
@@ -1023,6 +1223,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPregnantBackground.setColour(MekHQ.getMHQOptions().getPregnantBackground());
         optionPaidRetirementForeground.setColour(MekHQ.getMHQOptions().getPaidRetirementForeground());
         optionPaidRetirementBackground.setColour(MekHQ.getMHQOptions().getPaidRetirementBackground());
+        optionStratConHexCoordForeground.setColour(MekHQ.getMHQOptions().getStratConHexCoordForeground());
 
         comboMedicalViewDialogHandwritingFont.setSelectedItem(new FontDisplay(MekHQ.getMHQOptions().getMedicalViewDialogHandwritingFont()));
 
@@ -1054,6 +1255,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
 
+        txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
         spnStartGameClientDelay.setValue(MekHQ.getMHQOptions().getStartGameClientDelay());
         spnStartGameClientRetryCount.setValue(MekHQ.getMHQOptions().getStartGameClientRetryCount());

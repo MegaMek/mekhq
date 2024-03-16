@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,11 +18,10 @@
  */
 package mekhq.campaign.market.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
-import mekhq.campaign.market.unitMarket.EmptyUnitMarket;
+import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
 
 import java.util.ResourceBundle;
 
@@ -40,7 +39,7 @@ public enum UnitMarketMethod {
     //region Constructors
     UnitMarketMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -56,6 +55,10 @@ public enum UnitMarketMethod {
     public boolean isNone() {
         return this == NONE;
     }
+
+    public boolean isAtBMonthly() {
+        return this == ATB_MONTHLY;
+    }
     //endregion Boolean Comparisons
 
     public AbstractUnitMarket getUnitMarket() {
@@ -64,7 +67,7 @@ public enum UnitMarketMethod {
                 return new AtBMonthlyUnitMarket();
             case NONE:
             default:
-                return new EmptyUnitMarket();
+                return new DisabledUnitMarket();
         }
     }
 

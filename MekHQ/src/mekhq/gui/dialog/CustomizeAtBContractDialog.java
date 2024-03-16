@@ -27,7 +27,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
@@ -109,8 +108,8 @@ public class CustomizeAtBContractDialog extends JDialog {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewContractDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+                MekHQ.getMHQOptions().getLocale());
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
@@ -195,7 +194,7 @@ public class CustomizeAtBContractDialog extends JDialog {
                 new SpinnerNumberModel(contract.getContractScoreArbitraryModifier(),
                         null,null,1));
         JLabel lblContractScoreArbitraryModifier = new JLabel();
-        
+
         txtBasePay = new JMoneyTextField();
         txtBasePay.setMoney(contract.getBaseAmount());
         JLabel lblBasePay = new JLabel();
@@ -378,7 +377,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(spnRequiredLances, gbc);
-        
+
         lblEnemyMorale.setText(resourceMap.getString("lblEnemyMorale.text"));
         lblEnemyMorale.setName("lblEnemyMorale");
         gbc.gridx = 0;
@@ -411,7 +410,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(spnContractScoreArbitraryModifier, gbc);
-        
+
         lblBasePay.setText(resourceMap.getString("lblBasePay.text"));
         lblBasePay.setName("lblBasePay");
         gbc.gridx = 0;
@@ -427,7 +426,7 @@ public class CustomizeAtBContractDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         leftPanel.add(txtBasePay, gbc);
-        
+
 
         txtDesc.setText(contract.getDescription());
         txtDesc.setPreferredSize(new Dimension(400, 200));

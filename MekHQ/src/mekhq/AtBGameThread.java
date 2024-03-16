@@ -60,20 +60,24 @@ public class AtBGameThread extends GameThread {
 
     // String tokens for dialog boxes used for transport loading
     // FIXME : I'm not localized!
-    private static final String LOAD_FTR_DIALOG_TEXT = "Would you like the fighters assigned to %s to deploy loaded into its bays?";
-    private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters on Transport?";
-    private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground units assigned to %s to deploy loaded into its bays?";
-    private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units on Transport?";
+    private static final String LOAD_DROPSHIP_DIALOG_TITLE = "Load DropShips onto Transport?";
+    private static final String LOAD_DROPSHIP_DIALOG_TEXT = "Would you like the DropShip(s) assigned to %s to deploy loaded into its bays?";
+    private static final String LOAD_SMALL_CRAFT_DIALOG_TITLE = "Load Small Craft onto Transport?";
+    private static final String LOAD_SMALL_CRAFT_DIALOG_TEXT = "Would you like the small craft assigned to %s to deploy loaded into its bays?";
+    private static final String LOAD_FTR_DIALOG_TEXT = "Would you like the fighter(s) assigned to %s to deploy loaded into its bays?";
+    private static final String LOAD_FTR_DIALOG_TITLE = "Load Fighters onto Transport?";
+    private static final String LOAD_GND_DIALOG_TEXT = "Would you like the ground unit(s) assigned to %s to deploy loaded into its bays?";
+    private static final String LOAD_GND_DIALOG_TITLE = "Load Ground Units onto Transport?";
 
     @Override
     public void run() {
         client.addCloseClientListener(this);
 
         if (swingGui != null) {
-            for (Client client2 : swingGui.getBots().values()) {
+            for (Client client2 : swingGui.getLocalBots().values()) {
                 client2.die();
             }
-            swingGui.getBots().clear();
+            swingGui.getLocalBots().clear();
         }
         createController();
         swingGui = new ClientGUI(client, controller);
@@ -154,6 +158,7 @@ public class AtBGameThread extends GameThread {
                 planetaryConditions.setFog(scenario.getFog());
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
                 planetaryConditions.setGravity(scenario.getGravity());
+                planetaryConditions.setTemperature(scenario.getTemperature());
                 client.sendPlanetaryConditions(planetaryConditions);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
@@ -301,9 +306,9 @@ public class AtBGameThread extends GameThread {
                 for (int i = 0; i < scenario.getNumBots(); i++) {
                     BotForce bf = scenario.getBotForce(i);
                     String name = bf.getName();
-                    if (swingGui.getBots().containsKey(name)) {
+                    if (swingGui.getLocalBots().containsKey(name)) {
                         int append = 2;
-                        while (swingGui.getBots().containsKey(name + append)) {
+                        while (swingGui.getLocalBots().containsKey(name + append)) {
                             append++;
                         }
                         name += append;
@@ -315,7 +320,7 @@ public class AtBGameThread extends GameThread {
                     } catch (Exception e) {
                         LogManager.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
                     }
-                    swingGui.getBots().put(name, botClient);
+                    swingGui.getLocalBots().put(name, botClient);
 
                     // chill out while bot is created and connects to megamek
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
@@ -331,23 +336,42 @@ public class AtBGameThread extends GameThread {
                 // Prompt the player to autoload units into transports
                 if (!scenario.getPlayerTransportLinkages().isEmpty()) {
                     for (UUID id : scenario.getPlayerTransportLinkages().keySet()) {
+                        boolean loadDropShips = false;
+                        boolean loadSmallCraft = false;
                         boolean loadFighters = false;
                         boolean loadGround = false;
                         Unit transport = campaign.getUnit(id);
                         Set<Integer> toLoad = new HashSet<>();
-                        // Let the player choose to load fighters and/or ground units on each transport
-                        if (transport.isCarryingAero()) {
-                            loadFighters = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
-                                    String.format(AtBGameThread.LOAD_FTR_DIALOG_TEXT, transport.getName()),
-                                    AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
+                        // Let the player choose to load DropShips, Small Craft, fighters, and/or
+                        // ground units on each transport
+                        if (transport.getTransportedUnits().stream()
+                                .anyMatch(unit -> unit.getEntity().getUnitType() == UnitType.DROPSHIP)) {
+                            loadDropShips = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                                    String.format(AtBGameThread.LOAD_DROPSHIP_DIALOG_TEXT, transport.getName()),
+                                    AtBGameThread.LOAD_DROPSHIP_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
                         }
+
+                        if (transport.getTransportedUnits().stream()
+                                .anyMatch(unit -> unit.getEntity().getUnitType() == UnitType.SMALL_CRAFT)) {
+                            loadSmallCraft = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                                    String.format(AtBGameThread.LOAD_SMALL_CRAFT_DIALOG_TEXT, transport.getName()),
+                                    AtBGameThread.LOAD_SMALL_CRAFT_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
+                        }
+
+                        if (transport.isCarryingSmallerAero()) {
+                            loadFighters = JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                                    String.format(AtBGameThread.LOAD_FTR_DIALOG_TEXT, transport.getName()),
+                                    AtBGameThread.LOAD_FTR_DIALOG_TITLE, JOptionPane.YES_NO_OPTION);
+                        }
+
                         if (transport.isCarryingGround()) {
                             loadGround = (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
                                     String.format(AtBGameThread.LOAD_GND_DIALOG_TEXT, transport.getName()),
                                     AtBGameThread.LOAD_GND_DIALOG_TITLE, JOptionPane.YES_NO_OPTION));
                         }
+
                         // Now, send the load commands
-                        if (loadFighters || loadGround) {
+                        if (loadDropShips || loadSmallCraft || loadFighters || loadGround) {
                             // List of technicians assigned to transported units. Several units can share a tech.
                             Set<Person> cargoTechs = new HashSet<>();
                             for (UUID cargoId : scenario.getPlayerTransportLinkages().get(id)) {
@@ -361,10 +385,11 @@ public class AtBGameThread extends GameThread {
                                 }
                             }
                             // Update the transport's passenger count with assigned techs
-                            transport.getEntity().setNPassenger(transport.getEntity().getNPassenger() + (cargoTechs.size()));
+                            transport.getEntity().setNPassenger(transport.getEntity().getNPassenger() + cargoTechs.size());
                             client.sendUpdateEntity(transport.getEntity());
                             // And now load the units. Unit crews load as passengers here.
-                            Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad, client, loadFighters, loadGround);
+                            Utilities.loadPlayerTransports(transport.getEntity().getId(), toLoad,
+                                    client, loadDropShips, loadSmallCraft, loadFighters, loadGround);
                         }
                     }
                 }
@@ -373,8 +398,8 @@ public class AtBGameThread extends GameThread {
             while (!stop) {
                 Thread.sleep(50);
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         } finally {
             client.die();
             client = null;

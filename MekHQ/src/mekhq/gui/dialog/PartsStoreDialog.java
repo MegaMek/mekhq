@@ -29,7 +29,6 @@ import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -91,7 +90,7 @@ public class PartsStoreDialog extends JDialog {
     private JButton btnUseBonusPart;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PartsStoreDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     /** Creates new form PartsStoreDialog */
@@ -99,8 +98,8 @@ public class PartsStoreDialog extends JDialog {
         this(gui.getFrame(), modal, gui, gui.getCampaign(), true);
     }
 
-    /** Creates new form PartsStoreDialog */
-    public PartsStoreDialog(Frame frame, boolean modal, CampaignGUI gui, Campaign campaign, boolean add) {
+    public PartsStoreDialog(final JFrame frame, final boolean modal, final CampaignGUI gui,
+                            final Campaign campaign, final boolean add) {
         super(frame, modal);
         this.campaignGUI = gui;
         this.campaign = campaign;
@@ -114,7 +113,7 @@ public class PartsStoreDialog extends JDialog {
     }
 
     private void initComponents() {
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
 
@@ -153,7 +152,7 @@ public class PartsStoreDialog extends JDialog {
         c.gridx = 0;
         c.gridy = 0;
         c.weightx = 0.0;
-        c.anchor = java.awt.GridBagConstraints.WEST;
+        c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(5,5,5,5);
         panFilter.add(lblPartsChoice, c);
         c.gridx = 1;
@@ -166,11 +165,11 @@ public class PartsStoreDialog extends JDialog {
         c.gridy = 1;
         c.weightx = 0.0;
         panFilter.add(lblFilter, c);
-        txtFilter = new javax.swing.JTextField();
+        txtFilter = new JTextField();
         txtFilter.setText("");
-        txtFilter.setMinimumSize(new java.awt.Dimension(200, 28));
+        txtFilter.setMinimumSize(new Dimension(200, 28));
         txtFilter.setName("txtFilter");
-        txtFilter.setPreferredSize(new java.awt.Dimension(200, 28));
+        txtFilter.setPreferredSize(new Dimension(200, 28));
         txtFilter.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent e) {
@@ -254,7 +253,7 @@ public class PartsStoreDialog extends JDialog {
             //endregion Buy Bulk
 
             //region Bonus Part
-            if (campaign.getCampaignOptions().getUseAtB() && campaign.hasActiveContract()) {
+            if (campaign.getCampaignOptions().isUseAtB() && campaign.hasActiveContract()) {
                 btnUseBonusPart = new JButton(resourceMap.getString("useBonusPart.text") + " (" + campaign.totalBonusParts() + ")");
                 btnUseBonusPart.addActionListener(evt -> {
                     if (partsTable.getSelectedRowCount() > 0) {
@@ -395,11 +394,11 @@ public class PartsStoreDialog extends JDialog {
                         && !part.getName().toLowerCase().contains(txtFilter.getText().toLowerCase())
                         && !part.getDetails().toLowerCase().contains(txtFilter.getText().toLowerCase())) {
                     return false;
-                } else if ((part.getTechBase() == Part.T_CLAN)
-                        && !campaign.getCampaignOptions().allowClanPurchases()) {
+                } else if (((part.getTechBase() == Part.T_CLAN) || part.isClan())
+                        && !campaign.getCampaignOptions().isAllowClanPurchases()) {
                     return false;
                 } else if ((part.getTechBase() == Part.T_IS)
-                        && !campaign.getCampaignOptions().allowISPurchases()
+                        && !campaign.getCampaignOptions().isAllowISPurchases()
                         // Hack to allow Clan access to SL tech but not post-Exodus tech
                         // until 3050.
                         && !(campaign.useClanTechBase() && (part.getIntroductionDate() > 2787)

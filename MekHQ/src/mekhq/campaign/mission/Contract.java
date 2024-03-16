@@ -474,7 +474,7 @@ public class Contract extends Mission {
      */
     public Money getEstimatedPayrollExpenses(Campaign c) {
         Accountant accountant = c.getAccountant();
-        if (c.getCampaignOptions().usePeacetimeCost()) {
+        if (c.getCampaignOptions().isUsePeacetimeCost()) {
             return accountant.getPeacetimeCost();
         } else {
             return accountant.getPayRoll();
@@ -494,10 +494,10 @@ public class Contract extends Mission {
      * @return the total (2-way) estimated transportation fee from the player's current location to this contract's planet
      */
     public Money getTotalTransportationFees(Campaign c) {
-        if ((null != getSystem()) && c.getCampaignOptions().payForTransport()) {
+        if ((null != getSystem()) && c.getCampaignOptions().isPayForTransport()) {
             JumpPath jumpPath = getJumpPath(c);
 
-            boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
+            boolean campaignOps = c.getCampaignOptions().isEquipmentContractBase();
 
             return c.calculateCostPerJump(campaignOps, campaignOps).multipliedBy(jumpPath.getJumps()).multipliedBy(2);
         }
@@ -571,7 +571,7 @@ public class Contract extends Mission {
         }
 
         // calculate support amount
-        if (c.getCampaignOptions().usePeacetimeCost()
+        if (c.getCampaignOptions().isUsePeacetimeCost()
                 && c.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
             supportAmount = accountant.getPeacetimeCost()
                     .multipliedBy(getLength())
@@ -588,12 +588,12 @@ public class Contract extends Mission {
         }
 
         // calculate transportation costs
-        if (null != getSystem()) {
+        if (null != getSystem() && c.getCampaignOptions().isPayForTransport()) {
             JumpPath jumpPath = getJumpPath(c);
 
             // FM:Mercs transport payments take into account owned transports and do not use CampaignOps DropShip costs.
             // CampaignOps doesn't care about owned transports and does use its own DropShip costs.
-            boolean campaignOps = c.getCampaignOptions().useEquipmentContractBase();
+            boolean campaignOps = c.getCampaignOptions().isEquipmentContractBase();
             transportAmount = c.calculateCostPerJump(campaignOps, campaignOps)
                     .multipliedBy(jumpPath.getJumps())
                     .multipliedBy(2)
@@ -604,7 +604,7 @@ public class Contract extends Mission {
         }
 
         // calculate transit amount for CO
-        if (c.getCampaignOptions().usePeacetimeCost()
+        if (c.getCampaignOptions().isUsePeacetimeCost()
                 && c.getCampaignOptions().getUnitRatingMethod().equals(UnitRatingMethod.CAMPAIGN_OPS)) {
             // contract base * transport period * reputation * employer modifier
             transitAmount = accountant.getContractBase()
@@ -657,8 +657,8 @@ public class Contract extends Mission {
     }
 
     @Override
-    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
-        super.writeToXMLBegin(pw, indent++);
+    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
+        indent = super.writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nMonths", nMonths);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startDate", startDate);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "endDate", endDate);
@@ -684,6 +684,7 @@ public class Contract extends Mission {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "feeAmount", feeAmount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByUnit", salvagedByUnit);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salvagedByEmployer", salvagedByEmployer);
+        return indent;
     }
 
     @Override

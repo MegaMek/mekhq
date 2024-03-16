@@ -18,14 +18,13 @@
  */
 package mekhq.gui.view;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
@@ -92,7 +91,7 @@ public class MissionViewPanel extends JScrollablePanel {
     protected JTable scenarioTable;
 
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ContractViewPanel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public MissionViewPanel(Mission m, JTable scenarioTable, CampaignGUI gui) {
         super();
@@ -125,7 +124,7 @@ public class MissionViewPanel extends JScrollablePanel {
         add(pnlStats, gridBagConstraints);
 
         JScrollPane scrollScenarioTable = new JScrollPane(scenarioTable);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new Insets(10, 10, 10, 10);
@@ -188,7 +187,7 @@ public class MissionViewPanel extends JScrollablePanel {
                 public void mouseClicked(MouseEvent e) {
                     // Display where it is on the interstellar map
                     gui.getMapTab().switchSystemsMap(mission.getSystem());
-                    gui.setSelectedTab(MekHQTabType.INTERSTELLAR_MAP);
+                    gui.setSelectedTab(MHQTabType.INTERSTELLAR_MAP);
                 }
             });
             gridBagConstraints = new GridBagConstraints();
@@ -296,7 +295,7 @@ public class MissionViewPanel extends JScrollablePanel {
                 public void mouseClicked(MouseEvent e) {
                     // Display where it is on the interstellar map
                     gui.getMapTab().switchSystemsMap(contract.getSystem());
-                    gui.setSelectedTab(MekHQTabType.INTERSTELLAR_MAP);
+                    gui.setSelectedTab(MHQTabType.INTERSTELLAR_MAP);
                 }
             });
             gridBagConstraints = new GridBagConstraints();
@@ -626,7 +625,7 @@ public class MissionViewPanel extends JScrollablePanel {
             public void mouseClicked(MouseEvent e) {
                 // Display where it is on the interstellar map
                 gui.getMapTab().switchSystemsMap(contract.getSystem());
-                gui.setSelectedTab(MekHQTabType.INTERSTELLAR_MAP);
+                gui.setSelectedTab(MHQTabType.INTERSTELLAR_MAP);
             }
         });
         gridBagConstraints = new GridBagConstraints();
@@ -939,7 +938,7 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtMorale, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().getUseShareSystem()) {
+        if (campaign.getCampaignOptions().isUseShareSystem()) {
             lblSharePct.setName("lblSharePct");
             lblSharePct.setText(resourceMap.getString("lblSharePct.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -963,7 +962,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
         // for StratCon, contract score is irrelevant and only leads to confusion, so we
         // do not display it in that situation
-        boolean showContractScore = !gui.getCampaign().getCampaignOptions().getUseStratCon()
+        boolean showContractScore = !gui.getCampaign().getCampaignOptions().isUseStratCon()
                 && (mission instanceof AtBContract)
                 && (((AtBContract) mission).getStratconCampaignState() == null);
 

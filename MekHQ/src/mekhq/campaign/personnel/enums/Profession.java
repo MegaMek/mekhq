@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,10 +18,10 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -35,7 +35,7 @@ public enum Profession {
     INFANTRY("Profession.INFANTRY.text", "Profession.INFANTRY.toolTipText"),
     TECH("Profession.TECH.text", "Profession.TECH.toolTipText"),
     MEDICAL("Profession.MEDICAL.text", "Profession.MEDICAL.toolTipText"),
-    ADMIN("Profession.ADMIN.text", "Profession.ADMIN.toolTipText"),
+    ADMINISTRATOR("Profession.ADMINISTRATOR.text", "Profession.ADMINISTRATOR.toolTipText"),
     CIVILIAN("Profession.CIVILIAN.text", "Profession.CIVILIAN.toolTipText");
     //endregion Enum Declarations
 
@@ -47,7 +47,7 @@ public enum Profession {
     //region Constructors
     Profession(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -59,7 +59,7 @@ public enum Profession {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isMechWarrior() {
         return this == MECHWARRIOR;
     }
@@ -88,14 +88,14 @@ public enum Profession {
         return this == MEDICAL;
     }
 
-    public boolean isAdmin() {
-        return this == ADMIN;
+    public boolean isAdministrator() {
+        return this == ADMINISTRATOR;
     }
 
     public boolean isCivilian() {
         return this == CIVILIAN;
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     /**
      * This takes this, the initial profession, converts it into a base profession, and then calls
@@ -110,8 +110,8 @@ public enum Profession {
     }
 
     /**
-     * This takes this, the base profession, and uses it to determine the determine the profession
-     * to use for the provided rank in the provided rank system
+     * This takes this, the base profession, and uses it to determine the profession to use for the
+     * provided rank in the provided rank system
      *
      * @param rankSystem the rank system to determine the profession within
      * @param rank the rank to determine the profession for
@@ -165,15 +165,21 @@ public enum Profession {
             return false;
         }
 
-        // Check the first rank to ensure it indicates an alternative rank system, as otherwise the
-        // rank system is not empty.
         final Rank rank = rankSystem.getRanks().get(0);
         if (!rank.indicatesAlternativeSystem(this)) {
+            // Return false if the first rank doesn't indicate an alternative rank system, as the
+            // rank system is not empty.
             return false;
+        } else if (rankSystem.getRanks().size() == 1) {
+            // Return true if that's the only rank to check
+            return true;
+        } else {
+            // Return true if all ranks except the first are empty
+            return rankSystem.getRanks()
+                    .subList(1, rankSystem.getRanks().size())
+                    .stream()
+                    .allMatch(r -> r.isEmpty(this));
         }
-
-        // Return true if all ranks except the first are empty
-        return rankSystem.getRanks().subList(1, rankSystem.getRanks().size()).stream().allMatch(r -> r.isEmpty(this));
     }
 
     /**
@@ -201,6 +207,8 @@ public enum Profession {
      */
     public Profession getAlternateProfession(final String name) {
         switch (name.toUpperCase(Locale.ENGLISH)) {
+            case "--MW":
+                return MECHWARRIOR;
             case "--ASF":
                 return AEROSPACE;
             case "--VEE":
@@ -214,11 +222,12 @@ public enum Profession {
             case "--MEDICAL":
                 return MEDICAL;
             case "--ADMIN":
-                return ADMIN;
+                return ADMINISTRATOR;
             case "--CIVILIAN":
                 return CIVILIAN;
-            case "--MW":
             default:
+                LogManager.getLogger().error("Cannot get alternate profession for unknown alternative "
+                        + name + " returning MECHWARRIOR.");
                 return MECHWARRIOR;
         }
     }
@@ -259,7 +268,7 @@ public enum Profession {
             case ADMINISTRATOR_LOGISTICS:
             case ADMINISTRATOR_HR:
             case ADMINISTRATOR_TRANSPORT:
-                return ADMIN;
+                return ADMINISTRATOR;
             case DEPENDENT:
             case NONE:
                 return CIVILIAN;

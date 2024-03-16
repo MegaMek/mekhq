@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
@@ -134,20 +135,11 @@ public class SpacecraftEngine extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        // The engine is a MM object...
-        // And doesn't support XML serialization...
-        // But it's defined by 3 ints. So we'll save those here.
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<engineTonnage>"
-                +engineTonnage
-                +"</engineTonnage>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<clan>"
-                +clan
-                +"</clan>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "engineTonnage", engineTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clan", clan);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -239,46 +231,46 @@ public class SpacecraftEngine extends Part {
             }
             return time;
         }
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             time = 300;
-            //Light Damage
+            // Light Damage
             if (hits > 0 && hits < 3) {
                 time *= hits;
-            //Moderate damage
+            // Moderate damage
             } else if (hits > 2 && hits < 5) {
                 time *= (2 * hits);
-            //Heavy damage
+            // Heavy damage
             } else if (hits > 4) {
                 time *= (4 * hits);
             }
             return time;
         }
-        //Removed time for isSalvaging. Can't salvage an engine.
-        //Return the base 5 hours from SO if not using the improved times option
+        // Removed time for isSalvaging. Can't salvage an engine.
+        // Return the base 5 hours from SO if not using the improved times option
         return 300;
     }
 
     @Override
     public int getDifficulty() {
-        //Per errata, small craft now use fighter engine difficulty table
+        // Per errata, small craft now use fighter engine difficulty table
         if (null != unit && (unit.getEntity() instanceof SmallCraft && !(unit.getEntity() instanceof Dropship))) {
             return -1;
         }
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times and difficulty
-            //Light Damage
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times and difficulty
+            // Light Damage
             if (hits > 0 && hits < 3) {
                 return 1;
-            //Moderate damage
+            // Moderate damage
             } else if (hits > 2 && hits < 5) {
                 return 2;
-            //Heavy damage
+            // Heavy damage
             } else if (hits > 4) {
                 return 3;
             }
         }
-        //Otherwise, use the listed +1 difficulty from SO
+        // Otherwise, use the listed +1 difficulty from SO
         return 1;
     }
 
@@ -297,7 +289,7 @@ public class SpacecraftEngine extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (isSalvaging()) {
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 // Assuming it wasn't completely integrated into the ship it was built for, where are you going to keep this?
@@ -339,7 +331,7 @@ public class SpacecraftEngine extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ENGINE;
     }
 }

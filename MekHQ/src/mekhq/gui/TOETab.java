@@ -25,7 +25,7 @@ import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.TOEMouseAdapter;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
 import mekhq.gui.model.OrgTreeModel;
@@ -55,13 +55,12 @@ public final class TOETab extends CampaignGuiTab {
     //endregion Constructors
 
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.TOE;
+    public MHQTabType tabType() {
+        return MHQTabType.TOE;
     }
 
     @Override
     public void initTab() {
-        GridBagConstraints gridBagConstraints;
         setLayout(new GridBagLayout());
 
         orgModel = new OrgTreeModel(getCampaign());
@@ -71,28 +70,28 @@ public final class TOETab extends CampaignGuiTab {
         orgTree.setCellRenderer(new ForceRenderer());
         orgTree.setRowHeight(60);
         orgTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-        orgTree.addTreeSelectionListener(ev -> refreshForceView());
+        orgTree.addTreeSelectionListener(evt -> refreshForceView());
         orgTree.setDragEnabled(true);
         orgTree.setDropMode(DropMode.ON);
         orgTree.setTransferHandler(new TOETransferHandler(getCampaignGui()));
 
         panForceView = new JPanel();
         panForceView.getAccessibleContext().setAccessibleName("Selected Force Viewer");
-        panForceView.setMinimumSize(new java.awt.Dimension(550, 600));
-        panForceView.setPreferredSize(new java.awt.Dimension(550, 600));
+        panForceView.setMinimumSize(new Dimension(550, 600));
+        panForceView.setPreferredSize(new Dimension(550, 600));
         panForceView.setLayout(new BorderLayout());
 
         JScrollPane scrollOrg = new JScrollPane(orgTree);
         splitOrg = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, scrollOrg, panForceView);
         splitOrg.setOneTouchExpandable(true);
         splitOrg.setResizeWeight(1.0);
-        splitOrg.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshForceView());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        splitOrg.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, evt -> refreshForceView());
 
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(splitOrg, gridBagConstraints);
@@ -104,7 +103,7 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     public void refreshOrganization() {
-        javax.swing.SwingUtilities.invokeLater(() -> {
+        SwingUtilities.invokeLater(() -> {
             orgTree.updateUI();
             refreshForceView();
         });
@@ -198,11 +197,13 @@ public final class TOETab extends CampaignGuiTab {
     @Subscribe
     public void personChanged(PersonChangedEvent ev) {
         orgTree.repaint();
+        orgRefreshScheduler.schedule();
     }
 
     @Subscribe
     public void personRemoved(PersonRemovedEvent ev) {
         orgTree.repaint();
+        orgRefreshScheduler.schedule();
     }
 
     @Subscribe

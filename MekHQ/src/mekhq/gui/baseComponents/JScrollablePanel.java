@@ -28,6 +28,7 @@ import javax.swing.*;
  *
  * @author aarong original author
  */
+@Deprecated // Replace with AbstractMHQScrollablePanel and DefaultMHQScrollablePanel
 public class JScrollablePanel extends JPanel implements Scrollable {
     //region Variable Declarations
     // by default, track the width, and re-size as needed.
@@ -35,27 +36,6 @@ public class JScrollablePanel extends JPanel implements Scrollable {
     //endregion Variable Declarations
 
     //region Constructors
-    /**
-     * @see JPanel#JPanel(LayoutManager, boolean)
-     */
-    public JScrollablePanel(final LayoutManager layout, final boolean isDoubleBuffered) {
-        super(layout, isDoubleBuffered);
-    }
-
-    /**
-     * @see JPanel#JPanel(LayoutManager)
-     */
-    public JScrollablePanel(final LayoutManager layout) {
-        super(layout);
-    }
-
-    /**
-     * @see JPanel#JPanel(boolean)
-     */
-    public JScrollablePanel(final boolean isDoubleBuffered) {
-        super(isDoubleBuffered);
-    }
-
     /**
      * @see JPanel#JPanel()
      */

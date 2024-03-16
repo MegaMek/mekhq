@@ -83,7 +83,7 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.SHOW_COMPANY_GENERATOR, value);
     }
 
-    //region Command Center Display
+    //region Command Center Tab
     public boolean getCommandCenterUseUnitMarket() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.COMMAND_CENTER_USE_UNIT_MARKET, true);
     }
@@ -99,9 +99,76 @@ public final class MHQOptions extends SuiteOptions {
     public void setCommandCenterMRMS(boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.COMMAND_CENTER_MRMS, value);
     }
-    //endregion Command Center Display
+    //endregion Command Center Tab
 
-    //region Personnel Tab Display Options
+    //region Interstellar Map Tab
+    public boolean getInterstellarMapShowJumpRadius() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS, true);
+    }
+
+    public void setInterstellarMapShowJumpRadius(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS, value);
+    }
+
+    public double getInterstellarMapShowJumpRadiusMinimumZoom() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS_MINIMUM_ZOOM, 3d);
+    }
+
+    public void setInterstellarMapShowJumpRadiusMinimumZoom(final double value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_JUMP_RADIUS_MINIMUM_ZOOM, value);
+    }
+    public Color getInterstellarMapJumpRadiusColour() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.INTERSTELLAR_MAP_JUMP_RADIUS_COLOUR, Color.DARK_GRAY.getRGB()));
+    }
+
+    public void setInterstellarMapJumpRadiusColour(final Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.INTERSTELLAR_MAP_JUMP_RADIUS_COLOUR, value.getRGB());
+    }
+
+    public boolean getInterstellarMapShowPlanetaryAcquisitionRadius() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS, false);
+    }
+
+    public void setInterstellarMapShowPlanetaryAcquisitionRadius(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS, value);
+    }
+
+    public double getInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS_MINIMUM_ZOOM, 2d);
+    }
+
+    public void setInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom(final double value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putDouble(MHQConstants.INTERSTELLAR_MAP_SHOW_PLANETARY_ACQUISITION_RADIUS_MINIMUM_ZOOM, value);
+    }
+
+    public Color getInterstellarMapPlanetaryAcquisitionRadiusColour() {
+        // new Color(80, 80, 80)
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.INTERSTELLAR_MAP_PLANETARY_ACQUISITION_RADIUS_COLOUR, 0xFF505050));
+    }
+
+    public void setInterstellarMapPlanetaryAcquisitionRadiusColour(final Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.INTERSTELLAR_MAP_PLANETARY_ACQUISITION_RADIUS_COLOUR, value.getRGB());
+    }
+
+    public boolean getInterstellarMapShowContractSearchRadius() {
+        return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_CONTRACT_SEARCH_RADIUS, false);
+    }
+
+    public void setInterstellarMapShowContractSearchRadius(final boolean value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.INTERSTELLAR_MAP_SHOW_CONTRACT_SEARCH_RADIUS, value);
+    }
+
+    public Color getInterstellarMapContractSearchRadiusColour() {
+        // new Color(96, 96, 96)
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.INTERSTELLAR_MAP_CONTRACT_SEARCH_RADIUS_COLOUR, 0xFF606060));
+    }
+
+    public void setInterstellarMapContractSearchRadiusColour(final Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.INTERSTELLAR_MAP_CONTRACT_SEARCH_RADIUS_COLOUR, value.getRGB());
+    }
+    //endregion Interstellar Map Tab
+
+    //region Personnel Tab
     public PersonnelFilterStyle getPersonnelFilterStyle() {
         return PersonnelFilterStyle.valueOf(userPreferences.node(MHQConstants.DISPLAY_NODE)
                 .get(MHQConstants.PERSONNEL_FILTER_STYLE, PersonnelFilterStyle.STANDARD.name()));
@@ -118,7 +185,7 @@ public final class MHQOptions extends SuiteOptions {
     public void setPersonnelFilterOnPrimaryRole(boolean value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.PERSONNEL_FILTER_ON_PRIMARY_ROLE, value);
     }
-    //endregion Personnel Tab Display Options
+    //endregion Personnel Tab
     //endregion Display Tab
 
     //region Colours
@@ -383,6 +450,14 @@ public final class MHQOptions extends SuiteOptions {
     public void setPaidRetirementBackground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PAID_RETIREMENT_BACKGROUND, value.getRGB());
     }
+
+    public Color getStratConHexCoordForeground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
+    }
+
+    public void setStratConHexCoordForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, value.getRGB());
+    }
     //endregion Colours
 
     //region Fonts
@@ -565,6 +640,23 @@ public final class MHQOptions extends SuiteOptions {
      */
     public void setIndividualRankSystemPath(final String value) {
         userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH, value);
+    }
+
+    /**
+     * @return the path of the folder to load when exporting a unit sprite
+     */
+    public String getUnitSpriteExportPath() {
+        return userPreferences.node(MHQConstants.FILE_PATH_NODE).get(MHQConstants.UNIT_SPRITE_EXPORT_DIRECTORY_PATH, "");
+    }
+
+    /**
+     * This sets the path where one saves their unit sprite during export, as this is not
+     * required for any data but improves UX.
+     *
+     * @param value the path where the person saved their last unit sprite export
+     */
+    public void setUnitSpriteExportPath(final String value) {
+        userPreferences.node(MHQConstants.FILE_PATH_NODE).put(MHQConstants.UNIT_SPRITE_EXPORT_DIRECTORY_PATH, value);
     }
 
     /**

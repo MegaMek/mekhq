@@ -122,6 +122,7 @@ public class CampaignSummary {
                 case UnitType.TANK:
                     veeCount++;
                     break;
+                case UnitType.AEROSPACEFIGHTER:
                 case UnitType.AERO:
                 case UnitType.CONV_FIGHTER:
                     aeroCount++;
@@ -131,7 +132,7 @@ public class CampaignSummary {
                     break;
                 case UnitType.INFANTRY:
                     Infantry i = (Infantry) e;
-                    squadCount += i.getSquadN();
+                    squadCount += i.getSquadCount();
                     break;
             }
         }
@@ -165,7 +166,7 @@ public class CampaignSummary {
         int noSC = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT) - hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
         int noCF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - hangarStats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AERO) - hangarStats.getOccupiedBays(Entity.ETYPE_AERO), 0);
+        int noASF = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER) - hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
         int nolv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK) - hangarStats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int noinf = Math.max(hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
@@ -182,7 +183,7 @@ public class CampaignSummary {
         unitsOver = noMech + noASF + nolv + nohv + noinf + noBA + noProto;
         unitsTransported = hangarStats.getOccupiedBays(Entity.ETYPE_MECH) +
                 hangarStats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT) +
-                hangarStats.getOccupiedBays(Entity.ETYPE_AERO) +
+                hangarStats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER) +
                 hangarStats.getOccupiedBays(Entity.ETYPE_TANK, true) +
                 hangarStats.getOccupiedBays(Entity.ETYPE_TANK) +
                 hangarStats.getOccupiedBays(Entity.ETYPE_INFANTRY) +

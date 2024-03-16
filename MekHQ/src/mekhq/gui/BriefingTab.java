@@ -21,9 +21,9 @@ package mekhq.gui;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
@@ -39,7 +39,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.dialog.*;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.view.AtBScenarioViewPanel;
@@ -53,7 +53,6 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -101,8 +100,8 @@ public final class BriefingTab extends CampaignGuiTab {
     //endregion Constructors
 
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.BRIEFING_ROOM;
+    public MHQTabType tabType() {
+        return MHQTabType.BRIEFING_ROOM;
     }
 
     /*
@@ -113,16 +112,16 @@ public final class BriefingTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
         panMission = new JPanel(new GridBagLayout());
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.CENTER;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.CENTER;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         panMission.add(new JLabel(resourceMap.getString("lblMission.text")), gridBagConstraints);
@@ -183,11 +182,11 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollMissionView = new JScrollPane();
         scrollMissionView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollMissionView.setViewportView(null);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panMission.add(scrollMissionView, gridBagConstraints);
@@ -213,11 +212,11 @@ public final class BriefingTab extends CampaignGuiTab {
         panScenario = new JPanel(new GridBagLayout());
 
         panScenarioButtons = new JPanel(new GridLayout(3, 3));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         panScenario.add(panScenarioButtons, gridBagConstraints);
@@ -267,11 +266,11 @@ public final class BriefingTab extends CampaignGuiTab {
 
         scrollScenarioView = new JScrollPane();
         scrollScenarioView.setViewportView(null);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panScenario.add(scrollScenarioView, gridBagConstraints);
@@ -279,15 +278,15 @@ public final class BriefingTab extends CampaignGuiTab {
         /* ATB */
         panLanceAssignment = new LanceAssignmentView(getCampaign());
         JScrollPane paneLanceDeployment = new JScrollPane(panLanceAssignment);
-        paneLanceDeployment.setMinimumSize(new java.awt.Dimension(200, 300));
-        paneLanceDeployment.setPreferredSize(new java.awt.Dimension(200, 300));
-        paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().getUseAtB());
-        splitScenario = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT, panScenario,
+        paneLanceDeployment.setMinimumSize(new Dimension(200, 300));
+        paneLanceDeployment.setPreferredSize(new Dimension(200, 300));
+        paneLanceDeployment.setVisible(getCampaign().getCampaignOptions().isUseAtB());
+        splitScenario = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panScenario,
                 paneLanceDeployment);
         splitScenario.setOneTouchExpandable(true);
         splitScenario.setResizeWeight(1.0);
 
-        splitBrief = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, panMission, splitScenario);
+        splitBrief = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, panMission, splitScenario);
         splitBrief.setOneTouchExpandable(true);
         splitBrief.setResizeWeight(0.5);
         splitBrief.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, ev -> refreshScenarioView());
@@ -300,7 +299,7 @@ public final class BriefingTab extends CampaignGuiTab {
         MissionTypeDialog mtd = new MissionTypeDialog(getFrame(), true);
         mtd.setVisible(true);
         if (mtd.isContract()) {
-            NewContractDialog ncd = getCampaignOptions().getUseAtB()
+            NewContractDialog ncd = getCampaignOptions().isUseAtB()
                     ? new NewAtBContractDialog(getFrame(), true, getCampaign())
                     : new NewContractDialog(getFrame(), true, getCampaign());
             ncd.setVisible(true);
@@ -320,7 +319,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             CustomizeAtBContractDialog cmd = new CustomizeAtBContractDialog(getFrame(), true,
                     (AtBContract) mission, getCampaign());
             cmd.setVisible(true);
@@ -353,12 +352,12 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             if (((AtBContract) mission).contractExtended(getCampaign())) {
                 return;
             }
 
-            if (getCampaign().getCampaignOptions().getRandomRetirementMethod().isAtB()
+            if (getCampaign().getCampaignOptions().getRandomRetirementMethod().isAgainstTheBot()
                     && getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
                         (AtBContract) mission, true);
@@ -394,7 +393,7 @@ public final class BriefingTab extends CampaignGuiTab {
         getCampaign().completeMission(mission, status);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && (mission instanceof AtBContract)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             ((AtBContract) mission).checkForFollowup(getCampaign());
         }
 
@@ -479,7 +478,7 @@ public final class BriefingTab extends CampaignGuiTab {
         // tracker.postProcessEntities(control);
         ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
         resolveDialog.setVisible(true);
-        if (getCampaign().getCampaignOptions().getUseAtB()
+        if (getCampaign().getCampaignOptions().isUseAtB()
                 && getCampaign().getMission(scenario.getMissionId()) instanceof AtBContract
                 && !getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
@@ -508,7 +507,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // Then, we need to convert the ids to units, and filter out any units that are null and
         // any units with null entities
-        final List<Unit> units = unitIds.stream().map(unitId -> getCampaign().getUnit(unitId))
+        final List<Unit> units = unitIds.stream()
+                .map(unitId -> getCampaign().getUnit(unitId))
                 .filter(unit -> (unit != null) && (unit.getEntity() != null))
                 .collect(Collectors.toList());
 
@@ -517,9 +517,10 @@ public final class BriefingTab extends CampaignGuiTab {
 
         for (final Unit unit : units) {
             if (unit.checkDeployment() == null) {
+                unit.resetPilotAndEntity();
                 chosen.add(unit.getEntity());
             } else {
-                undeployed.append("\n").append(unit.getName()).append(" (").append(unit.checkDeployment()).append(")");
+                undeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
             }
         }
 
@@ -631,7 +632,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
             ((AtBScenario) scenario).refresh(getCampaign());
         }
 
@@ -691,77 +692,111 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void deployListFile() {
-        int row = scenarioTable.getSelectedRow();
+        final int row = scenarioTable.getSelectedRow();
         if (row < 0) {
             return;
         }
-        Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
+        final Scenario scenario = scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
         if (scenario == null) {
             return;
         }
-        Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(true);
-        if (uids.isEmpty()) {
-            return;
-        }
 
-        ArrayList<Entity> chosen = new ArrayList<>();
-        StringBuilder undeployed = new StringBuilder();
+        // First, we need to get all units assigned to the current scenario
+        final List<UUID> unitIds = scenario.getForces(getCampaign()).getAllUnits(true);
 
-        for (UUID uid : uids) {
-            Unit u = getCampaign().getUnit(uid);
-            if (null != u.getEntity()) {
-                if (null == u.checkDeployment()) {
-                    // Make sure the unit's entity and pilot are fully up to date!
-                    u.resetPilotAndEntity();
+        // Then, we need to convert the ids to units, and filter out any units that are null and
+        // any units with null entities
+        final List<Unit> units = unitIds.stream()
+                .map(unitId -> getCampaign().getUnit(unitId))
+                .filter(unit -> (unit != null) && (unit.getEntity() != null))
+                .collect(Collectors.toList());
 
-                    // Add the entity
-                    chosen.add(u.getEntity());
-                } else {
-                    undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
-                }
+        final ArrayList<Entity> chosen = new ArrayList<>();
+        final StringBuilder undeployed = new StringBuilder();
+
+        for (final Unit unit : units) {
+            if (unit.checkDeployment() == null) {
+                unit.resetPilotAndEntity();
+                chosen.add(unit.getEntity());
+            } else {
+                undeployed.append('\n').append(unit.getName()).append(" (").append(unit.checkDeployment()).append(')');
             }
         }
 
         if (undeployed.length() > 0) {
-            Object[] options = { "Continue", "Cancel" };
-            int n = JOptionPane.showOptionDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed, "Could not deploy some units",
-                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[1]);
-            if (n == 1) {
+            final Object[] options = { "Continue", "Cancel" };
+            if (JOptionPane.showOptionDialog(getFrame(),
+                    "The following units could not be deployed:" + undeployed,
+                    "Could not deploy some units", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, options, options[1]) == JOptionPane.NO_OPTION) {
                 return;
             }
         }
 
-        Optional<File> maybeUnitFile = FileDialogs.saveDeployUnits(getFrame(), scenario);
-
-        if (maybeUnitFile.isEmpty()) {
+        File file = determineMULFilePath(scenario, getCampaign().getName());
+        if (file == null) {
             return;
-        }
-
-        File unitFile = maybeUnitFile.get();
-
-        if (!(unitFile.getName().toLowerCase().endsWith(".mul")
-                || unitFile.getName().toLowerCase().endsWith(".xml"))) {
-            try {
-                unitFile = new File(unitFile.getCanonicalPath() + ".mul");
-            } catch (IOException ie) {
-                // nothing needs to be done here
-                return;
-            }
         }
 
         try {
             // Save the player's entities to the file.
-            // FIXME: this is not working
-            EntityListFile.saveTo(unitFile, chosen);
-        } catch (IOException e) {
-            LogManager.getLogger().error("", e);
+            EntityListFile.saveTo(file, chosen);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
 
-        if (undeployed.length() > 0) {
-            JOptionPane.showMessageDialog(getFrame(),
-                    "The following units could not be deployed:" + undeployed,
-                    "Could not deploy some units", JOptionPane.WARNING_MESSAGE);
+        final Mission mission = comboMission.getSelectedItem();
+        if ((mission instanceof AtBContract) && (scenario instanceof AtBScenario)
+                && !((AtBScenario) scenario).getAlliesPlayer().isEmpty()) {
+            // Export allies
+            chosen.clear();
+            chosen.addAll(((AtBScenario) scenario).getAlliesPlayer());
+            file = determineMULFilePath(scenario, ((AtBContract) mission).getEmployer());
+            if (file != null) {
+                try {
+                    // Save the player's allied entities to the file.
+                    EntityListFile.saveTo(file, chosen);
+                } catch (Exception ex) {
+                    LogManager.getLogger().error("", ex);
+                }
+            }
+        }
+
+        // Export Bot forces
+        for (final BotForce botForce : scenario.getBotForces()) {
+            chosen.clear();
+            chosen.addAll(botForce.getFullEntityList(getCampaign()));
+            if (chosen.isEmpty()) {
+                continue;
+            }
+            file = determineMULFilePath(scenario, botForce.getName());
+            if (file != null) {
+                try {
+                    // Save the bot force's entities to the file.
+                    EntityListFile.saveTo(file, chosen);
+                } catch (Exception ex) {
+                    LogManager.getLogger().error("", ex);
+                }
+            }
+        }
+    }
+
+    private @Nullable File determineMULFilePath(final Scenario scenario, final String name) {
+        final Optional<File> maybeUnitFile = FileDialogs.saveDeployUnits(getFrame(), scenario, name);
+        if (maybeUnitFile.isEmpty()) {
+            return null;
+        }
+
+        final File unitFile = maybeUnitFile.get();
+        if (unitFile.getName().toLowerCase().endsWith(".mul")) {
+            return unitFile;
+        } else {
+            try {
+                return new File(unitFile.getCanonicalPath() + ".mul");
+            } catch (Exception ignored) {
+                // nothing needs to be done here
+                return null;
+            }
         }
     }
 
@@ -777,7 +812,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         changeMission();
-        if (getCampaign().getCampaignOptions().getUseAtB()) {
+        if (getCampaign().getCampaignOptions().isUseAtB()) {
             refreshLanceAssignments();
         }
     }
@@ -801,7 +836,7 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
         selectedScenario = scenario.getId();
-        if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
             scrollScenarioView.setViewportView(
                     new AtBScenarioViewPanel((AtBScenario) scenario, getCampaign(), getFrame()));
         } else {
@@ -875,7 +910,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
-        splitScenario.getBottomComponent().setVisible(getCampaignOptions().getUseAtB());
+        splitScenario.getBottomComponent().setVisible(getCampaignOptions().isUseAtB());
         splitScenario.resetToPreferredSizes();
     }
 
@@ -901,7 +936,7 @@ public final class BriefingTab extends CampaignGuiTab {
     @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         scenarioDataScheduler.schedule();
-        if (getCampaignOptions().getUseAtB()) {
+        if (getCampaignOptions().isUseAtB()) {
             lanceAssignmentScheduler.schedule();
         }
     }

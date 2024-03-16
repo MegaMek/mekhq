@@ -355,7 +355,7 @@ public class MekLocationTest {
         // Deserialize the MekLocation
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MekLocation);
+        assertInstanceOf(MekLocation.class, deserializedPart);
 
         MekLocation deserialized = (MekLocation) deserializedPart;
 
@@ -1413,11 +1413,12 @@ public class MekLocationTest {
         // Only one part!
         MissingMekLocation missingPart = null;
         for (Part part : warehouse.getParts()) {
-            assertTrue(part instanceof MissingMekLocation);
+            assertInstanceOf(MissingMekLocation.class, part);
             assertNull(missingPart);
             missingPart = (MissingMekLocation) part;
         }
 
+        assertNotNull(missingPart);
         assertEquals(location, missingPart.getLocation());
     }
 
@@ -1628,7 +1629,7 @@ public class MekLocationTest {
         verify(mockQuartermaster, times(1)).addPart(partCaptor.capture(), eq(0));
 
         Part part = partCaptor.getValue();
-        assertTrue(part instanceof MissingMekLocation);
+        assertInstanceOf(MissingMekLocation.class, part);
         assertEquals(location, part.getLocation());
     }
 
@@ -1674,6 +1675,7 @@ public class MekLocationTest {
             }
         }
 
+        assertNotNull(missingPart);
         assertEquals(location, missingPart.getLocation());
     }
 
@@ -1961,25 +1963,19 @@ public class MekLocationTest {
         Campaign mockCampaign = mock(Campaign.class);
 
         int structureType = EquipmentType.T_STRUCTURE_ENDO_STEEL;
-        boolean isClan = true;
-        MekLocation centerTorso = new MekLocation(Mech.LOC_CT, 25, structureType, isClan, false, false, false, false, mockCampaign);
-
+        MekLocation centerTorso = new MekLocation(Mech.LOC_CT, 25, structureType, true, false, false, false, false, mockCampaign);
         assertNotNull(centerTorso.getTechAdvancement());
 
-        structureType = EquipmentType.T_STRUCTURE_ENDO_STEEL;
-        isClan = false;
-        centerTorso = new MekLocation(Mech.LOC_CT, 25, structureType, isClan, false, false, false, false, mockCampaign);
-
+        centerTorso = new MekLocation(Mech.LOC_CT, 25, structureType, false, false, false, false, false, mockCampaign);
         assertNotNull(centerTorso.getTechAdvancement());
     }
 
     @Test
-    public void getMassRepairOptionTypeTest() {
+    public void getMRMSOptionTypeTest() {
         Campaign mockCampaign = mock(Campaign.class);
 
         MekLocation centerTorso = new MekLocation(Mech.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
-
-        assertEquals(PartRepairType.GENERAL_LOCATION, centerTorso.getMassRepairOptionType());
+        assertEquals(PartRepairType.GENERAL_LOCATION, centerTorso.getMRMSOptionType());
     }
 
     @Test
@@ -1987,7 +1983,6 @@ public class MekLocationTest {
         Campaign mockCampaign = mock(Campaign.class);
 
         MekLocation centerTorso = new MekLocation(Mech.LOC_CT, 25, 0, false, false, false, false, false, mockCampaign);
-
         assertEquals(PartRepairType.MEK_LOCATION, centerTorso.getRepairPartType());
     }
 

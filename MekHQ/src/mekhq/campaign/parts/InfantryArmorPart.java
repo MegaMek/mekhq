@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
@@ -161,7 +162,7 @@ public class InfantryArmorPart extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -255,37 +256,16 @@ public class InfantryArmorPart extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<damageDivisor>"
-                +damageDivisor
-                +"</damageDivisor>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<dest>"
-                +dest
-                +"</dest>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<encumbering>"
-                +encumbering
-                +"</encumbering>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<sneak_camo>"
-                +sneak_camo
-                +"</sneak_camo>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<sneak_ecm>"
-                +sneak_ecm
-                +"</sneak_ecm>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<sneak_ir>"
-                +sneak_ir
-                +"</sneak_ir>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<spaceSuit>"
-                +spaceSuit
-                +"</spaceSuit>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "damageDivisor", damageDivisor);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dest", dest);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "encumbering", encumbering);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sneak_camo", sneak_camo);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sneak_ecm", sneak_ecm);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sneak_ir", sneak_ir);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaceSuit", spaceSuit);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -345,8 +325,8 @@ public class InfantryArmorPart extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
-        return PartRepairType.ARMOR;
+    public PartRepairType getMRMSOptionType() {
+        return PartRepairType.ARMOUR;
     }
 }
 

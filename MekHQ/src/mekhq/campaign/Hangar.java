@@ -131,7 +131,7 @@ public class Hangar {
      * @return The first unit found which matches the predicate,
      *         otherwise null if no unit was found.
      */
-    public Unit findUnit(Predicate<Unit> predicate) {
+    public @Nullable Unit findUnit(final @Nullable Predicate<Unit> predicate) {
         if (predicate == null) {
             return null;
         }
@@ -153,13 +153,9 @@ public class Hangar {
         return null != units.remove(id);
     }
 
-    public void writeToXml(PrintWriter pw1, int indent, String tag) {
-        MHQXMLUtility.writeSimpleXMLOpenIndentedLine(pw1, indent, tag);
-
-        forEachUnit(unit -> {
-            unit.writeToXML(pw1, indent + 1);
-        });
-
-        MHQXMLUtility.writeSimpleXMLCloseIndentedLine(pw1, indent, tag);
+    public void writeToXML(final PrintWriter pw, final int indent, final String tag) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent, tag);
+        forEachUnit(unit -> unit.writeToXML(pw, indent + 1));
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, tag);
     }
 }

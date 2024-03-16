@@ -13,11 +13,11 @@ SpaceStation
 </UnitType>
 
 <Name>
-Pressurized Yard - Large
+Pressurized Yard
 </Name>
 
 <Model>
-(2400)
+Large (2400)
 </Model>
 
 <mul id:>
@@ -121,7 +121,7 @@ cargobay:76940.0:1:7
 </structural_integrity>
 
 <source>
-TRO3057r - Age of War
+TRO: 3057 Revised
 </source>
 
 <tonnage>

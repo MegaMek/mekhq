@@ -26,7 +26,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
-import megamek.common.util.EncodeControl;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.MHQConstants;
@@ -42,13 +41,14 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.*;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.HangarTab;
 import mekhq.gui.MekLabTab;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.menus.AssignUnitToPersonMenu;
+import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
@@ -126,7 +126,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     //endregion Commands
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     protected UnitTableMouseAdapter(CampaignGUI gui, JTable unitTable, UnitTableModel unitModel) {
@@ -176,37 +176,32 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
         } else if (command.equals(COMMAND_SUPPLY_COST)) { // Single Unit only
             new MonthlyUnitCostReportDialog(gui.getFrame(), selectedUnit).setVisible(true);
         } else if (command.equals(COMMAND_SET_QUALITY)) {
-            int q;
-            Object[] possibilities = { "F", "E", "D", "C", "B", "A" }; // TODO : this probably shouldn't be inline
-            String quality = (String) JOptionPane.showInputDialog(gui.getFrame(),
-                    "Choose the new quality level", "Set Quality",
-                    JOptionPane.PLAIN_MESSAGE, null, possibilities, "F");
-            switch (quality) {
-                case "A":
-                    q = 0;
+            // TODO : Duplicated in PartsTableMouseAdapter#actionPerformed
+            int q = -1;
+            boolean reverse = gui.getCampaign().getCampaignOptions().isReverseQualityNames();
+            Object[] possibilities = {
+                Part.getQualityName(Part.QUALITY_A, reverse),
+                Part.getQualityName(Part.QUALITY_B, reverse),
+                Part.getQualityName(Part.QUALITY_C, reverse),
+                Part.getQualityName(Part.QUALITY_D, reverse),
+                Part.getQualityName(Part.QUALITY_E, reverse),
+                Part.getQualityName(Part.QUALITY_F, reverse)
+            };
+            String quality = (String) JOptionPane.showInputDialog(gui.getFrame(), "Choose the new quality level",
+                "Set Quality", JOptionPane.PLAIN_MESSAGE, null, possibilities,
+                Part.getQualityName(Part.QUALITY_D, reverse));
+            for (int i = 0; i < possibilities.length; i++) {
+                if (possibilities[i].equals(quality)) {
+                    q = i;
                     break;
-                case "B":
-                    q = 1;
-                    break;
-                case "C":
-                    q = 2;
-                    break;
-                case "D":
-                    q = 3;
-                    break;
-                case "E":
-                    q = 4;
-                    break;
-                case "F":
-                    q = 5;
-                    break;
-                default:
-                    q = -1;
-                    break;
+                }
             }
             if (q != -1) {
                 for (Unit unit : units) {
-                    unit.setQuality(q);
+                    if (unit != null) {
+                        unit.setQuality(q);
+                        MekHQ.triggerEvent(new UnitChangedEvent(unit));
+                    }
                 }
             }
         } else if (command.equals(COMMAND_SELL)) {
@@ -324,8 +319,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 hireAction.execute(gui.getCampaign(), unit);
             }
         } else if (command.equals(COMMAND_CUSTOMIZE)) { // Single Unit only
-            ((MekLabTab) gui.getTab(MekHQTabType.MEK_LAB)).loadUnit(selectedUnit);
-            gui.getTabMain().setSelectedIndex(MekHQTabType.MEK_LAB.ordinal());
+            ((MekLabTab) gui.getTab(MHQTabType.MEK_LAB)).loadUnit(selectedUnit);
+            gui.getTabMain().setSelectedIndex(MHQTabType.MEK_LAB.ordinal());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
@@ -396,7 +391,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_MOTHBALL)) {
             if (units.length > 1) {
-                gui.showMassMothballDialog(units, false);
+                new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), false).setVisible(true);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "mothballing");
                 MothballUnitAction mothballUnitAction = new MothballUnitAction(tech, false);
@@ -405,7 +400,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_ACTIVATE)) {
             if (units.length > 1) {
-                gui.showMassMothballDialog(units, true);
+                new MassMothballDialog(gui.getFrame(), units, gui.getCampaign(), true).setVisible(true);
             } else {
                 Person tech = pickTechForMothballOrActivation(selectedUnit, "activation");
                 ActivateUnitAction activateUnitAction = new ActivateUnitAction(tech, false);
@@ -744,8 +739,10 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
 
             JMenuHelpers.addMenuIfNonEmpty(popup, new AssignUnitToPersonMenu(gui.getCampaign(), units));
 
-            // if we're using maintenance and have selected something that requires maintenance
-            if (gui.getCampaign().getCampaignOptions().checkMaintenance() && (maintenanceTime > 0)) {
+            // if we're using maintenance and have selected something that requires maintenance and
+            // isn't mothballed or being mothballed
+            if (gui.getCampaign().getCampaignOptions().isCheckMaintenance() && (maintenanceTime > 0)
+                    && Stream.of(units).anyMatch(u -> !u.isMothballing() && !u.isMothballed())) {
                 menuItem = new JMenu("Set Maintenance Extra Time");
 
                 for (int x = 1; x <= 4; x++) {
@@ -774,7 +771,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (oneSelected && !unit.isMothballed()
-                    && gui.getCampaign().getCampaignOptions().usePeacetimeCost()) {
+                    && gui.getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
                 menuItem = new JMenuItem("Show Monthly Supply Cost Report");
                 menuItem.setActionCommand(COMMAND_SUPPLY_COST);
                 menuItem.addActionListener(this);
@@ -817,7 +814,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menu.add(menuItem);
                 }
 
-                if (oneSelected && gui.hasTab(MekHQTabType.MEK_LAB)) {
+                if (oneSelected && gui.hasTab(MHQTabType.MEK_LAB)) {
                     menuItem = new JMenuItem("Customize in Mek Lab...");
                     menuItem.setActionCommand(COMMAND_CUSTOMIZE);
                     menuItem.addActionListener(this);
@@ -873,7 +870,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (oneSelected && gui.getCampaign().getCampaignOptions().useQuirks()) {
+            if (oneSelected && gui.getCampaign().getCampaignOptions().isUseQuirks()) {
                 menuItem = new JMenuItem("Edit Quirks");
                 menuItem.setActionCommand(COMMAND_QUIRKS);
                 menuItem.addActionListener(this);
@@ -903,10 +900,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 });
                 popup.add(menuItem);
+
+                popup.add(new ExportUnitSpriteMenu(gui.getFrame(), gui.getCampaign(), unit));
             }
 
             // sell unit
-            if (!allDeployed && gui.getCampaign().getCampaignOptions().canSellUnits()) {
+            if (!allDeployed && gui.getCampaign().getCampaignOptions().isSellUnits()) {
                 popup.addSeparator();
                 menuItem = new JMenuItem("Sell Unit");
                 menuItem.setActionCommand(COMMAND_SELL);

@@ -38,6 +38,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
+import java.util.EnumSet;
 import java.util.Objects;
 
 /**
@@ -117,7 +118,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
             if (unit.getEntity() instanceof Protomech) {
                 // If protomechs are using alternate munitions then cut in half
-                if (getType().getMunitionType() != AmmoType.M_STANDARD) {
+                if (!EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(getType().getMunitionType())){
                     fullShots = fullShots / 2;
                 }
             }
@@ -156,7 +157,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             return (int) Math.floor(1000.0 / atype.getKgPerShot());
         }
 
-        //if not listed by kg per shot, we assume this is a single ton increment
+        // if not listed by kg per shot, we assume this is a single ton increment
         return getType().getShots();
     }
 
@@ -199,17 +200,17 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
         // CAW: InfantryAmmoBin may have negative shots needed
         if (shotsNeeded != 0) {
-            MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "shotsNeeded", shotsNeeded);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shotsNeeded", shotsNeeded);
         }
 
         if (oneShot) {
-            MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "oneShot", true);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "oneShot", true);
         }
 
-        super.writeToXmlEnd(pw1, indent);
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -225,8 +226,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("oneShot")) {
                     oneShot = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
 
@@ -235,7 +236,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     // FIXME: does not take into account BombType
     @Deprecated
-    public long getMunitionType() {
+    public EnumSet<AmmoType.Munitions> getMunitionType() {
         return getType().getMunitionType();
     }
 
@@ -519,7 +520,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (!isSalvaging() && (getAmountAvailable() == 0)) {
             return "No ammo of this type is available";
         } else if (null == unit) {
@@ -626,8 +627,8 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
-        return PartRepairType.AMMO;
+    public PartRepairType getMRMSOptionType() {
+        return PartRepairType.AMMUNITION;
     }
 
     @Override

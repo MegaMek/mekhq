@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.util.StringJoiner;
 
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.Node;
 
 import megamek.common.Aero;
@@ -50,17 +51,21 @@ public class MissingAvionics extends MissingPart {
 
     @Override
     public int getBaseTime() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
             int time = 0;
-            //Test of proposed errata for repair times
+            // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 2400;
             } else {
                 time = 600;
             }
             return time;
+	// CamOps, 3rd printing, page 207: 80 hours for Large Craft, 8 hours otherwise
+        } else if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
+            return 4800;
+        } else {
+            return 480;
         }
-        return 4800;
     }
 
     @Override
@@ -69,7 +74,7 @@ public class MissingAvionics extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if ((unit != null) && (unit.getEntity() instanceof LandAirMech)) {
             // Avionics are installed in the Head and both Torsos,
             // make sure they're not missing.

@@ -60,14 +60,14 @@ public class MissingInfantryAmmoBinTest {
     }
 
     @Test
-    public void missingAmmoBinMassRepairOptionType() {
+    public void missingAmmoBinMRMSOptionType() {
         Campaign mockCampaign = mock(Campaign.class);
         AmmoType ammoType = getAmmoType(EquipmentTypeLookup.INFANTRY_AMMO);
         InfantryWeapon weaponType = getInfantryWeapon(EquipmentTypeLookup.INFANTRY_ASSAULT_RIFLE);
 
         MissingInfantryAmmoBin missingAmmoBin = new MissingInfantryAmmoBin(0, ammoType, 18, weaponType, 1, false, mockCampaign);
 
-        assertEquals(PartRepairType.AMMO, missingAmmoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMUNITION, missingAmmoBin.getMRMSOptionType());
     }
 
     @Test
@@ -134,7 +134,7 @@ public class MissingInfantryAmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MissingInfantryAmmoBin);
+        assertInstanceOf(MissingInfantryAmmoBin.class, deserializedPart);
 
         MissingInfantryAmmoBin deserialized = (MissingInfantryAmmoBin) deserializedPart;
 
@@ -178,7 +178,7 @@ public class MissingInfantryAmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MissingInfantryAmmoBin);
+        assertInstanceOf(MissingInfantryAmmoBin.class, deserializedPart);
 
         MissingInfantryAmmoBin deserialized = (MissingInfantryAmmoBin) deserializedPart;
 
@@ -319,7 +319,7 @@ public class MissingInfantryAmmoBinTest {
         // 1. Unit should have received a new replacement
         Part replacementPart = replacementCaptor.getValue();
         assertNotNull(replacementPart);
-        assertTrue(replacementPart instanceof InfantryAmmoBin);
+        assertInstanceOf(InfantryAmmoBin.class, replacementPart);
 
         // 2. And the replacement should match the missing ammo bin
         InfantryAmmoBin replacementAmmoBin = (InfantryAmmoBin) replacementPart;

@@ -7222,8 +7222,8 @@
   </system>
   <system>
     <id>HL 06</id>
-    <xcood>-650</xcood>
-    <ycood>750</ycood>
+    <xcood>-670</xcood>
+    <ycood>760</ycood>
     <spectralType>G4V</spectralType>
     <planet>
       <name>6H-1</name>
@@ -7578,7 +7578,7 @@
   <system>
     <id>HL 08</id>
     <xcood>-625</xcood>
-    <ycood>820</ycood>
+    <ycood>830</ycood>
     <spectralType>A8V</spectralType>
     <planet>
       <name>IQW-1</name>
@@ -7765,7 +7765,7 @@
   </system>
   <system>
     <id>HL 09</id>
-    <xcood>-655</xcood>
+    <xcood>-665</xcood>
     <ycood>841</ycood>
     <spectralType>M1V</spectralType>
     <planet>
@@ -9329,7 +9329,7 @@
   </system>
   <system>
     <id>HL 18</id>
-    <xcood>-781</xcood>
+    <xcood>-785</xcood>
     <ycood>735</ycood>
     <spectralType>M2V</spectralType>
     <planet>
@@ -9954,7 +9954,7 @@
   </system>
   <system>
     <id>HL 22</id>
-    <xcood>-802</xcood>
+    <xcood>-812</xcood>
     <ycood>807</ycood>
     <spectralType>K7V</spectralType>
     <planet>
@@ -10357,7 +10357,7 @@
   <system>
     <id>HL 24</id>
     <xcood>-840</xcood>
-    <ycood>835</ycood>
+    <ycood>845</ycood>
     <spectralType>M8V</spectralType>
     <planet>
       <name>R7-1</name>
@@ -10716,7 +10716,7 @@
   </system>
   <system>
     <id>HL 26</id>
-    <xcood>-701</xcood>
+    <xcood>-715.5</xcood>
     <ycood>861</ycood>
     <spectralType>K1V</spectralType>
     <planet>
@@ -10809,7 +10809,7 @@
   <system>
     <id>HL 27</id>
     <xcood>-770</xcood>
-    <ycood>859</ycood>
+    <ycood>865</ycood>
     <spectralType>M4V</spectralType>
     <planet>
       <name>W-1</name>
@@ -70795,8 +70795,8 @@
   </system>
   <system>
     <id>HL 06</id>
-    <xcood>-650</xcood>
-    <ycood>750</ycood>
+    <xcood>-670</xcood>
+    <ycood>760</ycood>
     <spectralType>K3V</spectralType>
     <planet>
       <name>CI21</name>
@@ -71090,7 +71090,7 @@
   <system>
     <id>HL 08</id>
     <xcood>-625</xcood>
-    <ycood>820</ycood>
+    <ycood>830</ycood>
     <spectralType>M4V</spectralType>
     <planet>
       <name>1XB1</name>
@@ -71249,7 +71249,7 @@
   </system>
   <system>
     <id>HL 09</id>
-    <xcood>-655</xcood>
+    <xcood>-665</xcood>
     <ycood>841</ycood>
     <spectralType>G8V</spectralType>
     <planet>
@@ -72715,7 +72715,7 @@
   </system>
   <system>
     <id>HL 18</id>
-    <xcood>-781</xcood>
+    <xcood>-785</xcood>
     <ycood>735</ycood>
     <spectralType>G6V</spectralType>
     <planet>
@@ -73380,7 +73380,7 @@
   </system>
   <system>
     <id>HL 22</id>
-    <xcood>-802</xcood>
+    <xcood>-812</xcood>
     <ycood>807</ycood>
     <spectralType>M3V</spectralType>
     <planet>
@@ -73719,7 +73719,7 @@
   <system>
     <id>HL 24</id>
     <xcood>-840</xcood>
-    <ycood>835</ycood>
+    <ycood>845</ycood>
     <spectralType>M6V</spectralType>
     <planet>
       <name>DIA1 Belt</name>
@@ -74015,7 +74015,7 @@
   </system>
   <system>
     <id>HL 26</id>
-    <xcood>-701</xcood>
+    <xcood>-715.5</xcood>
     <ycood>861</ycood>
     <spectralType>M6V</spectralType>
     <planet>
@@ -74106,7 +74106,7 @@
   <system>
     <id>HL 27</id>
     <xcood>-770</xcood>
-    <ycood>859</ycood>
+    <ycood>865</ycood>
     <spectralType>M4V</spectralType>
     <planet>
       <name>H1</name>
@@ -95941,6 +95941,174 @@
       <density>1.2</density>
       <satellite size="medium">EI1</satellite>
       <smallMoons>14</smallMoons>
+    </planet>
+  </system>
+  <system>
+    <id>SE 01</id>
+    <xcood>-800</xcood>
+    <ycood>940</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 02</id>
+    <xcood>-830</xcood>
+    <ycood>940</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 03</id>
+    <xcood>-627.867</xcood>
+    <ycood>1108.36</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 04</id>
+    <xcood>-831.278</xcood>
+    <ycood>760.338</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 05</id>
+    <xcood>-850</xcood>
+    <ycood>762</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 06</id>
+    <xcood>-725</xcood>
+    <ycood>724</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 07</id>
+    <xcood>-750</xcood>
+    <ycood>724</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 08</id>
+    <xcood>-751.252</xcood>
+	<ycood>1050.247</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 09</id>
+    <xcood>-704.252</xcood>
+	<ycood>1050.247</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 10</id>
+    <xcood>-704.252</xcood>
+	<ycood>1035.247</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 11</id>
+    <xcood>-690.252</xcood>
+	<ycood>985.247</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
+    </planet>
+  </system>
+  <system>
+    <id>SE 12</id>
+    <xcood>-750</xcood>
+    <ycood>661</ycood>
+    <spectralType>M5V</spectralType>
+    <planet>
+      <name>R41 Belt</name>
+      <type>Asteroid Belt</type>
+      <orbitalDist>0.08</orbitalDist>
+      <sysPos>1</sysPos>
+      <temperature>2</temperature>
+      <yearLength>0.4</yearLength>
     </planet>
   </system>
 </systems>

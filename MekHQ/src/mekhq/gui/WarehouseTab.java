@@ -25,7 +25,6 @@ import megamek.common.MiscType;
 import megamek.common.TargetRoll;
 import megamek.common.WeaponType;
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.parts.*;
@@ -35,7 +34,7 @@ import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
@@ -116,7 +115,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
         panSupplies = new JPanel(new GridBagLayout());
@@ -352,8 +351,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.WAREHOUSE;
+    public MHQTabType tabType() {
+        return MHQTabType.WAREHOUSE;
     }
 
     public void filterParts() {
@@ -542,7 +541,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         refreshAstechPool(astechString);
 
         // If requested, switch to top entry
-        if ((null == selectedTech || getCampaign().getCampaignOptions().useResetToFirstTech())
+        if ((null == selectedTech || getCampaign().getCampaignOptions().isResetToFirstTech())
                 && techTable.getRowCount() > 0) {
             techTable.setRowSelectionInterval(0, 0);
         } else if (null != selectedTech) {

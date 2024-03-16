@@ -30,6 +30,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Skill type will hold static information for each skill type like base target number,
@@ -37,14 +38,7 @@ import java.util.Hashtable;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class SkillType {
-    public static final String ULTRA_GREEN_NM = "Ultra-Green";
-    public static final String GREEN_NM = "Green";
-    public static final String REGULAR_NM = "Regular";
-    public static final String VETERAN_NM = "Veteran";
-    public static final String ELITE_NM = "Elite";
-    public static final String[] SKILL_LEVEL_NAMES = { ULTRA_GREEN_NM, GREEN_NM, REGULAR_NM, VETERAN_NM, ELITE_NM };
-
-    //combat skills
+    // combat skills
     public static final String S_PILOT_MECH  = "Piloting/Mech";
     public static final String S_PILOT_AERO  = "Piloting/Aerospace";
     public static final String S_PILOT_JET   = "Piloting/Aircraft";
@@ -58,12 +52,12 @@ public class SkillType {
     public static final String S_GUN_VEE     = "Gunnery/Vehicle";
     public static final String S_GUN_SPACE   = "Gunnery/Spacecraft";
     public static final String S_GUN_BA      = "Gunnery/Battlesuit";
-    public static final String S_GUN_PROTO   = "Gunnery/Protomech";
+    public static final String S_GUN_PROTO   = "Gunnery/ProtoMech";
     public static final String S_ARTILLERY   = "Artillery";
     public static final String S_SMALL_ARMS  = "Small Arms";
     public static final String S_ANTI_MECH   = "Anti-Mech";
     public static final String S_TACTICS     = "Tactics";
-    //non-combat skills
+    // non-combat skills
     public static final String S_TECH_MECH     = "Tech/Mech";
     public static final String S_TECH_MECHANIC = "Tech/Mechanic";
     public static final String S_TECH_AERO     = "Tech/Aero";
@@ -91,7 +85,7 @@ public class SkillType {
                                               S_TACTICS,S_STRATEGY,
                                               S_NEG,S_LEADER,S_SCROUNGE};
 
-    public static Hashtable<String, SkillType> lookupHash;
+    public static Map<String, SkillType> lookupHash;
 
     public static final int SKILL_NONE = 0;
 
@@ -102,6 +96,25 @@ public class SkillType {
     public static final int EXP_VETERAN = 3;
     public static final int EXP_ELITE = 4;
 
+    public static String getExperienceLevelName(int level) {
+        switch (level) {
+            case EXP_ULTRA_GREEN:
+                return "Ultra-Green";
+            case EXP_GREEN:
+                return "Green";
+            case EXP_REGULAR:
+                return "Regular";
+            case EXP_VETERAN:
+                return "Veteran";
+            case EXP_ELITE:
+                return "Elite";
+            case -1:
+                return "Unknown";
+            default:
+                return "Impossible";
+        }
+    }
+
     private String name;
     private int target;
     private boolean countUp;
@@ -111,9 +124,9 @@ public class SkillType {
     private int eliteLvl;
     private Integer[] costs;
 
-    public static void setSkillTypes(Hashtable<String, SkillType> skills) {
-        //we are going to cycle through all skills in case ones have been added since this hash
-        //was created
+    public static void setSkillTypes(Map<String, SkillType> skills) {
+        // we are going to cycle through all skills in case ones have been added since this hash
+        // was created
         for (String name : skillList) {
             if (null != skills.get(name)) {
                 lookupHash.put(name, skills.get(name));
@@ -121,11 +134,11 @@ public class SkillType {
         }
     }
 
-    public static Hashtable<String, SkillType> getSkillHash() {
+    public static Map<String, SkillType> getSkillHash() {
         return lookupHash;
     }
 
-    public static void setSkillHash(final Hashtable<String, SkillType> hash) {
+    public static void setSkillHash(final Map<String, SkillType> hash) {
         lookupHash = hash;
     }
 
@@ -139,7 +152,7 @@ public class SkillType {
         regLvl = 3;
         vetLvl = 4;
         eliteLvl = 5;
-        costs = new Integer[]{0,0,0,0,0,0,0,0,0,0,0};
+        costs = new Integer[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
     }
 
     public String getName() {
@@ -169,8 +182,8 @@ public class SkillType {
             case EXP_GREEN:
                 return greenLvl;
             default:
-                //for ultra-green we take the midpoint between green and 0, rounding down.
-                //If the user has set green as zero, then this will be the same
+                // for ultra-green we take the midpoint between green and 0, rounding down.
+                // If the user has set green as zero, then this will be the same
                 return (int) Math.floor(greenLvl / 2.0);
         }
     }
@@ -311,25 +324,6 @@ public class SkillType {
         return lookupHash.get(t);
     }
 
-    public static String getExperienceLevelName(int level) {
-        switch (level) {
-            case EXP_ULTRA_GREEN:
-                return ULTRA_GREEN_NM;
-            case EXP_GREEN:
-                return GREEN_NM;
-            case EXP_REGULAR:
-                return REGULAR_NM;
-            case EXP_VETERAN:
-                return VETERAN_NM;
-            case EXP_ELITE:
-                return ELITE_NM;
-            case -1:
-                return "Unknown";
-            default:
-                return "Impossible";
-        }
-    }
-
     public static String getDrivingSkillFor(Entity en) {
         if (en instanceof Tank) {
             switch (en.getMovementMode()) {
@@ -421,13 +415,18 @@ public class SkillType {
                 }
             }
 
+            if ("Gunnery/Protomech".equals(retVal.getName())) { // Renamed in 0.49.12
+                retVal.name = "Gunnery/ProtoMech";
+            }
+
             lookupHash.put(retVal.name, retVal);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
     }
 
-    public static void generateSeparateInstanceFromXML(Node wn, Hashtable<String, SkillType> hash) {
+    public static void generateSeparateInstanceFromXML(final Node wn,
+                                                       final Map<String, SkillType> hash) {
         try {
             SkillType retVal = new SkillType();
             NodeList nl = wn.getChildNodes();
@@ -454,6 +453,10 @@ public class SkillType {
                         retVal.costs[i] = Integer.parseInt(values[i]);
                     }
                 }
+            }
+
+            if ("Gunnery/Protomech".equals(retVal.getName())) { // Renamed in 0.49.12
+                retVal.name = "Gunnery/ProtoMech";
             }
 
             hash.put(retVal.name, retVal);

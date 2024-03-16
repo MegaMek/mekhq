@@ -21,7 +21,6 @@
  */
 package mekhq.campaign.finances;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.enums.FinancialTerm;
@@ -50,7 +49,7 @@ public class Asset {
     private Money income;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -94,7 +93,7 @@ public class Asset {
     public void setIncome(final Money income) {
         this.income = income;
     }
-    //region Getters/Setters
+    //endregion Getters/Setters
 
     public void processNewDay(final Campaign campaign, final LocalDate yesterday,
                               final LocalDate today, final Finances finances) {

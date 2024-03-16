@@ -22,6 +22,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import org.w3c.dom.Node;
@@ -91,8 +92,8 @@ public class AeroLifeSupport extends Part {
     @Override
     public int getBaseTime() {
         int time = 0;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 if (isSalvaging()) {
                     time = 1200;
@@ -174,7 +175,7 @@ public class AeroLifeSupport extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -214,10 +215,10 @@ public class AeroLifeSupport extends Part {
 
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
-        writeToXmlBegin(pw, indent++);
+        indent = writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fighter", fighter);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cost", cost);
-        writeToXmlEnd(pw, --indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -256,7 +257,7 @@ public class AeroLifeSupport extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ELECTRONICS;
     }
 

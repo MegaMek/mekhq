@@ -156,13 +156,12 @@ public class BattleArmorAmmoBin extends AmmoBin {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         int amountAvailable = getAmountAvailable();
         if ((amountAvailable > 0) && (amountAvailable < getNumTroopers())) {
             return "Cannot do a partial reload of Battle Armor ammo less than the number of troopers";
         }
         return super.checkFixable();
-
     }
 
     @Override

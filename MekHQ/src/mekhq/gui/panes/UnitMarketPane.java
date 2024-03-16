@@ -111,7 +111,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
     public void setChkShowAerospace(final JCheckBox chkShowAerospace) {
         this.chkShowAerospace = chkShowAerospace;
     }
-    
+
     public JCheckBox getChkShowConvAero() {
         return chkShowConvAero;
     }
@@ -244,7 +244,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         getChkShowAerospace().setToolTipText(resources.getString("chkShowAerospace.toolTipText"));
         getChkShowAerospace().setName("chkShowAerospace");
         getChkShowAerospace().addActionListener(evt -> filterOffers());
-        
+
         setChkShowConvAero(new JCheckBox(resources.getString("chkShowConvAero.text")));
         getChkShowConvAero().setToolTipText(resources.getString("chkShowConvAero.toolTipText"));
         getChkShowConvAero().setName("chkShowConvAero");
@@ -321,6 +321,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
         // Create Table
         setMarketTable(new JTable(getMarketModel(), columnModel, null));
+        getMarketTable().setName("marketTable");
         getMarketTable().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         getMarketTable().setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         getMarketTable().createDefaultColumnsFromModel();
@@ -333,7 +334,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         getMarketTable().setIntercellSpacing(new Dimension(0, 0));
         getMarketTable().setShowGrid(false);
         columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitMarketTableModel.COL_DELIVERY),
-                !getCampaign().getCampaignOptions().getInstantUnitMarketDelivery());
+                !getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
         getMarketTable().getSelectionModel().addListSelectionListener(evt -> updateDisplay());
 
         final JScrollPane marketTableScrollPane = new JScrollPane(getMarketTable(),
@@ -439,7 +440,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                     price, String.format(resources.getString("UnitMarketPane.PurchasedUnit.finances"), entity.getShortName()));
         }
 
-        finalizeEntityAcquisition(offers, getCampaign().getCampaignOptions().getInstantUnitMarketDelivery());
+        finalizeEntityAcquisition(offers, getCampaign().getCampaignOptions().isInstantUnitMarketDelivery());
     }
 
     public void addSelectedOffers() {

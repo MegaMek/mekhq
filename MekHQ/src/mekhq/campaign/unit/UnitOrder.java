@@ -339,7 +339,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("daysToWait")) {
                     retVal.daysToWait = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.entity = MHQXMLUtility.parseSingleEntityMul((Element) wn2, c.getGameOptions());
+                    retVal.entity = MHQXMLUtility.parseSingleEntityMul((Element) wn2, c);
                 }
             }
         } catch (Exception ex) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -28,7 +28,9 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
-import mekhq.*;
+import mekhq.MekHQ;
+import mekhq.NullEntityException;
+import mekhq.Utilities;
 import mekhq.campaign.*;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.finances.Finances;
@@ -57,10 +59,7 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
-import mekhq.io.migration.CamouflageMigrator;
-import mekhq.io.migration.FactionMigrator;
-import mekhq.io.migration.ForceIconMigrator;
-import mekhq.io.migration.PersonMigrator;
+import mekhq.io.migration.*;
 import mekhq.module.atb.AtBEventProcessor;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
@@ -107,7 +106,6 @@ public class CampaignXmlParser {
             xmlDoc = db.parse(is);
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
-
             throw new CampaignXmlParseException(ex);
         }
 
@@ -119,6 +117,10 @@ public class CampaignXmlParser {
         campaignEle.normalize();
 
         final Version version = new Version(campaignEle.getAttribute("version"));
+        if (version.is("0.0.0")) {
+            throw new CampaignXmlParseException(String.format("Illegal version of %s failed to parse",
+                    campaignEle.getAttribute("version")));
+        }
 
         // Indicates whether or not new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading
@@ -305,6 +307,8 @@ public class CampaignXmlParser {
             FactionMigrator.migrateFactionCode(retVal);
         }
 
+        GameOptionsMigrator.migrate(version, retVal.getGameOptions());
+
         // We need to do a post-process pass to restore a number of references.
         // Fix any Person Id References
         PersonIdReference.fixPersonIdReferences(retVal);
@@ -341,7 +345,7 @@ public class CampaignXmlParser {
         }
 
         // determine if we've missed any lances and add those back into the campaign
-        if (options.getUseAtB()) {
+        if (options.isUseAtB()) {
             Hashtable<Integer, Lance> lances = retVal.getLances();
             for (Force f : retVal.getAllForces()) {
                 if (!f.getUnits().isEmpty() && (null == lances.get(f.getId()))) {
@@ -494,7 +498,7 @@ public class CampaignXmlParser {
             retVal.setRetirementDefectionTracker(new RetirementDefectionTracker());
         }
 
-        if (retVal.getCampaignOptions().getUseAtB()) {
+        if (retVal.getCampaignOptions().isUseAtB()) {
             retVal.setHasActiveContract();
             retVal.setAtBConfig(AtBConfiguration.loadFromXml());
             retVal.setAtBEventProcessor(new AtBEventProcessor(retVal));
@@ -1125,8 +1129,8 @@ public class CampaignXmlParser {
                                 unitList.add(name);
                             }
                         }
-                    } catch (Exception e) {
-                        LogManager.getLogger().error("Could not read entity from XML", e);
+                    } catch (Exception ex) {
+                        LogManager.getLogger().error("Could not read entity from XML", ex);
                     }
                 }
             }

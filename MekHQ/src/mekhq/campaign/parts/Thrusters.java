@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.finances.Money;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -75,7 +76,7 @@ public class Thrusters extends Part {
             }
             if (checkForDestruction
                     && hits > priorHits
-                    && (hits < 4 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && (hits < 4 && !campaign.getCampaignOptions().isUseAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 4) {
@@ -87,8 +88,8 @@ public class Thrusters extends Part {
     @Override
     public int getBaseTime() {
         int time = 0;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             if (isSalvaging()) {
                 time = 600;
             } else {
@@ -115,8 +116,8 @@ public class Thrusters extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair time and difficulty
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair time and difficulty
             if (isSalvaging()) {
                 return -2;
             }
@@ -189,7 +190,7 @@ public class Thrusters extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -238,13 +239,10 @@ public class Thrusters extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<isLeftThrusters>"
-                +isLeftThrusters
-                +"</isLeftThrusters>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isLeftThrusters", isLeftThrusters);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

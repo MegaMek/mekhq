@@ -16,9 +16,9 @@ Tank
 Nike Air Defense Platform
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 4725
@@ -31,6 +31,10 @@ Nike Air Defense Platform
 <type>
 IS Level 3
 </type>
+
+<role>
+Sniper
+</role>
 
 <motion_type>
 Tracked
@@ -93,7 +97,7 @@ IS LB 5-X AC
 </Turret Equipment>
 
 <source>
-XTRO RetroTech - Jihad
+XTR: RetroTech
 </source>
 
 <tonnage>

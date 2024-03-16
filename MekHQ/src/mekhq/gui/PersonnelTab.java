@@ -25,13 +25,12 @@ import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.campaign.event.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.adapter.PersonnelTableMouseAdapter;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.enums.PersonnelTabView;
 import mekhq.gui.enums.PersonnelTableModelColumn;
@@ -73,8 +72,8 @@ public final class PersonnelTab extends CampaignGuiTab {
     //endregion Constructors
 
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.PERSONNEL;
+    public MHQTabType tabType() {
+        return MHQTabType.PERSONNEL;
     }
 
     /*
@@ -85,7 +84,7 @@ public final class PersonnelTab extends CampaignGuiTab {
     @Override
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
@@ -151,7 +150,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
@@ -167,11 +166,11 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.NONE;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         add(chkGroupByUnit, gridBagConstraints);
 
         personModel = new PersonnelTableModel(getCampaign());
@@ -201,8 +200,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelTable.getSelectionModel().addListSelectionListener(ev -> refreshPersonnelView());
 
         scrollPersonnelView = new JScrollPane();
-        scrollPersonnelView.setMinimumSize(new java.awt.Dimension(PERSONNEL_VIEW_WIDTH, 600));
-        scrollPersonnelView.setPreferredSize(new java.awt.Dimension(PERSONNEL_VIEW_WIDTH, 600));
+        scrollPersonnelView.setMinimumSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
+        scrollPersonnelView.setPreferredSize(new Dimension(PERSONNEL_VIEW_WIDTH, 600));
         scrollPersonnelView.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPersonnelView.setViewportView(null);
 
@@ -215,7 +214,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 5;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(splitPersonnel, gridBagConstraints);
@@ -281,7 +280,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         personnelSorter.setRowFilter(new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends PersonnelTableModel, ? extends Integer> entry) {
-                return filter.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()));
+                return filter.getFilteredInformation(entry.getModel().getPerson(entry.getIdentifier()), getCampaignGui().getCampaign().getLocalDate());
             }
         });
     }
@@ -296,12 +295,7 @@ public final class PersonnelTab extends CampaignGuiTab {
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
             final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
             tableColumn.setCellRenderer(getPersonModel().getRenderer(choicePersonView.getSelectedItem()));
-            if (column.isRank() && view.isGraphic()) {
-                tableColumn.setPreferredWidth(125);
-                tableColumn.setHeaderValue("Person");
-            } else {
-                tableColumn.setPreferredWidth(column.getWidth());
-            }
+            tableColumn.setPreferredWidth(column.getWidth());
             columnModel.setColumnVisible(tableColumn,
                     column.isVisible(getCampaign(), view, getPersonnelTable()));
         }
@@ -367,9 +361,8 @@ public final class PersonnelTab extends CampaignGuiTab {
         Person selectedPerson = personModel.getPerson(personnelTable.convertRowIndexToModel(row));
         scrollPersonnelView.setViewportView(new PersonViewPanel(selectedPerson, getCampaign(), getCampaignGui()));
         // This odd code is to make sure that the scrollbar stays at the top
-        // I can't just call it here, because it ends up getting reset somewhere
-        // later
-        javax.swing.SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
+        // I can't just call it here, because it ends up getting reset somewhere later
+        SwingUtilities.invokeLater(() -> scrollPersonnelView.getVerticalScrollBar().setValue(0));
     }
 
     private ActionScheduler personnelListScheduler = new ActionScheduler(this::refreshPersonnelList);

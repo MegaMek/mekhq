@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,22 +18,19 @@
  */
 package mekhq.campaign.personnel.procreation;
 
-import megamek.codeUtilities.ObjectUtility;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
-import mekhq.campaign.ExtraData;
+import mekhq.campaign.ExtraData.IntKey;
+import mekhq.campaign.ExtraData.StringKey;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.FamilialRelationshipType;
-import mekhq.campaign.personnel.enums.GenderDescriptors;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.enums.*;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -48,26 +45,26 @@ import java.util.UUID;
 public abstract class AbstractProcreation {
     //region Variable Declarations
     private final RandomProcreationMethod method;
-    private boolean useClannerProcreation;
+    private boolean useClanPersonnelProcreation;
     private boolean usePrisonerProcreation;
     private boolean useRelationshiplessProcreation;
-    private boolean useRandomClannerProcreation;
+    private boolean useRandomClanPersonnelProcreation;
     private boolean useRandomPrisonerProcreation;
 
-    public static final ExtraData.IntKey PREGNANCY_CHILDREN_DATA = new ExtraData.IntKey("procreation:children");
-    public static final ExtraData.StringKey PREGNANCY_FATHER_DATA = new ExtraData.StringKey("procreation:father");
+    public static final IntKey PREGNANCY_CHILDREN_DATA = new IntKey("procreation:children");
+    public static final StringKey PREGNANCY_FATHER_DATA = new StringKey("procreation:father");
 
-    private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
     protected AbstractProcreation(final RandomProcreationMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClannerProcreation(options.isUseClannerProcreation());
+        setUseClanPersonnelProcreation(options.isUseClanPersonnelProcreation());
         setUsePrisonerProcreation(options.isUsePrisonerProcreation());
         setUseRelationshiplessProcreation(options.isUseRelationshiplessRandomProcreation());
-        setUseRandomClannerProcreation(options.isUseRandomClannerProcreation());
+        setUseRandomClanPersonnelProcreation(options.isUseRandomClanPersonnelProcreation());
         setUseRandomPrisonerProcreation(options.isUseRandomPrisonerProcreation());
     }
     //endregion Constructors
@@ -77,12 +74,12 @@ public abstract class AbstractProcreation {
         return method;
     }
 
-    public boolean isUseClannerProcreation() {
-        return useClannerProcreation;
+    public boolean isUseClanPersonnelProcreation() {
+        return useClanPersonnelProcreation;
     }
 
-    public void setUseClannerProcreation(final boolean useClannerProcreation) {
-        this.useClannerProcreation = useClannerProcreation;
+    public void setUseClanPersonnelProcreation(final boolean useClanPersonnelProcreation) {
+        this.useClanPersonnelProcreation = useClanPersonnelProcreation;
     }
 
     public boolean isUsePrisonerProcreation() {
@@ -101,12 +98,12 @@ public abstract class AbstractProcreation {
         this.useRelationshiplessProcreation = useRelationshiplessProcreation;
     }
 
-    public boolean isUseRandomClannerProcreation() {
-        return useRandomClannerProcreation;
+    public boolean isUseRandomClanPersonnelProcreation() {
+        return useRandomClanPersonnelProcreation;
     }
 
-    public void setUseRandomClannerProcreation(final boolean useRandomClannerProcreation) {
-        this.useRandomClannerProcreation = useRandomClannerProcreation;
+    public void setUseRandomClanPersonnelProcreation(final boolean useRandomClanPersonnelProcreation) {
+        this.useRandomClanPersonnelProcreation = useRandomClanPersonnelProcreation;
     }
 
     public boolean isUseRandomPrisonerProcreation() {
@@ -121,12 +118,13 @@ public abstract class AbstractProcreation {
     //region Determination Methods
     /**
      * This method determines the number of babies a person will give birth to.
-     * @param multiplePregnancyChance the chance to have each baby after the first
+     * @param multiplePregnancyOccurrences the X occurrences for there to be a single multiple
+     *                                    child occurrence (i.e. 1 in X)
      * @return the number of babies the person will give birth to, limited to decuplets
      */
-    private int determineNumberOfBabies(final int multiplePregnancyChance) {
+    protected int determineNumberOfBabies(final int multiplePregnancyOccurrences) {
         int children = 1;
-        while ((Compute.randomInt(multiplePregnancyChance) == 0) && (children < 10)) {
+        while ((Compute.randomInt(multiplePregnancyOccurrences) == 0) && (children < 10)) {
             children++;
         }
         return children;
@@ -148,7 +146,7 @@ public abstract class AbstractProcreation {
                 * Math.cos(2.0 * Math.PI * Math.random());
         // To not get weird results, we limit the variance to +/- 4.0 (almost 6 weeks). A base
         // length of 268 creates a solid enough duration for now.
-        return 268 + (int) Math.round(Math.max(-4.0, Math.min(4.0, gaussian)) * 10.0);
+        return 268 + (int) Math.round(MathUtility.clamp(gaussian, -4d, 4d) * 10.0);
     }
 
     /**
@@ -158,9 +156,23 @@ public abstract class AbstractProcreation {
      * @return the current week of their pregnancy
      */
     public int determinePregnancyWeek(final LocalDate today, final Person person) {
-        return Math.toIntExact(ChronoUnit.WEEKS.between(person.getExpectedDueDate()
-                .minus(MHQConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS)
-                .plus(1, ChronoUnit.DAYS), today));
+        return (int) Math.max(Math.ceil(ChronoUnit.DAYS.between(
+                person.getExpectedDueDate().minusDays(MHQConstants.PREGNANCY_STANDARD_DURATION),
+                today) / 7f), 1);
+    }
+
+    /**
+     * This determines the father of the baby.
+     *
+     * @param campaign the campaign the baby is part of
+     * @param mother the mother of the baby
+     */
+    protected @Nullable Person determineFather(final Campaign campaign, final Person mother) {
+        return (campaign.getCampaignOptions().isDetermineFatherAtBirth() && mother.getGenealogy().hasSpouse())
+                ? mother.getGenealogy().getSpouse()
+                : ((mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)
+                        ? campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA)))
+                        : null);
     }
     //endregion Determination Methods
 
@@ -187,16 +199,16 @@ public abstract class AbstractProcreation {
             return resources.getString("cannotProcreate.Child.text");
         } else if (person.getAge(today) >= 51) {
             return resources.getString("cannotProcreate.TooOld.text");
-        } else if (!isUseClannerProcreation() && person.isClanPersonnel()) {
-            return resources.getString("cannotProcreate.Clanner.text");
-        } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isPrisoner()) {
+        } else if (!isUseClanPersonnelProcreation() && person.isClanPersonnel()) {
+            return resources.getString("cannotProcreate.ClanPersonnel.text");
+        } else if (!isUsePrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotProcreate.Prisoner.text");
         } else if (randomProcreation) {
             if (!isUseRelationshiplessProcreation() && !person.getGenealogy().hasSpouse()) {
                 return resources.getString("cannotProcreate.NoSpouse.text");
-            } else if (!isUseRandomClannerProcreation() && person.isClanPersonnel()) {
-                return resources.getString("cannotProcreate.RandomClanner.text");
-            } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isPrisoner()) {
+            } else if (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) {
+                return resources.getString("cannotProcreate.RandomClanPersonnel.text");
+            } else if (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotProcreate.RandomPrisoner.text");
             } else if (person.getGenealogy().hasSpouse()) {
                 if (person.getGenealogy().getSpouse().getGender().isFemale()) {
@@ -205,17 +217,15 @@ public abstract class AbstractProcreation {
                     return resources.getString("cannotProcreate.SpouseNotTryingForABaby.text");
                 } else if (!person.getGenealogy().getSpouse().getStatus().isActive()) {
                     return resources.getString("cannotProcreate.InactiveSpouse.text");
-                } else if (!isUseRandomClannerProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
-                    return resources.getString("cannotProcreate.ClannerSpouse.text");
-                } else if (!isUseRandomPrisonerProcreation()
-                        && person.getGenealogy().getSpouse().getPrisonerStatus().isPrisoner()) {
-                    return resources.getString("cannotProcreate.PrisonerSpouse.text");
-                } else if (person.getGenealogy().getSpouse().getStatus().isMIA()) {
-                    return resources.getString("cannotProcreate.MIASpouse.text");
                 } else if (person.getGenealogy().getSpouse().isDeployed()) {
                     return resources.getString("cannotProcreate.DeployedSpouse.text");
                 } else if (person.getGenealogy().getSpouse().isChild(today)) {
                     return resources.getString("cannotProcreate.ChildSpouse.text");
+                } else if (!isUseRandomClanPersonnelProcreation() && person.getGenealogy().getSpouse().isClanPersonnel()) {
+                    return resources.getString("cannotProcreate.ClanPersonnelSpouse.text");
+                } else if (!isUseRandomPrisonerProcreation()
+                        && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
+                    return resources.getString("cannotProcreate.PrisonerSpouse.text");
                 }
             }
         }
@@ -249,8 +259,8 @@ public abstract class AbstractProcreation {
             return;
         }
 
-        mother.setExpectedDueDate(today.plus(MHQConstants.PREGNANCY_STANDARD_DURATION, ChronoUnit.DAYS));
-        mother.setDueDate(today.plus(determinePregnancyDuration(), ChronoUnit.DAYS));
+        mother.setExpectedDueDate(today.plusDays(MHQConstants.PREGNANCY_STANDARD_DURATION));
+        mother.setDueDate(today.plusDays(determinePregnancyDuration()));
         mother.getExtraData().set(PREGNANCY_CHILDREN_DATA, size);
         mother.getExtraData().set(PREGNANCY_FATHER_DATA, mother.getGenealogy().hasSpouse()
                 ? mother.getGenealogy().getSpouse().getId().toString() : null);
@@ -291,13 +301,10 @@ public abstract class AbstractProcreation {
         final int size = mother.getExtraData().get(PREGNANCY_CHILDREN_DATA, 1);
 
         // Determine father information
-        Person father = (mother.getExtraData().get(PREGNANCY_FATHER_DATA) != null)
-                ? campaign.getPerson(UUID.fromString(mother.getExtraData().get(PREGNANCY_FATHER_DATA))) : null;
-        father = campaign.getCampaignOptions().isDetermineFatherAtBirth()
-                ? ObjectUtility.nonNull(mother.getGenealogy().getSpouse(), father) : father;
+        final Person father = determineFather(campaign, mother);
 
         // Determine Prisoner Status
-        final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().getPrisonerBabyStatus()
+        final PrisonerStatus prisonerStatus = campaign.getCampaignOptions().isPrisonerBabyStatus()
                 ? mother.getPrisonerStatus() : PrisonerStatus.FREE;
 
         // Output a specific report to the campaign if they are giving birth to multiple children
@@ -336,7 +343,7 @@ public abstract class AbstractProcreation {
 
             // Founder Tag Assignment
             if (campaign.getCampaignOptions().isAssignNonPrisonerBabiesFounderTag()
-                    && !prisonerStatus.isPrisoner()) {
+                    && !prisonerStatus.isCurrentPrisoner()) {
                 baby.setFounder(true);
             } else if (campaign.getCampaignOptions().isAssignChildrenOfFoundersFounderTag()) {
                 baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
@@ -348,6 +355,45 @@ public abstract class AbstractProcreation {
 
         // Cleanup Data
         removePregnancy(mother);
+    }
+
+    /**
+     * This is used to process procreation when a person dies with the Pregnancy Complications status
+     * @param campaign the campaign to add the baby to
+     * @param today the current date
+     * @param person the person to process
+     */
+    public void processPregnancyComplications(final Campaign campaign, final LocalDate today,
+                                              final Person person) {
+        // The child might be able to be born, albeit into a world without their mother.
+        // The status, however, can be manually set for males and for those who are not pregnant.
+        // This is purposeful, to allow for player customization, and thus we first check if they
+        // are pregnant before checking if the birth occurs
+        if (!person.isPregnant()) {
+            return;
+        }
+
+        final int pregnancyWeek = determinePregnancyWeek(today, person);
+        final double babyBornChance;
+        if (pregnancyWeek > 35) {
+            babyBornChance = 0.99;
+        } else if (pregnancyWeek > 29) {
+            babyBornChance = 0.95;
+        } else if (pregnancyWeek > 25) {
+            babyBornChance = 0.9;
+        } else if (pregnancyWeek == 25) {
+            babyBornChance = 0.8;
+        } else if (pregnancyWeek == 24) {
+            babyBornChance = 0.5;
+        } else if (pregnancyWeek == 23) {
+            babyBornChance = 0.25;
+        } else {
+            babyBornChance = 0.0;
+        }
+
+        if (Compute.randomFloat() < babyBornChance) {
+            birth(campaign, today, person);
+        }
     }
 
     //region New Day
@@ -412,41 +458,4 @@ public abstract class AbstractProcreation {
     protected abstract boolean relationshiplessProcreation(final Person person);
     //endregion Random Procreation
     //endregion New Day
-
-    /**
-     * This is used to process procreation when a person dies with the Pregnancy Complications status
-     * @param campaign the campaign to add the baby to
-     * @param today the current date
-     * @param person the person to process
-     */
-    public void processPregnancyComplications(final Campaign campaign, final LocalDate today,
-                                              final Person person) {
-        // The child might be able to be born, albeit into a world without their mother.
-        // The status, however, can be manually set for males and for those who are not pregnant.
-        // This is purposeful, to allow for player customization, and thus we first check if they
-        // are pregnant before checking if the birth occurs
-        if (person.isPregnant()) {
-            final int pregnancyWeek = determinePregnancyWeek(today, person);
-            final double babyBornChance;
-            if (pregnancyWeek > 35) {
-                babyBornChance = 0.99;
-            } else if (pregnancyWeek > 29) {
-                babyBornChance = 0.95;
-            } else if (pregnancyWeek > 25) {
-                babyBornChance = 0.9;
-            } else if (pregnancyWeek == 25) {
-                babyBornChance = 0.8;
-            } else if (pregnancyWeek == 24) {
-                babyBornChance = 0.5;
-            } else if (pregnancyWeek == 23) {
-                babyBornChance = 0.25;
-            } else {
-                babyBornChance = 0.0;
-            }
-
-            if (Compute.randomFloat() < babyBornChance) {
-                birth(campaign, today, person);
-            }
-        }
-    }
 }

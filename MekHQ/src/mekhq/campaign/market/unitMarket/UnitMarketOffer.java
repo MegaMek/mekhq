@@ -128,8 +128,9 @@ public class UnitMarketOffer {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "offer");
     }
 
-    public static UnitMarketOffer generateInstanceFromXML(final Node wn, final Campaign campaign,
-                                                          final Version version) {
+    public static @Nullable UnitMarketOffer generateInstanceFromXML(final Node wn,
+                                                                    final Campaign campaign,
+                                                                    final Version version) {
         UnitMarketOffer retVal = new UnitMarketOffer();
         NodeList nl = wn.getChildNodes();
 
@@ -145,7 +146,12 @@ public class UnitMarketOffer {
                 } else if (wn3.getNodeName().equalsIgnoreCase("unitType")) {
                     retVal.setUnitType(Integer.parseInt(wn3.getTextContent().trim()));
                 } else if (wn3.getNodeName().equalsIgnoreCase("unit")) {
-                    retVal.setUnit(MechSummaryCache.getInstance().getMech(wn3.getTextContent().trim()));
+                    final String unitName = wn3.getTextContent().trim();
+                    retVal.setUnit(MechSummaryCache.getInstance().getMech(unitName));
+                    if (retVal.getUnit() == null) {
+                        LogManager.getLogger().error("Failed to find unit with name " + unitName + ", removing the offer from the market.");
+                        return null;
+                    }
                 } else if (wn3.getNodeName().equalsIgnoreCase("pct") // Legacy, 0.49.3 removal
                         || wn3.getNodeName().equalsIgnoreCase("percent")) {
                     retVal.setPercent(Integer.parseInt(wn3.getTextContent().trim()));
@@ -153,12 +159,13 @@ public class UnitMarketOffer {
                     retVal.setTransitDuration(Integer.parseInt(wn3.getTextContent().trim()));
                 }
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
+            return null;
         }
 
         if (version.isLowerThan("0.49.3")) {
-            retVal.setTransitDuration(campaign.getCampaignOptions().getInstantUnitMarketDelivery()
+            retVal.setTransitDuration(campaign.getCampaignOptions().isInstantUnitMarketDelivery()
                     ? 0 : campaign.calculatePartTransitTime(Compute.d6(2) - 2));
         }
 

@@ -21,6 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -66,7 +67,7 @@ public class AeroSensor extends Part {
             hits = ((Aero) unit.getEntity()).getSensorHits();
             if (checkForDestruction
                     && hits > priorHits
-                    && (hits < 3 && !campaign.getCampaignOptions().useAeroSystemHits())
+                    && (hits < 3 && !campaign.getCampaignOptions().isUseAeroSystemHits())
                     && Compute.d6(2) < campaign.getCampaignOptions().getDestroyPartTarget()) {
                 remove(false);
             } else if (hits >= 3) {
@@ -78,8 +79,8 @@ public class AeroSensor extends Part {
     @Override
     public int getBaseTime() {
         int time = 0;
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
-            //Test of proposed errata for repair times
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
+            // Test of proposed errata for repair times
             if (null != unit && (unit.getEntity() instanceof Dropship || unit.getEntity() instanceof Jumpship)) {
                 time = 120;
             } else {
@@ -114,7 +115,7 @@ public class AeroSensor extends Part {
 
     @Override
     public int getDifficulty() {
-        if (campaign.getCampaignOptions().useAeroSystemHits()) {
+        if (campaign.getCampaignOptions().isUseAeroSystemHits()) {
             // Test of proposed errata for repair time and difficulty
             if (isSalvaging()) {
                 return -2;
@@ -175,7 +176,7 @@ public class AeroSensor extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -209,9 +210,9 @@ public class AeroSensor extends Part {
 
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
-        writeToXmlBegin(pw, indent++);
+        indent = writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dropship", largeCraft);
-        writeToXmlEnd(pw, --indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -275,7 +276,7 @@ public class AeroSensor extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ELECTRONICS;
     }
 }

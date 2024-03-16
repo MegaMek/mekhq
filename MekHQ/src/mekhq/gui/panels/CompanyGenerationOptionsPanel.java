@@ -25,11 +25,13 @@ import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.enums.*;
 import mekhq.gui.FileDialogs;
-import mekhq.gui.baseComponents.AbstractMHQPanel;
-import mekhq.gui.baseComponents.JDisableablePanel;
+import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
+import megamek.client.ui.baseComponents.JDisableablePanel;
+import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
@@ -38,17 +40,19 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
  * @author Justin "Windchild" Bowen
  */
-public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
+public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
     //region Variable Declarations
     private final Campaign campaign;
 
     // Base Information
     private MMComboBox<CompanyGenerationMethod> comboCompanyGenerationMethod;
+    private MMComboBox<FactionDisplay> comboSpecifiedFaction;
     private JCheckBox chkGenerateMercenaryCompanyCommandLance;
     private JSpinner spnCompanyCount;
     private JSpinner spnIndividualLanceCount;
@@ -69,6 +73,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     private JCheckBox chkPrioritizeOfficerCombatSkills;
     private JCheckBox chkAssignMostSkilledToPrimaryLances;
     private JCheckBox chkAutomaticallyAssignRanks;
+    private JCheckBox chkUseSpecifiedFactionToAssignRanks;
     private JCheckBox chkAssignMechWarriorsCallsigns;
     private JCheckBox chkAssignFounderFlag;
 
@@ -82,6 +87,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     private JCheckBox chkSimulateRandomProcreation;
 
     // Units
+    private MMComboBox<BattleMechFactionGenerationMethod> comboBattleMechFactionGenerationMethod;
     private MMComboBox<BattleMechWeightClassGenerationMethod> comboBattleMechWeightClassGenerationMethod;
     private MMComboBox<BattleMechQualityGenerationMethod> comboBattleMechQualityGenerationMethod;
     private JCheckBox chkNeverGenerateStarLeagueMechs;
@@ -98,6 +104,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     // Unit
     private MMComboBox<ForceNamingMethod> comboForceNamingMethod;
     private JCheckBox chkGenerateForceIcons;
+    private JCheckBox chkUseSpecifiedFactionToGenerateForceIcons;
     private JCheckBox chkGenerateOriginNodeForceIcon;
     private JCheckBox chkUseOriginNodeForceIconLogo;
     private Map<Integer, JSpinner> spnForceWeightLimits;
@@ -141,6 +148,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                                          final @Nullable CompanyGenerationOptions companyGenerationOptions) {
         super(frame, "CompanyGenerationOptionsPanel", new GridBagLayout());
         this.campaign = campaign;
+        setTracksViewportWidth(false);
 
         initialize();
 
@@ -164,6 +172,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
     public void setComboCompanyGenerationMethod(final MMComboBox<CompanyGenerationMethod> comboCompanyGenerationMethod) {
         this.comboCompanyGenerationMethod = comboCompanyGenerationMethod;
+    }
+
+    public MMComboBox<FactionDisplay> getComboSpecifiedFaction() {
+        return comboSpecifiedFaction;
+    }
+
+    public void setComboSpecifiedFaction(final MMComboBox<FactionDisplay> comboSpecifiedFaction) {
+        this.comboSpecifiedFaction = comboSpecifiedFaction;
     }
 
     public JCheckBox getChkGenerateMercenaryCompanyCommandLance() {
@@ -317,6 +333,14 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         this.chkAutomaticallyAssignRanks = chkAutomaticallyAssignRanks;
     }
 
+    public JCheckBox getChkUseSpecifiedFactionToAssignRanks() {
+        return chkUseSpecifiedFactionToAssignRanks;
+    }
+
+    public void setChkUseSpecifiedFactionToAssignRanks(final JCheckBox chkUseSpecifiedFactionToAssignRanks) {
+        this.chkUseSpecifiedFactionToAssignRanks = chkUseSpecifiedFactionToAssignRanks;
+    }
+
     public JCheckBox getChkAssignMechWarriorsCallsigns() {
         return chkAssignMechWarriorsCallsigns;
     }
@@ -379,6 +403,15 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     //endregion Starting Simulation
 
     //region Units
+    public MMComboBox<BattleMechFactionGenerationMethod> getComboBattleMechFactionGenerationMethod() {
+        return comboBattleMechFactionGenerationMethod;
+    }
+
+    public void setComboBattleMechFactionGenerationMethod(
+            final MMComboBox<BattleMechFactionGenerationMethod> comboBattleMechFactionGenerationMethod) {
+        this.comboBattleMechFactionGenerationMethod = comboBattleMechFactionGenerationMethod;
+    }
+
     public MMComboBox<BattleMechWeightClassGenerationMethod> getComboBattleMechWeightClassGenerationMethod() {
         return comboBattleMechWeightClassGenerationMethod;
     }
@@ -493,6 +526,15 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
     public void setChkGenerateForceIcons(final JCheckBox chkGenerateForceIcons) {
         this.chkGenerateForceIcons = chkGenerateForceIcons;
+    }
+
+    public JCheckBox getChkUseSpecifiedFactionToGenerateForceIcons() {
+        return chkUseSpecifiedFactionToGenerateForceIcons;
+    }
+
+    public void setChkUseSpecifiedFactionToGenerateForceIcons(
+            final JCheckBox chkUseSpecifiedFactionToGenerateForceIcons) {
+        this.chkUseSpecifiedFactionToGenerateForceIcons = chkUseSpecifiedFactionToGenerateForceIcons;
     }
 
     public JCheckBox getChkGenerateOriginNodeForceIcon() {
@@ -800,6 +842,16 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
             }
         });
 
+        final JLabel lblSpecifiedFaction = new JLabel(resources.getString("lblSpecifiedFaction.text"));
+        lblSpecifiedFaction.setToolTipText(resources.getString("lblSpecifiedFaction.toolTipText"));
+        lblSpecifiedFaction.setName("lblSpecifiedFaction");
+
+        final DefaultComboBoxModel<FactionDisplay> specifiedFactionModel = new DefaultComboBoxModel<>();
+        specifiedFactionModel.addAll(FactionDisplay
+                .getSortedValidFactionDisplays(Factions.getInstance().getChoosableFactions(), getCampaign().getLocalDate()));
+        setComboSpecifiedFaction(new MMComboBox<>("comboFaction", specifiedFactionModel));
+        getComboSpecifiedFaction().setToolTipText(resources.getString("lblSpecifiedFaction.toolTipText"));
+
         setChkGenerateMercenaryCompanyCommandLance(new JCheckBox(resources.getString("chkGenerateMercenaryCompanyCommandLance.text")));
         getChkGenerateMercenaryCompanyCommandLance().setToolTipText(resources.getString("chkGenerateMercenaryCompanyCommandLance.toolTipText"));
         getChkGenerateMercenaryCompanyCommandLance().setName("chkGenerateMercenaryCompanyCommandLance");
@@ -847,6 +899,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         // Programmatically Assign Accessibility Labels
         lblCompanyGenerationMethod.setLabelFor(getComboCompanyGenerationMethod());
+        lblSpecifiedFaction.setLabelFor(getComboSpecifiedFaction());
         lblCompanyCount.setLabelFor(getSpnCompanyCount());
         lblIndividualLanceCount.setLabelFor(getSpnIndividualLanceCount());
         lblLancesPerCompany.setLabelFor(getSpnLancesPerCompany());
@@ -868,6 +921,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCompanyGenerationMethod)
                                 .addComponent(getComboCompanyGenerationMethod(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblSpecifiedFaction)
+                                .addComponent(getComboSpecifiedFaction(), Alignment.LEADING))
                         .addComponent(getChkGenerateMercenaryCompanyCommandLance())
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCompanyCount)
@@ -889,6 +945,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCompanyGenerationMethod)
                                 .addComponent(getComboCompanyGenerationMethod()))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblSpecifiedFaction)
+                                .addComponent(getComboSpecifiedFaction()))
                         .addComponent(getChkGenerateMercenaryCompanyCommandLance())
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCompanyCount)
@@ -961,6 +1020,10 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkAutomaticallyAssignRanks().setToolTipText(resources.getString("chkAutomaticallyAssignRanks.toolTipText"));
         getChkAutomaticallyAssignRanks().setName("chkAutomaticallyAssignRanks");
 
+        setChkUseSpecifiedFactionToAssignRanks(new JCheckBox(resources.getString("chkUseSpecifiedFactionToAssignRanks.text")));
+        getChkUseSpecifiedFactionToAssignRanks().setToolTipText(resources.getString("chkUseSpecifiedFactionToAssignRanks.toolTipText"));
+        getChkUseSpecifiedFactionToAssignRanks().setName("chkUseSpecifiedFactionToAssignRanks");
+
         setChkAssignMechWarriorsCallsigns(new JCheckBox(resources.getString("chkAssignMechWarriorsCallsigns.text")));
         getChkAssignMechWarriorsCallsigns().setToolTipText(resources.getString("chkAssignMechWarriorsCallsigns.toolTipText"));
         getChkAssignMechWarriorsCallsigns().setName("chkAssignMechWarriorsCallsigns");
@@ -999,6 +1062,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addComponent(getChkPrioritizeOfficerCombatSkills())
                         .addComponent(getChkAssignMostSkilledToPrimaryLances())
                         .addComponent(getChkAutomaticallyAssignRanks())
+                        .addComponent(getChkUseSpecifiedFactionToAssignRanks())
                         .addComponent(getChkAssignMechWarriorsCallsigns())
                         .addComponent(getChkAssignFounderFlag())
         );
@@ -1017,6 +1081,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                         .addComponent(getChkPrioritizeOfficerCombatSkills())
                         .addComponent(getChkAssignMostSkilledToPrimaryLances())
                         .addComponent(getChkAutomaticallyAssignRanks())
+                        .addComponent(getChkUseSpecifiedFactionToAssignRanks())
                         .addComponent(getChkAssignMechWarriorsCallsigns())
                         .addComponent(getChkAssignFounderFlag())
         );
@@ -1150,6 +1215,25 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
     private JPanel createUnitsPanel() {
         // Create Panel Components
+        final JLabel lblBattleMechFactionGenerationMethod = new JLabel(resources.getString("lblBattleMechFactionGenerationMethod.text"));
+        lblBattleMechFactionGenerationMethod.setToolTipText(resources.getString("lblBattleMechFactionGenerationMethod.toolTipText"));
+        lblBattleMechFactionGenerationMethod.setName("lblBattleMechFactionGenerationMethod");
+
+        setComboBattleMechFactionGenerationMethod(new MMComboBox<>("comboBattleMechFactionGenerationMethod", BattleMechFactionGenerationMethod.values()));
+        getComboBattleMechFactionGenerationMethod().setToolTipText(resources.getString("lblBattleMechFactionGenerationMethod.toolTipText"));
+        getComboBattleMechFactionGenerationMethod().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof BattleMechFactionGenerationMethod) {
+                    list.setToolTipText(((BattleMechFactionGenerationMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
         final JLabel lblBattleMechWeightClassGenerationMethod = new JLabel(resources.getString("lblBattleMechWeightClassGenerationMethod.text"));
         lblBattleMechWeightClassGenerationMethod.setToolTipText(resources.getString("lblBattleMechWeightClassGenerationMethod.toolTipText"));
         lblBattleMechWeightClassGenerationMethod.setName("lblBattleMechWeightClassGenerationMethod");
@@ -1233,6 +1317,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkAssignTechsToUnits().setName("chkAssignTechsToUnits");
 
         // Programmatically Assign Accessibility Labels
+        lblBattleMechFactionGenerationMethod.setLabelFor(getComboBattleMechFactionGenerationMethod());
         lblBattleMechWeightClassGenerationMethod.setLabelFor(getComboBattleMechWeightClassGenerationMethod());
         lblBattleMechQualityGenerationMethod.setLabelFor(getComboBattleMechQualityGenerationMethod());
 
@@ -1248,6 +1333,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblBattleMechFactionGenerationMethod)
+                                .addComponent(getComboBattleMechFactionGenerationMethod(), Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblBattleMechWeightClassGenerationMethod)
                                 .addComponent(getComboBattleMechWeightClassGenerationMethod(), Alignment.LEADING))
@@ -1268,6 +1356,9 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblBattleMechFactionGenerationMethod)
+                                .addComponent(getComboBattleMechFactionGenerationMethod()))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblBattleMechWeightClassGenerationMethod)
                                 .addComponent(getComboBattleMechWeightClassGenerationMethod()))
@@ -1318,11 +1409,16 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkGenerateForceIcons().setName("chkGenerateForceIcons");
         getChkGenerateForceIcons().addActionListener(evt -> {
             final boolean selected = getChkGenerateForceIcons().isSelected();
+            getChkUseSpecifiedFactionToGenerateForceIcons().setEnabled(selected);
             getChkGenerateOriginNodeForceIcon().setEnabled(selected);
             getChkUseOriginNodeForceIconLogo().setEnabled(selected
                     && getChkGenerateOriginNodeForceIcon().isSelected());
             forceWeightLimitsPanel.setEnabled(selected);
         });
+
+        setChkUseSpecifiedFactionToGenerateForceIcons(new JCheckBox(resources.getString("chkUseSpecifiedFactionToGenerateForceIcons.text")));
+        getChkUseSpecifiedFactionToGenerateForceIcons().setToolTipText(resources.getString("chkUseSpecifiedFactionToGenerateForceIcons.toolTipText"));
+        getChkUseSpecifiedFactionToGenerateForceIcons().setName("chkUseSpecifiedFactionToGenerateForceIcons");
 
         setChkGenerateOriginNodeForceIcon(new JCheckBox(resources.getString("chkGenerateOriginNodeForceIcon.text")));
         getChkGenerateOriginNodeForceIcon().setToolTipText(resources.getString("chkGenerateOriginNodeForceIcon.toolTipText"));
@@ -1356,6 +1452,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                                 .addComponent(lblForceNamingMethod)
                                 .addComponent(getComboForceNamingMethod(), Alignment.LEADING))
                         .addComponent(getChkGenerateForceIcons())
+                        .addComponent(getChkUseSpecifiedFactionToGenerateForceIcons())
                         .addComponent(getChkGenerateOriginNodeForceIcon())
                         .addComponent(getChkUseOriginNodeForceIconLogo())
                         .addComponent(forceWeightLimitsPanel)
@@ -1367,6 +1464,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                                 .addComponent(lblForceNamingMethod)
                                 .addComponent(getComboForceNamingMethod()))
                         .addComponent(getChkGenerateForceIcons())
+                        .addComponent(getChkUseSpecifiedFactionToGenerateForceIcons())
                         .addComponent(getChkGenerateOriginNodeForceIcon())
                         .addComponent(getChkUseOriginNodeForceIconLogo())
                         .addComponent(forceWeightLimitsPanel)
@@ -1906,6 +2004,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
     public void setOptions(final CompanyGenerationOptions options) {
         // Base Information
         getComboCompanyGenerationMethod().setSelectedItem(options.getMethod());
+        getComboSpecifiedFaction().setSelectedItem(new FactionDisplay(options.getSpecifiedFaction(), getCampaign().getLocalDate()));
         getChkGenerateMercenaryCompanyCommandLance().setSelected(options.isGenerateMercenaryCompanyCommandLance());
         getSpnCompanyCount().setValue(options.getCompanyCount());
         getSpnIndividualLanceCount().setValue(options.getIndividualLanceCount());
@@ -1932,6 +2031,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkPrioritizeOfficerCombatSkills().setSelected(options.isPrioritizeOfficerCombatSkills());
         getChkAssignMostSkilledToPrimaryLances().setSelected(options.isAssignMostSkilledToPrimaryLances());
         getChkAutomaticallyAssignRanks().setSelected(options.isAutomaticallyAssignRanks());
+        getChkUseSpecifiedFactionToAssignRanks().setSelected(options.isUseSpecifiedFactionToAssignRanks());
         getChkAssignMechWarriorsCallsigns().setSelected(options.isAssignMechWarriorsCallsigns());
         getChkAssignFounderFlag().setSelected(options.isAssignFounderFlag());
 
@@ -1947,6 +2047,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         getChkSimulateRandomProcreation().setSelected(options.isSimulateRandomProcreation());
 
         // Units
+        getComboBattleMechFactionGenerationMethod().setSelectedItem(options.getBattleMechFactionGenerationMethod());
         getComboBattleMechWeightClassGenerationMethod().setSelectedItem(options.getBattleMechWeightClassGenerationMethod());
         getComboBattleMechQualityGenerationMethod().setSelectedItem(options.getBattleMechQualityGenerationMethod());
         getChkNeverGenerateStarLeagueMechs().setSelected(options.isNeverGenerateStarLeagueMechs());
@@ -1965,7 +2066,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         if (getChkGenerateForceIcons().isSelected() != options.isGenerateForceIcons()) {
             getChkGenerateForceIcons().doClick();
         }
-
+        getChkUseSpecifiedFactionToGenerateForceIcons().setSelected(options.isUseSpecifiedFactionToGenerateForceIcons());
         if (getChkGenerateOriginNodeForceIcon().isSelected() != options.isGenerateOriginNodeForceIcon()) {
             getChkGenerateOriginNodeForceIcon().doClick();
         }
@@ -2036,6 +2137,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
                 getComboCompanyGenerationMethod().getSelectedItem());
 
         // Base Information
+        options.setSpecifiedFaction(Objects.requireNonNull(getComboSpecifiedFaction().getSelectedItem()).getFaction());
         options.setGenerateMercenaryCompanyCommandLance(getChkGenerateMercenaryCompanyCommandLance().isSelected());
         options.setCompanyCount((Integer) getSpnCompanyCount().getValue());
         options.setIndividualLanceCount((Integer) getSpnIndividualLanceCount().getValue());
@@ -2062,6 +2164,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         options.setPrioritizeOfficerCombatSkills(getChkPrioritizeOfficerCombatSkills().isSelected());
         options.setAssignMostSkilledToPrimaryLances(getChkAssignMostSkilledToPrimaryLances().isSelected());
         options.setAutomaticallyAssignRanks(getChkAutomaticallyAssignRanks().isSelected());
+        options.setUseSpecifiedFactionToAssignRanks(getChkUseSpecifiedFactionToAssignRanks().isSelected());
         options.setAssignMechWarriorsCallsigns(getChkAssignMechWarriorsCallsigns().isSelected());
         options.setAssignFounderFlag(getChkAssignFounderFlag().isSelected());
 
@@ -2075,6 +2178,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         options.setSimulateRandomProcreation(getChkSimulateRandomProcreation().isSelected());
 
         // Units
+        options.setBattleMechFactionGenerationMethod(getComboBattleMechFactionGenerationMethod().getSelectedItem());
         options.setBattleMechWeightClassGenerationMethod(getComboBattleMechWeightClassGenerationMethod().getSelectedItem());
         options.setBattleMechQualityGenerationMethod(getComboBattleMechQualityGenerationMethod().getSelectedItem());
         options.setNeverGenerateStarLeagueMechs(getChkNeverGenerateStarLeagueMechs().isSelected());
@@ -2091,6 +2195,7 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQPanel {
         // Unit
         options.setForceNamingMethod(getComboForceNamingMethod().getSelectedItem());
         options.setGenerateForceIcons(getChkGenerateForceIcons().isSelected());
+        options.setUseSpecifiedFactionToGenerateForceIcons(getChkUseSpecifiedFactionToGenerateForceIcons().isSelected());
         options.setGenerateOriginNodeForceIcon(getChkGenerateOriginNodeForceIcon().isSelected());
         options.setUseOriginNodeForceIconLogo(getChkUseOriginNodeForceIconLogo().isSelected());
         options.setForceWeightLimits(new TreeMap<>());

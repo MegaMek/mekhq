@@ -48,7 +48,7 @@ public interface PersonnelMarketMethod extends MekHQModule {
     }
 
     @Override
-    default void writeToXml(final PrintWriter pw, int indent) {
+    default void writeToXML(final PrintWriter pw, int indent) {
 
     }
 }

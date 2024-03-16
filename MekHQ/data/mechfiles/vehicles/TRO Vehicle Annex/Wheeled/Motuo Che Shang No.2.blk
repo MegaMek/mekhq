@@ -16,9 +16,9 @@ SupportTank
 Motuo Che Shang No.2
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 4680
@@ -35,6 +35,10 @@ Motuo Che Shang No.2
 <type>
 IS Level 2
 </type>
+
+<role>
+None
+</role>
 
 <motion_type>
 Wheeled
@@ -85,7 +89,7 @@ MonocycleChassisMod
 </structural_tech_rating>
 
 <source>
-TRO VAr - Age of War
+TRO: Vehicle Annex (Revised)
 </source>
 
 <tonnage>

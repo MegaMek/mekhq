@@ -23,21 +23,20 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MechSummaryCache;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
  */
 public class RefitNameDialog extends JDialog {
-    @SuppressWarnings("unused") // FIXME
-    private Frame frame;
+    private JFrame frame;
     private Refit refit;
     private boolean cancelled;
 
@@ -48,19 +47,17 @@ public class RefitNameDialog extends JDialog {
     private JLabel lblModel;
     private JTextField txtModel;
 
-    /** Creates new form RefitTeamDialog */
-    public RefitNameDialog(Frame parent, boolean modal, Refit r) {
-        super(parent, modal);
-        this.frame = parent;
-        this.refit = r;
+    public RefitNameDialog(final JFrame frame, final boolean modal, final Refit refit) {
+        super(frame, modal);
+        this.frame = frame;
+        this.refit = refit;
         cancelled = false;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
     private void initComponents() {
-         java.awt.GridBagConstraints gridBagConstraints;
 
         txtChassis = new JTextField();
         lblChassis = new JLabel();
@@ -70,14 +67,14 @@ public class RefitNameDialog extends JDialog {
         btnCancel = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RefitNameDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title"));
         getContentPane().setLayout(new GridBagLayout());
 
         lblChassis.setText(resourceMap.getString("lblChassis.text"));
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
@@ -97,52 +94,52 @@ public class RefitNameDialog extends JDialog {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtChassis, gridBagConstraints);
 
         lblModel.setText(resourceMap.getString("lblModel.text"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblModel, gridBagConstraints);
 
         txtModel.setText(refit.getNewEntity().getModel());
-        txtModel.setMinimumSize(new java.awt.Dimension(150, 28));
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        txtModel.setMinimumSize(new Dimension(150, 28));
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtModel, gridBagConstraints);
 
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.EAST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
         btnCancel.setText(resourceMap.getString("btnCancel.text"));
         btnCancel.setName("btnClose");
         btnCancel.addActionListener(this::btnCloseActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnCancel, gridBagConstraints);
 
         pack();
@@ -159,7 +156,7 @@ public class RefitNameDialog extends JDialog {
         }
     }
 
-    private void btnOKActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnOKActionPerformed(ActionEvent evt) {
         String chassis = txtChassis.getText().trim();
         String model = txtModel.getText().trim();
         if (chassis.isEmpty()) {
@@ -180,7 +177,7 @@ public class RefitNameDialog extends JDialog {
         this.setVisible(false);
     }
 
-    private void btnCloseActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnCloseActionPerformed(ActionEvent evt) {
         cancelled = true;
         this.setVisible(false);
     }

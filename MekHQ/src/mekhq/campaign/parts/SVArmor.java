@@ -22,6 +22,7 @@ import megamek.common.Entity;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
 import megamek.common.TechAdvancement;
+import megamek.common.equipment.ArmorType;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -81,31 +82,31 @@ public class SVArmor extends Armor {
 
     @Override
     public double getTonnage() {
-        return amount * EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
+        return amount * ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
     }
 
     @Override
     public Money getActualValue() {
         return adjustCostsForCampaignOptions(
-                Money.of(amount * EquipmentType.getSupportVehicleArmorCostPerPoint(bar)));
+                Money.of(amount * ArmorType.svArmor(bar).getCost()));
     }
 
     @Override
     public double getTonnageNeeded() {
-        return amountNeeded * EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
+        return amountNeeded * ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
     }
 
     @Override
     public Money getValueNeeded() {
         return adjustCostsForCampaignOptions(
-                Money.of(amountNeeded * EquipmentType.getSupportVehicleArmorCostPerPoint(bar)));
+                Money.of(amountNeeded * ArmorType.svArmor(bar).getCost()));
     }
 
     @Override
     public Money getStickerPrice() {
         // always in 5-ton increments
-        return Money.of(5.0 / EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating)
-                * EquipmentType.getSupportVehicleArmorCostPerPoint(bar));
+        return Money.of(5.0 / ArmorType.svArmor(bar).getSVWeightPerPoint(techRating)
+                * ArmorType.svArmor(bar).getCost());
     }
 
     @Override
@@ -117,7 +118,7 @@ public class SVArmor extends Armor {
 
     @Override
     public double getArmorWeight(int points) {
-        return points * EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
+        return points * ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
     }
 
     @Override
@@ -127,7 +128,7 @@ public class SVArmor extends Armor {
 
     @Override
     public double getArmorPointsPerTon() {
-        return 1.0 / EquipmentType.getSupportVehicleArmorWeightPerPoint(bar, techRating);
+        return 1.0 / ArmorType.svArmor(bar).getSVWeightPerPoint(techRating);
     }
 
     @Override
@@ -164,13 +165,11 @@ public class SVArmor extends Armor {
         }
     }
 
-    private static final String NODE_BAR = "bar";
-    private static final String NODE_TECH_RATING = "techRating";
-
     @Override
-    protected void writeAdditionalFields(PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXmlTag(pw, indent, NODE_BAR, bar);
-        MHQXMLUtility.writeSimpleXmlTag(pw, indent, NODE_TECH_RATING, ITechnology.getRatingName(techRating));
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bar", bar);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "techRating", ITechnology.getRatingName(techRating));
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -180,10 +179,10 @@ public class SVArmor extends Armor {
             final Node wn = node.getChildNodes().item(x);
             try {
                 switch (wn.getNodeName()) {
-                    case NODE_BAR:
+                    case "bar":
                         bar = Integer.parseInt(wn.getTextContent());
                         break;
-                    case NODE_TECH_RATING:
+                    case "techRating":
                         for (int r = 0; r < ratingNames.length; r++) {
                             if (ratingNames[r].equals(wn.getTextContent())) {
                                 techRating = r;
@@ -200,6 +199,6 @@ public class SVArmor extends Armor {
 
     @Override
     public TechAdvancement getTechAdvancement() {
-        return EquipmentType.getSVArmorTechAdvancement(bar);
+        return ArmorType.svArmor(bar).getTechAdvancement();
     }
 }

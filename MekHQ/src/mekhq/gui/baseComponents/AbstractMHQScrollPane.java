@@ -19,7 +19,6 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.baseComponents.AbstractScrollPane;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import javax.swing.*;
@@ -47,7 +46,7 @@ public abstract class AbstractMHQScrollPane extends AbstractScrollPane {
     protected AbstractMHQScrollPane(final JFrame frame, final String name,
                                     final int verticalScrollBarPolicy, final int horizontalScrollBarPolicy) {
         this(frame, ResourceBundle.getBundle("mekhq.resources.GUI",
-                        MekHQ.getMHQOptions().getLocale(), new EncodeControl()),
+                        MekHQ.getMHQOptions().getLocale()),
                 name, verticalScrollBarPolicy, horizontalScrollBarPolicy);
     }
 

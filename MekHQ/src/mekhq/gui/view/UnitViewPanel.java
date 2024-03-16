@@ -23,7 +23,6 @@ import megamek.common.Entity;
 import megamek.common.MechView;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
@@ -76,7 +75,7 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats = new JPanel();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.UnitViewPanel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
         setLayout(new GridBagLayout());
 
@@ -258,7 +257,7 @@ public class UnitViewPanel extends JScrollablePanel {
         pnlStats.add(txtBV, gridBagConstraints);
 
         double weight = 1.0;
-        if (campaign.getCampaignOptions().useQuirks() && (entity.countQuirks() > 0)) {
+        if (campaign.getCampaignOptions().isUseQuirks() && (entity.countQuirks() > 0)) {
             weight = 0.0;
         }
 
@@ -283,7 +282,7 @@ public class UnitViewPanel extends JScrollablePanel {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         pnlStats.add(txtCost, gridBagConstraints);
 
-        if (campaign.getCampaignOptions().useQuirks() && (entity.countQuirks() > 0)) {
+        if (campaign.getCampaignOptions().isUseQuirks() && (entity.countQuirks() > 0)) {
             lblQuirk.setName("lblQuirk1");
             lblQuirk.setText(resourceMap.getString("lblQuirk1.text"));
             gridBagConstraints = new GridBagConstraints();

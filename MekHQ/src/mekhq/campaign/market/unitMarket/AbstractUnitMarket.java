@@ -24,7 +24,6 @@ import megamek.common.Compute;
 import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
@@ -47,7 +46,7 @@ public abstract class AbstractUnitMarket {
     private List<UnitMarketOffer> offers;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Market",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -160,9 +159,9 @@ public abstract class AbstractUnitMarket {
                                              final int percent) {
         final MechSummary mechSummary = campaign.getUnitGenerator().generate(faction.getShortName(),
                 unitType, weight, campaign.getGameYear(), quality, movementModes, missionRoles,
-                ms -> (!campaign.getCampaignOptions().limitByYear() || (campaign.getGameYear() > ms.getYear()))
-                        && (!ms.isClan() || campaign.getCampaignOptions().allowClanPurchases())
-                        && (ms.isClan() || campaign.getCampaignOptions().allowISPurchases()));
+                ms -> (!campaign.getCampaignOptions().isLimitByYear() || (campaign.getGameYear() > ms.getYear()))
+                        && (!ms.isClan() || campaign.getCampaignOptions().isAllowClanPurchases())
+                        && (ms.isClan() || campaign.getCampaignOptions().isAllowISPurchases()));
         return (mechSummary == null) ? null : addSingleUnit(campaign, market, unitType, mechSummary, percent);
     }
 
@@ -196,7 +195,7 @@ public abstract class AbstractUnitMarket {
      * @return the generated transit duration
      */
     protected int generateTransitDuration(final Campaign campaign) {
-        return campaign.getCampaignOptions().getInstantUnitMarketDelivery() ? 0
+        return campaign.getCampaignOptions().isInstantUnitMarketDelivery() ? 0
                 : campaign.calculatePartTransitTime(Compute.d6(2) - 2);
     }
 
@@ -204,7 +203,7 @@ public abstract class AbstractUnitMarket {
      * @param campaign the campaign to write the refresh report to
      */
     protected void writeRefreshReport(final Campaign campaign) {
-        if (campaign.getCampaignOptions().getUnitMarketReportRefresh()) {
+        if (campaign.getCampaignOptions().isUnitMarketReportRefresh()) {
             campaign.addReport(resources.getString("AbstractUnitMarket.RefreshReport.report"));
         }
     }
@@ -261,8 +260,8 @@ public abstract class AbstractUnitMarket {
                 }
                 parseXMLNode(wn2, campaign, version);
             }
-        } catch (Exception e) {
-            LogManager.getLogger().error("Failed to parse Unit Market, keeping currently parsed market", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to parse Unit Market, keeping currently parsed market", ex);
         }
     }
 
@@ -275,7 +274,10 @@ public abstract class AbstractUnitMarket {
      */
     protected void parseXMLNode(final Node wn, final Campaign campaign, final Version version) {
         if (wn.getNodeName().equalsIgnoreCase("offer")) {
-            getOffers().add(UnitMarketOffer.generateInstanceFromXML(wn, campaign, version));
+            final UnitMarketOffer offer = UnitMarketOffer.generateInstanceFromXML(wn, campaign, version);
+            if (offer != null) {
+                getOffers().add(offer);
+            }
         }
     }
     //endregion File I/O

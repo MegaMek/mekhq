@@ -19,22 +19,11 @@
 package mekhq.campaign.mission.atb.scenario;
 
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.MechSummary;
-import megamek.common.UnitType;
+import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.market.unitMarket.AtBMonthlyUnitMarket;
-import mekhq.campaign.mission.AtBContract;
-import mekhq.campaign.mission.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.CommonObjectiveFactory;
-import mekhq.campaign.mission.Loot;
-import mekhq.campaign.mission.ScenarioObjective;
+import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.universe.Faction;
@@ -48,7 +37,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
     private static String TECH_FORCE_ID = "Tech";
 
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -59,7 +48,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Star League Cache 1";
+        return "Special Scenario: Star League Cache 1";
     }
 
     @Override
@@ -94,14 +83,14 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         setStart(Board.START_CENTER);
         int enemyStart = Board.START_N;
 
         int roll = Compute.d6();
         /* Only has enemy if SL 'Mech is not primitive */
-        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+        for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
             if (roll > 1) {
                 enemyEntities = new ArrayList<>();
                 for (int i = 0; i < 3; i++) {
@@ -111,10 +100,10 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
                 }
             }
 
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(getEnemyBotForce(getContract(campaign), enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
 
         List<Entity> otherForce = new ArrayList<>();
         MechSummary ms = null;
@@ -129,7 +118,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
             // TODO : AtB Star League RAT Roll Year Option
             final Faction faction = Factions.getInstance().getFaction("SL");
             ms = campaign.getUnitGenerator().generate(faction.getShortName(), UnitType.MEK,
-                    AtBMonthlyUnitMarket.getRandomWeight(campaign, UnitType.MEK, faction), 2750,
+                    AtBStaticWeightGenerator.getRandomWeight(campaign, UnitType.MEK, faction), 2750,
                     (roll == 6) ? IUnitRating.DRAGOON_A : IUnitRating.DRAGOON_D);
         }
         Entity en = (ms == null) ? null

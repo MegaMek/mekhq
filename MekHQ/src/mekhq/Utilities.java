@@ -28,7 +28,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -57,10 +56,10 @@ import java.util.function.Consumer;
 
 public class Utilities {
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Utilities",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     // A couple of arrays for use in the getLevelName() method
-    private static final int[] arabicNumbers = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+    private static final int[] arabicNumbers = { 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 };
     private static final String[] romanNumerals = "M,CM,D,CD,C,XC,L,XL,X,IX,V,IV,I".split(",");
 
     public static int roll3d6() {
@@ -222,7 +221,7 @@ public class Utilities {
             }
 
             // If we only allow canon units and this isn't canon we continue
-            if (!summary.isCanon() && options.allowCanonRefitOnly()) {
+            if (!summary.isCanon() && options.isAllowCanonRefitOnly()) {
                 continue;
             }
 
@@ -817,9 +816,6 @@ public class Utilities {
     public static String getOptionDisplayName(IOption option) {
         String name = option.getDisplayableNameWithValue();
         name = name.replaceAll("\\(.+?\\)", "");
-        if (option.getType() == IOption.CHOICE) {
-            name += " - " + option.getValue();
-        }
         return name;
     }
 
@@ -1113,13 +1109,16 @@ public class Utilities {
      * @param trnId - The MM id of the transport entity we want to load
      * @param toLoad - List of Entity ids for the units we want to load into this transport
      * @param client - the player's Client instance
+     * @param loadDropShips - Should DropShip units be loaded?
+     * @param loadSmallCraft - Should Small Craft units be loaded?
      * @param loadFighters - Should aero type units be loaded?
      * @param loadGround - should ground units be loaded?
      */
     public static void loadPlayerTransports(int trnId, Set<Integer> toLoad, Client client,
+                                            boolean loadDropShips, boolean loadSmallCraft,
                                             boolean loadFighters, boolean loadGround) {
-        if (!loadFighters && !loadGround) {
-            //Nothing to do. Get outta here!
+        if (!loadDropShips && !loadSmallCraft && !loadFighters && !loadGround) {
+            // Nothing to do. Get outta here!
             return;
         }
         Entity transport = client.getEntity(trnId);
@@ -1138,24 +1137,36 @@ public class Utilities {
         transport.resetTransporter();
         for (int id : toLoad) {
             Entity cargo = client.getEntity(id);
-            // And now load the units
-            if (cargo.isFighter() && loadFighters && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
-                client.sendLoadEntity(id, trnId, cargo.getTargetBay());
-                // Add a wait to make sure that we don't start processing client.sendLoadEntity out of order
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    LogManager.getLogger().error("", e);
-                }
-            } else if (loadGround && transport.canLoad(cargo, false) && cargo.getTargetBay() != -1) {
-                client.sendLoadEntity(id, trnId, cargo.getTargetBay());
-                // Add a wait to make sure that we don't start processing client.sendLoadEntity out of order
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    LogManager.getLogger().error("", e);
-                }
+            if (!transport.canLoad(cargo, false) || (cargo.getTargetBay() == -1)) {
+                continue;
             }
+
+            // And now load the units
+            if (cargo.getUnitType() == UnitType.DROPSHIP) {
+                if (loadDropShips) {
+                    sendLoadEntity(client, id, trnId, cargo);
+                }
+            } else if (cargo.getUnitType() == UnitType.SMALL_CRAFT) {
+                if (loadSmallCraft) {
+                    sendLoadEntity(client, id, trnId, cargo);
+                }
+            } else if (cargo.isFighter()) {
+                if (loadFighters) {
+                    sendLoadEntity(client, id, trnId, cargo);
+                }
+            } else if (loadGround) {
+                sendLoadEntity(client, id, trnId, cargo);
+            }
+        }
+    }
+
+    private static void sendLoadEntity(Client client, int id, int trnId, Entity cargo) {
+        client.sendLoadEntity(id, trnId, cargo.getTargetBay());
+        // Add a wait to make sure that we don't start processing client.sendLoadEntity out of order
+        try {
+            Thread.sleep(500);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -1167,49 +1178,66 @@ public class Utilities {
      * @return integer representing the (lowest) bay number on Transport that has space to carry Cargo
      */
     public static int selectBestBayFor(Entity cargo, Entity transport) {
-        if (cargo.isFighter()) {
-            // Try to load ASF bays first, so as not to hog SC bays
-            for (Bay b: transport.getTransportBays()) {
-                if (b instanceof ASFBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay
+        if (cargo.getUnitType() == UnitType.DROPSHIP) {
+            for (final DockingCollar dockingCollar : transport.getDockingCollars()) {
+                if (dockingCollar.canLoad(cargo)) {
+                    return dockingCollar.getCollarNumber();
+                }
+            }
+        } if (cargo.getUnitType() == UnitType.SMALL_CRAFT) {
+            for (Bay b : transport.getTransportBays()) {
+                if ((b instanceof SmallCraftBay) && b.canLoad(cargo)) {
+                    // Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
-            for (Bay b: transport.getTransportBays()) {
-                if (b instanceof SmallCraftBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay
+        } else if (cargo.isFighter()) {
+            // Try to load ASF bays first, so as not to hog SC bays
+            for (Bay b : transport.getTransportBays()) {
+                if ((b instanceof ASFBay) && b.canLoad(cargo)) {
+                    // Load 1 unit into the bay
+                    b.setCurrentSpace(1);
+                    return b.getBayNumber();
+                }
+            }
+
+            for (Bay b : transport.getTransportBays()) {
+                if ((b instanceof SmallCraftBay) && b.canLoad(cargo)) {
+                    // Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
         } else if (cargo.getUnitType() == UnitType.TANK) {
             // Try to fit lighter tanks into smaller bays first
-            for (Bay b: transport.getTransportBays()) {
-                if (b instanceof LightVehicleBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay
+            for (Bay b : transport.getTransportBays()) {
+                if ((b instanceof LightVehicleBay) && b.canLoad(cargo)) {
+                    // Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
-            for (Bay b: transport.getTransportBays()) {
-                if (b instanceof HeavyVehicleBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay
+
+            for (Bay b : transport.getTransportBays()) {
+                if ((b instanceof HeavyVehicleBay) && b.canLoad(cargo)) {
+                    // Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
-            for (Bay b: transport.getTransportBays()) {
-                if (b instanceof SuperHeavyVehicleBay && b.canLoad(cargo)) {
-                    //Load 1 unit into the bay
+
+            for (Bay b : transport.getTransportBays()) {
+                if ((b instanceof SuperHeavyVehicleBay) && b.canLoad(cargo)) {
+                    // Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
         } else if (cargo.getUnitType() == UnitType.INFANTRY) {
-            for (Bay b: transport.getTransportBays()) {
-                if (b instanceof InfantryBay && b.canLoad(cargo)) {
-                    //Update bay tonnage based on platoon/squad weight
+            for (Bay b : transport.getTransportBays()) {
+                if ((b instanceof InfantryBay) && b.canLoad(cargo)) {
+                    // Update bay tonnage based on platoon/squad weight
                     b.setCurrentSpace(b.spaceForUnit(cargo));
                     return b.getBayNumber();
                 }
@@ -1218,12 +1246,13 @@ public class Utilities {
             // Just return the first available bay
             for (Bay b : transport.getTransportBays()) {
                 if (b.canLoad(cargo)) {
-                    //Load 1 unit into the bay
+                    // Load 1 unit into the bay
                     b.setCurrentSpace(1);
                     return b.getBayNumber();
                 }
             }
         }
+
         // Shouldn't happen
         return -1;
     }

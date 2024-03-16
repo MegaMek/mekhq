@@ -19,18 +19,17 @@
 
 package mekhq.campaign.mission;
 
-import java.util.ResourceBundle;
-import java.util.UUID;
-
 import megamek.common.Dropship;
-import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
+
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.UUID;
 
 /**
  * This class contains code for the creation of some common objectives for an AtB scenario
@@ -39,7 +38,7 @@ import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
  */
 public class CommonObjectiveFactory {
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     /**
      * Generates a "keep the attached units alive" objective that applies to
@@ -223,7 +222,7 @@ public class CommonObjectiveFactory {
         int expectedNumUnits = AtBDynamicScenarioFactory.getLanceSize(campaign.getFactionCode());
         if (scenario.isBigBattle()) {
             expectedNumUnits *= 2;
-        } else if (scenario.isSpecialMission()) {
+        } else if (scenario.isSpecialScenario()) {
             expectedNumUnits = 1;
         }
 
@@ -249,7 +248,7 @@ public class CommonObjectiveFactory {
 
     /**
      * Worker function that adds all employer units in the given scenario (as specified in the contract)
-     * to the given objective, with the exception of dropships.
+     * to the given objective, with the exception of DropShips.
      */
     private static void addEmployerUnitsToObjective(AtBScenario scenario, AtBContract contract, ScenarioObjective objective) {
         for (int botForceID = 0; botForceID < scenario.getNumBots(); botForceID++) {
@@ -262,11 +261,9 @@ public class CommonObjectiveFactory {
             }
         }
 
-        for (Entity attachedAlly : scenario.getAlliesPlayer()) {
-            // only attach non-dropship units
-            if (!(attachedAlly instanceof Dropship)) {
-                objective.addUnit(attachedAlly.getExternalIdAsString());
-            }
-        }
+        scenario.getAlliesPlayer().stream()
+                .filter(Objects::nonNull)
+                .filter(entity -> !(entity instanceof Dropship))
+                .forEach(entity -> objective.addUnit(entity.getExternalIdAsString()));
     }
 }

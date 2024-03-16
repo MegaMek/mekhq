@@ -22,7 +22,6 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.campaign.event.*;
@@ -34,12 +33,12 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.adapter.ProcurementTableMouseAdapter;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.reportDialogs.*;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ProcurementTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TargetSorter;
-import mekhq.service.MassRepairMassSalvageMode;
-import mekhq.service.MassRepairService;
+import mekhq.service.enums.MRMSMode;
+import mekhq.service.mrms.MRMSService;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -95,7 +94,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblIcon;
 
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     /**
      * @param gui a {@link CampaignGUI} object that this tab is a component of
@@ -211,7 +210,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblExperienceHead, gridBagConstraints);
-        lblExperience = new JLabel(getCampaign().getUnitRating().getAverageExperience());
+        lblExperience = new JLabel(getCampaign().getUnitRating().getAverageExperience().toString());
         lblExperienceHead.setLabelFor(lblExperience);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -324,8 +323,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private void initLogPanel() {
         panLog = new DailyReportLogPanel(getCampaignGui());
         panLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panLog.title")));
-        panLog.setMinimumSize(new java.awt.Dimension(400, 100));
-        panLog.setPreferredSize(new java.awt.Dimension(400, 100));
+        panLog.setMinimumSize(new Dimension(400, 100));
+        panLog.setPreferredSize(new Dimension(400, 100));
     }
 
     /**
@@ -338,46 +337,40 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         btnGetUnit = new JButton(resourceMap.getString("btnGetUnit.text"));
         btnGetUnit.setToolTipText(resourceMap.getString("btnGetUnit.toolTipText"));
-        btnGetUnit.addActionListener(ev -> getUnit());
+        btnGetUnit.addActionListener(evt -> getUnit());
         panProcurementButtons.add(btnGetUnit);
 
         btnGetParts = new JButton(resourceMap.getString("btnGetParts.text"));
         btnGetParts.setToolTipText(resourceMap.getString("btnGetParts.toolTipText"));
-        btnGetParts.addActionListener(ev -> getParts());
+        btnGetParts.addActionListener(evt -> getParts());
         panProcurementButtons.add(btnGetParts);
 
         btnNeededParts = new JButton(resourceMap.getString("btnNeededParts.text"));
         btnNeededParts.setToolTipText(resourceMap.getString("btnNeededParts.toolTipText"));
-        btnNeededParts.addActionListener(ev -> {
-            AcquisitionsDialog dlg = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
-            dlg.setVisible(true);
-        });
+        btnNeededParts.addActionListener(evt ->
+                new AcquisitionsDialog(getFrame(), true, getCampaignGui()).setVisible(true));
         panProcurementButtons.add(btnNeededParts);
 
         btnPartsReport = new JButton(resourceMap.getString("btnPartsReport.text"));
         btnPartsReport.setToolTipText(resourceMap.getString("btnPartsReport.toolTipText"));
-        btnPartsReport.addActionListener(ev -> {
-            PartsReportDialog dlg = new PartsReportDialog(getCampaignGui(), true);
-            dlg.setVisible(true);
-        });
+        btnPartsReport.addActionListener(evt ->
+                new PartsReportDialog(getCampaignGui(), true).setVisible(true));
         panProcurementButtons.add(btnPartsReport);
 
         btnMRMSDialog = new JButton(resourceMap.getString("btnMRMSDialog.text"));
         btnMRMSDialog.setToolTipText(resourceMap.getString("btnMRMSDialog.toolTipText"));
         btnMRMSDialog.setName("btnMRMSDialog");
-        btnMRMSDialog.addActionListener(ev -> {
-            MassRepairSalvageDialog dlg = new MassRepairSalvageDialog(getFrame(), true,
-                    getCampaignGui(), null, MassRepairMassSalvageMode.UNITS);
-            dlg.setVisible(true);
-        });
+        btnMRMSDialog.addActionListener(evt ->
+                new MRMSDialog(getFrame(), true, getCampaignGui(), null, MRMSMode.UNITS)
+                        .setVisible(true));
         btnMRMSDialog.setVisible(MekHQ.getMHQOptions().getCommandCenterMRMS());
         panProcurementButtons.add(btnMRMSDialog);
 
         btnMRMSInstant = new JButton(resourceMap.getString("btnMRMSInstant.text"));
         btnMRMSInstant.setToolTipText(resourceMap.getString("btnMRMSInstant.toolTipText"));
         btnMRMSInstant.setName("btnMRMSInstant");
-        btnMRMSInstant.addActionListener(ev -> {
-            MassRepairService.massRepairSalvageAllUnits(getCampaign());
+        btnMRMSInstant.addActionListener(evt -> {
+            MRMSService.mrmsAllUnits(getCampaign());
             JOptionPane.showMessageDialog(getCampaignGui().getFrame(), "Mass Repair/Salvage complete.",
                     "Complete", JOptionPane.INFORMATION_MESSAGE);
         });
@@ -492,8 +485,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.COMMAND_CENTER;
+    public MHQTabType tabType() {
+        return MHQTabType.COMMAND_CENTER;
     }
 
     /**
@@ -516,7 +509,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblRating.setText(getCampaign().getUnitRatingText());
         lblPersonnel.setText(getCampaign().getCampaignSummary().getPersonnelReport());
         lblMissionSuccess.setText(getCampaign().getCampaignSummary().getMissionSuccessReport());
-        lblExperience.setText(getCampaign().getUnitRating().getAverageExperience());
+        lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
         lblComposition.setText(getCampaign().getCampaignSummary().getForceCompositionReport());
         lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport());
         lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());
@@ -550,8 +543,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
      * append new reports to the daily log report
      */
     synchronized private void refreshLog() {
-        List<String> newLogEntries = getCampaign().fetchAndClearNewReports();
-        panLog.appendLog(newLogEntries);
+        panLog.appendLog(getCampaign().fetchAndClearNewReports());
     }
 
     /**

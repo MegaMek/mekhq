@@ -807,16 +807,16 @@ public class Planet {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from neutral planets");
                 } else if (allies && !options.getPlanetAcquisitionFactionLimit().generateOnAlliedPlanets()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "No supplies from allied planets");
-                } else if (clanCrossover && options.disallowPlanetAcquisitionClanCrossover()) {
+                } else if (clanCrossover && options.isPlanetAcquisitionNoClanCrossover()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "The clans and inner sphere do not trade supplies");
                 }
             }
 
             if (noClansPresent && clanPart) {
-                if (options.disallowClanPartsFromIS()) {
+                if (options.isNoClanPartsFromIS()) {
                     return new TargetRoll(TargetRoll.IMPOSSIBLE, "No clan parts from non-clan factions");
                 }
-                target.addModifier(options.getPenaltyClanPartsFroIS(), "clan parts from non-clan faction");
+                target.addModifier(options.getPenaltyClanPartsFromIS(), "clan parts from non-clan faction");
             }
         }
 

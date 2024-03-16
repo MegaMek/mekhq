@@ -19,7 +19,6 @@
 package mekhq.gui.baseComponents;
 
 import megamek.client.ui.swing.util.MenuScroller;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.MHQConstants;
 
@@ -38,7 +37,7 @@ import java.util.ResourceBundle;
 public class JScrollableMenu extends JMenu {
     //region Variable Declarations
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors

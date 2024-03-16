@@ -21,6 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
@@ -160,7 +161,7 @@ public class AeroHeatSink extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -214,9 +215,9 @@ public class AeroHeatSink extends Part {
 
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
-        writeToXmlBegin(pw, indent++);
+        indent = writeToXMLBegin(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
-        writeToXmlEnd(pw, --indent);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

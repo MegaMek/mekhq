@@ -16,9 +16,9 @@ SmallCraft
 Aquarius Escort
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 3709
@@ -35,6 +35,10 @@ Aquarius Escort
 <type>
 IS Level 2
 </type>
+
+<role>
+None
+</role>
 
 <motion_type>
 Aerodyne
@@ -116,7 +120,7 @@ Medium Laser
 </structural_integrity>
 
 <source>
-TRO 3075 - Age of War
+TRO: 3075
 </source>
 
 <tonnage>

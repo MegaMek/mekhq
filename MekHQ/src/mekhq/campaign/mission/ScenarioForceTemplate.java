@@ -42,7 +42,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     // 6) Allowed unit types - This is a set of unit types of which the force may consist
 
     public static final String[] FORCE_ALIGNMENTS = { "Player", "Allied", "Opposing", "Third", "Planet Owner" };
-    public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count", "Player/Fixed Unit Count" };
+    public static final String[] FORCE_GENERATION_METHODS = { "Player Supplied", "BV Scaled", "Unit Count Scaled", "Fixed Unit Count", "Player/Fixed Unit Count", "Fixed MUL" };
     public static final String[] FORCE_DEPLOYMENT_SYNC_TYPES = { "None", "Same Edge", "Same Arc", "Opposite Edge", "Opposite Arc" };
     public static final String[] DEPLOYMENT_ZONES = { "Any", "Northwest", "North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Edge", "Center", "Narrow Edge" };
     public static final String[] BOT_DESTINATION_ZONES = { "North", "East", "South", "West", "Nearest", "None", "Opposite Deployment Edge", "Random" };
@@ -141,9 +141,14 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         FixedUnitCount,
 
         /**
-         * Either assigned by player from TO&amp;E or a minimum fixed number of units; TODO: currently unimplemented
+         * Either assigned by player from TO&amp;E or a minimum fixed number of units;
          */
-        PlayerOrFixedUnitCount
+        PlayerOrFixedUnitCount,
+        
+        /**
+         * Using one or more fixed MULs
+         */
+        FixedMUL
     }
 
     /**
@@ -171,7 +176,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         OppositeEdge,
 
         /**
-         * Oppositee or adjacent edge as the designated force (e.g. W = E, NE, SE)
+         * Opposite or adjacent edge as the designated force (e.g. W = E, NE, SE)
          */
         OppositeArc
     }
@@ -350,6 +355,11 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     private boolean subjectToRandomRemoval = true;
     
+    /**
+     * A file name of a MUL
+     */
+    private String fixedMul;
+    
     @Override
     public ScenarioForceTemplate clone() {
         return new ScenarioForceTemplate(this);
@@ -414,6 +424,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         deployOffBoard = forceDefinition.deployOffBoard;
         objectiveLinkedForces = new ArrayList<>();
         objectiveLinkedForces.addAll(forceDefinition.objectiveLinkedForces);
+        fixedMul = forceDefinition.fixedMul;
     }
 
     public int getForceAlignment() {
@@ -620,6 +631,15 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
 
     public void setSubjectToRandomRemoval(boolean subjectToRandomRemoval) {
         this.subjectToRandomRemoval = subjectToRandomRemoval;
+    }
+    
+    @Nullable
+    public String getFixedMul() {
+        return fixedMul;
+    }
+
+    public void setFixedMul(@Nullable String fixedMul) {
+        this.fixedMul = fixedMul;
     }
 
     @XmlElementWrapper(name = "objectiveLinkedForces")

@@ -24,7 +24,7 @@ import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconStrategicObjective;
 import mekhq.campaign.stratcon.StratconTrackState;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.stratcon.CampaignManagementDialog;
 
 import javax.swing.*;
@@ -175,8 +175,8 @@ public class StratconTab extends CampaignGuiTab {
     }
 
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.STRAT_CON;
+    public MHQTabType tabType() {
+        return MHQTabType.STRAT_CON;
     }
 
     /**
@@ -355,7 +355,7 @@ public class StratconTab extends CampaignGuiTab {
                         break;
                 }
                 if (coordsRevealed && displayCoordinateData) {
-                    sb.append(" at ").append(objective.getObjectiveCoords().toString())
+                    sb.append(" at ").append(objective.getObjectiveCoords().toBTString())
                         .append(" on ").append(track.getDisplayableName());
                 }
 

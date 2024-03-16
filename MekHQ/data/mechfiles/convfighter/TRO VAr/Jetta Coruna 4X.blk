@@ -16,9 +16,9 @@ FixedWingSupport
 Jetta Coruna 4X
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 4402
@@ -35,6 +35,10 @@ Jetta Coruna 4X
 <type>
 IS Level 2
 </type>
+
+<role>
+None
+</role>
 
 <motion_type>
 Aerodyne
@@ -104,7 +108,7 @@ Environmental Sealing
 </structural_tech_rating>
 
 <source>
-TRO Vehicle Annex (r) - Jihad
+TRO: Vehicle Annex Revised
 </source>
 
 <tonnage>

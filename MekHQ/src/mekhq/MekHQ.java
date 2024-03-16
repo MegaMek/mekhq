@@ -62,6 +62,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * The main class of the application.
@@ -377,7 +378,7 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
 
         // Start the game thread
-        if (getCampaign().getCampaignOptions().getUseAtB() && (scenario instanceof AtBScenario)) {
+        if (getCampaign().getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario)) {
             gameThread = new AtBGameThread(playerName, password, client, this, meks, (AtBScenario) scenario);
         } else {
             gameThread = new GameThread(playerName, password, client, this, meks, scenario);
@@ -462,7 +463,7 @@ public class MekHQ implements GameListener {
             ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true,
                     tracker);
             resolveDialog.setVisible(true);
-            if (campaignGUI.getCampaign().getCampaignOptions().getUseAtB()
+            if (campaignGUI.getCampaign().getCampaignOptions().isUseAtB()
                     && (campaignGUI.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract)
                     && !campaignGUI.getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
@@ -474,14 +475,19 @@ public class MekHQ implements GameListener {
             }
             gameThread.requestStop();
             // MegaMek dumps these in the deployment phase to free memory
-            if (getCampaign().getCampaignOptions().getUseAtB()) {
+            if (getCampaign().getCampaignOptions().isUseAtB()) {
                 RandomUnitGenerator.getInstance();
                 RandomNameGenerator.getInstance();
             }
+            // MegaMek creates some temporary files that MHQ needs to remove between runs
+            final File tempImageDirectory = new File("data/images/temp");
+            if (tempImageDirectory.isDirectory()) {
+                // This can't be null because of the above
+                Stream.of(tempImageDirectory.listFiles()).filter(file -> file.getName().endsWith(".png")).forEach(File::delete);
+            }
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
-
-        } catch (Exception e) {
-            LogManager.getLogger().error("", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("", ex);
         }
     }
 
@@ -566,9 +572,11 @@ public class MekHQ implements GameListener {
                     addOSXKeyStrokes((InputMap) UIManager.get("TextPane.focusInputMap"));
                     addOSXKeyStrokes((InputMap) UIManager.get("TextArea.focusInputMap"));
                 }
-                for (Frame frame : Frame.getFrames()) {
+
+                for (final Frame frame : Frame.getFrames()) {
                     SwingUtilities.updateComponentTreeUI(frame);
                 }
+
                 for (Window window : Window.getWindows()) {
                     SwingUtilities.updateComponentTreeUI(window);
                 }

@@ -26,10 +26,7 @@ import mekhq.EventSpy;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
 import mekhq.campaign.event.PartRemovedEvent;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.MekLocation;
-import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -429,7 +426,7 @@ public class WarehouseTest {
         // Add the armor to our warehouse, merging it
         // with any existing part
         Part addedArmor = warehouse.addPart(mockArmor, true);
-        assertTrue(addedArmor instanceof Armor);
+        assertInstanceOf(Armor.class, addedArmor);
 
         // We should only have one of these parts
         assertEquals(1, warehouse.getParts().size());
@@ -443,7 +440,7 @@ public class WarehouseTest {
             // Add the spare armor to our warehouse, and
             // ask that it be merged with an existing part
             addedArmor = warehouse.addPart(mockSpareArmor, true);
-            assertTrue(addedArmor instanceof Armor);
+            assertInstanceOf(Armor.class, addedArmor);
 
             // We should see that the original part was changed
             assertNotNull(eventSpy.findEvent(PartChangedEvent.class, e -> mockArmor == e.getPart()));
@@ -475,7 +472,7 @@ public class WarehouseTest {
         // Add the ammo to our warehouse, merging it
         // with any existing part (there are none)
         Part addedAmmo = warehouse.addPart(mockAmmoStorage, true);
-        assertTrue(addedAmmo instanceof AmmoStorage);
+        assertInstanceOf(AmmoStorage.class, addedAmmo);
 
         // We should only have one of these parts
         assertEquals(1, warehouse.getParts().size());
@@ -489,7 +486,7 @@ public class WarehouseTest {
             // Add the spare ammo to our warehouse, and
             // ask that it be merged with an existing part
             addedAmmo = warehouse.addPart(mockSpareAmmo, true);
-            assertTrue(addedAmmo instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, addedAmmo);
 
             // We should see that the original part was changed
             assertNotNull(eventSpy.findEvent(PartChangedEvent.class, e -> mockAmmoStorage == e.getPart()));
@@ -663,7 +660,7 @@ public class WarehouseTest {
 
         // Add the armor to our warehouse
         Part addedArmor = warehouse.addPart(mockArmor, true);
-        assertTrue(addedArmor instanceof Armor);
+        assertInstanceOf(Armor.class, addedArmor);
 
         // We should only have one of these parts
         assertEquals(1, warehouse.getParts().size());
@@ -709,7 +706,7 @@ public class WarehouseTest {
 
         // Add the armor to our warehouse
         Part addedArmor = warehouse.addPart(mockArmor, true);
-        assertTrue(addedArmor instanceof Armor);
+        assertInstanceOf(Armor.class, addedArmor);
 
         // We should only have one of these parts
         assertEquals(1, warehouse.getParts().size());
@@ -755,7 +752,7 @@ public class WarehouseTest {
         // Add the ammo to our warehouse, merging it
         // with any existing part (there are none)
         Part addedAmmo = warehouse.addPart(mockAmmoStorage, true);
-        assertTrue(addedAmmo instanceof AmmoStorage);
+        assertInstanceOf(AmmoStorage.class, addedAmmo);
 
         // We should only have one of these parts
         assertEquals(1, warehouse.getParts().size());
@@ -769,7 +766,7 @@ public class WarehouseTest {
             // Add the spare ammo to our warehouse, and
             // ask that it be merged with an existing part
             addedAmmo = warehouse.addPart(mockSpareAmmo, true);
-            assertTrue(addedAmmo instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, addedAmmo);
             assertTrue(mockSpareAmmo.getId() > 0);
             assertEquals(mockSpareAmmo, addedAmmo);
             assertTrue(addedAmmo.isSpare());

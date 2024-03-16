@@ -54,7 +54,7 @@ public class PersonnelReport extends AbstractReport {
             if (p.getStatus().isActive()) {
                 countPersonByType[p.getPrimaryRole().ordinal()]++;
                 countTotal++;
-                if (getCampaign().getCampaignOptions().useAdvancedMedical()
+                if (getCampaign().getCampaignOptions().isUseAdvancedMedical()
                         && !p.getInjuries().isEmpty()) {
                     countInjured++;
                 } else if (p.getHits() > 0) {
@@ -120,7 +120,7 @@ public class PersonnelReport extends AbstractReport {
                     countInjured++;
                 }
                 salary = salary.plus(p.getSalary(getCampaign()));
-            } else if (p.getPrisonerStatus().isPrisoner() && p.getStatus().isActive()) {
+            } else if (p.getPrisonerStatus().isCurrentPrisoner() && p.getStatus().isActive()) {
                 prisoners++;
                 if (!p.getInjuries().isEmpty() || (p.getHits() > 0)) {
                     countInjured++;

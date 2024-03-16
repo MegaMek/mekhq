@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import megamek.common.Jumpship;
@@ -72,7 +73,7 @@ public class MissingKFHeliumTank extends MissingPart {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -125,17 +126,11 @@ public class MissingKFHeliumTank extends MissingPart {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<coreType>"
-                +coreType
-                +"</coreType>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<docks>"
-                +docks
-                +"</docks>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "coreType", coreType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "docks", docks);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

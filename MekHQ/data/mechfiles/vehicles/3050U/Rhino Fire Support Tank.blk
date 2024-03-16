@@ -16,9 +16,9 @@ Tank
 Rhino Fire Support Tank
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 4913
@@ -31,6 +31,10 @@ Rhino Fire Support Tank
 <type>
 IS Level 1
 </type>
+
+<role>
+Missile Boat
+</role>
 
 <motion_type>
 Tracked
@@ -80,7 +84,7 @@ Medium Laser
 </Turret Equipment>
 
 <source>
-TRO 3050 - Star League
+TRO: 3050
 </source>
 
 <tonnage>

@@ -16,9 +16,9 @@ SupportTank
 Deusenberg VIP Luxury Hovercar
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 4074
@@ -35,6 +35,10 @@ Deusenberg VIP Luxury Hovercar
 <type>
 IS Level 3
 </type>
+
+<role>
+None
+</role>
 
 <motion_type>
 Hover
@@ -91,7 +95,7 @@ ISAntiPersonnelPod
 </structural_tech_rating>
 
 <source>
-TRO VAr - Clan Invasion
+TRO: Vehicle Annex (Revised)
 </source>
 
 <tonnage>

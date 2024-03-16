@@ -35,6 +35,7 @@ import java.util.Arrays;
 
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
@@ -125,7 +126,7 @@ public class AdjustLargeCraftAmmoActionTest {
         Part addedPart = partCaptor.getValue();
         verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0));
 
-        assertTrue(addedPart instanceof LargeCraftAmmoBin);
+        assertInstanceOf(LargeCraftAmmoBin.class, addedPart);
 
         LargeCraftAmmoBin ammoBin = (LargeCraftAmmoBin) addedPart;
         assertEquals(ammoType0, ammoBin.getType());
@@ -222,12 +223,12 @@ public class AdjustLargeCraftAmmoActionTest {
         Part addedPart = partCaptor.getValue();
         verify(quartermaster, times(1)).addPart(eq(addedPart), eq(0));
 
-        assertTrue(addedPart instanceof LargeCraftAmmoBin);
+        assertInstanceOf(LargeCraftAmmoBin.class, addedPart);
 
         LargeCraftAmmoBin ammoBin = (LargeCraftAmmoBin) addedPart;
         assertEquals(ammoType0, ammoBin.getType());
         assertEquals(equipmentNum, ammoBin.getEquipmentNum());
-        assertEquals((double) capacity, ammoBin.getCapacity(), 0.001);
+        assertEquals(capacity, ammoBin.getCapacity(), 0.001);
         assertEquals((capacity - onHand) * ammoType0.getShots(), ammoBin.getShotsNeeded());
         assertEquals(bayEquipmentNum, ammoBin.getBayEqNum());
         assertEquals(bay, ammoBin.getBay());

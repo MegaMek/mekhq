@@ -27,7 +27,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.UnitEditorDialog;
 import megamek.common.GunEmplacement;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.ResolveScenarioTracker;
@@ -64,7 +63,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     final static String SALVAGEPANEL = "Claim Salvage";
     final static String PRISONERPANEL= "Captured Personnel Status";
     final static String KILLPANEL    = "Assign Kills";
-    final static String REWARDPANEL  = "Collect Rewards";
+    final static String REWARDPANEL  = "Scenario Costs & Payouts";
     final static String PREVIEWPANEL = "Preview";
     /* Used by AtB to determine minor contract breaches and bonus rolls */
     final static String OBJECTIVEPANEL    = "Objective Status";
@@ -176,7 +175,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     //endregion Preview Panel components
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ResolveScenarioWizardDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     public ResolveScenarioWizardDialog(JFrame parent, boolean modal, ResolveScenarioTracker t) {

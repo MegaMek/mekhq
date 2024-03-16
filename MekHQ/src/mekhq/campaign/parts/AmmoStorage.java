@@ -124,7 +124,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
      */
     public boolean isSameAmmoType(AmmoType otherAmmoType) {
         return getType().equalsAmmoTypeOnly(otherAmmoType)
-            && (getType().getMunitionType() == otherAmmoType.getMunitionType())
+            && (getType().getMunitionType().equals(otherAmmoType.getMunitionType()))
             && (getType().getRackSize() == otherAmmoType.getRackSize());
     }
 
@@ -146,11 +146,11 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "typeName", getType().getInternalName());
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "shots", shots);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", getType().getInternalName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shots", shots);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -165,8 +165,8 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("shots")) {
                     shots = Integer.parseInt(wn2.getTextContent());
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
 
@@ -242,7 +242,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 

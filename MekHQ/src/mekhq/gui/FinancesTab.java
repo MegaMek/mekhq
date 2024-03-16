@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2017-2022 - The MegaMek Team. All rights reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,26 +18,23 @@
  */
 package mekhq.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-
+import megamek.common.event.Subscribe;
+import mekhq.MHQConstants;
+import mekhq.MekHQ;
+import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Asset;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.campaign.finances.Transaction;
+import mekhq.campaign.mission.Contract;
+import mekhq.gui.adapter.FinanceTableMouseAdapter;
+import mekhq.gui.adapter.LoanTableMouseAdapter;
+import mekhq.gui.dialog.AddFundsDialog;
+import mekhq.gui.dialog.ManageAssetsDialog;
+import mekhq.gui.dialog.NewLoanDialog;
+import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.model.FinanceTableModel;
+import mekhq.gui.model.LoanTableModel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -54,28 +51,14 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
 
-import megamek.common.event.Subscribe;
-import megamek.common.util.EncodeControl;
-import mekhq.MekHQ;
-import mekhq.campaign.event.AcquisitionEvent;
-import mekhq.campaign.event.AssetEvent;
-import mekhq.campaign.event.GMModeEvent;
-import mekhq.campaign.event.LoanEvent;
-import mekhq.campaign.event.MissionChangedEvent;
-import mekhq.campaign.event.MissionNewEvent;
-import mekhq.campaign.event.PartEvent;
-import mekhq.campaign.event.ScenarioResolvedEvent;
-import mekhq.campaign.event.TransactionEvent;
-import mekhq.campaign.event.UnitEvent;
-import mekhq.campaign.finances.Transaction;
-import mekhq.campaign.mission.Contract;
-import mekhq.gui.adapter.FinanceTableMouseAdapter;
-import mekhq.gui.adapter.LoanTableMouseAdapter;
-import mekhq.gui.dialog.AddFundsDialog;
-import mekhq.gui.dialog.ManageAssetsDialog;
-import mekhq.gui.dialog.NewLoanDialog;
-import mekhq.gui.model.FinanceTableModel;
-import mekhq.gui.model.LoanTableModel;
+import javax.swing.*;
+import javax.swing.table.TableColumn;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * Shows record of financial transactions.
@@ -91,7 +74,7 @@ public final class FinancesTab extends CampaignGuiTab {
     private LoanTableModel loanModel;
 
     private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     //region Constructors
     public FinancesTab(CampaignGUI gui, String name) {
@@ -111,7 +94,6 @@ public final class FinancesTab extends CampaignGuiTab {
      */
     @Override
     public void initTab() {
-        GridBagConstraints gridBagConstraints;
 
         setLayout(new GridBagLayout());
         ChartPanel financeAmountPanel = (ChartPanel) createGraphPanel(GraphType.BALANCE_AMOUNT);
@@ -145,23 +127,23 @@ public final class FinancesTab extends CampaignGuiTab {
         loanTable.setShowGrid(false);
         JScrollPane scrollLoanTable = new JScrollPane(loanTable);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         JPanel panBalance = new JPanel(new GridBagLayout());
         panBalance.add(new JScrollPane(financeTable), gridBagConstraints);
-        panBalance.setMinimumSize(new java.awt.Dimension(350, 100));
+        panBalance.setMinimumSize(new Dimension(350, 100));
         panBalance.setBorder(BorderFactory.createTitledBorder("Balance Sheet"));
         JPanel panLoan = new JPanel(new GridBagLayout());
         panLoan.add(scrollLoanTable, gridBagConstraints);
 
         JTabbedPane financeTab = new JTabbedPane();
-        financeTab.setMinimumSize(new java.awt.Dimension(450, 300));
-        financeTab.setPreferredSize(new java.awt.Dimension(450, 300));
+        financeTab.setMinimumSize(new Dimension(450, 300));
+        financeTab.setPreferredSize(new Dimension(450, 300));
 
         JSplitPane splitFinances = new JSplitPane(JSplitPane.VERTICAL_SPLIT, panBalance, financeTab);
         splitFinances.setOneTouchExpandable(true);
@@ -173,11 +155,11 @@ public final class FinancesTab extends CampaignGuiTab {
         financeTab.addTab(resourceMap.getString("cbillsBalanceTime.text"), financeAmountPanel);
         financeTab.addTab(resourceMap.getString("monthlyRevenueExpenditures.text"), financeMonthlyPanel);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.SOUTHWEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         add(splitFinances, gridBagConstraints);
@@ -203,7 +185,7 @@ public final class FinancesTab extends CampaignGuiTab {
         areaNetWorth = new JTextArea();
         areaNetWorth.setLineWrap(true);
         areaNetWorth.setWrapStyleWord(true);
-        areaNetWorth.setFont(new Font("Courier New", Font.PLAIN, 12));
+        areaNetWorth.setFont(new Font(MHQConstants.FONT_COURIER_NEW, Font.PLAIN, 12));
         areaNetWorth.setText(getFormattedFinancialReport());
         areaNetWorth.setEditable(false);
 
@@ -212,12 +194,12 @@ public final class FinancesTab extends CampaignGuiTab {
         areaNetWorth.setCaretPosition(0);
         descriptionScroll.setMinimumSize(new Dimension(300, 200));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
         add(panelFinanceRight, gridBagConstraints);
@@ -364,8 +346,8 @@ public final class FinancesTab extends CampaignGuiTab {
      * @see mekhq.gui.CampaignGuiTab#tabType()
      */
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.FINANCES;
+    public MHQTabType tabType() {
+        return MHQTabType.FINANCES;
     }
 
     private void addFundsActionPerformed() {
@@ -493,7 +475,7 @@ public final class FinancesTab extends CampaignGuiTab {
                 .append(String.format(formatted, r.getMaintenance().toAmountAndSymbolString())).append("\n");
         sb.append("    Overhead............. ")
                 .append(String.format(formatted, r.getOverheadCosts().toAmountAndSymbolString())).append("\n");
-        if (getCampaign().getCampaignOptions().usePeacetimeCost()) {
+        if (getCampaign().getCampaignOptions().isUsePeacetimeCost()) {
             sb.append("    Spare Parts.......... ")
                     .append(String.format(formatted, r.getMonthlySparePartCosts().toAmountAndSymbolString())).append("\n");
             sb.append("    Training Munitions... ")

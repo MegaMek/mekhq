@@ -57,13 +57,13 @@ public class MissingAmmoBinTest {
     }
 
     @Test
-    public void missingAmmoBinMassRepairOptionType() {
+    public void missingAmmoBinMRMSOptionType() {
         Campaign mockCampaign = mock(Campaign.class);
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
 
         MissingAmmoBin missingAmmoBin = new MissingAmmoBin(0, ammoType, 18, false, false, mockCampaign);
 
-        assertEquals(PartRepairType.AMMO, missingAmmoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMUNITION, missingAmmoBin.getMRMSOptionType());
     }
 
     @Test
@@ -126,7 +126,7 @@ public class MissingAmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MissingAmmoBin);
+        assertInstanceOf(MissingAmmoBin.class, deserializedPart);
 
         MissingAmmoBin deserialized = (MissingAmmoBin) deserializedPart;
 
@@ -168,7 +168,7 @@ public class MissingAmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MissingAmmoBin);
+        assertInstanceOf(MissingAmmoBin.class, deserializedPart);
 
         MissingAmmoBin deserialized = (MissingAmmoBin) deserializedPart;
 
@@ -303,7 +303,7 @@ public class MissingAmmoBinTest {
         // 1. Unit should have received a new replacement
         Part replacementPart = replacementCaptor.getValue();
         assertNotNull(replacementPart);
-        assertTrue(replacementPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, replacementPart);
 
         // 2. And the replacement should match the missing ammo bin
         AmmoBin replacementAmmoBin = (AmmoBin) replacementPart;
@@ -354,7 +354,7 @@ public class MissingAmmoBinTest {
         // 1. Unit should have received a new replacement
         Part replacementPart = replacementCaptor.getValue();
         assertNotNull(replacementPart);
-        assertTrue(replacementPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, replacementPart);
 
         // 2. And the replacement should match the missing ammo bin
         AmmoBin replacementAmmoBin = (AmmoBin) replacementPart;

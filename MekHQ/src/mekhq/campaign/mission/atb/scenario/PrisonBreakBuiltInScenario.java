@@ -45,7 +45,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
     private static String PRISONER_FORCE_ID = "Prisoners";
 
     @Override
-    public boolean isSpecialMission() {
+    public boolean isSpecialScenario() {
         return true;
     }
 
@@ -56,7 +56,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
 
     @Override
     public String getScenarioTypeDescription() {
-        return "Special Mission: Prison Break";
+        return "Special Scenario: Prison Break";
     }
 
     @Override
@@ -85,21 +85,21 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
     }
 
     @Override
-    public void setExtraMissionForces(Campaign campaign, ArrayList<Entity> allyEntities,
-            ArrayList<Entity> enemyEntities) {
+    public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
+                                       ArrayList<Entity> enemyEntities) {
         setStart(Board.START_CENTER);
         int enemyStart = startPos[Compute.randomInt(4)];
 
-        for (int weight = EntityWeightClass.WEIGHT_LIGHT; weight <= EntityWeightClass.WEIGHT_ASSAULT; weight++) {
+        for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
             enemyEntities = new ArrayList<>();
             for (int i = 0; i < 3; i++) {
                 enemyEntities.add(getEntity(getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
                         getContract(campaign).getEnemyQuality(), UnitType.MEK, weight, campaign));
             }
-            getSpecMissionEnemies().add(enemyEntities);
+            getSpecialScenarioEnemies().add(enemyEntities);
         }
 
-        addBotForce(new BotForce(GUARD_FORCE_ID, 2, enemyStart, getSpecMissionEnemies().get(0)), campaign);
+        addBotForce(new BotForce(GUARD_FORCE_ID, 2, enemyStart, getSpecialScenarioEnemies().get(0)), campaign);
 
         ArrayList<Entity> otherForce = new ArrayList<>();
 

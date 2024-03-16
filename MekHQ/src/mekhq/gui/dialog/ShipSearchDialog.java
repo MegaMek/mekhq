@@ -27,7 +27,6 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.TargetRoll;
 import megamek.common.UnitType;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.gui.CampaignGUI;
@@ -63,7 +62,7 @@ public class ShipSearchDialog extends JDialog {
 
     private void init() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.ShipSearchDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         setTitle(resourceMap.getString("title.text"));
 
         Container contentPane = getContentPane();

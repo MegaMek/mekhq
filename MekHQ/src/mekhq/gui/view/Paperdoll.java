@@ -25,7 +25,7 @@ import jakarta.xml.bind.annotation.*;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.campaign.personnel.enums.BodyLocation;
+import mekhq.campaign.personnel.BodyLocation;
 import mekhq.gui.utilities.MultiplyComposite;
 import org.apache.logging.log4j.LogManager;
 

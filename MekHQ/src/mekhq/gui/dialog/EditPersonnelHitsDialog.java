@@ -20,7 +20,6 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
@@ -40,13 +39,11 @@ public class EditPersonnelHitsDialog extends JDialog {
     private JSpinner spinnerHits;
     private SpinnerNumberModel spinnerModel;
 
-    public EditPersonnelHitsDialog(Frame parent, boolean modal, Person p) {
-        super(parent, modal);
-
-        person = p;
-
+    public EditPersonnelHitsDialog(final Frame frame, final boolean modal, final Person person) {
+        super(frame, modal);
+        this.person = person;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
@@ -55,7 +52,7 @@ public class EditPersonnelHitsDialog extends JDialog {
         btnOK = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelHitsDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title") + ' ' + person.getFullName());

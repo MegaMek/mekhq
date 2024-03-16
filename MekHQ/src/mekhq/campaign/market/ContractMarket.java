@@ -131,7 +131,7 @@ public class ContractMarket {
                     rollCommandClause(c, clauseMods.get(c.getId()).mods[clause]);
                     break;
                 case CLAUSE_SALVAGE:
-                    rollSalvageClause(c, clauseMods.get(c.getId()).mods[clause]);
+                    rollSalvageClause(c, clauseMods.get(c.getId()).mods[clause], campaign.getCampaignOptions().getContractMaxSalvagePercentage());
                     break;
                 case CLAUSE_TRANSPORT:
                     rollTransportClause(c, clauseMods.get(c.getId()).mods[clause]);
@@ -251,7 +251,7 @@ public class ContractMarket {
                     contracts.add(c);
                 }
             }
-            if (campaign.getCampaignOptions().getContractMarketReportRefresh()) {
+            if (campaign.getCampaignOptions().isContractMarketReportRefresh()) {
                 campaign.addReport("<a href='CONTRACT_MARKET'>Contract market updated</a>");
             }
         }
@@ -398,7 +398,7 @@ public class ContractMarket {
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
 
-        contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+        contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setAtBContractClauses(contract, unitRatingMod, campaign);
 
         contract.calculatePaymentMultiplier(campaign);
@@ -479,7 +479,7 @@ public class ContractMarket {
             contract.setAllySkill(SkillLevel.GREEN);
             contract.setAllyQuality(IUnitRating.DRAGOON_F);
         }
-        contract.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+        contract.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
 
         contract.setCommandRights(ContractCommandRights.values()[Math.max(parent.getCommandRights().ordinal() - 1, 0)]);
         contract.setSalvageExchange(parent.isSalvageExchange());
@@ -533,7 +533,7 @@ public class ContractMarket {
         followup.setAllyQuality(contract.getAllyQuality());
         followup.setEnemySkill(contract.getEnemySkill());
         followup.setEnemyQuality(contract.getEnemyQuality());
-        followup.calculateLength(campaign.getCampaignOptions().getVariableContractLength());
+        followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
         setAtBContractClauses(followup, campaign.getUnitRatingMod(), campaign);
 
         followup.calculatePaymentMultiplier(campaign);
@@ -759,7 +759,7 @@ public class ContractMarket {
         } else {
             contract.setCommandRights(ContractCommandRights.INTEGRATED);
         }
-        rollSalvageClause(contract, mods.mods[CLAUSE_SALVAGE]);
+        rollSalvageClause(contract, mods.mods[CLAUSE_SALVAGE], campaign.getCampaignOptions().getContractMaxSalvagePercentage());
         rollSupportClause(contract, mods.mods[CLAUSE_SUPPORT]);
         rollTransportClause(contract, mods.mods[CLAUSE_TRANSPORT]);
     }
@@ -777,7 +777,7 @@ public class ContractMarket {
         }
     }
 
-    private void rollSalvageClause(AtBContract contract, int mod) {
+    private void rollSalvageClause(AtBContract contract, int mod, int contractMaxSalvagePercentage) {
         contract.setSalvageExchange(false);
         int roll = Math.min(Compute.d6(2) + mod, 13);
         if (roll < 2) {
@@ -788,9 +788,9 @@ public class ContractMarket {
             do {
                 r = Compute.d6(2);
             } while (r < 4);
-            contract.setSalvagePct(Math.min((r - 3) * 10, 100));
+            contract.setSalvagePct(Math.min((r - 3) * 10, contractMaxSalvagePercentage));
         } else {
-            contract.setSalvagePct(Math.min((roll - 3) * 10, 100));
+            contract.setSalvagePct(Math.min((roll - 3) * 10, contractMaxSalvagePercentage));
         }
     }
 
@@ -822,29 +822,24 @@ public class ContractMarket {
         }
     }
 
-    public void writeToXml(PrintWriter pw1, int indent) {
-        pw1.println(MHQXMLUtility.indentStr(indent) + "<contractMarket>");
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent+1, "lastId", lastId);
-        for (Contract c : contracts) {
-            c.writeToXML(pw1, indent + 1);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "contractMarket");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastId", lastId);
+        for (final Contract contract : contracts) {
+            contract.writeToXML(pw, indent);
         }
-        for (Integer key : clauseMods.keySet()) {
+
+        for (final Integer key : clauseMods.keySet()) {
             if (!contractIds.containsKey(key)) {
                 continue;
             }
-            pw1.println(MHQXMLUtility.indentStr(indent+1)
-                    + "<clauseMods id=\"" + key + "\">");
-            String rerolls = "";
-            String mods = "";
-            for (int i = 0; i < CLAUSE_NUM; i++) {
-                rerolls += clauseMods.get(key).rerollsUsed[i] + ((i < CLAUSE_NUM - 1)?",":"");
-                mods += clauseMods.get(key).mods[i] + ((i < CLAUSE_NUM - 1)?",":"");
-            }
-            MHQXMLUtility.writeSimpleXmlTag(pw1, indent+2, "mods", mods);
-            MHQXMLUtility.writeSimpleXmlTag(pw1, indent+2, "rerollsUsed", rerolls);
-            pw1.println(MHQXMLUtility.indentStr(indent+1) + "</clauseMods>");
+
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "clauseMods", "id", key);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mods", clauseMods.get(key).mods);
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rerollsUsed", clauseMods.get(key).rerollsUsed);
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "clauseMods");
         }
-        pw1.println(MHQXMLUtility.indentStr(indent) + "</contractMarket>");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "contractMarket");
     }
 
     public static ContractMarket generateInstanceFromXML(Node wn, Campaign c, Version version) {

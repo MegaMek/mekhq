@@ -1,10 +1,12 @@
 package asserts;
 
+import mekhq.campaign.parts.equipment.BattleArmorAmmoBin;
 import org.junit.jupiter.api.Assertions;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -14,7 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class BigDecimalAssert {
     public static void assertEquals(BigDecimal expected, Object actual, int scale) {
         assertNotNull(actual);
-        assertTrue(actual instanceof BigDecimal, "actual: " + actual.getClass().getName());
+
+        assertInstanceOf(BigDecimal.class, actual, "actual: " + actual.getClass().getName());
         BigDecimal scaledExpected = expected.setScale(scale, RoundingMode.FLOOR);
         BigDecimal scaledActual = ((BigDecimal) actual).setScale(scale, RoundingMode.FLOOR);
         Assertions.assertEquals(0, scaledExpected.compareTo(scaledActual),

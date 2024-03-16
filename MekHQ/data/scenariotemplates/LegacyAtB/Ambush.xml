@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
-    <name>Special Mission: Ambush</name>
+    <name>Special Scenario: Ambush</name>
     <shortBriefing></shortBriefing>
     <detailedBriefing>One of your MechWarriors has been ambushed by hostile forces. Destroy them.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>

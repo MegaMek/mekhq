@@ -32,7 +32,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 /**
@@ -44,22 +44,22 @@ public class SelectUnusedAbilityDialog extends JDialog {
     private ButtonGroup group;
     private Vector<String> choices;
     private boolean cancelled;
-    private Hashtable<String, SpecialAbility> currentSPA;
+    private Map<String, SpecialAbility> currentSPA;
 
-    public SelectUnusedAbilityDialog(Frame parent, Vector<String> unused, Hashtable<String, SpecialAbility> c) {
-        super(parent, true);
+    public SelectUnusedAbilityDialog(final JFrame frame, final Vector<String> unused,
+                                     final Map<String, SpecialAbility> c) {
+        super(frame, true);
         choices = unused;
         currentSPA = c;
         cancelled = false;
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
     private void initComponents() {
-
-        btnOK = new javax.swing.JButton();
-        btnClose = new javax.swing.JButton();
+        btnOK = new JButton();
+        btnClose = new JButton();
 
         group = new ButtonGroup();
 
@@ -86,7 +86,7 @@ public class SelectUnusedAbilityDialog extends JDialog {
         panButtons.add(btnOK);
         panButtons.add(btnClose);
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Select Abilities");
         getContentPane().setLayout(new BorderLayout());
 

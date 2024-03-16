@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.finances.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.junit.jupiter.api.Test;
 
@@ -30,26 +29,112 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FinancialYearDurationTest {
+    //region Variable Declarations
+    private static final FinancialYearDuration[] durations = FinancialYearDuration.values();
+
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
+    //endregion Variable Declarations
+
+    //region Getters
+    @Test
+    public void testGetToolTipText() {
+        assertEquals(resources.getString("FinancialYearDuration.SEMIANNUAL.toolTipText"),
+                FinancialYearDuration.SEMIANNUAL.getToolTipText());
+        assertEquals(resources.getString("FinancialYearDuration.DECENNIAL.toolTipText"),
+                FinancialYearDuration.DECENNIAL.getToolTipText());
+    }
+    //endregion Getters
+
+    //region Boolean Comparison Methods
+    @Test
+    public void testIsSemiannual() {
+        for (final FinancialYearDuration duration : durations) {
+            if (duration == FinancialYearDuration.SEMIANNUAL) {
+                assertTrue(duration.isSemiannual());
+            } else {
+                assertFalse(duration.isSemiannual());
+            }
+        }
+    }
+
+    @Test
+    public void testIsAnnual() {
+        for (final FinancialYearDuration duration : durations) {
+            if (duration == FinancialYearDuration.ANNUAL) {
+                assertTrue(duration.isAnnual());
+            } else {
+                assertFalse(duration.isAnnual());
+            }
+        }
+    }
+
+    @Test
+    public void testIsBiennial() {
+        for (final FinancialYearDuration duration : durations) {
+            if (duration == FinancialYearDuration.BIENNIAL) {
+                assertTrue(duration.isBiennial());
+            } else {
+                assertFalse(duration.isBiennial());
+            }
+        }
+    }
+
+    @Test
+    public void testIsQuinquennial() {
+        for (final FinancialYearDuration duration : durations) {
+            if (duration == FinancialYearDuration.QUINQUENNIAL) {
+                assertTrue(duration.isQuinquennial());
+            } else {
+                assertFalse(duration.isQuinquennial());
+            }
+        }
+    }
+
+    @Test
+    public void testIsDecennial() {
+        for (final FinancialYearDuration duration : durations) {
+            if (duration == FinancialYearDuration.DECENNIAL) {
+                assertTrue(duration.isDecennial());
+            } else {
+                assertFalse(duration.isDecennial());
+            }
+        }
+    }
+
+    @Test
+    public void testIsForever() {
+        for (final FinancialYearDuration duration : durations) {
+            if (duration == FinancialYearDuration.FOREVER) {
+                assertTrue(duration.isForever());
+            } else {
+                assertFalse(duration.isForever());
+            }
+        }
+    }
+    //endregion Boolean Comparison Methods
 
     @Test
     public void testIsEndOfFinancialYear() {
         assertTrue(FinancialYearDuration.SEMIANNUAL.isEndOfFinancialYear(LocalDate.ofYearDay(3025, 1)));
         assertFalse(FinancialYearDuration.SEMIANNUAL.isEndOfFinancialYear(LocalDate.ofYearDay(3025, 45)));
         assertTrue(FinancialYearDuration.SEMIANNUAL.isEndOfFinancialYear(LocalDate.of(3025, 7, 1)));
+        assertFalse(FinancialYearDuration.SEMIANNUAL.isEndOfFinancialYear(LocalDate.of(3025, 7, 2)));
 
         assertTrue(FinancialYearDuration.ANNUAL.isEndOfFinancialYear(LocalDate.ofYearDay(3025, 1)));
         assertFalse(FinancialYearDuration.ANNUAL.isEndOfFinancialYear(LocalDate.of(3025, 12, 31)));
 
-        assertTrue(FinancialYearDuration.BIENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3026, 1)));
+        assertFalse(FinancialYearDuration.BIENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3025, 1)));
         assertFalse(FinancialYearDuration.BIENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3025, 11)));
+        assertTrue(FinancialYearDuration.BIENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3026, 1)));
 
         assertTrue(FinancialYearDuration.QUINQUENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3025, 1)));
+        assertFalse(FinancialYearDuration.QUINQUENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3026, 1)));
         assertFalse(FinancialYearDuration.QUINQUENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3026, 11)));
 
-        assertTrue(FinancialYearDuration.DECENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3030, 1)));
+        assertFalse(FinancialYearDuration.DECENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3026, 1)));
         assertFalse(FinancialYearDuration.DECENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3026, 11)));
+        assertTrue(FinancialYearDuration.DECENNIAL.isEndOfFinancialYear(LocalDate.ofYearDay(3030, 1)));
 
         assertFalse(FinancialYearDuration.FOREVER.isEndOfFinancialYear(LocalDate.ofYearDay(3000, 1)));
         assertFalse(FinancialYearDuration.FOREVER.isEndOfFinancialYear(LocalDate.ofYearDay(3006, 11)));
@@ -76,6 +161,7 @@ public class FinancialYearDurationTest {
         assertEquals("3030 - 3039", FinancialYearDuration.DECENNIAL.getExportFilenameDateString(LocalDate.ofYearDay(3040, 1)));
     }
 
+    //region File I/O
     @Test
     public void testParseFromString() {
         // Enum.valueOf Testing
@@ -89,6 +175,7 @@ public class FinancialYearDurationTest {
         // Failure Testing
         assertEquals(FinancialYearDuration.ANNUAL, FinancialYearDuration.parseFromString("failureFailsFake"));
     }
+    //endregion File I/O
 
     /**
      * Testing to ensure the toString Override is working as intended

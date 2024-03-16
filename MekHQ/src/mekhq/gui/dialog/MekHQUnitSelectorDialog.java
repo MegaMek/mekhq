@@ -55,14 +55,15 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     @Override
     public void updateOptionValues() {
         gameOptions = campaign.getGameOptions();
-        enableYearLimits = campaign.getCampaignOptions().limitByYear();
+        enableYearLimits = campaign.getCampaignOptions().isLimitByYear();
         allowedYear = campaign.getGameYear();
-        canonOnly = campaign.getCampaignOptions().allowCanonOnly();
+        canonOnly = campaign.getCampaignOptions().isAllowCanonOnly();
         gameTechLevel = campaign.getCampaignOptions().getTechLevel();
+        eraBasedTechLevel = campaign.getCampaignOptions().isVariableTechLevel();
 
-        if (campaign.getCampaignOptions().allowClanPurchases() && campaign.getCampaignOptions().allowISPurchases()) {
+        if (campaign.getCampaignOptions().isAllowClanPurchases() && campaign.getCampaignOptions().isAllowISPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_IS_CLAN;
-        } else if (campaign.getCampaignOptions().allowClanPurchases()) {
+        } else if (campaign.getCampaignOptions().isAllowClanPurchases()) {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_CLAN;
         } else {
             techLevelDisplayType = TECH_LEVEL_DISPLAY_IS;
@@ -209,8 +210,8 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
                             /* year limits */
                             (!enableYearLimits || (mech.getYear() <= allowedYear))
                             /* Clan/IS limits */
-                            && (campaign.getCampaignOptions().allowClanPurchases() || !TechConstants.isClan(mech.getType()))
-                            && (campaign.getCampaignOptions().allowISPurchases() || TechConstants.isClan(mech.getType()))
+                            && (campaign.getCampaignOptions().isAllowClanPurchases() || !TechConstants.isClan(mech.getType()))
+                            && (campaign.getCampaignOptions().isAllowISPurchases() || TechConstants.isClan(mech.getType()))
                             /* Canon */
                             && (!canonOnly || mech.isCanon())
                             /* Weight */

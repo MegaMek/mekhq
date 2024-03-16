@@ -21,10 +21,12 @@
 package mekhq.gui.dialog;
 
 import megamek.client.bot.princess.CardinalEdge;
+import megamek.client.ui.baseComponents.AbstractScrollablePanel;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.EntityWeightClass;
 import megamek.common.UnitType;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
@@ -32,6 +34,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -59,6 +62,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     private final static String EDIT_FORCE_COMMAND = "EDIT_FORCE_";
     private final static String SAVE_TEMPLATE_COMMAND = "SAVE_TEMPLATE";
     private final static String LOAD_TEMPLATE_COMMAND = "LOAD_TEMPLATE";
+
+    private final JFrame frame;
 
     // controls which need to be accessible across the lifetime of this dialog
     JComboBox<String> cboAlignment;
@@ -105,8 +110,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
     JList<ScenarioObjective> objectiveList;
     JScrollPane objectiveScrollPane;
     JButton btnRemoveObjective;
+    JList<String> lstMuls;
 
-    JPanel globalPanel;
+    AbstractScrollablePanel globalPanel;
 
     JPanel forcedPanel;
     JScrollPane forceScrollPane;
@@ -130,8 +136,9 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
      * Constructor. Creates a new instance of this dialog with the given parent JFrame.
      * @param parent
      */
-    public ScenarioTemplateEditorDialog(Frame parent) {
+    public ScenarioTemplateEditorDialog(JFrame parent) {
         super(parent, true);
+        frame = parent;
         initComponents();
         pack();
         validate();
@@ -145,8 +152,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         this.setTitle("Scenario Template Editor");
         getContentPane().setLayout(new GridLayout());
 
-        globalPanel = new JPanel();
-        globalPanel.setLayout(new GridBagLayout());
+        globalPanel = new DefaultMHQScrollablePanel(frame, "globalPanel", new GridBagLayout());
 
         JScrollPane globalScrollPane = new JScrollPane(globalPanel);
         globalScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -429,6 +435,29 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         gbc.gridx = 1;
         forcedPanel.add(cboSyncForceName, gbc);
+        
+        JLabel lblFixedMul = new JLabel("Fixed MUL:");
+        gbc.gridx = 0;
+        gbc.gridy++;
+        forcedPanel.add(lblFixedMul, gbc);        
+        
+        lstMuls = new JList<>();
+        DefaultListModel<String> mulModel = new DefaultListModel<>();
+        JScrollPane scrMulList = new JScrollPane(lstMuls);
+        File mulDir = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY);
+        
+        if (mulDir.exists() && mulDir.isDirectory()) {
+            for (String mul : mulDir.list((d, s) -> {
+                        return s.toLowerCase().endsWith(".mul");
+                      })) {
+                mulModel.addElement(mul);
+            }
+        }
+        
+        lstMuls.setModel(mulModel);    
+        lstMuls.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        gbc.gridx = 1;
+        forcedPanel.add(scrMulList, gbc);
 
         DefaultListModel<String> zoneModel = new DefaultListModel<>();
         for (String s : ScenarioForceTemplate.DEPLOYMENT_ZONES) {
@@ -600,6 +629,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         txtForceName.setText(forceTemplate.getForceName());
         cboSyncDeploymentType.setSelectedIndex(forceTemplate.getSyncDeploymentType().ordinal());
         cboSyncForceName.setSelectedItem(forceTemplate.getSyncedForceName());
+        lstMuls.setSelectedValue(forceTemplate.getFixedMul(), true);
 
         int[] deploymentZones = new int[forceTemplate.getDeploymentZones().size()];
         for (int x = 0; x < forceTemplate.getDeploymentZones().size(); x++) {
@@ -1109,6 +1139,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         sft.setDeployOffboard(chkOffBoard.isSelected());
 
         sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
+        
+        sft.setFixedMul(lstMuls.getSelectedValue());
 
         // if we have picked "None" for synchronization, then set explicit deployment zones.
         // otherwise, set the synced force name

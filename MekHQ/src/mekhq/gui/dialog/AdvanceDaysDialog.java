@@ -36,6 +36,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.IsoFields;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,9 +50,9 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
     private JButton btnNewDay;
     private JButton btnNewWeek;
     private JButton btnNewMonth;
+    private JButton btnNewQuarter;
     private JButton btnNewYear;
     private JButton btnNewQuinquennial;
-    private JButton btnNewDecade;
     private DailyReportLogPanel dailyLogPanel;
     //endregion Variable Declarations
 
@@ -116,6 +117,14 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         this.btnNewMonth = btnNewMonth;
     }
 
+    public JButton getBtnNewQuarter() {
+        return btnNewQuarter;
+    }
+
+    public void setBtnNewQuarter(final JButton btnNewQuarter) {
+        this.btnNewQuarter = btnNewQuarter;
+    }
+
     public JButton getBtnNewYear() {
         return btnNewYear;
     }
@@ -130,14 +139,6 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
 
     public void setBtnNewQuinquennial(final JButton btnNewQuinquennial) {
         this.btnNewQuinquennial = btnNewQuinquennial;
-    }
-
-    public JButton getBtnNewDecade() {
-        return btnNewDecade;
-    }
-
-    public void setBtnNewDecade(final JButton btnNewDecade) {
-        this.btnNewDecade = btnNewDecade;
     }
 
     public DailyReportLogPanel getDailyLogPanel() {
@@ -214,6 +215,10 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
                 resources.getString("btnNewMonth.toolTipText"), this::startAdvancement));
         panel.add(getBtnNewMonth());
 
+        setBtnNewQuarter(new MMButton("btnNewQuarter", resources.getString("btnNewQuarter.text"),
+                resources.getString("btnNewQuarter.toolTipText"), this::startAdvancement));
+        panel.add(getBtnNewQuarter());
+
         setBtnNewYear(new MMButton("btnNewYear", resources.getString("btnNewYear.text"),
                 resources.getString("btnNewYear.toolTipText"), this::startAdvancement));
         panel.add(getBtnNewYear());
@@ -221,10 +226,6 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         setBtnNewQuinquennial(new MMButton("btnNewQuinquennial", resources.getString("btnNewQuinquennial.text"),
                 resources.getString("btnNewQuinquennial.toolTipText"), this::startAdvancement));
         panel.add(getBtnNewQuinquennial());
-
-        setBtnNewDecade(new MMButton("btnNewDecade", resources.getString("btnNewDecade.text"),
-                resources.getString("btnNewDecade.toolTipText"), this::startAdvancement));
-        panel.add(getBtnNewDecade());
 
         return panel;
     }
@@ -269,6 +270,9 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
             // the current day, with the one added because otherwise we get the last day of the same
             // month
             days = today.lengthOfMonth() + 1 - today.getDayOfMonth();
+        } else if (getBtnNewQuarter().equals(evt.getSource())) {
+            days = Math.toIntExact(ChronoUnit.DAYS.between(today,
+                    today.with(IsoFields.DAY_OF_QUARTER, 1).plusMonths(3)));
         } else if (getBtnNewYear().equals(evt.getSource())) {
             // The number of days until the next year is the length of the year plus one minus
             // the current day, with the one added because otherwise we get the last day of the same
@@ -277,9 +281,6 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
         } else if (getBtnNewQuinquennial().equals(evt.getSource())) {
             days = Math.toIntExact(ChronoUnit.DAYS.between(today,
                     LocalDate.ofYearDay(today.getYear() + 5 - (today.getYear() % 5), 1)));
-        } else if (getBtnNewDecade().equals(evt.getSource())) {
-            days = Math.toIntExact(ChronoUnit.DAYS.between(today,
-                    LocalDate.ofYearDay(today.getYear() + 10 - (today.getYear() % 10), 1)));
         } else {
             LogManager.getLogger().error("Unknown source to start advancing days. Advancing to tomorrow.");
             days = 1;
@@ -302,7 +303,7 @@ public class AdvanceDaysDialog extends AbstractMHQDialog {
                     reports.add("<hr>");
                     reports.add(report);
                 }
-                getGUI().getCampaign().fetchAndClearNewReports();
+                reports.addAll(getGUI().getCampaign().fetchAndClearNewReports());
             } catch (Exception ex) {
                 LogManager.getLogger().error("", ex);
                 break;

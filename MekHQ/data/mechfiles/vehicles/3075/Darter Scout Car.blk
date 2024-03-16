@@ -12,9 +12,9 @@ Tank
 <Name>
 Darter Scout Car
 </Name>
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 836
@@ -43,11 +43,15 @@ ISMG Ammo (200)
 <type>
 IS Level 1
 </type>
+
+<role>
+Scout
+</role>
 <year>
 2822
 </year>
 <source>
-Succession Wars
+TRO: 3075
 </source>
 <internal_type>
 0

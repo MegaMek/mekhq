@@ -16,9 +16,9 @@ VTOL
 Garrot Superheavy Transport
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 6539
@@ -31,6 +31,10 @@ Garrot Superheavy Transport
 <type>
 IS Level 2
 </type>
+
+<role>
+None
+</role>
 
 <motion_type>
 VTOL
@@ -90,9 +94,14 @@ Light Machine Gun
 </Turret Equipment>
 
 <source>
-TRO 3145 Mercenaries - Late Republic
+TRO: 3145 Mercenaries
 </source>
 
 <tonnage>
 30.0
 </tonnage>
+
+<quirks>
+easy_maintain
+</quirks>
+

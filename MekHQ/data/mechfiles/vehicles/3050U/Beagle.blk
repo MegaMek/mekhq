@@ -16,9 +16,9 @@ Tank
 Beagle Hover Scout
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 312
@@ -31,6 +31,10 @@ Beagle Hover Scout
 <type>
 IS Level 2
 </type>
+
+<role>
+Scout
+</role>
 
 <motion_type>
 Hover
@@ -82,7 +86,7 @@ BeagleActiveProbe
 </Turret Equipment>
 
 <source>
-TRO 3050 - Star League
+TRO: 3050
 </source>
 
 <tonnage>

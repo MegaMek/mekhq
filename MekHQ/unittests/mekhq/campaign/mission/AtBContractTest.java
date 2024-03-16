@@ -45,7 +45,7 @@ public class AtBContractTest {
         // Ensure the parent is not set
         assertNull(child.getParentContract());
     }
-    
+
     @Test
     public void atbContractRestoresRefs() {
         Campaign mockCampaign = mock(Campaign.class);

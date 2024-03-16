@@ -3,12 +3,12 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.MechView;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ResourceBundle;
 
 /**
@@ -17,6 +17,9 @@ import java.util.ResourceBundle;
  */
 public class MekViewDialog extends JDialog {
     private MechView mview;
+    private JButton btnOkay;
+    private JScrollPane jScrollPane2;
+    private JTextPane txtMek;
 
     /** Creates new form MekViewDialog */
     public MekViewDialog(JFrame parent, boolean modal, MechView mv) {
@@ -33,8 +36,8 @@ public class MekViewDialog extends JDialog {
         btnOkay = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.MekViewDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+                MekHQ.getMHQOptions().getLocale());
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Unit View");
 
         jScrollPane2.setName("jScrollPane2");
@@ -67,10 +70,7 @@ public class MekViewDialog extends JDialog {
         }
     }
 
-    private void btnOkayActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnOkayActionPerformed(ActionEvent evt) {
         this.setVisible(false);
     }
-    private JButton btnOkay;
-    private JScrollPane jScrollPane2;
-    private JTextPane txtMek;
 }

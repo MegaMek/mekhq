@@ -101,15 +101,15 @@ public interface IPartWork extends IWork {
 
     boolean isBeingWorkedOn();
 
-    PartRepairType getMassRepairOptionType();
+    PartRepairType getMRMSOptionType();
 
     PartRepairType getRepairPartType();
 
-    static PartRepairType findCorrectMassRepairType(IPartWork part) {
+    static PartRepairType findCorrectMRMSType(IPartWork part) {
         if ((part instanceof EquipmentPart) && (((EquipmentPart) part).getType() instanceof WeaponType)) {
             return PartRepairType.WEAPON;
         } else {
-            return part.getMassRepairOptionType();
+            return part.getMRMSOptionType();
         }
     }
 

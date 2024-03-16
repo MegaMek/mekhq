@@ -25,6 +25,7 @@ import megamek.client.ui.swing.widget.SkinSpecification.UIComponents;
 import megamek.client.ui.swing.widget.SkinXMLHandler;
 import megamek.common.Configuration;
 import megamek.common.annotations.Nullable;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.util.ImageUtil;
 import megamek.common.util.fileUtils.MegaMekFile;
 import mekhq.MHQConstants;
@@ -43,12 +44,29 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FilenameFilter;
+import java.util.Arrays;
+import java.util.List;
 
 public class StartupScreenPanel extends AbstractMHQPanel {
     //region Variable Declarations
     private MekHQ app;
     private File lastSaveFile;
     private BufferedImage backgroundIcon;
+
+    // Save file filtering needs to avoid loading some special files
+    static public FilenameFilter saveFilter = new FilenameFilter() {
+        @Override
+        public boolean accept(File dir, String name) {
+            // Allow any .xml, .cpnx, and .cpnx.gz file that is not in the list of excluded files
+            List<String> toReject = Arrays.asList(
+                    PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase()
+            );
+            return (((name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml"))
+                        || name.toLowerCase().endsWith(".cpnx.gz")) && !toReject.contains(name.toLowerCase()));
+        }
+    };
+
     //endregion Variable Declarations
 
     //region Constructors
@@ -56,9 +74,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         super(new JFrame(MHQConstants.PROJECT_NAME), "StartupScreenPanel");
 
         this.app = app;
-        lastSaveFile = Utilities.lastFileModified(MekHQ.getCampaignsDirectory().getValue(),
-                (dir, name) -> (name.toLowerCase().endsWith(".cpnx") || name.toLowerCase().endsWith(".xml"))
-                        || name.toLowerCase().endsWith(".cpnx.gz"));
+        lastSaveFile = Utilities.lastFileModified(MekHQ.getCampaignsDirectory().getValue(), saveFilter);
 
         initialize();
     }

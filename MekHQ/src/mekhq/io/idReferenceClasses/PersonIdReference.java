@@ -25,65 +25,89 @@ import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
+import java.util.Map.Entry;
 
 public class PersonIdReference extends Person {
     //region Constructors
-    public PersonIdReference(String text) {
+    public PersonIdReference(final String text) {
         super(UUID.fromString(text));
     }
     //endregion Constructors
 
-    public static void fixPersonIdReferences(Campaign campaign) {
-        for (Person person : campaign.getPersonnel()) {
+    public static void fixPersonIdReferences(final Campaign campaign) {
+        for (final Person person : campaign.getPersonnel()) {
             fixGenealogyReferences(campaign, person);
         }
     }
 
-    private static void fixGenealogyReferences(Campaign campaign, Person person) {
-        List<Person> unknownPersonnel = new ArrayList<>();
-
-        // Origin
-        person.getGenealogy().setOrigin(person);
+    /**
+     * This fixes a person's Genealogy PersonIdReferences. It is public ONLY for unit testing
+     * @param campaign the campaign the person is in
+     * @param person the person to fix genealogy for
+     */
+    public static void fixGenealogyReferences(final Campaign campaign, final Person person) {
+        if (person.getGenealogy().isEmpty()) {
+            return;
+        }
 
         // Spouse
         if (person.getGenealogy().getSpouse() instanceof PersonIdReference) {
-            person.getGenealogy().setSpouse(campaign.getPerson(person.getGenealogy().getSpouse().getId()));
+            final Person spouse = campaign.getPerson(person.getGenealogy().getSpouse().getId());
+            if (spouse == null) {
+                LogManager.getLogger().warn("Failed to find the spouse for " + person.getFullTitle()
+                        + " with id " + person.getGenealogy().getSpouse().getId());
+            }
+            person.getGenealogy().setSpouse(spouse);
         }
 
         // Former Spouse
-        for (FormerSpouse formerSpouse : person.getGenealogy().getFormerSpouses()) {
-            if (!(formerSpouse.getFormerSpouse() instanceof PersonIdReference)) {
-                continue;
+        if (!person.getGenealogy().getFormerSpouses().isEmpty()) {
+            final List<Person> unknownPersonnel = new ArrayList<>();
+
+            for (final FormerSpouse formerSpouse : person.getGenealogy().getFormerSpouses()) {
+                if (!(formerSpouse.getFormerSpouse() instanceof PersonIdReference)) {
+                    continue;
+                }
+                final Person ex = campaign.getPerson(formerSpouse.getFormerSpouse().getId());
+                if (ex == null) {
+                    LogManager.getLogger().warn("Failed to find a person with id " + formerSpouse.getFormerSpouse().getId());
+                    unknownPersonnel.add(formerSpouse.getFormerSpouse());
+                } else {
+                    formerSpouse.setFormerSpouse(ex);
+                }
             }
-            final Person ex = campaign.getPerson(formerSpouse.getFormerSpouse().getId());
-            if (ex == null) {
-                LogManager.getLogger().warn("Failed to find a person with id " + formerSpouse.getFormerSpouse().getId());
-                unknownPersonnel.add(formerSpouse.getFormerSpouse());
-            } else {
-                formerSpouse.setFormerSpouse(ex);
+
+            for (final Person unknown : unknownPersonnel) {
+                person.getGenealogy().removeFormerSpouse(unknown);
             }
-        }
-        for (Person unknown : unknownPersonnel) {
-            person.getGenealogy().removeFormerSpouse(unknown);
         }
 
         // Family
-        Map<FamilialRelationshipType, List<Person>> family = new HashMap<>();
-        for (Map.Entry<FamilialRelationshipType, List<Person>> entry : person.getGenealogy().getFamily().entrySet()) {
-            for (Person familyMemberRef : entry.getValue()) {
-                if (familyMemberRef == null) {
+        if (person.getGenealogy().familyIsEmpty()) {
+            return;
+        }
+
+        // Create a shallow copy of the current family
+        final Map<FamilialRelationshipType, List<Person>> family = new HashMap<>(person.getGenealogy().getFamily());
+
+        // Clear the person's family
+        person.getGenealogy().getFamily().clear();
+
+        // Then we can migrate
+        for (final Entry<FamilialRelationshipType, List<Person>> entry : family.entrySet()) {
+            for (final Person familyMemberReference : entry.getValue()) {
+                if (familyMemberReference == null) {
                     continue;
                 }
-                final Person familyMember = (familyMemberRef instanceof PersonIdReference)
-                        ? campaign.getPerson(familyMemberRef.getId()) : familyMemberRef;
+                final Person familyMember = (familyMemberReference instanceof PersonIdReference)
+                        ? campaign.getPerson(familyMemberReference.getId()) : familyMemberReference;
                 if (familyMember == null) {
-                    LogManager.getLogger().warn("Failed to find a person with id " + familyMemberRef.getId());
+                    LogManager.getLogger().warn("Failed to find a person with id " + familyMemberReference.getId());
                 } else {
-                    family.putIfAbsent(entry.getKey(), new ArrayList<>());
-                    family.get(entry.getKey()).add(familyMember);
+                    person.getGenealogy().getFamily().putIfAbsent(entry.getKey(), new ArrayList<>());
+                    person.getGenealogy().getFamily().get(entry.getKey()).add(familyMember);
                 }
             }
         }
-        person.getGenealogy().setFamily(family);
     }
 }

@@ -21,13 +21,14 @@ package mekhq.gui.dialog;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.codeUtilities.MathUtility;
-import megamek.common.util.EncodeControl;
+import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -74,7 +75,7 @@ public final class BatchXPDialog extends JDialog {
 
     private transient String choiceNoSkill;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.BatchXPDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public BatchXPDialog(JFrame parent, Campaign campaign) {
         super(parent, "", true);
@@ -161,10 +162,7 @@ public final class BatchXPDialog extends JDialog {
             tableColumn.setCellRenderer(new MekHqTableCellRenderer());
             columnModel.setColumnVisible(tableColumn, true);
 
-            final Comparator<?> comparator = column.getComparator(campaign);
-            if (comparator != null) {
-                personnelSorter.setComparator(column.ordinal(), comparator);
-            }
+            personnelSorter.setComparator(column.ordinal(), column.getComparator(campaign));
             final SortOrder sortOrder = column.getDefaultSortOrder();
             if (sortOrder != null) {
                 sortKeys.add(new SortKey(column.ordinal(), sortOrder));
@@ -205,8 +203,8 @@ public final class BatchXPDialog extends JDialog {
         choiceExp.setMaximumSize(new Dimension(Short.MAX_VALUE, (int) choiceType.getPreferredSize().getHeight()));
         DefaultComboBoxModel<PersonTypeItem> personExpModel = new DefaultComboBoxModel<>();
         personExpModel.addElement(new PersonTypeItem(resourceMap.getString("experience.choice.text"), null));
-        for (int i = 0; i < 5; ++ i) {
-            personExpModel.addElement(new PersonTypeItem(SkillType.getExperienceLevelName(i), i));
+        for (int i = SkillLevel.ULTRA_GREEN.ordinal(); i < SkillLevel.ELITE.ordinal(); i++) {
+            personExpModel.addElement(new PersonTypeItem(Skills.SKILL_LEVELS[i].toString(), i));
         }
         choiceExp.setModel(personExpModel);
         choiceExp.setSelectedIndex(0);
@@ -388,14 +386,14 @@ public final class BatchXPDialog extends JDialog {
                         p.getSkill(skillName).getType().getName(), p.getSkill(skillName).toString());
 
                 // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
-                if (campaign.getCampaignOptions().getUseAtB()) {
+                if (campaign.getCampaignOptions().isUseAtB()) {
                     if (p.getPrimaryRole().isCombat() && !p.getPrimaryRole().isVesselCrew()
                             && (p.getExperienceLevel(campaign, false) > startingExperienceLevel)
                             && (startingExperienceLevel >= SkillType.EXP_REGULAR)) {
                         final SingleSpecialAbilityGenerator spaGenerator = new SingleSpecialAbilityGenerator();
                         final String spa = spaGenerator.rollSPA(campaign, p);
                         if (spa == null) {
-                            if (campaign.getCampaignOptions().useEdge()) {
+                            if (campaign.getCampaignOptions().isUseEdge()) {
                                 p.changeEdge(1);
                                 p.changeCurrentEdge(1);
                                 PersonalLogger.gainedEdge(campaign, p, campaign.getLocalDate());

@@ -16,9 +16,9 @@ Tank
 Po II Heavy Tank
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 2551
@@ -31,6 +31,10 @@ Po II Heavy Tank
 <type>
 IS Level 2
 </type>
+
+<role>
+Brawler
+</role>
 
 <tonnage>
 60
@@ -76,5 +80,5 @@ Machine Gun
 </Turret Equipment>
 
 <source>
-Jihad
+TRO: 3085
 </source>

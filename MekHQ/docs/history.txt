@@ -1,6 +1,174 @@
-VERSION HISTORY:
-----------------
-0.49.9-SNAPSHOT
+MEKHQ VERSION HISTORY:
+---------------
+0.49.19-SNAPSHOT
++ PR #3845: Adaptations for Adding Clan Personnel Tracking to MegaMek
++ Fix #3775: Non-superheavy Tripods can now be assigned crews; pilots can now be assigned to SH and Tripods in the personnel tab
++ Fix: #3848: Unable to assign Aerospace units to a transport in the TO&E
++ Fix: #3856: Display bug in 'Basic Unit Information', doesn't show aerospace units
++ Fix: #3815: StratCon Modifier BadEvent is broken and doesnt do anything
++ PR: #3874: Fixes MegaMek #4464 - StratCon Mapgen Fix
++ PR: #3866: Fixed Typo and Removed Indents
++ Data: #3865: 499 new callsigns 
++ PR: #3878: Interstellar Map Hiring Hall Highlight
++ PR: #3869: Fix issue #3839 to prevent loading clientsettings.xml instead of most recent campaign save file
+
+0.49.18 (2024-02-17 1800 UTC)
++ PR #3805: Adaptations for the Internal Bomb Bay quirk
++ PR #3801: New StratCon Scenario Modifiers (Thanks Thom293)
++ PR #3788: Adjust campaign creation dialogs to have correct jdialod owner
++ Fix #3540: Manually set TO&E force commander
++ PR #3818: MUL parser updates
++ PR #3816: Show if unit is in repair or salvage mode in repair bay. 
++ PR #3823, #3827, #3833: Rework of the internal representation of Armor
++ PR #3826: Adaptation to Mek Clan name separation in MM
++ Fix #3740: Consistent messaging in Daily Activity Log: ComStar bill vs. C-Bill
++ PR #3821: Add max contract salvage percentage to campaign options
++ Fix #3763: Reversing quality names in unit set quality GM menu
++ Fix #3194: Awarding non-stackable medals to multiple people 
++ Issue #3781: Force commanders can be picked from among highest-ranking individuals
++ Fix #3843: Fix chassis lookup
++ Fix #3842: Can't load prefab campaigns  
++ PR #3849: StratCon Heavy Battles, by PhoenixHeart.
+
+
+
+0.49.17 (2023-12-31 1900 UTC)
++ No code added
+
+0.49.16 (2023-12-30 2200 UTC)
++ PR #3771: Add "children" filter to personnel tab
++ PR #3780: Support for Beast Mounted Infantry
+
+0.49.15 (2023-10-21 1530 UTC)
++ PR #3735: Maintenance cost shown in whole C-Bills
++ Issue #3741: Stratcon fixes
+ - Improve contrast between revealed/unrevealed hexes
+ - Generate scenario using default temp mappings when facility-specific mappings aren't present
+ - fix missing badlands image
+ - definition file paths are now linux-friendly
++ Issue #3725: Improve performance when searching for parts using "planetary acquisition"
++ Issue #2854: Implemented CamOps errata for avionics repair times
++ PR #3756: Tech level filtering in the unit selector dialog has been corrected
++ Issue #3747: Unable to Assign Pilots to Tripod Mechs
++ PR #3766: weight calculation for spare mech locations
++ PR #3768: Arano Restoration Campaign - Planetary Control
+
+0.49.14 (2023-07-28 2100 UTC)
++ PR #3676: Gradle build fixes 
++ Issue #3682: Prevent NPE when changing bot config
++ Issue #3683 - fix issue preventing loading saved campaigns containing MASC
++ Issue #3621 - prevent NPE completing ship search immediately after loading campaign
++ PR #3692: Adaptations to MM's #4474 (BV calculation and reports update)
++ Issue #3402, #3715: Only hostile units are now displayed on the killboard during scenario resolution, Stratcon fixes
++ PR #3694: New StratCon feature - tracks now have individual terrain hexes (with graphics) and average temperatures; 
+    the terrain influences the map presets used for tactical battles; temperature is passed to megamek (may be hot!)
++ PR #3724: "Clan Personnel" special flag now correctly sets the person's clan status
++ PR #3731: Fix nightly build from a missed method rename in MegaMek. 
++ Issue #3713: allied turrets have upgraded network security; defeat in evacuation scenarios results in facility capture instead of destruction
+
+0.49.13 (2023-05-23 2000 UTC)
++ Data: updates to the Stratcon FAQ now version 2.3 in docs\atb folder.
++ PR #3618: Campaign Options: Properly Disable Retirement and Dependent Options On Preset Load
++ PR #3619: Campaign Options: Properly Disable Contract Market Pane based on AtB Selection
++ Issue #3634: Re-enable Mass Mothball dialog
++ Issue #3654: Engines can be swapped again in meklab
++ Issue #3652/3629: Addressed errors loading campaigns with pending special AtB scenarios
++ Data: Improvements to FedCom Civil War Planetary Control
++ Issue #3502: Campaign Options: Improve Maximum Acquisition Per Day Text and Tool Tip Text
++ PR #3662: Update refit classes based on CamOps
++ Issue #3632: [Stratcon] Text clarification regarding airborne dropship modifier
++ PR #3663: Properly classify CASE refits
++ Issue #3600: [Stratcon] Regenerating bot forces no longer duplicates displayed scenario objectives
++ PR #3665: Stratcon Hidden Facility Modifier Fix
+
+0.49.12 (2023-03-04 2200 UTC)
++ Issue #3345: Rename Gunnery/Protomech to Gunnery/ProtoMech
++ Issue #3541: Maintenance Extra Time Doesn't Show For Mothballing, Activating, and Mothballed Units
++ Issue #3542: Remove Unit Market Offers That Fail to Parse
++ Issue #3553: Migrate Turn Timer Game Option
++ Issue #3436: Add StratCon Preset
++ Issue #3558: RATs Are Used Outside of AtB
++ PR #3580: Personnel Table: Add Founder Column to Biographical Information View
++ PR #3574: Fixing Support VTOL Maintenance Time
++ PR #3579: Personnel Table Mouse Adapter: Add Founder to Spouse Selection Information
++ PR #3572: Adds Environmental Specialist Specialist
++ Issue #2482: Interstellar Map: Add Contract Search and Planetary Acquisition Radius Options
++ PR #3546: Campaign Options: Move Contract Search Radius and Variable Contract Length to Contract Market
++ PR #3551: Campaign Options: Fixing Financial Year Tool Tip Option Typo
++ Issue #3554: Null Protecting MechSummaryCache Return
++ PR #3557: Yearly Retirement Nag Now Follows Campaign Options
++ PR #3561: Campaign Options Dialog: Fixing Random Retirement Panel Name
++ PR #3563: Base Components: Moving JDisableablePanel to MM
++ Issue #3569: Company Generation Dialog: Fixing Warning Option Names
++ Issue #3573: Null Protect Adding Allied Entities to an Objective
++ Issue #3576: Prevent Ultra-Light and Superheavy Scenario Assignment OutOfBounds NPEs
++ PR #3581: Personnel Table: Adding Flag View
++ Issue #3582: Company Generator: Prevent Preset From Loading in Older Versions
++ Issue #3583: Campaign Preset: Prevent Preset From Loading in Older Versions
++ PR #3586: Campaign Ops Unit Rating: Properly Calculate Admin Personnel Numbers
++ PR #3589: Phenotype Enum: Migrating Uses to Simplification Methods
++ PR #3590: Fixing New Campaign SPA Options Reset
++ PR #3591: Use JFrame Instead of Frame as Frame has Accessibility Issues
++ MM Issue #4098: Adding Sprite Camouflage and Damage Export Options
++ PR #3550: Initial Swapovers to allow for Legendary and Heroic Skill Levels
++ Issue #3318: Add manual personnel payments that generate Finance debit
++ Issue #3543: Cleaning up some medal award images
++ PR #3603: News Update
++ Issue #3592: Handling Procration for Returning Pregnant Personnel
++ Issue #3607: Properly Load Support Edge Option Text
++ Issue #3605: News Properly Shows in Advance Days Dialog
++ PR #3614: Unit Table Mouse Adapter: Only Allow Unit Assignments for Available Units
++ PR #3612: Unit Market Pane: Fixing Missing Table Name
++ Issue #3601: Fixing Nag Display and Specified Description Text
++ Issue #3599: Prevent Null Entity Generation Scenario Creation NPEs
++ Java 17: Manifest File Add-Opens
+
+0.49.11 (2022-12-22 1500 UTC)
++ PR #3453: Remove restriction limiting generated/dynamic Scenarios to the current Campaign Week
++ PR #3450: Base Components: DefaultMHQScrollablePanel
++ PR #3482: Infantry refactor adaptation
++ PR #3486: Fixes issue where training ammo was affected by the parts cost multiplier
++ PR #3487: No longer attempt to include transport costs in contract costs if pay for transport is disabled
++ Issue #3478: Added "Partial Success" contract outcome option
++ PR #3466: Adding Faction Data Validation to Campaign Options Pane
++ Random Death: Fixing recommended type to Exponential from erroneous Percentage
++ PR #3499: MHQXMLUtility: Refit Swapover
++ PR #3500: MHQXMLUtility: Campaign: Removing duplicated fields
++ PR #3507: New Campaign Project: Adding Separate New Campaign Initialization Messages
++ Issue #3473: Load Default AtB Config When Custom Config Cannot Be Parsed
++ Issue #3489: Adding Small Craft and DropShip Transport Support
++ Issue #3492: Removing Cached ToolTip Portraits between MM Launches
++ Issue #3472: AdvanceDaysDialog: Replace Advance to New Decade with Advance to New Quarter
++ Issues #2467, #3483: Fix Part Store Battle Armour Tech Introduction and Clan Filtering
++ PR #3516: Company Generator: Adding Faction Options
++ PR #3511: Contract Market: Adding Transit Time and Estimated Profit Columns
++ PR #3501: MHQXMLUtility: Parts Swapover and Removing Deprecated Method Uses
++ PR #3520: Standardize Scenario and Mission naming so they no longer have displayed overlap
++ Issue #1858: Sandblaster can now be trained
++ PR #3529: Player Java 17 Support
++ Issue #3524: Fixing Missing Federated Commonwealth Planetary Events
++ PR #3534: Scenario Template Editor: Fixing Scrolling Intervals
++ PR #3535: MRMS Dialog: Fixing Scrolling Intervals
++ Issue #3373: Company Generator: Parts No Longer Go Missing After Unit Removal Before Reload
++ Issue #3435: Company Generator: Fixing Preset System
++ PR #3538: Data Loading: Don't Override the Selected Date
++ Issue #3389: Personnel Table: Sort Age Using Birthdate
++ Updating to Apache Commons Text 1.10.0 from 1.9
++ Updating to Commonmark 0.21.0 from 0.19.0
++ Updating to FlatLAF 2.6 from 2.4
++ Updating to JAXB Runtime 4.0.1 from 4.0.0
++ Updating to Joda Money 1.0.3 from 1.0.2
++ Updating to Joda Time 2.12.2 from 2.11.1
++ Updating to JUnit 5.9.1 from 5.9.0
++ Updating to Launch4j 2.5.4 from 2.5.3
++ Updating to Log4j 2.19.0 from 2.18.0
++ Updating to Mockito 4.10.0 from 4.6.1
++ Updating to Mockito JUnit Jupiter 4.10.0 from 4.6.1
+
+0.49.10 (2022-09-12 1500 UTC)
+    NO CHANGES FROM 0.49.9
+
+0.49.9 (2022-09-06 2100 UTC)
 + PR #3306: Swapping to a Single Retirement Campaign Report
 + PR #3311: MHQXMLUtility: Fixing Refit Filename and Campaign XML Custom Unit Name escaping
 + PR #3261: Fixing all Assert Usages
@@ -12,9 +180,33 @@ VERSION HISTORY:
 + Issue #3343: Mass Training Dialog: Properly Handle Skills With Training Disabled
 + PR #3344: Ignore End Date for Active Contract Scenario Assignment
 + PR #3340: Fixing Close Exists Resource Leaks
-+ Updating to FlatLAF 2.3 from 2.2
++ Issues #3346/3347: CustomizePersonDialog: Fixing Skills and Abilities Scroll Increments
++ Issue #3362: CampaignOptionsPane: Personnel Tab: Allow Horizontal Scrolling
++ Issue #2901: Removing IS Factions from Lupus Generation for 2860-3000
++ Issue #3370: Retirement: Fixing missing s in report format
++ Issue #3372: Fixing Campaign Loan Report Issues
++ Issue #3375: Export MUL File Exports a MUL Per Player
++ PR #3337: Testing: Heavily Expanding Personnel Unit Testing. Fixing Civilian Role Comparison, Loan Week Calculation, and Pregnancy Week Calculation.
++ Issue #3291: Fixing No Exclusive Bloodnames Bloodname Generation Exception
++ PR #3399: Fixing Single Entity MUL NPE with Null Campaign
++ Issue #3408: Player-controlled DropShips now properly register damage on post-battle resolution screen
++ Issue #2791, 3225: User is now able to delete scenarios from both briefing tab and StratCon map using GM mode
++ RFE #3410: Scenario templates can now load force definition from fixed MUL file; must be located in data/scenariotemplates/fixedmuls
++ PR #3419: Moving Financial Institutions to Data
++ PR #3417: Scenarios can now subtract money as a "reward" when defining loot (to simulate drop costs/entry fees/etc)
++ PR #3426: Canceling out of GM -> Set Unit Quality dialog no longer generates an error message
++ PR #3431: Base Components: Adding AbstractMHQScrollablePanel and Fixing Company Generation Options Dialog Scrolling
++ PR #3424: Properly fail to load a Campaign when the version can't be parsed
++ PR #3445: Individual units contribute to BV/unit count for OpFor budger
++ PR #3446: Company Generator: Improving Missing Force Icon Handling
++ Updating to Gradle 7.5.1 from 6.7
++ Updating to grgit 5.0.0 from 4.1.1
++ Updating to FlatLAF 2.4 from 2.2
 + Updating to Commonmark 0.19.0 from 0.18.2
++ Updating to Log4j 2.18.0 from 2.17.2
++ Updating to Joda Time 2.11.1 from 2.11.0
 + Updating to Mockito 4.6.1 from 4.5.1
++ Updating to JUnit 5.9.0 from 5.8.2
 
 0.49.8 (2022-05-27 1430 UTC)
 + PR #3117: Adding Build-Date to the Manifest File

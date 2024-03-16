@@ -172,10 +172,9 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     @Override
-    protected void writeToXmlEnd(PrintWriter pw1, int indent) {
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent + 1, "bayEqNum", bayEqNum);
-
-        super.writeToXmlEnd(pw1, indent);
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bayEqNum", bayEqNum);
+        super.writeToXMLEnd(pw, indent);
     }
 
     @Override

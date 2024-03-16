@@ -21,6 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -149,7 +150,7 @@ public class DropshipDockingCollar extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         return null;
     }
 
@@ -179,10 +180,10 @@ public class DropshipDockingCollar extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        MHQXMLUtility.writeSimpleXmlTag(pw1, indent, "collarType", collarType);
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "collarType", collarType);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -196,8 +197,8 @@ public class DropshipDockingCollar extends Part {
                 if (wn2.getNodeName().equalsIgnoreCase("collarType")) {
                     collarType = Integer.parseInt(wn2.getTextContent());
                 }
-            } catch (Exception e) {
-                LogManager.getLogger().error("", e);
+            } catch (Exception ex) {
+                LogManager.getLogger().error("", ex);
             }
         }
     }

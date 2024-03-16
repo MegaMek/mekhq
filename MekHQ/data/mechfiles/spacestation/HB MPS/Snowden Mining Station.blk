@@ -16,9 +16,9 @@ SpaceStation
 Snowden Mining Station
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 5093
@@ -35,6 +35,10 @@ Snowden Mining Station
 <type>
 IS Level 3
 </type>
+
+<role>
+None
+</role>
 
 <designtype>
 0
@@ -160,7 +164,7 @@ Small Laser
 </structural_integrity>
 
 <source>
-HB:MPS - Age of War
+Handbook: Major Periphery States
 </source>
 
 <tonnage>

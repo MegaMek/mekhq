@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2023 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -24,7 +24,6 @@ import megamek.common.Jumpship;
 import megamek.common.SmallCraft;
 import megamek.common.Tank;
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -45,6 +44,7 @@ import java.util.stream.Collectors;
 
 public enum PersonnelTableModelColumn {
     //region Enum Declarations
+    PERSON("PersonnelTableModelColumn.PERSON.text"),
     RANK("PersonnelTableModelColumn.RANK.text"),
     FIRST_NAME("PersonnelTableModelColumn.FIRST_NAME.text"),
     LAST_NAME("PersonnelTableModelColumn.LAST_NAME.text"),
@@ -96,6 +96,13 @@ public enum PersonnelTableModelColumn {
     DUE_DATE("PersonnelTableModelColumn.DUE_DATE.text"),
     RETIREMENT_DATE("PersonnelTableModelColumn.RETIREMENT_DATE.text"),
     DEATH_DATE("PersonnelTableModelColumn.DEATH_DATE.text"),
+    COMMANDER("PersonnelTableModelColumn.COMMANDER.text"),
+    FOUNDER("PersonnelTableModelColumn.FOUNDER.text"),
+    CLAN_PERSONNEL("PersonnelTableModelColumn.CLAN_PERSONNEL.text"),
+    MARRIAGEABLE("PersonnelTableModelColumn.MARRIAGEABLE.text"),
+    DIVORCEABLE("PersonnelTableModelColumn.DIVORCEABLE.text"),
+    TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
+    IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
     EDGE("PersonnelTableModelColumn.EDGE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
@@ -107,7 +114,7 @@ public enum PersonnelTableModelColumn {
     private final String name;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
@@ -117,6 +124,10 @@ public enum PersonnelTableModelColumn {
     //endregion Constructors
 
     //region Boolean Comparison Methods
+    public boolean isPerson() {
+        return this == PERSON;
+    }
+
     public boolean isRank() {
         return this == RANK;
     }
@@ -313,6 +324,42 @@ public enum PersonnelTableModelColumn {
         return this == DUE_DATE;
     }
 
+    public boolean isRetirementDate() {
+        return this == RETIREMENT_DATE;
+    }
+
+    public boolean isDeathDate() {
+        return this == DEATH_DATE;
+    }
+
+    public boolean isCommander() {
+        return this == COMMANDER;
+    }
+
+    public boolean isFounder() {
+        return this == FOUNDER;
+    }
+
+    public boolean isClanPersonnel() {
+        return this == CLAN_PERSONNEL;
+    }
+
+    public boolean isMarriageable() {
+        return this == MARRIAGEABLE;
+    }
+
+    public boolean isDivorceable() {
+        return this == DIVORCEABLE;
+    }
+
+    public boolean isTryingToConceive() {
+        return this == TRYING_TO_CONCEIVE;
+    }
+
+    public boolean isImmortal() {
+        return this == IMMORTAL;
+    }
+
     public boolean isToughness() {
         return this == TOUGHNESS;
     }
@@ -338,6 +385,8 @@ public enum PersonnelTableModelColumn {
                                final Person person, final boolean loadAssignmentFromMarket,
                                final boolean groupByUnit) {
         switch (this) {
+            case PERSON:
+                return "";
             case RANK:
                 return person.makeHTMLRank();
             case FIRST_NAME:
@@ -383,13 +432,14 @@ public enum PersonnelTableModelColumn {
             case CALLSIGN:
                 return person.getCallsign();
             case AGE:
-                return Integer.toString(person.getAge(campaign.getLocalDate()));
+            case BIRTHDAY:
+                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getBirthday());
             case PERSONNEL_STATUS:
                 return person.getStatus().toString();
             case GENDER:
-                return GenderDescriptors.MALE_FEMALE.getDescriptorCapitalized(person.getGender());
+                return GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender());
             case SKILL_LEVEL:
-                return person.getSkillSummary(campaign);
+                return person.getSkillLevel(campaign, false).toString();
             case PERSONNEL_ROLE:
                 return person.getRoleDesc();
             case UNIT_ASSIGNMENT: {
@@ -574,8 +624,6 @@ public enum PersonnelTableModelColumn {
             case ORIGIN_PLANET:
                 final Planet originPlanet = person.getOriginPlanet();
                 return (originPlanet == null) ? "" : originPlanet.getName(campaign.getLocalDate());
-            case BIRTHDAY:
-                return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getBirthday());
             case RECRUITMENT_DATE:
                 return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRecruitment());
             case LAST_RANK_CHANGE_DATE:
@@ -586,6 +634,20 @@ public enum PersonnelTableModelColumn {
                 return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getRetirement());
             case DEATH_DATE:
                 return MekHQ.getMHQOptions().getDisplayFormattedDate(person.getDateOfDeath());
+            case COMMANDER:
+                return resources.getString(person.isCommander() ? "Yes.text" : "No.text");
+            case FOUNDER:
+                return resources.getString(person.isFounder() ? "Yes.text" : "No.text");
+            case CLAN_PERSONNEL:
+                return resources.getString(person.isClanPersonnel() ? "Yes.text" : "No.text");
+            case MARRIAGEABLE:
+                return resources.getString(person.getGenealogy().hasSpouse() ? "NA.text" : (person.isMarriageable() ? "Yes.text" : "No.text"));
+            case DIVORCEABLE:
+                return resources.getString(person.getGenealogy().hasSpouse() ? (person.isDivorceable() ? "Yes.text" : "No.text") : "NA.text");
+            case TRYING_TO_CONCEIVE:
+                return resources.getString(person.getGender().isFemale() ? (person.isTryingToConceive() ? "Yes.text" : "No.text") : "NA.text");
+            case IMMORTAL:
+                return resources.getString(person.getStatus().isDead() ? "NA.text" : (person.isImmortal() ? "Yes.text" : "No.text"));
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
             case EDGE:
@@ -598,6 +660,15 @@ public enum PersonnelTableModelColumn {
                 return person.getPortrait().toString();
             default:
                 return "UNIMPLEMENTED";
+        }
+    }
+
+    public @Nullable String getDisplayText(final Campaign campaign, final Person person) {
+        switch (this) {
+            case AGE:
+                return Integer.toString(person.getAge(campaign.getLocalDate()));
+            default:
+                return null;
         }
     }
 
@@ -626,6 +697,9 @@ public enum PersonnelTableModelColumn {
 
     public int getWidth() {
         switch (this) {
+            case PERSON:
+            case UNIT_ASSIGNMENT:
+                return 125;
             case RANK:
             case FIRST_NAME:
             case GIVEN_NAME:
@@ -641,8 +715,6 @@ public enum PersonnelTableModelColumn {
             case PERSONNEL_ROLE:
             case FORCE:
                 return 100;
-            case UNIT_ASSIGNMENT:
-                return 125;
             default:
                 return 20;
         }
@@ -650,6 +722,7 @@ public enum PersonnelTableModelColumn {
 
     public int getAlignment() {
         switch (this) {
+            case PERSON:
             case RANK:
             case FIRST_NAME:
             case LAST_NAME:
@@ -679,7 +752,7 @@ public enum PersonnelTableModelColumn {
             case GRAPHIC: {
                 table.setRowHeight(80);
                 switch (this) {
-                    case RANK:
+                    case PERSON:
                     case UNIT_ASSIGNMENT:
                     case FORCE:
                         return true;
@@ -701,7 +774,7 @@ public enum PersonnelTableModelColumn {
                     case XP:
                         return true;
                     case SALARY:
-                        return campaign.getCampaignOptions().payForSalaries();
+                        return campaign.getCampaignOptions().isPayForSalaries();
                     default:
                         return false;
                 }
@@ -791,10 +864,11 @@ public enum PersonnelTableModelColumn {
                     case AGE:
                     case PERSONNEL_STATUS:
                     case PERSONNEL_ROLE:
+                    case FOUNDER:
                         return true;
                     case ORIGIN_FACTION:
                     case ORIGIN_PLANET:
-                        return campaign.getCampaignOptions().showOriginFaction();
+                        return campaign.getCampaignOptions().isShowOriginFaction();
                     default:
                         return false;
                 }
@@ -825,14 +899,31 @@ public enum PersonnelTableModelColumn {
                     case DEATH_DATE:
                         return true;
                     case RECRUITMENT_DATE:
-                        return campaign.getCampaignOptions().getUseTimeInService();
+                        return campaign.getCampaignOptions().isUseTimeInService();
                     case LAST_RANK_CHANGE_DATE:
-                        return campaign.getCampaignOptions().getUseTimeInRank();
+                        return campaign.getCampaignOptions().isUseTimeInRank();
                     case DUE_DATE:
                         return campaign.getCampaignOptions().isUseManualProcreation()
                                 || !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
                     case RETIREMENT_DATE:
                         return campaign.getCampaignOptions().isUseRetirementDateTracking();
+                    default:
+                        return false;
+                }
+            }
+            case FLAGS: {
+                switch (this) {
+                    case RANK:
+                    case FIRST_NAME:
+                    case LAST_NAME:
+                    case COMMANDER:
+                    case FOUNDER:
+                    case CLAN_PERSONNEL:
+                    case MARRIAGEABLE:
+                    case DIVORCEABLE:
+                    case TRYING_TO_CONCEIVE:
+                    case IMMORTAL:
+                        return true;
                     default:
                         return false;
                 }
@@ -858,36 +949,18 @@ public enum PersonnelTableModelColumn {
         }
     }
 
-    public @Nullable Comparator<?> getComparator(final Campaign campaign) {
+    public Comparator<?> getComparator(final Campaign campaign) {
         switch (this) {
             case RANK:
                 return new PersonRankStringSorter(campaign);
-            case FIRST_NAME:
-            case LAST_NAME:
-            case PRE_NOMINAL:
-            case GIVEN_NAME:
-            case SURNAME:
-            case BLOODNAME:
-            case POST_NOMINAL:
-            case CALLSIGN:
-            case PERSONNEL_STATUS:
-            case GENDER:
-            case PERSONNEL_ROLE:
-            case UNIT_ASSIGNMENT:
-            case FORCE:
-            case ORIGIN_FACTION:
-            case ORIGIN_PLANET:
-            case PORTRAIT_PATH:
-                return new NaturalOrderComparator();
             case AGE:
-            case INJURIES:
-            case KILLS:
-            case XP:
-            case TOUGHNESS:
-            case EDGE:
-            case SPA_COUNT:
-            case IMPLANT_COUNT:
-                return Comparator.comparingInt(s -> Integer.parseInt((String) s));
+            case BIRTHDAY:
+            case RECRUITMENT_DATE:
+            case LAST_RANK_CHANGE_DATE:
+            case DUE_DATE:
+            case RETIREMENT_DATE:
+            case DEATH_DATE:
+                return new DateStringComparator();
             case SKILL_LEVEL:
                 return new LevelSorter();
             case MEK:
@@ -913,17 +986,18 @@ public enum PersonnelTableModelColumn {
             case NEGOTIATION:
             case SCROUNGE:
                 return new BonusSorter();
+            case INJURIES:
+            case KILLS:
+            case XP:
+            case TOUGHNESS:
+            case EDGE:
+            case SPA_COUNT:
+            case IMPLANT_COUNT:
+                return new IntegerStringSorter();
             case SALARY:
                 return new FormattedNumberSorter();
-            case BIRTHDAY:
-            case RECRUITMENT_DATE:
-            case LAST_RANK_CHANGE_DATE:
-            case DUE_DATE:
-            case RETIREMENT_DATE:
-            case DEATH_DATE:
-                return new DateStringComparator();
             default:
-                return null;
+                return new NaturalOrderComparator();
         }
     }
 

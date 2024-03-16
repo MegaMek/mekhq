@@ -21,7 +21,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.AmmoType;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.InfantryAmmoBin;
@@ -42,9 +41,9 @@ public class SmallSVAmmoSwapDialog extends JDialog {
     private final List<WeaponRow> rows = new ArrayList<>();
     private boolean canceled = true;
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.SmallSVAmmoSwapDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
-    public SmallSVAmmoSwapDialog(Frame frame, Unit unit) {
+    public SmallSVAmmoSwapDialog(final JFrame frame, final Unit unit) {
         super(frame, true);
         setTitle(unit.getName());
         getContentPane().setLayout(new BorderLayout());
@@ -56,7 +55,7 @@ public class SmallSVAmmoSwapDialog extends JDialog {
         // from there.
         for (Part part : unit.getParts()) {
             if ((part instanceof InfantryAmmoBin)
-                    && (((InfantryAmmoBin) part).getType().getMunitionType() == AmmoType.M_INFERNO)) {
+                    && (((InfantryAmmoBin) part).getType().getMunitionType().contains(AmmoType.Munitions.M_INFERNO))) {
                 WeaponRow row = new WeaponRow((InfantryAmmoBin) part);
                 rows.add(row);
                 panMain.add(row);

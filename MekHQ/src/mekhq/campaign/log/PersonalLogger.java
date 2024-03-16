@@ -19,7 +19,6 @@
 package mekhq.campaign.log;
 
 import megamek.codeUtilities.StringUtility;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -35,7 +34,7 @@ import java.util.ResourceBundle;
  */
 public class PersonalLogger {
     private static final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public static void spouseKia(Person spouse, Person person, LocalDate date) {
         String message = resources.getString("spouseKia.text");
@@ -56,7 +55,7 @@ public class PersonalLogger {
         String message = resources.getString("marriageNameChange.text");
 
         message = MessageFormat.format(message,
-                GenderDescriptors.HIS_HER.getDescriptor(person.getGender()),
+                GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender()),
                 (!StringUtility.isNullOrBlank(person.getMaidenName())) ? person.getMaidenName()
                         : resources.getString("marriageNameChange.emptyMaidenName.text"),
                 person.getSurname(), spouse.getFullName());

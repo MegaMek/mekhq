@@ -21,7 +21,6 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Injury;
@@ -42,7 +41,7 @@ import java.util.ResourceBundle;
  * @author Ralgith
  */
 public class EditPersonnelInjuriesDialog extends JDialog {
-    private Frame frame;
+    private JFrame frame;
     private Campaign campaign;
     private Person person;
     private InjuryTableModel injuryModel;
@@ -51,15 +50,15 @@ public class EditPersonnelInjuriesDialog extends JDialog {
     private JButton btnDelete;
     private JTable injuriesTable;
 
-    /** Creates new form EditPersonnelInjuriesDialog */
-    public EditPersonnelInjuriesDialog(Frame parent, boolean modal, Campaign c, Person p) {
-        super(parent, modal);
-        this.frame = parent;
-        campaign = c;
-        person = p;
-        injuryModel = new InjuryTableModel(p.getInjuries());
+    public EditPersonnelInjuriesDialog(final JFrame frame, final boolean modal,
+                                       final Campaign campaign, final Person person) {
+        super(frame, modal);
+        this.frame = frame;
+        this.campaign = campaign;
+        this.person = person;
+        injuryModel = new InjuryTableModel(person.getInjuries());
         initComponents();
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
@@ -70,7 +69,7 @@ public class EditPersonnelInjuriesDialog extends JDialog {
         btnDelete = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelInjuriesDialog",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("Form.title") + " " + person.getFullName());

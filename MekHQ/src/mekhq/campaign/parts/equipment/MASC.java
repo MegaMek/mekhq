@@ -70,7 +70,7 @@ public class MASC extends EquipmentPart {
             return 0;
         }
         //supercharger tonnage will need to be set by hand in parts store
-        if (TechConstants.isClan(type.getTechLevel(campaign.getGameYear()))) {
+        if (isClan()) {
             return Math.round(getUnitTonnage() / 25.0f);
         }
         return Math.round(getUnitTonnage() / 20.0f);
@@ -104,27 +104,14 @@ public class MASC extends EquipmentPart {
                 && getEngineRating() == ((MASC) part).getEngineRating();
     }
 
-
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<equipmentNum>"
-                +equipmentNum
-                +"</equipmentNum>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<typeName>"
-                +MHQXMLUtility.escape(type.getInternalName())
-                +"</typeName>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<equipTonnage>"
-                +equipTonnage
-                +"</equipTonnage>");
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<engineRating>"
-                +engineRating
-                +"</engineRating>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentNum", equipmentNum);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipTonnage", equipTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "engineRating", engineRating);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override

@@ -234,8 +234,8 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 		<parties>FWL,FWLR</parties>
 	</war>
 
-	<!-- Aurigan Civil War: setting for HBS' BattleTech game. The dates are very roughly estimated based on descriptions in game and in the sourcebook. That means they are semi-canon, and should be updated if possible -->
-	<war name="Aurigan Civil War" start="3025-01-25" end ="3025-09-01">
+	<!-- Aurigan Civil War: setting for HBS' BattleTech game. The dates are very roughly estimated based on descriptions in game and in the sourcebook. That means they are semi-canon, and should be updated if possible. Ulysses Update: Changed these to match the planetary control dates better in MHQ to help contract generation. -->
+	<war name="Aurigan Civil War" start="3025-01-25" end ="3025-12-30">
 		<parties>ARC,ARD</parties>
 		<parties start="3025-05-09" end="3025-08-15">ARC,TC</parties>
 	</war>
@@ -455,7 +455,8 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 	<war name="Falcon-Viper War" start="3061-04-01" end="3061-07-04">
 		<parties>CJF,CSV</parties>
 	</war>
-	<war name="FedCom Civil War" start="3062-12-08" end="3067-04-20">
+	<war name="FedCom Civil War" start="3062-11-16" end="3067-04-20">
+		<parties>LA,FC</parties>
 		<parties>LA,FS</parties>
 		<parties>FS,DC</parties>
 	</war>
@@ -550,6 +551,10 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 		<!-- start date is a guess based on conquest beginning late January 3080 -->
 		<parties>CGS,NC,UC</parties>
 	</alliance>
+	<alliance name="Scorpion Empire" start="3141-03-03">
+		<!-- start date is based on the Hanseatic Crusade PDF stating the war started January 3rd of 3040 and lasted 15 months -->
+		<parties>CGS,NC,UC,HL</parties>
+	</alliance>
 
 	<war name="Second Dominion-Combine War" start="3098-07-01" end="3101-06-30">
 		<parties>CGB,DC</parties>
@@ -629,12 +634,12 @@ they shouldn't be fighting DC and Stone's Coalition, so I make them neutral for 
 		<parties>OC,EF</parties>
 	</alliance>
 	<alliance start="3020-01-01" end="3057-12-31">
-		<parties>FS,LA,FS</parties>
+		<parties>FS,LA,FC</parties>
 	</alliance>
-	<alliance>
+	<alliance start="3029-01-01" end="3063-06-10">
 		<parties>FS,LA,FC,SIC</parties>
 	</alliance>
-	<alliance end="3067-03-28">
+	<alliance start="3029-03-03" end="3031-09-01">
 		<parties>FS,FC,LA,TFR</parties>
 	</alliance>
 	<alliance start="3059-05-20" end="3141-06-14">

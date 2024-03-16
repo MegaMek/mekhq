@@ -29,8 +29,8 @@ public class PercentageRandomDeath extends AbstractDeath {
     //endregion Variable Declarations
 
     //region Constructors
-    public PercentageRandomDeath(final CampaignOptions options) {
-        super(RandomDeathMethod.PERCENTAGE, options);
+    public PercentageRandomDeath(final CampaignOptions options, final boolean initializeCauses) {
+        super(RandomDeathMethod.PERCENTAGE, options, initializeCauses);
         setPercentage(options.getPercentageRandomDeathChance());
     }
     //endregion Constructors

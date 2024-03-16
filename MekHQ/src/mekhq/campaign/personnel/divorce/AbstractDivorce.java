@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,7 +19,6 @@
 package mekhq.campaign.personnel.divorce;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -44,25 +43,25 @@ import java.util.ResourceBundle;
 public abstract class AbstractDivorce {
     //region Variable Declarations
     private final RandomDivorceMethod method;
-    private boolean useClannerDivorce;
+    private boolean useClanPersonnelDivorce;
     private boolean usePrisonerDivorce;
     private boolean useRandomOppositeSexDivorce;
     private boolean useRandomSameSexDivorce;
-    private boolean useRandomClannerDivorce;
+    private boolean useRandomClanPersonnelDivorce;
     private boolean useRandomPrisonerDivorce;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
     protected AbstractDivorce(final RandomDivorceMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClannerDivorce(options.isUseClannerDivorce());
+        setUseClanPersonnelDivorce(options.isUseClanPersonnelDivorce());
         setUsePrisonerDivorce(options.isUsePrisonerDivorce());
         setUseRandomOppositeSexDivorce(options.isUseRandomOppositeSexDivorce());
         setUseRandomSameSexDivorce(options.isUseRandomSameSexDivorce());
-        setUseRandomClannerDivorce(options.isUseRandomClannerDivorce());
+        setUseRandomClanPersonnelDivorce(options.isUseRandomClanPersonnelDivorce());
         setUseRandomPrisonerDivorce(options.isUseRandomPrisonerDivorce());
     }
     //endregion Constructors
@@ -72,12 +71,12 @@ public abstract class AbstractDivorce {
         return method;
     }
 
-    public boolean isUseClannerDivorce() {
-        return useClannerDivorce;
+    public boolean isUseClanPersonnelDivorce() {
+        return useClanPersonnelDivorce;
     }
 
-    public void setUseClannerDivorce(final boolean useClannerDivorce) {
-        this.useClannerDivorce = useClannerDivorce;
+    public void setUseClanPersonnelDivorce(final boolean useClanPersonnelDivorce) {
+        this.useClanPersonnelDivorce = useClanPersonnelDivorce;
     }
 
     public boolean isUsePrisonerDivorce() {
@@ -104,12 +103,12 @@ public abstract class AbstractDivorce {
         this.useRandomSameSexDivorce = useRandomSameSexDivorce;
     }
 
-    public boolean isUseRandomClannerDivorce() {
-        return useRandomClannerDivorce;
+    public boolean isUseRandomClanPersonnelDivorce() {
+        return useRandomClanPersonnelDivorce;
     }
 
-    public void setUseRandomClannerDivorce(final boolean useRandomClannerDivorce) {
-        this.useRandomClannerDivorce = useRandomClannerDivorce;
+    public void setUseRandomClanPersonnelDivorce(final boolean useRandomClanPersonnelDivorce) {
+        this.useRandomClanPersonnelDivorce = useRandomClanPersonnelDivorce;
     }
 
     public boolean isUseRandomPrisonerDivorce() {
@@ -134,22 +133,22 @@ public abstract class AbstractDivorce {
             return resources.getString("cannotDivorce.NotDivorceable.text");
         } else if (!person.getGenealogy().getSpouse().isDivorceable()) {
             return resources.getString("cannotDivorce.SpouseNotDivorceable.text");
-        } else if (!isUseClannerDivorce() && person.isClanPersonnel()) {
-            return resources.getString("cannotDivorce.Clanner.text");
-        } else if (!isUseClannerDivorce() && person.getGenealogy().getSpouse().isClanPersonnel()) {
-            return resources.getString("cannotDivorce.ClannerSpouse.text");
-        } else if (!isUsePrisonerDivorce() && person.getPrisonerStatus().isPrisoner()) {
+        } else if (!isUseClanPersonnelDivorce() && person.isClanPersonnel()) {
+            return resources.getString("cannotDivorce.ClanPersonnel.text");
+        } else if (!isUseClanPersonnelDivorce() && person.getGenealogy().getSpouse().isClanPersonnel()) {
+            return resources.getString("cannotDivorce.ClanPersonnelSpouse.text");
+        } else if (!isUsePrisonerDivorce() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotDivorce.Prisoner.text");
-        } else if (!isUsePrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isPrisoner()) {
+        } else if (!isUsePrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotDivorce.PrisonerSpouse.text");
         } else if (randomDivorce) {
-            if (!isUseRandomClannerDivorce() && person.isClanPersonnel()) {
-                return resources.getString("cannotDivorce.RandomClanner.text");
-            } else if (!isUseRandomClannerDivorce() && person.getGenealogy().getSpouse().isClanPersonnel()) {
-                return resources.getString("cannotDivorce.RandomClannerSpouse.text");
-            } else if (!isUseRandomPrisonerDivorce() && person.getPrisonerStatus().isPrisoner()) {
+            if (!isUseRandomClanPersonnelDivorce() && person.isClanPersonnel()) {
+                return resources.getString("cannotDivorce.RandomClanPersonnel.text");
+            } else if (!isUseRandomClanPersonnelDivorce() && person.getGenealogy().getSpouse().isClanPersonnel()) {
+                return resources.getString("cannotDivorce.RandomClanPersonnelSpouse.text");
+            } else if (!isUseRandomPrisonerDivorce() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotDivorce.RandomPrisoner.text");
-            } else if (!isUseRandomPrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isPrisoner()) {
+            } else if (!isUseRandomPrisonerDivorce() && person.getGenealogy().getSpouse().getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotDivorce.RandomPrisonerSpouse.text");
             }
             final boolean sameSex = person.getGenealogy().getSpouse().getGender() == person.getGender();
@@ -174,7 +173,7 @@ public abstract class AbstractDivorce {
      * @param person the person whose spouse has died
      */
     public void widowed(final Campaign campaign, final LocalDate today, final Person person) {
-        divorce(campaign, today, person, campaign.getCampaignOptions().getKeepMarriedNameUponSpouseDeath()
+        divorce(campaign, today, person, campaign.getCampaignOptions().isKeepMarriedNameUponSpouseDeath()
                 ? SplittingSurnameStyle.BOTH_KEEP_SURNAME : SplittingSurnameStyle.ORIGIN_CHANGES_SURNAME);
     }
 
@@ -216,7 +215,8 @@ public abstract class AbstractDivorce {
             }
             origin.setMaidenName(null);
             origin.getGenealogy().setSpouse(null);
-        } else { // Origin is Dead or MIA
+        } else {
+            // Origin is Dead or MIA
             reason = FormerSpouseReason.WIDOWED;
 
             if (origin.getStatus().isKIA()) {
@@ -246,8 +246,8 @@ public abstract class AbstractDivorce {
             return;
         }
 
-        final boolean sameSex = person.getGenealogy().getSpouse().getGender() == person.getGender();
-        if ((!sameSex && randomOppositeSexDivorce(person)) || (sameSex && randomSameSexDivorce(person))) {
+        if ((person.getGenealogy().getSpouse().getGender() == person.getGender())
+                ? randomSameSexDivorce(person) : randomOppositeSexDivorce(person)) {
             divorce(campaign, today, person, SplittingSurnameStyle.WEIGHTED);
         }
     }

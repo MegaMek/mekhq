@@ -18,12 +18,9 @@
  */
 package mekhq.gui.utilities;
 
-import java.awt.Color;
-import java.awt.Component;
-
-import javax.swing.JTable;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 
 public class MekHqTableCellRenderer extends DefaultTableCellRenderer {
     @Override

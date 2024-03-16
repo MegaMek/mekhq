@@ -21,6 +21,7 @@
 package mekhq.campaign.parts;
 
 import megamek.common.*;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -125,11 +126,11 @@ public class MekActuator extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent + 1) + "<type>" + type + "</type>");
-        pw1.println(MHQXMLUtility.indentStr(indent + 1) + "<location>" + location + "</location>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "type", type);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "location", location);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -236,7 +237,7 @@ public class MekActuator extends Part {
             if (!StringUtils.isEmpty(getLocationName())) {
                 sj.add(getLocationName());
             }
-            if (includeRepairDetails && campaign.getCampaignOptions().payForRepairs()) {
+            if (includeRepairDetails && campaign.getCampaignOptions().isPayForRepairs()) {
                 sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
             return sj.toString();
@@ -256,7 +257,7 @@ public class MekActuator extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (null == unit) {
             return null;
         }
@@ -313,7 +314,7 @@ public class MekActuator extends Part {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.ACTUATOR;
     }
 }

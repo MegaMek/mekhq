@@ -23,6 +23,7 @@ import megamek.common.AmmoType;
 import megamek.common.EquipmentTypeLookup;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.equipment.InfantryAmmoBin;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
@@ -38,10 +39,7 @@ import java.io.StringWriter;
 
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static mekhq.campaign.parts.AmmoUtilities.getInfantryWeapon;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 public class InfantryAmmoStorageTest {
@@ -134,7 +132,7 @@ public class InfantryAmmoStorageTest {
         // Deserialize the AmmoStorage
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof InfantryAmmoStorage);
+        assertInstanceOf(InfantryAmmoStorage.class, deserializedPart);
 
         InfantryAmmoStorage deserialized = (InfantryAmmoStorage) deserializedPart;
 

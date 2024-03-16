@@ -16,9 +16,9 @@ Aero
 Aeshna Heavy Drone Fighter
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 15
@@ -35,6 +35,10 @@ Aeshna Heavy Drone Fighter
 <type>
 IS Level 4
 </type>
+
+<role>
+Attack Fighter
+</role>
 
 <motion_type>
 Aerodyne
@@ -116,7 +120,7 @@ Aerospace Smart Robotic Control System (Improved) gives the Aeshna a Piloting Sk
 </notes>
 
 <source>
-JHS:Terra - Jihad
+Jihad Hot Spots: Terra
 </source>
 
 <tonnage>

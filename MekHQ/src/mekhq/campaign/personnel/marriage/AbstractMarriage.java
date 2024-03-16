@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.marriage;
 import megamek.common.Compute;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -44,23 +43,23 @@ import java.util.stream.Collectors;
 public abstract class AbstractMarriage {
     //region Variable Declarations
     private final RandomMarriageMethod method;
-    private boolean useClannerMarriages;
+    private boolean useClanPersonnelMarriages;
     private boolean usePrisonerMarriages;
     private boolean useRandomSameSexMarriages;
-    private boolean useRandomClannerMarriages;
+    private boolean useRandomClanPersonnelMarriages;
     private boolean useRandomPrisonerMarriages;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
     protected AbstractMarriage(final RandomMarriageMethod method, final CampaignOptions options) {
         this.method = method;
-        setUseClannerMarriages(options.isUseClannerMarriages());
+        setUseClanPersonnelMarriages(options.isUseClanPersonnelMarriages());
         setUsePrisonerMarriages(options.isUsePrisonerMarriages());
         setUseRandomSameSexMarriages(options.isUseRandomSameSexMarriages());
-        setUseRandomClannerMarriages(options.isUseRandomClannerMarriages());
+        setUseRandomClanPersonnelMarriages(options.isUseRandomClanPersonnelMarriages());
         setUseRandomPrisonerMarriages(options.isUseRandomPrisonerMarriages());
     }
     //endregion Constructors
@@ -70,12 +69,12 @@ public abstract class AbstractMarriage {
         return method;
     }
 
-    public boolean isUseClannerMarriages() {
-        return useClannerMarriages;
+    public boolean isUseClanPersonnelMarriages() {
+        return useClanPersonnelMarriages;
     }
 
-    public void setUseClannerMarriages(final boolean useClannerMarriages) {
-        this.useClannerMarriages = useClannerMarriages;
+    public void setUseClanPersonnelMarriages(final boolean useClanPersonnelMarriages) {
+        this.useClanPersonnelMarriages = useClanPersonnelMarriages;
     }
 
     public boolean isUsePrisonerMarriages() {
@@ -94,12 +93,12 @@ public abstract class AbstractMarriage {
         this.useRandomSameSexMarriages = useRandomSameSexMarriages;
     }
 
-    public boolean isUseRandomClannerMarriages() {
-        return useRandomClannerMarriages;
+    public boolean isUseRandomClanPersonnelMarriages() {
+        return useRandomClanPersonnelMarriages;
     }
 
-    public void setUseRandomClannerMarriages(final boolean useRandomClannerMarriages) {
-        this.useRandomClannerMarriages = useRandomClannerMarriages;
+    public void setUseRandomClanPersonnelMarriages(final boolean useRandomClanPersonnelMarriages) {
+        this.useRandomClanPersonnelMarriages = useRandomClanPersonnelMarriages;
     }
 
     public boolean isUseRandomPrisonerMarriages() {
@@ -131,14 +130,14 @@ public abstract class AbstractMarriage {
             return resources.getString("cannotMarry.Deployed.text");
         } else if (person.getAge(today) < campaign.getCampaignOptions().getMinimumMarriageAge()) {
             return resources.getString("cannotMarry.TooYoung.text");
-        } else if (!isUseClannerMarriages() && person.isClanPersonnel()) {
-            return resources.getString("cannotMarry.Clanner.text");
-        } else if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isPrisoner()) {
+        } else if (!isUseClanPersonnelMarriages() && person.isClanPersonnel()) {
+            return resources.getString("cannotMarry.ClanPersonnel.text");
+        } else if (!isUsePrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
             return resources.getString("cannotMarry.Prisoner.text");
         } else if (randomMarriage) {
-            if (!isUseRandomClannerMarriages() && person.isClanPersonnel()) {
-                return resources.getString("cannotMarry.RandomClanner.text");
-            } else if (!isUseRandomPrisonerMarriages() && person.getPrisonerStatus().isPrisoner()) {
+            if (!isUseRandomClanPersonnelMarriages() && person.isClanPersonnel()) {
+                return resources.getString("cannotMarry.RandomClanPersonnel.text");
+            } else if (!isUseRandomPrisonerMarriages() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotMarry.RandomPrisoner.text");
             }
         }
@@ -171,9 +170,9 @@ public abstract class AbstractMarriage {
                         campaign.getCampaignOptions().getCheckMutualAncestorsDepth())) {
             return false;
         } else if (randomMarriage) {
-            return person.getPrisonerStatus().isPrisoner() == potentialSpouse.getPrisonerStatus().isPrisoner();
+            return person.getPrisonerStatus().isCurrentPrisoner() == potentialSpouse.getPrisonerStatus().isCurrentPrisoner();
         } else {
-            return !potentialSpouse.getPrisonerStatus().isPrisoner() || person.getPrisonerStatus().isPrisoner();
+            return !potentialSpouse.getPrisonerStatus().isCurrentPrisoner() || person.getPrisonerStatus().isCurrentPrisoner();
         }
     }
 
@@ -255,8 +254,8 @@ public abstract class AbstractMarriage {
      * @param person the person who is getting randomly married
      * @param sameSex whether the marriage is homosexual or heterosexual
      */
-    private void marryRandomSpouse(final Campaign campaign, final LocalDate today,
-                                   final Person person, final boolean sameSex) {
+    protected void marryRandomSpouse(final Campaign campaign, final LocalDate today,
+                                     final Person person, final boolean sameSex) {
         final Gender gender = sameSex ? person.getGender() : (person.getGender().isMale() ? Gender.FEMALE : Gender.MALE);
         final List<Person> potentials = campaign.getActivePersonnel().stream()
                 .filter(potentialSpouse -> isPotentialRandomSpouse(campaign, today, person, potentialSpouse, gender))
@@ -278,9 +277,9 @@ public abstract class AbstractMarriage {
      * @param gender the desired gender to be married to
      * @return true if they are a valid potential random spouse
      */
-    private boolean isPotentialRandomSpouse(final Campaign campaign, final LocalDate today,
-                                            final Person person, final Person potentialSpouse,
-                                            final Gender gender) {
+    protected boolean isPotentialRandomSpouse(final Campaign campaign, final LocalDate today,
+                                              final Person person, final Person potentialSpouse,
+                                              final Gender gender) {
         // A Potential Spouse must:
         // 1. Be the specified gender
         // 2. Be a safe spouse for the current person

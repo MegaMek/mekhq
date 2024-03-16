@@ -21,7 +21,6 @@ package mekhq.campaign;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.GameOptions;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.utilities.xml.MMXMLUtility;
 import mekhq.MekHQ;
@@ -83,8 +82,8 @@ public class CampaignPreset {
     private GameOptions gameOptions;
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences;
-    private Hashtable<String, SkillType> skills;
-    private Hashtable<String, SpecialAbility> specialAbilities;
+    private Map<String, SkillType> skills;
+    private Map<String, SpecialAbility> specialAbilities;
     //endregion Variable Declarations
 
     //region Constructors
@@ -95,7 +94,7 @@ public class CampaignPreset {
     public CampaignPreset(final boolean userData) {
         this("Title", "", userData, null, null, null, null,
                 2, true, null, null, null, null,
-                new Hashtable<>(), new Hashtable<>());
+                new HashMap<>(), new HashMap<>());
     }
 
     public CampaignPreset(final Campaign campaign) {
@@ -103,7 +102,7 @@ public class CampaignPreset {
                 campaign.getCurrentSystem().getPrimaryPlanet(), campaign.getRankSystem(), 2,
                 campaign.isGM(), null, campaign.getGameOptions(), campaign.getCampaignOptions(),
                 campaign.getRandomSkillPreferences(), SkillType.getSkillHash(),
-                SpecialAbility.getAllSpecialAbilities());
+                SpecialAbility.getSpecialAbilities());
     }
 
     public CampaignPreset(final String title, final String description, final boolean userData,
@@ -114,8 +113,8 @@ public class CampaignPreset {
                           final @Nullable GameOptions gameOptions,
                           final @Nullable CampaignOptions campaignOptions,
                           final @Nullable RandomSkillPreferences randomSkillPreferences,
-                          final Hashtable<String, SkillType> skills,
-                          final Hashtable<String, SpecialAbility> specialAbilities) {
+                          final Map<String, SkillType> skills,
+                          final Map<String, SpecialAbility> specialAbilities) {
         this.userData = userData;
 
         setTitle(title);
@@ -239,19 +238,19 @@ public class CampaignPreset {
         this.randomSkillPreferences = randomSkillPreferences;
     }
 
-    public Hashtable<String, SkillType> getSkills() {
+    public Map<String, SkillType> getSkills() {
         return skills;
     }
 
-    public void setSkills(final Hashtable<String, SkillType> skills) {
+    public void setSkills(final Map<String, SkillType> skills) {
         this.skills = skills;
     }
 
-    public Hashtable<String, SpecialAbility> getSpecialAbilities() {
+    public Map<String, SpecialAbility> getSpecialAbilities() {
         return specialAbilities;
     }
 
-    public void setSpecialAbilities(final Hashtable<String, SpecialAbility> specialAbilities) {
+    public void setSpecialAbilities(final Map<String, SpecialAbility> specialAbilities) {
         this.specialAbilities = specialAbilities;
     }
     //endregion Continuous
@@ -315,7 +314,7 @@ public class CampaignPreset {
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
             final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
-                    MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                    MekHQ.getMHQOptions().getLocale());
             JOptionPane.showMessageDialog(frame, resources.getString("CampaignPresetSaveFailure.text"),
                     resources.getString("CampaignPresetSaveFailure.title"), JOptionPane.ERROR_MESSAGE);
         }
@@ -363,7 +362,7 @@ public class CampaignPreset {
         }
 
         if (getRandomSkillPreferences() != null) {
-            getRandomSkillPreferences().writeToXml(pw, indent);
+            getRandomSkillPreferences().writeToXML(pw, indent);
         }
 
         if (!getSkills().isEmpty()) {
@@ -423,6 +422,13 @@ public class CampaignPreset {
     }
 
     public static @Nullable CampaignPreset parseFromXML(final NodeList nl, final Version version) {
+        if (MHQConstants.VERSION.isLowerThan(version)) {
+            LogManager.getLogger().error(String.format(
+                    "Cannot parse Campaign Preset from %s in older version %s.",
+                    version.toString(), MHQConstants.VERSION));
+            return null;
+        }
+
         final CampaignPreset preset = new CampaignPreset();
         try {
             for (int x = 0; x < nl.getLength(); x++) {

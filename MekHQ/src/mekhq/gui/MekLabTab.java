@@ -58,7 +58,7 @@ import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -191,8 +191,8 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     @Override
-    public MekHQTabType tabType() {
-        return MekHQTabType.MEK_LAB;
+    public MHQTabType tabType() {
+        return MHQTabType.MEK_LAB;
     }
 
     public Unit getUnit() {
@@ -237,9 +237,17 @@ public class MekLabTab extends CampaignGuiTab {
 
     public void resetUnit() {
         MechSummary mechSummary = MechSummaryCache.getInstance().getMech(unit.getEntity().getShortName());
+
+        if (mechSummary == null) {
+            LogManager.getLogger().error(String.format(
+                    "Cannot reset unit %s as it cannot be found in the cache.",
+                    unit.getEntity().getDisplayName()));
+            return;
+        }
+
         Entity entity;
         try {
-            entity = (new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName())).getEntity();
+            entity = new MechFileParser(mechSummary.getSourceFile(), mechSummary.getEntryName()).getEntity();
         } catch (EntityLoadingException ex) {
             LogManager.getLogger().error("", ex);
             return;
@@ -290,10 +298,7 @@ public class MekLabTab extends CampaignGuiTab {
         testEntity.correctEntity(sb);
 
         int walk = entity.getOriginalWalkMP();
-        int run = entity.getRunMP();
-        if (entity instanceof Mech) {
-            run = ((Mech) entity).getOriginalRunMPwithoutMASC();
-        }
+        int run = entity.getRunMP(MPCalculationSetting.NO_MASC);
         int jump = entity.getOriginalJumpMP();
         int heat = entity.getHeatCapacity();
 
@@ -455,10 +460,26 @@ public class MekLabTab extends CampaignGuiTab {
     }
 
     private abstract static class EntityPanel extends JTabbedPane implements RefreshListener, EntitySource {
+
+        private boolean refreshRequired = false;
         @Override
         public abstract Entity getEntity();
 
         abstract void setTechFaction(int techFaction);
+
+
+        @Override
+        public void scheduleRefresh() {
+            refreshRequired = true;
+            SwingUtilities.invokeLater(this::performRefresh);
+        }
+
+        private void performRefresh() {
+            if (refreshRequired) {
+                refreshRequired = false;
+                refreshAll();
+            }
+        }
     }
 
     private class AeroPanel extends EntityPanel {

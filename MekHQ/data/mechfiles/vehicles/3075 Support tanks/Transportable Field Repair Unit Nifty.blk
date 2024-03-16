@@ -16,9 +16,9 @@ SupportTank
 Nifty Transportable Field Repair Unit
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 4716
@@ -35,6 +35,10 @@ Nifty Transportable Field Repair Unit
 <type>
 IS Level 2
 </type>
+
+<role>
+None
+</role>
 
 <motion_type>
 Tracked
@@ -89,7 +93,7 @@ Lift Hoist/Arresting Hoist
 </structural_tech_rating>
 
 <source>
-TRO 3075 - Jihad
+TRO: 3075
 </source>
 
 <tonnage>

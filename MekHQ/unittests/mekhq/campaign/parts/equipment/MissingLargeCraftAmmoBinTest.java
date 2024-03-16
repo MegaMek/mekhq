@@ -58,13 +58,13 @@ public class MissingLargeCraftAmmoBinTest {
     }
 
     @Test
-    public void missingLargeCraftAmmoBinMassRepairOptionType() {
+    public void missingLargeCraftAmmoBinMRMSOptionType() {
         Campaign mockCampaign = mock(Campaign.class);
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
 
         MissingLargeCraftAmmoBin missingAmmoBin = new MissingLargeCraftAmmoBin(0, ammoType, 18, 25.0, mockCampaign);
 
-        assertEquals(PartRepairType.AMMO, missingAmmoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMUNITION, missingAmmoBin.getMRMSOptionType());
     }
 
     @Test
@@ -113,7 +113,7 @@ public class MissingLargeCraftAmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof MissingLargeCraftAmmoBin);
+        assertInstanceOf(MissingLargeCraftAmmoBin.class, deserializedPart);
 
         MissingLargeCraftAmmoBin deserialized = (MissingLargeCraftAmmoBin) deserializedPart;
 
@@ -231,7 +231,7 @@ public class MissingLargeCraftAmmoBinTest {
         // 1. Unit should have received a new replacement
         Part replacementPart = replacementCaptor.getValue();
         assertNotNull(replacementPart);
-        assertTrue(replacementPart instanceof LargeCraftAmmoBin);
+        assertInstanceOf(LargeCraftAmmoBin.class, replacementPart);
 
         // 2. And the replacement should match the missing ammo bin
         LargeCraftAmmoBin replacementAmmoBin = (LargeCraftAmmoBin) replacementPart;

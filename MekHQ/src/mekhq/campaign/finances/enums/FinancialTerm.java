@@ -18,10 +18,10 @@
  */
 package mekhq.campaign.finances.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
@@ -45,7 +45,7 @@ public enum FinancialTerm {
     //region Constructors
     FinancialTerm(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Finances",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -89,7 +89,7 @@ public enum FinancialTerm {
     }
 
     /**
-     * @param yesterday the day before the today
+     * @param yesterday the day before today
      * @param today the origin date, which will normally (but not always) be the current date
      * @return the next valid date for the financial term, with a built-in grace period to line up
      * everything to the first day of a financial setup (Monday, First of the Month, First of the Year)
@@ -98,10 +98,10 @@ public enum FinancialTerm {
         switch (this) {
             case BIWEEKLY:
                 // First, find the first day of the current week
-                final LocalDate date = today.with(WeekFields.ISO.dayOfWeek(), 1);
+                final LocalDate date = today.with(WeekFields.of(DayOfWeek.MONDAY, 7).dayOfWeek(), 1);
                 // Second, add two weeks to the date if this is an even week, or three if it is not
                 return date.plusWeeks(
-                        ((date.get(WeekFields.ISO.weekOfYear()) % 2) == 0)
+                        ((date.get(WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()) % 2) == 0)
                                 ? 2 : 3);
             case MONTHLY:
                 // First, determine if the term would end today. If it would, use today or otherwise
@@ -143,8 +143,8 @@ public enum FinancialTerm {
         switch (this) {
             case BIWEEKLY:
                 // Start of the week, on an even week
-                return (today.get(WeekFields.ISO.dayOfWeek()) == 1)
-                        && ((today.get(WeekFields.ISO.weekOfYear()) % 2) == 0);
+                return (today.get(WeekFields.of(DayOfWeek.MONDAY, 7).dayOfWeek()) == 1)
+                        && ((today.get(WeekFields.of(DayOfWeek.MONDAY, 7).weekOfYear()) % 2) == 0);
             case MONTHLY:
                 return today.getMonth() != yesterday.getMonth();
             case QUARTERLY:
@@ -199,8 +199,7 @@ public enum FinancialTerm {
 
         }
 
-        LogManager.getLogger().error("Failed to parse the FinancialTerm from text " + text + ", returning ANNUALLY.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a FinancialTerm. Returning ANNUALLY.");
         return ANNUALLY;
     }
     //endregion File I/O

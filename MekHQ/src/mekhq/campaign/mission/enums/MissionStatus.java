@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.mission.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import org.apache.logging.log4j.LogManager;
 
@@ -28,6 +27,7 @@ public enum MissionStatus {
     //region Enum Declarations
     ACTIVE("MissionStatus.ACTIVE.text", "MissionStatus.ACTIVE.toolTipText"),
     SUCCESS("MissionStatus.SUCCESS.text", "MissionStatus.SUCCESS.toolTipText"),
+    PARTIAL("MissionStatus.PARTIAL.text", "MissionStatus.PARTIAL.toolTipText"),
     FAILED("MissionStatus.FAILED.text", "MissionStatus.FAILED.toolTipText"),
     BREACH("MissionStatus.BREACH.text", "MissionStatus.BREACH.toolTipText");
     //endregion Enum Declarations
@@ -40,7 +40,7 @@ public enum MissionStatus {
     //region Constructors
     MissionStatus(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Mission",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -61,6 +61,10 @@ public enum MissionStatus {
         return this == SUCCESS;
     }
 
+    public boolean isPartialSuccess() {
+        return this == PARTIAL;
+    }
+
     public boolean isFailed() {
         return this == FAILED;
     }
@@ -75,7 +79,7 @@ public enum MissionStatus {
      * @return true if the mission has been completed, otherwise false
      */
     public boolean isCompleted() {
-        return isSuccess() || isFailed() || isBreach();
+        return isSuccess() || isPartialSuccess() || isFailed() || isBreach();
     }
     //endregion Boolean Comparison Methods
 
@@ -98,8 +102,10 @@ public enum MissionStatus {
                 case 1:
                     return SUCCESS;
                 case 2:
-                    return FAILED;
+                    return PARTIAL;
                 case 3:
+                    return FAILED;
+                case 4:
                     return BREACH;
                 default:
                     break;
@@ -108,8 +114,7 @@ public enum MissionStatus {
 
         }
 
-        LogManager.getLogger().error("Failed to parse text " + text + " into a MissionStatus, returning ACTIVE.");
-
+        LogManager.getLogger().error("Unable to parse " + text + " into a MissionStatus. Returning ACTIVE.");
         return ACTIVE;
     }
     //endregion File I/O

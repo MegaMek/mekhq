@@ -91,7 +91,7 @@ public class Scenario {
     private ForceStub stub;
     private boolean cloaked;
 
-    //allow multiple loot objects for meeting different mission objectives
+    // allow multiple loot objects for meeting different scenario objectives
     private List<Loot> loots;
 
     private List<ScenarioObjective> scenarioObjectives;
@@ -751,11 +751,11 @@ public class Scenario {
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
-        writeToXMLBegin(pw, indent);
+        indent = writeToXMLBegin(pw, indent);
         writeToXMLEnd(pw, indent);
     }
 
-    protected void writeToXMLBegin(final PrintWriter pw, int indent) {
+    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenario", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", desc);
@@ -821,6 +821,7 @@ public class Scenario {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shiftWindStrength", shiftWindStrength);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxWindStrength", maxWindStrength);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "minWindStrength", minWindStrength);
+        return indent;
     }
 
     protected void writeToXMLEnd(final PrintWriter pw, int indent) {

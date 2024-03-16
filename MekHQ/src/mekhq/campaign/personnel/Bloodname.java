@@ -139,14 +139,14 @@ public class Bloodname {
     private int phenotypeMultiplier(Phenotype warriorType, int year) {
         switch (getPhenotype()) {
             case MECHWARRIOR:
-                return (warriorType == Phenotype.MECHWARRIOR) ? 3 : 0;
+                return warriorType.isMechWarrior() ? 3 : 0;
             case AEROSPACE:
-                return ((warriorType == Phenotype.AEROSPACE) || (warriorType == Phenotype.PROTOMECH)) ? 3 : 0;
+                return (warriorType.isAerospace() || warriorType.isProtoMech()) ? 3 : 0;
             case ELEMENTAL:
                 if (year < 2870) {
                     return 1;
                 }
-                return (warriorType == Phenotype.ELEMENTAL) ? 3 : 0;
+                return warriorType.isElemental() ? 3 : 0;
             case PROTOMECH:
                 switch (warriorType) {
                     case PROTOMECH:
@@ -157,7 +157,7 @@ public class Bloodname {
                         return 0;
                 }
             case NAVAL:
-                return (warriorType == Phenotype.NAVAL) ? 3 : 0;
+                return warriorType.isNaval() ? 3 : 0;
             case VEHICLE:
             case GENERAL:
             default:
@@ -256,7 +256,7 @@ public class Bloodname {
         }
 
         // This is required because there are currently no bloodnames specifically for vehicle phenotypes
-        if (phenotype == Phenotype.VEHICLE) {
+        if (phenotype.isVehicle()) {
             phenotype = Phenotype.GENERAL;
         }
 
@@ -264,6 +264,7 @@ public class Bloodname {
             /* 1 in 20 chance that warrior was taken as isorla from another Clan */
             return randomBloodname(faction.getRivalClan(year), phenotype, year);
         }
+
         if (Compute.randomInt(20) == 0) {
             /* Bloodnames that are predominantly used for a particular phenotype are not
              * exclusively used for that phenotype. A 5% chance of ignoring phenotype will
@@ -318,13 +319,13 @@ public class Bloodname {
                         weight = new Fraction(1, numClans);
                     } else {
                         weight = eraFraction(year);
-                        nonExclusivesWeight += 1 - eraFraction(year).value();
+                        nonExclusivesWeight += 1 - weight.value();
                         /* The fraction is squared to represent the combined effect
                          * of increasing distribution among the Clans and the likelihood
                          * that non-exclusive names would suffer
                          * more reavings and have a lower Bloodcount.
                          */
-                        weight.mul(eraFraction(year));
+                        weight.mul(weight);
                     }
                 } else {
                     /* Most non-exclusives have an unknown distribution and are estimated.
@@ -382,11 +383,12 @@ public class Bloodname {
         if (year >= 3100) {
             nonExclusivesWeight = nameList.size() / 10.0;
         }
-        int roll = Compute.randomInt(nameList.size() + (int) (nonExclusivesWeight + 0.5));
+        int roll = Compute.randomInt(nameList.size() + (int) Math.round(nonExclusivesWeight + 0.5));
         if (roll > nameList.size() - 1) {
-            return nonExclusives.get(Compute.randomInt(nonExclusives.size()));
+            return nonExclusives.isEmpty() ? null : nonExclusives.get(Compute.randomInt(nonExclusives.size()));
+        } else {
+            return nameList.get(roll);
         }
-        return nameList.get(roll);
     }
 
     /**

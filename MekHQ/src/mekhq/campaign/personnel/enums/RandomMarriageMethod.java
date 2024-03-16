@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
@@ -41,7 +40,7 @@ public enum RandomMarriageMethod {
     //region Constructors
     RandomMarriageMethod(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
@@ -53,7 +52,7 @@ public enum RandomMarriageMethod {
     }
     //endregion Getters
 
-    //region Boolean Comparisons
+    //region Boolean Comparison Methods
     public boolean isNone() {
         return this == NONE;
     }
@@ -61,7 +60,7 @@ public enum RandomMarriageMethod {
     public boolean isPercentage() {
         return this == PERCENTAGE;
     }
-    //endregion Boolean Comparisons
+    //endregion Boolean Comparison Methods
 
     public AbstractMarriage getMethod(final CampaignOptions options) {
         switch (this) {

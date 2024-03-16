@@ -331,7 +331,7 @@ public class BotForceRandomizer {
                     break;
             }
 
-            if (phenotype != Phenotype.NONE) {
+            if (!phenotype.isNone()) {
                 String bloodname = Bloodname.randomBloodname(faction.getShortName(), phenotype,
                         campaign.getGameYear()).getName();
                 crewName += " " + bloodname;
@@ -343,7 +343,7 @@ public class BotForceRandomizer {
         extraData.put(0, innerMap);
 
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
-                skills[0], skills[1], gender, extraData));
+                skills[0], skills[1], gender, faction.isClan(), extraData));
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
         return en;

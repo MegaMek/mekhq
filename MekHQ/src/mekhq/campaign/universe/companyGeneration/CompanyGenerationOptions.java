@@ -22,6 +22,8 @@ import megamek.Version;
 import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -36,17 +38,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
  * @author Justin "Windchild" Bowen
  */
-public class CompanyGenerationOptions implements Serializable {
+public class CompanyGenerationOptions {
     //region Variable Declarations
-    private static final long serialVersionUID = 3034123423672457769L;
-
     // Base Information
     private CompanyGenerationMethod method;
+    private Faction specifiedFaction;
     private boolean generateMercenaryCompanyCommandLance;
     private int companyCount;
     private int individualLanceCount;
@@ -66,6 +68,7 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean prioritizeOfficerCombatSkills;
     private boolean assignMostSkilledToPrimaryLances;
     private boolean automaticallyAssignRanks;
+    private boolean useSpecifiedFactionToAssignRanks;
     private boolean assignMechWarriorsCallsigns;
     private boolean assignFounderFlag;
 
@@ -79,6 +82,7 @@ public class CompanyGenerationOptions implements Serializable {
     private boolean simulateRandomProcreation;
 
     // Units
+    private BattleMechFactionGenerationMethod battleMechFactionGenerationMethod;
     private BattleMechWeightClassGenerationMethod battleMechWeightClassGenerationMethod;
     private BattleMechQualityGenerationMethod battleMechQualityGenerationMethod;
     private boolean neverGenerateStarLeagueMechs;
@@ -95,6 +99,7 @@ public class CompanyGenerationOptions implements Serializable {
     // Unit
     private ForceNamingMethod forceNamingMethod;
     private boolean generateForceIcons;
+    private boolean useSpecifiedFactionToGenerateForceIcons;
     private boolean generateOriginNodeForceIcon;
     private boolean useOriginNodeForceIconLogo;
     private TreeMap<Integer, Integer> forceWeightLimits;
@@ -137,6 +142,7 @@ public class CompanyGenerationOptions implements Serializable {
     public CompanyGenerationOptions(final CompanyGenerationMethod method) {
         // Base Information
         setMethod(method);
+        setSpecifiedFaction(Factions.getInstance().getDefaultFaction());
         setGenerateMercenaryCompanyCommandLance(false);
         setCompanyCount(1);
         setIndividualLanceCount(0);
@@ -171,6 +177,7 @@ public class CompanyGenerationOptions implements Serializable {
         setPrioritizeOfficerCombatSkills(false);
         setAssignMostSkilledToPrimaryLances(method.isWindchild());
         setAutomaticallyAssignRanks(true);
+        setUseSpecifiedFactionToAssignRanks(false);
         setAssignMechWarriorsCallsigns(true);
         setAssignFounderFlag(true);
 
@@ -184,26 +191,28 @@ public class CompanyGenerationOptions implements Serializable {
         setSimulateRandomProcreation(method.isWindchild());
 
         // Units
-        setBattleMechWeightClassGenerationMethod(method.isAtB()
+        setBattleMechFactionGenerationMethod(BattleMechFactionGenerationMethod.ORIGIN_FACTION);
+        setBattleMechWeightClassGenerationMethod(method.isAgainstTheBot()
                 ? BattleMechWeightClassGenerationMethod.AGAINST_THE_BOT
                 : BattleMechWeightClassGenerationMethod.WINDCHILD);
-        setBattleMechQualityGenerationMethod(method.isAtB()
+        setBattleMechQualityGenerationMethod(method.isAgainstTheBot()
                 ? BattleMechQualityGenerationMethod.AGAINST_THE_BOT
                 : BattleMechQualityGenerationMethod.WINDCHILD);
         setNeverGenerateStarLeagueMechs(false);
         setOnlyGenerateStarLeagueMechs(false);
         setOnlyGenerateOmniMechs(false);
-        setGenerateUnitsAsAttached(method.isAtB());
+        setGenerateUnitsAsAttached(method.isAgainstTheBot());
         setAssignBestRollToCompanyCommander(method.isWindchild());
         setSortStarLeagueUnitsFirst(true);
         setGroupByWeight(true);
         setGroupByQuality(method.isWindchild());
-        setKeepOfficerRollsSeparate(method.isAtB());
+        setKeepOfficerRollsSeparate(method.isAgainstTheBot());
         setAssignTechsToUnits(true);
 
         // Unit
         setForceNamingMethod(ForceNamingMethod.CCB_1943);
         setGenerateForceIcons(true);
+        setUseSpecifiedFactionToGenerateForceIcons(false);
         setGenerateOriginNodeForceIcon(true);
         setUseOriginNodeForceIconLogo(false);
         setForceWeightLimits(new TreeMap<>());
@@ -257,6 +266,14 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setMethod(final CompanyGenerationMethod method) {
         this.method = method;
+    }
+
+    public Faction getSpecifiedFaction() {
+        return specifiedFaction;
+    }
+
+    public void setSpecifiedFaction(final Faction specifiedFaction) {
+        this.specifiedFaction = specifiedFaction;
     }
 
     public boolean isGenerateMercenaryCompanyCommandLance() {
@@ -397,6 +414,14 @@ public class CompanyGenerationOptions implements Serializable {
         this.automaticallyAssignRanks = automaticallyAssignRanks;
     }
 
+    public boolean isUseSpecifiedFactionToAssignRanks() {
+        return useSpecifiedFactionToAssignRanks;
+    }
+
+    public void setUseSpecifiedFactionToAssignRanks(final boolean useSpecifiedFactionToAssignRanks) {
+        this.useSpecifiedFactionToAssignRanks = useSpecifiedFactionToAssignRanks;
+    }
+
     public boolean isAssignMechWarriorsCallsigns() {
         return assignMechWarriorsCallsigns;
     }
@@ -459,6 +484,15 @@ public class CompanyGenerationOptions implements Serializable {
     //endregion Starting Simulation
 
     //region Units
+    public BattleMechFactionGenerationMethod getBattleMechFactionGenerationMethod() {
+        return battleMechFactionGenerationMethod;
+    }
+
+    public void setBattleMechFactionGenerationMethod(
+            final BattleMechFactionGenerationMethod battleMechFactionGenerationMethod) {
+        this.battleMechFactionGenerationMethod = battleMechFactionGenerationMethod;
+    }
+
     public BattleMechWeightClassGenerationMethod getBattleMechWeightClassGenerationMethod() {
         return battleMechWeightClassGenerationMethod;
     }
@@ -573,6 +607,14 @@ public class CompanyGenerationOptions implements Serializable {
 
     public void setGenerateForceIcons(final boolean generateForceIcons) {
         this.generateForceIcons = generateForceIcons;
+    }
+
+    public boolean isUseSpecifiedFactionToGenerateForceIcons() {
+        return useSpecifiedFactionToGenerateForceIcons;
+    }
+
+    public void setUseSpecifiedFactionToGenerateForceIcons(final boolean useSpecifiedFactionToGenerateForceIcons) {
+        this.useSpecifiedFactionToGenerateForceIcons = useSpecifiedFactionToGenerateForceIcons;
     }
 
     public boolean isGenerateOriginNodeForceIcon() {
@@ -852,6 +894,7 @@ public class CompanyGenerationOptions implements Serializable {
 
         // Base Information
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "method", getMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "specifiedFaction", getSpecifiedFaction().getShortName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateMercenaryCompanyCommandLance", isGenerateMercenaryCompanyCommandLance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "companyCount", getCompanyCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "individualLanceCount", getIndividualLanceCount());
@@ -875,6 +918,7 @@ public class CompanyGenerationOptions implements Serializable {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "prioritizeOfficerCombatSkills", isPrioritizeOfficerCombatSkills());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMostSkilledToPrimaryLances", isAssignMostSkilledToPrimaryLances());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "automaticallyAssignRanks", isAutomaticallyAssignRanks());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSpecifiedFactionToAssignRanks", isUseSpecifiedFactionToAssignRanks());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignMechWarriorsCallsigns", isAssignMechWarriorsCallsigns());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignFounderFlag", isAssignFounderFlag());
 
@@ -888,6 +932,7 @@ public class CompanyGenerationOptions implements Serializable {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "simulateRandomProcreation", isSimulateRandomProcreation());
 
         // Units
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechFactionGenerationMethod", getBattleMechFactionGenerationMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechWeightClassGenerationMethod", getBattleMechWeightClassGenerationMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "battleMechQualityGenerationMethod", getBattleMechQualityGenerationMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "neverGenerateStarLeagueMechs", isNeverGenerateStarLeagueMechs());
@@ -904,11 +949,12 @@ public class CompanyGenerationOptions implements Serializable {
         // Unit
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceNamingMethod", getForceNamingMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateForceIcons", isGenerateForceIcons());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSpecifiedFactionToGenerateForceIcons", isUseSpecifiedFactionToGenerateForceIcons());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "generateOriginNodeForceIcon", isGenerateOriginNodeForceIcon());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useOriginNodeForceIconLogo", isUseOriginNodeForceIconLogo());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "forceWeightLimits");
         for (final Entry<Integer, Integer> entry : getForceWeightLimits().entrySet()) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, entry.getKey().toString(), entry.getValue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "WeightClass:" + entry.getValue(), entry.getKey().toString());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "forceWeightLimits");
 
@@ -967,34 +1013,36 @@ public class CompanyGenerationOptions implements Serializable {
         // Open up the file.
         try (InputStream is = new FileInputStream(file)) {
             element = MHQXMLUtility.newSafeDocumentBuilder().parse(is).getDocumentElement();
-        } catch (Exception e) {
-            LogManager.getLogger().error("Failed to open file, returning the default Windchild options", e);
+        } catch (Exception ex) {
+            LogManager.getLogger().error("Failed to open file, returning the default Windchild options", ex);
             return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         }
         element.normalize();
 
         final Version version = new Version(element.getAttribute("version"));
-        final NodeList nl = element.getChildNodes();
-        for (int i = 0; i < nl.getLength(); i++) {
-            final Node wn = nl.item(i);
-            if ("companyGenerationOptions".equals(wn.getNodeName()) && wn.hasChildNodes()) {
-                final CompanyGenerationOptions options = parseFromXML(wn.getChildNodes(), version);
-                if (options != null) {
-                    return options;
-                }
-            }
+        final CompanyGenerationOptions options = parseFromXML(element.getChildNodes(), version);
+        if (options == null) {
+            LogManager.getLogger().error("Failed to parse file, returning the default Windchild options");
+            return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
+        } else {
+            return options;
         }
-        LogManager.getLogger().error("Failed to parse file, returning the default Windchild options");
-        return new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
     }
 
     /**
      * @param nl the node list to parse the options from
-     * @param ignoredVersion the Version of the XML to parse from. This is included for future-proofing
+     * @param version the Version of the XML to parse from
      * @return the parsed company generation options, or null if the parsing fails
      */
     public static @Nullable CompanyGenerationOptions parseFromXML(final NodeList nl,
-                                                                  final Version ignoredVersion) {
+                                                                  final Version version) {
+        if (MHQConstants.VERSION.isLowerThan(version)) {
+            LogManager.getLogger().error(String.format(
+                    "Cannot parse Company Generation Options from %s in older version %s.",
+                    version.toString(), MHQConstants.VERSION));
+            return null;
+        }
+
         final CompanyGenerationOptions options = new CompanyGenerationOptions(CompanyGenerationMethod.WINDCHILD);
         try {
             for (int x = 0; x < nl.getLength(); x++) {
@@ -1003,6 +1051,12 @@ public class CompanyGenerationOptions implements Serializable {
                     //region Base Information
                     case "method":
                         options.setMethod(CompanyGenerationMethod.valueOf(wn.getTextContent().trim()));
+                        break;
+                    case "specifiedFaction":
+                        final String factionCode = wn.getTextContent().trim();
+                        final Faction faction = Factions.getInstance().getFaction(factionCode);
+                        Objects.requireNonNull(faction, "Cannot parse unknown faction with code " + factionCode);
+                        options.setSpecifiedFaction(faction);
                         break;
                     case "generateMercenaryCompanyCommandLance":
                         options.setGenerateMercenaryCompanyCommandLance(Boolean.parseBoolean(wn.getTextContent().trim()));
@@ -1070,6 +1124,9 @@ public class CompanyGenerationOptions implements Serializable {
                     case "automaticallyAssignRanks":
                         options.setAutomaticallyAssignRanks(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
+                    case "useSpecifiedFactionToAssignRanks":
+                        options.setUseSpecifiedFactionToAssignRanks(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
                     case "assignMechWarriorsCallsigns":
                         options.setAssignMechWarriorsCallsigns(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
@@ -1106,6 +1163,9 @@ public class CompanyGenerationOptions implements Serializable {
                     //endregion Starting Simulation
 
                     //region Units
+                    case "battleMechFactionGenerationMethod":
+                        options.setBattleMechFactionGenerationMethod(BattleMechFactionGenerationMethod.valueOf(wn.getTextContent().trim()));
+                        break;
                     case "battleMechWeightClassGenerationMethod":
                         options.setBattleMechWeightClassGenerationMethod(BattleMechWeightClassGenerationMethod.valueOf(wn.getTextContent().trim()));
                         break;
@@ -1151,6 +1211,9 @@ public class CompanyGenerationOptions implements Serializable {
                     case "generateForceIcons":
                         options.setGenerateForceIcons(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
+                    case "useSpecifiedFactionToGenerateForceIcons":
+                        options.setUseSpecifiedFactionToGenerateForceIcons(Boolean.parseBoolean(wn.getTextContent().trim()));
+                        break;
                     case "generateOriginNodeForceIcon":
                         options.setGenerateOriginNodeForceIcon(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
@@ -1164,8 +1227,8 @@ public class CompanyGenerationOptions implements Serializable {
                             final Node wn2 = nl2.item(y);
                             try {
                                 options.getForceWeightLimits().put(
-                                        Integer.parseInt(wn2.getNodeName().trim()),
-                                        Integer.parseInt(wn2.getTextContent().trim()));
+                                        Integer.parseInt(wn2.getTextContent().trim()),
+                                        Integer.parseInt(wn2.getNodeName().trim().split(":")[1]));
                             } catch (Exception ignored) {
 
                             }

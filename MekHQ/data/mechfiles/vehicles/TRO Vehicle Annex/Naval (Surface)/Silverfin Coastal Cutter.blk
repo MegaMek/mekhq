@@ -16,9 +16,9 @@ SupportTank
 Silverfin Coastal Cutter
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 5063
@@ -35,6 +35,10 @@ Silverfin Coastal Cutter
 <type>
 IS Level 2
 </type>
+
+<role>
+None
+</role>
 
 <motion_type>
 Hydrofoil
@@ -97,7 +101,7 @@ Searchlight
 </structural_tech_rating>
 
 <source>
-TRO VAr - Age of War
+TRO: Vehicle Annex (Revised)
 </source>
 
 <tonnage>

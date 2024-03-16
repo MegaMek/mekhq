@@ -19,10 +19,10 @@
 package mekhq.campaign.parts;
 
 import megamek.Version;
-import megamek.common.Entity;
-import megamek.common.EquipmentType;
-import megamek.common.Player;
+import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.options.GameOptions;
+import megamek.common.options.OptionsConstants;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
@@ -33,7 +33,12 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -48,12 +53,57 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(value = MockitoExtension.class)
 public class RefitTest {
+    @Mock
+    private Campaign mockCampaign;
+
+    @Mock
+    private CampaignOptions mockCampaignOptions;
+
+    @Mock
+    private Game mockGame;
+
+    @Mock
+    private GameOptions mockGameOptions;
+
+    @Mock
+    private Board mockBoard;
+
+    @Mock
+    private Quartermaster mockQuartermaster;
+
+    @Mock
+    private Warehouse mockWarehouse;
+
+    @BeforeAll
+    static void before() {
+        EquipmentType.initializeTypes();
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        lenient().when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
+        lenient().when(mockCampaignOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1d);
+        lenient().when(mockCampaignOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1d);
+
+        lenient().when(mockCampaign.getGame()).thenReturn(mockGame);
+        lenient().when(mockGame.getBoard()).thenReturn(mockBoard);
+        lenient().when(mockBoard.inSpace()).thenReturn(false);
+        lenient().when(mockGame.getOptions()).thenReturn(mockGameOptions);
+        lenient().when(mockGameOptions.booleanOption(OptionsConstants.ADVAERORULES_SINGLE_NO_CAP))
+                .thenReturn(false);
+        lenient().when(mockGameOptions.booleanOption(OptionsConstants.ADVAERORULES_STRATOPS_CAPITAL_FIGHTER))
+                .thenReturn(false);
+
+        lenient().when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
+
+        lenient().when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
+    }
+
     @Test
     public void deserializationCtor() {
         Refit refit = new Refit();
@@ -62,17 +112,6 @@ public class RefitTest {
 
     @Test
     public void newRefitCtor() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse mockWarehouse = mock(Warehouse.class);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
-        Quartermaster mockQuartermaster = mock(Quartermaster.class);
-        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
-        CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
-        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
-        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
-        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
-
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
         Player mockPlayer = mock(Player.class);
@@ -102,17 +141,6 @@ public class RefitTest {
 
     @Test
     public void locust1Vto1ETest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        Warehouse mockWarehouse = mock(Warehouse.class);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
-        Quartermaster mockQuartermaster = mock(Quartermaster.class);
-        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
-        CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
-        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
-        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
-        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
-
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
         Player mockPlayer = mock(Player.class);
@@ -135,7 +163,7 @@ public class RefitTest {
         // Locust 1V to 1E Class D refit steps (in no particular order):
         // 1. Remove excess Machine Gun (LA) [120 mins]
         // 2. Remove excess Machine Gun (RA) [120 mins]
-        // 3. Remove Machine Gun Ammo Bin (CT) [120 mins]
+        // 3. Remove Machine Gun Ammo [Full] Bin (CT) [120 mins]
         // 4. Move Medium Laser (CT) to (RA) [120 mins]
         // 5. Add Medium Laser to (LA) [120 mins]
         // 6. Add Small Laser to (RA) [120 mins]
@@ -169,7 +197,7 @@ public class RefitTest {
                 .filter(p -> (p instanceof EquipmentPart) && p.getName().equals("Machine Gun"))
                 .count());
         assertEquals(1, removedParts.stream()
-                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo Bin"))
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo [Full] Bin"))
                 .count());
 
         // All of the new parts should be from the old unit
@@ -188,18 +216,6 @@ public class RefitTest {
 
     @Test
     public void testLocust1Vto1EWriteToXml() throws ParserConfigurationException, SAXException, IOException {
-        Campaign mockCampaign = mock(Campaign.class);
-        when(mockCampaign.getEntities()).thenReturn(new ArrayList<>());
-        Warehouse mockWarehouse = mock(Warehouse.class);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
-        Quartermaster mockQuartermaster = mock(Quartermaster.class);
-        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
-        CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
-        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
-        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
-        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
-
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getLocustLCT1V();
         Player mockPlayer = mock(Player.class);
@@ -277,8 +293,7 @@ public class RefitTest {
                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
-        // Check that we got all the shopping list entries (by name, not amazing but
-        // reasonable)
+        // Check that we got all the shopping list entries (by name, not amazing but reasonable)
         List<String> shoppingList = refit.getShoppingList().stream()
                 .map(Part::getName)
                 .collect(Collectors.toList());
@@ -313,17 +328,6 @@ public class RefitTest {
 
     @Test
     public void javelinJVN10Nto10ATest() {
-        Campaign mockCampaign = mock(Campaign.class);
-        CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
-        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1.0);
-        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1.0);
-        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1.0);
-        Warehouse mockWarehouse = mock(Warehouse.class);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
-        Quartermaster mockQuartermaster = mock(Quartermaster.class);
-        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
-
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getJavelinJVN10N();
         Player mockPlayer = mock(Player.class);
@@ -397,14 +401,6 @@ public class RefitTest {
 
     @Test
     public void testJavelinJVN10Nto10AWriteToXml() throws ParserConfigurationException, SAXException, IOException {
-        Campaign mockCampaign = mock(Campaign.class);
-        when(mockCampaign.getEntities()).thenReturn(new ArrayList<>());
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse mockWarehouse = mock(Warehouse.class);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
-        Quartermaster mockQuartermaster = mock(Quartermaster.class);
-        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         Person mockTech = mock(Person.class);
         UUID techId = UUID.randomUUID();
         when(mockTech.getId()).thenReturn(techId);
@@ -488,8 +484,7 @@ public class RefitTest {
                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
-        // Check that we got all the shopping list entries (by name, not amazing but
-        // reasonable)
+        // Check that we got all the shopping list entries (by name, not amazing but reasonable)
         List<String> shoppingList = refit.getShoppingList().stream()
                 .map(Part::getName)
                 .collect(Collectors.toList());
@@ -524,20 +519,6 @@ public class RefitTest {
 
     @Test
     public void fleaFLE4toFLE15Test() {
-        CampaignOptions mockOptions = mock(CampaignOptions.class);
-        when(mockOptions.getCommonPartPriceMultiplier()).thenReturn(1d);
-        when(mockOptions.getInnerSphereUnitPriceMultiplier()).thenReturn(1d);
-        when(mockOptions.getInnerSpherePartPriceMultiplier()).thenReturn(1d);
-
-        Warehouse mockWarehouse = mock(Warehouse.class);
-
-        Quartermaster mockQuartermaster = mock(Quartermaster.class);
-
-        Campaign mockCampaign = mock(Campaign.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
-        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
-
         // Create the original entity backing the unit
         Entity oldEntity = UnitTestUtilities.getFleaFLE4();
         Player mockPlayer = mock(Player.class);
@@ -565,7 +546,7 @@ public class RefitTest {
         // 5. Add Medium Laser (RA) [120 mins]
         // 6. Add Machine Gun (LA) [120 mins]
         // 7. Add Machine Gun (RA) [120 mins]
-        // 8. Add Machine Gun Ammo Bin to (CT) [120 mins]
+        // 8. Add Machine Gun Ammo [Full] Bin to (CT) [120 mins]
         // 9. Add 16 points of armor to 10 locations (except the HD).
         // a. Add 1 point to (LA) [5 mins]
         // b. Add 1 point to (RA) [5 mins]
@@ -626,7 +607,7 @@ public class RefitTest {
                 .filter(p -> (p instanceof MissingEquipmentPart) && p.getName().equals("Machine Gun"))
                 .count());
         assertEquals(1, shoppingCart.stream()
-                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo Bin"))
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo [Full] Bin"))
                 .count());
 
         // We should have 16 points of standard armor on order
@@ -637,15 +618,6 @@ public class RefitTest {
 
     @Test
     public void testFleaFLE4toFLE15WriteToXml() throws ParserConfigurationException, SAXException, IOException {
-        Campaign mockCampaign = mock(Campaign.class);
-        when(mockCampaign.getEntities()).thenReturn(new ArrayList<>());
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Warehouse mockWarehouse = mock(Warehouse.class);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
-        doReturn(null).when(mockWarehouse).findSparePart(any());
-        Quartermaster mockQuartermaster = mock(Quartermaster.class);
-        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
         Person mockTech = mock(Person.class);
         UUID techId = UUID.randomUUID();
         when(mockTech.getId()).thenReturn(techId);
@@ -730,8 +702,7 @@ public class RefitTest {
                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
-        // Check that we got all the shopping list entries (by name, not amazing but
-        // reasonable)
+        // Check that we got all the shopping list entries (by name, not amazing but reasonable)
         List<String> shoppingList = refit.getShoppingList().stream()
                 .map(Part::getName)
                 .collect(Collectors.toList());
@@ -772,16 +743,9 @@ public class RefitTest {
 
     @Test
     public void heavyTrackedApcMgToStandard() throws EntityLoadingException, IOException {
-        Campaign mockCampaign = mock(Campaign.class);
-        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
-        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
-        Hangar mockHangar = mock(Hangar.class);
+        final Hangar mockHangar = mock(Hangar.class);
         when(mockCampaign.getHangar()).thenReturn(mockHangar);
-        Warehouse mockWarehouse = mock(Warehouse.class);
-        when(mockCampaign.getWarehouse()).thenReturn(mockWarehouse);
-        Quartermaster mockQuartermaster = mock(Quartermaster.class);
-        when(mockCampaign.getQuartermaster()).thenReturn(mockQuartermaster);
-        ShoppingList mockShoppingList = mock(ShoppingList.class);
+        final ShoppingList mockShoppingList = mock(ShoppingList.class);
         when(mockCampaign.getShoppingList()).thenReturn(mockShoppingList);
 
         // Create the original entity backing the unit
@@ -809,7 +773,7 @@ public class RefitTest {
                 .filter(p -> (p instanceof EquipmentPart) && p.getName().equals("Machine Gun"))
                 .count());
         assertEquals(1, removedParts.stream()
-                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo Bin"))
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Machine Gun Ammo [Full] Bin"))
                 .count());
 
         // All of the new parts (except ammo bins) should be from the old unit

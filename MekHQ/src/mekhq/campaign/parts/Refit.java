@@ -546,39 +546,28 @@ public class Refit extends Part implements IAcquisitionWork {
             }
 
             /*CHECK REFIT CLASS*/
+            // See Campaign Operations, page 211 as of third printing
             if (nPart instanceof MissingEnginePart) {
-                if (oldUnit.getEntity().getEngine().getRating() != newUnit.getEntity().getEngine().getRating()) {
-                    updateRefitClass(CLASS_D);
-                }
-                if (newUnit.getEntity().getEngine().getEngineType() != oldUnit.getEntity().getEngine().getEngineType()) {
-                    updateRefitClass(CLASS_F);
+                if (oldUnit.getEntity().getEngine().getRating() != newUnit.getEntity().getEngine().getRating() || newUnit.getEntity().getEngine().getEngineType() != oldUnit.getEntity().getEngine().getEngineType()) {
+                    updateRefitClass(customJob ? CLASS_E : CLASS_D);
                 }
                 if (((MissingEnginePart) nPart).getEngine().getSideTorsoCriticalSlots().length > 0) {
                     locationHasNewStuff[Mech.LOC_LT] = true;
                     locationHasNewStuff[Mech.LOC_RT] = true;
                 }
             } else if (nPart instanceof MissingMekGyro) {
-                updateRefitClass(CLASS_F);
+                updateRefitClass(CLASS_D);
             } else if (nPart instanceof MissingMekLocation) {
                 replacingLocations = true;
-                if (((Mech) newUnit.getEntity()).hasTSM(true) != ((Mech) oldUnit.getEntity()).hasTSM(true)) {
-                    updateRefitClass(CLASS_E);
-                } else {
-                    updateRefitClass(CLASS_F);
-                }
+
+                // If a location is being replaced, the internal structure or myomer must have been changed.
+                updateRefitClass(CLASS_F);
             } else if (nPart instanceof Armor) {
-                updateRefitClass(CLASS_C);
+                updateRefitClass(CLASS_A);
                 locationHasNewStuff[nPart.getLocation()] = true;
             } else if (nPart instanceof MissingMekCockpit) {
-                updateRefitClass(CLASS_F);
+                updateRefitClass(CLASS_E);
                 locationHasNewStuff[Mech.LOC_HEAD] = true;
-            }else if (nPart instanceof MissingMekActuator) {
-                if (isOmniRefit && nPart.isOmniPoddable()) {
-                    updateRefitClass(CLASS_OMNI);
-                } else {
-                    updateRefitClass(CLASS_D);
-                }
-                locationHasNewStuff[nPart.getLocation()] = true;
             } else if (nPart instanceof MissingInfantryMotiveType || nPart instanceof MissingInfantryArmorPart) {
                 updateRefitClass(CLASS_A);
             } else {
@@ -896,16 +885,16 @@ public class Refit extends Part implements IAcquisitionWork {
 
         //check for CASE
         //TODO: we still dont have to order the part, we need to get the CASE issues sorted out
-        for (int loc = 0; loc < newEntity.locations(); loc++) {
-            if ((newEntity.locationHasCase(loc) != oldUnit.getEntity().locationHasCase(loc)
-                    && !(newEntity.isClan() && newEntity instanceof Mech))
-                    || (newEntity instanceof Mech
-                            && ((Mech) newEntity).hasCASEII(loc) != ((Mech) oldUnit.getEntity()).hasCASEII(loc))) {
-                if (isOmniRefit) {
-                    updateRefitClass(CLASS_OMNI);
-                } else {
-                    time += 60;
-                    updateRefitClass(CLASS_E);
+        if (!oldUnit.getEntity().isClan()) { // Clan units always have CASE or CASE II everywhere
+            for (int loc = 0; loc < newEntity.locations(); loc++) {
+                // If the old location has neither kind of CASE and the new location has either, update the refit class
+                if (!(oldUnit.getEntity().locationHasCase(loc) || (oldUnit.getEntity() instanceof Mech && ((Mech) oldUnit.getEntity()).hasCASEII(loc))) && (newEntity.locationHasCase(loc) || (newEntity instanceof Mech && ((Mech) newEntity).hasCASEII(loc)))) {
+                    if (isOmniRefit) {
+                        updateRefitClass(CLASS_OMNI);
+                    } else {
+                        time += 60;
+                        updateRefitClass(CLASS_D);
+                    }
                 }
             }
         }
@@ -934,7 +923,7 @@ public class Refit extends Part implements IAcquisitionWork {
         //infantry take zero time to re-organize
         //also check for squad size and number changes
         if (oldUnit.isConventionalInfantry()) {
-            if (((Infantry) oldUnit.getEntity()).getSquadN() != ((Infantry) newEntity).getSquadN()
+            if (((Infantry) oldUnit.getEntity()).getSquadCount() != ((Infantry) newEntity).getSquadCount()
                     ||((Infantry) oldUnit.getEntity()).getSquadSize() != ((Infantry) newEntity).getSquadSize()) {
                 updateRefitClass(CLASS_A);
             }
@@ -1889,75 +1878,66 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indentLvl) {
-        pw1.println(MHQXMLUtility.indentStr(indentLvl) + "<refit>");
-        pw1.println(MHQXMLUtility.writeEntityToXmlString(newEntity, indentLvl + 1, getCampaign().getEntities()));
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<time>"
-                + time + "</time>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<timeSpent>" + timeSpent
-                + "</timeSpent>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<refitClass>" + refitClass
-                + "</refitClass>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<cost>" + cost.toXmlString()
-                + "</cost>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<failedCheck>" + failedCheck
-                + "</failedCheck>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<customJob>" + customJob
-                + "</customJob>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<kitFound>" + kitFound
-                + "</kitFound>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<isRefurbishing>" + isRefurbishing
-                + "</isRefurbishing>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<armorNeeded>" + armorNeeded
-                + "</armorNeeded>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<sameArmorType>" + sameArmorType
-                + "</sameArmorType>");
-        if (null != assignedTech) {
-            pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<assignedTechId>" + assignedTech.getId()
-                    + "</assignedTechId>");
+    public void writeToXML(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "refit");
+        pw.println(MHQXMLUtility.writeEntityToXmlString(newEntity, indent, getCampaign().getEntities()));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "time", time);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "timeSpent", timeSpent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "refitClass", refitClass);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cost", cost);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "failedCheck", failedCheck);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "customJob", customJob);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "kitFound", kitFound);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRefurbishing", isRefurbishing);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "armorNeeded", armorNeeded);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sameArmorType", sameArmorType);
+        if (assignedTech != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignedTechId", assignedTech.getId());
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl+1)
-                +"<quantity>"
-                +quantity
-                +"</quantity>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl+1)
-                +"<daysToWait>"
-                +daysToWait
-                +"</daysToWait>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<oldUnitParts>");
-        for (Part part : oldUnitParts) {
-            pw1.println(MHQXMLUtility.indentStr(indentLvl + 2) + "<pid>" + part.getId()
-                    + "</pid>");
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "quantity", quantity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "daysToWait", daysToWait);
+        if (!oldUnitParts.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "oldUnitParts");
+            for (final Part part : oldUnitParts) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pid", part.getId());
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "oldUnitParts");
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "</oldUnitParts>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<newUnitParts>");
-        for (Part part : newUnitParts) {
-            pw1.println(MHQXMLUtility.indentStr(indentLvl + 2) + "<pid>" + part.getId()
-                    + "</pid>");
+
+        if (!newUnitParts.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "newUnitParts");
+            for (final Part part : newUnitParts) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pid", part.getId());
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "newUnitParts");
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "</newUnitParts>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<lcBinsToChange>");
-        for (Part part : lcBinsToChange) {
-            pw1.println(MHQXMLUtility.indentStr(indentLvl + 2) + "<pid>" + part.getId()
-                    + "</pid>");
+
+        if (!lcBinsToChange.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lcBinsToChange");
+            for (Part part : lcBinsToChange) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "pid", part.getId());
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lcBinsToChange");
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "</lcBinsToChange>");
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<shoppingList>");
-        for (Part p : shoppingList) {
-            p.writeToXML(pw1, indentLvl+2);
+
+        if (!shoppingList.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "shoppingList");
+            for (final Part part : shoppingList) {
+                part.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "shoppingList");
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "</shoppingList>");
-        if (null != newArmorSupplies) {
+
+        if (newArmorSupplies != null) {
             if (newArmorSupplies.getId() <= 0) {
-                pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<newArmorSupplies>");
-                newArmorSupplies.writeToXML(pw1, indentLvl+2);
-                pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "</newArmorSupplies>");
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "newArmorSupplies");
+                newArmorSupplies.writeToXML(pw, indent);
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "newArmorSupplies");
             } else {
-                pw1.println(MHQXMLUtility.indentStr(indentLvl + 1) + "<newArmorSuppliesId>" + newArmorSupplies.getId()
-                        + "</newArmorSuppliesId>");
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "newArmorSuppliesId", newArmorSupplies.getId());
             }
         }
-        pw1.println(MHQXMLUtility.indentStr(indentLvl) + "</refit>");
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "refit");
     }
 
     public static @Nullable Refit generateInstanceFromXML(final Node wn, final Version version,
@@ -2000,7 +1980,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 } else if (wn2.getNodeName().equalsIgnoreCase("sameArmorType")) {
                     retVal.sameArmorType = wn2.getTextContent().equalsIgnoreCase("true");
                 } else if (wn2.getNodeName().equalsIgnoreCase("entity")) {
-                    retVal.newEntity = Objects.requireNonNull(MHQXMLUtility.parseSingleEntityMul((Element) wn2, campaign.getGameOptions()));
+                    retVal.newEntity = Objects.requireNonNull(MHQXMLUtility.parseSingleEntityMul((Element) wn2, campaign));
                 } else if (wn2.getNodeName().equalsIgnoreCase("oldUnitParts")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
@@ -2019,7 +1999,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("lcBinsToChange")) {
                     NodeList nl2 = wn2.getChildNodes();
-                    for (int y=0; y<nl2.getLength(); y++) {
+                    for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         if (wn3.getNodeName().equalsIgnoreCase("pid")) {
                             retVal.lcBinsToChange.add(new RefitPartRef(Integer.parseInt(wn3.getTextContent())));
@@ -2282,7 +2262,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
             newEntity.setChassis(chassis);
             String model = "?";
-            if (infantry.getSecondaryN() > 1 && null != infantry.getSecondaryWeapon()) {
+            if (infantry.getSecondaryWeaponsPerSquad() > 1 && null != infantry.getSecondaryWeapon()) {
                 model = "(" + infantry.getSecondaryWeapon().getInternalName() + ")";
             } else if (null != infantry.getPrimaryWeapon()) {
                 model = "(" + infantry.getPrimaryWeapon().getInternalName() + ")";
@@ -2705,7 +2685,7 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         @Override
-        public String checkFixable() {
+        public @Nullable String checkFixable() {
             return null;
         }
 
@@ -2735,11 +2715,13 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         @Override
-        public void writeToXML(PrintWriter pw1, int indent) {
+        public void writeToXML(final PrintWriter pw, int indent) {
+
         }
 
         @Override
         protected void loadFieldsFromXmlNode(Node wn) {
+
         }
 
         @Override

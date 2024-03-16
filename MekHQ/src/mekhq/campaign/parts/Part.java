@@ -25,7 +25,6 @@ import megamek.Version;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
@@ -76,8 +75,6 @@ public abstract class Part implements IPartWork, ITechnology {
     public static final int QUALITY_D = 3;
     public static final int QUALITY_E = 4;
     public static final int QUALITY_F = 5;
-
-    protected static final String NL = System.lineSeparator();
 
     protected static final TechAdvancement TA_POD = Entity.getOmniAdvancement();
     // Generic TechAdvancement for a number of basic components.
@@ -156,7 +153,7 @@ public abstract class Part implements IPartWork, ITechnology {
     private Part replacementPart;
 
     protected final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Parts",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public Part() {
         this(0, false, null);
@@ -224,7 +221,7 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     public String getQualityName() {
-        return getQualityName(getQuality(), campaign.getCampaignOptions().reverseQualityNames());
+        return getQualityName(getQuality(), campaign.getCampaignOptions().isReverseQualityNames());
     }
 
     public void setId(int id) {
@@ -551,7 +548,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
     public abstract void writeToXML(final PrintWriter pw, int indent);
 
-    protected void writeToXmlBegin(final PrintWriter pw, int indent) {
+    protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
@@ -621,10 +618,12 @@ public abstract class Part implements IPartWork, ITechnology {
         for (final Part childPart : childParts) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childPartId", childPart.getId());
         }
+
+        return indent;
     }
 
-    protected void writeToXmlEnd(final PrintWriter pw, int indent) {
-        MHQXMLUtility.writeSimpleXMLCloseTag(pw, indent, "part");
+    protected void writeToXMLEnd(final PrintWriter pw, int indent) {
+        MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "part");
     }
 
     public static Part generateInstanceFromXML(Node wn, Version version) {
@@ -632,7 +631,7 @@ public abstract class Part implements IPartWork, ITechnology {
         Node classNameNode = attrs.getNamedItem("type");
         String className = classNameNode.getTextContent();
 
-        //reverse compatibility checks
+        // reverse compatibility checks
         if (className.equalsIgnoreCase("mekhq.campaign.parts.MekEngine")) {
             className = "mekhq.campaign.parts.EnginePart";
         } else if (className.equalsIgnoreCase("mekhq.campaign.parts.MissingMekEngine")) {
@@ -859,22 +858,22 @@ public abstract class Part implements IPartWork, ITechnology {
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
                 mods.addModifier(-1, "Weapon specialist");
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
-                    && (IPartWork.findCorrectRepairType(this) == PartRepairType.ARMOR)) {
+                    && IPartWork.findCorrectRepairType(this).isArmour()) {
                 mods.addModifier(-1, "Armor specialist");
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ELECTRONICS)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ENGINE)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GYRO)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
                 mods.addModifier(-1, "Internal specialist");
             }
 
@@ -913,22 +912,22 @@ public abstract class Part implements IPartWork, ITechnology {
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
                 mods.addModifier(-1, "Weapon specialist");
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST)
-                    && (IPartWork.findCorrectRepairType(this) == PartRepairType.ARMOR)) {
+                    && IPartWork.findCorrectRepairType(this).isArmour()) {
                 mods.addModifier(-1, "Armor specialist");
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST)
                     && ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ELECTRONICS)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.ENGINE)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GYRO)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.MEK_LOCATION)
-                    || (IPartWork.findCorrectMassRepairType(this) == PartRepairType.GENERAL_LOCATION))) {
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION)
+                    || (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
                 mods.addModifier(-1, "Internal specialist");
             }
 
@@ -941,7 +940,7 @@ public abstract class Part implements IPartWork, ITechnology {
             mods.addModifier(1, "prototype TSM");
         }
 
-        return getCampaign().getCampaignOptions().useQualityMaintenance()
+        return getCampaign().getCampaignOptions().isUseQualityMaintenance()
                 ? getQualityMods(mods, getUnit().getTech()) : mods;
     }
 
@@ -973,7 +972,7 @@ public abstract class Part implements IPartWork, ITechnology {
                 qualityMod = -2;
                 break;
         }
-        mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().reverseQualityNames()));
+        mods.addModifier(qualityMod, getQualityName(quality, campaign.getCampaignOptions().isReverseQualityNames()));
         if ((qualityMod > 0) &&
                 (null != tech) &&
                 tech.getOptions().booleanOption(PersonnelOptions.TECH_FIXER)) {
@@ -1023,13 +1022,13 @@ public abstract class Part implements IPartWork, ITechnology {
     }
 
     @Override
-    public PartRepairType getMassRepairOptionType() {
+    public PartRepairType getMRMSOptionType() {
         return PartRepairType.GENERAL;
     }
 
     @Override
     public PartRepairType getRepairPartType() {
-        return getMassRepairOptionType();
+        return getMRMSOptionType();
     }
 
     @Override
@@ -1100,7 +1099,7 @@ public abstract class Part implements IPartWork, ITechnology {
 
         if (includeRepairDetails) {
             sj.add(hits + " hit(s)");
-            if (campaign.getCampaignOptions().payForRepairs() && (hits > 0)) {
+            if (campaign.getCampaignOptions().isPayForRepairs() && (hits > 0)) {
                 sj.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
             }
         }
@@ -1507,10 +1506,10 @@ public abstract class Part implements IPartWork, ITechnology {
         PartRepairType repairType = IPartWork.findCorrectRepairType(part);
 
         switch (repairType) {
-            case ARMOR:
+            case ARMOUR:
                 imgBase = "armor";
                 break;
-            case AMMO:
+            case AMMUNITION:
                 imgBase = "ammo";
                 break;
             case ACTUATOR:
@@ -1852,7 +1851,7 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         @Override
-        public String checkFixable() {
+        public @Nullable String checkFixable() {
             return null;
         }
 
@@ -1882,11 +1881,13 @@ public abstract class Part implements IPartWork, ITechnology {
         }
 
         @Override
-        public void writeToXML(PrintWriter pw1, int indent) {
+        public void writeToXML(final PrintWriter pw, int indent) {
+
         }
 
         @Override
         protected void loadFieldsFromXmlNode(Node wn) {
+
         }
 
         @Override

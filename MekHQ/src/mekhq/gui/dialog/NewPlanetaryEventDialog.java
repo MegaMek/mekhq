@@ -22,7 +22,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.adapter.SocioIndustrialDataAdapter;
 import mekhq.campaign.Campaign;
@@ -89,19 +88,21 @@ public class NewPlanetaryEventDialog extends JDialog {
     private JLabel hpgCombined;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.NewPlanetaryEventDialog",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
-    public NewPlanetaryEventDialog(Frame parent, Campaign campaign, Planet planet) {
-        this(parent, campaign, planet, true);
+    public NewPlanetaryEventDialog(final JFrame frame, final Campaign campaign,
+                                   final Planet planet) {
+        this(frame, true, campaign, planet);
     }
 
-    public NewPlanetaryEventDialog(Frame parent, Campaign campaign, Planet planet, boolean modal) {
-        super(parent, modal);
+    public NewPlanetaryEventDialog(final JFrame frame, final boolean modal,
+                                   final Campaign campaign, final Planet planet) {
+        super(frame, modal);
         this.planet = new Planet(Objects.requireNonNull(planet).getId());
         this.planet.copyDataFrom(planet);
         this.date = campaign.getLocalDate();
         initComponents(campaign);
-        setLocationRelativeTo(parent);
+        setLocationRelativeTo(frame);
         setUserPreferences();
     }
 
@@ -110,7 +111,7 @@ public class NewPlanetaryEventDialog extends JDialog {
     }
 
     protected void initComponents(Campaign campaign) {
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("form");
         setTitle(resourceMap.getString("Form.title"));
         setPreferredSize(new Dimension(600, 600));

@@ -16,9 +16,9 @@ SupportTank
 White Tip Submarine
 </Name>
 
-<Model>
-(Standard)
-</Model>
+<model>
+
+</model>
 
 <mul id:>
 5406
@@ -35,6 +35,10 @@ White Tip Submarine
 <type>
 IS Level 3
 </type>
+
+<role>
+Ambusher
+</role>
 
 <motion_type>
 Submarine
@@ -118,7 +122,7 @@ ISERMediumLaser
 </structural_tech_rating>
 
 <source>
-XTRO RetroTech - Jihad
+XTR: RetroTech
 </source>
 
 <tonnage>

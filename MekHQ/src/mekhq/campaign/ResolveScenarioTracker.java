@@ -234,12 +234,7 @@ public class ResolveScenarioTracker {
             }
             // Kill credit automatically assigned only if they can't escape
             if (!e.canEscape()) {
-                Entity killer = victoryEvent.getEntity(e.getKillerId());
-                if ((null != killer) && !"-1".equals(killer.getExternalIdAsString())) {
-                    killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-                } else {
-                    killCredits.put(e.getDisplayName(), "None");
-                }
+                appendKillCredit(e);
             }
         }
 
@@ -281,12 +276,8 @@ public class ResolveScenarioTracker {
                     }
                 }
             }
-            Entity killer = victoryEvent.getEntity(e.getKillerId());
-            if ((null != killer) && !"-1".equals(killer.getExternalIdAsString())) {
-                killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-            } else {
-                killCredits.put(e.getDisplayName(), "None");
-            }
+
+            appendKillCredit(e);
         }
 
         //add retreated units
@@ -376,12 +367,8 @@ public class ResolveScenarioTracker {
                     potentialSalvage.add(nu);
                 }
             }
-            Entity killer = victoryEvent.getEntity(e.getKillerId());
-            if ((null != killer) && !"-1".equals(killer.getExternalIdAsString())) {
-                killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
-            } else {
-                killCredits.put(e.getDisplayName(), "None");
-            }
+
+            appendKillCredit(e);
         }
         //If a unit in a bay was destroyed, add it. We still need to deal with the crew
         for (Enumeration<Entity> iter = victoryEvent.getGraveyardEntities(); iter.hasMoreElements();) {
@@ -399,6 +386,24 @@ public class ResolveScenarioTracker {
             }
         }
         checkStatusOfPersonnel();
+    }
+
+    /**
+     * Worker function that, where appropriate, appends kill credit to the local killCredits tracker
+     */
+    private void appendKillCredit(Entity e) {
+        // no need to add kill credits for player or allied units
+        if (!e.getOwner().isEnemyOf(client.getLocalPlayer())) {
+            return;
+        }
+
+        Entity killer = victoryEvent.getEntity(e.getKillerId());
+
+        if ((null != killer) && !"-1".equals(killer.getExternalIdAsString())) {
+            killCredits.put(e.getDisplayName(), killer.getExternalIdAsString());
+        } else {
+            killCredits.put(e.getDisplayName(), "None");
+        }
     }
 
     private UnitStatus processAlliedUnit(Entity e) {
@@ -644,7 +649,7 @@ public class ResolveScenarioTracker {
                         }
                         if (wounded) {
                             int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
-                            if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
+                            if (campaign.getCampaignOptions().isUseAdvancedMedical() || campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
                                 int range = 6 - hits;
                                 hits = hits + Compute.randomInt(range);
                             }
@@ -659,7 +664,7 @@ public class ResolveScenarioTracker {
         }
 
         // And now we have potential prisoners that are crewing a unit...
-        if (campaign.getCampaignOptions().getPrisonerCaptureStyle().isEnabled()) {
+        if (!campaign.getCampaignOptions().getPrisonerCaptureStyle().isNone()) {
             processPrisonerCapture(potentialSalvage);
             processPrisonerCapture(devastatedEnemyUnits);
         }
@@ -753,7 +758,7 @@ public class ResolveScenarioTracker {
 
             if (wounded) {
                 int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
-                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
+                if (campaign.getCampaignOptions().isUseAdvancedMedical() || campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
                     int range = 6 - hits;
                     hits = hits + Compute.randomInt(range);
                 }
@@ -793,7 +798,7 @@ public class ResolveScenarioTracker {
 
                             if (wounded) {
                                 int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
-                                if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
+                                if (campaign.getCampaignOptions().isUseAdvancedMedical() || campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
                                     int range = 6 - hits;
                                     hits = hits + Compute.randomInt(range);
                                 }
@@ -1032,7 +1037,7 @@ public class ResolveScenarioTracker {
                     }
                     if (wounded) {
                         int hits = campaign.getCampaignOptions().getMinimumHitsForVehicles();
-                        if (campaign.getCampaignOptions().useAdvancedMedical() || campaign.getCampaignOptions().useRandomHitsForVehicles()) {
+                        if (campaign.getCampaignOptions().isUseAdvancedMedical() || campaign.getCampaignOptions().isUseRandomHitsForVehicles()) {
                             int range = 6 - hits;
                             hits = hits + Compute.randomInt(range);
                         }
@@ -1393,7 +1398,7 @@ public class ResolveScenarioTracker {
 
             if (status.wasDeployed()) {
                 person.awardXP(campaign, status.getXP());
-                ServiceLogger.participatedInMission(person, campaign.getLocalDate(),
+                ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(),
                         scenario.getName(), mission.getName());
             }
             for (Kill k : status.getKills()) {
@@ -1403,13 +1408,13 @@ public class ResolveScenarioTracker {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
-                if (getCampaign().getCampaignOptions().getUseAtB() && isAtBContract) {
+                if (getCampaign().getCampaignOptions().isUseAtB() && isAtBContract) {
                     getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
                             true, getCampaign(), (AtBContract) mission);
                 }
             }
 
-            if (getCampaign().getCampaignOptions().useAdvancedMedical()) {
+            if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
                 person.diagnose(getCampaign(), status.getHits());
             }
 
@@ -1435,7 +1440,7 @@ public class ResolveScenarioTracker {
                 PrisonerStatus prisonerStatus = getCampaign().getCampaignOptions().getDefaultPrisonerStatus();
 
                 // Then, we need to determine if they are a defector
-                if (prisonerStatus.isPrisoner() && getCampaign().getCampaignOptions().useAtBPrisonerDefection()
+                if (prisonerStatus.isCurrentPrisoner() && getCampaign().getCampaignOptions().isUseAtBPrisonerDefection()
                         && isAtBContract) {
                     // Are they actually a defector?
                     if (Compute.d6(2) >= (8 + ((AtBContract) mission).getEnemySkill().ordinal() - getCampaign().getUnitRatingAsInteger())) {
@@ -1444,7 +1449,7 @@ public class ResolveScenarioTracker {
                 }
 
                 getCampaign().recruitPerson(person, prisonerStatus);
-                if (prisonerStatus.isWillingToDefect()) {
+                if (prisonerStatus.isPrisonerDefector()) {
                     getCampaign().addReport(String.format("You have convinced %s to defect.",
                             person.getHyperlinkedName()));
                 }
@@ -1456,13 +1461,13 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.participatedInMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
             }
 
-            if (campaign.getCampaignOptions().useAdvancedMedical()) {
+            if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
                 person.diagnose(getCampaign(), status.getHits());
             }
         }
@@ -1470,27 +1475,27 @@ public class ResolveScenarioTracker {
         if (prisonerRansoms.isGreaterThan(Money.zero())) {
             getCampaign().getFinances().credit(TransactionType.RANSOM, getCampaign().getLocalDate(),
                     prisonerRansoms, "Prisoner ransoms for " + getScenario().getName());
-            getCampaign().addReport(prisonerRansoms.toAmountAndNameString()
+            getCampaign().addReport(prisonerRansoms.toAmountAndSymbolString()
                     + " has been credited to your account for prisoner ransoms following "
                     + getScenario().getName() + ".");
         }
         //endregion Prisoners
 
-        //now lets update all units
+        // now lets update all units
         for (Unit unit : getUnits()) {
             UnitStatus ustatus = unitsStatus.get(unit.getId());
             if (null == ustatus) {
-                //shouldn't happen
+                // shouldn't happen
                 continue;
             }
             Entity en = ustatus.getEntity();
             Money unitValue = unit.getBuyCost();
-            if (campaign.getCampaignOptions().useBLCSaleValue()) {
+            if (campaign.getCampaignOptions().isBLCSaleValue()) {
                 unitValue = unit.getSellValue();
             }
 
             if (ustatus.isTotalLoss()) {
-                //missing unit
+                // missing unit
                 if (blc > 0) {
                     Money value = unitValue.multipliedBy(blc);
                     campaign.getFinances().credit(TransactionType.BATTLE_LOSS_COMPENSATION,
@@ -1517,18 +1522,18 @@ public class ResolveScenarioTracker {
                     unit.setSalvage(true);
                 }
                 campaign.addReport(unit.getHyperlinkedName() + " has been recovered.");
-                //check for BLC
+                // check for BLC
                 Money newValue = unit.getValueOfAllMissingParts();
                 Money blcValue = newValue.minus(currentValue);
                 Money repairBLC = Money.zero();
                 String blcString = "battle loss compensation (parts) for " + unit.getName();
                 if (!unit.isRepairable()) {
-                    //if the unit is not repairable, you should get BLC for it but we should subtract
-                    //the value of salvageable parts
+                    // if the unit is not repairable, you should get BLC for it but we should subtract
+                    // the value of salvageable parts
                     blcValue = unitValue.minus(unit.getSellValue());
                     blcString = "battle loss compensation for " + unit.getName();
                 }
-                if (campaign.getCampaignOptions().payForRepairs()) {
+                if (campaign.getCampaignOptions().isPayForRepairs()) {
                     for (Part p : unit.getParts()) {
                         if (p.needsFixing() && !(p instanceof Armor)) {
                             repairBLC = repairBLC.plus(p.getActualValue().multipliedBy(0.2));
@@ -1546,7 +1551,7 @@ public class ResolveScenarioTracker {
             }
         }
 
-        //now lets take care of salvage
+        // now lets take care of salvage
         for (TestUnit salvageUnit : getActualSalvage()) {
             UnitStatus salstatus = new UnitStatus(salvageUnit);
             // FIXME: Need to implement a "fuel" part just like the "armor" part
@@ -1555,7 +1560,7 @@ public class ResolveScenarioTracker {
             }
             campaign.clearGameData(salvageUnit.getEntity());
             campaign.addTestUnit(salvageUnit);
-            //if this is a contract, add to the salvaged value
+            // if this is a contract, add to the salvaged value
             if (isContract) {
                 ((Contract) mission).addSalvageByUnit(salvageUnit.getSellValue());
             }
@@ -1570,7 +1575,7 @@ public class ResolveScenarioTracker {
             if (unitRansoms.isGreaterThan(Money.zero())) {
                 getCampaign().getFinances().credit(TransactionType.SALVAGE, getCampaign().getLocalDate(),
                         unitRansoms, "Unit ransoms for " + getScenario().getName());
-                getCampaign().addReport(unitRansoms.toAmountAndNameString()
+                getCampaign().addReport(unitRansoms.toAmountAndSymbolString()
                         + " has been credited to your account from unit ransoms following "
                         + getScenario().getName() + ".");
                 if (isContract) {
@@ -1594,7 +1599,7 @@ public class ResolveScenarioTracker {
             }
         }
 
-        if (campaign.getCampaignOptions().getUseAtB() && isAtBContract) {
+        if (campaign.getCampaignOptions().isUseAtB() && isAtBContract) {
             final int unitRatingMod = campaign.getUnitRatingMod();
             for (Unit unit : getUnits()) {
                 unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
@@ -1611,7 +1616,7 @@ public class ResolveScenarioTracker {
         scenario.setStatus(resolution);
         scenario.setReport(report);
         scenario.clearAllForcesAndPersonnel(campaign);
-        //lets reset the network ids from the c3UUIDs
+        // lets reset the network ids from the c3UUIDs
         campaign.reloadGameEntities();
         campaign.refreshNetworks();
         scenario.setDate(campaign.getLocalDate());
@@ -1908,7 +1913,7 @@ public class ResolveScenarioTracker {
         public UnitStatus(Unit unit) {
             this.unit = unit;
             this.name = unit.getName();
-            chassis = unit.getEntity().getChassis();
+            chassis = unit.getEntity().getFullChassis();
             model = unit.getEntity().getModel();
             //assume its a total loss until we find something that says otherwise
             totalLoss = true;

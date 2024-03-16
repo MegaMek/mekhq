@@ -18,7 +18,6 @@
  */
 package mekhq.gui.control;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.log.LogEntry;
@@ -27,6 +26,7 @@ import mekhq.gui.dialog.AddOrEditPersonnelEntryDialog;
 import mekhq.gui.model.LogTableModel;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ResourceBundle;
@@ -55,10 +55,10 @@ public class EditPersonnelLogControl extends JPanel {
 
     private void initComponents() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditPersonnelLogControl",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+                MekHQ.getMHQOptions().getLocale());
 
         setName(resourceMap.getString("control.name"));
-        this.setLayout(new java.awt.BorderLayout());
+        this.setLayout(new BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1, 0));
 
@@ -102,7 +102,7 @@ public class EditPersonnelLogControl extends JPanel {
         this.add(scrollLogsTable, BorderLayout.CENTER);
     }
 
-    private void logTableValueChanged(javax.swing.event.ListSelectionEvent evt) {
+    private void logTableValueChanged(ListSelectionEvent evt) {
         int row = logsTable.getSelectedRow();
         btnDelete.setEnabled(row != -1);
         btnEdit.setEnabled(row != -1);

@@ -13,11 +13,11 @@ SpaceStation
 </UnitType>
 
 <Name>
-Habitat - Large
+Habitat
 </Name>
 
 <Model>
-(2500)
+Large (2500)
 </Model>
 
 <mul id:>
@@ -35,6 +35,10 @@ Habitat - Large
 <type>
 IS Level 3
 </type>
+
+<role>
+None
+</role>
 
 <designtype>
 0
@@ -126,7 +130,7 @@ Small Laser
 </structural_integrity>
 
 <source>
-TRO3057r - Age of War
+TRO: 3057 Revised
 </source>
 
 <tonnage>

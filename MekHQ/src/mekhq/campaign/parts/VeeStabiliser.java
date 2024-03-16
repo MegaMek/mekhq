@@ -24,6 +24,7 @@ import megamek.common.Compute;
 import megamek.common.EquipmentType;
 import megamek.common.Tank;
 import megamek.common.TechAdvancement;
+import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -63,13 +64,10 @@ public class VeeStabiliser extends Part {
     }
 
     @Override
-    public void writeToXML(PrintWriter pw1, int indent) {
-        writeToXmlBegin(pw1, indent);
-        pw1.println(MHQXMLUtility.indentStr(indent+1)
-                +"<loc>"
-                +loc
-                +"</loc>");
-        writeToXmlEnd(pw1, indent);
+    public void writeToXML(final PrintWriter pw, int indent) {
+        indent = writeToXMLBegin(pw, indent);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loc", loc);
+        writeToXMLEnd(pw, indent);
     }
 
     @Override
@@ -175,7 +173,7 @@ public class VeeStabiliser extends Part {
     }
 
     @Override
-    public String checkFixable() {
+    public @Nullable String checkFixable() {
         if (!isSalvaging() && (null != unit) && unit.isLocationBreached(loc)) {
             return unit.getEntity().getLocationName(loc) + " is breached.";
         }

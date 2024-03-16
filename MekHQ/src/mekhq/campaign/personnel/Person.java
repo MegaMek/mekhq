@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2023 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -25,11 +25,11 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Portrait;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
@@ -85,7 +85,7 @@ public class Person {
 
     //region Family Variables
     // Lineage
-    private Genealogy genealogy;
+    private final Genealogy genealogy;
 
     //region Procreation
     private LocalDate dueDate;
@@ -121,7 +121,7 @@ public class Person {
     private LocalDate retirement;
     private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
-    private List<LogEntry> missionLog;
+    private List<LogEntry> scenarioLog;
 
     private Skills skills;
     private PersonnelOptions options;
@@ -204,7 +204,7 @@ public class Person {
     private ExtraData extraData;
 
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     // initializes the AtB ransom values
     static {
@@ -229,6 +229,7 @@ public class Person {
     //region Constructors
     protected Person(final UUID id) {
         this.id = id;
+        this.genealogy = new Genealogy(this);
     }
 
     public Person(final Campaign campaign) {
@@ -284,7 +285,7 @@ public class Person {
         phenotype = Phenotype.NONE;
         bloodname = "";
         biography = "";
-        setGenealogy(new Genealogy(this));
+        this.genealogy = new Genealogy(this);
         dueDate = null;
         expectedDueDate = null;
         setPortrait(new Portrait());
@@ -315,7 +316,7 @@ public class Person {
         currentEdge = 0;
         techUnits = new ArrayList<>();
         personnelLog = new ArrayList<>();
-        missionLog = new ArrayList<>();
+        scenarioLog = new ArrayList<>();
         awardController = new PersonAwardController(this);
         injuries = new ArrayList<>();
         originalUnitWeight = EntityWeightClass.WEIGHT_ULTRA_LIGHT;
@@ -390,8 +391,8 @@ public class Person {
         // used during recruitment
 
         final boolean freed = !getPrisonerStatus().isFree();
-        final boolean isPrisoner = prisonerStatus.isPrisoner();
-        this.prisonerStatus = prisonerStatus;
+        final boolean isPrisoner = prisonerStatus.isCurrentPrisoner();
+        setPrisonerStatusDirect(prisonerStatus);
 
         // Now, we need to fix values and ranks based on the Person's status
         switch (prisonerStatus) {
@@ -412,10 +413,10 @@ public class Person {
                 break;
             case FREE:
                 if (!getPrimaryRole().isDependent()) {
-                    if (campaign.getCampaignOptions().getUseTimeInService()) {
+                    if (campaign.getCampaignOptions().isUseTimeInService()) {
                         setRecruitment(campaign.getLocalDate());
                     }
-                    if (campaign.getCampaignOptions().getUseTimeInRank()) {
+                    if (campaign.getCampaignOptions().isUseTimeInRank()) {
                         setLastRankChangeDate(campaign.getLocalDate());
                     }
                 }
@@ -439,6 +440,14 @@ public class Person {
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(this));
+    }
+
+    /**
+     * This is public for unit testing reasons
+     * @param prisonerStatus the person's new prisoner status
+     */
+    public void setPrisonerStatusDirect(final PrisonerStatus prisonerStatus) {
+        this.prisonerStatus = prisonerStatus;
     }
 
     //region Text Getters
@@ -489,7 +498,7 @@ public class Person {
 
     /**
      * Return a full last name which may be a bloodname or a surname with or without a post-nominal.
-     * A bloodname will overrule a surname but we do not disallow surnames for clanners, if the
+     * A bloodname will overrule a surname but we do not disallow surnames for clan personnel, if the
      * player wants to input them
      * @return a String of the person's last name
      */
@@ -621,7 +630,7 @@ public class Person {
     public void migrateName(final String text) {
         // How this works:
         // Takes the input name, and splits it into individual parts.
-        // Then, it depends on whether the person is a Clanner or not.
+        // Then, it depends on whether the person is Clan or not.
         // For Clan names:
         // Takes the input name, and assumes that person does not have a surname
         // Bloodnames are assumed to have been assigned by MekHQ
@@ -964,7 +973,12 @@ public class Person {
             }
         }
 
-        if (!status.isActive()) {
+        if (status.isActive()) {
+            // Check Pregnancy
+            if (isPregnant() && getDueDate().isBefore(today)) {
+                campaign.getProcreation().birth(campaign, getDueDate(), this);
+            }
+        } else {
             setDoctorId(null, campaign.getCampaignOptions().getNaturalHealingWaitingPeriod());
 
             // If we're assigned to a unit, remove us from it
@@ -1111,10 +1125,6 @@ public class Person {
 
     public Genealogy getGenealogy() {
         return genealogy;
-    }
-
-    public void setGenealogy(final Genealogy genealogy) {
-        this.genealogy = genealogy;
     }
 
     //region Pregnancy
@@ -1337,8 +1347,8 @@ public class Person {
                         originPlanet.getParentSystem().getId(), originPlanet.getId());
             }
 
-            if (phenotype != Phenotype.NONE) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", phenotype.name());
+            if (!getPhenotype().isNone()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "phenotype", getPhenotype().name());
             }
 
             if (!StringUtility.isNullOrBlank(bloodname)) {
@@ -1469,12 +1479,12 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelLog");
             }
 
-            if (!missionLog.isEmpty()) {
-                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "missionLog");
-                for (LogEntry entry : missionLog) {
+            if (!scenarioLog.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "scenarioLog");
+                for (LogEntry entry : scenarioLog) {
                     entry.writeToXML(pw, indent);
                 }
-                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "missionLog");
+                MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "scenarioLog");
             }
 
             if (!getAwardController().getAwards().isEmpty()) {
@@ -1729,7 +1739,8 @@ public class Person {
                             retVal.addLogEntry(logEntry);
                         }
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("missionLog")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionLog") // Legacy - 0.49.11 removal
+                        || wn2.getNodeName().equalsIgnoreCase("scenarioLog")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
@@ -1739,13 +1750,13 @@ public class Person {
                         }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("logEntry")) {
-                            LogManager.getLogger().error("Unknown node type not loaded in mission log nodes: " + wn3.getNodeName());
+                            LogManager.getLogger().error("Unknown node type not loaded in scenario log nodes: " + wn3.getNodeName());
                             continue;
                         }
 
                         final LogEntry logEntry = LogEntryFactory.getInstance().generateInstanceFromXML(wn3);
                         if (logEntry != null) {
-                            retVal.addMissionLogEntry(logEntry);
+                            retVal.addScenarioLogEntry(logEntry);
                         }
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("awards")) {
@@ -1887,9 +1898,6 @@ public class Person {
                 }
             }
 
-            // Ensure the Genealogy Origin is set to this
-            retVal.getGenealogy().setOrigin(retVal);
-
             // Fixing Prisoner Ranks - 0.47.X Fix
             if (retVal.getRankNumeric() < 0) {
                 retVal.setRank(0);
@@ -1920,7 +1928,7 @@ public class Person {
         // TODO : Figure out a way to allow negative salaries... could be used to simulate a Holovid
         // TODO : star paying to be part of the company, for example
         Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getPrimaryRole().ordinal()];
-        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(campaign, false)));
+        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, false)));
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
             if (hasSkill(SkillType.S_ANTI_MECH)) {
                 primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
@@ -1933,7 +1941,7 @@ public class Person {
         }
 
         Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
-        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultiplier(getExperienceLevel(campaign, true)));
+        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
         if (getSecondaryRole().isSoldierOrBattleArmour()) {
             if (hasSkill(SkillType.S_ANTI_MECH)) {
                 secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
@@ -2035,7 +2043,7 @@ public class Person {
         setRank(rankNumeric);
         setRankLevel(rankLevel);
 
-        if (campaign.getCampaignOptions().getUseTimeInRank()) {
+        if (campaign.getCampaignOptions().isUseTimeInRank()) {
             if (getPrisonerStatus().isFree() && !getPrimaryRole().isDependent()) {
                 setLastRankChangeDate(campaign.getLocalDate());
             } else {
@@ -2132,10 +2140,6 @@ public class Person {
     }
     //endregion Ranks
 
-    public String getSkillSummary(final Campaign campaign) {
-        return SkillType.getExperienceLevelName(getExperienceLevel(campaign, false));
-    }
-
     @Override
     public String toString() {
         return getFullName();
@@ -2162,6 +2166,10 @@ public class Person {
         return getId().hashCode();
     }
 
+    public SkillLevel getSkillLevel(final Campaign campaign, final boolean secondary) {
+        return Skills.SKILL_LEVELS[getExperienceLevel(campaign, secondary) + 1];
+    }
+
     public int getExperienceLevel(final Campaign campaign, final boolean secondary) {
         final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
         switch (role) {
@@ -2172,7 +2180,7 @@ public class Person {
                      * due to non-standard experience thresholds then fall back on lower precision averaging
                      * See Bug #140
                      */
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_MECH).getLevel() + getSkill(SkillType.S_PILOT_MECH).getLevel()) / 2.0
                         );
@@ -2195,7 +2203,7 @@ public class Person {
                      * due to non-standard experience thresholds then fall back on lower precision averaging
                      * See Bug #140
                      */
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor((Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH,
                                 SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).mapToInt(s -> getSkill(s).getLevel()).sum())
                                 / 4.0);
@@ -2227,7 +2235,7 @@ public class Person {
                 return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() : SkillType.EXP_NONE;
             case AEROSPACE_PILOT:
                 if (hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO)) {
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_AERO).getLevel() + getSkill(SkillType.S_PILOT_AERO).getLevel()) / 2.0
                         );
@@ -2244,7 +2252,7 @@ public class Person {
                 }
             case CONVENTIONAL_AIRCRAFT_PILOT:
                 if (hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET)) {
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_JET).getLevel() + getSkill(SkillType.S_PILOT_JET).getLevel()) / 2.0
                         );
@@ -2263,7 +2271,7 @@ public class Person {
                 return hasSkill(SkillType.S_GUN_PROTO) ? getSkill(SkillType.S_GUN_PROTO).getExperienceLevel() : SkillType.EXP_NONE;
             case BATTLE_ARMOUR:
                 if (hasSkill(SkillType.S_GUN_BA) && hasSkill(SkillType.S_ANTI_MECH)) {
-                    if (campaign.getCampaignOptions().useAlternativeQualityAveraging()) {
+                    if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
                         int rawScore = (int) Math.floor(
                             (getSkill(SkillType.S_GUN_BA).getLevel() + getSkill(SkillType.S_ANTI_MECH).getLevel()) / 2.0
                         );
@@ -2320,7 +2328,7 @@ public class Person {
      * personnel table among other places
      */
     public String getFullDesc(final Campaign campaign) {
-        return "<b>" + getFullTitle() + "</b><br/>" + getSkillSummary(campaign) + ' ' + getRoleDesc();
+        return "<b>" + getFullTitle() + "</b><br/>" + getSkillLevel(campaign, false) + ' ' + getRoleDesc();
     }
 
     public String getHTMLTitle() {
@@ -2377,7 +2385,7 @@ public class Person {
     }
 
     public int getHealingDifficulty(final Campaign campaign) {
-        return campaign.getCampaignOptions().useTougherHealing() ? Math.max(0, getHits() - 2) : 0;
+        return campaign.getCampaignOptions().isTougherHealing() ? Math.max(0, getHits() - 2) : 0;
     }
 
     public TargetRoll getHealingMods(final Campaign campaign) {
@@ -3071,17 +3079,17 @@ public class Person {
         return personnelLog;
     }
 
-    public List<LogEntry> getMissionLog() {
-        missionLog.sort(Comparator.comparing(LogEntry::getDate));
-        return missionLog;
+    public List<LogEntry> getScenarioLog() {
+        scenarioLog.sort(Comparator.comparing(LogEntry::getDate));
+        return scenarioLog;
     }
 
     public void addLogEntry(final LogEntry entry) {
         personnelLog.add(entry);
     }
 
-    public void addMissionLogEntry(final LogEntry entry) {
-        missionLog.add(entry);
+    public void addScenarioLogEntry(final LogEntry entry) {
+        scenarioLog.add(entry);
     }
 
     //region injuries
@@ -3114,7 +3122,7 @@ public class Person {
 
     public int getAbilityTimeModifier(final Campaign campaign) {
         int modifier = 100;
-        if (campaign.getCampaignOptions().useToughness()) {
+        if (campaign.getCampaignOptions().isUseToughness()) {
             if (getToughness() == 1) {
                 modifier -= 10;
             }

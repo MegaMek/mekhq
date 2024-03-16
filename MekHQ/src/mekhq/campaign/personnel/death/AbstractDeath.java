@@ -21,7 +21,6 @@ package mekhq.campaign.personnel.death;
 import megamek.Version;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
-import megamek.common.util.EncodeControl;
 import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -52,25 +51,26 @@ public abstract class AbstractDeath {
     private final boolean enableRandomDeathSuicideCause;
     private final Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> causes;
 
-    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
+            MekHQ.getMHQOptions().getLocale());
     //endregion Variable Declarations
 
     //region Constructors
-    protected AbstractDeath(final RandomDeathMethod method, final CampaignOptions options) {
+    protected AbstractDeath(final RandomDeathMethod method, final CampaignOptions options,
+                            final boolean initializeCauses) {
         this.method = method;
         setEnabledAgeGroups(options.getEnabledRandomDeathAgeGroups());
         setUseRandomClanPersonnelDeath(options.isUseRandomClanPersonnelDeath());
         setUseRandomPrisonerDeath(options.isUseRandomPrisonerDeath());
         this.enableRandomDeathSuicideCause = options.isUseRandomDeathSuicideCause();
         this.causes = new HashMap<>();
-        if (!method.isNone()) {
+        if (initializeCauses && !method.isNone()) {
             initializeCauses();
         }
     }
     //endregion Constructors
 
-    //region Getters
+    //region Getters/Setters
     public RandomDeathMethod getMethod() {
         return method;
     }
@@ -106,7 +106,7 @@ public abstract class AbstractDeath {
     public Map<Gender, Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>>> getCauses() {
         return causes;
     }
-    //endregion Getters
+    //endregion Getters/Setters
 
     /**
      * This is used to determine if a person can die.
@@ -126,7 +126,7 @@ public abstract class AbstractDeath {
                 return resources.getString("cannotDie.AgeGroupDisabled.text");
             } else if (!isUseRandomClanPersonnelDeath() && person.isClanPersonnel()) {
                 return resources.getString("cannotDie.RandomClanPersonnel.text");
-            } else if (!isUseRandomPrisonerDeath() && person.getPrisonerStatus().isPrisoner()) {
+            } else if (!isUseRandomPrisonerDeath() && person.getPrisonerStatus().isCurrentPrisoner()) {
                 return resources.getString("cannotDie.RandomPrisoner.text");
             }
         }
@@ -141,7 +141,8 @@ public abstract class AbstractDeath {
      * @param today the current day
      * @param person the person to process
      */
-    public boolean processNewDay(final Campaign campaign, final LocalDate today, final Person person) {
+    public boolean processNewDay(final Campaign campaign, final LocalDate today,
+                                 final Person person) {
         final int age = person.getAge(today);
         final AgeGroup ageGroup = AgeGroup.determineAgeGroup(age);
         if (canDie(person, ageGroup, true) != null) {

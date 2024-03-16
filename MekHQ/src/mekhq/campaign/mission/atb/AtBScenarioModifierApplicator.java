@@ -31,6 +31,7 @@ import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.Skills;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
@@ -175,7 +176,7 @@ public class AtBScenarioModifierApplicator {
     public static void adjustSkill(AtBDynamicScenario scenario, Campaign campaign,
             ForceAlignment eventRecipient, int skillAdjustment) {
         // We want a non-none Skill Level
-        final SkillLevel adjustedSkill = SkillLevel.values()[MathUtility.clamp(
+        final SkillLevel adjustedSkill = Skills.SKILL_LEVELS[MathUtility.clamp(
                 scenario.getEffectiveOpforSkill().ordinal() + skillAdjustment,
                 SkillLevel.ULTRA_GREEN.ordinal(), SkillLevel.LEGENDARY.ordinal())];
         // fire up a skill generator set to the appropriate skill model
@@ -329,13 +330,16 @@ public class AtBScenarioModifierApplicator {
      * Applies an objective to the scenario.
      */
     public static void applyObjective(AtBDynamicScenario scenario, Campaign campaign, ScenarioObjective objective, EventTiming timing) {
-        // if we're doing this before force generation, just add the objective for future translation
-        scenario.getTemplate().scenarioObjectives.add(objective);
+        // Only apply objective if it isn't already added
+        if (!scenario.getTemplate().scenarioObjectives.contains(objective)) {
+            // if we're doing this before force generation, just add the objective for future translation
+            scenario.getTemplate().scenarioObjectives.add(objective);
 
-        // if we're doing it after, we have to translate it individually
-        if (timing == EventTiming.PostForceGeneration) {
-            ScenarioObjective actualObjective = AtBDynamicScenarioFactory.translateTemplateObjective(scenario, campaign, objective);
-            scenario.getScenarioObjectives().add(actualObjective);
+            // if we're doing it after, we have to translate it individually
+            if (timing == EventTiming.PostForceGeneration) {
+                ScenarioObjective actualObjective = AtBDynamicScenarioFactory.translateTemplateObjective(scenario, campaign, objective);
+                scenario.getScenarioObjectives().add(actualObjective);
+            }
         }
     }
 

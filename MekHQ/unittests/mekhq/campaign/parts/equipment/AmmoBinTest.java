@@ -114,12 +114,12 @@ public class AmmoBinTest {
     }
 
     @Test
-    public void massRepairOptionTest() {
+    public void mrmsOptionTest() {
         Campaign mockCampaign = mock(Campaign.class);
         AmmoType ammoType = getAmmoType("ISSRM6 Inferno Ammo");
         AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, ammoType.getShots(), false, false, mockCampaign);
 
-        assertEquals(PartRepairType.AMMO, ammoBin.getMassRepairOptionType());
+        assertEquals(PartRepairType.AMMUNITION, ammoBin.getMRMSOptionType());
     }
 
     @Test
@@ -178,7 +178,7 @@ public class AmmoBinTest {
 
         // Grab the missing part via IAcquisitionWork
         IAcquisitionWork acquisitionPart = ammoBin.getAcquisitionWork();
-        assertTrue(acquisitionPart instanceof AmmoStorage);
+        assertInstanceOf(AmmoStorage.class, acquisitionPart);
 
         AmmoStorage ammoStorage = (AmmoStorage) acquisitionPart;
         assertEquals(ammoBin.getType(), ammoStorage.getType());
@@ -190,7 +190,7 @@ public class AmmoBinTest {
 
         // Check that we buy a ton, even if the bin is one shot
         acquisitionPart = ammoBin.getAcquisitionWork();
-        assertTrue(acquisitionPart instanceof AmmoStorage);
+        assertInstanceOf(AmmoStorage.class, acquisitionPart);
 
         ammoStorage = (AmmoStorage) acquisitionPart;
         assertEquals(ammoBin.getType(), ammoStorage.getType());
@@ -449,7 +449,7 @@ public class AmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, deserializedPart);
 
         AmmoBin deserialized = (AmmoBin) deserializedPart;
 
@@ -489,7 +489,7 @@ public class AmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, deserializedPart);
 
         AmmoBin deserialized = (AmmoBin) deserializedPart;
 
@@ -530,7 +530,7 @@ public class AmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, deserializedPart);
 
         AmmoBin deserialized = (AmmoBin) deserializedPart;
 
@@ -570,7 +570,7 @@ public class AmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, deserializedPart);
 
         AmmoBin deserialized = (AmmoBin) deserializedPart;
 
@@ -656,7 +656,7 @@ public class AmmoBinTest {
         // Deserialize the AmmoBin
         Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
         assertNotNull(deserializedPart);
-        assertTrue(deserializedPart instanceof AmmoBin);
+        assertInstanceOf(AmmoBin.class, deserializedPart);
 
         AmmoBin deserialized = (AmmoBin) deserializedPart;
 
@@ -710,7 +710,7 @@ public class AmmoBinTest {
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             added = (AmmoStorage) part;
         }
 
@@ -740,7 +740,7 @@ public class AmmoBinTest {
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             added = (AmmoStorage) part;
         }
 
@@ -796,7 +796,7 @@ public class AmmoBinTest {
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             added = (AmmoStorage) part;
         }
 
@@ -829,7 +829,7 @@ public class AmmoBinTest {
         AmmoStorage added = null;
         for (Part part : warehouse.getParts()) {
             assertNull(added);
-            assertTrue(part instanceof AmmoStorage);
+            assertInstanceOf(AmmoStorage.class, part);
             added = (AmmoStorage) part;
         }
 

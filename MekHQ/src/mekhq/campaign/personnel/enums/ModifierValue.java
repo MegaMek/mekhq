@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All rights reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -19,6 +19,18 @@
 package mekhq.campaign.personnel.enums;
 
 public enum ModifierValue {
+    //region Enum Declarations
     PILOTING,
-    GUNNERY
+    GUNNERY;
+    //endregion Enum Declarations
+
+    //region Boolean Comparison Methods
+    public boolean isPiloting() {
+        return this == PILOTING;
+    }
+
+    public boolean isGunnery() {
+        return this == GUNNERY;
+    }
+    //endregion Boolean Comparison Methods
 }

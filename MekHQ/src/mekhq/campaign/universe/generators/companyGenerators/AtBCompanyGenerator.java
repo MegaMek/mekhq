@@ -41,18 +41,18 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
 
     //region Personnel
     /**
-     * @param campaign the campaign to use in generating the commanding officer's rank
+     * @param faction the faction to use in generating the commanding officer's rank
      * @param tracker the commanding officer's tracker
      * @param numMechWarriors the number of MechWarriors in their force, used to determine their rank
      */
     @Override
-    protected void generateCommandingOfficerRank(final Campaign campaign,
+    protected void generateCommandingOfficerRank(final Faction faction,
                                                  final CompanyGenerationPersonTracker tracker,
                                                  final int numMechWarriors) {
         if (numMechWarriors >= 36) {
-            tracker.getPerson().setRank(Rank.RWO_MAX + (campaign.getFaction().isComStarOrWoB() ? 7 : 8));
+            tracker.getPerson().setRank(Rank.RWO_MAX + (faction.isComStarOrWoB() ? 7 : 8));
         } else if (numMechWarriors >= 12) {
-            tracker.getPerson().setRank(Rank.RWO_MAX + (campaign.getFaction().isComStarOrWoB() ? 7 : 5));
+            tracker.getPerson().setRank(Rank.RWO_MAX + (faction.isComStarOrWoB() ? 7 : 5));
         } else if (numMechWarriors >= 4) {
             tracker.getPerson().setRank(Rank.RWO_MAX + 4);
         } else {
@@ -74,7 +74,7 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
                                                         final Faction faction) {
         if (parameters.isStarLeague() && !faction.isComStarOrWoB()) {
             if (faction.isClan()) {
-                // Clanners generate from Front Line tables instead of Star League
+                // Clan Pilots generate from Front Line tables instead of Star League
                 parameters.setQuality(IUnitRating.DRAGOON_B);
                 return generateMechSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
@@ -83,7 +83,7 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
                 return generateMechSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }
         } else {
-            // Clanners Generate from 2nd Line Tables
+            // Clan Pilots Generate from 2nd Line Tables
             if (faction.isClan()) {
                 parameters.setQuality(IUnitRating.DRAGOON_C);
             }

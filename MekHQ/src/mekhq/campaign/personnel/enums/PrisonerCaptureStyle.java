@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,7 +18,6 @@
  */
 package mekhq.campaign.personnel.enums;
 
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
@@ -31,35 +30,41 @@ public enum PrisonerCaptureStyle {
     //endregion Enum Declarations
 
     //region Variable Declarations
-    private final String styleName;
-    private final String toolTip;
+    private final String name;
+    private final String toolTipText;
     //endregion Variable Declarations
 
     //region Constructors
-    PrisonerCaptureStyle(String styleName, String toolTip) {
+    PrisonerCaptureStyle(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
-                MekHQ.getMHQOptions().getLocale(), new EncodeControl());
-        this.styleName = resources.getString(styleName);
-        this.toolTip = resources.getString(toolTip);
+                MekHQ.getMHQOptions().getLocale());
+        this.name = resources.getString(name);
+        this.toolTipText = resources.getString(toolTipText);
     }
     //endregion Constructors
 
-    //region Boolean Comparisons
-    public boolean isEnabled() {
-        return this != NONE;
+    //region Getters
+    public String getToolTipText() {
+        return toolTipText;
+    }
+    //endregion Getters
+
+    //region Boolean Comparison Methods
+    public boolean isNone() {
+        return this == NONE;
     }
 
     public boolean isAtB() {
         return this == ATB;
     }
-    //endregion Boolean Comparisons
+
+    public boolean isTaharqa() {
+        return this == TAHARQA;
+    }
+    //endregion Boolean Comparison Methods
 
     @Override
     public String toString() {
-        return styleName;
-    }
-
-    public String getToolTip() {
-        return toolTip;
+        return name;
     }
 }

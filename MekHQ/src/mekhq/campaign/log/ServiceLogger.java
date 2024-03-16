@@ -19,7 +19,6 @@
 package mekhq.campaign.log;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -38,12 +37,12 @@ import java.util.ResourceBundle;
  */
 public class ServiceLogger {
     private static final transient ResourceBundle logEntriesResourceMap = ResourceBundle.getBundle("mekhq.resources.LogEntries",
-            MekHQ.getMHQOptions().getLocale(), new EncodeControl());
+            MekHQ.getMHQOptions().getLocale());
 
     public static void retireDueToWounds(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("retiredDueToWounds.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
-                GenderDescriptors.HIS_HER.getDescriptor(person.getGender()))));
+                GenderDescriptors.HIS_HER_THEIR.getDescriptor(person.getGender()))));
     }
 
     public static void madeBondsman(Person person, LocalDate date, String name, String rankEntry) {
@@ -125,9 +124,10 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, person.getRankName())));
     }
 
-    public static void participatedInMission(Person person, LocalDate date, String scenarioName, String missionName) {
-        String message = logEntriesResourceMap.getString("participatedInMission.text");
-        person.addMissionLogEntry(new ServiceLogEntry(date,
+    public static void participatedInScenarioDuringMission(Person person, LocalDate date,
+                                                           String scenarioName, String missionName) {
+        String message = logEntriesResourceMap.getString("participatedInScenarioDuringMission.text");
+        person.addScenarioLogEntry(new ServiceLogEntry(date,
                 MessageFormat.format(message, scenarioName, missionName)));
     }
 

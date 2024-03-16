@@ -165,7 +165,7 @@ public class Lance {
                 if (null != entity) {
                     if ((entity.getEntityType() & Entity.ETYPE_MECH) != 0) {
                         armor += 1;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AERO) != 0) {
+                    } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
                         other += 0.5;
                     } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
                         armor += 0.5;
@@ -217,7 +217,7 @@ public class Lance {
 
         /* Check that the number of units and weight are within the limits
          * and that the force contains at least one ground unit. */
-        if (c.getCampaignOptions().getLimitLanceNumUnits()) {
+        if (c.getCampaignOptions().isLimitLanceNumUnits()) {
             int size = getSize(c);
             if (size < getStdLanceSize(c.getFaction()) - 1 ||
                     size > getStdLanceSize(c.getFaction()) + 2) {
@@ -225,7 +225,7 @@ public class Lance {
             }
         }
 
-        if (c.getCampaignOptions().getLimitLanceWeight() &&
+        if (c.getCampaignOptions().isLimitLanceWeight() &&
                 getWeightClass(c) > EntityWeightClass.WEIGHT_ASSAULT) {
             return false;
         }
@@ -250,24 +250,8 @@ public class Lance {
     }
 
     /* Code to find unit commander from ForceViewPanel */
-
     public static UUID findCommander(int forceId, Campaign c) {
-        ArrayList<Person> people = new ArrayList<>();
-        for (UUID uid : c.getForce(forceId).getAllUnits(false)) {
-            Unit u = c.getUnit(uid);
-            if (null != u) {
-                Person p = u.getCommander();
-                if (null != p) {
-                    people.add(p);
-                }
-            }
-        }
-        // sort person vector by rank
-        people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if (!people.isEmpty()) {
-            return people.get(0).getId();
-        }
-        return null;
+        return c.getForce(forceId).getForceCommanderID();
     }
 
     public static LocalDate getBattleDate(LocalDate today) {
@@ -283,7 +267,7 @@ public class Lance {
         }
 
         // if we are using StratCon, don't *also* generate legacy scenarios
-        if (c.getCampaignOptions().getUseStratCon() &&
+        if (c.getCampaignOptions().isUseStratCon() &&
                 (getContract(c).getStratconCampaignState() != null)) {
             return null;
         }
@@ -323,7 +307,7 @@ public class Lance {
                             AtBScenario.STANDUP, false,
                             getBattleDate(c.getLocalDate()));
                 } else if (roll < 33) {
-                    if (c.getCampaignOptions().generateChases()) {
+                    if (c.getCampaignOptions().isGenerateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, false,
                                 getBattleDate(c.getLocalDate()));
@@ -349,7 +333,7 @@ public class Lance {
                             AtBScenario.BASEATTACK, false,
                             getBattleDate(c.getLocalDate()));
                 } else if (roll < 11) {
-                    if (c.getCampaignOptions().generateChases()) {
+                    if (c.getCampaignOptions().isGenerateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, true,
                                 getBattleDate(c.getLocalDate()));
@@ -423,7 +407,7 @@ public class Lance {
                             AtBScenario.BREAKTHROUGH, true,
                             getBattleDate(c.getLocalDate()));
                 } else if (roll < 7) {
-                    if (c.getCampaignOptions().generateChases()) {
+                    if (c.getCampaignOptions().isGenerateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, true,
                                 getBattleDate(c.getLocalDate()));
@@ -437,7 +421,7 @@ public class Lance {
                             AtBScenario.HIDEANDSEEK, false,
                             getBattleDate(c.getLocalDate()));
                 } else {
-                    if (c.getCampaignOptions().generateChases()) {
+                    if (c.getCampaignOptions().isGenerateChases()) {
                         return AtBScenarioFactory.createScenario(c, this,
                                 AtBScenario.CHASE, false,
                                 getBattleDate(c.getLocalDate()));
@@ -510,12 +494,12 @@ public class Lance {
                             (entity.getEntityType() & Entity.ETYPE_INFANTRY) != 0) {
                         weight += entity.getWeight();
                     } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
-                        if (c.getFaction().isClan() || c.getCampaignOptions().getAdjustPlayerVehicles()) {
+                        if (c.getFaction().isClan() || c.getCampaignOptions().isAdjustPlayerVehicles()) {
                             weight += entity.getWeight() * 0.5;
                         } else {
                             weight += entity.getWeight();
                         }
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AERO) != 0) {
+                    } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
                         if (c.getFaction().isClan()) {
                             weight += entity.getWeight() * 0.5;
                         } else {
