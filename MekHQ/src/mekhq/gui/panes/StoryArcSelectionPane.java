@@ -22,6 +22,7 @@ import megamek.client.ui.preferences.JListPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.renderers.StoryArcRenderer;
 import mekhq.campaign.storyarc.StoryArcStub;
@@ -73,7 +74,7 @@ public class StoryArcSelectionPane extends AbstractMHQScrollPane {
         getStoryArcStubs().setLayoutOrientation(JList.VERTICAL);
         getStoryArcStubs().setCellRenderer(new StoryArcRenderer(getFrame()));
 
-        final JPanel panel = new JScrollablePanel(new GridLayout(1, 1));
+        final JPanel panel = new DefaultMHQScrollablePanel(this.getFrame(), "storyArcPanel", new GridLayout(1, 1));
         panel.setName("storyArcPanel");
         panel.add(getStoryArcStubs());
 

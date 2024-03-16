@@ -33,7 +33,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.Option;
 import megamek.common.options.OptionsConstants;
-import megamek.common.util.EncodeControl;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
@@ -117,7 +116,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private Campaign campaign;
 
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CreateCharacterDialog",
-            new EncodeControl());
+        MekHQ.getMHQOptions().getLocale());
     //endregion Variable declarations
 
     /** Creates new form CustomizePilotDialog */
@@ -585,7 +584,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textToughness.setText(Integer.toString(person.getToughness()));
         textToughness.setName("textToughness"); // NOI18N
 
-        if (campaign.getCampaignOptions().useToughness()) {
+        if (campaign.getCampaignOptions().isUseToughness()) {
             gridBagConstraints = new java.awt.GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
@@ -680,7 +679,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         scrOptions.setPreferredSize(new java.awt.Dimension(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills); // NOI18N
-        if (campaign.getCampaignOptions().useAbilities() || campaign.getCampaignOptions().useImplants()) {
+        if (campaign.getCampaignOptions().isUseAbilities() || campaign.getCampaignOptions().isUseImplants()) {
             tabStats.addTab(resourceMap.getString("scrOptions.TabConstraints.tabTitle"), scrOptions); // NOI18N
         }
 
@@ -933,7 +932,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             IOptionGroup group = i.nextElement();
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.LVL3_ADVANTAGES)
-                    && !campaign.getCampaignOptions().useAbilities()) {
+                    && !campaign.getCampaignOptions().isUseAbilities()) {
                 continue;
             }
 
@@ -942,7 +941,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             }
 
             if (group.getKey().equalsIgnoreCase(PersonnelOptions.MD_ADVANTAGES)
-                    && !campaign.getCampaignOptions().useImplants()) {
+                    && !campaign.getCampaignOptions().isUseImplants()) {
                 continue;
             }
 
@@ -1217,7 +1216,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     }
 
     private void randomName() {
-        String factionCode = campaign.getCampaignOptions().useOriginFactionForNames()
+        String factionCode = campaign.getCampaignOptions().isUseOriginFactionForNames()
                 ? person.getOriginFaction().getShortName()
                 : RandomNameGenerator.getInstance().getChosenFaction();
 

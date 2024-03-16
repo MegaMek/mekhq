@@ -24,7 +24,7 @@ import megamek.Version;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
-import mekhq.gui.enums.MekHQTabType;
+import mekhq.gui.enums.MHQTabType;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -34,7 +34,7 @@ import java.text.ParseException;
 
 public class SwitchTabStoryTrigger extends StoryTrigger {
 
-    MekHQTabType tab;
+    MHQTabType tab;
 
     @Override
     protected void execute() {
@@ -57,7 +57,7 @@ public class SwitchTabStoryTrigger extends StoryTrigger {
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("tab")) {
-                    tab = MekHQTabType.parseFromString(wn2.getTextContent().trim());
+                    //tab = MHQTabType.parseFromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);
