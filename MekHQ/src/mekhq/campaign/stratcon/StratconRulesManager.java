@@ -192,7 +192,7 @@ public class StratconRulesManager {
                 backingScenario.getTerrainType() != Scenario.TER_SPACE) {
             backingScenario.setTemperature(track.getTemperature());
         }
-        
+
         // for now, if we're using a fixed map or in a facility, don't replace the scenario
         // TODO: facility spaces will always have a relevant biome
         if (backingScenario.isUsingFixedMap()) {
@@ -201,12 +201,12 @@ public class StratconRulesManager {
 
         StratconFacility facility = track.getFacility(scenario.getCoords());
         String terrainType;
-        
+
         // facilities have their own terrain lists
         if (facility != null) {
             int kelvinTemp = track.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
             StratconBiome facilityBiome;
-            
+
             // if facility doesn't have a biome temp map or no entry for the current temperature, use the default one
             if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
                 facilityBiome = StratconBiomeManifest.getInstance().getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
@@ -218,7 +218,7 @@ public class StratconRulesManager {
         } else {
             terrainType = track.getTerrainTile(coords);
         }
-        
+
         var mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
 
         // don't have a map list for the given terrain, leave it alone
@@ -1431,9 +1431,12 @@ public class StratconRulesManager {
                     StratconFacility facility = track.getFacility(scenario.getCoords());
 
                     boolean victory = rst.getScenario().getStatus().isOverallVictory();
+                    boolean draw = rst.getScenario().getStatus().isDraw();
 
                     if (scenario.isRequiredScenario()) {
                         campaignState.updateVictoryPoints(victory ? 1 : -1);
+                        // if draw, add 1VP to counteract lost VP from above line
+                        campaignState.updateVictoryPoints(draw ? 1 : 0);
                     }
 
                     // this must be done before removing the scenario from the track
