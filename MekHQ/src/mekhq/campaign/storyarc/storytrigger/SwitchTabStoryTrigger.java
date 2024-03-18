@@ -57,7 +57,7 @@ public class SwitchTabStoryTrigger extends StoryTrigger {
 
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("tab")) {
-                    //tab = MHQTabType.parseFromString(wn2.getTextContent().trim());
+                    tab = MHQTabType.parseFromString(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);
