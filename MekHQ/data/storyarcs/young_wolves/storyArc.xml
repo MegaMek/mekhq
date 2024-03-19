@@ -5744,7 +5744,209 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Save the Khan</name>
         <desc>
+          SaKhan Phelan Ward is under heavy assault from Jade Falcon forces! You must combat drop onto their positions with everything you have to save the khan.
         </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>32,34</mapSize>
+        <map>/unofficial/pokefan548/Fan Pack Arctic/32x34/32x34 Arctic Fields</map>
+        <botForce>
+          <name>Fourth Talon Cluster</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Vau Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>MENACE</name>
+            <forcedWithdrawal>true</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>4</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>3</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="c994808b-70f8-482c-b72a-1fbed82dbf0a" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Star Commander Letha" nick="" gender="FEMALE" gunnery="2" piloting="3" artillery="4" externalId="db0be97b-caba-4291-928e-2fc6d9087b63" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="22"/>
+              </location>
+              <location index="2"> Right Torso
+                <armor points="17"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="5"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="6"/>
+              </location>
+              <Game id="1"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="8859bd05-7447-41e0-b844-09164e16f6b9" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Karinda" nick="" gender="FEMALE" gunnery="3" piloting="3" artillery="4" externalId="1a188952-2af1-4226-8515-0ae918249cb2" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <armor points="17"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ultra AC/20 Ammo" shots="2"/>
+                <slot index="6" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <Game id="2"/>
+            </entity>
+            <entity chassis="Cauldron-Born (Ebon Jaguar)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="fdff6a0a-f29e-4a59-ac03-bf545761ec6c" quirks="low_profile">
+              <pilot size="1" name="Margaret" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="3cc1422d-7184-4616-b06c-0c72bc032a9e" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="5" type="Clan Ultra AC/10 Ammo" shots="4"/>
+                <slot index="6" type="Clan Ultra AC/10 Ammo" shots="10"/>
+              </location>
+              <location index="3"> Left Torso
+                <armor points="17"/>
+                <slot index="4" type="Clan Ultra AC/10 Ammo" shots="10"/>
+                <slot index="5" type="Clan Ultra AC/10 Ammo" shots="10"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="9"/>
+              </location>
+              <Game id="3"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="c63de838-747f-46ca-809a-a62109dca63a" quirks="imp_target_med">
+              <pilot size="1" name="François" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="54b3da69-8c51-4d1a-89cb-06c67b1a10d5" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="18"/>
+              </location>
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="7" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="7" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="4"> Right Arm
+                <armor points="11"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="7" type="Clan LB 5-X AC Ammo" shots="20"/>
+                <slot index="8" type="Clan LB 5-X Cluster Ammo" shots="20"/>
+              </location>
+              <Game id="4"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="fda0a23a-ce37-4f66-bf99-eca6a373c955" quirks="imp_target_med">
+              <pilot size="1" name="Ebrahim" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="c7614afa-d7db-4b50-9c23-9c2757d90d58" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="10" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="10" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+              <Game id="5"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="d2e1c334-be67-4a97-bb94-2d4dd690169c" quirks="stable">
+              <pilot size="1" name="Star Commander Atindra" nick="" gender="MALE" gunnery="3" piloting="3" artillery="4" externalId="2c88cce8-70df-4575-894e-54a0e78b3272" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="20"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="3" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="4" type="Clan Ultra AC/20 Ammo" shots="5"/>
+              </location>
+              <Game id="6"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="26b1c787-6d50-4d27-a2b8-fc488735758d" quirks="stable">
+              <pilot size="1" name="Rhonda" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="f3f8f62f-5b01-4b0d-b525-874b084449c4" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="20"/>
+              </location>
+              <location index="4"> Right Arm
+                <armor points="13"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+                <slot index="9" type="Clan LB 10-X AC Ammo" shots="10"/>
+                <slot index="10" type="Clan LB 10-X Cluster Ammo" shots="10"/>
+              </location>
+              <Game id="7"/>
+            </entity>
+            <entity chassis="Puma (Adder)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="f702d356-1fa1-4322-ac72-4055a854ffb1" quirks="low_profile">
+              <pilot size="1" name="Shakil" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="271ac3aa-6a9b-4c49-ab4f-429107482bf1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="4"> Right Arm
+                <slot index="6" type="Clan Ultra AC/5 Ammo" shots="20"/>
+              </location>
+              <Game id="8"/>
+            </entity>
+            <entity chassis="Puma (Adder)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="5fffde7a-a9dd-43c6-a9ec-fce1f1ceaed6" quirks="low_profile">
+              <pilot size="1" name="Jussi" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="48a5426a-c9d5-4413-bc10-21aeefa1e42a" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <armor points="7"/>
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="4"> Right Arm
+                <slot index="6" type="Clan Ultra AC/5 Ammo" shots="20"/>
+              </location>
+              <Game id="9"/>
+            </entity>
+            <entity chassis="Pouncer" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="cff0024e-0687-4158-b3d1-28844363d640" quirks="weak_head_2">
+              <pilot size="1" name="Mike" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="875c9f9e-c031-42fe-978c-3175bd1614e0" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="8" type="Clan Ultra AC/10 Ammo" shots="10"/>
+                <slot index="9" type="Clan Ultra AC/10 Ammo" shots="10"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="8"/>
+              </location>
+              <Game id="10"/>
+            </entity>
+          </entities>
+        </botForce>
+        <botForce>
+          <name>Phelan</name>
+          <team>1</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf</camoCategory>
+          <camoFileName>Delta Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>CAUTIOUS</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>7</fallShameIndex>
+            <hyperAggressionIndex>3</hyperAggressionIndex>
+            <selfPreservationIndex>8</selfPreservationIndex>
+            <herdMentalityIndex>2</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Black Hawk (Nova)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="437e1e40-052d-4c3b-b2c3-dfe23d6b64b5" quirks="combat_computer::low_profile">
+              <pilot size="1" name="Phelan Ward" nick="" gender="MALE" gunnery="1" piloting="1" artillery="4" externalId="979aceda-cd08-4fa3-9054-5b4f75d6f0c9" ejected="false" advantages="maneuvering_ace" edge="edge 3::edge_when_headhit::edge_when_tac::edge_when_ko" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              <Game id="11"/>
+            </entity>
+          </entities>
+        </botForce>
       </scenario>
     </storyPoint>
   </storyPoints>
