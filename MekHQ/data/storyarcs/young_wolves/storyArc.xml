@@ -5744,12 +5744,12 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Save the Khan</name>
         <desc>
-          SaKhan Phelan Ward is under heavy assault from Jade Falcon forces! You must combat drop onto their positions with everything you have to save the khan.
+          SaKhan Phelan Ward is under heavy assault from Jade Falcon forces! You must combat behind them with everything you have to save the khan.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
         <mapSize>32,34</mapSize>
-        <map>/unofficial/pokefan548/Fan Pack Arctic/32x34/32x34 Arctic Fields</map>
+        <map>/unofficial/pokefan548/Fan Pack Arctic/32x34/32x34 Arctic Field</map>
         <botForce>
           <name>Fourth Talon Cluster</name>
           <team>2</team>
@@ -5926,8 +5926,8 @@ This is a story arc in active development. Try at your own risk!
         <botForce>
           <name>Phelan</name>
           <team>1</team>
-          <start>2</start>
-          <camoCategory>Clans/Wolf</camoCategory>
+          <start>6</start>
+          <camoCategory>Clans/Wolf/Delta Galaxy</camoCategory>
           <camoFileName>Delta Galaxy.jpg</camoFileName>
           <behaviorSettings>
             <name>CAUTIOUS</name>
@@ -5941,13 +5941,42 @@ This is a story arc in active development. Try at your own risk!
             <braveryIndex>5</braveryIndex>
           </behaviorSettings>
           <entities>
-            <entity chassis="Black Hawk (Nova)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="437e1e40-052d-4c3b-b2c3-dfe23d6b64b5" quirks="combat_computer::low_profile">
-              <pilot size="1" name="Phelan Ward" nick="" gender="MALE" gunnery="1" piloting="1" artillery="4" externalId="979aceda-cd08-4fa3-9054-5b4f75d6f0c9" ejected="false" advantages="maneuvering_ace" edge="edge 3::edge_when_headhit::edge_when_tac::edge_when_ko" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+            <entity chassis="Black Hawk (Nova)" model="Phelan" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="437e1e40-052d-4c3b-b2c3-dfe23d6b64b5" quirks="combat_computer::low_profile">
+              <pilot size="1" name="Phelan Ward" nick="" gender="MALE" gunnery="1" piloting="1" artillery="4" portraitFile="Phelan.jpg" externalId="979aceda-cd08-4fa3-9054-5b4f75d6f0c9" ejected="false" advantages="maneuvering_ace" edge="edge 3::edge_when_headhit::edge_when_tac::edge_when_ko" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
               <Game id="11"/>
             </entity>
           </entities>
         </botForce>
+        <scenarioObjective>
+          <associatedUnitIDs>
+            <associatedUnitID>437e1e40-052d-4c3b-b2c3-dfe23d6b64b5</associatedUnitID>
+          </associatedUnitIDs>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Defend Khan Phelan Ward:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+        </scenarioObjective>
       </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId></nextStoryPointId>
     </storyPoint>
   </storyPoints>
   <personalities>
