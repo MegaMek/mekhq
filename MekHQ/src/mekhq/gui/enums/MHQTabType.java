@@ -152,4 +152,15 @@ public enum MHQTabType {
     public String toString() {
         return name;
     }
+
+    public static MHQTabType parseFromString(String source) {
+
+        // attempt enum parse
+        try {
+            return valueOf(source);
+        } catch (Exception ignored) {}
+
+        // failing all else, return command center
+        return COMMAND_CENTER;
+    }
 }
