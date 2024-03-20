@@ -23,12 +23,11 @@ import java.util.ArrayList;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.EntityWeightClass;
-import megamek.common.PlanetaryConditions;
 import megamek.common.UnitType;
-import megamek.common.enums.Fog;
-import megamek.common.enums.Light;
-import megamek.common.enums.Weather;
-import megamek.common.enums.Wind;
+import megamek.common.planetaryconditions.Fog;
+import megamek.common.planetaryconditions.Light;
+import megamek.common.planetaryconditions.Weather;
+import megamek.common.planetaryconditions.Wind;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
@@ -36,7 +35,6 @@ import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
 
 @AtBScenarioEnabled
 public class OfficerDuelBuiltInScenario extends AtBScenario {

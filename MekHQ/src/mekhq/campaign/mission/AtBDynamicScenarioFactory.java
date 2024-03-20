@@ -30,7 +30,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.Atmosphere;
+import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;

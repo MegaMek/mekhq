@@ -25,7 +25,7 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.*;
 import megamek.common.Compute;
-import megamek.common.enums.*;
+import megamek.common.planetaryconditions.*;
 import mekhq.MHQConstants;
 import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.utilities.MHQXMLUtility;

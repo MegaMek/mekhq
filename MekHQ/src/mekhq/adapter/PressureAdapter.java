@@ -19,8 +19,7 @@
 package mekhq.adapter;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import megamek.common.PlanetaryConditions;
-import megamek.common.enums.Atmosphere;
+import megamek.common.planetaryconditions.Atmosphere;
 
 public class PressureAdapter extends XmlAdapter<String, Integer> {
 

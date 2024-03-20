@@ -20,9 +20,9 @@
  */
 package mekhq.gui.view;
 
-import megamek.common.PlanetaryConditions;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.Atmosphere;
+import megamek.common.planetaryconditions.Atmosphere;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
