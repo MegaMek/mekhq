@@ -312,8 +312,8 @@ public class PersonnelMarket {
             return Entity.ETYPE_MECH;
         } else if ((mostTypes & Entity.ETYPE_TANK) != 0) {
             return Entity.ETYPE_TANK;
-        } else if ((mostTypes & Entity.ETYPE_AERO) != 0) {
-            return Entity.ETYPE_AERO;
+        } else if ((mostTypes & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
+            return Entity.ETYPE_AEROSPACEFIGHTER;
         } else if ((mostTypes & Entity.ETYPE_BATTLEARMOR) != 0) {
             return Entity.ETYPE_BATTLEARMOR;
         } else if ((mostTypes & Entity.ETYPE_INFANTRY) != 0) {
@@ -337,7 +337,7 @@ public class PersonnelMarket {
         int ds = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int sc = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int cf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
         int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) + hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
         int inf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
         int ba = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
@@ -381,7 +381,7 @@ public class PersonnelMarket {
             retval = retval | Entity.ETYPE_CONV_FIGHTER;
         }
         if (most == asf) {
-            retval = retval | Entity.ETYPE_AERO;
+            retval = retval | Entity.ETYPE_AEROSPACEFIGHTER;
         }
         if (most == vee) {
             retval = retval | Entity.ETYPE_TANK;
