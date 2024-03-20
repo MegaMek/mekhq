@@ -75,13 +75,40 @@ This is a story arc in active development. Try at your own risk!
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
-    <!-- Checks on Game Over events -->
+    <!-- Game over check -->
     <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
       <id>84832d14-3c74-4ef8-8dfb-52a265c60b0f</id>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
       <statusCondition>KIA</statusCondition>
       <statusCondition>MIA</statusCondition>
       <nextStoryPointId>c108aefb-d65f-4c5b-8b8a-e405e5914f77</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_main_char_killed" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>c108aefb-d65f-4c5b-8b8a-e405e5914f77</id>
+      <title>The Story Ends Here</title>
+      <narrative>Unfortunately, your life has come to an end. With the end of your life comes the end of *this* story, but the story of the Wolves and the Jade Falcons will endure. May your actions earn you a rightful place in the Remembrance.
+
+        Seyla.
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_killed" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>d13f379e-3035-4637-a7e7-e6f9b205a8d6</id>
+      <title>Khan Ward has Fallen</title>
+      <narrative>
+        Khan Phelan Ward has fallen in battle. The remaining Wolf forces are in disarray and it is only a matter of time before they are overwhelmed by the Jade Falcons. The story ends here.
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
+      </storyTrigger>
     </storyPoint>
     <!-- Variable checks -->
     <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
@@ -1014,7 +1041,7 @@ This is a story arc in active development. Try at your own risk!
       <id>1cb4ba0e-7579-4ce8-ab57-abb53b730ea4</id>
       <title>A Grateful Khan</title>
       <question>
-        {commander}, I am grateful for your unexpected, but fortuitous, arrival. I take it that Ulric sent you our way due to your ... point of view? Or was it just that you couldn't stand the Vlad's stink any longer?
+        {commander}, I am grateful for your unexpected, but fortuitous, arrival. I take it that Ulric sent you our way due to your ... point of view? Or was it just that you couldn't stand Vlad's stink any longer?
       </question>
       <choice id="no_choice">It was never really much of a choice for me. The Inner Sphere must be protected from fanatics like the Jade Falcons.</choice>
       <choice id="shown_way">It was not easy, but Natasha and Ulric showed me that this is the only path forward.</choice>
@@ -1035,22 +1062,7 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
-
     <!-- Narrative story events -->
-    <storyPoint name="narr_main_char_killed" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>c108aefb-d65f-4c5b-8b8a-e405e5914f77</id>
-      <title>The Story Ends Here</title>
-      <narrative>Unfortunately, your life has come to an end. With the end of your life comes the end of *this* story, but the story of the Wolves and the Jade Falcons will endure. May your actions earn you a rightful place in the Remembrance.
-
-Seyla.
-      </narrative>
-      <storySplash>
-        <category></category>
-        <filename>splash-postbattle.jpg</filename>
-      </storySplash>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
-      </storyTrigger>
-    </storyPoint>
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
       <title>A Khan's Greeting</title>
@@ -5785,7 +5797,21 @@ Seyla.
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Save the Khan</name>
         <desc>
-          SaKhan Phelan Ward is under heavy assault from Jade Falcon forces! You must combat behind them with everything you have to save the khan.
+          SaKhan Phelan Ward is under heavy assault from Jade Falcon forces!
+          You must combat drop behind them with everything you have to save the
+          khan.
+
+### Hegira/Retreat Conditions
+
+          The Jade Falcon forces should request *hegira* if reduced to less
+          than half their original force size while the player has more BV
+          remaining. This can be simulated in MegaMek with the `/victory`
+          command. If the player does not wish to grant *hegira*, then the
+          bot settings for the Jade Falcons should be changed to RETREAT and
+          they should begin a fighting withdrawal. In either case, the
+          player can claim control of the battlefield for *isorla*.
+
+          The player will not be granted *hegira* by the Jade Falcons.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
@@ -6007,18 +6033,22 @@ Seyla.
             </failureEffect>
           </failureEffects>
           <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
           <description>Defend Khan Phelan Ward:</description>
           <destinationEdge>NONE</destinationEdge>
           <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
         </scenarioObjective>
       </scenario>
       <storyOutcomes>
         <storyOutcome result="PYRRHIC_VICTORY">
-          <nextStoryPointId></nextStoryPointId>
+          <nextStoryPointId>1cb4ba0e-7579-4ce8-ab57-abb53b730ea4</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
-      <!-- TODO: Failing this mission should result in game over -->
-      <nextStoryPointId></nextStoryPointId>
+      <!-- Failing this mission should result in game over -->
+      <nextStoryPointId>d13f379e-3035-4637-a7e7-e6f9b205a8d6</nextStoryPointId>
     </storyPoint>
   </storyPoints>
   <personalities>
