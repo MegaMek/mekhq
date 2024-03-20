@@ -227,6 +227,10 @@ This is a story arc in active development. Try at your own risk!
       <id>71591078-04e4-4caf-8baa-7851be233ea5</id>
       <nextStoryPointId>79360f28-c082-44f0-831b-83dfceadd09e</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="check_morges_interlude" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>369c61e2-0448-449d-99e1-6198d2a52b43</id>
+      <nextStoryPointId>2b94122d-d4c2-4891-a397-cab0565bbf02</nextStoryPointId>
+    </storyPoint>
     <!-- Person checks-->
     <storyPoint name="check_mathius_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>a2634663-dec8-4429-9b11-4364b8b3dcef</id>
@@ -1048,16 +1052,13 @@ This is a story arc in active development. Try at your own risk!
       <choice id="vlad_stinks">I tried to give him some deodorant, but he insisted it was "unclan-like."</choice>
       <storyOutcomes>
         <storyOutcome result="no_choice">
-          <!-- TODO: fill in next storypoint -->
-          <nextStoryPointId></nextStoryPointId>
+          <nextStoryPointId>ee7d6276-c3a1-427f-9649-e2371b3ea2d8</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="shown_way">
-          <!-- TODO: fill in next storypoint -->
-          <nextStoryPointId></nextStoryPointId>
+          <nextStoryPointId>52505184-d3b4-4a2a-8f2c-577dabcde281</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="vlad_stinks">
-          <!-- TODO: fill in next storypoint -->
-          <nextStoryPointId></nextStoryPointId>
+          <nextStoryPointId>1e38ce77-7d7a-4b85-a2f2-97c9ab1ee9e1</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
@@ -1832,6 +1833,84 @@ This is a story arc in active development. Try at your own risk!
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
         <tab>BRIEFING_ROOM</tab>
       </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_no_choice" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>ee7d6276-c3a1-427f-9649-e2371b3ea2d8</id>
+      <title>A Grateful Khan</title>
+      <narrative>
+        *Phelan nods.*
+
+        If only other warriors came out of the iron womb with such wisdom, {commanderRank}. It would make our job a
+        lot easier.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>1e49e0a8-6a54-43d4-b99c-47de969857c3</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_shown_path" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>52505184-d3b4-4a2a-8f2c-577dabcde281</id>
+      <title>A Grateful Khan</title>
+      <narrative>
+        *Phelan grasps you firmly around the shoulders.*
+
+        {commander}, its never too late to learn these lessons, for you and others. In this, you could not have had
+        better teachers than Ulric and Natasha. Now it is our turn to be the teachers.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>1e49e0a8-6a54-43d4-b99c-47de969857c3</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_vlad_stinks" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1e38ce77-7d7a-4b85-a2f2-97c9ab1ee9e1</id>
+      <title>A Grateful Khan</title>
+      <narrative>
+        *Phelan laughs out loud.*
+
+        What is this? A clan warrior with a sense of humour? I think I shall enjoy your company, {commander}.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>1e49e0a8-6a54-43d4-b99c-47de969857c3</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_morges" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1e49e0a8-6a54-43d4-b99c-47de969857c3</id>
+      <title>Situation on Morges</title>
+      <narrative>
+        The situation here on Morges has been on a razor's edge. The Falcons threw everything they could at us. With
+        the help of the Kell Hounds, we have endured. I now have a plan underway to turn the tables on the jade
+        birds and kick them off of Morges for good.
+
+        I will give you and your forces a few days time to repair and re-arm at our field base, but expect me to call
+        on you again shortly.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>369c61e2-0448-449d-99e1-6198d2a52b43</storyPointId>
+        <futureDays>3</futureDays>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_sitrep_convoy" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>2b94122d-d4c2-4891-a397-cab0565bbf02</id>
+      <title>Broken Hope</title>
+      <narrative>
+        As promised {commanderRank}, I have returned with new orders that should bust this dance wide open.
+
+        The Jade Falcons have been pushing us hard since their loss at Icegrief Pass. They are loaded with ballistic
+        weaponry for maximum destructive effect and it has been effective. However, they are now running low on
+        ammunition.
+
+        Earlier today, the Kell Hounds intercepted a transmission indicating that a re-supply convoy was on its way
+        to Broken Hope to deliver much needed ammunition to the front line Falcon units. I can't spare many units for
+        such a deep strike mission and moving troops from the front line might alert the Falcons to our intent. You,
+        however, are new here and will likely be able to slip behind enemy lines and strike this convoy before it
+        reaches Broken Hope.
+
+        The convoy will likely be well guarded, but those guards will be
+        second line forces. Thus, I expect your battle hardened troops to make short work of them. Suit up,
+        {commander}, I want you on the move in 30 minutes!
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>0d5c8112-e0fa-4ac0-83f2-38836d3f6bbb</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tobias_alternate_full" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>88dfc686-8fce-40e5-a01a-7e1506726990</id>
@@ -6049,6 +6128,224 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <!-- Failing this mission should result in game over -->
       <nextStoryPointId>d13f379e-3035-4637-a7e7-e6f9b205a8d6</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="scenario_morges_destroy_convoy" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>0d5c8112-e0fa-4ac0-83f2-38836d3f6bbb</id>
+      <missionStoryPointId>ec09c184-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Destroy the Convoy</name>
+        <desc>
+          You must destroy the supply convoy heading towards Broken Hope. To avoid detection, you will be limited to
+          two stars of mechs.
+
+## Hegira/Retreat Conditions
+
+          Jade Falcon forces will not retreat or ask for Hegira under any conditions, but individual units will
+          operate under forced withdrawal conditions. Due to the nature of this strike, you will not be able to claim
+          battlefield salvage.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>45,45</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/45x45 Alpine</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>10</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Eyrie Garrison Cluster</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Omega Galaxy.jpg</camoFileName>
+          <botForceRandomizer>
+            <factionCode>CJF</factionCode>
+            <quality>3</quality>
+            <unitType>0</unitType>
+            <skill>GREEN</skill>
+            <lanceSize>1</lanceSize>
+            <forceMultiplier>1.3</forceMultiplier>
+            <balancingMethod>WEIGHT_ADJ</balancingMethod>
+          </botForceRandomizer>
+        </botForce>
+        <botForce>
+          <name>Jade Falcon Logistical Team</name>
+          <team>2</team>
+          <start>0</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Omega Galaxy.jpg</camoFileName>
+          <entities>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="05ee6c3c-109d-424b-9a15-54cd052e5bfc">
+              <pilot size="3" name="Joe" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="cfd4f918-1ba2-4e90-b89b-8d639dea8843" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="1"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="5566ef46-a23d-43a6-8969-c9ec8c06a700">
+              <pilot size="3" name="Zahra" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="23e9cfd5-0c10-4400-983b-096762f7b904" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="2"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="fac6ec18-560c-43fd-afb0-2887e8ffb0cc">
+              <pilot size="3" name="Keira" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="e9863643-ddf5-4534-a62c-74a2e147d676" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="3"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="407700ec-6806-49d0-91af-fe16150b0cbd">
+              <pilot size="3" name="Tansy" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="3cf5118f-8786-4a9c-8331-0805c66525d7" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="4"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="f9eb5f3a-312f-423d-aa4a-bc841be59d0c">
+              <pilot size="3" name="Guy" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="bf2fcab4-9e7f-4568-acfe-7ed1ea4bb55a" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="5"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="2bde49e8-d17d-4c98-af21-0316ceb15095">
+              <pilot size="3" name="Erin" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="365f782d-7669-402f-a58c-b58dbb3cfc26" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="6"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="457b0a1e-cbae-4c84-8b29-530966606751">
+              <pilot size="3" name="Stanislava" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="08b47f10-e2af-4ff5-9901-6972593e46e1" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="7"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="434a93f2-365f-406a-903e-25725f11fabf">
+              <pilot size="3" name="Fadhila" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="43ea0528-3969-4c5f-9f88-45a3f1632369" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="8"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="aa91fea1-6d77-496d-8ea5-9986d523654c">
+              <pilot size="3" name="Christovão" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="47dd5083-929d-4799-8e54-c2b6e81eb72d" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="9"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="5faf8584-9bf1-415e-8ece-0917cd6d9c5e">
+              <pilot size="3" name="Djordje" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="62b021c1-905f-4524-8c10-89ebaf9ff144" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="10"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="7b8b55d5-04a0-423b-996d-8a8b31700681">
+              <pilot size="3" name="Gigi" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="285491ff-a012-4548-896a-f48103bfd87f" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="11"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="96fd2e56-48c2-4d19-b312-0c0a8ca02c11">
+              <pilot size="3" name="Alexina" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="1a04493b-d3eb-414a-a06e-bba1d75cedce" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="12"/>
+            </entity>
+          </entities>
+          <behaviorSettings>
+            <name>BREAKTHROUGH</name>
+            <forcedWithdrawal>true</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>true</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>6</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>8</selfPreservationIndex>
+            <herdMentalityIndex>6</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Logistical Team</associatedForceName>
+          </associatedForceNames>
+          <associatedUnitIDs/>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <description>Destroy at least 75% the following force(s) and unit(s) before they exit the map:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>75</percentage>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
   </storyPoints>
   <personalities>
