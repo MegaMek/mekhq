@@ -81,6 +81,7 @@ This is a story arc in active development. Try at your own risk!
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
       <statusCondition>KIA</statusCondition>
       <statusCondition>MIA</statusCondition>
+      <nextStoryPointId>c108aefb-d65f-4c5b-8b8a-e405e5914f77</nextStoryPointId>
     </storyPoint>
     <!-- Variable checks -->
     <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
@@ -1036,6 +1037,20 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
 
     <!-- Narrative story events -->
+    <storyPoint name="narr_main_char_killed" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>c108aefb-d65f-4c5b-8b8a-e405e5914f77</id>
+      <title>The Story Ends Here</title>
+      <narrative>Unfortunately, your life has come to an end. With the end of your life comes the end of *this* story, but the story of the Wolves and the Jade Falcons will endure. May your actions earn you a rightful place in the Remembrance.
+
+Seyla.
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
+      </storyTrigger>
+    </storyPoint>
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
       <title>A Khan's Greeting</title>
