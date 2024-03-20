@@ -63,7 +63,7 @@ Under integrated or house command, or if the liaison is coming along for the rid
 Additionally, if there's an allied facility on the track, the scenario will move towards the nearest allied facility. Sometimes, you need to keep those intact as part of the contract. And if they get captured without a fight, the enemy will put them to use, making subsequent scenarios more difficult.
 Some scenarios might draw a bunch of modifiers and be very difficult.  There is no shame in skipping a scenario if it is too hard.  Just make sure you win your other ones.
 
-* Don't delete a scenario with a deployed force. Many bugs involved. The best solution is to eat the Stategic VP loss, and add the Campaign Victory Point through GM mode, if needed. Or, you can resolve it manually in MHQ, without a MUL file.
+* Don't delete a scenario with a deployed force. Many bugs involved. The best solution is to eat the Campaign VP loss, and add the Campaign Victory Point through GM mode, if needed. Or, you can resolve it manually in MHQ, without a MUL file.
 
 
 =======================================
