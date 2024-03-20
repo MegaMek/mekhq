@@ -1434,9 +1434,11 @@ public class StratconRulesManager {
                     boolean draw = rst.getScenario().getStatus().isDraw();
 
                     if (scenario.isRequiredScenario()) {
-                        campaignState.updateVictoryPoints(victory ? 1 : -1);
-                        // if draw, add 1VP to counteract lost VP from above line
-                        campaignState.updateVictoryPoints(draw ? 1 : 0);
+                        if (draw) {
+                            // do nothing
+                        } else {
+                            campaignState.updateVictoryPoints(victory ? 1 : -1);
+                        }
                     }
 
                     // this must be done before removing the scenario from the track
