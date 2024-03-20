@@ -1009,6 +1009,32 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>07a505ea-5fc5-4166-be0c-b98c4852b0ab</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="choice_phelan_rescue" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>1cb4ba0e-7579-4ce8-ab57-abb53b730ea4</id>
+      <title>A Grateful Khan</title>
+      <question>
+        {commander}, I am grateful for your unexpected, but fortuitous, arrival. I take it that Ulric sent you our way due to your ... point of view? Or was it just that you couldn't stand the Vlad's stink any longer?
+      </question>
+      <choice id="no_choice">It was never really much of a choice for me. The Inner Sphere must be protected from fanatics like the Jade Falcons.</choice>
+      <choice id="shown_way">It was not easy, but Natasha and Ulric showed me that this is the only path forward.</choice>
+      <choice id="vlad_stinks">I tried to give him some deodorant, but he insisted it was "unclan-like."</choice>
+      <storyOutcomes>
+        <storyOutcome result="no_choice">
+          <!-- TODO: fill in next storypoint -->
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="shown_way">
+          <!-- TODO: fill in next storypoint -->
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="vlad_stinks">
+          <!-- TODO: fill in next storypoint -->
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
@@ -5976,6 +6002,7 @@ This is a story arc in active development. Try at your own risk!
           <nextStoryPointId></nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
+      <!-- TODO: Failing this mission should result in game over -->
       <nextStoryPointId></nextStoryPointId>
     </storyPoint>
   </storyPoints>
