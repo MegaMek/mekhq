@@ -357,12 +357,12 @@ public class ScenarioObjectiveProcessor {
         switch (effect.effectType) {
             case ScenarioVictory:
                 if (dryRun) {
-                    return String.format("%d scenario victory point", effect.howMuch);
+                    return String.format("%d Operational Victory Point/s", effect.howMuch);
                 }
                 break;
             case ScenarioDefeat:
                 if (dryRun) {
-                    return String.format("%d scenario victory point", -effect.howMuch);
+                    return String.format("%d Operational Victory Point/s", -effect.howMuch);
                 }
                 break;
             case ContractScoreUpdate:
@@ -374,7 +374,7 @@ public class ScenarioObjectiveProcessor {
                     int scoreEffect = effect.howMuch * effectMultiplier;
 
                     if (dryRun) {
-                        return String.format("%d contract score", scoreEffect);
+                        return String.format("%d Contract Score/Campaign Victory Points", scoreEffect);
                     } else {
                         contract.setContractScoreArbitraryModifier(contract.getContractScoreArbitraryModifier() + scoreEffect);
                     }

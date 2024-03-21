@@ -121,7 +121,7 @@ public class StratconTab extends CampaignGuiTab {
         infoPanel.add(new JLabel("Current Campaign Status:"));
         infoPanel.add(campaignStatusText);
 
-        JButton btnManageCampaignState = new JButton("Manage SP/VP");
+        JButton btnManageCampaignState = new JButton("Manage SP/CVP");
         btnManageCampaignState.setHorizontalAlignment(SwingConstants.LEFT);
         btnManageCampaignState.setVerticalAlignment(SwingConstants.TOP);
         btnManageCampaignState.addActionListener(this::showCampaignStateManagement);
@@ -221,7 +221,7 @@ public class StratconTab extends CampaignGuiTab {
             sb.append("<br/>Contract term has expired!");
         }
 
-        sb.append("<br/>Victory Points: ").append(campaignState.getVictoryPoints())
+        sb.append("<br/>Campaign Victory Points: ").append(campaignState.getVictoryPoints())
             .append("<br/>Support Points: ").append(campaignState.getSupportPoints())
             .append("<br/>Deployment Period: ").append(currentTDI.track.getDeploymentTime())
             .append(" days")
@@ -375,7 +375,7 @@ public class StratconTab extends CampaignGuiTab {
                 sb.append("<span color='red'>").append(OBJECTIVE_FAILED);
             }
 
-            sb.append(" Maintain victory point count above 0 by completing required scenarios")
+            sb.append(" Maintain Campaign Victory Point count above 0 by completing required scenarios")
                 .append("</span><br/>");
         }
 
