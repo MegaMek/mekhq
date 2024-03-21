@@ -83,7 +83,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>9dff4cbe-4b7b-4725-9820-c1303ad8792e</nextStoryPointId>
+      <nextStoryPointId>5e061b82-cff4-4d36-a9f5-12e558c86cd2</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -258,13 +258,27 @@ This is a story arc in active development. Try at your own risk!
       <id>072c70de-1f8e-4e9e-8301-6fb0bae02328</id>
       <nextStoryPointId>e667428e-4f1a-4ef2-940e-b47a0e7e5ddc</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="check_morges_interlude_tabbiya" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+    <storyPoint name="check_morges_interlude_tayyiba" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>41a8d936-f02c-47e6-90b1-3c0327a79942</id>
       <nextStoryPointId>d6fb2fdf-d8d7-4a56-b813-6ed5b563c09b</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_morges_interlude_bloodname" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>430a773a-2ca1-44f6-bd03-ab0ca552a25b</id>
-      <nextStoryPointId></nextStoryPointId>
+      <nextStoryPointId>5e061b82-cff4-4d36-a9f5-12e558c86cd2</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_morges_trial_bloodname1" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>ab211686-b377-44f1-afd1-5b4048d412db</id>
+      <nextStoryPointId>1e3fd5e1-8c30-4f8f-a193-1e3332c81f39</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="check_morges_trial_bloodname2" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>d6748828-7b40-4fbf-8b6a-846f2cef51d3</id>
+      <nextStoryPointId>a1b72ce3-5017-4b42-b2fc-df06e8945ec9</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="check_morges_interlude_kurultai" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>35fabd74-41fa-4472-b409-8a1d0c280418</id>
@@ -1334,6 +1348,18 @@ This is a story arc in active development. Try at your own risk!
         <tab>REPAIR</tab>
       </storyTrigger>
     </storyPoint>
+    <storyPoint name="narr_tech_bloodname_trial" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>955ee81c-b23e-48a7-a4ab-5187ba0d9eeb</id>
+      <title>Preparing for the Trial</title>
+      <narrative>
+        So tomorrow is the big day, huh? You let us know if you want to make any changes or need any repairs to the mech you want to use for each battle. Depending on your opponent, you may want to swap your loadout, or even change your ride entirely.
+
+        We will also be ready to repair your mech right after battle. If you don't bang it up too much, we should be able to get it ready for the next day's combat.
+
+        Good luck, {commanderRank}.
+      </narrative>
+      <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+    </storyPoint>
     <storyPoint name="narr_arrive_sudeten" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>6622fc78-1d9b-4ab5-a8eb-5696eae49f0d</id>
       <title>Welcome to Sudeten</title>
@@ -2255,6 +2281,10 @@ This is a story arc in active development. Try at your own risk!
 
         *Finally, the Wolf fighters cease their onslaught. A thick black fog lies over the Jade Falcon camp, partially concealing a scene of utter devastation. The twisted remains of mechs litter the ground, and survivors are seen limping here and there among the ruins.*
       </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>ec09c184-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+        <missionStatus>SUCCESS</missionStatus>
+      </storyTrigger>
       <storySplash>
         <category></category>
         <filename>splash-demolition.jpg</filename>
@@ -2327,6 +2357,20 @@ This is a story arc in active development. Try at your own risk!
         <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
         <futureDays>7</futureDays>
       </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_bloodname_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>7c261b19-8633-4e4d-9fe3-f113869f0abe</id>
+      <title>Trial Failure</title>
+      <narrative>
+        It is unfortunate that you were not able to prevail, {commander}. I am sure that you will have the opportunity in the future to claim your bloodright once again. May fate favor you on that day.
+
+        Soon, I will address out Touman at a final Kurultai that brings this war to an end and sets a vision for the future. Bloodname or no, I would like you at my side at this event.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
+        <futureDays>3</futureDays>
+      </storyTrigger>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
     <storyPoint name="narr_phelan_kurultai" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>581e54c9-abad-47d8-b3ab-a3b566c494eb</id>
@@ -2488,6 +2532,25 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>8408467a-9131-4d3e-83f7-6f1722cbb9a9</personalityId>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
         <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_hall_trial_bloodname" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>5e061b82-cff4-4d36-a9f5-12e558c86cd2</id>
+      <title>You Have Been Nominated</title>
+      <narrative>
+        Greetings, {commander}. I have been chosen to serve in the role of Loremaster until a permanent replacement is found. It is therefore my duty to inform you that you have been nominated to participate in a trial of bloodright for the {bloodname} bloodname. The documents I have with me should indicate that this is a particularly prestigious bloodheritage, and thus I expect no objection to such a nomination, quaiff?
+
+        *He pauses briefly, before continuing.*
+
+        Due to shortages of manpower, we have less than the normal 32 participants for this trial. You have therefore been seeded to join the competition in the second round. You will have to win four consecutive rounds of combat to emerge as the ultimate victor.
+
+        Your first battle is scheduled for tomorrow. Each of the subsequent battles will be a day apart, allowing you some time for repair, if necessary. I will next see you at the trial, {commanderRank}. May your skill prove your worth.
+      </narrative>
+      <personalityId>8408467a-9131-4d3e-83f7-6f1722cbb9a9</personalityId>
+      <nextStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>ab211686-b377-44f1-afd1-5b4048d412db</storyPointId>
+        <futureDays>1</futureDays>
       </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_trial_kill_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -2980,9 +3043,18 @@ This is a story arc in active development. Try at your own risk!
         <name>Morges</name>
         <type>Planetary Assault</type>
         <systemId>Morges</systemId>
-        <desc></desc>
+        <desc>The Falcons have come to Morges to end the remaining Wolves. You must win or die.</desc>
       </mission>
       <scenarioStoryPointId>eb08a01c-ece2-48f4-8b54-8b0c9ece9174</scenarioStoryPointId>
+    </storyPoint>
+    <storyPoint name="mission_bloodname" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>Bloodright Trial</name>
+        <type>Planetary Assault</type>
+        <systemId>Morges</systemId>
+        <desc>You fight for a bloodname! If you are victorious, a new trial will appear each day until you beat all of the competition.</desc>
+      </mission>
     </storyPoint>
     <!-- Scenarios -->
     <storyPoint name="scenario_colmar_cutting_teeth" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
@@ -6767,6 +6839,144 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>9dff4cbe-4b7b-4725-9820-c1303ad8792e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="scenario_bloodname1" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>1e3fd5e1-8c30-4f8f-a193-1e3332c81f39</id>
+      <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Bloodright, Round 2</name>
+        <desc>
+          Due to the small number of participants, you were seeded directly into round two.
+
+          In this round, you face a warrior named Aziza who is even older than you. Assigned to a second line mech in a garrison cluster, she nonetheless proved herself in battle upon Morges, earning a nomination for this trial.
+
+          Aziza pilots an ancient second line *Stone Rhino* that nonetheless presents a formidable threat.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>16,17</mapSize>
+        <map>/Essential Box Maps/16x17 Patchwork (Clear)</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Mechwarrior Aziza</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Gamma Galaxy</camoCategory>
+          <camoFileName>Gamma Galaxy - 7th Wolf Guard.jpg</camoFileName>
+          <entities>
+            <entity chassis="Warhammer IIC" model="" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="f3a17b2c-6e3f-4b9e-9745-bc4d07b8ed65" quirks="searchlight::stable">
+        			<pilot size="1" name="Aziza" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" portraitCat="Female/MechWarrior/" portraitFile="MW_F_34.png" externalId="db0c2d27-0ec8-484d-be13-001f8e14b680" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+        			<location index="2"> Right Torso
+        				<slot index="8" type="Clan Ammo SRM-6" shots="15"/>
+        			</location>
+        			<Game id="1"/>
+        		</entity>
+          </entities>
+          <behaviorSettings>
+            <name>HONOR</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>4</fallShameIndex>
+            <hyperAggressionIndex>6</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>6</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Mechwarrior Aziza</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy the following units:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve your own forces</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+            <storyPointId>d6748828-7b40-4fbf-8b6a-846f2cef51d3</storyPointId>
+            <futureDays>1</futureDays>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+      <nextStoryPointId>7c261b19-8633-4e4d-9fe3-f113869f0abe</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="scenario_bloodname2" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>a1b72ce3-5017-4b42-b2fc-df06e8945ec9</id>
+      <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Bloodright, Round 3</name>
+        <desc>
+          Another day, another trial.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>16,17</mapSize>
+        <map>/German/Tallassia 3 Country Side I</map>
+      </scenario>
     </storyPoint>
   </storyPoints>
   <personalities>
