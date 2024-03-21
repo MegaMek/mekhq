@@ -280,6 +280,20 @@ This is a story arc in active development. Try at your own risk!
         <tab>BRIEFING_ROOM</tab>
       </storyTrigger>
     </storyPoint>
+    <storyPoint name="check_morges_trial_bloodname3" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>763e68fa-1fca-478d-ac38-e22e1724cd44</id>
+      <nextStoryPointId>f85b4569-c9f6-4b20-9702-8525dc391368</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="check_morges_trial_bloodname4" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>365aee45-7fec-444c-bd27-a53c2166580b</id>
+      <nextStoryPointId>b3f0df38-defb-40e8-8b8d-5549fa32c782</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+    </storyPoint>
     <storyPoint name="check_morges_interlude_kurultai" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>35fabd74-41fa-4472-b409-8a1d0c280418</id>
       <nextStoryPointId>581e54c9-abad-47d8-b3ab-a3b566c494eb</nextStoryPointId>
@@ -2358,13 +2372,25 @@ This is a story arc in active development. Try at your own risk!
         <futureDays>7</futureDays>
       </storyTrigger>
     </storyPoint>
+    <storyPoint name="narr_phelan_bloodname_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>7c261b19-8633-4e4d-9fe3-f113869f0abe</id>
+      <title>Trial Success</title>
+      <narrative>
+        You did it! I knew you were more than capable. It seems that your time has come.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
+        <futureDays>3</futureDays>
+      </storyTrigger>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
     <storyPoint name="narr_phelan_bloodname_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>7c261b19-8633-4e4d-9fe3-f113869f0abe</id>
       <title>Trial Failure</title>
       <narrative>
         It is unfortunate that you were not able to prevail, {commander}. I am sure that you will have the opportunity in the future to claim your bloodright once again. May fate favor you on that day.
 
-        Soon, I will address out Touman at a final Kurultai that brings this war to an end and sets a vision for the future. Bloodname or no, I would like you at my side at this event.
+        Soon, I will address out Touman at a final Kurultai that brings this war to an end and sets a vision for the future. Bloodname or not, I would like you at my side at this event.
       </narrative>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
         <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
@@ -3055,6 +3081,14 @@ This is a story arc in active development. Try at your own risk!
         <systemId>Morges</systemId>
         <desc>You fight for a bloodname! If you are victorious, a new trial will appear each day until you beat all of the competition.</desc>
       </mission>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>7c261b19-8633-4e4d-9fe3-f113869f0abe</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>7c261b19-8633-4e4d-9fe3-f113869f0abe</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <!-- Scenarios -->
     <storyPoint name="scenario_colmar_cutting_teeth" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
@@ -6850,12 +6884,12 @@ This is a story arc in active development. Try at your own risk!
 
           In this round, you face a warrior named Aziza who is even older than you. Assigned to a second line mech in a garrison cluster, she nonetheless proved herself in battle upon Morges, earning a nomination for this trial.
 
-          Aziza pilots an ancient second line *Stone Rhino* that nonetheless presents a formidable threat.
+          Aziza pilots an ancient second line *Warhammer IIC* that still presents a formidable threat.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
         <mapSize>16,17</mapSize>
-        <map>/Essential Box Maps/16x17 Patchwork (Clear)</map>
+        <map>/Essentials Box Maps/16x17 Patchwork (Clear)</map>
         <scenarioDeploymentLimit>
           <quantityLimit>1</quantityLimit>
           <quantityType>ABSOLUTE</quantityType>
@@ -6962,7 +6996,6 @@ This is a story arc in active development. Try at your own risk!
         <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
         <missionStatus>FAILED</missionStatus>
       </storyTrigger>
-      <nextStoryPointId>7c261b19-8633-4e4d-9fe3-f113869f0abe</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_bloodname2" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>a1b72ce3-5017-4b42-b2fc-df06e8945ec9</id>
@@ -6970,13 +7003,354 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Trial of Bloodright, Round 3</name>
         <desc>
-          Another day, another trial.
+          Your opponent in this round is a brash, young mechwarrior named Damien. What he lacks for in experience, he makes up for in enthusiasm. He likes speed and will be bringing a jump-capable *Shadow Cat*. Make sure you don't let him run (or jump) circles around you.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
         <mapSize>16,17</mapSize>
         <map>/German/Tallassia 3 Country Side I</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Mechwarrior Damien</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Alpha Galaxy</camoCategory>
+          <camoFileName>Alpha Galaxy.jpg</camoFileName>
+          <entities>
+            <entity chassis="Shadow Cat" model="M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="9072cbba-59b4-4396-b458-4e0f39628ab1" quirks="low_profile">
+        			<pilot size="1" name="Damien" nick="" gender="MALE" gunnery="3" piloting="3" artillery="4" portraitCat="Male/MechWarrior/" portraitFile="MW_M_68.png" externalId="e9a1f09b-5fdf-496b-bc0a-7b094a74af3a" ejected="false" advantages="jumping_jack" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+        			<Game id="1"/>
+        		</entity>
+          </entities>
+          <behaviorSettings>
+            <name>PIZZAZZ</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>8</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Mechwarrior Damien</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy the following units:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve your own forces</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
       </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+            <storyPointId>763e68fa-1fca-478d-ac38-e22e1724cd44</storyPointId>
+            <futureDays>1</futureDays>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_bloodname3" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>f85b4569-c9f6-4b20-9702-8525dc391368</id>
+      <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Bloodright, Round 4</name>
+        <desc>
+          You have made it to the semi-finals. Your opponent in this round is Star Commander Jameel. He is an experienced mechwarrior. He will be piloting a *Summoner C*. I am sure you realize this means a heavy ultra auto-cannon in the left arm. If you let him in too close, he can end this trial very quickly.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>16,17</mapSize>
+        <map>/additional/16x17 Plateaus A</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Star Commander Jameel</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Beta Galaxy</camoCategory>
+          <camoFileName>Beta Galaxy.jpg</camoFileName>
+          <entities>
+            <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="662836bc-1268-45dd-9889-756c7a900d35" quirks="imp_com::ubiquitous_clan">
+        			<pilot size="1" name="Star Commander Jameel" nick="" gender="FEMALE" gunnery="2" piloting="3" artillery="4" portraitCat="Male/Vehicle Crew/" portraitFile="VeeCrew_M_21.png" externalId="a0f6c3bf-9102-4a79-b1ac-4f01e09cdd91" ejected="false" advantages="tm_mountaineer" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+        			<location index="3"> Left Torso
+        				<slot index="5" type="Clan Ultra AC/20 Ammo" shots="5"/>
+        				<slot index="6" type="Clan Ultra AC/20 Ammo" shots="5"/>
+        				<slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+        			</location>
+        			<Game id="1"/>
+        		</entity>
+          </entities>
+          <behaviorSettings>
+            <name>HUNTER</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>6</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>6</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Star Commander Jameel</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy the following units:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve your own forces</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+            <storyPointId>365aee45-7fec-444c-bd27-a53c2166580b</storyPointId>
+            <futureDays>1</futureDays>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_bloodname4" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>b3f0df38-defb-40e8-8b8d-5549fa32c782</id>
+      <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Bloodright, Round 5</name>
+        <desc>
+          This is it - the finals. Win today and the bloodname is yours. That will not be easy, however. Your opponent is Star Captain Olympia. She is an experienced mechwarrior and considered something of a tactical genius. She will be piloting an *Executioner* in its A configuration, which means lots of lasers.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>16,17</mapSize>
+        <map>/AGoAC Maps/16x17 Grassland 3</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Star Captain Olympia</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Gamma Galaxy</camoCategory>
+          <camoFileName>Bronze Keshik.png</camoFileName>
+          <entities>
+            <entity chassis="Gladiator (Executioner)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="567320de-1439-4387-b7cf-e52d3f75d1ff" quirks="distracting">
+        			<pilot size="1" name="Star Captain Olympia" nick="" gender="FEMALE" gunnery="1" piloting="2" artillery="4" portraitCat="Female/MechWarrior/" portraitFile="MW_F_49.png" externalId="096cf76a-679d-4f3e-ba86-3edfa06606e5" ejected="false" advantages="tactical_genius" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+        			<location index="2"> Right Torso
+        				<slot index="7" type="Clan Machine Gun Ammo - Full" shots="200"/>
+        			</location>
+        			<Game id="1"/>
+        		</entity>
+          </entities>
+          <behaviorSettings>
+            <name>PIZZAZZ</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>6</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>6</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Star Captain Olympia</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy the following units:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve your own forces</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
     </storyPoint>
   </storyPoints>
   <personalities>
