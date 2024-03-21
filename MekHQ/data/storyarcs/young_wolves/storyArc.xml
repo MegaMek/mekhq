@@ -56,6 +56,10 @@ This is a story arc in active development. Try at your own risk!
       <key>bloodname</key>
       <value>Ward</value>
     </customStringVariable>
+    <customStringVariable>
+      <key>claimBloodname</key>
+      <value>no</value>
+    </customStringVariable>
   </customStringVariables>
   <storyPoints>
     <!-- Initial story event -->
@@ -254,6 +258,18 @@ This is a story arc in active development. Try at your own risk!
       <id>072c70de-1f8e-4e9e-8301-6fb0bae02328</id>
       <nextStoryPointId>e667428e-4f1a-4ef2-940e-b47a0e7e5ddc</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="check_morges_interlude_tabbiya" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>41a8d936-f02c-47e6-90b1-3c0327a79942</id>
+      <nextStoryPointId>d6fb2fdf-d8d7-4a56-b813-6ed5b563c09b</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_morges_interlude_bloodname" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>430a773a-2ca1-44f6-bd03-ab0ca552a25b</id>
+      <nextStoryPointId></nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_morges_interlude_kurultai" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>35fabd74-41fa-4472-b409-8a1d0c280418</id>
+      <nextStoryPointId>581e54c9-abad-47d8-b3ab-a3b566c494eb</nextStoryPointId>
+    </storyPoint>
     <!-- Person checks-->
     <storyPoint name="check_mathius_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>a2634663-dec8-4429-9b11-4364b8b3dcef</id>
@@ -304,6 +320,15 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>03d02678-a914-455f-928a-b7634d5688d6</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_tayyiba_active3" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>d6fb2fdf-d8d7-4a56-b813-6ed5b563c09b</id>
+      <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>29b8f1ea-9ae0-443e-a9dd-e28826c1d41b</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <storyPoint name="check_tayyiba_active3" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>c50d628f-b14f-47a9-accb-79057dbf81b3</id>
@@ -786,6 +811,26 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
     </storyPoint>
+    <storyPoint name="choice_tayyiba_final" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>29b8f1ea-9ae0-443e-a9dd-e28826c1d41b</id>
+      <title>Tayyiba's Question</title>
+      <question>
+        *As you oversee repairs to your units, Tayyiba approaches you.*
+
+        We finally did it then? We won this war. How come it doesn't feel like a win, then?
+      </question>
+      <choice id="worth_it">Because it came at a heavy cost. However, its a cost I would pay again, knowing the alternative.</choice>
+      <choice id="not_win">Because we have lost everything and can never return home. That is not really a win in my book.</choice>
+      <storyOutcomes>
+        <storyOutcome result="worth_it">
+          <nextStoryPointId>8b21ce93-0bae-47aa-9dbc-d1267ce2ebf8</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="not_win">
+          <nextStoryPointId>9172fc81-691c-4a46-af02-08827591f1c8</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+    </storyPoint>
     <storyPoint name="choice_tobias_batchall" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>d417170a-8970-4406-9c46-a6c9c8138646</id>
       <title>Batchall</title>
@@ -1198,14 +1243,14 @@ This is a story arc in active development. Try at your own risk!
 
         Will you compete for a bloodname?
       </question>
-      <choice id="yes">Yes</choice>
-      <choice id="no">No</choice>
+      <choice id="yes">Yes, I will claim my bloodright.</choice>
+      <choice id="no">No, I have had enough of fighting for now.</choice>
       <storyOutcomes>
         <storyOutcome result="yes">
-          <nextStoryPointId></nextStoryPointId>
+          <nextStoryPointId>602e3951-904e-496f-88dc-cec97965caf8</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="no">
-          <nextStoryPointId></nextStoryPointId>
+          <nextStoryPointId>bbc3ffb6-b14a-4f40-99f8-331e61cf2709</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
@@ -2068,6 +2113,32 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_tayyiba_worth_it" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>8b21ce93-0bae-47aa-9dbc-d1267ce2ebf8</id>
+      <narrative>
+        *Tayyiba drops her head.*
+
+        I want to believe that, but given everything that has happened, its hard to accept. To live in exile away from our kin? To lose Ulric and Natasha? I hope that time will heal these wounds and show the wisdom of the decision.
+
+        *She stands up straight and looks intently at you.*
+
+        Regardless, it has been a pleasure to serve with your, {commander}. I hope that I will be able to continue to serve with you in our uncertain future.
+      </narrative>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_tayyiba_not_win" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>9172fc81-691c-4a46-af02-08827591f1c8</id>
+      <narrative>
+        *Tayyiba drops her head.*
+
+        Thats how I feel, as well. We may have survived but I cannot call this a win. Then I think about Kate, that little girl from Tukkayid. I may be exiled from my kin, but not from the family I have gained along the way.
+
+        *She stands up straight and looks intently at you.*
+
+        I consider you part of that family, {commander}. It has been an honor to serve with you. I hope that I will be able to continue to serve with you in our uncertain future.
+      </narrative>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+    </storyPoint>
     <storyPoint name="narr_phelan_help" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>319cd061-56cb-49ae-b86b-4df55defddb7</id>
       <narrative>
@@ -2222,6 +2293,48 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
       <nextStoryPointId>c52e9315-2b95-4426-b493-751b347986ae</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_bloodname_yes" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>602e3951-904e-496f-88dc-cec97965caf8</id>
+      <title>Earn a bloodname</title>
+      <narrative>
+        Excellent. I am sure you will receive a nomination and avoid any Grand Melee. It may take a little time to organize trials. In the meantime, you should focus on rest and repair.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>41a8d936-f02c-47e6-90b1-3c0327a79942</storyPointId>
+        <futureDays>2</futureDays>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>430a773a-2ca1-44f6-bd03-ab0ca552a25b</storyPointId>
+        <futureDays>4</futureDays>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_bloodname_no" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>bbc3ffb6-b14a-4f40-99f8-331e61cf2709</id>
+      <title>Earn a bloodname</title>
+      <narrative>
+        I understand, although I am disappointed. Clan Wolf is in need of leadership and leadership demands a bloodname. Perhaps after some time to rest and recuperate, you will reconsider. It will take time to organize so many trials anyway.
+
+        The war is over, {commanderRank}. I release you to your unit to rest and repair. Once we have dealt with the immediate aftermath of this war, I will call the Clan together for a final Kurultai to mark the occasion.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>41a8d936-f02c-47e6-90b1-3c0327a79942</storyPointId>
+        <futureDays>2</futureDays>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
+        <futureDays>7</futureDays>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>581e54c9-abad-47d8-b3ab-a3b566c494eb</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        *A week has passed.*
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
     <storyPoint name="narr_tobias_alternate_full" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>88dfc686-8fce-40e5-a01a-7e1506726990</id>
@@ -6186,7 +6299,7 @@ This is a story arc in active development. Try at your own risk!
           You must combat drop behind them with everything you have to save the
           khan.
 
-### Hegira/Retreat Conditions
+      ### Hegira/Retreat Conditions
 
           The Jade Falcon forces should request *hegira* if reduced to less
           than half their original force size while the player has more BV
@@ -6444,7 +6557,7 @@ This is a story arc in active development. Try at your own risk!
           You must destroy the supply convoy heading towards Broken Hope. To avoid detection, you will be limited to
           two stars of mechs.
 
-## Hegira/Retreat Conditions
+         ### Hegira/Retreat Conditions
 
           Jade Falcon forces will not retreat or ask for Hegira under any conditions, but individual units will
           operate under forced withdrawal conditions. Due to the nature of this strike, you will not be able to claim
