@@ -61,6 +61,10 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
     private int hits;
 
     /**
+     * The rank the person should have
+     */
+    private int rank;
+    /**
      * A bloodname to assign
      */
     private String bloodname;
@@ -86,6 +90,10 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                 p.setHits(hits);
             }
 
+            if(rank > 0) {
+                p.setRank(rank);
+            }
+
             if(null != bloodname && !bloodname.isEmpty()) {
                 if(assignKeyBloodname) {
                     String name = getStoryArc().getCustomStringVariable(bloodname);
@@ -108,6 +116,7 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "takeUnit", takeUnit);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "hits", hits);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "rank", rank);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "bloodname", bloodname);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignKeyBloodname", assignKeyBloodname);
         writeToXmlEnd(pw1, --indent);
@@ -129,6 +138,8 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                     takeUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     hits = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
+                    rank = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
                     bloodname = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("assignKeyBloodname")) {
