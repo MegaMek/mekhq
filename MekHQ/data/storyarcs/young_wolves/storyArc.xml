@@ -110,6 +110,17 @@ This is a story arc in active development. Try at your own risk!
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
       </storyTrigger>
     </storyPoint>
+    <storyPoint name="narr_trial_game_over" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>441b1e8e-6ce3-4138-b173-6f21195a0d22</id>
+      <title>End of Your Story</title>
+      <narrative>As you attempt to extricate yourself from the cockpit of your downed mech, you hear the footfall of Mathius's mech approach. You know there will be no mercy. This fight was always to the death. As the laser beams begin to atomize your body, you close your eyes, taking some small comfort that Clan Wolf will live on in some form or another and that you have done all that could be expected of you as a warrior. This is the end of your story.</narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
+      </storyTrigger>
+    </storyPoint>
     <!-- Variable checks -->
     <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>948f6baa-7079-48e7-aec5-4989832a6c2a</id>
@@ -2115,11 +2126,6 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
       <nextStoryPointId>00f287b1-c152-457c-9691-998c0ea386dc</nextStoryPointId>
-    </storyPoint>
-    <storyPoint name="narr_trial_game_over" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>441b1e8e-6ce3-4138-b173-6f21195a0d22</id>
-      <title>End of Your Story</title>
-      <narrative>As you attempt to extricate yourself from the cockpit of your downed mech, you hear the footfall of Mathius's mech approach. You know there will be no mercy. This fight was always to the death. As the laser beams begin to atomize your body, you close your eyes, taking some small comfort that Clan Wolf will live on in some form or another and that you have done all that could be expected of you as a warrior. This is the end of your story.</narrative>
     </storyPoint>
     <storyPoint name="narr_trothkin_div_begin" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>8b060124-1d9d-4f8d-a56b-2403bb7c7145</id>
