@@ -112,8 +112,10 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
             parseStorySplashDirectory = false;
             try {
-                storySplashDirectory = new DirectoryItems(new File("data/images/storysplash"), // TODO : remove inline file path
-                        new ImageFileFactory());
+                File f = new File("data/images/storysplash");
+                if(f.exists()) {
+                    storySplashDirectory = new DirectoryItems(f, new ImageFileFactory());
+                }
             } catch (Exception e) {
                 LogManager.getLogger().error("Could not parse the storyarc icon directory!", e);
             }
@@ -130,8 +132,10 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
             parseUserStoryPortraitDirectory = false;
             try {
-                userStoryPortraitDirectory = new DirectoryItems(new File(path),
-                        new ImageFileFactory());
+                File f = new File(path);
+                if(f.exists()) {
+                    userStoryPortraitDirectory = new DirectoryItems(f, new ImageFileFactory());
+                }
             } catch (Exception e) {
                 LogManager.getLogger().error("Could not parse the storyarc portrait directory!", e);
             }
@@ -148,10 +152,12 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
             parseUserStorySplashDirectory = false;
             try {
-                userStorySplashDirectory = new DirectoryItems(new File(path),
-                        new ImageFileFactory());
+                File f = new File(path);
+                if(f.exists()) {
+                    userStorySplashDirectory = new DirectoryItems(f, new ImageFileFactory());
+                }
             } catch (Exception e) {
-                LogManager.getLogger().error("Could not parse the storyarc directory!", e);
+                LogManager.getLogger().error("Could not parse the storyarc splash image directory!", e);
             }
         }
     }
