@@ -17,35 +17,35 @@ This is a story arc in active development. Try at your own risk!
   <startingPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</startingPointId>
   <customStringVariables>
     <customStringVariable>
-      <key>first_impressions</key>
+      <key>firstImpressions</key>
       <value>none</value>
     </customStringVariable>
     <customStringVariable>
-      <key>mathius_disgrace</key>
+      <key>mathiusDisgrace</key>
       <value>none</value>
     </customStringVariable>
     <customStringVariable>
-      <key>clan_politics</key>
+      <key>clanPolitics</key>
       <value>neutral</value>
     </customStringVariable>
     <customStringVariable>
-      <key>tukayyid_service</key>
+      <key>tukayyidService</key>
       <value>none</value>
     </customStringVariable>
     <customStringVariable>
-      <key>tobias_first_bid</key>
+      <key>tobiasFirstBid</key>
       <value>none</value>
     </customStringVariable>
     <customStringVariable>
-      <key>tobias_final_bid</key>
+      <key>tobiasFinalBid</key>
       <value>none</value>
     </customStringVariable>
     <customStringVariable>
-      <key>trial_location</key>
+      <key>trialLocation</key>
       <value>plains</value>
     </customStringVariable>
     <customStringVariable>
-      <key>trothkin_fight</key>
+      <key>trothkinFight</key>
       <value>none</value>
     </customStringVariable>
     <customStringVariable>
@@ -128,7 +128,7 @@ This is a story arc in active development. Try at your own risk!
     <!-- Variable checks -->
     <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>948f6baa-7079-48e7-aec5-4989832a6c2a</id>
-      <key>first_impressions</key>
+      <key>firstImpressions</key>
       <storyOutcomes>
         <storyOutcome result="farce">
           <nextStoryPointId>14a73d17-9527-4ddf-93ec-e8904905b89d</nextStoryPointId>
@@ -138,7 +138,7 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
     <storyPoint name="check_tobias_first_bid" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>9ef236cf-ec08-4cf4-b28f-2522649447f1</id>
-      <key>tobias_first_bid</key>
+      <key>tobiasFirstBid</key>
       <storyOutcomes>
         <storyOutcome result="all">
           <nextStoryPointId>87057af1-f341-4e29-b9cd-498b1b2ca910</nextStoryPointId>
@@ -148,7 +148,7 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
     <storyPoint name="check_tobias_final_bid" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>667c05e9-ada2-481a-86d7-1a4136c0973e</id>
-      <key>tobias_final_bid</key>
+      <key>tobiasFinalBid</key>
       <storyOutcomes>
         <storyOutcome result="all">
           <nextStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
@@ -173,7 +173,7 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
     <storyPoint name="check_trial_location" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>61354e8d-61c8-45f1-883f-ce5926c2286f</id>
-      <key>trial_location</key>
+      <key>trialLocation</key>
       <storyOutcomes>
         <storyOutcome result="glacier">
           <nextStoryPointId>cf12e8d2-3d86-4a4d-bb37-1001c143a23b</nextStoryPointId>
@@ -189,7 +189,7 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
     <storyPoint name="check_deadly_ella_w" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>8ad45544-ba9c-403f-9c80-3b8349276b34</id>
-      <key>trothkin_fight</key>
+      <key>trothkinFight</key>
       <storyOutcomes>
         <storyOutcome result="knives">
           <nextStoryPointId>b1852aab-910e-4620-9aa0-79e13a80fc38</nextStoryPointId>
@@ -199,7 +199,7 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
     <storyPoint name="check_deadly_felipe_w" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>f4d1a63a-451c-4f85-9371-78d0c3e785d5</id>
-      <key>trothkin_fight</key>
+      <key>trothkinFight</key>
       <storyOutcomes>
         <storyOutcome result="knives">
           <nextStoryPointId>dc66c2ec-f5a8-49da-ba87-bc575a74be7c</nextStoryPointId>
@@ -209,7 +209,7 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
     <storyPoint name="check_fight_warden" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>ec658315-a5ec-476d-af20-8c5977285103</id>
-      <key>trothkin_fight</key>
+      <key>trothkinFight</key>
       <storyOutcomes>
         <storyOutcome result="disallow">
           <nextStoryPointId>4501de6e-0c1c-49a8-bd93-27fe4220992f</nextStoryPointId>
@@ -222,7 +222,7 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
     <storyPoint name="check_fight_crusader" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>e3f44b7d-b34d-46a8-adb3-36adeab4663d</id>
-      <key>trothkin_fight</key>
+      <key>trothkinFight</key>
       <storyOutcomes>
         <storyOutcome result="disallow">
           <nextStoryPointId>283a324f-339b-4d53-a994-6a4bd8e647b4</nextStoryPointId>
@@ -402,21 +402,21 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="honor">
           <nextStoryPointId>e8c9803c-3bda-47f7-9609-176ca461bf88</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>first_impressions</key>
+            <key>firstImpressions</key>
             <value>honor</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="duty">
           <nextStoryPointId>8e3f8bc0-1625-4901-9bd3-fbf3408eefcb</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>first_impressions</key>
+            <key>firstImpressions</key>
             <value>duty</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="farce">
           <nextStoryPointId>bbd099bd-f0a2-4323-8d70-ed02b98e1de5</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>first_impressions</key>
+            <key>firstImpressions</key>
             <value>farce</value>
           </storyTrigger>
         </storyOutcome>
@@ -464,21 +464,21 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="yes">
           <nextStoryPointId>11a5ef16-a675-4863-8127-cf4e8e30001c</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>mathius_disgrace</key>
+            <key>mathiusDisgrace</key>
             <value>defend_natasha</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="dispatch">
           <nextStoryPointId>11a5ef16-a675-4863-8127-cf4e8e30001c</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>mathius_disgrace</key>
+            <key>mathiusDisgrace</key>
             <value>defend_natasha</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="no">
           <nextStoryPointId>ca127468-c181-4d9a-8c25-39961eaa0aa1</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>mathius_disgrace</key>
+            <key>mathiusDisgrace</key>
             <value>agree_mathius</value>
           </storyTrigger>
         </storyOutcome>
@@ -595,21 +595,21 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="yes">
           <nextStoryPointId>3281d606-0b86-41b9-b69a-7b562d7b53b4</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>clan_politics</key>
+            <key>clanPolitics</key>
             <value>warden</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="dont_know">
           <nextStoryPointId>66193940-72bb-4a46-aa35-fdf85577c598</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>clan_politics</key>
+            <key>clanPolitics</key>
             <value>neutral</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="no">
           <nextStoryPointId>c2f3928a-f8c1-4633-aa45-440ca7ce2887</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>clan_politics</key>
+            <key>clanPolitics</key>
             <value>crusader</value>
           </storyTrigger>
         </storyOutcome>
@@ -738,14 +738,14 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="batchall_all">
           <nextStoryPointId>88dfc686-8fce-40e5-a01a-7e1506726990</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>tobias_first_bid</key>
+            <key>tobiasFirstBid</key>
             <value>all</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="batchall_equal">
           <nextStoryPointId>164b5ba1-6043-47aa-9888-1bfe84d9ae2e</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>tobias_first_bid</key>
+            <key>tobiasFirstBid</key>
             <value>equal</value>
           </storyTrigger>
         </storyOutcome>
@@ -768,14 +768,14 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="batchall_all">
           <nextStoryPointId>88dfc686-8fce-40e5-a01a-7e1506726990</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>tobias_first_bid</key>
+            <key>tobiasFirstBid</key>
             <value>all</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="batchall_equal">
           <nextStoryPointId>164b5ba1-6043-47aa-9888-1bfe84d9ae2e</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>tobias_first_bid</key>
+            <key>tobiasFirstBid</key>
             <value>equal</value>
           </storyTrigger>
         </storyOutcome>
@@ -795,21 +795,21 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="batchall_all">
           <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>tobias_final_bid</key>
+            <key>tobiasFinalBid</key>
             <value>all</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="batchall_equal">
           <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>tobias_final_bid</key>
+            <key>tobiasFinalBid</key>
             <value>equal</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="batchall_single">
           <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>tobias_final_bid</key>
+            <key>tobiasFinalBid</key>
             <value>single</value>
           </storyTrigger>
         </storyOutcome>
@@ -829,21 +829,21 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="batchall_all">
           <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>tobias_final_bid</key>
+            <key>tobiasFinalBid</key>
             <value>all</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="batchall_equal">
           <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>tobias_final_bid</key>
+            <key>tobiasFinalBid</key>
             <value>equal</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="batchall_single">
           <nextStoryPointId>d177a07e-efc3-4831-acfe-976d97b46d6a</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>tobias_final_bid</key>
+            <key>tobiasFinalBid</key>
             <value>single</value>
           </storyTrigger>
         </storyOutcome>
@@ -904,28 +904,28 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="glacier">
           <nextStoryPointId>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>trial_location</key>
+            <key>trialLocation</key>
             <value>glacier</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="swamp">
           <nextStoryPointId>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>trial_location</key>
+            <key>trialLocation</key>
             <value>swamp</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="vacuum">
           <nextStoryPointId>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>trial_location</key>
+            <key>trialLocation</key>
             <value>vacuum</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="plains">
           <nextStoryPointId>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>trial_location</key>
+            <key>trialLocation</key>
             <value>plains</value>
           </storyTrigger>
         </storyOutcome>
@@ -947,20 +947,20 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="stop">
           <nextStoryPointId>4419d33b-a8a7-424f-af0c-ba9565c92325</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>trothkin_fight</key>
+            <key>trothkinFight</key>
             <value>disallow</value>
           </storyTrigger>
         </storyOutcome>
         <storyOutcome result="knives">
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>trothkin_fight</key>
+            <key>trothkinFight</key>
             <value>knives</value>
           </storyTrigger>
           <nextStoryPointId>03cf5f5b-ac40-47b0-b353-a222a054ebf8</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="fists">
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
-            <key>trothkin_fight</key>
+            <key>trothkinFight</key>
             <value>fists</value>
           </storyTrigger>
           <nextStoryPointId>1a30e69d-c12e-4f69-b1fb-4bc0fbc6ac1b</nextStoryPointId>
