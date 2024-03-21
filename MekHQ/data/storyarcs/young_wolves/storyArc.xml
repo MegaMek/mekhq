@@ -83,7 +83,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>5e061b82-cff4-4d36-a9f5-12e558c86cd2</nextStoryPointId>
+      <nextStoryPointId>f873e505-966a-4e87-a77b-dde935388ff1</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -358,7 +358,7 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
     </storyPoint>
-    <storyPoint name="check_tayyiba_active3" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+    <storyPoint name="check_tayyiba_active4" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>c50d628f-b14f-47a9-accb-79057dbf81b3</id>
       <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
       <storyOutcomes>
@@ -367,6 +367,26 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_tayyiba_active5" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>a6d27c5d-54e7-40df-829d-4a849b04c315</id>
+      <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>c0867f5c-95f6-46f4-a61c-cd213be63456</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>5757a75f-d24e-46f9-9a41-f823df59198c</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_tobias_active" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>5757a75f-d24e-46f9-9a41-f823df59198c</id>
+      <personId>828189ee-a14f-4c7a-bb33-b62883757152</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>41c12537-7d9f-45cd-8e8c-427cc358d03b</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>2010919f-da33-414d-a8e3-f01603df061c</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_felipe_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>79360f28-c082-44f0-831b-83dfceadd09e</id>
@@ -2179,6 +2199,17 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
     </storyPoint>
+    <storyPoint name="narr_tayyiba_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>c0867f5c-95f6-46f4-a61c-cd213be63456</id>
+      <title>Congratulations</title>
+      <narrative>
+        *Tayyiba runs over and gives you a hug.*
+
+        I knew you could do it! I will be proud to serve with you in the Eleventh, {commander}. Together, perhaps we can show the Inner Sphere that we are not the monsters they think we are.
+      </narrative>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+      <nextStoryPointId>5757a75f-d24e-46f9-9a41-f823df59198c</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_phelan_help" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>319cd061-56cb-49ae-b86b-4df55defddb7</id>
       <narrative>
@@ -2386,6 +2417,7 @@ This is a story arc in active development. Try at your own risk!
         <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
         <futureDays>3</futureDays>
       </storyTrigger>
+      <nextStoryPointId>a6d27c5d-54e7-40df-829d-4a849b04c315</nextStoryPointId>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
     <storyPoint name="narr_phelan_bloodname_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -2549,6 +2581,34 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_tobias_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>41c12537-7d9f-45cd-8e8c-427cc358d03b</id>
+      <title>Congratulations</title>
+      <narrative>
+        Congratulations, indeed, {commanderRank}. The bloodname contest is truly the codex of the warrior distilled into a simple but reliable formula. I do find it so exciting, especially from the perspective of a new clan. You know, it really reminds of the epic poem of....
+
+        *Tobias trails off as others gather around you to celebrate.*
+      </narrative>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+      <nextStoryPointId>2010919f-da33-414d-a8e3-f01603df061c</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_luisa_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>2010919f-da33-414d-a8e3-f01603df061c</id>
+      <title>Congratulations</title>
+      <narrative>
+        I know I have not directly joined in on combat, but it has been an honor to serve with you {commander}. Your new rank and bloodname are well deserved. I know transportation assets get moved around pretty fluidly, but I would be happy to fly around your tin cans in my tin can anytime.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>db3bf2ba-7dda-456b-a1c9-d47d5ddbe08d</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_tech_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>db3bf2ba-7dda-456b-a1c9-d47d5ddbe08d</id>
+      <title>Congratulations</title>
+      <narrative>
+        Congratulations, {commander}. Glad to see you managed to earn a bloodname without totally wrecking my - sorry, I mean your - mech. We will get right on it and get it back in mint condition in no time.
+      </narrative>
+      <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
     </storyPoint>
     <storyPoint name="narr_hall_trial_final" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</id>
