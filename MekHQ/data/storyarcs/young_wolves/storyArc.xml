@@ -79,7 +79,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>742691c8-24a1-430e-8f63-c05aac6fc9ba</nextStoryPointId>
+      <nextStoryPointId>9dff4cbe-4b7b-4725-9820-c1303ad8792e</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -246,9 +246,13 @@ This is a story arc in active development. Try at your own risk!
       <id>71591078-04e4-4caf-8baa-7851be233ea5</id>
       <nextStoryPointId>79360f28-c082-44f0-831b-83dfceadd09e</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="check_morges_interlude" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+    <storyPoint name="check_morges_interlude1" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>369c61e2-0448-449d-99e1-6198d2a52b43</id>
       <nextStoryPointId>2b94122d-d4c2-4891-a397-cab0565bbf02</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_morges_interlude2" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>072c70de-1f8e-4e9e-8301-6fb0bae02328</id>
+      <nextStoryPointId>e667428e-4f1a-4ef2-940e-b47a0e7e5ddc</nextStoryPointId>
     </storyPoint>
     <!-- Person checks-->
     <storyPoint name="check_mathius_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
@@ -1158,6 +1162,54 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
+    <storyPoint name="choice_phelan_broken_hope" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>18f0a585-c4a6-46f8-aad4-8e33a6110808</id>
+      <title>Broken Hope</title>
+      <question>
+        *Phelan turns to you with a grave expression.*
+
+        The Refusal War is over. Clan Wolf will live on.
+
+        *He fixes you with a quizzical look.*
+
+        What do you think of my actions here today?
+      </question>
+      <choice id="war_hell">War is hell. I do not desire to see other warriors die in such a fashion, but I understand why the decision was made. The Wolves must survive.</choice>
+      <choice id="dishonor">It is a dishonor to our ways. These warriors deserved a better death, Falcon or not.</choice>
+      <choice id="psycho">They had it coming.</choice>
+      <storyOutcomes>
+        <storyOutcome result="war_hell">
+          <nextStoryPointId>efc2c68c-88f6-43ff-b02a-bb2b1b8d314e</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="dishonor">
+          <nextStoryPointId>5e8d8afb-47c2-447f-9076-7c4c8641813f</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="psycho">
+          <nextStoryPointId>f2ad2f75-6a19-4ec3-93b6-c1a0ff5d6d1d</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_phelan_bloodname" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>c52e9315-2b95-4426-b493-751b347986ae</id>
+      <title>Earn a Bloodname</title>
+      <question>
+        Now that the war is over, we must turn our attention to rebuilding our forces. With the touman so reduced, there are sadly  many {bloodname} bloodnames that have been left vacant. I would encourage you to claim one.
+
+        Will you compete for a bloodname?
+      </question>
+      <choice id="yes">Yes</choice>
+      <choice id="no">No</choice>
+      <storyOutcomes>
+        <storyOutcome result="yes">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="no">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
@@ -1592,6 +1644,34 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>319cd061-56cb-49ae-b86b-4df55defddb7</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_morges_convoy_debrief_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>9c8bfcf2-b805-4b52-86b4-a114ce543c00</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        Excellent work, {commanderRank}. With their supply line cut, the Falcon mechs started running dry and we pushed them all the way back to their rally point at the Bay of Broken Hope.
+
+        Now I have something special planned for the Falcons. You should join my forces as we march on the Bay of Broken Hope. I will speak with you more once we arrive.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>072c70de-1f8e-4e9e-8301-6fb0bae02328</storyPointId>
+        <futureDays>4</futureDays>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_morges_convoy_debrief_failure" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>9dff4cbe-4b7b-4725-9820-c1303ad8792e</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        Unfortunately, enough of the convoy survived to keep the Falcon fighting for a little longer. It cost me more than I would have liked, but we finally were able to push them back.
+
+        They are regrouping at the Bay of Broken Hope. Before they launch their next offensive, I have something special planned. You should join my forces as we march on the Bay of Broken Hope. I will speak with you more once we arrive.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>072c70de-1f8e-4e9e-8301-6fb0bae02328</storyPointId>
+        <futureDays>4</futureDays>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
@@ -2057,7 +2137,7 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
     <storyPoint name="narr_phelan_sitrep_convoy" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b94122d-d4c2-4891-a397-cab0565bbf02</id>
-      <title>Broken Hope</title>
+      <title>Cut Their Supply Lines</title>
       <narrative>
         As promised {commanderRank}, I have returned with new orders that should bust this dance wide open.
 
@@ -2066,10 +2146,10 @@ This is a story arc in active development. Try at your own risk!
         ammunition.
 
         Earlier today, the Kell Hounds intercepted a transmission indicating that a re-supply convoy was on its way
-        to Broken Hope to deliver much needed ammunition to the front line Falcon units. I can't spare many units for
+        from broken Hope to Carson Rift to deliver much needed ammunition to the front line Falcon units. I can't spare many units for
         such a deep strike mission and moving troops from the front line might alert the Falcons to our intent. You,
         however, are new here and will likely be able to slip behind enemy lines and strike this convoy before it
-        reaches Broken Hope.
+        reaches Carson Rift.
 
         The convoy will likely be well guarded, but those guards will be
         second line forces. Thus, I expect your battle hardened troops to make short work of them. Suit up,
@@ -2080,6 +2160,68 @@ This is a story arc in active development. Try at your own risk!
       </storyTrigger>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
       <nextStoryPointId>0d5c8112-e0fa-4ac0-83f2-38836d3f6bbb</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_broken_hope1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>e667428e-4f1a-4ef2-940e-b47a0e7e5ddc</id>
+      <title>Broken Hope</title>
+      <narrative>
+        *Phelan waits for you on a bluff overlooking the Bay of Broken Hope. You can see Jade Falcon technicians and mechwarriors running frantically throughout the camp below as they prepare for the coming onslaught of Wolves. Ice and snow lie gleaming upon the bulbous tops of Jade Falcon dropships.*
+
+        Thank you for meeting me here. I wanted to show you something. We lost Tukkayid because the Inner Sphere understands the concept of Total War, but we do not. Today, I will teach that lesson to the Jade Falcons again.
+
+        *Suddenly, you hear the roar of jet engines above and look up to see the contrails of aerospace fighters diving toward the bay. The sky is filled with Wolf aerospace fighters.*
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>83a4de0b-5abe-4a2d-bf4c-5474f9be3496</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_broken_hope2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>83a4de0b-5abe-4a2d-bf4c-5474f9be3496</id>
+      <title>Broken Hope</title>
+      <narrative>
+        *Jade Falcon fighters launch from their dropships to meet these intruders in the sky. For minutes, the sky is a tangled mass of fighters, twisting and turning for advantage, as they stab at one another with PPC, laser, and missile.*
+
+        *Quickly, however, the Jade Falcons are overwhelmed by their numerical disadvantage, when multiple flights of Kell Hounds fighters join the fray. Freed from their aerial concerns, the Wolf fighters begin to strafe the camp. Explosions ripple through the camp, tearing apart flesh and steel. Realizing, their exposed position, the Jade Falcons attempt to evacuate, but only one dropship makes it into the air, where it is torn apart by the combined Kell Hound fire.*
+
+        *Finally, the Wolf fighters cease their onslaught. A thick black fog lies over the Jade Falcon camp, partially concealing a scene of utter devastation. The twisted remains of mechs litter the ground, and survivors are seen limping here and there among the ruins.*
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-demolition.jpg</filename>
+      </storySplash>
+      <nextStoryPointId>18f0a585-c4a6-46f8-aad4-8e33a6110808</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_war_hell" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>efc2c68c-88f6-43ff-b02a-bb2b1b8d314e</id>
+      <title>Broken Hope</title>
+      <narrative>
+        *Phelan nods solemnly.*
+
+        I take no pride or joy in what I have done here. But it is a lesson we all must learn if we are to face an uncertain future.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>c52e9315-2b95-4426-b493-751b347986ae</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_dishonor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>5e8d8afb-47c2-447f-9076-7c4c8641813f</id>
+      <title>Broken Hope</title>
+      <narrative>
+        *Phelan nods solemnly.*
+
+        I agree. They did deserve a better death. I take no pride or joy in what I have done here. As the Khan, this is my burden to bear.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>c52e9315-2b95-4426-b493-751b347986ae</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_psycho" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>f2ad2f75-6a19-4ec3-93b6-c1a0ff5d6d1d</id>
+      <title>Broken Hope</title>
+      <narrative>
+        *Phelan's eyes widen in surprise.*
+
+        After the deaths of Natasha and Ulric, I can understand why you would feel this way. But they did not have it coming. They deserved better. However, my commitment to the survival of the Wolves means I could not give them what they deserve. As the Khan, this is my burden to bear.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>c52e9315-2b95-4426-b493-751b347986ae</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tobias_alternate_full" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>88dfc686-8fce-40e5-a01a-7e1506726990</id>
@@ -6508,8 +6650,10 @@ This is a story arc in active development. Try at your own risk!
       </scenario>
       <storyOutcomes>
         <storyOutcome result="PYRRHIC_VICTORY">
+          <nextStoryPointId>9c8bfcf2-b805-4b52-86b4-a114ce543c00</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
+      <nextStoryPointId>9dff4cbe-4b7b-4725-9820-c1303ad8792e</nextStoryPointId>
     </storyPoint>
   </storyPoints>
   <personalities>
