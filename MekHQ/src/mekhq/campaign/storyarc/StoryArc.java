@@ -146,6 +146,10 @@ public class StoryArc {
         return customStringVariables.get(key);
     }
 
+    public Map<String, String> getCustomStringVariables() {
+        return customStringVariables;
+    }
+
     public void begin() {
         MekHQ.registerHandler(this);
         getStoryPoint(getStartingPointId()).start();
@@ -432,6 +436,8 @@ public class StoryArc {
         if(null == replacementTokens) {
             replacementTokens = new LinkedHashMap<>();
         }
+
+        // get commander information
         Person commander = c.getSeniorCommander();
         if(null == commander) {
             //shouldn't happen unless there are no personnel, but just in case
@@ -444,6 +450,17 @@ public class StoryArc {
             replacementTokens.put("\\{commanderRank\\}", commander.getRankName());
             replacementTokens.put("\\{commander\\}", commander.getFullTitle());
         }
+
+        // tokens for customStringVariables
+        Map<String, String> customVariables = c.getStoryArc().getCustomStringVariables();
+        if(!customVariables.isEmpty()) {
+            for (Map.Entry<String, String> entry : customVariables.entrySet()) {
+                if (null != entry.getValue()) {
+                    replacementTokens.put("\\{" + entry.getKey() + "\\}", entry.getValue());
+                }
+            }
+        }
+
     }
 
     /**
