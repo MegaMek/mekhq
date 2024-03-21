@@ -49,6 +49,10 @@ This is a story arc in active development. Try at your own risk!
       <value>none</value>
     </customStringVariable>
     <customStringVariable>
+      <key>heritage</key>
+      <value>none</value>
+    </customStringVariable>
+    <customStringVariable>
       <key>bloodname</key>
       <value>Ward</value>
     </customStringVariable>
@@ -75,7 +79,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>319cd061-56cb-49ae-b86b-4df55defddb7</nextStoryPointId>
+      <nextStoryPointId>742691c8-24a1-430e-8f63-c05aac6fc9ba</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -418,6 +422,82 @@ This is a story arc in active development. Try at your own risk!
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
             <key>firstImpressions</key>
             <value>farce</value>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="choice_natasha_heritage" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>d7d887df-4049-4929-8478-bd2d825a7cce</id>
+      <title>Clan Heritage</title>
+      <question>
+        You are clearly a formidable warrior as well as a competent commander, {commanderRank}. Yet, you possess no bloodname. Why is this?
+      </question>
+      <choice id="loser">I have entered five bloodname trials but I have never earned the final prize.</choice>
+      <choice id="wound">I was severely wounded at Tukayyid and my recovery took a long time, preventing me from participating in any trials.</choice>
+      <choice id="cool">Honors and awards are for the needy. I prove my worth on the battlefield.</choice>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <storyOutcomes>
+        <storyOutcome result="loser">
+          <nextStoryPointId>e8c9803c-3bda-47f7-9609-176ca461bf88</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>heritage</key>
+            <value>loser</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="wound">
+          <nextStoryPointId>85a6ce37-2fbc-40b9-8485-6f80eae4d90d</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>heritage</key>
+            <value>wound</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="cool">
+          <nextStoryPointId>23a5ab65-48bc-457e-b4d5-e65231410154</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>heritage</key>
+            <value>cool</value>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="choice_natasha_heritage" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>a11300a1-6a9e-420a-a250-076b98df0b9e</id>
+      <title>Clan Heritage</title>
+      <question>
+        To which bloodname house do you belong?
+      </question>
+      <choice id="ward">Ward</choice>
+      <choice id="radick">Radick</choice>
+      <choice id="carns">Carns</choice>
+      <choice id="vickers">Vickers</choice>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <storyOutcomes>
+        <storyOutcome result="ward">
+          <nextStoryPointId>e2f5e6a7-c0f2-4d8f-bbcd-675d916fed66</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>bloodname</key>
+            <value>Ward</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="radick">
+          <nextStoryPointId>0aa2baa2-38bd-4024-a648-67e96680e0a7</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>bloodname</key>
+            <value>Radick</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="carns">
+          <nextStoryPointId>51110748-3c57-420c-96e1-b9f0159e5838</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>bloodname</key>
+            <value>Carns</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="vickers">
+          <nextStoryPointId>99709a9b-6e82-4693-b7ea-d26685ffdcad</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>bloodname</key>
+            <value>Vickers</value>
           </storyTrigger>
         </storyOutcome>
       </storyOutcomes>
@@ -1110,13 +1190,22 @@ This is a story arc in active development. Try at your own risk!
         <tab>BRIEFING_ROOM</tab>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="narr_colmar_debrief" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_colmar_debrief1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>742691c8-24a1-430e-8f63-c05aac6fc9ba</id>
       <title>Post-Mission Report</title>
       <narrative>
         It looks like your pups cut some teeth today, {commanderRank}. As you saw, the Falcons are not honoring us with zellbrigen, so I would recommend that you return the favor for the foreseeable future.
 
-        I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for another round of hunting green birds.
+        I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>d7d887df-4049-4929-8478-bd2d825a7cce</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_colmar_debrief2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>0065e443-fdad-4214-89a9-42c62a81d641</id>
+      <title>Time to Go</title>
+      <narrative>
+        You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for another round of hunting green birds.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextStoryPointId>
@@ -1536,6 +1625,71 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_loser" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        Luck is an inherent part of combat. Not every bloodname trial picks the best warrior. I am sure you will get your opportunity in the future.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>a11300a1-6a9e-420a-a250-076b98df0b9e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_wound" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>85a6ce37-2fbc-40b9-8485-6f80eae4d90d</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        One of the many costs of Tukayyid, earned by our arrogance and paid by your blood. Nonetheless, I am sure you will get your opportunity in the future.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>a11300a1-6a9e-420a-a250-076b98df0b9e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_cool" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>23a5ab65-48bc-457e-b4d5-e65231410154</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        Is that so? Very unusual for a clan warrior to turn their back on our traditions. However, once this war is over, I fear there may be so many vacancies that you will have no choice but to earn a bloodname.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>a11300a1-6a9e-420a-a250-076b98df0b9e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_ward" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>e2f5e6a7-c0f2-4d8f-bbcd-675d916fed66</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        The most famed and honored of all the bloodnames of our Clan. Well, except for mine, of course.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0065e443-fdad-4214-89a9-42c62a81d641</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_radick" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>0aa2baa2-38bd-4024-a648-67e96680e0a7</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        A true warrior bloodname, if perhaps too well known for its tendency toward savagery.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0065e443-fdad-4214-89a9-42c62a81d641</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_carns" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>51110748-3c57-420c-96e1-b9f0159e5838</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        A solid workhorse bloodname, perhaps unlucky to exist in a clan of Wards and Kerenskys.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0065e443-fdad-4214-89a9-42c62a81d641</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_vickers" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>99709a9b-6e82-4693-b7ea-d26685ffdcad</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        A Widowmaker bloodline? What happens when the Black Widow meets the Widowmaker, {commander}?
+
+        Don't answer that. It was a rhetorical question.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0065e443-fdad-4214-89a9-42c62a81d641</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_natasha_sacrifice" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>9081c4f9-0eb2-419f-b2e1-38761db76c8c</id>
