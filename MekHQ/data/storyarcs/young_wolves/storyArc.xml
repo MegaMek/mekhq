@@ -48,6 +48,10 @@ This is a story arc in active development. Try at your own risk!
       <key>trothkin_fight</key>
       <value>none</value>
     </customStringVariable>
+    <customStringVariable>
+      <key>bloodname</key>
+      <value>Ward</value>
+    </customStringVariable>
   </customStringVariables>
   <storyPoints>
     <!-- Initial story event -->
