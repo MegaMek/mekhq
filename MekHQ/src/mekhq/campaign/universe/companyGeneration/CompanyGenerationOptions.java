@@ -239,7 +239,7 @@ public class CompanyGenerationOptions {
         setProcessFinances(true);
         setStartingCash(60000000);
         setRandomizeStartingCash(method.isWindchild());
-        setRandomStartingCashDiceCount(17);
+        setRandomStartingCashDiceCount(18);
         setMinimumStartingFloat(method.isWindchild() ? 3500000 : 0);
         setIncludeInitialContractPayment(method.isWindchild());
         setStartingLoan(!method.isWindchild());
