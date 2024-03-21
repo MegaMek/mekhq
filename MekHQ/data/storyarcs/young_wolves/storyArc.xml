@@ -83,7 +83,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>5e061b82-cff4-4d36-a9f5-12e558c86cd2</nextStoryPointId>
+      <nextStoryPointId>f873e505-966a-4e87-a77b-dde935388ff1</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -2373,10 +2373,14 @@ This is a story arc in active development. Try at your own risk!
       </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_phelan_bloodname_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>7c261b19-8633-4e4d-9fe3-f113869f0abe</id>
+      <id>f873e505-966a-4e87-a77b-dde935388ff1</id>
       <title>Trial Success</title>
       <narrative>
-        You did it! I knew you were more than capable. It seems that your time has come.
+        You did it! I knew you were more than capable. It seems that your time has come, {commander}.
+
+        Yes, you heard that right - Star Colonel. Don't looks so confused. I can hardly have a Star Captain commanding the Eleventh Wolf Guards, can I? Consider yourself their new commander, {commanderRank}. As part of our re-organization, I am going to assign all surviving members of your trinary to the Eleventh, so that they can continue to serve under you.
+
+        Soon, I will address our Touman at a final Kurultai that brings this war to an end and sets a vision for the future. I would like you at my side for this event.
       </narrative>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
         <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
@@ -2390,7 +2394,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         It is unfortunate that you were not able to prevail, {commander}. I am sure that you will have the opportunity in the future to claim your bloodright once again. May fate favor you on that day.
 
-        Soon, I will address out Touman at a final Kurultai that brings this war to an end and sets a vision for the future. Bloodname or not, I would like you at my side at this event.
+        Soon, I will address our Touman at a final Kurultai that brings this war to an end and sets a vision for the future. Bloodname or not, I would like you at my side at this event.
       </narrative>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
         <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
@@ -3083,7 +3087,13 @@ This is a story arc in active development. Try at your own risk!
       </mission>
       <storyOutcomes>
         <storyOutcome result="SUCCESS">
-          <nextStoryPointId>7c261b19-8633-4e4d-9fe3-f113869f0abe</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+            <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
+            <rank>38</rank>
+            <bloodname>bloodname</bloodname>
+            <assignKeyBloodname>true</assignKeyBloodname>
+          </storyTrigger>
+          <nextStoryPointId>f873e505-966a-4e87-a77b-dde935388ff1</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="FAILED">
           <nextStoryPointId>7c261b19-8633-4e4d-9fe3-f113869f0abe</nextStoryPointId>
