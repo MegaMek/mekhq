@@ -83,9 +83,9 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>f873e505-966a-4e87-a77b-dde935388ff1</nextStoryPointId>
+      <!--<nextStoryPointId>f873e505-966a-4e87-a77b-dde935388ff1</nextStoryPointId>-->
       <!-- Real next story point Id. Can be commented out to test things -->
-      <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
+      <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
     </storyPoint>
     <!-- Game over check -->
     <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
