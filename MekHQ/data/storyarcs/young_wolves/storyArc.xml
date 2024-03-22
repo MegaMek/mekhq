@@ -83,7 +83,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>de590e44-731b-44d7-88f4-d828907b1270</nextStoryPointId>
+      <nextStoryPointId>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -1316,7 +1316,27 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
-    <storyPoint name="choice_vlad_leader" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+    <storyPoint name="choice_vlad_black_widow_dead" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>9fba8e2a-2b9a-476f-977b-9caa6ce38ec0</id>
+      <title>Vlad's Question</title>
+      <question>
+        Is it true? Is the Chalcas Black Widow finally dead? Are we finally free of her taint?
+
+        Tell me how she died.
+      </question>
+      <choice id="warrior">She died as a warrior, in single combat. Her sacrifice allowed the rest of our forces to withdraw from Twycross with minimal losses.</choice>
+      <choice id="fool">She died as an arrogant fool, burned to ash under the boot of an unremarkable Jade Falcon.</choice>
+      <storyOutcomes>
+        <storyOutcome result="warrior">
+          <nextStoryPointId>767daef0-1a09-46ec-8f18-91551d5a6859</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="fool">
+          <nextStoryPointId>783c9be5-f53a-40a5-8ae1-a9ac34287f31</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_vlad_leader1" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>f600e9a3-f92f-42b3-9dae-6c8599c1738f</id>
       <title>Vlad Takes Charge</title>
       <question>
@@ -1336,7 +1356,7 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
     </storyPoint>
-    <storyPoint name="choice_vlad_leader" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+    <storyPoint name="choice_vlad_leader2" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>29fd4dfb-a14c-493a-8987-c0399b1d0b7f</id>
       <title>Vlad Takes Charge?</title>
       <question>
@@ -1717,17 +1737,26 @@ This is a story arc in active development. Try at your own risk!
         <tab>INTERSTELLAR_MAP</tab>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="narr_butler_arrive" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_butler_arrive1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
       <title>Arrival at Butler</title>
       <narrative>
-        You arrive on Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to meet up and join forces with Star Colonel Ulric Kerensky's task force. You arrive at the jump point to find it teeming with Wolf transports. Shortly, you receive a direct message from Star Colonel Ulric Kerensky which you display on the main screen of the *Moonhowler's* bridge.
+        You arrive on Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to meet up and join forces with Star Colonel Ulric Kerensky's task force. You arrive at the jump point to find it teeming with Wolf transports. Shortly, you receive an urgent message from Star Captain Vlad.
       </narrative>
-      <nextStoryPointId>c1485e61-9773-41b9-9dd0-61697e4d0f61</nextStoryPointId>
+      <nextStoryPointId>9fba8e2a-2b9a-476f-977b-9caa6ce38ec0</nextStoryPointId>
       <storySplash>
         <category></category>
         <filename>splash-guardduty.png</filename>
       </storySplash>
+    </storyPoint>
+    <storyPoint name="narr_butler_arrive2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>ab898654-cf0b-4404-956d-72f160d3f1ee</id>
+      <title>Priority Communique</title>
+      <narrative>
+        My apologies for interrupting, {commander}, but I have a priority communication coming through from Star Colonel Ulric Kerensky, himself. I am patching it over to your screen, now.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>c1485e61-9773-41b9-9dd0-61697e4d0f61</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_butler_drop" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>95b5fa0b-c578-400a-b5da-6b24f55229f4</id>
@@ -1843,7 +1872,7 @@ This is a story arc in active development. Try at your own risk!
         <futureDays>4</futureDays>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="narr_butler_arrive1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_wotan_arrive1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>de590e44-731b-44d7-88f4-d828907b1270</id>
       <title>Arrival at Wotan</title>
       <narrative>
@@ -2851,6 +2880,26 @@ This is a story arc in active development. Try at your own risk!
         Congratulations, {commander}. Glad to see you managed to earn a bloodname without totally wrecking my - sorry, I mean your - mech. We will get right on it and get it back in mint condition in no time.
       </narrative>
       <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_black_widow_warrior" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>767daef0-1a09-46ec-8f18-91551d5a6859</id>
+      <title>Vlad's Question</title>
+      <narrative>
+        She died so that Clan warriors could ... *retreat*? What honor is there in this? She denied you glory in battle and yet you speak of her with fondness in your voice. You are a--
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>ab898654-cf0b-4404-956d-72f160d3f1ee</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_black_widow_fool" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>783c9be5-f53a-40a5-8ae1-a9ac34287f31</id>
+      <title>Vlad's Question</title>
+      <narrative>
+        *Vlad can barely contain his glee.*
+
+        I cannot imagine a better end to one such as Natasha Kerensky. May her name be stricken from the Remembrance. Now, if only the old man would do us the favor of dying as well so that we could repudiate this farcial "truce" and march again on--
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>ab898654-cf0b-4404-956d-72f160d3f1ee</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_vlad_leader" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>951ba04b-9db3-4ddb-9e05-9fe1bbd9b12c</id>
