@@ -60,6 +60,20 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
      */
     private int hits;
 
+    /**
+     * The rank the person should have
+     */
+    private int rank;
+    /**
+     * A bloodname to assign
+     */
+    private String bloodname;
+
+    /**
+     * A boolean indicator for whether the bloodname variable is a key to variable in the Story Arc
+     */
+    private boolean assignKeyBloodname = false;
+
     @Override
     protected void execute() {
         Person p = getCampaign().getPerson(personId);
@@ -75,6 +89,21 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
             if (hits > 0 && hits > p.getHits()) {
                 p.setHits(hits);
             }
+
+            if(rank > 0) {
+                p.setRank(rank);
+            }
+
+            if(null != bloodname && !bloodname.isEmpty()) {
+                if(assignKeyBloodname) {
+                    String name = getStoryArc().getCustomStringVariable(bloodname);
+                    if(null != name && !name.isEmpty()) {
+                        p.setBloodname(name);
+                    }
+                } else {
+                    p.setBloodname(bloodname);
+                }
+            }
         }
     }
 
@@ -87,6 +116,9 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "takeUnit", takeUnit);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "hits", hits);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "rank", rank);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "bloodname", bloodname);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignKeyBloodname", assignKeyBloodname);
         writeToXmlEnd(pw1, --indent);
     }
 
@@ -106,6 +138,12 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                     takeUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
                     hits = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
+                    rank = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
+                    bloodname = wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("assignKeyBloodname")) {
+                    assignKeyBloodname = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);

@@ -48,6 +48,18 @@ This is a story arc in active development. Try at your own risk!
       <key>trothkinFight</key>
       <value>none</value>
     </customStringVariable>
+    <customStringVariable>
+      <key>heritage</key>
+      <value>none</value>
+    </customStringVariable>
+    <customStringVariable>
+      <key>bloodname</key>
+      <value>Ward</value>
+    </customStringVariable>
+    <customStringVariable>
+      <key>claimBloodname</key>
+      <value>no</value>
+    </customStringVariable>
   </customStringVariables>
   <storyPoints>
     <!-- Initial story event -->
@@ -71,17 +83,68 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <!--<nextStoryPointId>59cb8882-1ce6-4dca-b6aa-004a109f700b</nextStoryPointId>-->
+      <nextStoryPointId>f873e505-966a-4e87-a77b-dde935388ff1</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
-      <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
+      <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
-    <!-- Checks on Game Over events -->
+    <!-- Game over check -->
     <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
       <id>84832d14-3c74-4ef8-8dfb-52a265c60b0f</id>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
       <statusCondition>KIA</statusCondition>
       <statusCondition>MIA</statusCondition>
       <nextStoryPointId>c108aefb-d65f-4c5b-8b8a-e405e5914f77</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_main_char_killed" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>c108aefb-d65f-4c5b-8b8a-e405e5914f77</id>
+      <title>The Story Ends Here</title>
+      <narrative>Unfortunately, your life has come to an end. With the end of your life comes the end of *this* story, but the story of the Wolves and the Jade Falcons will endure. May your actions earn you a rightful place in the Remembrance.
+
+        Seyla.
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_killed" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>d13f379e-3035-4637-a7e7-e6f9b205a8d6</id>
+      <title>Khan Ward has Fallen</title>
+      <narrative>
+        Khan Phelan Ward has fallen in battle. The remaining Wolf forces are in disarray and it is only a matter of time before they are overwhelmed by the Jade Falcons. The story ends here.
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_trial_game_over" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>441b1e8e-6ce3-4138-b173-6f21195a0d22</id>
+      <title>End of Your Story</title>
+      <narrative>As you attempt to extricate yourself from the cockpit of your downed mech, you hear the footfall of Mathius's mech approach. You know there will be no mercy. This fight was always to the death. As the laser beams begin to atomize your body, you close your eyes, taking some small comfort that Clan Wolf will live on in some form or another and that you have done all that could be expected of you as a warrior. This is the end of your story.</narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_game_end" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>508d4c18-54ba-41b1-a751-dec92f0d7b1f</id>
+      <title>This Journey is Over; Another Begins?</title>
+      <narrative>
+        You have reached the end of the Young Wolves story arc. Thanks for playing! I hope you enjoyed it.
+
+        You may continue playing with this campaign as you wish. Or you can start again with another campaign and see what other possibilities exist within the story arc.
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-liftoff.jpg</filename>
+      </storySplash>
     </storyPoint>
     <!-- Variable checks -->
     <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
@@ -200,6 +263,54 @@ This is a story arc in active development. Try at your own risk!
       <id>71591078-04e4-4caf-8baa-7851be233ea5</id>
       <nextStoryPointId>79360f28-c082-44f0-831b-83dfceadd09e</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="check_morges_interlude1" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>369c61e2-0448-449d-99e1-6198d2a52b43</id>
+      <nextStoryPointId>2b94122d-d4c2-4891-a397-cab0565bbf02</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_morges_interlude2" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>072c70de-1f8e-4e9e-8301-6fb0bae02328</id>
+      <nextStoryPointId>e667428e-4f1a-4ef2-940e-b47a0e7e5ddc</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_morges_interlude_tayyiba" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>41a8d936-f02c-47e6-90b1-3c0327a79942</id>
+      <nextStoryPointId>d6fb2fdf-d8d7-4a56-b813-6ed5b563c09b</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_morges_interlude_bloodname" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>430a773a-2ca1-44f6-bd03-ab0ca552a25b</id>
+      <nextStoryPointId>5e061b82-cff4-4d36-a9f5-12e558c86cd2</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_morges_trial_bloodname1" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>ab211686-b377-44f1-afd1-5b4048d412db</id>
+      <nextStoryPointId>1e3fd5e1-8c30-4f8f-a193-1e3332c81f39</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="check_morges_trial_bloodname2" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>d6748828-7b40-4fbf-8b6a-846f2cef51d3</id>
+      <nextStoryPointId>a1b72ce3-5017-4b42-b2fc-df06e8945ec9</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="check_morges_trial_bloodname3" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>763e68fa-1fca-478d-ac38-e22e1724cd44</id>
+      <nextStoryPointId>f85b4569-c9f6-4b20-9702-8525dc391368</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="check_morges_trial_bloodname4" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>365aee45-7fec-444c-bd27-a53c2166580b</id>
+      <nextStoryPointId>b3f0df38-defb-40e8-8b8d-5549fa32c782</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="check_morges_interlude_kurultai" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>35fabd74-41fa-4472-b409-8a1d0c280418</id>
+      <nextStoryPointId>581e54c9-abad-47d8-b3ab-a3b566c494eb</nextStoryPointId>
+    </storyPoint>
     <!-- Person checks-->
     <storyPoint name="check_mathius_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>a2634663-dec8-4429-9b11-4364b8b3dcef</id>
@@ -252,6 +363,15 @@ This is a story arc in active development. Try at your own risk!
       <nextStoryPointId>03d02678-a914-455f-928a-b7634d5688d6</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_tayyiba_active3" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>d6fb2fdf-d8d7-4a56-b813-6ed5b563c09b</id>
+      <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>29b8f1ea-9ae0-443e-a9dd-e28826c1d41b</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="check_tayyiba_active4" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>c50d628f-b14f-47a9-accb-79057dbf81b3</id>
       <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
       <storyOutcomes>
@@ -260,6 +380,26 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_tayyiba_active5" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>a6d27c5d-54e7-40df-829d-4a849b04c315</id>
+      <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>c0867f5c-95f6-46f4-a61c-cd213be63456</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>5757a75f-d24e-46f9-9a41-f823df59198c</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_tobias_active" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>5757a75f-d24e-46f9-9a41-f823df59198c</id>
+      <personId>828189ee-a14f-4c7a-bb33-b62883757152</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>41c12537-7d9f-45cd-8e8c-427cc358d03b</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>2010919f-da33-414d-a8e3-f01603df061c</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_felipe_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>79360f28-c082-44f0-831b-83dfceadd09e</id>
@@ -372,6 +512,82 @@ This is a story arc in active development. Try at your own risk!
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
             <key>firstImpressions</key>
             <value>farce</value>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="choice_natasha_heritage" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>d7d887df-4049-4929-8478-bd2d825a7cce</id>
+      <title>Clan Heritage</title>
+      <question>
+        You are clearly a formidable warrior as well as a competent commander, {commanderRank}. Yet, you possess no bloodname. Why is this?
+      </question>
+      <choice id="loser">I have entered five bloodname trials but I have never earned the final prize.</choice>
+      <choice id="wound">I was severely wounded at Tukayyid and my recovery took a long time, preventing me from participating in any trials.</choice>
+      <choice id="cool">Honors and awards are for the needy. I prove my worth on the battlefield.</choice>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <storyOutcomes>
+        <storyOutcome result="loser">
+          <nextStoryPointId>e8c9803c-3bda-47f7-9609-176ca461bf88</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>heritage</key>
+            <value>loser</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="wound">
+          <nextStoryPointId>85a6ce37-2fbc-40b9-8485-6f80eae4d90d</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>heritage</key>
+            <value>wound</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="cool">
+          <nextStoryPointId>23a5ab65-48bc-457e-b4d5-e65231410154</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>heritage</key>
+            <value>cool</value>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="choice_natasha_heritage" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>a11300a1-6a9e-420a-a250-076b98df0b9e</id>
+      <title>Clan Heritage</title>
+      <question>
+        To which bloodname house do you belong?
+      </question>
+      <choice id="ward">Ward</choice>
+      <choice id="radick">Radick</choice>
+      <choice id="carns">Carns</choice>
+      <choice id="vickers">Vickers</choice>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <storyOutcomes>
+        <storyOutcome result="ward">
+          <nextStoryPointId>e2f5e6a7-c0f2-4d8f-bbcd-675d916fed66</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>bloodname</key>
+            <value>Ward</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="radick">
+          <nextStoryPointId>0aa2baa2-38bd-4024-a648-67e96680e0a7</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>bloodname</key>
+            <value>Radick</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="carns">
+          <nextStoryPointId>51110748-3c57-420c-96e1-b9f0159e5838</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>bloodname</key>
+            <value>Carns</value>
+          </storyTrigger>
+        </storyOutcome>
+        <storyOutcome result="vickers">
+          <nextStoryPointId>99709a9b-6e82-4693-b7ea-d26685ffdcad</nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
+            <key>bloodname</key>
+            <value>Vickers</value>
           </storyTrigger>
         </storyOutcome>
       </storyOutcomes>
@@ -652,6 +868,26 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
         <storyOutcome result="coward">
           <nextStoryPointId>1e2db04a-a137-4018-982e-cd54145818ac</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_tayyiba_final" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>29b8f1ea-9ae0-443e-a9dd-e28826c1d41b</id>
+      <title>Tayyiba's Question</title>
+      <question>
+        *As you oversee repairs to your units, Tayyiba approaches you.*
+
+        We finally did it then? We won this war. How come it doesn't feel like a win, then?
+      </question>
+      <choice id="worth_it">Because it came at a heavy cost. However, its a cost I would pay again, knowing the alternative.</choice>
+      <choice id="not_win">Because we have lost everything and can never return home. That is not really a win in my book.</choice>
+      <storyOutcomes>
+        <storyOutcome result="worth_it">
+          <nextStoryPointId>8b21ce93-0bae-47aa-9dbc-d1267ce2ebf8</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="not_win">
+          <nextStoryPointId>9172fc81-691c-4a46-af02-08827591f1c8</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
@@ -1010,21 +1246,77 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>07a505ea-5fc5-4166-be0c-b98c4852b0ab</nextStoryPointId>
     </storyPoint>
-    <!-- Narrative story events -->
-    <storyPoint name="narr_main_char_killed" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>c108aefb-d65f-4c5b-8b8a-e405e5914f77</id>
-      <title>The Story Ends Here</title>
-      <narrative>Unfortunately, your life has come to an end. With the end of your life comes the end of *this* story, but the story of the Wolves and the Jade Falcons will endure. May your actions earn you a rightful place in the Remembrance.
-
-Seyla.
-      </narrative>
-      <storySplash>
-        <category></category>
-        <filename>splash-postbattle.jpg</filename>
-      </storySplash>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
-      </storyTrigger>
+    <storyPoint name="choice_phelan_rescue" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>1cb4ba0e-7579-4ce8-ab57-abb53b730ea4</id>
+      <title>A Grateful Khan</title>
+      <question>
+        {commander}, I am grateful for your unexpected, but fortuitous, arrival. I take it that Ulric sent you our way due to your ... point of view? Or was it just that you couldn't stand Vlad's stink any longer?
+      </question>
+      <choice id="no_choice">It was never really much of a choice for me. The Inner Sphere must be protected from fanatics like the Jade Falcons.</choice>
+      <choice id="shown_way">It was not easy, but Natasha and Ulric showed me that this is the only path forward.</choice>
+      <choice id="vlad_stinks">I tried to give him some deodorant, but he insisted it was "unclan-like."</choice>
+      <storyOutcomes>
+        <storyOutcome result="no_choice">
+          <nextStoryPointId>ee7d6276-c3a1-427f-9649-e2371b3ea2d8</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="shown_way">
+          <nextStoryPointId>52505184-d3b4-4a2a-8f2c-577dabcde281</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="vlad_stinks">
+          <nextStoryPointId>1e38ce77-7d7a-4b85-a2f2-97c9ab1ee9e1</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
+    <storyPoint name="choice_phelan_broken_hope" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>18f0a585-c4a6-46f8-aad4-8e33a6110808</id>
+      <title>Broken Hope</title>
+      <question>
+        *Phelan turns to you with a grave expression.*
+
+        The Refusal War is over. Clan Wolf will live on.
+
+        *He fixes you with a quizzical look.*
+
+        What do you think of my actions here today?
+      </question>
+      <choice id="war_hell">War is hell. I do not desire to see other warriors die in such a fashion, but I understand why the decision was made. The Wolves must survive.</choice>
+      <choice id="dishonor">It is a dishonor to our ways. These warriors deserved a better death, Falcon or not.</choice>
+      <choice id="psycho">They had it coming.</choice>
+      <storyOutcomes>
+        <storyOutcome result="war_hell">
+          <nextStoryPointId>efc2c68c-88f6-43ff-b02a-bb2b1b8d314e</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="dishonor">
+          <nextStoryPointId>5e8d8afb-47c2-447f-9076-7c4c8641813f</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="psycho">
+          <nextStoryPointId>f2ad2f75-6a19-4ec3-93b6-c1a0ff5d6d1d</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_phelan_bloodname" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>c52e9315-2b95-4426-b493-751b347986ae</id>
+      <title>Earn a Bloodname</title>
+      <question>
+        Now that the war is over, we must turn our attention to rebuilding our forces. With the touman so reduced, there are sadly  many {bloodname} bloodnames that have been left vacant. I would encourage you to claim one.
+
+        Will you compete for a bloodname?
+      </question>
+      <choice id="yes">Yes, I will claim my bloodright.</choice>
+      <choice id="no">No, I have had enough of fighting for now.</choice>
+      <storyOutcomes>
+        <storyOutcome result="yes">
+          <nextStoryPointId>602e3951-904e-496f-88dc-cec97965caf8</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="no">
+          <nextStoryPointId>bbc3ffb6-b14a-4f40-99f8-331e61cf2709</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
       <title>A Khan's Greeting</title>
@@ -1056,13 +1348,22 @@ Seyla.
         <tab>BRIEFING_ROOM</tab>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="narr_colmar_debrief" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_colmar_debrief1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>742691c8-24a1-430e-8f63-c05aac6fc9ba</id>
       <title>Post-Mission Report</title>
       <narrative>
         It looks like your pups cut some teeth today, {commanderRank}. As you saw, the Falcons are not honoring us with zellbrigen, so I would recommend that you return the favor for the foreseeable future.
 
-        I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital. You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for another round of hunting green birds.
+        I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>d7d887df-4049-4929-8478-bd2d825a7cce</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_colmar_debrief2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>0065e443-fdad-4214-89a9-42c62a81d641</id>
+      <title>Time to Go</title>
+      <narrative>
+        You should return to your dropship and get busy with repairs. We will travel with Khan Phelan Ward's forces to Sudeten for another round of hunting green birds.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>0f3caf49-3b53-4ed5-8f55-690fb7356fc3</nextStoryPointId>
@@ -1093,6 +1394,18 @@ Seyla.
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
         <tab>REPAIR</tab>
       </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_tech_bloodname_trial" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>955ee81c-b23e-48a7-a4ab-5187ba0d9eeb</id>
+      <title>Preparing for the Trial</title>
+      <narrative>
+        So tomorrow is the big day, huh? You let us know if you want to make any changes or need any repairs to the mech you want to use for each battle. Depending on your opponent, you may want to swap your loadout, or even change your ride entirely.
+
+        We will also be ready to repair your mech right after battle. If you don't bang it up too much, we should be able to get it ready for the next day's combat.
+
+        Good luck, {commanderRank}.
+      </narrative>
+      <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
     </storyPoint>
     <storyPoint name="narr_arrive_sudeten" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>6622fc78-1d9b-4ab5-a8eb-5696eae49f0d</id>
@@ -1450,6 +1763,34 @@ Seyla.
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>319cd061-56cb-49ae-b86b-4df55defddb7</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_morges_convoy_debrief_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>9c8bfcf2-b805-4b52-86b4-a114ce543c00</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        Excellent work, {commanderRank}. With their supply line cut, the Falcon mechs started running dry and we pushed them all the way back to their rally point at the Bay of Broken Hope.
+
+        Now I have something special planned for the Falcons. You should join my forces as we march on the Bay of Broken Hope. I will speak with you more once we arrive.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>072c70de-1f8e-4e9e-8301-6fb0bae02328</storyPointId>
+        <futureDays>4</futureDays>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_morges_convoy_debrief_failure" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>9dff4cbe-4b7b-4725-9820-c1303ad8792e</id>
+      <title>Post-Mission Report</title>
+      <narrative>
+        Unfortunately, enough of the convoy survived to keep the Falcon fighting for a little longer. It cost me more than I would have liked, but we finally were able to push them back.
+
+        They are regrouping at the Bay of Broken Hope. Before they launch their next offensive, I have something special planned. You should join my forces as we march on the Bay of Broken Hope. I will speak with you more once we arrive.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>072c70de-1f8e-4e9e-8301-6fb0bae02328</storyPointId>
+        <futureDays>4</futureDays>
+      </storyTrigger>
+    </storyPoint>
     <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
       <title>A Khan's Greeting</title>
@@ -1482,6 +1823,71 @@ Seyla.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_loser" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        Luck is an inherent part of combat. Not every bloodname trial picks the best warrior. I am sure you will get your opportunity in the future.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>a11300a1-6a9e-420a-a250-076b98df0b9e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_wound" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>85a6ce37-2fbc-40b9-8485-6f80eae4d90d</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        One of the many costs of Tukayyid, earned by our arrogance and paid by your blood. Nonetheless, I am sure you will get your opportunity in the future.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>a11300a1-6a9e-420a-a250-076b98df0b9e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_cool" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>23a5ab65-48bc-457e-b4d5-e65231410154</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        Is that so? Very unusual for a clan warrior to turn their back on our traditions. However, once this war is over, I fear there may be so many vacancies that you will have no choice but to earn a bloodname.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>a11300a1-6a9e-420a-a250-076b98df0b9e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_ward" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>e2f5e6a7-c0f2-4d8f-bbcd-675d916fed66</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        The most famed and honored of all the bloodnames of our Clan. Well, except for mine, of course.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0065e443-fdad-4214-89a9-42c62a81d641</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_radick" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>0aa2baa2-38bd-4024-a648-67e96680e0a7</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        A true warrior bloodname, if perhaps too well known for its tendency toward savagery.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0065e443-fdad-4214-89a9-42c62a81d641</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_carns" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>51110748-3c57-420c-96e1-b9f0159e5838</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        A solid workhorse bloodname, perhaps unlucky to exist in a clan of Wards and Kerenskys.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0065e443-fdad-4214-89a9-42c62a81d641</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_natasha_vickers" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>99709a9b-6e82-4693-b7ea-d26685ffdcad</id>
+      <title>Clan Heritage</title>
+      <narrative>
+        A Widowmaker bloodline? What happens when the Black Widow meets the Widowmaker, {commander}?
+
+        Don't answer that. It was a rhetorical question.
+      </narrative>
+      <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
+      <nextStoryPointId>0065e443-fdad-4214-89a9-42c62a81d641</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_natasha_sacrifice" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>9081c4f9-0eb2-419f-b2e1-38761db76c8c</id>
@@ -1780,6 +2186,43 @@ Seyla.
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_tayyiba_worth_it" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>8b21ce93-0bae-47aa-9dbc-d1267ce2ebf8</id>
+      <narrative>
+        *Tayyiba drops her head.*
+
+        I want to believe that, but given everything that has happened, its hard to accept. To live in exile away from our kin? To lose Ulric and Natasha? I hope that time will heal these wounds and show the wisdom of the decision.
+
+        *She stands up straight and looks intently at you.*
+
+        Regardless, it has been a pleasure to serve with your, {commander}. I hope that I will be able to continue to serve with you in our uncertain future.
+      </narrative>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_tayyiba_not_win" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>9172fc81-691c-4a46-af02-08827591f1c8</id>
+      <narrative>
+        *Tayyiba drops her head.*
+
+        Thats how I feel, as well. We may have survived but I cannot call this a win. Then I think about Kate, that little girl from Tukkayid. I may be exiled from my kin, but not from the family I have gained along the way.
+
+        *She stands up straight and looks intently at you.*
+
+        I consider you part of that family, {commander}. It has been an honor to serve with you. I hope that I will be able to continue to serve with you in our uncertain future.
+      </narrative>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_tayyiba_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>c0867f5c-95f6-46f4-a61c-cd213be63456</id>
+      <title>Congratulations</title>
+      <narrative>
+        *Tayyiba runs over and gives you a hug.*
+
+        I knew you could do it! I will be proud to serve with you in the Eleventh, {commander}. Together, perhaps we can show the Inner Sphere that we are not the monsters they think we are.
+      </narrative>
+      <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
+      <nextStoryPointId>5757a75f-d24e-46f9-9a41-f823df59198c</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_phelan_help" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>319cd061-56cb-49ae-b86b-4df55defddb7</id>
       <narrative>
@@ -1794,6 +2237,320 @@ Seyla.
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
         <tab>BRIEFING_ROOM</tab>
       </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_no_choice" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>ee7d6276-c3a1-427f-9649-e2371b3ea2d8</id>
+      <title>A Grateful Khan</title>
+      <narrative>
+        *Phelan nods.*
+
+        If only other warriors came out of the iron womb with such wisdom, {commanderRank}. It would make our job a
+        lot easier.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>1e49e0a8-6a54-43d4-b99c-47de969857c3</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_shown_path" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>52505184-d3b4-4a2a-8f2c-577dabcde281</id>
+      <title>A Grateful Khan</title>
+      <narrative>
+        *Phelan grasps you firmly around the shoulders.*
+
+        {commander}, its never too late to learn these lessons, for you and others. In this, you could not have had
+        better teachers than Ulric and Natasha. Now it is our turn to be the teachers.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>1e49e0a8-6a54-43d4-b99c-47de969857c3</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_vlad_stinks" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1e38ce77-7d7a-4b85-a2f2-97c9ab1ee9e1</id>
+      <title>A Grateful Khan</title>
+      <narrative>
+        *Phelan laughs out loud.*
+
+        What is this? A clan warrior with a sense of humour? I think I shall enjoy your company, {commander}.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>1e49e0a8-6a54-43d4-b99c-47de969857c3</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_morges" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1e49e0a8-6a54-43d4-b99c-47de969857c3</id>
+      <title>Situation on Morges</title>
+      <narrative>
+        The situation here on Morges has been on a razor's edge. The Falcons threw everything they could at us. With
+        the help of the Kell Hounds, we have endured. I now have a plan underway to turn the tables on the jade
+        birds and kick them off of Morges for good.
+
+        I will give you and your forces a few days time to repair and re-arm at our field base, but expect me to call
+        on you again shortly.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>369c61e2-0448-449d-99e1-6198d2a52b43</storyPointId>
+        <futureDays>3</futureDays>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_sitrep_convoy" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>2b94122d-d4c2-4891-a397-cab0565bbf02</id>
+      <title>Cut Their Supply Lines</title>
+      <narrative>
+        As promised {commanderRank}, I have returned with new orders that should bust this dance wide open.
+
+        The Jade Falcons have been pushing us hard since their loss at Icegrief Pass. They are loaded with ballistic
+        weaponry for maximum destructive effect and it has been effective. However, they are now running low on
+        ammunition.
+
+        Earlier today, the Kell Hounds intercepted a transmission indicating that a re-supply convoy was on its way
+        from broken Hope to Carson Rift to deliver much needed ammunition to the front line Falcon units. I can't spare many units for
+        such a deep strike mission and moving troops from the front line might alert the Falcons to our intent. You,
+        however, are new here and will likely be able to slip behind enemy lines and strike this convoy before it
+        reaches Carson Rift.
+
+        The convoy will likely be well guarded, but those guards will be
+        second line forces. Thus, I expect your battle hardened troops to make short work of them. Suit up,
+        {commander}, I want you on the move in 30 minutes!
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>0d5c8112-e0fa-4ac0-83f2-38836d3f6bbb</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_broken_hope1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>e667428e-4f1a-4ef2-940e-b47a0e7e5ddc</id>
+      <title>Broken Hope</title>
+      <narrative>
+        *Phelan waits for you on a bluff overlooking the Bay of Broken Hope. You can see Jade Falcon technicians and mechwarriors running frantically throughout the camp below as they prepare for the coming onslaught of Wolves. Ice and snow lie gleaming upon the bulbous tops of Jade Falcon dropships.*
+
+        Thank you for meeting me here. I wanted to show you something. We lost Tukkayid because the Inner Sphere understands the concept of Total War, but we do not. Today, I will teach that lesson to the Jade Falcons again.
+
+        *Suddenly, you hear the roar of jet engines above and look up to see the contrails of aerospace fighters diving toward the bay. The sky is filled with Wolf aerospace fighters.*
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>83a4de0b-5abe-4a2d-bf4c-5474f9be3496</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_broken_hope2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>83a4de0b-5abe-4a2d-bf4c-5474f9be3496</id>
+      <title>Broken Hope</title>
+      <narrative>
+        *Jade Falcon fighters launch from their dropships to meet these intruders in the sky. For minutes, the sky is a tangled mass of fighters, twisting and turning for advantage, as they stab at one another with PPC, laser, and missile.*
+
+        *Quickly, however, the Jade Falcons are overwhelmed by their numerical disadvantage, when multiple flights of Kell Hounds fighters join the fray. Freed from their aerial concerns, the Wolf fighters begin to strafe the camp. Explosions ripple through the camp, tearing apart flesh and steel. Realizing, their exposed position, the Jade Falcons attempt to evacuate, but only one dropship makes it into the air, where it is torn apart by the combined Kell Hound fire.*
+
+        *Finally, the Wolf fighters cease their onslaught. A thick black fog lies over the Jade Falcon camp, partially concealing a scene of utter devastation. The twisted remains of mechs litter the ground, and survivors are seen limping here and there among the ruins.*
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>ec09c184-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+        <missionStatus>SUCCESS</missionStatus>
+      </storyTrigger>
+      <storySplash>
+        <category></category>
+        <filename>splash-demolition.jpg</filename>
+      </storySplash>
+      <nextStoryPointId>18f0a585-c4a6-46f8-aad4-8e33a6110808</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_war_hell" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>efc2c68c-88f6-43ff-b02a-bb2b1b8d314e</id>
+      <title>Broken Hope</title>
+      <narrative>
+        *Phelan nods solemnly.*
+
+        I take no pride or joy in what I have done here. But it is a lesson we all must learn if we are to face an uncertain future.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>c52e9315-2b95-4426-b493-751b347986ae</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_dishonor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>5e8d8afb-47c2-447f-9076-7c4c8641813f</id>
+      <title>Broken Hope</title>
+      <narrative>
+        *Phelan nods solemnly.*
+
+        I agree. They did deserve a better death. I take no pride or joy in what I have done here. As the Khan, this is my burden to bear.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>c52e9315-2b95-4426-b493-751b347986ae</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_psycho" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>f2ad2f75-6a19-4ec3-93b6-c1a0ff5d6d1d</id>
+      <title>Broken Hope</title>
+      <narrative>
+        *Phelan's eyes widen in surprise.*
+
+        After the deaths of Natasha and Ulric, I can understand why you would feel this way. But they did not have it coming. They deserved better. However, my commitment to the survival of the Wolves means I could not give them what they deserve. As the Khan, this is my burden to bear.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <nextStoryPointId>c52e9315-2b95-4426-b493-751b347986ae</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_bloodname_yes" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>602e3951-904e-496f-88dc-cec97965caf8</id>
+      <title>Earn a bloodname</title>
+      <narrative>
+        Excellent. I am sure you will receive a nomination and avoid any Grand Melee. It may take a little time to organize trials. In the meantime, you should focus on rest and repair.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>41a8d936-f02c-47e6-90b1-3c0327a79942</storyPointId>
+        <futureDays>2</futureDays>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>430a773a-2ca1-44f6-bd03-ab0ca552a25b</storyPointId>
+        <futureDays>4</futureDays>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_bloodname_no" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>bbc3ffb6-b14a-4f40-99f8-331e61cf2709</id>
+      <title>Earn a bloodname</title>
+      <narrative>
+        I understand, although I am disappointed. Clan Wolf is in need of leadership and leadership demands a bloodname. Perhaps after some time to rest and recuperate, you will reconsider. It will take time to organize so many trials anyway.
+
+        The war is over, {commanderRank}. I release you to your unit to rest and repair. Once we have dealt with the immediate aftermath of this war, I will call the Clan together for a final Kurultai to mark the occasion.
+      </narrative>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>41a8d936-f02c-47e6-90b1-3c0327a79942</storyPointId>
+        <futureDays>2</futureDays>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
+        <futureDays>7</futureDays>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_phelan_bloodname_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>f873e505-966a-4e87-a77b-dde935388ff1</id>
+      <title>Trial Success</title>
+      <narrative>
+        You did it! I knew you were more than capable. It seems that your time has come, {commander}.
+
+        Yes, you heard that right - Star Colonel. Don't looks so confused. I can hardly have a Star Captain commanding the Eleventh Wolf Guards, can I? Consider yourself their new commander, {commanderRank}. As part of our re-organization, I am going to assign all surviving members of your trinary to the Eleventh, so that they can continue to serve under you.
+
+        Soon, I will address our Touman at a final Kurultai that brings this war to an end and sets a vision for the future. I would like you at my side for this event.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
+        <futureDays>3</futureDays>
+      </storyTrigger>
+      <nextStoryPointId>a6d27c5d-54e7-40df-829d-4a849b04c315</nextStoryPointId>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_bloodname_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>7c261b19-8633-4e4d-9fe3-f113869f0abe</id>
+      <title>Trial Failure</title>
+      <narrative>
+        It is unfortunate that you were not able to prevail, {commander}. I am sure that you will have the opportunity in the future to claim your bloodright once again. May fate favor you on that day.
+
+        Soon, I will address our Touman at a final Kurultai that brings this war to an end and sets a vision for the future. Bloodname or not, I would like you at my side at this event.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
+        <futureDays>3</futureDays>
+      </storyTrigger>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>581e54c9-abad-47d8-b3ab-a3b566c494eb</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        *The remaining warriors of Clan Wolf have gathered together in a large auditorium under dim lighting. All are quiet, and the only sound is the creak of ceremonial leathers, as Khan Phelan Ward ascends the podium to address the group. You, along with several others, stand behind him.*
+
+        I am the Oathmaster! All will be bound by this conclave until they are dust and memories and then beyond that until the end of all that is.
+
+        *The crowd intones as one - Seyla.*
+      </narrative>
+      <nextStoryPointId>7e04fc4e-8282-499b-ba71-5eeb76a0a204</nextStoryPointId>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>7e04fc4e-8282-499b-ba71-5eeb76a0a204</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        We have defeated the Jade Falcons in combat.
+
+        *Cheers from the crowd.**
+
+        Yet, Khan Vandervahn Chistu claimed, after murdering Ulric Kerensky on Wotan, that *our* Trial of Refusal was, instead, *their* Trial of Absorption.
+
+        *The crowd erupts in cries of confusion and disbelief. Phelan quiets them with a hand.*
+
+        Thankfully, among the survivors of Wotan was one Wolf warrior named Vlad. He witnessed the treachery of Khan Chistu, firstand, when he murdered Ulric Kerensky. He challenged Chistu to a Trial of Refusal over the absorption. Chistu was forced to accept and was slain in the fight.
+
+        *Cheers erupt from the crowd again.*
+      </narrative>
+      <nextStoryPointId>be325a38-bff3-4bad-89ba-4f89ddbed374</nextStoryPointId>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>be325a38-bff3-4bad-89ba-4f89ddbed374</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        *Phelan looks suddenly solemn.*
+
+        Sadly, Vlad's victory does not mean that these Wolf survivors will be coming home. Khan Elias Crichell instead has dubbed these surviving Wolves as members of a new Jade Wolf Clan. Vlad was subsequently awarded a bloodname. Specifically, he was awarded *my* bloodname, for I, like all of you, have been *abjured.*
+
+        *The crowd erupts again into murmurs of discontent, before being quieted.*
+
+        The Jade Falcons have disowned us. The Jade Wolves will not claim us. Yet, in my heart, I know that we are the true Wolves. We will be the Wolves forever, and we will honor the vision of those who created the clans.
+      </narrative>
+      <nextStoryPointId>1d96e69a-a2cf-4077-89dd-fff06c591cbf</nextStoryPointId>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai4" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1d96e69a-a2cf-4077-89dd-fff06c591cbf</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        There may be some among you who believe I am wrong, and wish to reconcile with the Jade Wolves. None will stand in your path if you choose to leave. I ask only that you respect those of us who wish to remain as true Wolves.
+
+        Here in the realm of my birth, I realize I still belong to the Inner Sphere. I will always take pride in being a Kell. Yet, I am equally proud of being a Wolf. I believe that by merging the best qualities of the Inner Sphere and the Clans, we can adapt and improve. I would happily continue to lead you.
+
+        *Phelan pauses and looks out at the crowd.*
+
+        But I cannot, for without a bloodname, I am no longer eligible to be a Khan.
+      </narrative>
+      <nextStoryPointId>0884f1da-62c5-4771-b700-6073280493eb</nextStoryPointId>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai5" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>0884f1da-62c5-4771-b700-6073280493eb</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        *As the crowd wails in protest, there is a commotion at the front of the crowd as an older man with an eyepatch in white robes approaches the podium. He waves the shocked Phelan aside.*
+
+        Thank you, Khan Phelan. I am Precentor Martial Anastasius Focht and I am here to deliver a message entrusted to me by Ulrick Kerensky. None have yet seen the message I display.
+
+        *A screen descends behind the Precentor Martial and, after a moment, the face of Ulric Kerensky appears.*
+
+        Greetings, my friends. If you are seeing this, I have been slain by the Jade Falcons and Phelan Ward has successfully moved our touman to the Inner Sphere.
+      </narrative>
+      <nextStoryPointId>1c5f6daf-23d9-4642-9ba0-587011573969</nextStoryPointId>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai6" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1c5f6daf-23d9-4642-9ba0-587011573969</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        This message concerns the future. It is the ilKhan's right to reward success. No higher honor can be bestowed than the creation of a new Bloodname. I, ilKhan Ulric Kerensky, create the Kell bloodname in honor of Phelan Ward Kell. He will be the first to bear this Bloodname.
+
+        *After momentary confusion, cheers erupt from the crowd, briefly drowning out Ulric's next words. Phelan stares at the screen in shock.*
+
+        You are embarking upon a grand mission that will determine the future of all humanity. Be true to your traditions. Never abandon what makes the Wolves strong, but adopt that which will make us stronger.
+      </narrative>
+      <nextStoryPointId>15d6c271-2990-4f68-bcfb-8161828f6ec6</nextStoryPointId>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai7" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>15d6c271-2990-4f68-bcfb-8161828f6ec6</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        You mission is now to defend the Inner Sphere from the threat represented by the Clans. Who else could it be? You must stand united to prevent the Crusaders from their path to destruction. You have Khan Phelan Kell to lead you and the courage to follow.
+
+        This is your destiny as Wolves and from it you shall not shy.
+
+        *As Ulric's image fades out, the entire auditorium is momentarily silent. Then a single word spoken in absolute unity echoes out from every throat.*
+
+        Seyla!
+      </narrative>
+      <nextStoryPointId>508d4c18-54ba-41b1-a751-dec92f0d7b1f</nextStoryPointId>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
     </storyPoint>
     <storyPoint name="narr_tobias_alternate_full" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>88dfc686-8fce-40e5-a01a-7e1506726990</id>
@@ -1935,6 +2692,34 @@ Seyla.
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_tobias_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>41c12537-7d9f-45cd-8e8c-427cc358d03b</id>
+      <title>Congratulations</title>
+      <narrative>
+        Congratulations, indeed, {commanderRank}. The bloodname contest is truly the codex of the warrior distilled into a simple but reliable formula. I do find it so exciting, especially from the perspective of a new clan. You know, it really reminds of the epic poem of....
+
+        *Tobias trails off as others gather around you to celebrate.*
+      </narrative>
+      <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
+      <nextStoryPointId>2010919f-da33-414d-a8e3-f01603df061c</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_luisa_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>2010919f-da33-414d-a8e3-f01603df061c</id>
+      <title>Congratulations</title>
+      <narrative>
+        I know I have not directly joined in on combat, but it has been an honor to serve with you {commander}. Your new rank and bloodname are well deserved. I know transportation assets get moved around pretty fluidly, but I would be happy to fly around your tin cans in my tin can anytime.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>db3bf2ba-7dda-456b-a1c9-d47d5ddbe08d</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_tech_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>db3bf2ba-7dda-456b-a1c9-d47d5ddbe08d</id>
+      <title>Congratulations</title>
+      <narrative>
+        Congratulations, {commander}. Glad to see you managed to earn a bloodname without totally wrecking my - sorry, I mean your - mech. We will get right on it and get it back in mint condition in no time.
+      </narrative>
+      <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+    </storyPoint>
     <storyPoint name="narr_hall_trial_final" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</id>
       <title>Negotiating the Trial</title>
@@ -1947,6 +2732,25 @@ Seyla.
       <personalityId>8408467a-9131-4d3e-83f7-6f1722cbb9a9</personalityId>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
         <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_hall_trial_bloodname" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>5e061b82-cff4-4d36-a9f5-12e558c86cd2</id>
+      <title>You Have Been Nominated</title>
+      <narrative>
+        Greetings, {commander}. I have been chosen to serve in the role of Loremaster until a permanent replacement is found. It is therefore my duty to inform you that you have been nominated to participate in a trial of bloodright for the {bloodname} bloodname. The documents I have with me should indicate that this is a particularly prestigious bloodheritage, and thus I expect no objection to such a nomination, quaiff?
+
+        *He pauses briefly, before continuing.*
+
+        Due to shortages of manpower, we have less than the normal 32 participants for this trial. You have therefore been seeded to join the competition in the second round. You will have to win four consecutive rounds of combat to emerge as the ultimate victor.
+
+        Your first battle is scheduled for tomorrow. Each of the subsequent battles will be a day apart, allowing you some time for repair, if necessary. I will next see you at the trial, {commanderRank}. May your skill prove your worth.
+      </narrative>
+      <personalityId>8408467a-9131-4d3e-83f7-6f1722cbb9a9</personalityId>
+      <nextStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>ab211686-b377-44f1-afd1-5b4048d412db</storyPointId>
+        <futureDays>1</futureDays>
       </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_trial_kill_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -1998,11 +2802,6 @@ Seyla.
       </narrative>
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
       <nextStoryPointId>00f287b1-c152-457c-9691-998c0ea386dc</nextStoryPointId>
-    </storyPoint>
-    <storyPoint name="narr_trial_game_over" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>441b1e8e-6ce3-4138-b173-6f21195a0d22</id>
-      <title>End of Your Story</title>
-      <narrative>As you attempt to extricate yourself from the cockpit of your downed mech, you hear the footfall of Mathius's mech approach. You know there will be no mercy. This fight was always to the death. As the laser beams begin to atomize your body, you close your eyes, taking some small comfort that Clan Wolf will live on in some form or another and that you have done all that could be expected of you as a warrior. This is the end of your story.</narrative>
     </storyPoint>
     <storyPoint name="narr_trothkin_div_begin" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>8b060124-1d9d-4f8d-a56b-2403bb7c7145</id>
@@ -2444,9 +3243,32 @@ Seyla.
         <name>Morges</name>
         <type>Planetary Assault</type>
         <systemId>Morges</systemId>
-        <desc></desc>
+        <desc>The Falcons have come to Morges to end the remaining Wolves. You must win or die.</desc>
       </mission>
       <scenarioStoryPointId>eb08a01c-ece2-48f4-8b54-8b0c9ece9174</scenarioStoryPointId>
+    </storyPoint>
+    <storyPoint name="mission_bloodname" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>Bloodright Trial</name>
+        <type>Planetary Assault</type>
+        <systemId>Morges</systemId>
+        <desc>You fight for a bloodname! If you are victorious, a new trial will appear each day until you beat all of the competition.</desc>
+      </mission>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+            <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
+            <rank>38</rank>
+            <bloodname>bloodname</bloodname>
+            <assignKeyBloodname>true</assignKeyBloodname>
+          </storyTrigger>
+          <nextStoryPointId>f873e505-966a-4e87-a77b-dde935388ff1</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>7c261b19-8633-4e4d-9fe3-f113869f0abe</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <!-- Scenarios -->
     <storyPoint name="scenario_colmar_cutting_teeth" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
@@ -5759,8 +6581,956 @@ Seyla.
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Save the Khan</name>
         <desc>
+          SaKhan Phelan Ward is under heavy assault from Jade Falcon forces!
+          You must combat drop behind them with everything you have to save the
+          khan.
+
+      ### Hegira/Retreat Conditions
+
+          The Jade Falcon forces should request *hegira* if reduced to less
+          than half their original force size while the player has more BV
+          remaining. This can be simulated in MegaMek with the `/victory`
+          command. If the player does not wish to grant *hegira*, then the
+          bot settings for the Jade Falcons should be changed to RETREAT and
+          they should begin a fighting withdrawal. In either case, the
+          player can claim control of the battlefield for *isorla*.
+
+          The player will not be granted *hegira* by the Jade Falcons.
         </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>32,34</mapSize>
+        <map>/unofficial/pokefan548/Fan Pack Arctic/32x34/32x34 Arctic Field</map>
+        <botForce>
+          <name>Fourth Talon Cluster</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Vau Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>MENACE</name>
+            <forcedWithdrawal>true</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>4</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>3</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="c994808b-70f8-482c-b72a-1fbed82dbf0a" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Star Commander Letha" nick="" gender="FEMALE" gunnery="2" piloting="3" artillery="4" externalId="db0be97b-caba-4291-928e-2fc6d9087b63" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="22"/>
+              </location>
+              <location index="2"> Right Torso
+                <armor points="17"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ammo LRM-15" shots="5"/>
+                <slot index="6" type="Clan Ammo LRM-15" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="6"/>
+              </location>
+              <Game id="1"/>
+            </entity>
+            <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="8859bd05-7447-41e0-b844-09164e16f6b9" quirks="imp_com::ubiquitous_clan">
+              <pilot size="1" name="Karinda" nick="" gender="FEMALE" gunnery="3" piloting="3" artillery="4" externalId="1a188952-2af1-4226-8515-0ae918249cb2" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <armor points="17"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="5" type="Clan Ultra AC/20 Ammo" shots="2"/>
+                <slot index="6" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+              </location>
+              <Game id="2"/>
+            </entity>
+            <entity chassis="Cauldron-Born (Ebon Jaguar)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="fdff6a0a-f29e-4a59-ac03-bf545761ec6c" quirks="low_profile">
+              <pilot size="1" name="Margaret" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="3cc1422d-7184-4616-b06c-0c72bc032a9e" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="5" type="Clan Ultra AC/10 Ammo" shots="4"/>
+                <slot index="6" type="Clan Ultra AC/10 Ammo" shots="10"/>
+              </location>
+              <location index="3"> Left Torso
+                <armor points="17"/>
+                <slot index="4" type="Clan Ultra AC/10 Ammo" shots="10"/>
+                <slot index="5" type="Clan Ultra AC/10 Ammo" shots="10"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="9"/>
+              </location>
+              <Game id="3"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="c63de838-747f-46ca-809a-a62109dca63a" quirks="imp_target_med">
+              <pilot size="1" name="François" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="54b3da69-8c51-4d1a-89cb-06c67b1a10d5" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="18"/>
+              </location>
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="7" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Ammo SRM-6" shots="15"/>
+                <slot index="7" type="Clan Ammo SRM-6" shots="15"/>
+              </location>
+              <location index="4"> Right Arm
+                <armor points="11"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="7" type="Clan LB 5-X AC Ammo" shots="20"/>
+                <slot index="8" type="Clan LB 5-X Cluster Ammo" shots="20"/>
+              </location>
+              <Game id="4"/>
+            </entity>
+            <entity chassis="Vulture (Mad Dog)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="fda0a23a-ce37-4f66-bf99-eca6a373c955" quirks="imp_target_med">
+              <pilot size="1" name="Ebrahim" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="c7614afa-d7db-4b50-9c23-9c2757d90d58" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="10" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="9" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="10" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+              <Game id="5"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="d2e1c334-be67-4a97-bb94-2d4dd690169c" quirks="stable">
+              <pilot size="1" name="Star Commander Atindra" nick="" gender="MALE" gunnery="3" piloting="3" artillery="4" externalId="2c88cce8-70df-4575-894e-54a0e78b3272" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="20"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="3" type="Clan Ultra AC/20 Ammo" shots="5"/>
+                <slot index="4" type="Clan Ultra AC/20 Ammo" shots="5"/>
+              </location>
+              <Game id="6"/>
+            </entity>
+            <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="26b1c787-6d50-4d27-a2b8-fc488735758d" quirks="stable">
+              <pilot size="1" name="Rhonda" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" externalId="f3f8f62f-5b01-4b0d-b525-874b084449c4" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="1"> Center Torso
+                <armor points="20"/>
+              </location>
+              <location index="4"> Right Arm
+                <armor points="13"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="8" type="Clan LB 10-X AC Ammo" shots="10"/>
+                <slot index="9" type="Clan LB 10-X AC Ammo" shots="10"/>
+                <slot index="10" type="Clan LB 10-X Cluster Ammo" shots="10"/>
+              </location>
+              <Game id="7"/>
+            </entity>
+            <entity chassis="Puma (Adder)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="f702d356-1fa1-4322-ac72-4055a854ffb1" quirks="low_profile">
+              <pilot size="1" name="Shakil" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="271ac3aa-6a9b-4c49-ab4f-429107482bf1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="4"> Right Arm
+                <slot index="6" type="Clan Ultra AC/5 Ammo" shots="20"/>
+              </location>
+              <Game id="8"/>
+            </entity>
+            <entity chassis="Puma (Adder)" model="D" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="5fffde7a-a9dd-43c6-a9ec-fce1f1ceaed6" quirks="low_profile">
+              <pilot size="1" name="Jussi" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="48a5426a-c9d5-4413-bc10-21aeefa1e42a" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <armor points="7"/>
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="6" type="Clan Streak SRM 2 Ammo" shots="50"/>
+              </location>
+              <location index="4"> Right Arm
+                <slot index="6" type="Clan Ultra AC/5 Ammo" shots="20"/>
+              </location>
+              <Game id="9"/>
+            </entity>
+            <entity chassis="Pouncer" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="cff0024e-0687-4158-b3d1-28844363d640" quirks="weak_head_2">
+              <pilot size="1" name="Mike" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4" externalId="875c9f9e-c031-42fe-978c-3175bd1614e0" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="8" type="Clan Ultra AC/10 Ammo" shots="10"/>
+                <slot index="9" type="Clan Ultra AC/10 Ammo" shots="10"/>
+              </location>
+              <location index="7"> Left Leg
+                <armor points="8"/>
+              </location>
+              <Game id="10"/>
+            </entity>
+          </entities>
+        </botForce>
+        <botForce>
+          <name>Phelan</name>
+          <team>1</team>
+          <start>6</start>
+          <camoCategory>Clans/Wolf/Delta Galaxy</camoCategory>
+          <camoFileName>Delta Galaxy.jpg</camoFileName>
+          <behaviorSettings>
+            <name>CAUTIOUS</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <fallShameIndex>7</fallShameIndex>
+            <hyperAggressionIndex>3</hyperAggressionIndex>
+            <selfPreservationIndex>8</selfPreservationIndex>
+            <herdMentalityIndex>2</herdMentalityIndex>
+            <braveryIndex>5</braveryIndex>
+          </behaviorSettings>
+          <entities>
+            <entity chassis="Black Hawk (Nova)" model="Phelan" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="2" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="437e1e40-052d-4c3b-b2c3-dfe23d6b64b5" quirks="combat_computer::low_profile">
+              <pilot size="1" name="Phelan Ward" nick="" gender="MALE" gunnery="1" piloting="1" artillery="4" portraitFile="Phelan.jpg" externalId="979aceda-cd08-4fa3-9054-5b4f75d6f0c9" ejected="false" advantages="maneuvering_ace" edge="edge 3::edge_when_headhit::edge_when_tac::edge_when_ko" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              <Game id="11"/>
+            </entity>
+          </entities>
+        </botForce>
+        <scenarioObjective>
+          <associatedUnitIDs>
+            <associatedUnitID>437e1e40-052d-4c3b-b2c3-dfe23d6b64b5</associatedUnitID>
+          </associatedUnitIDs>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Defend Khan Phelan Ward:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
       </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <nextStoryPointId>1cb4ba0e-7579-4ce8-ab57-abb53b730ea4</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <!-- Failing this mission should result in game over -->
+      <nextStoryPointId>d13f379e-3035-4637-a7e7-e6f9b205a8d6</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="scenario_morges_destroy_convoy" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>0d5c8112-e0fa-4ac0-83f2-38836d3f6bbb</id>
+      <missionStoryPointId>ec09c184-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Destroy the Convoy</name>
+        <desc>
+          You must destroy the supply convoy heading towards Broken Hope. To avoid detection, you will be limited to
+          two stars of mechs.
+
+         ### Hegira/Retreat Conditions
+
+          Jade Falcon forces will not retreat or ask for Hegira under any conditions, but individual units will
+          operate under forced withdrawal conditions. Due to the nature of this strike, you will not be able to claim
+          battlefield salvage.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>45,45</mapSize>
+        <map>/unofficial/Dervs/Map Pack 3/45x45 Alpine</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>10</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Eyrie Garrison Cluster</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Omega Galaxy.jpg</camoFileName>
+          <botForceRandomizer>
+            <factionCode>CJF</factionCode>
+            <quality>3</quality>
+            <unitType>0</unitType>
+            <skill>GREEN</skill>
+            <lanceSize>1</lanceSize>
+            <forceMultiplier>1.3</forceMultiplier>
+            <balancingMethod>WEIGHT_ADJ</balancingMethod>
+          </botForceRandomizer>
+        </botForce>
+        <botForce>
+          <name>Jade Falcon Logistical Team</name>
+          <team>2</team>
+          <start>0</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Omega Galaxy.jpg</camoFileName>
+          <entities>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="05ee6c3c-109d-424b-9a15-54cd052e5bfc">
+              <pilot size="3" name="Joe" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="cfd4f918-1ba2-4e90-b89b-8d639dea8843" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="1"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="5566ef46-a23d-43a6-8969-c9ec8c06a700">
+              <pilot size="3" name="Zahra" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="23e9cfd5-0c10-4400-983b-096762f7b904" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="2"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="fac6ec18-560c-43fd-afb0-2887e8ffb0cc">
+              <pilot size="3" name="Keira" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="e9863643-ddf5-4534-a62c-74a2e147d676" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="3"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="407700ec-6806-49d0-91af-fe16150b0cbd">
+              <pilot size="3" name="Tansy" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="3cf5118f-8786-4a9c-8331-0805c66525d7" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="4"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="f9eb5f3a-312f-423d-aa4a-bc841be59d0c">
+              <pilot size="3" name="Guy" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="bf2fcab4-9e7f-4568-acfe-7ed1ea4bb55a" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="5"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="2bde49e8-d17d-4c98-af21-0316ceb15095">
+              <pilot size="3" name="Erin" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="365f782d-7669-402f-a58c-b58dbb3cfc26" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="6"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="457b0a1e-cbae-4c84-8b29-530966606751">
+              <pilot size="3" name="Stanislava" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="08b47f10-e2af-4ff5-9901-6972593e46e1" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="7"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="434a93f2-365f-406a-903e-25725f11fabf">
+              <pilot size="3" name="Fadhila" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="43ea0528-3969-4c5f-9f88-45a3f1632369" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="8"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="aa91fea1-6d77-496d-8ea5-9986d523654c">
+              <pilot size="3" name="Christovão" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="47dd5083-929d-4799-8e54-c2b6e81eb72d" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="9"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="5faf8584-9bf1-415e-8ece-0917cd6d9c5e">
+              <pilot size="3" name="Djordje" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4" externalId="62b021c1-905f-4524-8c10-89ebaf9ff144" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="10"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="7b8b55d5-04a0-423b-996d-8a8b31700681">
+              <pilot size="3" name="Gigi" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="285491ff-a012-4548-896a-f48103bfd87f" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="11"/>
+            </entity>
+            <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="0" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2" neverDeployed="true" externalId="96fd2e56-48c2-4d19-b312-0c0a8ca02c11">
+              <pilot size="3" name="Alexina" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="1a04493b-d3eb-414a-a06e-bba1d75cedce" ejected="false"/>
+              <motive damage="0" penalty="0"/>
+              Tanks have special needs, so don't delete any ammo slots.
+              The first slot in a location is at index="1".
+              <location index="0"> Body
+                <slot index="2" type="IS Ammo MG - Full" shots="200"/>
+              </location>
+              <Game id="12"/>
+            </entity>
+          </entities>
+          <behaviorSettings>
+            <name>BREAKTHROUGH</name>
+            <forcedWithdrawal>true</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>true</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>6</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>8</selfPreservationIndex>
+            <herdMentalityIndex>6</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcon Logistical Team</associatedForceName>
+          </associatedForceNames>
+          <associatedUnitIDs/>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <description>Destroy at least 75% the following force(s) and unit(s) before they exit the map:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>75</percentage>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <nextStoryPointId>9c8bfcf2-b805-4b52-86b4-a114ce543c00</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>9dff4cbe-4b7b-4725-9820-c1303ad8792e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="scenario_bloodname1" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>1e3fd5e1-8c30-4f8f-a193-1e3332c81f39</id>
+      <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Bloodright, Round 2</name>
+        <desc>
+          Due to the small number of participants, you were seeded directly into round two.
+
+          In this round, you face a warrior named Aziza who is even older than you. Assigned to a second line mech in a garrison cluster, she nonetheless proved herself in battle upon Morges, earning a nomination for this trial.
+
+          Aziza pilots an ancient second line *Warhammer IIC* that still presents a formidable threat.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>16,17</mapSize>
+        <map>/Essentials Box Maps/16x17 Patchwork (Clear)</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Mechwarrior Aziza</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Gamma Galaxy</camoCategory>
+          <camoFileName>Gamma Galaxy - 7th Wolf Guard.jpg</camoFileName>
+          <entities>
+            <entity chassis="Warhammer IIC" model="" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="f3a17b2c-6e3f-4b9e-9745-bc4d07b8ed65" quirks="searchlight::stable">
+        			<pilot size="1" name="Aziza" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4" portraitCat="Female/MechWarrior/" portraitFile="MW_F_34.png" externalId="db0c2d27-0ec8-484d-be13-001f8e14b680" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+        			<location index="2"> Right Torso
+        				<slot index="8" type="Clan Ammo SRM-6" shots="15"/>
+        			</location>
+        			<Game id="1"/>
+        		</entity>
+          </entities>
+          <behaviorSettings>
+            <name>HONOR</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>4</fallShameIndex>
+            <hyperAggressionIndex>6</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>6</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Mechwarrior Aziza</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy the following units:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve your own forces</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+            <storyPointId>d6748828-7b40-4fbf-8b6a-846f2cef51d3</storyPointId>
+            <futureDays>1</futureDays>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_bloodname2" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>a1b72ce3-5017-4b42-b2fc-df06e8945ec9</id>
+      <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Bloodright, Round 3</name>
+        <desc>
+          Your opponent in this round is a brash, young mechwarrior named Damien. What he lacks for in experience, he makes up for in enthusiasm. He likes speed and will be bringing a jump-capable *Shadow Cat*. Make sure you don't let him run (or jump) circles around you.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>16,17</mapSize>
+        <map>/German/Tallassia 3 Country Side I</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Mechwarrior Damien</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Alpha Galaxy</camoCategory>
+          <camoFileName>Alpha Galaxy.jpg</camoFileName>
+          <entities>
+            <entity chassis="Shadow Cat" model="M" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="9072cbba-59b4-4396-b458-4e0f39628ab1" quirks="low_profile">
+        			<pilot size="1" name="Damien" nick="" gender="MALE" gunnery="3" piloting="3" artillery="4" portraitCat="Male/MechWarrior/" portraitFile="MW_M_68.png" externalId="e9a1f09b-5fdf-496b-bc0a-7b094a74af3a" ejected="false" advantages="jumping_jack" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+        			<Game id="1"/>
+        		</entity>
+          </entities>
+          <behaviorSettings>
+            <name>PIZZAZZ</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>8</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Mechwarrior Damien</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy the following units:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve your own forces</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+            <storyPointId>763e68fa-1fca-478d-ac38-e22e1724cd44</storyPointId>
+            <futureDays>1</futureDays>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_bloodname3" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>f85b4569-c9f6-4b20-9702-8525dc391368</id>
+      <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Bloodright, Round 4</name>
+        <desc>
+          You have made it to the semi-finals. Your opponent in this round is Star Commander Jameel. He is an experienced mechwarrior. He will be piloting a *Summoner C*. I am sure you realize this means a heavy ultra auto-cannon in the left arm. If you let him in too close, he can end this trial very quickly.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>16,17</mapSize>
+        <map>/unofficial/Jakes Map Pack/16x17 Fault Hills C</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Star Commander Jameel</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Beta Galaxy</camoCategory>
+          <camoFileName>Beta Galaxy.jpg</camoFileName>
+          <entities>
+            <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="662836bc-1268-45dd-9889-756c7a900d35" quirks="imp_com::ubiquitous_clan">
+        			<pilot size="1" name="Star Commander Jameel" nick="" gender="FEMALE" gunnery="2" piloting="3" artillery="4" portraitCat="Male/Vehicle Crew/" portraitFile="VeeCrew_M_21.png" externalId="a0f6c3bf-9102-4a79-b1ac-4f01e09cdd91" ejected="false" advantages="tm_mountaineer" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+        			<location index="3"> Left Torso
+        				<slot index="5" type="Clan Ultra AC/20 Ammo" shots="5"/>
+        				<slot index="6" type="Clan Ultra AC/20 Ammo" shots="5"/>
+        				<slot index="7" type="Clan Streak SRM 6 Ammo" shots="15"/>
+        			</location>
+        			<Game id="1"/>
+        		</entity>
+          </entities>
+          <behaviorSettings>
+            <name>HUNTER</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>6</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>6</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Star Commander Jameel</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy the following units:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve your own forces</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+            <storyPointId>365aee45-7fec-444c-bd27-a53c2166580b</storyPointId>
+            <futureDays>1</futureDays>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_bloodname4" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>b3f0df38-defb-40e8-8b8d-5549fa32c782</id>
+      <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Bloodright, Round 5</name>
+        <desc>
+          This is it - the finals. Win today and the bloodname is yours. That will not be easy, however. Your opponent is Star Captain Olympia. She is an experienced mechwarrior and considered something of a tactical genius. She will be piloting an *Executioner* in its A configuration, which means lots of lasers.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>16,17</mapSize>
+        <map>/AGoAC Maps/16x17 Grassland 3</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Star Captain Olympia</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Wolf/Gamma Galaxy</camoCategory>
+          <camoFileName>Bronze Keshik.png</camoFileName>
+          <entities>
+            <entity chassis="Gladiator (Executioner)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="567320de-1439-4387-b7cf-e52d3f75d1ff" quirks="distracting">
+        			<pilot size="1" name="Star Captain Olympia" nick="" gender="FEMALE" gunnery="1" piloting="2" artillery="4" portraitCat="Female/MechWarrior/" portraitFile="MW_F_49.png" externalId="096cf76a-679d-4f3e-ba86-3edfa06606e5" ejected="false" advantages="tactical_genius" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+        			<location index="2"> Right Torso
+        				<slot index="7" type="Clan Machine Gun Ammo - Full" shots="200"/>
+        			</location>
+        			<Game id="1"/>
+        		</entity>
+          </entities>
+          <behaviorSettings>
+            <name>PIZZAZZ</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>6</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>6</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Star Captain Olympia</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy the following units:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve your own forces</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
     </storyPoint>
   </storyPoints>
   <personalities>
