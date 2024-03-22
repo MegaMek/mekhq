@@ -83,9 +83,9 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <!--<nextStoryPointId>f873e505-966a-4e87-a77b-dde935388ff1</nextStoryPointId>-->
+      <nextStoryPointId>de590e44-731b-44d7-88f4-d828907b1270</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
-      <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
+      <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
     <!-- Game over check -->
     <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
@@ -252,7 +252,7 @@ This is a story arc in active development. Try at your own risk!
           <nextStoryPointId>4dc4408f-c277-48a9-ba74-412f17b20fe9</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
-      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+      <nextStoryPointId>301fadbf-68c5-44ba-9491-413b8e506251</nextStoryPointId>
     </storyPoint>
     <!-- Date reached checks -->
     <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
@@ -418,7 +418,7 @@ This is a story arc in active development. Try at your own risk!
           <nextStoryPointId>e3f44b7d-b34d-46a8-adb3-36adeab4663d</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
-      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+      <nextStoryPointId>301fadbf-68c5-44ba-9491-413b8e506251</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_ella_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>37336d54-b228-4e50-9c91-c876cbfaf370</id>
@@ -1316,6 +1316,46 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
+    <storyPoint name="choice_vlad_leader" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>f600e9a3-f92f-42b3-9dae-6c8599c1738f</id>
+      <title>Vlad Takes Charge</title>
+      <question>
+        *You quickly reconnoiter with Ulric and Vlad.*
+
+        Trial site is a large public square in Borealtown, about two clicks that way. We are likely to meet some resistance but our goal is to push through as quickly as possible and bring Ulric to his Trial. Follow my lead.
+      </question>
+      <choice id="lead">Hold on one second, who made you the leader, *Star Captain?*</choice>
+      <choice id="follow">Lead the way, Star Captain Vlad.</choice>
+      <storyOutcomes>
+        <storyOutcome result="lead">
+          <nextStoryPointId>29fd4dfb-a14c-493a-8987-c0399b1d0b7f</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="follow">
+          <nextStoryPointId>eeb158a4-0294-477b-8ea9-aae9e4dca46c</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_vlad_leader" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>29fd4dfb-a14c-493a-8987-c0399b1d0b7f</id>
+      <title>Vlad Takes Charge?</title>
+      <question>
+        *Vlad turns his Timber Wolf toward you in a quizzical way.*
+
+        What!? I am clearly the senior Star Captain. I am here at the special request of Star Colonel Ulric Kerensky.
+      </question>
+      <choice id="lead">We are all here at the request of Star Colonel Ulric Kerensky.</choice>
+      <choice id="follow">Good point. I defer to you, Star Captain Vlad.</choice>
+      <storyOutcomes>
+        <storyOutcome result="lead">
+          <nextStoryPointId>951ba04b-9db3-4ddb-9e05-9fe1bbd9b12c</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="follow">
+          <nextStoryPointId>eeb158a4-0294-477b-8ea9-aae9e4dca46c</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+    </storyPoint>
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
@@ -1681,7 +1721,7 @@ This is a story arc in active development. Try at your own risk!
       <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
       <title>Arrival at Butler</title>
       <narrative>
-        You arrive on Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to meet up and join forces with Star Colonel Ulric Kerensky's task force. You arrive at the jump point to find it teeming with Wolf transports. Shortly, you receive a direct message from Star Colonel Ulric Kerensky which you display on the main screen of the *Moonhowler's* bridge..
+        You arrive on Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to meet up and join forces with Star Colonel Ulric Kerensky's task force. You arrive at the jump point to find it teeming with Wolf transports. Shortly, you receive a direct message from Star Colonel Ulric Kerensky which you display on the main screen of the *Moonhowler's* bridge.
       </narrative>
       <nextStoryPointId>c1485e61-9773-41b9-9dd0-61697e4d0f61</nextStoryPointId>
       <storySplash>
@@ -1752,6 +1792,18 @@ This is a story arc in active development. Try at your own risk!
         <tab>INTERSTELLAR_MAP</tab>
       </storyTrigger>
     </storyPoint>
+    <storyPoint name="narr_butler_liftoff5" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>301fadbf-68c5-44ba-9491-413b8e506251</id>
+      <title>Onward to Wotan</title>
+      <narrative>
+        Greetings, {commanderRank}. A flotilla of jumpships is waiting at the nadir point to carry us to Wotan. Please, prepare for acceleration.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>INTERSTELLAR_MAP</tab>
+      </storyTrigger>
+    </storyPoint>
     <storyPoint name="narr_morges_arrival" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>cbcaca85-766a-4216-9486-440a16b07b3b</id>
       <title>Welome to Morges</title>
@@ -1790,6 +1842,86 @@ This is a story arc in active development. Try at your own risk!
         <storyPointId>072c70de-1f8e-4e9e-8301-6fb0bae02328</storyPointId>
         <futureDays>4</futureDays>
       </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_butler_arrive1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>de590e44-731b-44d7-88f4-d828907b1270</id>
+      <title>Arrival at Wotan</title>
+      <narrative>
+        *Ulric's face flickers onto your screen and the screen of every member of this strike force.*
+
+        We have arrived on Wotan. As I predicted, we have caught the Jade Falcons by surprise. Lacking the guile of the Wolves, they could not envision such a bold maneuver.
+
+        We will keep them off-guard by immediately dropping everything we have onto Wotan. The goal is the elimination of the remaining Jade Falcons as a viable fighting force. I don't expect that many of us will survive this fight, but our sacrifice will ensure the survival of Clan Wolf. The Wolves will live on, even if the Wolf dies. Go with honor, my trothkin, and earn your place in the Remembrance.
+      </narrative>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+      <nextStoryPointId>fda9c1a7-578e-4f51-be30-438cffea8289</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_arrive2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>fda9c1a7-578e-4f51-be30-438cffea8289</id>
+      <title>Arrival at Wotan</title>
+      <narrative>
+        *The screen flickers for a moment but Ulric's face remains.*
+
+        For you, {commander}, I have a special assignment. I have challenged saKhan Chistu of the Jade Falcons to a personal trial. You and your trinary are to accompany me to the site of this trial as an honor guard, along with Star Captain Vlad. It is likely we will have to fight our way in.
+      </narrative>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+      <nextStoryPointId>acf04c24-c462-4018-822d-36f396b15ed0</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_arrive3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>acf04c24-c462-4018-822d-36f396b15ed0</id>
+      <title>Arrival at Wotan</title>
+      <narrative>
+        *The screen flickers to a new view.*
+
+        I tell you again, Star Colonel. If you would just allow me my own trinary, these additional forces would not be necessary.  We are more than capable of providing your honor guard.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>43575dd4-3da5-43dc-add5-202884015d25</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_arrive4" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>43575dd4-3da5-43dc-add5-202884015d25</id>
+      <title>Arrival at Wotan</title>
+      <narrative>
+        Vlad, you once again misunderstand my purpose. {commander} is here as a proper honor guard. *You* are here because I feel the need to keep an eye on you.
+
+        We will drop in 30 minutes. I have sent your dropship commander the rendezvous point.
+      </narrative>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+      <nextStoryPointId>6a7cef45-407b-4631-acc2-cec882be6722</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_arrive5" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>6a7cef45-407b-4631-acc2-cec882be6722</id>
+      <title>Final Drop</title>
+      <narrative>
+        Strap yourself in {commanderRank}. This could be a bumpy ride.
+
+        *You strap yourself in. After several minutes of waiting in silence in the cockpit of your mech, you are suddenly thrown violently to the left and right as the Moonhowler executes evasive action.*
+
+        Sorry, {commanderRank}. The drop zone is a little hot right now, but nothing I cannot handle. We should be landing shortly.
+
+        *G-forces push you into your seat as the thunder of engines tells you that you are coming in for a landing. After minutes, you feel the g-forces lift, followed by the familiar sound of the dropship hitting dirt.*
+
+        Lifting bay doors now.... You are clear for egress. Good hunting, {commander}.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>f600e9a3-f92f-42b3-9dae-6c8599c1738f</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_arrive6" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>eeb158a4-0294-477b-8ea9-aae9e4dca46c</id>
+      <title>The Streets of Borealtown</title>
+      <narrative>
+        *You make your way through city streets that have already seen fighting. Much of the current fighting has moved away from this zone, leaving it eerily quiet.*
+
+        *As you near your destination, the quiet is suddenly disrupted by weapons fire, as several Jade Falcon mechs surge forward from side streets. You are under attack!*
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-fight.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+      <nextStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
@@ -2720,6 +2852,21 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
     </storyPoint>
+    <storyPoint name="narr_vlad_leader" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>951ba04b-9db3-4ddb-9e05-9fe1bbd9b12c</id>
+      <title>Arrival at Wotan</title>
+      <narrative>
+        *You hear Vlad's frustration in his voice.*
+
+        Time is of the essence, and we must not bicker any longer. We will *both* lead the way, {commander}. You may take point, while I guard the rear.
+
+        *As you head forth, Vlad cannot avoid one final reminder of his authority.*
+
+        Keep your head on a swivel, folks.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>eeb158a4-0294-477b-8ea9-aae9e4dca46c</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_hall_trial_final" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</id>
       <title>Negotiating the Trial</title>
@@ -3031,7 +3178,7 @@ This is a story arc in active development. Try at your own risk!
     <storyPoint name="travel_wotan" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
       <id>638988fc-f3f1-4dfa-a749-a7a4155f7b4f</id>
       <destinationId>Wotan</destinationId>
-      <nextStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</nextStoryPointId>
+      <nextStoryPointId>de590e44-731b-44d7-88f4-d828907b1270</nextStoryPointId>
     </storyPoint>
     <!-- Missions -->
     <storyPoint name="mission_colmar" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
@@ -3234,7 +3381,7 @@ This is a story arc in active development. Try at your own risk!
         <name>Wotan</name>
         <type>Planetary Assault</type>
         <systemId>Wotan</systemId>
-        <desc></desc>
+        <desc>Escort Ulric through the streets of the capital of Borealtown, so that he may face off with saKhan Vandervahn Chistu.</desc>
       </mission>
     </storyPoint>
     <storyPoint name="mission_morges" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
