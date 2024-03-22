@@ -494,7 +494,7 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <storyOutcomes>
         <storyOutcome result="honor">
-          <nextStoryPointId>e8c9803c-3bda-47f7-9609-176ca461bf88</nextStoryPointId>
+          <nextStoryPointId>6bf74133-7efa-4a53-a970-83049c14a6d2</nextStoryPointId>
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger">
             <key>firstImpressions</key>
             <value>honor</value>
@@ -1792,7 +1792,7 @@ This is a story arc in active development. Try at your own risk!
       </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_natasha_honor" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-      <id>e8c9803c-3bda-47f7-9609-176ca461bf88</id>
+      <id>6bf74133-7efa-4a53-a970-83049c14a6d2</id>
       <title>A Khan's Greeting</title>
       <narrative>
         *Khan Kerensky rolls her eyes slightly.*
