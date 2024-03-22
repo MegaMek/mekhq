@@ -83,7 +83,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</nextStoryPointId>
+      <nextStoryPointId>eeb158a4-0294-477b-8ea9-aae9e4dca46c</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -114,6 +114,19 @@ This is a story arc in active development. Try at your own risk!
       <title>Khan Ward has Fallen</title>
       <narrative>
         Khan Phelan Ward has fallen in battle. The remaining Wolf forces are in disarray and it is only a matter of time before they are overwhelmed by the Jade Falcons. The story ends here.
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_ulric_killed" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>5fc66857-384a-4e8e-b0cd-cf9050507bdb</id>
+      <title>Khan Ulric has Fallen</title>
+      <narrative>
+        Khan Ulric Kerensky has fallen in battle. You fight bravely on as you are swarmed by Jade Falcon mechs from all sides. Eventually you succumb to the onslaught. The story ends here.
       </narrative>
       <storySplash>
         <category></category>
@@ -1941,7 +1954,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         *You make your way through city streets that have already seen fighting. Much of the current fighting has moved away from this zone, leaving it eerily quiet.*
 
-        *As you near your destination, the quiet is suddenly disrupted by weapons fire, as several Jade Falcon mechs surge forward from side streets. You are under attack!*
+        *As you near your destination, angry red dots show up on your sensors ahead. Enemy forces are incoming!*
       </narrative>
       <storySplash>
         <category></category>
@@ -3432,6 +3445,7 @@ This is a story arc in active development. Try at your own risk!
         <systemId>Wotan</systemId>
         <desc>Escort Ulric through the streets of the capital of Borealtown, so that he may face off with saKhan Vandervahn Chistu.</desc>
       </mission>
+      <scenarioStoryPointId>46099293-dfc8-4e99-a00b-ff71f13c9066</scenarioStoryPointId>
     </storyPoint>
     <storyPoint name="mission_morges" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>ec09c184-5b16-11ec-bf63-0242ac130002</id>
@@ -3484,7 +3498,7 @@ This is a story arc in active development. Try at your own risk!
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
-        <mapSize>35,35</mapSize>
+        <mapSize>36,35</mapSize>
         <map>/unofficial/Cartes/35x35 Lilith</map>
         <botForce>
           <name>Twelfth Falcon Regulars</name>
@@ -7065,7 +7079,7 @@ This is a story arc in active development. Try at your own risk!
           <camoFileName>Omega Galaxy.jpg</camoFileName>
           <botForceRandomizer>
             <factionCode>CJF</factionCode>
-            <quality>3</quality>
+            <quality>2</quality>
             <unitType>0</unitType>
             <skill>GREEN</skill>
             <lanceSize>1</lanceSize>
@@ -7249,6 +7263,148 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>9dff4cbe-4b7b-4725-9820-c1303ad8792e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="scenario_wotan_initial" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>46099293-dfc8-4e99-a00b-ff71f13c9066</id>
+      <missionStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Defend Ulric</name>
+        <desc>
+          You must defend Ulric from Jade Falcon attackers in an urban battlefield.
+
+         ### Hegira/Retreat Conditions
+
+         The Jade Falcons will not accept or grant *hegira*. They will operate under forced withdrawal. Due the nature of the scenario, you may not collect *isorla.*
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/deadborder/35x35 Ancient City</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>15</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Delta Galaxy</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Delta Galaxy.jpg</camoFileName>
+          <botForceRandomizer>
+            <factionCode>CJF</factionCode>
+            <quality>4</quality>
+            <unitType>0</unitType>
+            <skill>REGULAR</skill>
+            <lanceSize>1</lanceSize>
+            <forceMultiplier>0.75</forceMultiplier>
+            <balancingMethod>WEIGHT_ADJ</balancingMethod>
+          </botForceRandomizer>
+        </botForce>
+        <botForce>
+          <name>Star Colonel Ulric Kerensky</name>
+          <team>1</team>
+          <start>6</start>
+          <camoCategory>Clans/Wolf/Alpha Galaxy</camoCategory>
+          <camoFileName>Golden Keshik.png</camoFileName>
+          <entities>
+            <entity chassis="Man O' War (Gargoyle)" model="A" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="88fa1590-dd33-414c-824c-c6978e8577e4">
+              <pilot size="1" name="Star Colonel Ulric Kerensky" nick="" gender="MALE" gunnery="1" piloting="2" artillery="4" portraitFile="Ulric.jpg" externalId="a6ba2172-b510-4a9e-bd8a-d6693e9d2033" ejected="false" advantages="tm_mountaineer::human_tro Mek::tactical_genius" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="4"> Right Arm
+                <slot index="3" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
+                <slot index="4" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
+                <slot index="5" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
+                <slot index="6" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
+              </location>
+              <location index="5"> Left Arm
+                <slot index="5" type="CLLargePulseLaser" quirks="stable_weapon" isDestroyed="false"/>
+                <slot index="6" type="CLLargePulseLaser" quirks="stable_weapon" isDestroyed="false"/>
+                <slot index="7" type="CLMediumPulseLaser" quirks="stable_weapon" isDestroyed="false"/>
+                <slot index="8" type="CLERMediumLaser" quirks="stable_weapon" isDestroyed="false"/>
+                <slot index="9" type="CLERSmallLaser" quirks="stable_weapon" isDestroyed="false"/>
+              </location>
+            </entity>
+          </entities>
+          <behaviorSettings>
+            <name>PRESERVE</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>5</fallShameIndex>
+            <hyperAggressionIndex>3</hyperAggressionIndex>
+            <selfPreservationIndex>9</selfPreservationIndex>
+            <herdMentalityIndex>3</herdMentalityIndex>
+            <braveryIndex>3</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Star Colonel Ulric Kerensky</associatedForceName>
+          </associatedForceNames>
+          <associatedUnitIDs/>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <description>The following force(s) and unit(s) must survive:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Delta Galaxy</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy or rout 100% the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>5fc66857-384a-4e8e-b0cd-cf9050507bdb</nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_bloodname1" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>1e3fd5e1-8c30-4f8f-a193-1e3332c81f39</id>
