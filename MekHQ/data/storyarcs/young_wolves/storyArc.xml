@@ -133,6 +133,19 @@ This is a story arc in active development. Try at your own risk!
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
       </storyTrigger>
     </storyPoint>
+    <storyPoint name="narr_game_end" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>508d4c18-54ba-41b1-a751-dec92f0d7b1f</id>
+      <title>This Journey is Over; Another Begins?</title>
+      <narrative>
+        You have reached the end of the Young Wolves story arc. Thanks for playing! I hope you enjoyed it.
+
+        You may continue playing with this campaign as you wish. Or you can start again with another campaign and see what other possibilities exist within the story arc.
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-liftoff.jpg</filename>
+      </storySplash>
+    </storyPoint>
     <!-- Variable checks -->
     <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
       <id>948f6baa-7079-48e7-aec5-4989832a6c2a</id>
@@ -2434,13 +2447,110 @@ This is a story arc in active development. Try at your own risk!
       </storyTrigger>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
-    <storyPoint name="narr_phelan_kurultai" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_phelan_kurultai1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>581e54c9-abad-47d8-b3ab-a3b566c494eb</id>
       <title>Final Kurultai</title>
       <narrative>
-        *A week has passed.*
+        *The remaining warriors of Clan Wolf have gathered together in a large auditorium under dim lighting. All are quiet, and the only sound is the creak of ceremonial leathers, as Khan Phelan Ward ascends the podium to address the group. You, along with several others, stand behind him.*
+
+        I am the Oathmaster! All will be bound by this conclave until they are dust and memories and then beyond that until the end of all that is.
+
+        *The crowd intones as one - Seyla.*
       </narrative>
+      <nextStoryPointId>7e04fc4e-8282-499b-ba71-5eeb76a0a204</nextStoryPointId>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>7e04fc4e-8282-499b-ba71-5eeb76a0a204</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        We have defeated the Jade Falcons in combat.
+
+        *Cheers from the crowd.**
+
+        Yet, Khan Vandervahn Chistu claimed, after murdering Ulric Kerensky on Wotan, that *our* Trial of Refusal was, instead, *their* Trial of Absorption.
+
+        *The crowd erupts in cries of confusion and disbelief. Phelan quiets them with a hand.*
+
+        Thankfully, among the survivors of Wotan was one Wolf warrior named Vlad. He witnessed the treachery of Khan Chistu, firstand, when he murdered Ulric Kerensky. He challenged Chistu to a Trial of Refusal over the absorption. Chistu was forced to accept and was slain in the fight.
+
+        *Cheers erupt from the crowd again.*
+      </narrative>
+      <nextStoryPointId>be325a38-bff3-4bad-89ba-4f89ddbed374</nextStoryPointId>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>be325a38-bff3-4bad-89ba-4f89ddbed374</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        *Phelan looks suddenly solemn.*
+
+        Sadly, Vlad's victory does not mean that these Wolf survivors will be coming home. Khan Elias Crichell instead has dubbed these surviving Wolves as members of a new Jade Wolf Clan. Vlad was subsequently awarded a bloodname. Specifically, he was awarded *my* bloodname, for I, like all of you, have been *abjured.*
+
+        *The crowd erupts again into murmurs of discontent, before being quieted.*
+
+        The Jade Falcons have disowned us. The Jade Wolves will not claim us. Yet, in my heart, I know that we are the true Wolves. We will be the Wolves forever, and we will honor the vision of those who created the clans.
+      </narrative>
+      <nextStoryPointId>1d96e69a-a2cf-4077-89dd-fff06c591cbf</nextStoryPointId>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai4" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1d96e69a-a2cf-4077-89dd-fff06c591cbf</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        There may be some among you who believe I am wrong, and wish to reconcile with the Jade Wolves. None will stand in your path if you choose to leave. I ask only that you respect those of us who wish to remain as true Wolves.
+
+        Here in the realm of my birth, I realize I still belong to the Inner Sphere. I will always take pride in being a Kell. Yet, I am equally proud of being a Wolf. I believe that by merging the best qualities of the Inner Sphere and the Clans, we can adapt and improve. I would happily continue to lead you.
+
+        *Phelan pauses and looks out at the crowd.*
+
+        But I cannot, for without a bloodname, I am no longer eligible to be a Khan.
+      </narrative>
+      <nextStoryPointId>0884f1da-62c5-4771-b700-6073280493eb</nextStoryPointId>
+      <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai5" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>0884f1da-62c5-4771-b700-6073280493eb</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        *As the crowd wails in protest, there is a commotion at the front of the crowd as an older man with an eyepatch in white robes approaches the podium. He waves the shocked Phelan aside.*
+
+        Thank you, Khan Phelan. I am Precentor Martial Anastasius Focht and I am here to deliver a message entrusted to me by Ulrick Kerensky. None have yet seen the message I display.
+
+        *A screen descends behind the Precentor Martial and, after a moment, the face of Ulric Kerensky appears.*
+
+        Greetings, my friends. If you are seeing this, I have been slain by the Jade Falcons and Phelan Ward has successfully moved our touman to the Inner Sphere.
+      </narrative>
+      <nextStoryPointId>1c5f6daf-23d9-4642-9ba0-587011573969</nextStoryPointId>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai6" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1c5f6daf-23d9-4642-9ba0-587011573969</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        This message concerns the future. It is the ilKhan's right to reward success. No higher honor can be bestowed than the creation of a new Bloodname. I, ilKhan Ulric Kerensky, create the Kell bloodname in honor of Phelan Ward Kell. He will be the first to bear this Bloodname.
+
+        *After momentary confusion, cheers erupt from the crowd, briefly drowning out Ulric's next words. Phelan stares at the screen in shock.*
+
+        You are embarking upon a grand mission that will determine the future of all humanity. Be true to your traditions. Never abandon what makes the Wolves strong, but adopt that which will make us stronger.
+      </narrative>
+      <nextStoryPointId>15d6c271-2990-4f68-bcfb-8161828f6ec6</nextStoryPointId>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_phelan_kurultai7" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>15d6c271-2990-4f68-bcfb-8161828f6ec6</id>
+      <title>Final Kurultai</title>
+      <narrative>
+        You mission is now to defend the Inner Sphere from the threat represented by the Clans. Who else could it be? You must stand united to prevent the Crusaders from their path to destruction. You have Khan Phelan Kell to lead you and the courage to follow.
+
+        This is your destiny as Wolves and from it you shall not shy.
+
+        *As Ulric's image fades out, the entire auditorium is momentarily silent. Then a single word spoken in absolute unity echoes out from every throat.*
+
+        Seyla!
+      </narrative>
+      <nextStoryPointId>508d4c18-54ba-41b1-a751-dec92f0d7b1f</nextStoryPointId>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
     </storyPoint>
     <storyPoint name="narr_tobias_alternate_full" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>88dfc686-8fce-40e5-a01a-7e1506726990</id>
