@@ -33,6 +33,7 @@ import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -793,5 +794,10 @@ public class RefitTest {
         // Complete the refit!
         String report = refit.succeed();
         assertNotNull(report);
+    }
+
+    @Test
+    void TestRetrieveOriginalUnit() {
+
     }
 }
