@@ -284,6 +284,7 @@ class GameThread extends Thread implements CloseClientListener {
                     }
                     entity.setOwner(botClient.getLocalPlayer());
                     entity.setForceString(forceName);
+                    entity.setDeployRound(botForce.getDeployRound());
                     entities.add(entity);
                 }
                 botClient.sendAddEntity(entities);
