@@ -1389,6 +1389,63 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
     </storyPoint>
+    <storyPoint name="choice_wotan_ambush_success" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>fb1f7248-923e-4256-ae3b-79d6738884b9</id>
+      <title>Accept Surrender?</title>
+      <question>
+        *What was once a grand square is now a wasteland of wreckage. The smoking carcasses of metal giants lie all around you. Some are Jade Falcons, but many belong to your own forces. Yet, out of the smoke come more green mechs. One of them hails you on your comm.*
+
+        Wolf commander, you have fought with honor and skill. I ask you to accept defeat so that I will not be forced to kill a great warrior. I promise that you and your warriors will not remain bondsmen long.
+
+        *You look out at your few remaining warriors before responding.*
+      </question>
+      <choice id="surrender">Aff, I accept your proposal. Wolf or Jade Falcon matters little, so long as we can continue the fight.</choice>
+      <choice id="fight">Neg, you will have to destroy us to the last man before we become Jade Falcons.</choice>
+      <storyOutcomes>
+        <storyOutcome result="surrender">
+          <nextStoryPointId>6835f1d3-a511-4e5e-bf31-84ee13477946</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="fight">
+          <nextStoryPointId>6835f1d3-a511-4e5e-bf31-84ee13477946</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+    </storyPoint>
+    <storyPoint name="choice_vlad_wake_up" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>f01196d7-4b66-4a23-9201-c48b44ad30b5</id>
+      <title></title>
+      <question>
+        {commander}? .... Wake up, {commanderRank}! That is an order!
+
+        *You blink as the bright lights of the medbay seem to stab at your eyes. Above you floats the bruised face of Vlad.*
+
+        He is awake! {commander}, tell me, how are you feeling?
+
+        *As your vision comes back to you, you see several of your warriors standing behind Vlad. Vlad himself looks badly injured with a cast on his right arm and leg. He stands on crutches. You appear to be lying on a medical cot in a medbay somewhere.*
+      </question>
+      <choice id="great">I have never felt better.</choice>
+      <choice id="terrible">I feel like I have been disassembled and put back together by a poorly trained *freebirth* tech.</choice>
+      <choice id="heaven">Am I dead? If this is heaven, why are you here?</choice>
+      <storyOutcomes>
+        <storyOutcome result="great">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="terrible">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="heaven">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
+        <hits>0</hits>
+      </storyTrigger>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+    </storyPoint>
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b13807e-8bf0-4b87-aba7-949b54d4af4a</id>
@@ -3285,7 +3342,7 @@ This is a story arc in active development. Try at your own risk!
         <status>KIA</status>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="narr_trap_aftermath" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_wotan_trap_aftermath" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>23e6b17d-376f-49c6-82d0-f014b45301ed</id>
       <title>Trapped</title>
       <narrative>
@@ -3299,6 +3356,34 @@ This is a story arc in active development. Try at your own risk!
         <tab>BRIEFING_ROOM</tab>
       </storyTrigger>
       <nextStoryPointId>139fc8ab-3058-498d-9989-38fcdf66a001</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_ambush_failure" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>2321ceb2-2158-40fa-8e4b-34325310bf72</id>
+      <title>The End?</title>
+      <narrative>
+        *You fight like Wolves, but there are simply too many enemies. As your mechwarriors fall, you sense this battle will be the end of your command and perhaps your life.*
+
+        *Finally, your own mech is brought down. As your consciousness fades into darkness, you have a dim awareness of someone pulling your body from a burning cockpit. Then all goes black.*
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-rescue.jpg</filename>
+      </storySplash>
+      <nextStoryPointId>f01196d7-4b66-4a23-9201-c48b44ad30b5</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_black_out" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>6835f1d3-a511-4e5e-bf31-84ee13477946</id>
+      <title>The End?</title>
+      <narrative>
+        *As you open the mike to deliver your response, you suddenly lose your balance and start to see double. It appears that the head injury you suffered in combat was worse than you thought.*
+
+        *Your body tenses as your mech topples. At the moment of impact, you feel exploding pain in your temple and the whole world fades to black.*
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <nextStoryPointId>f01196d7-4b66-4a23-9201-c48b44ad30b5</nextStoryPointId>
     </storyPoint>
     <!-- Travel Story Events -->
     <storyPoint name="travel_sudeten" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
@@ -3545,6 +3630,14 @@ This is a story arc in active development. Try at your own risk!
         <desc>Escort Ulric through the streets of the capital of Borealtown, so that he may face off with saKhan Vandervahn Chistu.</desc>
       </mission>
       <scenarioStoryPointId>46099293-dfc8-4e99-a00b-ff71f13c9066</scenarioStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>fb1f7248-923e-4256-ae3b-79d6738884b9</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>2321ceb2-2158-40fa-8e4b-34325310bf72</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
     </storyPoint>
     <storyPoint name="mission_morges" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
       <id>ec09c184-5b16-11ec-bf63-0242ac130002</id>
@@ -7542,7 +7635,7 @@ This is a story arc in active development. Try at your own risk!
             <unitType>0</unitType>
             <skill>VETERAN</skill>
             <lanceSize>1</lanceSize>
-            <forceMultiplier>1.2</forceMultiplier>
+            <forceMultiplier>1.0</forceMultiplier>
             <balancingMethod>WEIGHT_ADJ</balancingMethod>
           </botForceRandomizer>
           <behaviorSettings>
@@ -7620,10 +7713,16 @@ This is a story arc in active development. Try at your own risk!
       </scenario>
       <storyOutcomes>
         <storyOutcome result="PYRRHIC_VICTORY">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
         </storyOutcome>
       </storyOutcomes>
-      <nextStoryPointId></nextStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
     </storyPoint>
     <storyPoint name="scenario_bloodname1" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>1e3fd5e1-8c30-4f8f-a193-1e3332c81f39</id>
