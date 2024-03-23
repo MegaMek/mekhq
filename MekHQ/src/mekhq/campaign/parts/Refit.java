@@ -1569,7 +1569,7 @@ public class Refit extends Part implements IAcquisitionWork {
         getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
 
         try {
-            MechSummary summary = retrieveOriginalUnit(newEntity);
+            MechSummary summary = Utilities.retrieveOriginalUnit(newEntity);
 
             newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             LogManager.getLogger().info(String.format("Saved %s %s to %s",
@@ -1594,38 +1594,6 @@ public class Refit extends Part implements IAcquisitionWork {
         }
     }
 
-    /**
-     * Testable function to get the original unit based on information from a new unit
-     * @param newE new Entity we want to read information from
-     * @return MechSummary that most closely represents the original of the new Entity
-     * @throws EntityLoadingException
-     */
-    public MechSummary retrieveOriginalUnit(Entity newE) throws EntityLoadingException {
-        MechSummaryCache cacheInstance = MechSummaryCache.getInstance();
-        cacheInstance.loadMechData();
-
-        // I need to change the new entity to the one from the mtf file now, so that equipment numbers will match
-        MechSummary summary = cacheInstance.getMech(newE.getChassis() + " " + newE.getModel());
-
-        // Need to deal with old naming conventions
-        if (null == summary) {
-            summary = cacheInstance.getMech(
-                    newE.getChassis() + " (" + newE.getClanChassisName() + ") " + newE.getModel());
-        }
-
-        // Try the first fuzzy match
-        if (null == summary) {
-            summary = cacheInstance.fuzzyGetMech(newE.getChassis() + " " + newE.getModel()).get(0);
-        }
-
-        // If we got this far with no summary loaded, give up
-        if (null == summary) {
-            throw new EntityLoadingException(String.format("Could not load %s %s from the mech cache",
-                    newEntity.getChassis(), newEntity.getModel()));
-        }
-
-        return summary;
-    }
 
     private int getTimeMultiplier() {
         int mult;

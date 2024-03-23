@@ -795,9 +795,4 @@ public class RefitTest {
         String report = refit.succeed();
         assertNotNull(report);
     }
-
-    @Test
-    void TestRetrieveOriginalUnit() {
-
-    }
 }
