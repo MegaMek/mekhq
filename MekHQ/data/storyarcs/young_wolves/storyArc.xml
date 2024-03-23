@@ -2148,7 +2148,7 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
       <nextStoryPointId>bd5d6d06-e764-4559-bc69-a0f4180699ff</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="narr_ulric_wotan" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_ulric_decision_wotan" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>b01d1563-645d-4544-9440-7f36a60452ac</id>
       <title>A Decision Made</title>
       <narrative>
@@ -2159,7 +2159,7 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
       <nextStoryPointId>bd5d6d06-e764-4559-bc69-a0f4180699ff</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="narr_ulric_morges" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_ulric_decision_morges" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>f0dcdd2e-fb04-47a3-931e-82acc2f7d691</id>
       <title>A Decision Made</title>
       <narrative>
@@ -2171,6 +2171,66 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
       <nextStoryPointId>95102bb4-fa5b-4ba0-afc3-137673c47333</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_ulric_goodbye" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>4867421d-0c1a-4af7-9662-71537911eb3e</id>
+      <title>Circle of Equals</title>
+      <narrative>
+        *As you approach an open square you see a lone Gladiator in Jade Falcon colors. Ulric opens his mike.*
+
+        The Circle of Equals will take place here. You should wait here at the perimeter, while Vlad accompanies me within. If I do not survive this encounter, it has been an honor to fight with you, {commander}.
+
+        *You watch as Ulric approaches the lone Gladiator.*
+
+        Greetings, Vahn.
+      </narrative>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+      <nextStoryPointId>09041ca5-a6d5-47f9-8924-7089f303ec5d</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_ulric_circle1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>cf05689f-5e7e-470f-aa4d-ec35fcfcad1b</id>
+      <title>Circle of Equals</title>
+      <narrative>
+        While you might consider them seconds, I consider them witnesses.
+      </narrative>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+      <nextStoryPointId>3539dc5a-4808-46ad-a114-82a02520d670</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_ulric_circle2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>cef48652-4b75-4a84-b583-43a33a3d28ec</id>
+      <title>Circle of Equals</title>
+      <narrative>
+        I prefer not to rely exclusively on technology. Do you require a formal declaration, or shall we begin?
+      </narrative>
+      <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
+      <nextStoryPointId>a2c15131-635e-4821-881c-24bce7008264</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vandervahn_greeting" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>09041ca5-a6d5-47f9-8924-7089f303ec5d</id>
+      <title>Circle of Equals</title>
+      <narrative>
+        Greetings to you, Ulric. I had no idea you would be bringing seconds to this duel.
+      </narrative>
+      <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
+      <nextStoryPointId>cf05689f-5e7e-470f-aa4d-ec35fcfcad1b</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vandervahn_circle1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>3539dc5a-4808-46ad-a114-82a02520d670</id>
+      <title>Circle of Equals</title>
+      <narrative>
+        My gun-camera video should be sufficient to certify your death.
+      </narrative>
+      <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
+      <nextStoryPointId>cef48652-4b75-4a84-b583-43a33a3d28ec</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vandervahn_circle2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>a2c15131-635e-4821-881c-24bce7008264</id>
+      <title>Circle of Equals</title>
+      <narrative>
+        We have already begun, Ulric.
+      </narrative>
+      <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
+      <nextStoryPointId>098ff77b-519e-4448-8d63-a2748107ce78</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_mathius_defend_natasha" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>11a5ef16-a675-4863-8127-cf4e8e30001c</id>
@@ -2929,6 +2989,30 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
       <nextStoryPointId>eeb158a4-0294-477b-8ea9-aae9e4dca46c</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_vlad_post_battle" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>071573f2-8fa4-41a9-9dd0-0811af909e76</id>
+      <title>In the Thick of It</title>
+      <narrative>
+        *As the last of the Jade Falcons falls, You see a Timber Wolf emerge through the smoke behind you. You raise your weapons only to realize that it is Vlad's mech. You can see evidence of furious battle engraved upon its armored carapace.*
+
+        That takes care of the enemies to our rear. We are almost at the designated spot for the trial. Let us continue.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>4867421d-0c1a-4af7-9662-71537911eb3e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_trap" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>098ff77b-519e-4448-8d63-a2748107ce78</id>
+      <title>Its a Trap!</title>
+      <narrative>
+        *Caught offguard by this strange comment, you suddenly notice a small light emanating from Chistu's mech and seeming to probe Ulric's Gargoyle. Your heart races, as you realize something is wrong. Vlad, however, realizes it a second sooner.*
+
+        Ulric, it's a trap!
+
+        *The sky is suddenly blotted out by a battery of missiles arcing over the nearby buildings. Homing in on Ulric's position, they dive like angry hornets. There is no time to react. You are momentarily blinded by a massive explosion in the center of the square.*
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>23e6b17d-376f-49c6-82d0-f014b45301ed</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_hall_trial_final" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</id>
       <title>Negotiating the Trial</title>
@@ -3200,6 +3284,21 @@ This is a story arc in active development. Try at your own risk!
         <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
         <status>KIA</status>
       </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_trap_aftermath" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>23e6b17d-376f-49c6-82d0-f014b45301ed</id>
+      <title>Trapped</title>
+      <narrative>
+        *When your vision returns, you can see that Ulric's Gargoyle is nothing but ash and liquid metal. Quickly, Chistu turns and fires upon Vlad's Timber Wolf, knocking it back into a building. You are about to rush to his aid, when your sensors ping with multiple enemy contacts. Its an ambush!*
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-fight.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
+      <nextStoryPointId>139fc8ab-3058-498d-9989-38fcdf66a001</nextStoryPointId>
     </storyPoint>
     <!-- Travel Story Events -->
     <storyPoint name="travel_sudeten" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
@@ -7393,7 +7492,127 @@ This is a story arc in active development. Try at your own risk!
           <timeLimitAtMost>true</timeLimitAtMost>
           <timeLimit>0</timeLimit>
           <timeLimitType>None</timeLimitType>
-          <description>Destroy or rout 100% the following force(s) and unit(s):</description>
+          <description>Destroy or rout 100% of the following force(s) and unit(s):</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>ForceWithdraw</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <nextStoryPointId>071573f2-8fa4-41a9-9dd0-0811af909e76</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>5fc66857-384a-4e8e-b0cd-cf9050507bdb</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="scenario_wotan_final" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>139fc8ab-3058-498d-9989-38fcdf66a001</id>
+      <missionStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Ambush!</name>
+        <desc>
+          The treacherous Vandervahn Chistu has murdered Ulric Kerensky! Now he is sending a wave of enemies at you to remove the evidence. You are unlikely to defeat them all, but you will fight like a Wolf.
+
+         ### Hegira/Retreat Conditions
+
+         The Jade Falcons will not accept or grant *hegira*. They will operate under forced withdrawal. Due to the nature of the scenario, you may not collect *isorla.*
+        </desc>
+        <start>10</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>35,35</mapSize>
+        <map>/unofficial/deadborder/35x35 Occupy Paragon City</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>15</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>Jade Falcons, Wave I</name>
+          <team>2</team>
+          <start>9</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Delta Galaxy.jpg</camoFileName>
+          <botForceRandomizer>
+            <factionCode>CJF</factionCode>
+            <quality>4</quality>
+            <unitType>0</unitType>
+            <skill>VETERAN</skill>
+            <lanceSize>1</lanceSize>
+            <forceMultiplier>1.2</forceMultiplier>
+            <balancingMethod>WEIGHT_ADJ</balancingMethod>
+          </botForceRandomizer>
+          <behaviorSettings>
+            <name>AGGRO</name>
+            <forcedWithdrawal>true</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>4</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <botForce>
+          <name>Jade Falcons, Wave II</name>
+          <team>2</team>
+          <start>9</start>
+          <deployRound>7</deployRound>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Delta Galaxy.jpg</camoFileName>
+          <botForceRandomizer>
+            <factionCode>CJF</factionCode>
+            <quality>4</quality>
+            <unitType>0</unitType>
+            <skill>VETERAN</skill>
+            <lanceSize>1</lanceSize>
+            <forceMultiplier>1.0</forceMultiplier>
+            <balancingMethod>WEIGHT_ADJ</balancingMethod>
+          </botForceRandomizer>
+          <behaviorSettings>
+            <name>AGGRO</name>
+            <forcedWithdrawal>true</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>4</fallShameIndex>
+            <hyperAggressionIndex>7</hyperAggressionIndex>
+            <selfPreservationIndex>4</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>7</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Jade Falcons, Wave I</associatedForceName>
+            <associatedForceName>Jade Falcons, Wave II</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy or rout 100% of the following force(s) and unit(s):</description>
           <destinationEdge>NONE</destinationEdge>
           <objectiveCriterion>ForceWithdraw</objectiveCriterion>
           <percentage>100</percentage>
@@ -7404,7 +7623,7 @@ This is a story arc in active development. Try at your own risk!
           <nextStoryPointId></nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
-      <nextStoryPointId>5fc66857-384a-4e8e-b0cd-cf9050507bdb</nextStoryPointId>
+      <nextStoryPointId></nextStoryPointId>
     </storyPoint>
     <storyPoint name="scenario_bloodname1" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
       <id>1e3fd5e1-8c30-4f8f-a193-1e3332c81f39</id>
@@ -7973,6 +8192,14 @@ This is a story arc in active development. Try at your own risk!
     <personality name="ella">
       <id>49ef61b4-e210-4f42-9b6d-583ba52f7f7a</id>
       <personCampaignId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personCampaignId>
+    </personality>
+    <personality name="vandervahn_chistu">
+      <id>41ebf989-5770-4d11-864a-d7e89e9df1bf</id>
+      <title>saKhan Vandervahn Chistu</title>
+      <portrait>
+        <category></category>
+        <filename>Vandervahn.jpg</filename>
+      </portrait>
     </personality>
   </personalities>
 </storyArc>
