@@ -83,7 +83,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>eeb158a4-0294-477b-8ea9-aae9e4dca46c</nextStoryPointId>
+      <nextStoryPointId>f01196d7-4b66-4a23-9201-c48b44ad30b5</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -1429,7 +1429,7 @@ This is a story arc in active development. Try at your own risk!
       <choice id="great">I have never felt better.</choice>
       <choice id="terrible">I feel like I have been disassembled and put back together by a poorly trained *freebirth* tech.</choice>
       <choice id="heaven">Am I dead? If this is heaven, why are you here?</choice>
-      <storyOutcomes>
+      <!-- <storyOutcomes>
         <storyOutcome result="great">
           <nextStoryPointId></nextStoryPointId>
         </storyOutcome>
@@ -1439,10 +1439,13 @@ This is a story arc in active development. Try at your own risk!
         <storyOutcome result="heaven">
           <nextStoryPointId></nextStoryPointId>
         </storyOutcome>
-      </storyOutcomes>
+      </storyOutcomes>-->
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
         <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
         <hits>0</hits>
+      </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.RemoveUnitStoryTrigger">
+        <removeAll>true</removeAll>
       </storyTrigger>
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
     </storyPoint>
