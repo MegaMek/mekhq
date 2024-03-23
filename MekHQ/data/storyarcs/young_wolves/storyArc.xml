@@ -1447,6 +1447,9 @@ This is a story arc in active development. Try at your own risk!
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.RemoveUnitStoryTrigger">
         <removeAll>true</removeAll>
       </storyTrigger>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AdvanceTimeStoryTrigger">
+        <days>4</days>
+      </storyTrigger>
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
     </storyPoint>
     <!-- Narrative story events -->
