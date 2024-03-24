@@ -83,7 +83,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>f01196d7-4b66-4a23-9201-c48b44ad30b5</nextStoryPointId>
+      <nextStoryPointId>12480bac-61db-4ba1-ae33-f84bc4404765</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -1526,7 +1526,7 @@ This is a story arc in active development. Try at your own risk!
 
         Greetings, {commander}. Since the battle, they have me working as a bondsman tech, but I was just ordered to get over to this mech bay on the double to support you for a Trial. Scuttlebut says it is to get our Clan back. I sure as hell hope so, because this Falcon jumpsuit itches like you would not believe.
 
-        Anyway, first thing we need to do is get you a mech. Your opponent is going to be in a *Executioner* although I do not know the configuration. If you want to go for a similar assault mech, I could put you in a *Warhawk*. Alternatively, I could put you in something a little lighter, faster, and more iconic like the *Timber Wolf*. If you want to really go for speed, I can put you in a *Stormcrow* and you can try to run circles around him.
+        Anyway, first thing we need to do is get you a mech, since pretty much everything we had is in the salvage pile. Your opponent is going to be in a *Executioner* although I do not know the configuration. If you want to go for a similar assault mech, I could put you in a *Warhawk*. Alternatively, I could put you in something a little lighter, faster, and more iconic like the *Timber Wolf*. If you want to really go for speed, I can put you in a *Stormcrow* and you can try to run circles around him.
 
         So, what will it be?
       </question>
@@ -1547,49 +1547,94 @@ This is a story arc in active development. Try at your own risk!
       <choice id="stormcrow_d">Stormcrow D</choice>
       <storyOutcomes>
         <storyOutcome result="warhawk_prime">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Masakari (Warhawk) Prime</entityName>
+          </storyTrigger>
+          <nextStoryPointId>bef32318-0beb-4555-9210-cbe90ba3222a</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="warhawk_a">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Masakari (Warhawk) A</entityName>
+          </storyTrigger>
+          <nextStoryPointId>bef32318-0beb-4555-9210-cbe90ba3222a</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="warhawk_b">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Masakari (Warhawk) B</entityName>
+          </storyTrigger>
+          <nextStoryPointId>bef32318-0beb-4555-9210-cbe90ba3222a</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="warhawk_c">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Masakari (Warhawk) C</entityName>
+          </storyTrigger>
+          <nextStoryPointId>bef32318-0beb-4555-9210-cbe90ba3222a</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="warhawk_d">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Masakari (Warhawk) D</entityName>
+          </storyTrigger>
+          <nextStoryPointId>bef32318-0beb-4555-9210-cbe90ba3222a</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="timber_wolf_prime">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Mad Cat (Timber Wolf) Prime</entityName>
+          </storyTrigger>
+          <nextStoryPointId>22022055-60b6-4ef7-b23a-c0e1bcdb6251</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="timber_wolf_a">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Mad Cat (Timber Wolf) A</entityName>
+          </storyTrigger>
+          <nextStoryPointId>22022055-60b6-4ef7-b23a-c0e1bcdb6251</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="timber_wolf_b">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Mad Cat (Timber Wolf) B</entityName>
+          </storyTrigger>
+          <nextStoryPointId>22022055-60b6-4ef7-b23a-c0e1bcdb6251</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="timber_wolf_c">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Mad Cat (Timber Wolf) C</entityName>
+          </storyTrigger>
+          <nextStoryPointId>22022055-60b6-4ef7-b23a-c0e1bcdb6251</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="timber_wolf_d">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Mad Cat (Timber Wolf) D</entityName>
+          </storyTrigger>
+          <nextStoryPointId>22022055-60b6-4ef7-b23a-c0e1bcdb6251</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="stormcrow_prime">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Ryoken (Stormcrow) Prime</entityName>
+          </storyTrigger>
+          <nextStoryPointId>309d5bad-135d-4f4e-a058-95ae9ce61e0a</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="stormcrow_a">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Ryoken (Stormcrow) A</entityName>
+          </storyTrigger>
+          <nextStoryPointId>309d5bad-135d-4f4e-a058-95ae9ce61e0a</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="stormcrow_b">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Ryoken (Stormcrow) B</entityName>
+          </storyTrigger>
+          <nextStoryPointId>309d5bad-135d-4f4e-a058-95ae9ce61e0a</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="stormcrow_c">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Ryoken (Stormcrow) C</entityName>
+          </storyTrigger>
+          <nextStoryPointId>309d5bad-135d-4f4e-a058-95ae9ce61e0a</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="stormcrow_d">
-          <nextStoryPointId></nextStoryPointId>
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AddUnitStoryTrigger">
+            <entityName>Ryoken (Stormcrow) D</entityName>
+          </storyTrigger>
+          <nextStoryPointId>309d5bad-135d-4f4e-a058-95ae9ce61e0a</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
       <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
@@ -1672,6 +1717,39 @@ This is a story arc in active development. Try at your own risk!
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
         <tab>REPAIR</tab>
       </storyTrigger>
+    </storyPoint>
+    <storyPoint name="narr_tech_choice_warhawk" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>bef32318-0beb-4555-9210-cbe90ba3222a</id>
+      <title>You Chose Warhawk</title>
+      <narrative>
+        Good choice, {commanderRank}. You cannot go wrong with that beast. It may not have the tonnage of the *Executioner* but it sure does pack a punch!
+
+        I will get to work on it right away. We should have your mech ready for combat shortly. Give him hell, {commanderRank}!
+      </narrative>
+      <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+      <nextStoryPointId></nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_tech_choice_timber_wolf" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>22022055-60b6-4ef7-b23a-c0e1bcdb6251</id>
+      <title>You Chose Timber Wolf</title>
+      <narrative>
+        I hoped you would pick that one, {commanderRank}. What better way to restore the honor of Clan Wolf than with our iconic mech!
+
+        I will get to work on it right away. We should have your mech ready for combat shortly. Give him hell, {commanderRank}!
+      </narrative>
+      <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+      <nextStoryPointId></nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_tech_choice_timber_wolf" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>309d5bad-135d-4f4e-a058-95ae9ce61e0a</id>
+      <title>You Chose Stormcrow</title>
+      <narrative>
+        Excellent idea, {commanderRank}. You will easily outpace his slow ass in that ride.
+
+        I will get to work on it right away. We should have your mech ready for combat shortly. Give him hell, {commanderRank}!
+      </narrative>
+      <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+      <nextStoryPointId></nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tech_bloodname_trial" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>955ee81c-b23e-48a7-a4ab-5187ba0d9eeb</id>
