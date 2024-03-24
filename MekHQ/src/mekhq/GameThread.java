@@ -301,7 +301,7 @@ class GameThread extends Thread implements CloseClientListener {
         List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
         AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
         int lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
-        if (botForce.getTeam() != 0) {
+        if (botForce.getTeam() == 2) {
             lanceSize = Lance.getStdLanceSize(contract.getEnemy());
         }
         Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
