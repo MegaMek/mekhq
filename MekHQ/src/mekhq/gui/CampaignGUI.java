@@ -1581,7 +1581,7 @@ public class CampaignGUI extends JPanel {
                 }
             }
 
-            String s = (String) JOptionPane.showInputDialog(frame,
+            String s = (techList.isEmpty()) ? null : (String) JOptionPane.showInputDialog(frame,
                     "Which tech should work on the refit?", "Select Tech",
                     JOptionPane.PLAIN_MESSAGE, null, techList.toArray(), techList.get(0));
 
