@@ -174,7 +174,7 @@ public class RetirementDefectionTracker {
 
       TargetRoll target = new TargetRoll(3, "Target");
       target.addModifier(p.getExperienceLevel(campaign, false) - campaign.getUnitRatingMod(),
-          "Experience");
+          "Unit Experience");
       target.addModifier(campaign.getUnitRatingMod(), "Company Rating");
 
       /* Retirement rolls are made before the contract status is set */
