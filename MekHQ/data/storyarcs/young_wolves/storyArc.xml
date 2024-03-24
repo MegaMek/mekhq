@@ -65,7 +65,7 @@ This is a story arc in active development. Try at your own risk!
     <!-- Initial story event -->
     <storyPoint name="create_main_char" type="mekhq.campaign.storyarc.storypoint.CreateCharacterStoryPoint">
       <id>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</id>
-      <xpPool>60</xpPool>
+      <xpPool>48</xpPool>
       <rank>34</rank>
       <firstname>Julius</firstname>
       <age>35</age>
