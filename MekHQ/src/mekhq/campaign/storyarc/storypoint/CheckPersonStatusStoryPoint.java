@@ -33,11 +33,11 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.UUID;
 
-public class CheckPersonActiveStoryPoint extends StoryPoint {
+public class CheckPersonStatusStoryPoint extends StoryPoint {
 
     private UUID personId;
 
-    public CheckPersonActiveStoryPoint() {
+    public CheckPersonStatusStoryPoint() {
         super();
     }
 
@@ -50,10 +50,10 @@ public class CheckPersonActiveStoryPoint extends StoryPoint {
     @Override
     protected String getResult() {
         Person p = getCampaign().getPerson(personId);
-        if ((null == p) || !p.getStatus().isActive()) {
-            return "Inactive";
+        if (null == p) {
+            return "UNKNOWN";
         } else {
-            return "Active";
+            return p.getStatus().name();
         }
     }
 

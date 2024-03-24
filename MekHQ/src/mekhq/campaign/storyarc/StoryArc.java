@@ -444,11 +444,12 @@ public class StoryArc {
             replacementTokens.put("\\{commanderCallsign\\}", "callsign(?)");
             replacementTokens.put("\\{commanderRank\\}", "rank(?)");
             replacementTokens.put("\\{commander\\}", "commander(?)");
-
+            replacementTokens.put("\\{commanderName\\}", "name(?)");
         } else {
             replacementTokens.put("\\{commanderCallsign\\}", commander.getCallsign());
             replacementTokens.put("\\{commanderRank\\}", commander.getRankName());
             replacementTokens.put("\\{commander\\}", commander.getFullTitle());
+            replacementTokens.put("\\{commanderName\\}", commander.getFullName());
         }
 
         // tokens for customStringVariables
