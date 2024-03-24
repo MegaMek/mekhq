@@ -38,7 +38,7 @@ public class CampaignManagementDialog extends JDialog {
 
     public CampaignManagementDialog(StratconTab parent) {
         this.parent = parent;
-        this.setTitle("Manage SP/VP");
+        this.setTitle("Manage SP/CVP");
         initializeUI();
     }
 
@@ -74,7 +74,7 @@ public class CampaignManagementDialog extends JDialog {
         getContentPane().setLayout(layout);
 
         btnConvertVPToSP = new JButton();
-        btnConvertVPToSP.setText("Convert VP to SP");
+        btnConvertVPToSP.setText("Convert CVP to SP");
         btnConvertVPToSP.addActionListener(this::convertVPtoSPHandler);
         getContentPane().add(btnConvertVPToSP);
 
@@ -84,7 +84,7 @@ public class CampaignManagementDialog extends JDialog {
         getContentPane().add(btnConvertSPtoBonusPart);
 
         btnGMAddVP = new JButton();
-        btnGMAddVP.setText("Add VP (GM)");
+        btnGMAddVP.setText("Add CVP (GM)");
         btnGMAddVP.addActionListener(this::gmAddVPHandler);
         getContentPane().add(btnGMAddVP);
 

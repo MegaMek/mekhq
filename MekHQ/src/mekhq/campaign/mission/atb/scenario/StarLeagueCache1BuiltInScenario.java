@@ -69,7 +69,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
     @Override
     public void setMapFile() {
         setMap("Brian-cache");
-        setTerrainType(TER_LIGHTURBAN);
+        setTerrainType("Urban");
     }
 
     @Override

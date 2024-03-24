@@ -28,8 +28,12 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @AtBScenarioEnabled
 public class HideAndSeekBuiltInScenario extends AtBScenario {
@@ -50,10 +54,15 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
     @Override
     public void setTerrain() {
+        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
         do {
-            setTerrainType(terrainChart[Compute.d6(2) - 2]);
-        } while ((getTerrainType() == TER_WETLANDS || getTerrainType() == TER_COASTAL
-                || getTerrainType() == TER_FLATLANDS));
+            setTerrainType(keys.get(Compute.randomInt(keys.size())));
+        } while (getTerrainType().equals("ColdSea")
+                || getTerrainType().equals("FrozenSea")
+                || getTerrainType().equals("HotSea")
+                || getTerrainType().equals("Plains")
+                || getTerrainType().equals("Savannah"));
     }
 
     @Override

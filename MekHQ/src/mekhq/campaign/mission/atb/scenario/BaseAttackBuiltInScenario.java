@@ -59,7 +59,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
     @Override
     public void setTerrain() {
-        setTerrainType((Compute.d6() < 4) ? TER_LIGHTURBAN : TER_HEAVYURBAN);
+        setTerrainType("Urban");
     }
 
     @Override
@@ -166,8 +166,6 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         destroyHostiles.addForce(String.format("%s%s", contract.getEnemyBotName(), SECOND_ENEMY_FORCE_SUFFIX));
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
                 50, false);
-        ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
-                this);
 
         ScenarioObjective preserveBaseUnits = null;
         if (!isAttacker()) {
@@ -202,9 +200,6 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
             getScenarioObjectives().add(preserveBaseUnits);
         }
 
-        if (keepAttachedUnitsAlive != null) {
-            getScenarioObjectives().add(keepAttachedUnitsAlive);
-        }
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);
     }

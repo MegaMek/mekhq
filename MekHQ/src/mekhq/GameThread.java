@@ -25,6 +25,7 @@ import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.*;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -137,13 +138,15 @@ class GameThread extends Thread implements CloseClientListener {
                     mapSettings.getBoardsSelectedVector().clear();
 
                     // if the scenario is taking place in space, do space settings instead
-                    if (scenario.getTerrainType() == Scenario.TER_SPACE) {
+                    if (scenario.getBoardType() == Scenario.T_SPACE) {
                         mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                         mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                     } else if (scenario.isUsingFixedMap()) {
-                        mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", ""));
+                        String board = scenario.getMap().replace(".board", ""); // TODO : remove inline file type
+                        board = board.replace("\\", "/");
+                        mapSettings.getBoardsSelectedVector().add(board);
 
-                        if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+                        if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
                             mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                         }
                     } else {
@@ -154,7 +157,7 @@ class GameThread extends Thread implements CloseClientListener {
                             LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);  // TODO : remove inline file path
                         }
 
-                        if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+                        if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
                             mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                         }
 
@@ -173,17 +176,17 @@ class GameThread extends Thread implements CloseClientListener {
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
                 planetaryConditions.setWeather(scenario.getWeather());
-                planetaryConditions.setWindStrength(scenario.getWind());
+                planetaryConditions.setWind(scenario.getWind());
                 planetaryConditions.setFog(scenario.getFog());
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
-                planetaryConditions.setTemperature(scenario.getTemperature());
+                planetaryConditions.setTemperature(scenario.getModifiedTemperature());
                 planetaryConditions.setGravity(scenario.getGravity());
-                planetaryConditions.setEMI(scenario.usesEMI());
-                planetaryConditions.setBlowingSand(scenario.usesBlowingSand());
+                planetaryConditions.setEMI(scenario.getEMI());
+                planetaryConditions.setBlowingSand(scenario.getBlowingSand());
                 planetaryConditions.setShiftingWindDirection(scenario.canWindShiftDirection());
                 planetaryConditions.setShiftingWindStrength(scenario.canWindShiftStrength());
-                planetaryConditions.setMaxWindStrength(scenario.getMaxWindStrength());
-                planetaryConditions.setMinWindStrength(scenario.getMinWindStrength());
+                planetaryConditions.setWindMax(scenario.getMaxWindStrength());
+                planetaryConditions.setWindMin(scenario.getMinWindStrength());
 
                 client.sendPlanetaryConditions(planetaryConditions);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
@@ -236,6 +239,7 @@ class GameThread extends Thread implements CloseClientListener {
         } catch (Exception e) {
             LogManager.getLogger().error("", e);
         } finally {
+            swingGui.setDisconnectQuietly(true);
             client.die();
             client = null;
             swingGui = null;

@@ -19,6 +19,9 @@
 package mekhq.campaign.mission.atb.scenario;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import megamek.common.Compute;
 import megamek.common.Entity;
@@ -29,6 +32,7 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
 
 @AtBScenarioEnabled
 public class ProbeBuiltInScenario extends AtBScenario {
@@ -49,9 +53,11 @@ public class ProbeBuiltInScenario extends AtBScenario {
 
     @Override
     public void setTerrain() {
+        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
         do {
-            setTerrainType(terrainChart[Compute.d6(2) - 2]);
-        } while (getTerrainType() == TER_HEAVYURBAN);
+            setTerrainType(keys.get(Compute.randomInt(keys.size())));
+        } while (getTerrainType().toUpperCase().contains("URBAN"));
     }
 
     @Override

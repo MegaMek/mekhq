@@ -5729,8 +5729,12 @@ public class Campaign implements ITechManager {
         entity.setDoomed(false);
         entity.setHidden(false);
         entity.clearNarcAndiNarcPods();
+        entity.setShutDown(false);
+        entity.setSearchlightState(false);
 
-        if (!entity.getSensors().isEmpty()) {
+        if (entity.hasBAP()) {
+            entity.setNextSensor(entity.getSensors().lastElement());
+        } else if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
         }
 
