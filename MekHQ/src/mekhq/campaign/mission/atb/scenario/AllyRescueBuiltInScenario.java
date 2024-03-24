@@ -18,10 +18,7 @@
  */
 package mekhq.campaign.mission.atb.scenario;
 
-import megamek.common.Board;
-import megamek.common.Entity;
-import megamek.common.EntityWeightClass;
-import megamek.common.UnitType;
+import megamek.common.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
 import mekhq.campaign.mission.*;
@@ -67,7 +64,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
     @Override
     public void setMapFile() {
         setMap("Ally-rescue");
-        setTerrainType(TER_LIGHTURBAN);
+        setTerrainType("Urban");
     }
 
     @Override

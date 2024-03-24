@@ -26,7 +26,6 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.EquipmentType;
 import megamek.common.ITechnology;
-import megamek.common.PlanetaryConditions;
 import megamek.common.TargetRoll;
 import mekhq.Utilities;
 import mekhq.adapter.*;
@@ -649,8 +648,8 @@ public class Planet {
     }
 
     public String getPressureName(LocalDate when) {
-        Integer currentPressure = getPressure(when);
-        return null != currentPressure ? PlanetaryConditions.getAtmosphereDisplayableName(currentPressure) : "unknown";
+        megamek.common.planetaryconditions.Atmosphere currentPressure = megamek.common.planetaryconditions.Atmosphere.getAtmosphere(getPressure(when));
+        return null != currentPressure ? currentPressure.toString() : "unknown";
     }
 
     public Atmosphere getAtmosphere(LocalDate when) {

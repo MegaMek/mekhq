@@ -7,8 +7,9 @@
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>
         <allowedTerrainTypes>
-            <allowedTerrainType>3</allowedTerrainType>
-            <allowedTerrainType>6</allowedTerrainType>
+            <allowedTerrainType>ColdUrban</allowedTerrainType>
+            <allowedTerrainType>HotUrban</allowedTerrainType>
+            <allowedTerrainType>Urban</allowedTerrainType>
         </allowedTerrainTypes>
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>

@@ -33,6 +33,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import org.apache.logging.log4j.LogManager;
@@ -46,6 +47,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -810,11 +812,19 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         localGbc.gridheight = GridBagConstraints.RELATIVE;
         lstAllowedTerrainTypes = new JList<>();
         DefaultListModel<String> terrainTypeModel = new DefaultListModel<>();
-        for (String terrainType : AtBScenario.terrainTypes) {
+        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
+        List<Integer> indexes = new ArrayList<>();
+        int i = 0;
+        for (String terrainType : keys) {
             terrainTypeModel.addElement(terrainType);
+            if (scenarioTemplate.mapParameters.getAllowedTerrainType().contains(terrainType)) {
+                indexes.add(i);
+            }
+            i++;
         }
         lstAllowedTerrainTypes.setModel(terrainTypeModel);
-        lstAllowedTerrainTypes.setSelectedIndices(scenarioTemplate.mapParameters.getAllowedTerrainTypeArray());
+        lstAllowedTerrainTypes.setSelectedIndices(indexes.stream().mapToInt(Integer::intValue).toArray());
         mapTypeChangeHandler();
         pnlMapParameters.add(lstAllowedTerrainTypes, localGbc);
 
@@ -1336,7 +1346,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         scenarioTemplate.detailedBriefing = txtLongBriefing.getText();
 
         scenarioTemplate.mapParameters.allowedTerrainTypes.clear();
-        for (int terrainType : lstAllowedTerrainTypes.getSelectedIndices()) {
+        for (int index : lstAllowedTerrainTypes.getSelectedIndices()) {
+            String terrainType = lstAllowedTerrainTypes.getModel().getElementAt(index);
             scenarioTemplate.mapParameters.allowedTerrainTypes.add(terrainType);
         }
         scenarioTemplate.mapParameters.setBaseHeight(Integer.parseInt(txtBaseHeight.getText()));

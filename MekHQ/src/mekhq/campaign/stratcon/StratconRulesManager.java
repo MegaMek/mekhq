@@ -186,17 +186,12 @@ public class StratconRulesManager {
     public static void setScenarioParametersFromBiome(StratconTrackState track, StratconScenario scenario) {
         StratconCoords coords = scenario.getCoords();
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
 
         // for non-surface scenarios, we will skip the temperature update
-        if (backingScenario.getTerrainType() != Scenario.TER_LOW_ATMO &&
-                backingScenario.getTerrainType() != Scenario.TER_SPACE) {
+        if (backingScenario.getBoardType() != Scenario.T_SPACE &&
+                backingScenario.getBoardType() != Scenario.T_ATMOSPHERE) {
             backingScenario.setTemperature(track.getTemperature());
-        }
-
-        // for now, if we're using a fixed map or in a facility, don't replace the scenario
-        // TODO: facility spaces will always have a relevant biome
-        if (backingScenario.isUsingFixedMap()) {
-            return; // for now
         }
 
         StratconFacility facility = track.getFacility(scenario.getCoords());
@@ -209,7 +204,7 @@ public class StratconRulesManager {
 
             // if facility doesn't have a biome temp map or no entry for the current temperature, use the default one
             if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
-                facilityBiome = StratconBiomeManifest.getInstance().getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
+                facilityBiome = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
                         .floorEntry(kelvinTemp).getValue();
             } else {
                 facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
@@ -218,8 +213,8 @@ public class StratconRulesManager {
         } else {
             terrainType = track.getTerrainTile(coords);
         }
-
-        var mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        
+        var mapTypes = biomeManifest.getBiomeMapTypes();
 
         // don't have a map list for the given terrain, leave it alone
         if(!mapTypes.containsKey(terrainType)) {
@@ -227,9 +222,17 @@ public class StratconRulesManager {
         }
 
         // if we are in space, do not update the map; note that it's ok to do so in low atmo
-        if (backingScenario.getTerrainType() != Scenario.TER_SPACE) {
+        if (backingScenario.getBoardType() != Scenario.T_SPACE) {
             var mapTypeList = mapTypes.get(terrainType).mapTypes;
-            backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+            backingScenario.setHasTrack(true);
+            backingScenario.setTerrainType(terrainType);
+            // for now, if we're using a fixed map or in a facility, don't replace the scenario
+            // TODO: facility spaces will always have a relevant biome
+            if (!backingScenario.isUsingFixedMap()) {
+                backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+            }
+            backingScenario.setLightConditions();
+            backingScenario.setWeather();
         }
     }
 

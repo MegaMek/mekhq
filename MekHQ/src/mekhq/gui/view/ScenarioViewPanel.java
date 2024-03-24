@@ -20,8 +20,9 @@
  */
 package mekhq.gui.view;
 
-import megamek.common.PlanetaryConditions;
 import megamek.common.annotations.Nullable;
+import megamek.common.planetaryconditions.Atmosphere;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
@@ -387,9 +388,9 @@ public class ScenarioViewPanel extends JScrollablePanel {
         pnlMap.add(lblTerrain, leftGbc);
 
         JLabel lblTerrainDesc = new JLabel();
-        if (scenario.getTerrainType() == Scenario.TER_SPACE) {
+        if (scenario.getBoardType() == Scenario.T_SPACE) {
             lblTerrainDesc.setText("Space");
-        } else if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+        } else if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
             lblTerrainDesc.setText("Low Atmosphere");
         } else {
             lblTerrainDesc.setText("Ground");
@@ -397,7 +398,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         rightGbc.gridy++;
         pnlMap.add(lblTerrainDesc, rightGbc);
 
-        if (scenario.getTerrainType() != Scenario.TER_SPACE) {
+        if (scenario.getBoardType() != Scenario.T_SPACE) {
             JLabel lblMap = new JLabel(resourceMap.getString("lblMap.text"));
             leftGbc.gridy++;
             pnlMap.add(lblMap, leftGbc);
@@ -415,7 +416,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         rightGbc.gridy++;
         pnlMap.add(lblMapSizeDesc, rightGbc);
 
-        if (scenario.getTerrainType() == Scenario.TER_SPACE) {
+        if (scenario.getBoardType() == Scenario.T_SPACE) {
             // if a space scenario return here as the rest is all planet based information
             return;
         }
@@ -424,7 +425,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlMap.add(lblLight, leftGbc);
 
-        JLabel lblLightDesc = new JLabel(PlanetaryConditions.getLightDisplayableName(scenario.getLight()));
+        JLabel lblLightDesc = new JLabel(scenario.getLight().toString());
         rightGbc.gridy++;
         pnlMap.add(lblLightDesc, rightGbc);
 
@@ -432,7 +433,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlMap.add(lblWeather, leftGbc);
 
-        JLabel lblWeatherDesc = new JLabel(PlanetaryConditions.getWeatherDisplayableName(scenario.getWeather()));
+        JLabel lblWeatherDesc = new JLabel(scenario.getWeather().toString());
         rightGbc.gridy++;
         pnlMap.add(lblWeatherDesc, rightGbc);
 
@@ -440,7 +441,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlMap.add(lblWind, leftGbc);
 
-        JLabel lblWindDesc = new JLabel(PlanetaryConditions.getWindDisplayableName(scenario.getWind()));
+        JLabel lblWindDesc = new JLabel(scenario.getWind().toString());
         rightGbc.gridy++;
         pnlMap.add(lblWindDesc, rightGbc);
 
@@ -448,15 +449,33 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlMap.add(lblFog, leftGbc);
 
-        JLabel lblFogDesc = new JLabel(PlanetaryConditions.getFogDisplayableName(scenario.getFog()));
+        JLabel lblFogDesc = new JLabel(scenario.getFog().toString());
         rightGbc.gridy++;
         pnlMap.add(lblFogDesc, rightGbc);
+
+        JLabel lblBlowingSand = new JLabel(resourceMap.getString("lblBlowingSand.text"));
+        leftGbc.gridy++;
+        pnlMap.add(lblBlowingSand, leftGbc);
+
+        String blowingSandDesc = scenario.getBlowingSand().toString();
+        JLabel lblBlowingSandDesc = new JLabel(blowingSandDesc);
+        rightGbc.gridy++;
+        pnlMap.add(lblBlowingSandDesc, rightGbc);
+
+        JLabel lblEMI = new JLabel(resourceMap.getString("lblEMI.text"));
+        leftGbc.gridy++;
+        pnlMap.add(lblEMI, leftGbc);
+
+        String emiDesc = scenario.getEMI().toString();
+        JLabel lblEMIDesc = new JLabel(emiDesc);
+        rightGbc.gridy++;
+        pnlMap.add(lblEMIDesc, rightGbc);
 
         JLabel lblTemperature = new JLabel(resourceMap.getString("lblTemperature.text"));
         leftGbc.gridy++;
         pnlMap.add(lblTemperature, leftGbc);
 
-        JLabel lblTemperatureDesc = new JLabel(PlanetaryConditions.getTemperatureDisplayableName(scenario.getTemperature()));
+        JLabel lblTemperatureDesc = new JLabel(PlanetaryConditions.getTemperatureDisplayableName(scenario.getModifiedTemperature()));
         rightGbc.gridy++;
         pnlMap.add(lblTemperatureDesc, rightGbc);
 
@@ -471,21 +490,21 @@ public class ScenarioViewPanel extends JScrollablePanel {
         }
 
 
-        if (scenario.getAtmosphere() != PlanetaryConditions.ATMO_STANDARD) {
+        if (scenario.getAtmosphere() != Atmosphere.STANDARD) {
             JLabel lblAtmosphere = new JLabel(resourceMap.getString("lblAtmosphere.text"));
             leftGbc.gridy++;
             pnlMap.add(lblAtmosphere, leftGbc);
 
-            JLabel lblAtmosphereDesc = new JLabel(PlanetaryConditions.getAtmosphereDisplayableName(scenario.getAtmosphere()));
+            JLabel lblAtmosphereDesc = new JLabel(scenario.getAtmosphere().toString());
             rightGbc.gridy++;
             pnlMap.add(lblAtmosphereDesc, rightGbc);
         }
 
         ArrayList<String> otherConditions = new ArrayList<>();
-        if (scenario.usesEMI()) {
+        if (scenario.getEMI().isEMI()) {
             otherConditions.add(resourceMap.getString("emi.text"));
         }
-        if (scenario.usesBlowingSand()) {
+        if (scenario.getBlowingSand().isBlowingSand()) {
             otherConditions.add(resourceMap.getString("sand.text"));
         }
         if (!otherConditions.isEmpty()) {

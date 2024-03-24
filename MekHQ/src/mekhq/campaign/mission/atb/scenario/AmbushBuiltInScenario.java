@@ -56,7 +56,7 @@ public class AmbushBuiltInScenario extends AtBScenario {
     @Override
     public void setMapFile() {
         setMap("Savannah");
-        setTerrainType(TER_FLATLANDS);
+        setTerrainType("Savannah");
     }
 
     @Override
