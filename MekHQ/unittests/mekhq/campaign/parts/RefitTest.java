@@ -23,6 +23,7 @@ import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
+import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.*;
 import mekhq.campaign.finances.Money;
@@ -794,5 +795,84 @@ public class RefitTest {
         // Complete the refit!
         String report = refit.succeed();
         assertNotNull(report);
+    }
+
+    @Test
+    public void testMasakariAtoMasakariB() {
+        // Create the original entity backing the unit
+        Entity oldEntity = UnitTestUtilities.getMasakariWarhawkA();
+        Player mockPlayer = mock(Player.class);
+        when(mockPlayer.getName()).thenReturn("Test Player");
+        oldEntity.setOwner(mockPlayer);
+
+        // Create the entity we're going to refit to
+        Entity newEntity = UnitTestUtilities.getMasakariWarhawkB();
+
+        // Create the unit which will be refit
+        Unit oldUnit = new Unit(oldEntity, mockCampaign);
+        oldUnit.setId(UUID.randomUUID());
+        oldUnit.initializeParts(false);
+
+        // Create the Refit
+        Refit refit = new Refit(oldUnit, newEntity, false, false);
+        assertEquals(mockCampaign, refit.getCampaign());
+
+        // Omni reconfiguration
+        assertEquals(Refit.CLASS_OMNI, refit.getRefitClass());
+
+        // Time?
+        // Omni reconfig = 120 minutes here
+        assertEquals(120.0, refit.getActualTime(), 0.1);
+
+        // Cost?
+        assertEquals(Money.of(316000).multipliedBy(1.1),
+                refit.getCost());
+
+        // We're removing 1 Large Laser and using existing armor in 10 locations
+        List<Part> removedParts = refit.getOldUnitParts();
+        assertEquals(9, removedParts.size());
+        assertEquals(2, removedParts.stream()
+                .filter(p -> (p instanceof EquipmentPart) && p.getName().equals("ER Large Laser"))
+                .count());
+        assertEquals(0, removedParts.stream().filter(p -> (p instanceof Armor)).count());
+
+        // All of the new parts should be from the old unit
+        List<Part> newParts = refit.getNewUnitParts();
+        assertTrue(newParts.stream().allMatch(p -> p.getUnit().equals(oldUnit)));
+
+        // We need to buy:
+        // - 1 clan gauss rifle with 2 ammo bins,
+        // - 3 ER medium lasers,
+        // - 1 ER small laser,
+        // - 2 SRM-6 launchers sharing 5 Narc-capable ammo bins,
+        // - 1 NARC launcher with 1 ton of pods
+        List<Part> shoppingCart = refit.getShoppingList();
+        assertEquals(1, shoppingCart.stream()
+                .filter(p -> (p instanceof MissingEquipmentPart) && p.getName().equals("Gauss Rifle"))
+                .count());
+        assertEquals(2, shoppingCart.stream()
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Gauss Rifle Ammo [Clan] Bin"))
+                .count());
+        assertEquals(3, shoppingCart.stream()
+                .filter(p -> (p instanceof MissingEquipmentPart) && p.getName().equals("ER Medium Laser"))
+                .count());
+        assertEquals(1, shoppingCart.stream()
+                .filter(p -> (p instanceof MissingEquipmentPart) && p.getName().equals("ER Small Laser"))
+                .count());
+        assertEquals(2, shoppingCart.stream()
+                .filter(p -> (p instanceof MissingEquipmentPart) && p.getName().equals("SRM 6"))
+                .count());
+        assertEquals(5, shoppingCart.stream()
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("SRM 6 (Clan) Narc-capable Ammo Bin"))
+                .count());
+        assertEquals(1, shoppingCart.stream()
+                .filter(p -> (p instanceof MissingEquipmentPart) && p.getName().equals("Narc"))
+                .count());
+        assertEquals(1, shoppingCart.stream()
+                .filter(p -> (p instanceof AmmoBin) && p.getName().equals("Narc Pods Bin"))
+                .count());
+
+        // We should have 0 points of standard armor on order
+        assertNull(refit.getNewArmorSupplies());
     }
 }
