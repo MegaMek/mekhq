@@ -16,6 +16,9 @@ MEKHQ VERSION HISTORY:
 + Fix #3877: MekHQ units aren't defaulting to active probes for sensors
 + Fix #1812: AtB/StratCon] Base Attack (Defender) Objective Changes 
 + PR #3892: Corrected Typo in Mass Repair Dialog 
++ Fix #2990: Stratcon draw counts as loss 
++ PR #3895: Correct Starting Cash Dice Count in Company Generator 
++ PR #3900: Disconnect quietly from GameThread for MekHQ 
 
 0.49.18 (2024-02-17 1800 UTC)
 + PR #3805: Adaptations for the Internal Bomb Bay quirk
