@@ -261,8 +261,9 @@ public class ChooseRefitDialog extends JDialog {
         List<Refit> refits = new ArrayList<>();
         Entity e = unit.getEntity();
         for (String model : Utilities.getAllVariants(e, campaign)) {
-            MechSummary summary = MechSummaryCache.getInstance().getMech(e.getChassis() + " " + model);
+            MechSummary summary = MechSummaryCache.getInstance().getMech(e.getFullChassis() + " " + model);
             if (null == summary) {
+                // Attempt to deal with new naming scheme directly
                 summary = MechSummaryCache.getInstance().getMech(e.getChassis() + " (" + e.getClanChassisName() + ") " + model);
                 if (null == summary) {
                     continue;

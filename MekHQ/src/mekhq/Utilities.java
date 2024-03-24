@@ -1269,17 +1269,12 @@ public class Utilities {
         cacheInstance.loadMechData();
 
         // I need to change the new entity to the one from the mtf file now, so that equipment numbers will match
-        MechSummary summary = cacheInstance.getMech(newE.getChassis() + " " + newE.getModel());
+        MechSummary summary = cacheInstance.getMech(newE.getFullChassis() + " " + newE.getModel());
 
-        // Need to deal with old naming conventions
         if (null == summary) {
+            // Attempt to deal with new naming convention directly
             summary = cacheInstance.getMech(
                     newE.getChassis() + " (" + newE.getClanChassisName() + ") " + newE.getModel());
-        }
-
-        // Try the first fuzzy match
-        if (null == summary) {
-            summary = cacheInstance.fuzzyGetMech(newE.getChassis() + " " + newE.getModel()).get(0);
         }
 
         // If we got this far with no summary loaded, give up
