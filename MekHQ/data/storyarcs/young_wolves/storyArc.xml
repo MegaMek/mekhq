@@ -83,7 +83,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>a2634663-dec8-4429-9b11-4364b8b3dcef</nextStoryPointId>
+      <nextStoryPointId>eeb158a4-0294-477b-8ea9-aae9e4dca46c</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -395,6 +395,23 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>a7be7384-5642-4045-bd32-1c79fd3b1e3f</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_mathius_active6" type="mekhq.campaign.storyarc.storypoint.CheckPersonStatusStoryPoint">
+      <id>14028377-8036-4108-b526-81f3b1c4bdad</id>
+      <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+      <storyOutcomes>
+        <storyOutcome result="ACTIVE">
+          <nextStoryPointId>0d1c4875-ec92-4146-89bc-15683a635b39</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="MIA">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+            <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+            <status>ACTIVE</status>
+          </storyTrigger>
+          <nextStoryPointId>0d1c4875-ec92-4146-89bc-15683a635b39</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>1a48a701-ac13-4957-8e8c-6ecf79b40581</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_tayyiba_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonStatusStoryPoint">
       <id>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</id>
@@ -2827,6 +2844,17 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
       <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_mathius_medbay" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>0d1c4875-ec92-4146-89bc-15683a635b39</id>
+      <title>You Awaken</title>
+      <narrative>
+        *Mathius leans over Vlad's shoulder. His face is battered and bruised and he is holding one of his arms gingerly.*
+
+        {commander}! You are alive, thank the Great Father. Vlad has just returned to us as well after digging himself out of the rubble. He brings dire tidings.
+      </narrative>
+      <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+      <nextStoryPointId>1a48a701-ac13-4957-8e8c-6ecf79b40581</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_mathius_victory" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>faafb550-5b99-4b75-bd9b-e1e22201149d</id>
       <title>Victory</title>
@@ -3615,7 +3643,7 @@ This is a story arc in active development. Try at your own risk!
         Excellent, because I have need of you.
       </narrative>
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
-      <nextStoryPointId>1a48a701-ac13-4957-8e8c-6ecf79b40581</nextStoryPointId>
+      <nextStoryPointId>14028377-8036-4108-b526-81f3b1c4bdad</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_vlad_medbay_terrible" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>28a036e8-e077-4e69-beee-c050c9fcb325</id>
@@ -3624,7 +3652,7 @@ This is a story arc in active development. Try at your own risk!
         Yes, that is how I felt after spending four days buried in my *Timber Wolf* with two broken limbs. The doctors tell me all your limbs are intact. So get up, warrior, as I have need of you.
       </narrative>
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
-      <nextStoryPointId>1a48a701-ac13-4957-8e8c-6ecf79b40581</nextStoryPointId>
+      <nextStoryPointId>14028377-8036-4108-b526-81f3b1c4bdad</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_vlad_medbay_heaven" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>4221987e-8a7b-4531-a0df-c240e36dd79a</id>
@@ -3633,7 +3661,7 @@ This is a story arc in active development. Try at your own risk!
         Your Spheroid sense of humor was not affected apparently. You are not dead, and our work is not done. Get up, I have need of you.
       </narrative>
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
-      <nextStoryPointId>1a48a701-ac13-4957-8e8c-6ecf79b40581</nextStoryPointId>
+      <nextStoryPointId>14028377-8036-4108-b526-81f3b1c4bdad</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_vlad_medbay_review" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>1a48a701-ac13-4957-8e8c-6ecf79b40581</id>
