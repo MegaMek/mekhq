@@ -83,7 +83,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>12480bac-61db-4ba1-ae33-f84bc4404765</nextStoryPointId>
+      <nextStoryPointId>236167b3-36a4-4b63-9dd7-0fd60a0f16b8</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -341,6 +341,10 @@ This is a story arc in active development. Try at your own risk!
       <id>35fabd74-41fa-4472-b409-8a1d0c280418</id>
       <nextStoryPointId>581e54c9-abad-47d8-b3ab-a3b566c494eb</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="check_wotan_interlude_kurultai" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>df9d1e1e-1499-44ca-99ab-8f859d4a5f9a</id>
+      <nextStoryPointId>0243e946-723c-42d3-ae23-a84597b857ba</nextStoryPointId>
+    </storyPoint>
     <!-- Person checks-->
     <storyPoint name="check_mathius_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>a2634663-dec8-4429-9b11-4364b8b3dcef</id>
@@ -381,6 +385,16 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>236167b3-36a4-4b63-9dd7-0fd60a0f16b8</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_mathius_active5" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>51b8a364-9be7-4ca3-8cb9-c7145db963dd</id>
+      <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>94463c00-1796-44e5-96a7-3d0899614e19</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>a7be7384-5642-4045-bd32-1c79fd3b1e3f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_tayyiba_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</id>
@@ -1559,6 +1573,32 @@ This is a story arc in active development. Try at your own risk!
       <nextStoryPointId>4a547ba9-8672-4296-9bed-64f7d4404158</nextStoryPointId>
       <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
     </storyPoint>
+    <storyPoint name="choice_crichell_kurultai" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>0243e946-723c-42d3-ae23-a84597b857ba</id>
+      <title>Bloodname Trial</title>
+      <question>
+        *You stand before the assembled warriors of your Clan. The Refusal War has diminished the touman significantly and barely more than 200 faces gaze back at you.*
+
+        *Khan Elias Crichell stands in front of you.*
+
+        {commander}, why you are worthy of the {bloodname} bloodname?
+      </question>
+      <choice id="recite">I won three trials to help guarantee the Wolves were represented among the Clans returning to the Inner Sphere. During the invasion, I fought on Kirchbach and Hohenems, helping to liberate both planets. On Tukayyid, I fought with honor. In this Refusal War, I have bested the Jade Falcons on Colmar, Baker 3, Devin, Denizli, and Wotan. I have been defeated only the treachery of Vandervahn Chistu who is now slain by my hand.</choice>
+      <choice id="restore">I have slain a Khan and saved my Clan from Absorption.</choice>
+      <choice id="killer">Mostly, it is that I have killed a lot of Jade Falcons. *A lot*.</choice>
+      <storyOutcomes>
+        <storyOutcome result="recite">
+          <nextStoryPointId>6a2b1677-0c63-4902-b4ee-406e1c469bd8</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="restore">
+          <nextStoryPointId>6b1de6f1-0b5f-4083-b7e8-9769131f2fa6</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="killer">
+          <nextStoryPointId>7f4fd8f2-b024-4194-a119-478d81a6517d</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+    </storyPoint>
     <storyPoint name="choice_vandervahn_end" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>0e8d2968-d803-4563-89fd-306056eb14d0</id>
       <title>Vandervahn's Fate</title>
@@ -2720,9 +2760,52 @@ This is a story arc in active development. Try at your own risk!
 
         *A cheer goes up from all those around you.*
 
-        You will need to elect new leadership for your clan. I will prepare a Kurultai for that purpose, two days hence.
+        You will need to elect new leadership for your Clan. I will prepare a Kurultai for that purpose, two days hence.
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>df9d1e1e-1499-44ca-99ab-8f859d4a5f9a</storyPointId>
+        <futureDays>2</futureDays>
+      </storyTrigger>
+      <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_crichell_bloodname_recite" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>6a2b1677-0c63-4902-b4ee-406e1c469bd8</id>
+      <title>Bloodname Trial</title>
+      <narrative>
+        *Crichell nods, seemingly appreciative of your traditional recitation.*
+
+        Your claims are of merit and have been verified. You shall now face your first opponent.
+
+        *Crichell waves you forward to where five Wolf warriors stand in a line.*
       </narrative>
       <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+      <nextStoryPointId>51b8a364-9be7-4ca3-8cb9-c7145db963dd</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_crichell_bloodname_restore" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>6b1de6f1-0b5f-4083-b7e8-9769131f2fa6</id>
+      <title>Bloodname Trial</title>
+      <narrative>
+        *Crichell narrows his eyes at your unorthodox answer.*
+
+        Your claims are of merit and have been verified. You shall now face your first opponent.
+
+        *Crichell waves you forward to where five Wolf warriors stand in a line.*
+      </narrative>
+      <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+      <nextStoryPointId>51b8a364-9be7-4ca3-8cb9-c7145db963dd</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_crichell_bloodname_killer" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>7f4fd8f2-b024-4194-a119-478d81a6517d</id>
+      <title>Bloodname Trial</title>
+      <narrative>
+        *Crichell is visibly surprised by your lack of decorum. For a second, you can see he is reconsidering. Then he regains his composure.*
+
+        Your claims are of merit and have been verified. You shall now face your first opponent.
+
+        *Crichell waves you forward to where five Wolf warriors stand in a line.*
+      </narrative>
+      <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+      <nextStoryPointId>51b8a364-9be7-4ca3-8cb9-c7145db963dd</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_mathius_defend_natasha" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>11a5ef16-a675-4863-8127-cf4e8e30001c</id>
@@ -3447,7 +3530,7 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>db3bf2ba-7dda-456b-a1c9-d47d5ddbe08d</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="narr_louisa_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_louisa_victory" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>c7791fb6-3013-4489-9dc8-1483002c3f05</id>
       <title>Victory</title>
       <narrative>
@@ -3956,6 +4039,110 @@ This is a story arc in active development. Try at your own risk!
         <filename>splash-postbattle.jpg</filename>
       </storySplash>
       <nextStoryPointId>f01196d7-4b66-4a23-9201-c48b44ad30b5</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_blood_trial1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>a7be7384-5642-4045-bd32-1c79fd3b1e3f</id>
+      <title>Bloodname Trial</title>
+      <narrative>
+        *You step forward to meet your first opponent, a heavily muscled mechwarrior. You hear Khan Crichell behind you.*
+
+        Why are you worthy of the {bloodname} bloodname?
+
+        *The mechwarrior responds.*
+
+        I am Star Commander Marketta. I represent fourteen who are not worthy.
+
+        *The Star Commander looks at you expectantly. You tap her lightly on the shoulder. She turns to the side and kneels.*
+
+        *Because of what you have done for the Clan, none wish to stand against you for a bloodname, but tradition must still be honored. You continue through the next four warriors in the same fashion.*
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
+        <bloodname>bloodname</bloodname>
+        <assignKeyBloodname>true</assignKeyBloodname>
+      </storyTrigger>
+      <personalityId>682a21b2-206d-4ee9-b8bd-7c31b5e23696</personalityId>
+      <nextStoryPointId>ba403c01-23fe-46a1-b47a-dafc49b1eedf</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_blood_trial1_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>94463c00-1796-44e5-96a7-3d0899614e19</id>
+      <title>Bloodname Trial</title>
+      <narrative>
+        *You step forward to meet your first opponent, who is none other than Star Commander Mathius. You hear Khan Crichell behind you.*
+
+        Why are you worthy of the {bloodname} bloodname?
+
+        *Mathius responds.*
+
+        I am Star Commander Mathius. I represent fourteen who are not worthy.
+
+        *Mathius looks at you expectantly. You tap him lightly on the shoulder. He turns to the side and kneels.*
+
+        *Because of what you have done for the Clan, none wish to stand against you for a bloodname, but tradition must still be honored. You continue through the next four warriors in the same fashion.*
+      </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+        <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
+        <bloodname>bloodname</bloodname>
+        <assignKeyBloodname>true</assignKeyBloodname>
+      </storyTrigger>
+      <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+      <nextStoryPointId>ba403c01-23fe-46a1-b47a-dafc49b1eedf</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_blood_trial2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>ba403c01-23fe-46a1-b47a-dafc49b1eedf</id>
+      <title>Bloodname Trial</title>
+      <narrative>
+        Another of your number has been blooded. I present to you {commander}.
+
+        *Many voices rise in unison.*
+
+        Seyla!
+
+        *As you stand on the stage, You see Vlad rise and stand before Crichell. The ritual is repeated as Vlad is awarded a bloodname as well. Unlike you, he takes the opportunity to brutalize each of the warriors he defeats. Soon he stands on the stage next to you as Vladimir Ward.*
+
+        Your clan is now without a Khan. Who should lead the Wolves?
+      </narrative>
+      <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+      <nextStoryPointId>1093f0ff-80bb-4fc1-9f66-98d854fbcbc0</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_khan_nomination1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1093f0ff-80bb-4fc1-9f66-98d854fbcbc0</id>
+      <title>Who will be Khan?</title>
+      <narrative>
+        I nominate Star Captain Vlad Ward as Khan and {commander} as saKhan.
+      </narrative>
+      <personalityId>682a21b2-206d-4ee9-b8bd-7c31b5e23696</personalityId>
+      <nextStoryPointId>21436e3c-d2d8-4cd3-984c-1f35a8ff6bcd</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_khan_nomination2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>21436e3c-d2d8-4cd3-984c-1f35a8ff6bcd</id>
+      <title>Who will be Khan?</title>
+      <narrative>
+        Vey well. Are there any other nominations.
+
+        *The hall is silent.*
+
+        All those in favor of this nomination, raise your voice.
+
+        *As one, all those in the hall exclaim "Aye."*
+
+        Then let it be recorded. I present to you Khan Vladimir Ward and saKhan {commanderName}.
+      </narrative>
+      <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+      <nextStoryPointId>ceb45c59-51eb-4c8d-b4b2-00abb7104939</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_wotan_khan_nomination3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>ceb45c59-51eb-4c8d-b4b2-00abb7104939</id>
+      <title>You Lead, but to Where?</title>
+      <narrative>
+        *As the crowd cheers, you look across at Vlad who has a steely look in his eyes.*
+
+        *You have restored your Clan, but much is yet uncertain. Your clan is diminished and will need to rebuild its strength while others will sense its weakness. Khan Ward will likely wish to resume the march to Terra soon. Will you join or oppose him? That will be your decision to make in the years to come. For now, you will bask in the glory of all that you have accomplished.*
+
+        Seyla!
+      </narrative>
+      <personalityId>b1326a7f-0fdf-4da5-92a8-b1e927d1ded2</personalityId>
+      <nextStoryPointId>508d4c18-54ba-41b1-a751-dec92f0d7b1f</nextStoryPointId>
     </storyPoint>
     <!-- Travel Story Events -->
     <storyPoint name="travel_sudeten" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
@@ -8952,6 +9139,14 @@ This is a story arc in active development. Try at your own risk!
         <filename>Vlad.jpg</filename>
       </portrait>
     </personality>
+    <personality name="vlad_khan">
+      <id>b1326a7f-0fdf-4da5-92a8-b1e927d1ded2</id>
+      <title>Khan Vladimir Ward</title>
+      <portrait>
+        <category></category>
+        <filename>Vlad.jpg</filename>
+      </portrait>
+    </personality>
     <personality name="marco_hall">
       <id>8408467a-9131-4d3e-83f7-6f1722cbb9a9</id>
       <title>Star Colonel Marco Hall</title>
@@ -9022,6 +9217,14 @@ This is a story arc in active development. Try at your own risk!
       <portrait>
         <category></category>
         <filename>Crichell.jpg</filename>
+      </portrait>
+    </personality>
+    <personality name="marketta">
+      <id>682a21b2-206d-4ee9-b8bd-7c31b5e23696</id>
+      <title>Star Commander Marketta</title>
+      <portrait>
+        <category>Female/MechWarrior</category>
+        <filename>MW_F_4.png</filename>
       </portrait>
     </personality>
   </personalities>
