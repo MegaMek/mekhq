@@ -336,6 +336,10 @@ public class CampaignGUI extends JPanel {
                 }
             }
             MekHQ.unregisterHandler(this);
+            // check for a loaded story arc and unregister that handler as well
+            if (null != getCampaign().getStoryArc()) {
+                MekHQ.unregisterHandler(getCampaign().getStoryArc());
+            }
         });
         menuFile.add(menuLoad);
 
