@@ -296,6 +296,7 @@ class GameThread extends Thread implements CloseClientListener {
         int i = 0;
         int j = 1;
         String lastType = "";
+        String lanceName = RandomCallsignGenerator.getInstance().generate();
         List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
         AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
         int lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
@@ -312,19 +313,21 @@ class GameThread extends Thread implements CloseClientListener {
                 continue;
             }
             if ((i != 0)
-                    && lastType != entity.getEntityMajorTypeName(entity.getEntityType())) {
+                    && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
                 j++;
+                lanceName = RandomCallsignGenerator.getInstance().generate();
                 i = j * lanceSize;
             }
 
             lastType = entity.getEntityMajorTypeName(entity.getEntityType());
             entity.setOwner(botClient.getLocalPlayer());
-            String fName = String.format(forceName, RandomCallsignGenerator.getInstance().generate(), j);
+            String fName = String.format(forceName, lanceName, j);
             entity.setForceString(fName);
             entities.add(entity);
             i++;
             if (i % lanceSize == 0) {
                 j++;
+                lanceName = RandomCallsignGenerator.getInstance().generate();
             }
         }
 
