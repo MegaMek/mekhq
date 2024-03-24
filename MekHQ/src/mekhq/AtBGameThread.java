@@ -401,6 +401,7 @@ public class AtBGameThread extends GameThread {
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         } finally {
+            swingGui.setDisconnectQuietly(true);
             client.die();
             client = null;
             swingGui = null;

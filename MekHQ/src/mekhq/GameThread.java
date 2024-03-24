@@ -236,6 +236,7 @@ class GameThread extends Thread implements CloseClientListener {
         } catch (Exception e) {
             LogManager.getLogger().error("", e);
         } finally {
+            swingGui.setDisconnectQuietly(true);
             client.die();
             client = null;
             swingGui = null;
