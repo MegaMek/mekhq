@@ -296,7 +296,8 @@ class GameThread extends Thread implements CloseClientListener {
         int i = 0;
         int j = 1;
         String lastType = "";
-        String lanceName = RandomCallsignGenerator.getInstance().generate();
+        final RandomCallsignGenerator RCG = RandomCallsignGenerator.getInstance();
+        String lanceName = RCG.generate();
         List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
         AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
         int lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
@@ -305,7 +306,7 @@ class GameThread extends Thread implements CloseClientListener {
         }
         Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
         comp = comp.thenComparing(((Entity e) -> e.getDeployRound()));
-        comp = comp.thenComparing(((Entity e) -> e.getWeight()));
+        comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
         comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
         entitiesSorted.sort(comp);
         for (Entity entity : entitiesSorted) {
@@ -315,7 +316,7 @@ class GameThread extends Thread implements CloseClientListener {
             if ((i != 0)
                     && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
                 j++;
-                lanceName = RandomCallsignGenerator.getInstance().generate();
+                lanceName = RCG.generate();
                 i = j * lanceSize;
             }
 
@@ -327,7 +328,7 @@ class GameThread extends Thread implements CloseClientListener {
             i++;
             if (i % lanceSize == 0) {
                 j++;
-                lanceName = RandomCallsignGenerator.getInstance().generate();
+                lanceName = RCG.generate();
             }
         }
 
