@@ -85,6 +85,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     private boolean editOrigin;
     private boolean editBirthday;
     private boolean editGender;
+    private boolean limitFaction;
     private CreateCharacterDialog.NameRestrictions nameRestrictions;
 
     /** ids to assign person to unit and force **/
@@ -106,6 +107,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         editOrigin = false;
         editBirthday = false;
         editBirthday = false;
+        limitFaction = false;
         nameRestrictions = CreateCharacterDialog.NameRestrictions.NONE;
 
     }
@@ -176,7 +178,8 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         super.start();
         Person person = createPerson();
         final CreateCharacterDialog personDialog = new CreateCharacterDialog(null, true, person,
-                getCampaign(), xpPool, instructions, editOrigin, editBirthday, editGender, nameRestrictions);
+                getCampaign(), xpPool, instructions, editOrigin, editBirthday, editGender, nameRestrictions,
+                limitFaction);
         getCampaign().importPerson(person);
         personDialog.setVisible(true);
         if(null != assignedUnitId) {
@@ -231,6 +234,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "editOrigin", editOrigin);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "editBirthday", editBirthday);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "editGender", editGender);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "limitFaction", limitFaction);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "nameRestrictions", nameRestrictions.name());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "instructions", instructions);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "edge", edge);
@@ -283,6 +287,8 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                     editBirthday = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }  else if (wn2.getNodeName().equalsIgnoreCase("editGender")) {
                     editGender = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("limitFaction")) {
+                    limitFaction = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }  else if (wn2.getNodeName().equalsIgnoreCase("nameRestrictions")) {
                     nameRestrictions = CreateCharacterDialog.NameRestrictions.valueOf(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("instructions")) {

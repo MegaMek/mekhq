@@ -71,6 +71,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private boolean editOrigin;
     private boolean editBirthday;
     private boolean editGender;
+    private boolean limitFaction;
     private NameRestrictions nameRestrictions;
 
     private String instructions;
@@ -122,7 +123,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     /** Creates new form CustomizePilotDialog */
     public CreateCharacterDialog(JFrame parent, boolean modal, Person person, Campaign campaign,
                                  int xpPool, String instructions, boolean editOrigin, boolean editBirthday,
-                                 boolean editGender, NameRestrictions nameRestrictions) {
+                                 boolean editGender, NameRestrictions nameRestrictions, boolean limitFaction) {
         super(parent, modal);
         this.campaign = campaign;
         this.frame = parent;
@@ -134,6 +135,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         this.instructions = instructions;
         this.xpPool = xpPool;
         initializePilotAndOptions();
+        chkOnlyOurFaction.setSelected(limitFaction);
+        filterPlanetarySystemsForOurFaction(chkOnlyOurFaction.isSelected());
         setLocationRelativeTo(parent);
         try {
             setUserPreferences();
