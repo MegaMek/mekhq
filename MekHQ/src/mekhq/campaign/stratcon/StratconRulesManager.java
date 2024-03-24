@@ -1431,9 +1431,14 @@ public class StratconRulesManager {
                     StratconFacility facility = track.getFacility(scenario.getCoords());
 
                     boolean victory = rst.getScenario().getStatus().isOverallVictory();
+                    boolean draw = rst.getScenario().getStatus().isDraw();
 
                     if (scenario.isRequiredScenario()) {
-                        campaignState.updateVictoryPoints(victory ? 1 : -1);
+                        if (draw) {
+                            // do nothing
+                        } else {
+                            campaignState.updateVictoryPoints(victory ? 1 : -1);
+                        }
                     }
 
                     // this must be done before removing the scenario from the track
