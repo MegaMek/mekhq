@@ -1726,8 +1726,11 @@ This is a story arc in active development. Try at your own risk!
 
         I will get to work on it right away. We should have your mech ready for combat shortly. Give him hell, {commanderRank}!
       </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
       <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
-      <nextStoryPointId></nextStoryPointId>
+      <nextStoryPointId>c70ab29f-30e8-4ea6-b197-30ca19b689c6</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tech_choice_timber_wolf" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>22022055-60b6-4ef7-b23a-c0e1bcdb6251</id>
@@ -1737,8 +1740,11 @@ This is a story arc in active development. Try at your own risk!
 
         I will get to work on it right away. We should have your mech ready for combat shortly. Give him hell, {commanderRank}!
       </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
       <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
-      <nextStoryPointId></nextStoryPointId>
+      <nextStoryPointId>c70ab29f-30e8-4ea6-b197-30ca19b689c6</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tech_choice_timber_wolf" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>309d5bad-135d-4f4e-a058-95ae9ce61e0a</id>
@@ -1748,8 +1754,11 @@ This is a story arc in active development. Try at your own risk!
 
         I will get to work on it right away. We should have your mech ready for combat shortly. Give him hell, {commanderRank}!
       </narrative>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
+        <tab>BRIEFING_ROOM</tab>
+      </storyTrigger>
       <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
-      <nextStoryPointId></nextStoryPointId>
+      <nextStoryPointId>c70ab29f-30e8-4ea6-b197-30ca19b689c6</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tech_bloodname_trial" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>955ee81c-b23e-48a7-a4ab-5187ba0d9eeb</id>
@@ -4098,6 +4107,16 @@ This is a story arc in active development. Try at your own risk!
           <nextStoryPointId>7c261b19-8633-4e4d-9fe3-f113869f0abe</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="mission_trial_refusal" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>c70ab29f-30e8-4ea6-b197-30ca19b689c6</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>Trial of Refusal</name>
+        <type>Clan Trial</type>
+        <systemId>Wotan</systemId>
+        <desc>You fight against Vandervahn Chistu to repudiate his claim to Absorb the Wolf Clan. If you win, Clan Wolf will live on.</desc>
+      </mission>
+      <scenarioStoryPointId>9510b66b-faee-439a-8642-f173e5a49c52</scenarioStoryPointId>
     </storyPoint>
     <!-- Scenarios -->
     <storyPoint name="scenario_colmar_cutting_teeth" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
@@ -8626,6 +8645,130 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
         <missionStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</missionStoryPointId>
+        <missionStatus>FAILED</missionStatus>
+      </storyTrigger>
+    </storyPoint>
+    <storyPoint name="scenario_trial_refusal" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>9510b66b-faee-439a-8642-f173e5a49c52</id>
+      <missionStoryPointId>c70ab29f-30e8-4ea6-b197-30ca19b689c6</missionStoryPointId>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Trial of Refusal</name>
+        <desc>
+          You can hear the roar of the crowd. Many have gathered here to watch this epic battle between yourself and saKhan Vandervahn Chistu. Among the spectators will be many who were formerly of Clan Wolf and would like nothing better than to return.
+
+          Its time to suit up and finish this.
+        </desc>
+        <start>6</start>
+        <usingFixedMap>true</usingFixedMap>
+        <mapSize>25,25</mapSize>
+        <map>/unofficial/Jakes Map Pack/25x25 Tilting Grounds</map>
+        <scenarioDeploymentLimit>
+          <quantityLimit>1</quantityLimit>
+          <quantityType>ABSOLUTE</quantityType>
+          <countType>UNIT</countType>
+          <allowedUnitTypes>
+            <allowedUnitType>0</allowedUnitType>
+          </allowedUnitTypes>
+          <requiredPersonnel>2cd38bed-c6e3-4245-83e7-cb9827886372</requiredPersonnel>
+        </scenarioDeploymentLimit>
+        <botForce>
+          <name>saKhan Vandervahn Chistu</name>
+          <team>2</team>
+          <start>2</start>
+          <camoCategory>Clans/Jade Falcon</camoCategory>
+          <camoFileName>Turkina Keshik.jpg</camoFileName>
+          <entities>
+            <entity chassis="Gladiator (Executioner)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="554b8a27-d760-4cf0-ad8a-e19d375a6501" quirks="distracting">
+              <pilot size="1" name="saKhan Vandervahn Chistu" nick="" gender="MALE" gunnery="2" piloting="2" artillery="4" externalId="67b64800-159f-4a6e-ab02-6af136fbbf14" portraitFile="Vandervahn.jpg" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
+              The first slot in a location is at index="1".
+              <location index="2"> Right Torso
+                <slot index="7" type="Clan Machine Gun Ammo - Full" shots="200"/>
+              </location>
+              <location index="3"> Left Torso
+                <slot index="3" type="Clan Gauss Ammo" shots="8"/>
+                <slot index="4" type="Clan Gauss Ammo" shots="8"/>
+              </location>
+            </entity>
+          </entities>
+          <behaviorSettings>
+            <name>CAUTION</name>
+            <forcedWithdrawal>false</forcedWithdrawal>
+            <goHome>false</goHome>
+            <autoFlee>false</autoFlee>
+            <destinationEdge>1</destinationEdge>
+            <fallShameIndex>6</fallShameIndex>
+            <hyperAggressionIndex>4</hyperAggressionIndex>
+            <selfPreservationIndex>7</selfPreservationIndex>
+            <herdMentalityIndex>5</herdMentalityIndex>
+            <braveryIndex>4</braveryIndex>
+            <strategicTargets/>
+          </behaviorSettings>
+        </botForce>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>saKhan Vandervahn Chistu</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimit>0</timeLimit>
+          <timeLimitType>None</timeLimitType>
+          <description>Destroy the following units:</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Destroy</objectiveCriterion>
+          <percentage>100</percentage>
+        </scenarioObjective>
+        <scenarioObjective>
+          <associatedForceNames>
+            <associatedForceName>Player</associatedForceName>
+          </associatedForceNames>
+          <successEffects>
+            <successEffect>
+              <effectType>ScenarioVictory</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </successEffect>
+          </successEffects>
+          <failureEffects>
+            <failureEffect>
+              <effectType>ScenarioDefeat</effectType>
+              <effectScaling>Fixed</effectScaling>
+              <howMuch>1</howMuch>
+            </failureEffect>
+          </failureEffects>
+          <additionalDetails/>
+          <description>Preserve your own forces</description>
+          <destinationEdge>NONE</destinationEdge>
+          <objectiveCriterion>Preserve</objectiveCriterion>
+          <percentage>100</percentage>
+          <timeLimit>0</timeLimit>
+          <timeLimitAtMost>true</timeLimitAtMost>
+          <timeLimitType>None</timeLimitType>
+        </scenarioObjective>
+      </scenario>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>c70ab29f-30e8-4ea6-b197-30ca19b689c6</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>c70ab29f-30e8-4ea6-b197-30ca19b689c6</missionStoryPointId>
         <missionStatus>FAILED</missionStatus>
       </storyTrigger>
     </storyPoint>
