@@ -1416,7 +1416,7 @@ This is a story arc in active development. Try at your own risk!
     </storyPoint>
     <storyPoint name="choice_vlad_wake_up" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>f01196d7-4b66-4a23-9201-c48b44ad30b5</id>
-      <title></title>
+      <title>You Awaken</title>
       <question>
         {commander}? .... Wake up, {commanderRank}! That is an order!
 
@@ -1429,17 +1429,17 @@ This is a story arc in active development. Try at your own risk!
       <choice id="great">I have never felt better.</choice>
       <choice id="terrible">I feel like I have been disassembled and put back together by a poorly trained *freebirth* tech.</choice>
       <choice id="heaven">Am I dead? If this is heaven, why are you here?</choice>
-      <!-- <storyOutcomes>
+      <storyOutcomes>
         <storyOutcome result="great">
-          <nextStoryPointId></nextStoryPointId>
+          <nextStoryPointId>6a028375-20f6-4a56-8b11-f9b2685f45d0</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="terrible">
-          <nextStoryPointId></nextStoryPointId>
+          <nextStoryPointId>28a036e8-e077-4e69-beee-c050c9fcb325</nextStoryPointId>
         </storyOutcome>
         <storyOutcome result="heaven">
-          <nextStoryPointId></nextStoryPointId>
+          <nextStoryPointId>4221987e-8a7b-4531-a0df-c240e36dd79a</nextStoryPointId>
         </storyOutcome>
-      </storyOutcomes>-->
+      </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
         <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
         <hits>0</hits>
@@ -1451,6 +1451,148 @@ This is a story arc in active development. Try at your own risk!
         <days>4</days>
       </storyTrigger>
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_vlad_medbay_alive" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>16b9c7c6-3d6c-4570-b098-f84adf27b601</id>
+      <title>State of Things</title>
+      <question>
+        By eliminating Ulric and absorbing a clan, Chistu is clearly aiming for the Ilkhanship. But he has reached too far. By murdering Ulric in such a treacherous manner he betrayed the principles of the Clans. The Jade Falcons are the most hide-bound of all the Clans. If evidence of his treachery is found, his own Clan will tear him to pieces.
+      </question>
+      <choice id="damning">If this evidence is so damning, then how are you and I still alive?</choice>
+      <choice id="fool">He is a fool not to have covered his tracks better.</choice>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>89331f12-c127-4252-a7ff-7fb61c4a4584</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="choice_vlad_medbay_review3" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>0d3d71c0-8be6-4571-b362-ecf2609fb8f8</id>
+      <title>State of Things</title>
+      <question>
+        *You slowly get to your feet. You feel slightly woozy, but are surprised to find no broken bones.*
+
+        You can stand. You must come with me. A private meeting with the Jade Falcon Khans awaits us. We will present this evidence to Elias Crichell and challenge Chistu to a Trial of Refusal.
+      </question>
+      <choice id="why_grant">Why would Khan Crichell grant such a private meeting?</choice>
+      <choice id="clan_council">Why not just take this evidence to the full Clan Council?</choice>
+      <storyOutcomes>
+        <storyOutcome result="why_grant">
+          <nextStoryPointId>080173b6-968c-456b-b6cb-835ee2b4042b</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="clan_council">
+          <nextStoryPointId>6a60d7d7-0fd2-408f-b865-1559c08c006b</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_vlad_meeting_khans4" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>39769596-c6c7-41a9-abc8-73bea446e8f6</id>
+      <title>Meeting with Khans</title>
+      <question>
+        *Now it is Vlad's turn to object.*
+
+        What!? Neg! I offered the challenge and I can fight! Chistu must fight me!
+      </question>
+      <choice id="mine">You are in no shape to fight, Vlad. I can handle this one.</choice>
+      <choice id="yours">The challenge was issued by Vlad. He should be the one to fight.</choice>
+      <storyOutcomes>
+        <storyOutcome result="mine">
+          <nextStoryPointId>78acf75d-46b5-40f6-908d-540f536206b1</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="yours">
+          <nextStoryPointId>4bace4f7-600e-451d-84ff-6bcdb1a737bf</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_crichell_khan_meeting1" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>ba4c65a1-ad0f-4ef8-9f5f-1e7f92251584</id>
+      <title>Meeting with Khans</title>
+      <question>
+        They dispute your telling of how Ulric Kerensky died, Vandervahn.
+
+        *Vandervahn's face becomes pale. Elias Crichell looks toward you.*
+
+        You also claimed to witness this event. What did you see?
+      </question>
+      <choice id="treachery">Khan Chistu used a targeting laser to send overwhelming indirect missile fired at Ulric's mech after an individual trial had been declared.</choice>
+      <choice id="murder">This *stravag* lured Ulric into the open and murdered him with indirect missile fire after declaring an individual trial.</choice>
+      <nextStoryPointId>4a547ba9-8672-4296-9bed-64f7d4404158</nextStoryPointId>
+      <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_trial_mech" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>12480bac-61db-4ba1-ae33-f84bc4404765</id>
+      <title>Which Mech?</title>
+      <question>
+        *You step into an assigned mech bay to prepare for the Trial and are surprised when your chief tech is there to greet you.*
+
+        Greetings, {commander}. Since the battle, they have me working as a bondsman tech, but I was just ordered to get over to this mech bay on the double to support you for a Trial. Scuttlebut says it is to get our Clan back. I sure as hell hope so, because this Falcon jumpsuit itches like you would not believe.
+
+        Anyway, first thing we need to do is get you a mech. Your opponent is going to be in a *Executioner* although I do not know the configuration. If you want to go for a similar assault mech, I could put you in a *Warhawk*. Alternatively, I could put you in something a little lighter, faster, and more iconic like the *Timber Wolf*. If you want to really go for speed, I can put you in a *Stormcrow* and you can try to run circles around him.
+
+        So, what will it be?
+      </question>
+      <choice id="warhawk_prime">Warhawk Prime</choice>
+      <choice id="warhawk_a">Warhawk A</choice>
+      <choice id="warhawk_b">Warhawk B</choice>
+      <choice id="warhawk_c">Warhawk C</choice>
+      <choice id="warhawk_d">Warhawk D</choice>
+      <choice id="timber_wolf_prime">Timber Wolf Prime</choice>
+      <choice id="timber_wolf_a">Timber Wolf A</choice>
+      <choice id="timber_wolf_b">Timber Wolf B</choice>
+      <choice id="timber_wolf_c">Timber Wolf C</choice>
+      <choice id="timber_wolf_d">Timber Wolf D</choice>
+      <choice id="stormcrow_prime">Stormcrow Prime</choice>
+      <choice id="stormcrow_a">Stormcrow A</choice>
+      <choice id="stormcrow_b">Stormcrow B</choice>
+      <choice id="stormcrow_c">Stormcrow C</choice>
+      <choice id="stormcrow_d">Stormcrow D</choice>
+      <storyOutcomes>
+        <storyOutcome result="warhawk_prime">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="warhawk_a">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="warhawk_b">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="warhawk_c">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="warhawk_d">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="timber_wolf_prime">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="timber_wolf_a">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="timber_wolf_b">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="timber_wolf_c">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="timber_wolf_d">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="stormcrow_prime">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="stormcrow_a">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="stormcrow_b">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="stormcrow_c">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="stormcrow_d">
+          <nextStoryPointId></nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
     </storyPoint>
     <!-- Narrative story events -->
     <storyPoint name="narr_colmar_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -2295,6 +2437,90 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
       <nextStoryPointId>098ff77b-519e-4448-8d63-a2748107ce78</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_vandervahn_khan_meeting1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>037af725-8483-4e9d-b9b7-acb944eacd86</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        *Some time later, you sit in Khan Elias Crichell's private chambers. Across from you sit the two Jade Falcon Khans. Vandervahn Chistu regards you both with a contemptous air. He looks at Vlad.*
+
+        So you are the last Wolf? I do not believe we have met before.
+      </narrative>
+      <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
+      <nextStoryPointId>e879bd97-15f5-4bd7-98b5-31e437279150</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vandervahn_khan_meeting2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>4a547ba9-8672-4296-9bed-64f7d4404158</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        *Chistu stands angrily.*
+
+        These are outrageous lies! I have been dishonored by these insults!
+      </narrative>
+      <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
+      <nextStoryPointId>5d72e3f7-ecc1-404c-9bec-5ac34c8bcb2c</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vandervahn_khan_meeting3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>7c0723f2-cc3d-46b9-9cc3-803e029ecd65</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        Disputing the nature of Ulric's death?
+      </narrative>
+      <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
+      <nextStoryPointId>74989b09-bcb5-4806-8e01-ccea7782782d</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vandervahn_khan_meeting4" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>a934b5ab-dca5-4137-93c8-e9df3f7d11d1</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        Then we shall have a Trial of Refusal. The fight will be to settle the issue of Absorption.
+      </narrative>
+      <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
+      <nextStoryPointId>eb80b53a-2b6d-47ac-a87d-419470a9b89e</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vandervahn_khan_meeting5" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>6d88506c-48fe-4de7-b7a8-2b348e14f023</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        *I* am a Khan as well, in case you have forgotten, Elias. *I* grant this request to challenge me over the absorption.
+
+        *Chistu looks disparaginly at Vlad.*
+
+        However, I cannot fight a crippled warrior, nor wait for your recovery. I must fight your second instead.
+
+        *Chistu nods in your direction.*
+      </narrative>
+      <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
+      <nextStoryPointId>39769596-c6c7-41a9-abc8-73bea446e8f6</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vandervahn_khan_meeting6" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>78acf75d-46b5-40f6-908d-540f536206b1</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        Bargained well and done. It is settled. We shall fight in a Trial of Refusal. There is no need to delay any longer, let us finish it today. After I crush you, the Wolves will finally be dead. I will see you on the battlefield.
+
+        *Chistu sweeps from the room.*
+      </narrative>
+      <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
+      <nextStoryPointId>965c6cc7-cc4b-4477-8af6-9c8367e87f63</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_crichell_khan_meeting2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>eb80b53a-2b6d-47ac-a87d-419470a9b89e</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        No! I never agreed to such a thing when I granted permission for this battle to take place. I revoke that permission and without it, a Khan cannot be challenged.
+      </narrative>
+      <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+      <nextStoryPointId>6d88506c-48fe-4de7-b7a8-2b348e14f023</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_crichell_khan_meeting3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>4bace4f7-600e-451d-84ff-6bcdb1a737bf</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        On this issue, I am in agreement with saKhan Chistu. Vlad is in no condition to participate in a Trial. {commander}, you will fight for the survival of your Clan. The Trial will commence as soon as we are able to arrange it. You best prepare.
+      </narrative>
+      <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+      <nextStoryPointId>965c6cc7-cc4b-4477-8af6-9c8367e87f63</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_mathius_defend_natasha" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>11a5ef16-a675-4863-8127-cf4e8e30001c</id>
       <title>A Disgrace?</title>
@@ -3075,6 +3301,123 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
       <nextStoryPointId>23e6b17d-376f-49c6-82d0-f014b45301ed</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_medbay_great" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>6a028375-20f6-4a56-8b11-f9b2685f45d0</id>
+      <title>You Awaken</title>
+      <narrative>
+        Excellent, because I have need of you.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>1a48a701-ac13-4957-8e8c-6ecf79b40581</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_medbay_terrible" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>28a036e8-e077-4e69-beee-c050c9fcb325</id>
+      <title>You Awaken</title>
+      <narrative>
+        Yes, that is how I felt after spending four days buried in my *Timber Wolf* with two broken limbs. The doctors tell me all your limbs are intact. So get up, warrior, as I have need of you.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>1a48a701-ac13-4957-8e8c-6ecf79b40581</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_medbay_heaven" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>4221987e-8a7b-4531-a0df-c240e36dd79a</id>
+      <title>You Awaken</title>
+      <narrative>
+        Your Spheroid sense of humor was not affected apparently. You are not dead, and our work is not done. Get up, I have need of you.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>1a48a701-ac13-4957-8e8c-6ecf79b40581</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_medbay_review" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>1a48a701-ac13-4957-8e8c-6ecf79b40581</id>
+      <title>State of Things</title>
+      <narrative>
+        After he treacherously murdered Ulric, saKhan Vandervahn Chistu claimed that this whole Trial of Refusal was actually a Trial of Absorption. The Wolves who followed the *stravag* Phelan with their tails between their legs have been Abjured. If we remaining Wolves are Absorbed, then Clan Wolf will cease to exist. You and I are going to ensure that does not happen.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>16b9c7c6-3d6c-4570-b098-f84adf27b601</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_medbay_review2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>89331f12-c127-4252-a7ff-7fb61c4a4584</id>
+      <title>State of Things</title>
+      <narrative>
+        *Vlad offers a predatory smile.*
+
+        He assumed I was dead, after being buried under a building. He ordered his troops to kill you and your trinary to the last man. In this, he underestimated the resolve of the Wolf.
+
+        I survived and was freed by a salvage team. You fought so bravely that you earned the respect of the Star Colonel leading the assault. He refused to kill your warriors needlessly.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>0d3d71c0-8be6-4571-b362-ecf2609fb8f8</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_medbay_why_grant" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>080173b6-968c-456b-b6cb-835ee2b4042b</id>
+      <title>State of Things</title>
+      <narrative>
+        Because Khan Crichell sees Vandervahn Chistu as a threat to his own goal of the Ilkhanship. He will shed no tears were Chistu to die.
+
+        Chistu himself would give anything to avoid the evidence of his treachery becoming public. I intend to use that to get my Clan back.
+
+        Come, we must not be late!
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>037af725-8483-4e9d-b9b7-acb944eacd86</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_medbay_clan_council" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>6a60d7d7-0fd2-408f-b865-1559c08c006b</id>
+      <title>State of Things</title>
+      <narrative>
+        Because Chistu would give anything to avoid the evidence of his treachery becoming public. I intend to use that to get my Clan back.
+
+        Come, we must not be late!
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>037af725-8483-4e9d-b9b7-acb944eacd86</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_khan_meeting1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>e879bd97-15f5-4bd7-98b5-31e437279150</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        We have not met face-to-face, but I was there on Government Hill when you faced Ulric, as was my companion. I know what you did. I have already told Khan Crichell who has granted me permission to challenge you to personal combat over our differences.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>ba4c65a1-ad0f-4ef8-9f5f-1e7f92251584</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_khan_meeting2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>5d72e3f7-ecc1-404c-9bec-5ac34c8bcb2c</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        *Vlad angrily stands up as well.*
+
+        I demand a Trial of Refusal!
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>7c0723f2-cc3d-46b9-9cc3-803e029ecd65</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_khan_meeting3" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>74989b09-bcb5-4806-8e01-ccea7782782d</id>
+      <title>Meeting with the Khans</title>
+      <narrative>
+        That is the least of our differences. You made a Trial of Refusal into a Trial of Absorption.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>a934b5ab-dca5-4137-93c8-e9df3f7d11d1</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vlad_khan_meeting5" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>965c6cc7-cc4b-4477-8af6-9c8367e87f63</id>
+      <title>Vlad's Wishes</title>
+      <narrative>
+        *As you leave the meeting, Vlad grabs you by the shoulder. His eyes burn through you with anger and frustration.*
+
+        It should have been me.
+
+        *He punches a wall with his cast and then screams in pain. After a few second, he takes a deep and slow breath.*
+
+        The fate of Clan Wolf is all that matters now. You must win this battle for us, {commander}. I have seen you fight and I have no doubts you will make short work of Chistu. May you honor the Clan.
+      </narrative>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>12480bac-61db-4ba1-ae33-f84bc4404765</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_hall_trial_final" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>d0a8c6db-d72d-446f-a05e-ab2b5ec8ab35</id>
@@ -8304,6 +8647,14 @@ This is a story arc in active development. Try at your own risk!
       <portrait>
         <category></category>
         <filename>Vandervahn.jpg</filename>
+      </portrait>
+    </personality>
+    <personality name="elias_crichell">
+      <id>05e7d636-977c-4ab0-a870-39fbb26224c7</id>
+      <title>Khan Elias Crichell</title>
+      <portrait>
+        <category></category>
+        <filename>Crichell.jpg</filename>
       </portrait>
     </personality>
   </personalities>
