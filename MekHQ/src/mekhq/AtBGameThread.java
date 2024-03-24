@@ -21,16 +21,17 @@ package mekhq;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.*;
 import megamek.common.planetaryconditions.PlanetaryConditions;
+import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.force.Lance;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -329,7 +330,7 @@ public class AtBGameThread extends GameThread {
 
                     // chill out while bot is created and connects to megamek
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
-                    configureBot(botClient, bf);
+                    configureBot(botClient, bf, scenario);
 
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
@@ -421,7 +422,7 @@ public class AtBGameThread extends GameThread {
      * @param botClient
      * @param botForce
      */
-    private void configureBot(BotClient botClient, BotForce botForce) {
+    private void configureBot(BotClient botClient, BotForce botForce, Scenario scenario) {
         try {
             // Wait for the server to add the bot client, but allow a timeout rather than blocking
             int retryCount = 0;
@@ -445,16 +446,7 @@ public class AtBGameThread extends GameThread {
 
                 botClient.sendPlayerInfo();
 
-                String forceName = botClient.getLocalPlayer().getName() + "|1";
-                var entities = new ArrayList<Entity>();
-                for (Entity entity : botForce.getFullEntityList(campaign)) {
-                    if (null == entity) {
-                        continue;
-                    }
-                    entity.setOwner(botClient.getLocalPlayer());
-                    entity.setForceString(forceName);
-                    entities.add(entity);
-                }
+                List<Entity> entities = setupEntities(botClient, botForce, scenario);
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception ex) {
