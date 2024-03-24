@@ -146,6 +146,23 @@ This is a story arc in active development. Try at your own risk!
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
       </storyTrigger>
     </storyPoint>
+    <storyPoint name="narr_trial_chistu_death" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>d9e7b352-5b0b-46dd-bb6d-076bfcab99ee</id>
+      <title>End of Your Story</title>
+      <narrative>
+        *Your mech lies sprawled on the ground, nothing but salvage. You hear the footfalls of Chistu's mech as he approaches.*
+
+        It would have been better if you had died when you were supposed to, {commanderRank}. No matter, I will rectify that now.
+
+        *A blast of searing energy is the last thing you remember, as you are burned to atoms. Your story ends here.*
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger">
+      </storyTrigger>
+    </storyPoint>
     <storyPoint name="narr_game_end" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>508d4c18-54ba-41b1-a751-dec92f0d7b1f</id>
       <title>This Journey is Over; Another Begins?</title>
@@ -354,6 +371,16 @@ This is a story arc in active development. Try at your own risk!
         </storyOutcome>
       </storyOutcomes>
       <nextStoryPointId>bf062237-46dc-4661-8764-a4ad41bb6565</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="check_mathius_active4" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
+      <id>0b436f39-88b9-412e-8175-a498cdc7d9bf</id>
+      <personId>02f8af55-9c4f-41d7-8bd1-06b0d784463b</personId>
+      <storyOutcomes>
+        <storyOutcome result="Active">
+          <nextStoryPointId>faafb550-5b99-4b75-bd9b-e1e22201149d</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <nextStoryPointId>236167b3-36a4-4b63-9dd7-0fd60a0f16b8</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_tayyiba_active1" type="mekhq.campaign.storyarc.storypoint.CheckPersonActiveStoryPoint">
       <id>2bf0e5ed-ac89-4e2c-b197-bf8ef7155ce9</id>
@@ -1503,6 +1530,20 @@ This is a story arc in active development. Try at your own risk!
       </storyOutcomes>
       <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
     </storyPoint>
+    <storyPoint name="choice_vlad_victory" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>9f21bea3-7f3a-4c44-975d-4c3b372be5e6</id>
+      <title>Victory</title>
+      <question>
+        *As you strip off your neurohelmet and step out of the cockpit, you see a crowd of people rushing toward you, cheering. Vlad is the first to reach you.*
+
+        You have done it. Perhaps you cut it a little close, but you have done it. Clan Wolf survives and the Truce of Tukayyid is rejected. You and I will lead our Clan to Terra itself!
+      </question>
+      <choice id="terra">To Terra!</choice>
+      <choice id="me">Who said anything about *you*?</choice>
+      <choice id="hold_on">I did not just save the Wolf Clan to leave it in Crusader hands.</choice>
+      <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
+      <nextStoryPointId>35571cd1-791b-4866-a363-02c239714394</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="choice_crichell_khan_meeting1" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>ba4c65a1-ad0f-4ef8-9f5f-1e7f92251584</id>
       <title>Meeting with Khans</title>
@@ -1517,6 +1558,26 @@ This is a story arc in active development. Try at your own risk!
       <choice id="murder">This *stravag* lured Ulric into the open and murdered him with indirect missile fire after declaring an individual trial.</choice>
       <nextStoryPointId>4a547ba9-8672-4296-9bed-64f7d4404158</nextStoryPointId>
       <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
+    </storyPoint>
+    <storyPoint name="choice_vandervahn_end" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>0e8d2968-d803-4563-89fd-306056eb14d0</id>
+      <title>Vandervahn's Fate</title>
+      <question>
+        *As you walk over to Chistu's fallen Executioner, his voice comes across your comm from a tight-beam transmission.*
+
+        You have defeated me. Make me your bondsman. You will find me very resourceful and you will need me to deal with Crichell. He is not to be trusted.
+      </question>
+      <choice id="death">Neg, Chistu. I know that I cannot trust *you*.</choice>
+      <choice id="bondsman">So be it. You will become my bondsman. However, if I detect the slightest treachery, you will be cleaning latrines for the rest of your life.</choice>
+      <storyOutcomes>
+        <storyOutcome result="death">
+          <nextStoryPointId>74ffea73-7160-4a86-ac73-958e89ed4728</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="bondsman">
+          <nextStoryPointId>863a4111-8d00-46eb-a2bc-daa94d9e5bca</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
     </storyPoint>
     <storyPoint name="choice_trial_mech" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
       <id>12480bac-61db-4ba1-ae33-f84bc4404765</id>
@@ -1771,6 +1832,19 @@ This is a story arc in active development. Try at your own risk!
         Good luck, {commanderRank}.
       </narrative>
       <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+    </storyPoint>
+    <storyPoint name="narr_tech_victory" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>35571cd1-791b-4866-a363-02c239714394</id>
+      <title>Victory</title>
+      <narrative>
+        *Before Vlad can respond, you are mobbed by other Wolves ready to offer their congratulations.*
+
+        I told you that was the right mech for the fight! Glad to see you managed to win without totally wrecking my equipment.
+
+        I will be so glad to get this malfing green jumpsuit off. It is definitely not my color.
+      </narrative>
+      <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+      <nextStoryPointId>c7791fb6-3013-4489-9dc8-1483002c3f05</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_arrive_sudeten" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>6622fc78-1d9b-4ab5-a8eb-5696eae49f0d</id>
@@ -2590,6 +2664,34 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>41ebf989-5770-4d11-864a-d7e89e9df1bf</personalityId>
       <nextStoryPointId>965c6cc7-cc4b-4477-8af6-9c8367e87f63</nextStoryPointId>
     </storyPoint>
+    <storyPoint name="narr_vandervahn_death" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>74ffea73-7160-4a86-ac73-958e89ed4728</id>
+      <title>Vandervahn's Fate</title>
+      <narrative>
+        *You fire an alpha strike into the cockpit of Vandervahn's Executioner, leaving a smoking ruin. Whatever final screams he might have made are drowned out by the sounds of metal popping and steam hissing. All that remains is a smoking carcass. Vandervahn Chistu is no more.*
+
+        *As you make your way back into the mech bay, you are dimly aware of a crowd chanting and cheering.*
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <nextStoryPointId>9f21bea3-7f3a-4c44-975d-4c3b372be5e6</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_vandervahn_spared" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>863a4111-8d00-46eb-a2bc-daa94d9e5bca</id>
+      <title>Vandervahn's Fate</title>
+      <narrative>
+        You will not regret it, I swear! With my resourcefulness and cunning and your skills, we will soon rule Clan Wolf.
+
+        *You leave Chistu to be freed by techs that have run onto the field. As you make your way back into the mech bay, you are dimly aware of a crowd chanting and cheering.*
+      </narrative>
+      <storySplash>
+        <category></category>
+        <filename>splash-postbattle.jpg</filename>
+      </storySplash>
+      <nextStoryPointId>9f21bea3-7f3a-4c44-975d-4c3b372be5e6</nextStoryPointId>
+    </storyPoint>
     <storyPoint name="narr_crichell_khan_meeting2" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>eb80b53a-2b6d-47ac-a87d-419470a9b89e</id>
       <title>Meeting with the Khans</title>
@@ -2607,6 +2709,20 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
       <nextStoryPointId>965c6cc7-cc4b-4477-8af6-9c8367e87f63</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_crichell_victory" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>236167b3-36a4-4b63-9dd7-0fd60a0f16b8</id>
+      <title>Victory</title>
+      <narrative>
+        *The crowd parts as Khan Elias Crichell pushes his way through. He wears a smile that does not reach his eyes.*
+
+        Well fought, {commander}. You have a won a Trial of Refusal over the Absoption of the Wolves. I hereby declare Clan Wolf restored, although the cowards who fled into the Inner Sphere will remain Abjured.
+
+        *A cheer goes up from all those around you.*
+
+        You will need to elect new leadership for your clan. I will prepare a Kurultai for that purpose, two days hence.
+      </narrative>
+      <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
     </storyPoint>
     <storyPoint name="narr_mathius_defend_natasha" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>11a5ef16-a675-4863-8127-cf4e8e30001c</id>
@@ -2627,6 +2743,15 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
       <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_mathius_victory" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>faafb550-5b99-4b75-bd9b-e1e22201149d</id>
+      <title>Victory</title>
+      <narrative>
+        Well done, {commander}. You are a great warrior and I will follow you wherever you lead.
+      </narrative>
+      <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
+      <nextStoryPointId>236167b3-36a4-4b63-9dd7-0fd60a0f16b8</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tayyiba_warden_yes" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>3281d606-0b86-41b9-b69a-7b562d7b53b4</id>
@@ -3313,7 +3438,7 @@ This is a story arc in active development. Try at your own risk!
       <personalityId>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</personalityId>
       <nextStoryPointId>2010919f-da33-414d-a8e3-f01603df061c</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="narr_luisa_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+    <storyPoint name="narr_louisa_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2010919f-da33-414d-a8e3-f01603df061c</id>
       <title>Congratulations</title>
       <narrative>
@@ -3321,6 +3446,17 @@ This is a story arc in active development. Try at your own risk!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>db3bf2ba-7dda-456b-a1c9-d47d5ddbe08d</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_louisa_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>c7791fb6-3013-4489-9dc8-1483002c3f05</id>
+      <title>Victory</title>
+      <narrative>
+        Congratulations, {commander}. I had no doubt that you would be victorious. It feels good to be a Wolf again.
+
+        I do not know what the future holds and I know transportation assets get moved around pretty fluidly, but I would be happy to fly around your tin cans in my tin can anytime.
+      </narrative>
+      <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
+      <nextStoryPointId>0b436f39-88b9-412e-8175-a498cdc7d9bf</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_tech_congrats" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>db3bf2ba-7dda-456b-a1c9-d47d5ddbe08d</id>
@@ -4116,6 +4252,14 @@ This is a story arc in active development. Try at your own risk!
         <systemId>Wotan</systemId>
         <desc>You fight against Vandervahn Chistu to repudiate his claim to Absorb the Wolf Clan. If you win, Clan Wolf will live on.</desc>
       </mission>
+      <storyOutcomes>
+        <storyOutcome result="SUCCESS">
+          <nextStoryPointId>0e8d2968-d803-4563-89fd-306056eb14d0</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="FAILED">
+          <nextStoryPointId>d9e7b352-5b0b-46dd-bb6d-076bfcab99ee</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
       <scenarioStoryPointId>9510b66b-faee-439a-8642-f173e5a49c52</scenarioStoryPointId>
     </storyPoint>
     <!-- Scenarios -->
@@ -8055,6 +8199,8 @@ This is a story arc in active development. Try at your own risk!
          ### Hegira/Retreat Conditions
 
          The Jade Falcons will not accept or grant *hegira*. They will operate under forced withdrawal. Due to the nature of the scenario, you may not collect *isorla.*
+
+         If you fail the mission but your commander is not killed, do not check your commander as MIA in the scenario resolution.
         </desc>
         <start>10</start>
         <usingFixedMap>true</usingFixedMap>
