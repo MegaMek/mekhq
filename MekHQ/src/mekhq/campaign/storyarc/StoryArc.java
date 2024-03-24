@@ -220,16 +220,28 @@ public class StoryArc {
 
     @Subscribe
     public void handleNewDay(NewDayEvent ev) {
-        //search through StoryPoints for a matching CheckDateReachedStoryPoint
-        CheckDateReachedStoryPoint storyPoint;
+        // search through StoryPoints for a matching CheckDateReachedStoryPoint
+        CheckDateReachedStoryPoint dateStoryPoint;
         for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             if (entry.getValue() instanceof CheckDateReachedStoryPoint) {
-                storyPoint = (CheckDateReachedStoryPoint) entry.getValue();
-                if (null != storyPoint.getDate() && ev.getCampaign().getLocalDate().equals(storyPoint.getDate())) {
-                    storyPoint.start();
-                    break;
+                dateStoryPoint = (CheckDateReachedStoryPoint) entry.getValue();
+                if (null != dateStoryPoint.getDate() && ev.getCampaign().getLocalDate().equals(dateStoryPoint.getDate())) {
+                    dateStoryPoint.start();
                 }
-
+            }
+        }
+        // search through StoryPoints and see if we have any active waiting story points
+        WaitStoryPoint waitStoryPoint;
+        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+            if (entry.getValue() instanceof WaitStoryPoint) {
+                waitStoryPoint = (WaitStoryPoint) entry.getValue();
+                if(!waitStoryPoint.isActive()) {
+                    continue;
+                }
+                waitStoryPoint.reduceDays();
+                if (waitStoryPoint.getDays() <= 0) {
+                    waitStoryPoint.complete();
+                }
             }
         }
     }

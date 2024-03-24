@@ -83,7 +83,7 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>eeb158a4-0294-477b-8ea9-aae9e4dca46c</nextStoryPointId>
+      <nextStoryPointId>236167b3-36a4-4b63-9dd7-0fd60a0f16b8</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
       <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
     </storyPoint>
@@ -285,64 +285,85 @@ This is a story arc in active development. Try at your own risk!
       <nextStoryPointId>301fadbf-68c5-44ba-9491-413b8e506251</nextStoryPointId>
     </storyPoint>
     <!-- Date reached checks -->
-    <storyPoint name="check_devin_start" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
-      <id>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</id>
-      <nextStoryPointId>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</nextStoryPointId>
-    </storyPoint>
     <storyPoint name="check_baker3_turnover" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>71591078-04e4-4caf-8baa-7851be233ea5</id>
       <nextStoryPointId>79360f28-c082-44f0-831b-83dfceadd09e</nextStoryPointId>
-    </storyPoint>
-    <storyPoint name="check_morges_interlude1" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
-      <id>369c61e2-0448-449d-99e1-6198d2a52b43</id>
-      <nextStoryPointId>2b94122d-d4c2-4891-a397-cab0565bbf02</nextStoryPointId>
-    </storyPoint>
-    <storyPoint name="check_morges_interlude2" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
-      <id>072c70de-1f8e-4e9e-8301-6fb0bae02328</id>
-      <nextStoryPointId>e667428e-4f1a-4ef2-940e-b47a0e7e5ddc</nextStoryPointId>
     </storyPoint>
     <storyPoint name="check_morges_interlude_tayyiba" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
       <id>41a8d936-f02c-47e6-90b1-3c0327a79942</id>
       <nextStoryPointId>d6fb2fdf-d8d7-4a56-b813-6ed5b563c09b</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="check_morges_interlude_bloodname" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+    <!-- Wait story points -->
+    <storyPoint name="wait_devin_start" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
+      <id>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</id>
+      <title>Wait on Devin for further orders</title>
+      <days>2</days>
+      <nextStoryPointId>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="wait_morges_interlude1" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
+      <id>369c61e2-0448-449d-99e1-6198d2a52b43</id>
+      <title>Repair and rearm while awaiting further orders</title>
+      <days>3</days>
+      <nextStoryPointId>2b94122d-d4c2-4891-a397-cab0565bbf02</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="wait_morges_interlude2" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
+      <id>072c70de-1f8e-4e9e-8301-6fb0bae02328</id>
+      <title>Pass time while you travel with Phelan to Broken Hope</title>
+      <days>4</days>
+      <nextStoryPointId>e667428e-4f1a-4ef2-940e-b47a0e7e5ddc</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="wait_morges_interlude_bloodname" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
       <id>430a773a-2ca1-44f6-bd03-ab0ca552a25b</id>
+      <title>Wait while Trial of Bloodright is organized</title>
+      <days>4</days>
       <nextStoryPointId>5e061b82-cff4-4d36-a9f5-12e558c86cd2</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="check_morges_trial_bloodname1" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+    <storyPoint name="wait_morges_trial_bloodname1" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
       <id>ab211686-b377-44f1-afd1-5b4048d412db</id>
-      <nextStoryPointId>1e3fd5e1-8c30-4f8f-a193-1e3332c81f39</nextStoryPointId>
+      <title>Wait for the next round of competition</title>
+      <days>1</days>
+      <nextStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</nextStoryPointId>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
         <tab>BRIEFING_ROOM</tab>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="check_morges_trial_bloodname2" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+    <storyPoint name="wait_morges_trial_bloodname2" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
       <id>d6748828-7b40-4fbf-8b6a-846f2cef51d3</id>
+      <title>Wait for the next round of competition</title>
+      <days>1</days>
       <nextStoryPointId>a1b72ce3-5017-4b42-b2fc-df06e8945ec9</nextStoryPointId>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
         <tab>BRIEFING_ROOM</tab>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="check_morges_trial_bloodname3" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+    <storyPoint name="wait_morges_trial_bloodname3" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
       <id>763e68fa-1fca-478d-ac38-e22e1724cd44</id>
+      <title>Wait for the next round of competition</title>
+      <days>1</days>
       <nextStoryPointId>f85b4569-c9f6-4b20-9702-8525dc391368</nextStoryPointId>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
         <tab>BRIEFING_ROOM</tab>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="check_morges_trial_bloodname4" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+    <storyPoint name="wait_morges_trial_bloodname4" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
       <id>365aee45-7fec-444c-bd27-a53c2166580b</id>
+      <title>Wait for the next round of competition</title>
+      <days>1</days>
       <nextStoryPointId>b3f0df38-defb-40e8-8b8d-5549fa32c782</nextStoryPointId>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
         <tab>BRIEFING_ROOM</tab>
       </storyTrigger>
     </storyPoint>
-    <storyPoint name="check_morges_interlude_kurultai" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+    <storyPoint name="wait_morges_interlude_kurultai" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
       <id>35fabd74-41fa-4472-b409-8a1d0c280418</id>
+      <title>Wait for the Clan Kurultai</title>
+      <days>4</days>
       <nextStoryPointId>581e54c9-abad-47d8-b3ab-a3b566c494eb</nextStoryPointId>
     </storyPoint>
-    <storyPoint name="check_wotan_interlude_kurultai" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+    <storyPoint name="wait_wotan_interlude_kurultai" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
       <id>df9d1e1e-1499-44ca-99ab-8f859d4a5f9a</id>
+      <title>Wait for the Clan Kurultai</title>
+      <days>2</days>
       <nextStoryPointId>0243e946-723c-42d3-ae23-a84597b857ba</nextStoryPointId>
     </storyPoint>
     <!-- Person checks-->
@@ -1981,10 +2002,7 @@ This is a story arc in active development. Try at your own risk!
         We have now arrived at the ball of dust and sand they call Devin. I am going to give the Silver Devils the call up on this one, so you should just stand by in orbit. With luck, we should make short work of the Second Falcon Jaegers stationed on planet.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-        <storyPointId>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</storyPointId>
-        <futureDays>2</futureDays>
-      </storyTrigger>
+      <nextStoryPointId>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_devin_sitep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</id>
@@ -2289,10 +2307,7 @@ This is a story arc in active development. Try at your own risk!
         Now I have something special planned for the Falcons. You should join my forces as we march on the Bay of Broken Hope. I will speak with you more once we arrive.
       </narrative>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-        <storyPointId>072c70de-1f8e-4e9e-8301-6fb0bae02328</storyPointId>
-        <futureDays>4</futureDays>
-      </storyTrigger>
+      <nextStoryPointId>072c70de-1f8e-4e9e-8301-6fb0bae02328</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_morges_convoy_debrief_failure" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>9dff4cbe-4b7b-4725-9820-c1303ad8792e</id>
@@ -2303,10 +2318,7 @@ This is a story arc in active development. Try at your own risk!
         They are regrouping at the Bay of Broken Hope. Before they launch their next offensive, I have something special planned. You should join my forces as we march on the Bay of Broken Hope. I will speak with you more once we arrive.
       </narrative>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-        <storyPointId>072c70de-1f8e-4e9e-8301-6fb0bae02328</storyPointId>
-        <futureDays>4</futureDays>
-      </storyTrigger>
+      <nextStoryPointId>072c70de-1f8e-4e9e-8301-6fb0bae02328</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_wotan_arrive1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>de590e44-731b-44d7-88f4-d828907b1270</id>
@@ -2779,10 +2791,7 @@ This is a story arc in active development. Try at your own risk!
 
         You will need to elect new leadership for your Clan. I will prepare a Kurultai for that purpose, two days hence.
       </narrative>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-        <storyPointId>df9d1e1e-1499-44ca-99ab-8f859d4a5f9a</storyPointId>
-        <futureDays>2</futureDays>
-      </storyTrigger>
+      <nextStoryPointId>df9d1e1e-1499-44ca-99ab-8f859d4a5f9a</nextStoryPointId>
       <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
     </storyPoint>
     <storyPoint name="narr_crichell_bloodname_recite" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -3131,10 +3140,7 @@ This is a story arc in active development. Try at your own risk!
         on you again shortly.
       </narrative>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-        <storyPointId>369c61e2-0448-449d-99e1-6198d2a52b43</storyPointId>
-        <futureDays>3</futureDays>
-      </storyTrigger>
+      <nextStoryPointId>369c61e2-0448-449d-99e1-6198d2a52b43</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_phelan_sitrep_convoy" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>2b94122d-d4c2-4891-a397-cab0565bbf02</id>
@@ -3239,10 +3245,7 @@ This is a story arc in active development. Try at your own risk!
         <storyPointId>41a8d936-f02c-47e6-90b1-3c0327a79942</storyPointId>
         <futureDays>2</futureDays>
       </storyTrigger>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-        <storyPointId>430a773a-2ca1-44f6-bd03-ab0ca552a25b</storyPointId>
-        <futureDays>4</futureDays>
-      </storyTrigger>
+      <nextStoryPointId>430a773a-2ca1-44f6-bd03-ab0ca552a25b</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_phelan_bloodname_no" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>bbc3ffb6-b14a-4f40-99f8-331e61cf2709</id>
@@ -3257,10 +3260,7 @@ This is a story arc in active development. Try at your own risk!
         <storyPointId>41a8d936-f02c-47e6-90b1-3c0327a79942</storyPointId>
         <futureDays>2</futureDays>
       </storyTrigger>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-        <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
-        <futureDays>7</futureDays>
-      </storyTrigger>
+      <nextStoryPointId>35fabd74-41fa-4472-b409-8a1d0c280418</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_phelan_bloodname_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>f873e505-966a-4e87-a77b-dde935388ff1</id>
@@ -3272,10 +3272,6 @@ This is a story arc in active development. Try at your own risk!
 
         Soon, I will address our Touman at a final Kurultai that brings this war to an end and sets a vision for the future. I would like you at my side for this event.
       </narrative>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-        <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
-        <futureDays>3</futureDays>
-      </storyTrigger>
       <nextStoryPointId>a6d27c5d-54e7-40df-829d-4a849b04c315</nextStoryPointId>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
@@ -3286,11 +3282,8 @@ This is a story arc in active development. Try at your own risk!
         It is unfortunate that you were not able to prevail, {commander}. I am sure that you will have the opportunity in the future to claim your bloodright once again. May fate favor you on that day.
 
         Soon, I will address our Touman at a final Kurultai that brings this war to an end and sets a vision for the future. Bloodname or not, I would like you at my side at this event.
-      </narrative>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-        <storyPointId>35fabd74-41fa-4472-b409-8a1d0c280418</storyPointId>
-        <futureDays>3</futureDays>
-      </storyTrigger>
+      </narrative>å
+      <nextStoryPointId>35fabd74-41fa-4472-b409-8a1d0c280418</nextStoryPointId>
       <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
     </storyPoint>
     <storyPoint name="narr_phelan_kurultai1" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -3576,6 +3569,7 @@ This is a story arc in active development. Try at your own risk!
         Congratulations, {commander}. Glad to see you managed to earn a bloodname without totally wrecking my - sorry, I mean your - mech. We will get right on it and get it back in mint condition in no time.
       </narrative>
       <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+      <nextStoryPointId>35fabd74-41fa-4472-b409-8a1d0c280418</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_vlad_black_widow_warrior" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>767daef0-1a09-46ec-8f18-91551d5a6859</id>
@@ -3780,11 +3774,7 @@ This is a story arc in active development. Try at your own risk!
         Your first battle is scheduled for tomorrow. Each of the subsequent battles will be a day apart, allowing you some time for repair, if necessary. I will next see you at the trial, {commanderRank}. May your skill prove your worth.
       </narrative>
       <personalityId>8408467a-9131-4d3e-83f7-6f1722cbb9a9</personalityId>
-      <nextStoryPointId>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</nextStoryPointId>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-        <storyPointId>ab211686-b377-44f1-afd1-5b4048d412db</storyPointId>
-        <futureDays>1</futureDays>
-      </storyTrigger>
+      <nextStoryPointId>ab211686-b377-44f1-afd1-5b4048d412db</nextStoryPointId>
     </storyPoint>
     <storyPoint name="narr_trial_kill_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>290c0343-2e82-4a16-b5bc-1dc5cd8dc71b</id>
@@ -4444,6 +4434,7 @@ This is a story arc in active development. Try at your own risk!
         <systemId>Morges</systemId>
         <desc>You fight for a bloodname! If you are victorious, a new trial will appear each day until you beat all of the competition.</desc>
       </mission>
+      <scenarioStoryPointId>1e3fd5e1-8c30-4f8f-a193-1e3332c81f39</scenarioStoryPointId>
       <storyOutcomes>
         <storyOutcome result="SUCCESS">
           <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
@@ -8643,10 +8634,7 @@ This is a story arc in active development. Try at your own risk!
       </scenario>
       <storyOutcomes>
         <storyOutcome result="PYRRHIC_VICTORY">
-          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-            <storyPointId>d6748828-7b40-4fbf-8b6a-846f2cef51d3</storyPointId>
-            <futureDays>1</futureDays>
-          </storyTrigger>
+          <nextStoryPointId>d6748828-7b40-4fbf-8b6a-846f2cef51d3</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
@@ -8758,10 +8746,7 @@ This is a story arc in active development. Try at your own risk!
       </scenario>
       <storyOutcomes>
         <storyOutcome result="PYRRHIC_VICTORY">
-          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-            <storyPointId>763e68fa-1fca-478d-ac38-e22e1724cd44</storyPointId>
-            <futureDays>1</futureDays>
-          </storyTrigger>
+          <nextStoryPointId>763e68fa-1fca-478d-ac38-e22e1724cd44</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
@@ -8879,10 +8864,7 @@ This is a story arc in active development. Try at your own risk!
       </scenario>
       <storyOutcomes>
         <storyOutcome result="PYRRHIC_VICTORY">
-          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
-            <storyPointId>365aee45-7fec-444c-bd27-a53c2166580b</storyPointId>
-            <futureDays>1</futureDays>
-          </storyTrigger>
+          <nextStoryPointId>365aee45-7fec-444c-bd27-a53c2166580b</nextStoryPointId>
         </storyOutcome>
       </storyOutcomes>
       <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
