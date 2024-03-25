@@ -817,8 +817,8 @@ public class Scenario {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "temperature", temperature);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atmosphere", atmosphere.ordinal());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gravity", gravity);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "emi", emi.ordinal());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "blowingSand", blowingSand.ordinal());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "emi", emi.isEMI());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "blowingSand", blowingSand.isBlowingSand());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shiftWindDirection", shiftWindDirection);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shiftWindStrength", shiftWindStrength);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxWindStrength", maxWindStrength.ordinal());
