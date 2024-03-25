@@ -84,9 +84,9 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <nextStoryPointId>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</nextStoryPointId>
+      <!--<nextStoryPointId>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</nextStoryPointId>-->
       <!-- Real next story point Id. Can be commented out to test things -->
-      <!-- <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId> -->
+      <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
     </storyPoint>
     <!-- Game over check -->
     <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
@@ -297,7 +297,7 @@ This is a story arc in active development. Try at your own risk!
     <!-- Wait story points -->
     <storyPoint name="wait_devin_start" type="mekhq.campaign.storyarc.storypoint.WaitStoryPoint">
       <id>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</id>
-      <title>Wait on Devin for further orders</title>
+      <title>Wait in orbit around Devin for further orders</title>
       <days>2</days>
       <nextStoryPointId>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</nextStoryPointId>
     </storyPoint>
@@ -1803,7 +1803,7 @@ This is a story arc in active development. Try at your own risk!
 
         *You hear the distant sound of hydraulic motors.*
 
-        We have landed and are ready to dismount your forces. All the information you need is available in the on-board BRIEFING_ROOM room. Good hunting, {commanderRank}!
+        We have landed and are ready to dismount your forces. All the information you need is available in the on-board briefing room. Good hunting, {commanderRank}!
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</nextStoryPointId>
@@ -1817,7 +1817,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         It looks like your pups cut some teeth today, {commanderRank}. As you saw, the Falcons are not honoring us with zellbrigen, so I would recommend that you return the favor for the foreseeable future.
 
-        I am happy to report that the Falcon presence on Colmar have been eliminated. I will be taking my Wolf Spiders to officially liberate the capital.
+        I am happy to report that the Falcon presence on Colmar has been eliminated. I will be taking my Wolf Spiders to officially liberate the capital.
       </narrative>
       <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
       <nextStoryPointId>d7d887df-4049-4929-8478-bd2d825a7cce</nextStoryPointId>
@@ -1941,7 +1941,7 @@ This is a story arc in active development. Try at your own risk!
       <id>68fa87e5-95f3-466c-9f0e-e0d4b9dedc06</id>
       <title>Welcome to Baker 3</title>
       <narrative>
-        Welcome to Baker 3, {commanderRank}! At this point, you have already probably heard the rumors about Khan Ward's task force. After smashing the Falcons on Sudeten, his entire task force was diverted at my command to the Inner Sphere where they will help prepare the Spheroids for a resumption of hostilities with our brethren. He brought with him the entire genetic repository of our Clan.
+        Welcome to Baker 3, {commanderRank}! At this point, you have no doubt heard the rumors about Khan Ward's task force. After smashing the Falcons on Sudeten, his entire task force was diverted at my command to the Inner Sphere where they will help prepare the Spheroids for a resumption of hostilities with our brethren. He brought with him the entire genetic repository of our Clan.
 
         Like every other damn warrior in this Touman, you may have your own opinions about this decision. Frankly, I don't give a damn right now. From an operational standpoint, all it means is that we will not have Khan Ward's forces available to us and so I will need to lean more heavily on my existing forces, including yours. In other words, I hope you got all the dents out of your mechs because I am going to need them shortly.
       </narrative>
@@ -2966,7 +2966,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         They did not care that I was the enemy. I was just a person in need of help. They nursed me back to health. They had two children. Their names were Kate and Tynan. They would sit at the foot of my bed and ask me questions about life in the Clans for hours. They were curious, not afraid. When they were not questioning me, they would play games with me to keep me from getting bored. Kate would come in at night with a book so that I could read her a bedtime story.
 
-        Eventually, I recovered enough to travel and I was returned to our clan in a prisoner exchange. I cried when I had to leave that family, knowing that I would likely never see them again.
+        Eventually, I recovered enough to travel and I was returned to our clan in a prisoner exchange. I felt a pit in my stomach when I had to leave that family, knowing that I would likely never see them again.
       </narrative>
       <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
       <nextStoryPointId>d44b965a-84a8-40b1-9fe0-7b1b3028d113</nextStoryPointId>
@@ -3060,7 +3060,7 @@ This is a story arc in active development. Try at your own risk!
       <narrative>
         *Tayyiba drops her head.*
 
-        Thats how I feel, as well. We may have survived but I cannot call this a win. Then I think about Kate, that little girl from Tukkayid. I may be exiled from my kin, but not from the family I have gained along the way.
+        Thats how I feel, as well. We may have survived but I cannot call this a win. Then I think about Kate and Tynan on Tukkayid. I may be exiled from my kin, but not from the family I have gained along the way.
 
         *She stands up straight and looks intently at you.*
 
@@ -3472,7 +3472,7 @@ This is a story arc in active development. Try at your own risk!
       <id>ed49a12e-1126-4dce-b330-aac946f4127e</id>
       <title>Well-Bargained and Done</title>
       <narrative>
-        But, of course. That is the customary way, after all. I assure you it will not take you long to realize the advantages that could accrue should you decide to cut my bondcord. My tactical expertise is quite extensive. I feel that it would be best, perhaps, if I serve in a capacity that would put me in close proximity to you so that I could share my wealth of tactical and strategic knowledge. Something like an adie-de-camp, quaiff? Yes, I think that would be most bene--
+        But, of course. That is the customary way, after all. I assure you it will not take you long to realize the advantages that could accrue should you decide to cut my bondcord. My tactical expertise is quite extensive. I feel that it would be best, perhaps, if I serve in a capacity that would put me in close proximity to you so that I could share my wealth of tactical and strategic knowledge. Something like an adie-de-camp, quiaff? Yes, I think that would be most bene--
 
         *You cut the mike, questioning what you have done.*
       </narrative>
@@ -3766,7 +3766,7 @@ This is a story arc in active development. Try at your own risk!
       <id>5e061b82-cff4-4d36-a9f5-12e558c86cd2</id>
       <title>You Have Been Nominated</title>
       <narrative>
-        Greetings, {commander}. I have been chosen to serve in the role of Loremaster until a permanent replacement is found. It is therefore my duty to inform you that you have been nominated to participate in a trial of bloodright for the {bloodname} bloodname. The documents I have with me should indicate that this is a particularly prestigious bloodheritage, and thus I expect no objection to such a nomination, quaiff?
+        Greetings, {commander}. I have been chosen to serve in the role of Loremaster until a permanent replacement is found. It is therefore my duty to inform you that you have been nominated to participate in a trial of bloodright for the {bloodname} bloodname. The documents I have with me should indicate that this is a particularly prestigious bloodheritage, and thus I expect no objection to such a nomination, quiaff?
 
         *He pauses briefly, before continuing.*
 
@@ -4240,7 +4240,11 @@ This is a story arc in active development. Try at your own risk!
         <name>Devin</name>
         <type>Planetary Assault</type>
         <systemId>Devin</systemId>
-        <desc></desc>
+        <desc>
+          A jumpship sail array mishap delayed the start of the Devin campaign, suggesting ill omen for the assault. The desert planet itself was a foreboding place, raging with windstorms and electrical interference.
+
+          Khan Kerensky deployed her few remaining fresh clusters to the attack. It would prove to be a disastrous assault.
+        </desc>
       </mission>
       <scenarioStoryPointId>d8bdc8c9-8057-4cc2-a933-e8534d410200</scenarioStoryPointId>
       <storyOutcomes>
@@ -4481,9 +4485,9 @@ This is a story arc in active development. Try at your own risk!
 
           ### Hegira/Retreat Conditions
 
-          The 12th Falcon Regulars should request *hegira* if reduced to less than half their original force size while the player has more BV remaining. This can be simulated in MegaMek with the `/victory` command. If the player does not wish to grant *hegira*, then the bot settings for the 12th Falcon Regulars should be changed to RETREAT and they should begin a fighting withdrawal. In either case, the player can claim control of the battlefield for *isorla*.
+          The 12th Falcon Regulars should ask for *hegira* if reduced to less than half their original force size while the player has more BV remaining. This can be simulated in MegaMek with the `/victory` command. If the player does not wish to grant *hegira*, then the bot settings for the 12th Falcon Regulars should be changed to RETREAT and they should begin a fighting withdrawal. In either case, the player can claim control of the battlefield for *isorla*.
 
-          The player may receive *hegira* from the Falcon forces at any point by using the `/defeat` command in MegaMek. Players granted *hegira* cannot claim control of the battlefield. They can recover downed pilots, but not mechs or salvage.
+          The player may be granted *hegira* from the Falcon forces at any point by using the `/defeat` command in MegaMek. Players granted *hegira* cannot claim control of the battlefield. They can recover downed pilots, but not mechs or salvage.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
@@ -4849,7 +4853,7 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Hide and Seek</name>
         <desc>
-          After wading up the river bed of the Baker River, you have pulled steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long.
+          After wading up the river bed of the Baker River, you have pulled steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long. So meet your objectives and get out.
 
           Fortunately, the successful feint attack by the remaining forces has left only a token garrison force and some units are currently shut down and will not immediately enter the combat.
 
@@ -5053,7 +5057,7 @@ This is a story arc in active development. Try at your own risk!
       <scenario type="mekhq.campaign.mission.Scenario">
         <name>Hide and Seek</name>
         <desc>
-          After wading up the river bed of the Baker River, you have pulled your steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long.
+          After wading up the river bed of the Baker River, you have pulled your steaming mechs out along the banks near your target. Your star has been assigned the task of taking out a nearby comm center and supply depot. Taking out any sentry units is an added bonus, but you will likely face heavy reinforcements if you remain in the field too long. So meet your objectives and get out.
 
           Unfortunately, the Falons have not been fooled by the feint attack by your remaining forces and so the buildings are defended by a full Nova. Additional reinforcements may arrive if you take too long to meet your objectives.
 
@@ -5280,7 +5284,7 @@ This is a story arc in active development. Try at your own risk!
 
           ### Hegira/Retreat Conditions
 
-          Jade Falcon units will operate under forced withdrawal but will not ask for *hegira*, although they will accept it. Given the difficult situation, the player will not be able to claim battlefield salvage.
+          Jade Falcon units will operate under forced withdrawal but will not ask for *hegira*, although they will grant it. Given the difficult situation, the player will not be able to claim battlefield salvage.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
@@ -7108,7 +7112,7 @@ This is a story arc in active development. Try at your own risk!
 
           ### Hegira/Retreat Conditions
 
-          Jade Falcon units will operate under forced withdrawal but will not ask for *hegira*, although they will accept it. The wolf forces must withdraw and will not be able to claim battlefield salvage.
+          Jade Falcon units will operate under forced withdrawal but will not ask for *hegira*, although they will grant it. The wolf forces must withdraw and will not be able to claim battlefield salvage.
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
@@ -7786,7 +7790,7 @@ This is a story arc in active development. Try at your own risk!
 
       ### Hegira/Retreat Conditions
 
-          The Jade Falcon forces should request *hegira* if reduced to less
+          The Jade Falcon forces should ask for *hegira* if reduced to less
           than half their original force size while the player has more BV
           remaining. This can be simulated in MegaMek with the `/victory`
           command. If the player does not wish to grant *hegira*, then the
@@ -8045,7 +8049,7 @@ This is a story arc in active development. Try at your own risk!
          ### Hegira/Retreat Conditions
 
           Jade Falcon forces will not retreat or ask for Hegira under any conditions, but individual units will
-          operate under forced withdrawal conditions. Due to the nature of this strike, you will not be able to claim
+          operate under forced withdrawal conditions. They will grant hegira. Due to the nature of this strike, you will not be able to claim
           battlefield salvage.
         </desc>
         <start>6</start>
@@ -8263,7 +8267,7 @@ This is a story arc in active development. Try at your own risk!
 
          ### Hegira/Retreat Conditions
 
-         The Jade Falcons will not accept or grant *hegira*. They will operate under forced withdrawal. Due the nature of the scenario, you may not collect *isorla.*
+         The Jade Falcons will not ask for or grant *hegira*. They will operate under forced withdrawal. Due the nature of the scenario, you may not collect *isorla.*
         </desc>
         <start>6</start>
         <usingFixedMap>true</usingFixedMap>
@@ -8405,7 +8409,7 @@ This is a story arc in active development. Try at your own risk!
 
          ### Hegira/Retreat Conditions
 
-         The Jade Falcons will not accept or grant *hegira*. They will operate under forced withdrawal. Due to the nature of the scenario, you may not collect *isorla.*
+         The Jade Falcons will not ask for or grant *hegira*. They will operate under forced withdrawal. Due to the nature of the scenario, you may not collect *isorla.*
 
          If you fail the mission but your commander is not killed, do not check your commander as MIA in the scenario resolution.
         </desc>
