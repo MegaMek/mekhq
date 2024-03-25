@@ -446,7 +446,7 @@ public class AtBGameThread extends GameThread {
 
                 botClient.sendPlayerInfo();
 
-                List<Entity> entities = setupEntities(botClient, botForce, scenario);
+                List<Entity> entities = setupBotEntities(botClient, botForce, scenario);
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception ex) {

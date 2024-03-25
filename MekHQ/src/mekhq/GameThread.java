@@ -282,7 +282,7 @@ class GameThread extends Thread implements CloseClientListener {
 
                 botClient.sendPlayerInfo();
 
-                List<Entity> entities = setupEntities(botClient, botForce, scenario);
+                List<Entity> entities = setupBotEntities(botClient, botForce, scenario);
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception ex) {
@@ -290,11 +290,11 @@ class GameThread extends Thread implements CloseClientListener {
         }
     }
 
-    protected List<Entity> setupEntities(BotClient botClient, BotForce botForce, Scenario scenario) {
+    protected List<Entity> setupBotEntities(BotClient botClient, BotForce botForce, Scenario scenario) {
         String forceName = botClient.getLocalPlayer().getName() + "|0||%s Lance|%s||";
         var entities = new ArrayList<Entity>();
         int i = 0;
-        int j = 1;
+        int forceIdLance = 1;
         String lastType = "";
         final RandomCallsignGenerator RCG = RandomCallsignGenerator.getInstance();
         String lanceName = RCG.generate();
@@ -305,7 +305,6 @@ class GameThread extends Thread implements CloseClientListener {
             lanceSize = Lance.getStdLanceSize(contract.getEnemy());
         }
         Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
-        comp = comp.thenComparing(((Entity e) -> e.getDeployRound()));
         comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
         comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
         entitiesSorted.sort(comp);
@@ -315,19 +314,19 @@ class GameThread extends Thread implements CloseClientListener {
             }
             if ((i != 0)
                     && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
-                j++;
+                forceIdLance++;
                 lanceName = RCG.generate();
-                i = j * lanceSize;
+                i = forceIdLance * lanceSize;
             }
 
             lastType = entity.getEntityMajorTypeName(entity.getEntityType());
             entity.setOwner(botClient.getLocalPlayer());
-            String fName = String.format(forceName, lanceName, j);
+            String fName = String.format(forceName, lanceName, forceIdLance);
             entity.setForceString(fName);
             entities.add(entity);
             i++;
             if (i % lanceSize == 0) {
-                j++;
+                forceIdLance++;
                 lanceName = RCG.generate();
             }
         }
