@@ -288,7 +288,12 @@ class GameThread extends Thread implements CloseClientListener {
                     }
                     entity.setOwner(botClient.getLocalPlayer());
                     entity.setForceString(forceName);
-                    entity.setDeployRound(botForce.getDeployRound());
+                    // only overwrite deployment round for entities with the botForce default if they
+                    // have an individual deployment round of zero. Otherwise, we will overwrite entity
+                    // specific deployment information.
+                    if(entity.getDeployRound() == 0) {
+                        entity.setDeployRound(botForce.getDeployRound());
+                    }
                     entities.add(entity);
                 }
                 botClient.sendAddEntity(entities);
