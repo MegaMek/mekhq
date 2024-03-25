@@ -4279,7 +4279,7 @@ This is a story arc in active development. Try at your own risk!
         <name>Denizli</name>
         <type>Planetary Assault</type>
         <systemId>Denizli</systemId>
-        <desc>You have bid your full forces to take the oil refinery from Star Captain Tobias Malthus's forces.</desc>
+        <desc>While the main Wolf forces engages the Jade Falcons elsewhere on the planet, you have been tasked with capturing an oil refinery gaurded by a unique Jade Falcon Warrior named Tobias Malthus. You have bid your full forces to take the oil refinery from his forces.</desc>
       </mission>
       <scenarioStoryPointId>512d07d4-b311-4339-9924-d6158b52464c</scenarioStoryPointId>
       <storyOutcomes>
@@ -4297,7 +4297,7 @@ This is a story arc in active development. Try at your own risk!
         <name>Denizli</name>
         <type>Planetary Assault</type>
         <systemId>Denizli</systemId>
-        <desc>You have bid forces to take the oil refinery equal to those of Star Captain Tobias Malthus.</desc>
+        <desc>While the main Wolf forces engages the Jade Falcons elsewhere on the planet, you have been tasked with capturing an oil refinery gaurded by a unique Jade Falcon Warrior named Tobias Malthus. You have bid forces to take the oil refinery equal to the defending forces.</desc>
       </mission>
       <scenarioStoryPointId>2d1cbd9f-0334-46e7-9965-93701eb10366</scenarioStoryPointId>
       <storyOutcomes>
@@ -4315,7 +4315,7 @@ This is a story arc in active development. Try at your own risk!
         <name>Denizli</name>
         <type>Planetary Assault</type>
         <systemId>Denizli</systemId>
-        <desc>You will face Star Captain Tobias Malthus's forces in a series of single combat trials. Each trial will be fought in the arctic tundra near the target facility.</desc>
+        <desc>While the main Wolf forces engages the Jade Falcons elsewhere on the planet, you have been tasked with capturing an oil refinery gaurded by a unique Jade Falcon Warrior named Tobias Malthus. You have agreed to face his forces in a series of single combat trials. Each trial will be fought in the arctic tundra near the target facility.</desc>
       </mission>
       <scenarioStoryPointId>03abca34-5dff-4fd5-80f3-dade21e221e2</scenarioStoryPointId>
       <scenarioStoryPointId>0c3224a5-13e5-4b21-9df1-f641d24f139d</scenarioStoryPointId>
@@ -4426,7 +4426,7 @@ This is a story arc in active development. Try at your own risk!
         <name>Wotan</name>
         <type>Planetary Assault</type>
         <systemId>Wotan</systemId>
-        <desc>Escort Ulric through the streets of the capital of Borealtown, so that he may face off with saKhan Vandervahn Chistu.</desc>
+        <desc>Surprising the Jade Falcons, Ulric leapfrogged past Butler to strike directly at Wotan, the seat of the Jade Falcon occupation zone. As his forces descended upon the capital city of Borealtown, a challenge was issued. You must now escort Ulric through the streets so that he may face off with saKhan Vandervahn Chistu in single combat.</desc>
       </mission>
       <scenarioStoryPointId>46099293-dfc8-4e99-a00b-ff71f13c9066</scenarioStoryPointId>
       <storyOutcomes>
@@ -4444,7 +4444,7 @@ This is a story arc in active development. Try at your own risk!
         <name>Morges</name>
         <type>Planetary Assault</type>
         <systemId>Morges</systemId>
-        <desc>The Falcons have come to Morges to end the remaining Wolves. You must win or die.</desc>
+        <desc>Enraged by Khan Phelan Ward's seeming retreat, the Jade Falcons sent a large force to Morges to exterminate the remaining Wolves. These forces were surprised to not only face Wolves, but a regiment of the famed Kell Hounds mercenary group. This is now a fight for survival. You must win or die.</desc>
       </mission>
       <scenarioStoryPointId>eb08a01c-ece2-48f4-8b54-8b0c9ece9174</scenarioStoryPointId>
     </storyPoint>
@@ -4452,7 +4452,7 @@ This is a story arc in active development. Try at your own risk!
       <id>618b89fd-4f8a-4b29-b999-bc22bb6f1dc5</id>
       <mission type="mekhq.campaign.mission.Mission">
         <name>Bloodright Trial</name>
-        <type>Planetary Assault</type>
+        <type>Clan Trial</type>
         <systemId>Morges</systemId>
         <desc>You fight for a bloodname! If you are victorious, a new trial will appear each day until you beat all of the competition.</desc>
       </mission>
