@@ -25,6 +25,7 @@ import java.util.ResourceBundle;
 
 public enum ScenarioStatus {
     //region Enum Declarations
+    NEW("ScenarioStatus.NEW.text", "ScenarioStatus.NEW.toolTipText"),
     CURRENT("ScenarioStatus.CURRENT.text", "ScenarioStatus.CURRENT.toolTipText"),
     DECISIVE_VICTORY("ScenarioStatus.DECISIVE_VICTORY.text", "ScenarioStatus.DECISIVE_VICTORY.toolTipText"),
     VICTORY("ScenarioStatus.VICTORY.text", "ScenarioStatus.VICTORY.toolTipText"),
