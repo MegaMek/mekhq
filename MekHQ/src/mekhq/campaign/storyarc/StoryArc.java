@@ -231,6 +231,7 @@ public class StoryArc {
             }
         }
         // search through StoryPoints and see if we have any active waiting story points
+        ArrayList<WaitStoryPoint> toProcess = new ArrayList<WaitStoryPoint>();
         WaitStoryPoint waitStoryPoint;
         for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             if (entry.getValue() instanceof WaitStoryPoint) {
@@ -238,8 +239,7 @@ public class StoryArc {
                 if(!waitStoryPoint.isActive()) {
                     continue;
                 }
-                waitStoryPoint.reduceDays();
-                if (waitStoryPoint.getDays() <= 0) {
+                if (null != waitStoryPoint.getDate() && ev.getCampaign().getLocalDate().equals(waitStoryPoint.getDate())) {
                     waitStoryPoint.complete();
                 }
             }

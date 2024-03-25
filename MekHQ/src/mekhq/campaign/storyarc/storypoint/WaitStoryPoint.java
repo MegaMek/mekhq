@@ -30,6 +30,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.time.LocalDate;
 
 /**
  * A StoryPoint that waits until a certain number of days pass before completing
@@ -38,6 +39,7 @@ public class WaitStoryPoint extends StoryPoint {
 
     String title;
     int days;
+    private LocalDate date;
 
     public WaitStoryPoint() {
         super();
@@ -63,22 +65,19 @@ public class WaitStoryPoint extends StoryPoint {
     @Override
     public void start() {
         super.start();
+        // convert number of days to an actual date that we can check
+        date = getCampaign().getLocalDate().plusDays(days);
         // refresh for objectives
         getCampaign().getApp().getCampaigngui().refreshAllTabs();
     }
 
-    public int getDays() {
-        return days;
-    }
-
-    public void reduceDays() {
-        days--;
-    }
+    public LocalDate getDate() { return date; }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "title", title);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "date", date);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "days", days);
         writeToXmlEnd(pw1, --indent);
     }
@@ -93,6 +92,8 @@ public class WaitStoryPoint extends StoryPoint {
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("title")) {
                     title = wn2.getTextContent().trim();
+                } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
+                    date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("days")) {
                     days = Integer.parseInt(wn2.getTextContent().trim());
                 }
