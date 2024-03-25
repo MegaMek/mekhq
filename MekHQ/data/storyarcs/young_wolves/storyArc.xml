@@ -1836,8 +1836,6 @@ This is a story arc in active development. Try at your own risk!
       <title>Back on board</title>
       <narrative>
         Welcome back, {commanderRank}. Once you have your mechs secured in their bays, I am ready to boost for orbit. From there, we are headed to Sudeten along with the rest of the joint task force. I have already mapped in coordinates, so you don't need to worry about the details. You can check on our travel progress from the on-board interstellar map, if you like. The trip should give you enough time to deal with any battle damage and injuries.
-
-        When you get back on board, Tech Larine said she would like a word.
       </narrative>
       <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
       <nextStoryPointId>c3b2acb9-f91f-4704-9dc2-6fb16a82f272</nextStoryPointId>
@@ -1850,13 +1848,21 @@ This is a story arc in active development. Try at your own risk!
 
         We have quite a few parts and equipment in storage aboard the ship, but keep in mind that once those supplies are used up, we do not have access to anything more, given wartime shortages. So if you want to make sure you stay in supply, you will want to be sure to salvage whatever isorla you can from your battles. You can always check on our supplies by heading over to the warehouse.
 
-        Also keep in mind that we have no way to acquire new units given the situation. We do have some second-line mechs mothballed in the cargo bay, that can be used to replace units that have been completely destroyed or wich do not have available parts. Just keep in mind it will take some time to pull those units out of mothball so be sure to give me some advance warning.
+        Also keep in mind that we have no way to acquire new units given the situation. We do have some second-line mechs mothballed in the hangar bay, that can be used to replace units that have been completely destroyed or do not have available parts. It will take some time to pull those units out of mothball, though, so be sure to give me some advance warning.
       </narrative>
       <personalityId>592fa833-c114-474f-abfe-49f6731553ab</personalityId>
+      <nextStoryPointId>6b269fae-ad5d-4de8-8970-9251a6b64ede</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_doctor_intro" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>6b269fae-ad5d-4de8-8970-9251a6b64ede</id>
+      <title>Doc Chat</title>
+      <narrative>
+        Greetings, {commander}. I am the doctor assigned to the *Moonhowler*. If you have any wounded mechwarriors from this battle or future battles, be sure to send them to the infirmary so that I may treat them.
+
+        I know that the ego of many mechwarriors is such that they are too proud to admit to their injuries, but it is imperative that they do so. If they are not sent to the infirmary, natural healing will take much longer.
+      </narrative>
+      <personalityId>a76440e2-6af5-460e-a3a5-e24960eb6697</personalityId>
       <nextStoryPointId>7460e570-83ec-478f-a7a5-a34cacc8562d</nextStoryPointId>
-      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SwitchTabStoryTrigger">
-        <tab>REPAIR_BAY</tab>
-      </storyTrigger>
     </storyPoint>
     <storyPoint name="narr_tech_choice_warhawk" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
       <id>bef32318-0beb-4555-9210-cbe90ba3222a</id>
@@ -9189,10 +9195,10 @@ This is a story arc in active development. Try at your own risk!
     <personality name="chief_tech">
       <id>592fa833-c114-474f-abfe-49f6731553ab</id>
       <personCampaignId>3105fbba-e8ac-4dff-8a82-36a2524e422c</personCampaignId>
-      <portrait>
-        <category></category>
-        <filename>ChiefTech.jpg</filename>
-      </portrait>
+    </personality>
+    <personality name="doctor">
+      <id>a76440e2-6af5-460e-a3a5-e24960eb6697</id>
+      <personCampaignId>dd96e74d-c778-4739-abf6-7227f31d084a</personCampaignId>
     </personality>
     <personality name="mathius">
       <id>e73e4041-d7f1-435c-9ee5-3d3489e73f71</id>
