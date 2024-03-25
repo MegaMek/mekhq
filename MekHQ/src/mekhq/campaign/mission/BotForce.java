@@ -24,10 +24,7 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.UnitNameTracker;
+import megamek.common.*;
 import megamek.common.icons.Camouflage;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
@@ -39,6 +36,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -323,12 +321,10 @@ public class BotForce {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "templateName", templateName);
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "entities");
-        for (Entity en : getFixedEntityListDirect()) {
-            if (en == null) {
-                LogManager.getLogger().error("Null entity when saving a bot force, we should never find a null here. Please investigate");
-            } else {
-                MHQXMLUtility.writeEntityWithCrewToXML(pw, indent, en, getFixedEntityListDirect());
-            }
+        try {
+            EntityListFile.writeEntityList(pw, (ArrayList<Entity>) getFixedEntityListDirect());
+        } catch (IOException ex) {
+            LogManager.getLogger().error("Error loading entities for BotForce " + this.getName(), ex);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "entities");
 
