@@ -84,9 +84,9 @@ This is a story arc in active development. Try at your own risk!
       <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
       <assignedForceId>2</assignedForceId>
       <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-      <!--<nextStoryPointId>236167b3-36a4-4b63-9dd7-0fd60a0f16b8</nextStoryPointId>-->
+      <nextStoryPointId>d93cb2b3-252b-4895-be0c-8fd38f70839e</nextStoryPointId>
       <!-- Real next story point Id. Can be commented out to test things -->
-      <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
+      <!-- <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId> -->
     </storyPoint>
     <!-- Game over check -->
     <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
@@ -3436,8 +3436,8 @@ This is a story arc in active development. Try at your own risk!
           <clan>true</clan>
           <phenotype>MECHWARRIOR</phenotype>
           <portrait>
-            <category>Male/Admin/Logistical</category>
-            <filename>Adm_Log_M_2.png</filename>
+            <category></category>
+            <filename>Tobias.jpg</filename>
           </portrait>
           <gender>MALE</gender>
           <rank>4</rank>
@@ -3487,8 +3487,8 @@ This is a story arc in active development. Try at your own risk!
           <clan>true</clan>
           <phenotype>MECHWARRIOR</phenotype>
           <portrait>
-            <category>Male/Admin/Logistical</category>
-            <filename>Adm_Log_M_2.png</filename>
+            <category></category>
+            <filename>Tobias.jpg</filename>
           </portrait>
           <gender>MALE</gender>
           <rank>4</rank>
@@ -5309,7 +5309,7 @@ This is a story arc in active development. Try at your own risk!
             <strategicTargets/>
           </behaviorSettings>
           <entities>
-            <entity chassis="Puma (Adder)" model="S" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true" externalId="d3b2706c-d762-46f1-b459-e6b0c97807e5" quirks="low_profile::no_twist">
+            <entity chassis="Puma (Adder)" model="S" type="Biped" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" neverDeployed="true" externalId="d3b2706c-d762-46f1-b459-e6b0c97807e5" quirks="low_profile::no_twist">
               <pilot size="1" name="Star Commander Trevor" nick="" gender="FEMALE" gunnery="2" piloting="3" artillery="4" externalId="220c2078-64ad-4d2f-8f08-ba58b78ee356" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
               The first slot in a location is at index="1".
               <location index="1"> Center Torso
@@ -5382,7 +5382,7 @@ This is a story arc in active development. Try at your own risk!
               <Game id="5"/>
               <Force force="Trinary Charlie|0||Talon Star 1|1||"/>
             </entity>
-            <entity chassis="Black Lanner" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true" externalId="a31d367f-c8cd-4f0a-bc5d-c5fe05c662dc" quirks="stable">
+            <entity chassis="Black Lanner" model="B" type="Biped" commander="false" offboard="false" hidden="false" deployment="3" deploymentZone="0" neverDeployed="true" externalId="a31d367f-c8cd-4f0a-bc5d-c5fe05c662dc" quirks="stable">
               <pilot size="1" name="Warrior Mary" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4" externalId="98749a8e-7ed0-45a1-9048-6a390c733d68" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
               The first slot in a location is at index="1".
               <location index="2"> Right Torso
@@ -5395,7 +5395,7 @@ This is a story arc in active development. Try at your own risk!
               <Game id="6"/>
               <Force force="Trinary Charlie|0||Talon Star 2|2||"/>
             </entity>
-            <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true" externalId="4d60eb9b-31ef-40a4-bd10-bf8bca69160d" quirks="stable">
+            <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false" offboard="false" hidden="false" deployment="3" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="4d60eb9b-31ef-40a4-bd10-bf8bca69160d" quirks="stable">
               <pilot size="1" name="Star Commander Kumaragupta" nick="" gender="MALE" gunnery="2" piloting="3" artillery="4" externalId="af01f50d-368b-4529-afb3-f43438a6adc8" commandB="1" ejected="false" autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
               <location index="1"> Center Torso
                 <armor points="20"/>
@@ -9178,7 +9178,7 @@ This is a story arc in active development. Try at your own risk!
       <id>c62f2cfc-35a4-41e8-bbc7-faf2bd8e4b20</id>
       <title>Star Captain Tobias Malthus</title>
       <portrait>
-        <category>Male/Admin/Logistical</category>
+        <category></category>
         <filename>Tobias.jpg</filename>
       </portrait>
     </personality>
