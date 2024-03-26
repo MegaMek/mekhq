@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
