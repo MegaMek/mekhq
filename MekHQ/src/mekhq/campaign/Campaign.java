@@ -5223,7 +5223,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        return getUnitRatingMod() + modifier;
+        return MathUtility.clamp(getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR) + modifier;
     }
 
     public void resetAstechMinutes() {
