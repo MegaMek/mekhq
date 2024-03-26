@@ -345,12 +345,6 @@ public class CampaignGUI extends JPanel {
         menuSave.addActionListener(this::saveCampaign);
         menuFile.add(menuSave);
 
-        JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
-        menuNew.setMnemonic(KeyEvent.VK_N);
-        menuNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
-        menuNew.addActionListener(evt -> new DataLoadingDialog(frame, app, null).setVisible(true));
-        menuFile.add(menuNew);
-
         //region menuImport
         // The Import menu uses the following Mnemonic keys as of 25-MAR-2022:
         // A, C, F, I, P
@@ -657,6 +651,12 @@ public class CampaignGUI extends JPanel {
         menuThemes.setMnemonic(KeyEvent.VK_T);
         refreshThemeChoices();
         menuFile.add(menuThemes);
+
+        JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
+        menuNew.setMnemonic(KeyEvent.VK_N);
+        // menuNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
+        menuNew.addActionListener(evt -> new DataLoadingDialog(frame, app, null).setVisible(true));
+        menuFile.add(menuNew);
 
         JMenuItem menuExitItem = new JMenuItem(resourceMap.getString("menuExit.text"));
         menuExitItem.setMnemonic(KeyEvent.VK_E);
