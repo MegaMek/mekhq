@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
@@ -403,14 +404,14 @@ public class RetirementDefectionTracker {
                 person.getPrimaryRole()).isMechWarrior();
         switch (person.getExperienceLevel(campaign, false)) {
             case SkillType.EXP_ELITE:
-                return Money.of(isMechWarriorProfession ? 9600 : 5920);
+                return Money.of(isMechWarriorProfession ? 14400 : 8880);
             case SkillType.EXP_VETERAN:
-                return Money.of(isMechWarriorProfession ? 4800 : 2960);
+                return Money.of(isMechWarriorProfession ? 7200 : 4440);
             case SkillType.EXP_REGULAR:
-                return Money.of(isMechWarriorProfession ? 3000 : 1850);
+                return Money.of(isMechWarriorProfession ? 4500 : 2775);
             case SkillType.EXP_GREEN:
             default:
-                return Money.of(isMechWarriorProfession ? 1800 : 1110);
+                return Money.of(isMechWarriorProfession ? 2400 : 1665);
         }
     }
 
