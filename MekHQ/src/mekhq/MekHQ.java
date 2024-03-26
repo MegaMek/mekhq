@@ -168,6 +168,19 @@ public class MekHQ implements GameListener {
         new StartupScreenPanel(this).getFrame().setVisible(true);
     }
 
+    /**
+     * restart back to the splash screen
+     */
+    public void restart() {
+
+        // Actually close MHQ
+        if (campaignGUI != null) {
+            campaignGUI.getFrame().dispose();
+        }
+
+        new StartupScreenPanel(this).getFrame().setVisible(true);
+    }
+
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
         try {

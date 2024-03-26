@@ -52,6 +52,7 @@ public class BotForce {
     private List<UUID> traitors;
     private int team;
     private int start;
+    private int deployRound;
     private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
     private BehaviorSettings behaviorSettings;
@@ -87,6 +88,7 @@ public class BotForce {
         this.name = name;
         this.team = team;
         this.start = start;
+        this.deployRound = 0;
         setFixedEntityList(entityList);
         setCamouflage(camouflage);
         setColour(colour);
@@ -188,6 +190,14 @@ public class BotForce {
 
     public void setStart(int start) {
         this.start = start;
+    }
+
+    public int getDeployRound() {
+        return deployRound;
+    }
+
+    public void setDeployRound(int round) {
+        this.deployRound = round;
     }
 
     public String getTemplateName() {
@@ -321,6 +331,7 @@ public class BotForce {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "team", team);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "start", start);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deployRound", deployRound);
         getCamouflage().writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "templateName", templateName);
@@ -364,6 +375,8 @@ public class BotForce {
                     team = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
                     start = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("deployRound")) {
+                    deployRound = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
                     setCamouflage(Camouflage.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("camoCategory")) { // Legacy - 0.49.3 removal

@@ -61,4 +61,4 @@
 /properties_local.gradle
 /settings_local.gradle
 /*.sav.gz
-/.DS_Store
+.DS_Store

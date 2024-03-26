@@ -453,6 +453,7 @@ public class AtBGameThread extends GameThread {
                     }
                     entity.setOwner(botClient.getLocalPlayer());
                     entity.setForceString(forceName);
+                    entity.setDeployRound(botForce.getDeployRound());
                     entities.add(entity);
                 }
                 botClient.sendAddEntity(entities);

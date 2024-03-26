@@ -119,6 +119,7 @@ public class Scenario {
 
     //Stores combinations of units and the transports they are assigned to
     private Map<UUID, List<UUID>> playerTransportLinkages;
+
     //endregion Variable Declarations
 
     public Scenario() {
