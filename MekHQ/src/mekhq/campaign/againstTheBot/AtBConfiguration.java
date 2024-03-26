@@ -21,6 +21,7 @@
  */
 package mekhq.campaign.againstTheBot;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
@@ -334,7 +335,7 @@ public class AtBConfiguration {
             }
         }
         target.addModifier(SkillType.EXP_REGULAR - adminLogExp, "Admin/Logistics");
-        target.addModifier(IUnitRating.DRAGOON_C - campaign.getUnitRatingMod(),
+        target.addModifier(IUnitRating.DRAGOON_C - MathUtility.clamp(campaign.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR),
                 "Unit Rating");
         return target;
     }

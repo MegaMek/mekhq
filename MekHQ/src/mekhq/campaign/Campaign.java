@@ -614,7 +614,7 @@ public class Campaign implements ITechManager {
                 report.append("<br/>Search successful. ");
 
                 MechSummary ms = getUnitGenerator().generate(getFactionCode(), shipSearchType, -1,
-                        getGameYear(), getUnitRatingMod());
+                        getGameYear(), MathUtility.clamp(getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR));
 
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
