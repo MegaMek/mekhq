@@ -3222,7 +3222,7 @@ public class Campaign implements ITechManager {
             rating.reInitialize();
 
             for (AtBContract contract : getActiveAtBContracts()) {
-                contract.checkMorale(getLocalDate(), getUnitRatingMod());
+                contract.checkMorale(getLocalDate(), MathUtility.clamp(getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR));
                 addReport("Enemy morale is now " + contract.getMoraleLevel()
                         + " on contract " + contract.getName());
             }
