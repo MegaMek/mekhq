@@ -426,6 +426,17 @@ public class PersonnelTableModelColumnTest {
     }
 
     @Test
+    public void testIsTechVessel() {
+        for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
+            if (personnelTableModelColumn == PersonnelTableModelColumn.TECH_VESSEL) {
+                assertTrue(personnelTableModelColumn.isTechVessel());
+            } else {
+                assertFalse(personnelTableModelColumn.isTechVessel());
+            }
+        }
+    }
+
+    @Test
     public void testIsMedical() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             if (personnelTableModelColumn == PersonnelTableModelColumn.MEDICAL) {
