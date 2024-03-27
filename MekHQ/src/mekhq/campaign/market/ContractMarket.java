@@ -565,7 +565,8 @@ public class ContractMarket {
                         AtBContractType.SECURITY_DUTY, AtBContractType.OBJECTIVE_RAID, AtBContractType.GARRISON_DUTY,
                         AtBContractType.CADRE_DUTY, AtBContractType.DIVERSIONARY_RAID }
         };
-        int roll = MathUtility.clamp(Compute.d6(2) + unitRatingMod - IUnitRating.DRAGOON_C, 2, 12);
+      int roll = MathUtility.clamp(Compute.d6(2) + MathUtility.clamp(unitRatingMod, IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR)
+          - IUnitRating.DRAGOON_C, 2, 12);
         return table[majorPower ? 0 : 1][roll - 2];
     }
 
