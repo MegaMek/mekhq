@@ -176,20 +176,47 @@ public class RetirementDefectionTracker {
             TargetRoll target = new TargetRoll(3, "Target");
 
             // Skill Rating modifier
-            target.addModifier(p.getExperienceLevel(campaign, false), "Veterancy");
+            int skillRating = p.getExperienceLevel(campaign, false);
+            String skillRatingDescription;
 
-            // Unit Rating modifier
-            int ratingMod = 0;
-
-            if (campaign.getUnitRatingMod() < 1) {
-                ratingMod = 2;
-            } else if (campaign.getUnitRatingMod() == 1) {
-                ratingMod = 1;
-            } else if (campaign.getUnitRatingMod() > 3) {
-                ratingMod = -1;
+            switch (skillRating) {
+                case -1:
+                    skillRatingDescription = "Unskilled";
+                    break;
+                case 0:
+                    skillRatingDescription = "Ultra-Green";
+                    break;
+                case 1:
+                    skillRatingDescription = "Green";
+                    break;
+                case 2:
+                    skillRatingDescription = "Regular";
+                    break;
+                case 3:
+                    skillRatingDescription = "Veteran";
+                    break;
+                case 4:
+                    skillRatingDescription = "Elite";
+                    break;
+                default:
+                    skillRatingDescription = "Error, please see log";
+                    LogManager.getLogger().error("Unable to parse skillRating in Retirement check: returning " + skillRating);
             }
 
-            target.addModifier(ratingMod, "Unit Rating");
+            target.addModifier(skillRating, skillRatingDescription);
+
+            // Unit Rating modifier
+            int unitRating = 0;
+
+            if (campaign.getUnitRatingMod() < 1) {
+                unitRating = 2;
+            } else if (campaign.getUnitRatingMod() == 1) {
+                unitRating = 1;
+            } else if (campaign.getUnitRatingMod() > 3) {
+                unitRating = -1;
+            }
+
+            target.addModifier(unitRating, "Unit Rating");
 
             /* Retirement rolls are made before the contract status is set */
             if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
