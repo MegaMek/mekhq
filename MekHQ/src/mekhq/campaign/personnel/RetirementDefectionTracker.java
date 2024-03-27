@@ -174,10 +174,24 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
+            // Base TN
             TargetRoll target = new TargetRoll(3, "Target");
-            target.addModifier(p.getExperienceLevel(campaign, false), "Experience");
-            target.addModifier(- MathUtility.clamp(campaign.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR),
-                "Unit Rating");
+
+            // Skill Rating modifier
+            target.addModifier(p.getExperienceLevel(campaign, false), "Veterancy");
+
+            // Unit Rating modifier
+            int ratingMod = 0;
+
+            if (campaign.getUnitRatingMod() < 1) {
+                ratingMod = 2;
+            } else if (campaign.getUnitRatingMod() == 1) {
+                ratingMod = 1;
+            } else if (campaign.getUnitRatingMod() > 3) {
+                ratingMod = -1;
+            }
+
+            target.addModifier(ratingMod, "Unit Rating");
 
             /* Retirement rolls are made before the contract status is set */
             if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
