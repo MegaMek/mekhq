@@ -179,7 +179,7 @@
 		<useManualProcreation>true</useManualProcreation>
 		<useClannerProcreation>false</useClannerProcreation>
 		<usePrisonerProcreation>true</usePrisonerProcreation>
-		<multiplePregnancyOccurrences>50</multiplePregnancyOccurrences>
+		<multiplePregnancyOccurrences>30</multiplePregnancyOccurrences>
 		<babySurnameStyle>MOTHERS</babySurnameStyle>
 		<assignNonPrisonerBabiesFounderTag>false</assignNonPrisonerBabiesFounderTag>
 		<assignChildrenOfFoundersFounderTag>false</assignChildrenOfFoundersFounderTag>

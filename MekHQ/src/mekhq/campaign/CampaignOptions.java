@@ -745,7 +745,7 @@ public class CampaignOptions {
         setUseManualProcreation(true);
         setUseClanPersonnelProcreation(false);
         setUsePrisonerProcreation(true);
-        setMultiplePregnancyOccurrences(50); // Hellin's Law is 89, but we make it more common so it shows up more
+        setMultiplePregnancyOccurrences(30); // Based on 2015 US birthrates: https://www.cdc.gov/nchs/data/nvsr/nvsr66/nvsr66_01.pdf
         setBabySurnameStyle(BabySurnameStyle.MOTHERS);
         setAssignNonPrisonerBabiesFounderTag(false);
         setAssignChildrenOfFoundersFounderTag(false);
