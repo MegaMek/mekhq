@@ -300,18 +300,24 @@ class GameThread extends Thread implements CloseClientListener {
         String lanceName = RCG.generate();
         List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
         AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
-        int lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
+        int lanceSize;
+
         if (botForce.getTeam() == 2) {
             lanceSize = Lance.getStdLanceSize(contract.getEnemy());
+        } else {
+            lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
         }
+
         Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
         comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
         comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
         entitiesSorted.sort(comp);
+
         for (Entity entity : entitiesSorted) {
             if (null == entity) {
                 continue;
             }
+
             if ((i != 0)
                     && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
                 forceIdLance++;
@@ -325,6 +331,7 @@ class GameThread extends Thread implements CloseClientListener {
             entity.setForceString(fName);
             entities.add(entity);
             i++;
+
             if (i % lanceSize == 0) {
                 forceIdLance++;
                 lanceName = RCG.generate();
