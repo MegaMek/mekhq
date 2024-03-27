@@ -875,6 +875,7 @@ public class PersonnelTableModelColumnTest {
                 case TECH_AERO:
                 case TECH_MECHANIC:
                 case TECH_BA:
+                case TECH_VESSEL:
                 case MEDICAL:
                 case ADMINISTRATION:
                 case NEGOTIATION:
