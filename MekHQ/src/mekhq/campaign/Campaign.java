@@ -614,7 +614,7 @@ public class Campaign implements ITechManager {
                 report.append("<br/>Search successful. ");
 
                 MechSummary ms = getUnitGenerator().generate(getFactionCode(), shipSearchType, -1,
-                        getGameYear(), getUnitRatingMod());
+                        getGameYear(), MathUtility.clamp(getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR));
 
                 if (ms == null) {
                     ms = getAtBConfig().findShip(shipSearchType);
@@ -3187,7 +3187,8 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            final int roll = MathUtility.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
+            final int roll = MathUtility.clamp(Compute.d6(2)
+                + MathUtility.clamp(getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR) - 2, 2, 12);
 
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
@@ -3221,7 +3222,7 @@ public class Campaign implements ITechManager {
             rating.reInitialize();
 
             for (AtBContract contract : getActiveAtBContracts()) {
-                contract.checkMorale(getLocalDate(), getUnitRatingMod());
+                contract.checkMorale(getLocalDate(), MathUtility.clamp(getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR));
                 addReport("Enemy morale is now " + contract.getMoraleLevel()
                         + " on contract " + contract.getName());
             }
@@ -5222,7 +5223,7 @@ public class Campaign implements ITechManager {
             }
         }
 
-        return getUnitRatingMod() + modifier;
+        return MathUtility.clamp(getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR) + modifier;
     }
 
     public void resetAstechMinutes() {

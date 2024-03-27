@@ -20,10 +20,12 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
+import mekhq.campaign.rating.IUnitRating;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -173,8 +175,9 @@ public class RetirementDefectionTracker {
             }
 
             TargetRoll target = new TargetRoll(3, "Target");
-            target.addModifier(p.getExperienceLevel(campaign, false) - campaign.getUnitRatingMod(),
-                    "Experience");
+            target.addModifier(p.getExperienceLevel(campaign, false)
+                    - MathUtility.clamp(campaign.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR),
+                "Experience");
             /* Retirement rolls are made before the contract status is set */
             if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
                 target.addModifier(1, "Failed mission");

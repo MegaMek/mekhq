@@ -110,7 +110,8 @@ public class ContractMarket {
     }
 
     public AtBContract addAtBContract(Campaign campaign) {
-        AtBContract c = generateAtBContract(campaign, campaign.getUnitRatingMod());
+        AtBContract c = generateAtBContract(campaign,
+            MathUtility.clamp(campaign.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR));
         if (c != null) {
             contracts.add(c);
         }
@@ -155,7 +156,7 @@ public class ContractMarket {
             // need to copy to prevent concurrent modification errors
             new ArrayList<>(contracts).forEach(this::removeContract);
 
-            int unitRatingMod = campaign.getUnitRatingMod();
+            int unitRatingMod = MathUtility.clamp(campaign.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
 
             for (AtBContract contract : campaign.getActiveAtBContracts()) {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
@@ -534,7 +535,8 @@ public class ContractMarket {
         followup.setEnemySkill(contract.getEnemySkill());
         followup.setEnemyQuality(contract.getEnemyQuality());
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
-        setAtBContractClauses(followup, campaign.getUnitRatingMod(), campaign);
+        setAtBContractClauses(followup,
+            MathUtility.clamp(campaign.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR), campaign);
 
         followup.calculatePaymentMultiplier(campaign);
 
@@ -563,7 +565,8 @@ public class ContractMarket {
                         AtBContractType.SECURITY_DUTY, AtBContractType.OBJECTIVE_RAID, AtBContractType.GARRISON_DUTY,
                         AtBContractType.CADRE_DUTY, AtBContractType.DIVERSIONARY_RAID }
         };
-        int roll = MathUtility.clamp(Compute.d6(2) + unitRatingMod - IUnitRating.DRAGOON_C, 2, 12);
+      int roll = MathUtility.clamp(Compute.d6(2) + MathUtility.clamp(unitRatingMod, IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR)
+          - IUnitRating.DRAGOON_C, 2, 12);
         return table[majorPower ? 0 : 1][roll - 2];
     }
 

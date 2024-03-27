@@ -21,6 +21,7 @@ package mekhq.campaign.market;
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
@@ -56,7 +57,7 @@ public class PersonnelMarketFMMr implements PersonnelMarketMethod {
         for (PersonnelRole role : PersonnelRole.getMilitaryRoles()) {
             int roll = Compute.d6(2);
             // TODO: Modifiers for hiring hall, but first needs to track the hiring hall
-            switch (c.getUnitRatingMod()) {
+            switch (MathUtility.clamp(c.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR)) {
                 case IUnitRating.DRAGOON_A:
                 case IUnitRating.DRAGOON_ASTAR:
                     roll += 3;

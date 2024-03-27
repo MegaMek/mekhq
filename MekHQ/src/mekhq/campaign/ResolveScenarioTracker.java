@@ -21,6 +21,7 @@
 package mekhq.campaign;
 
 import megamek.client.Client;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.event.GameVictoryEvent;
@@ -39,9 +40,11 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
+import mekhq.campaign.unit.actions.IUnitAction;
 import mekhq.gui.FileDialogs;
 import org.apache.logging.log4j.LogManager;
 
@@ -1600,7 +1603,7 @@ public class ResolveScenarioTracker {
         }
 
         if (campaign.getCampaignOptions().isUseAtB() && isAtBContract) {
-            final int unitRatingMod = campaign.getUnitRatingMod();
+            final int unitRatingMod = MathUtility.clamp(campaign.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
             for (Unit unit : getUnits()) {
                 unit.setSite(((AtBContract) mission).getRepairLocation(unitRatingMod));
             }
