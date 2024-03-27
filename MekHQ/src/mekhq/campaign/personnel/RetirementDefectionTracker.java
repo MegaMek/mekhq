@@ -20,12 +20,10 @@
  */
 package mekhq.campaign.personnel;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
