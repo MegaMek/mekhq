@@ -110,7 +110,8 @@ public class ContractMarket {
     }
 
     public AtBContract addAtBContract(Campaign campaign) {
-        AtBContract c = generateAtBContract(campaign, campaign.getUnitRatingMod());
+        AtBContract c = generateAtBContract(campaign,
+            MathUtility.clamp(campaign.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR));
         if (c != null) {
             contracts.add(c);
         }
@@ -155,7 +156,7 @@ public class ContractMarket {
             // need to copy to prevent concurrent modification errors
             new ArrayList<>(contracts).forEach(this::removeContract);
 
-            int unitRatingMod = campaign.getUnitRatingMod();
+            int unitRatingMod = MathUtility.clamp(campaign.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
 
             for (AtBContract contract : campaign.getActiveAtBContracts()) {
                 checkForSubcontracts(campaign, contract, unitRatingMod);
@@ -534,7 +535,8 @@ public class ContractMarket {
         followup.setEnemySkill(contract.getEnemySkill());
         followup.setEnemyQuality(contract.getEnemyQuality());
         followup.calculateLength(campaign.getCampaignOptions().isVariableContractLength());
-        setAtBContractClauses(followup, campaign.getUnitRatingMod(), campaign);
+        setAtBContractClauses(followup,
+            MathUtility.clamp(campaign.getUnitRatingMod(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR), campaign);
 
         followup.calculatePaymentMultiplier(campaign);
 
