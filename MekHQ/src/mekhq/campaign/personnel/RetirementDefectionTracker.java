@@ -266,8 +266,6 @@ public class RetirementDefectionTracker {
                 if ((c != null) && (c.getSharesPct() > 20)) {
                     target.addModifier(-((c.getSharesPct() - 20) / 10), "Shares");
                 }
-            } else {
-                // Bonus payments handled by dialog
             }
 
             if (p.getPrimaryRole().isSoldier()) {
