@@ -80,6 +80,7 @@ public enum PersonnelTableModelColumn {
     TECH_AERO("PersonnelTableModelColumn.TECH_AERO.text"),
     TECH_MECHANIC("PersonnelTableModelColumn.TECH_MECHANIC.text"),
     TECH_BA("PersonnelTableModelColumn.TECH_BA.text"),
+    TECH_VESSEL("PersonnelTableModelColumn.TECH_VESSEL.text"),
     MEDICAL("PersonnelTableModelColumn.MEDICAL.text"),
     ADMINISTRATION("PersonnelTableModelColumn.ADMINISTRATION.text"),
     NEGOTIATION("PersonnelTableModelColumn.NEGOTIATION.text"),
@@ -266,6 +267,9 @@ public enum PersonnelTableModelColumn {
 
     public boolean isTechBA() {
         return this == TECH_BA;
+    }
+    public boolean isTechVessel() {
+        return this == TECH_VESSEL;
     }
 
     public boolean isMedical() {
@@ -595,6 +599,10 @@ public enum PersonnelTableModelColumn {
                 return person.hasSkill(SkillType.S_TECH_BA)
                         ? Integer.toString(person.getSkill(SkillType.S_TECH_BA).getFinalSkillValue())
                         : "-";
+            case TECH_VESSEL:
+                return person.hasSkill(SkillType.S_TECH_VESSEL)
+                        ? Integer.toString(person.getSkill(SkillType.S_TECH_VESSEL).getFinalSkillValue())
+                        : "-";
             case MEDICAL:
                 return person.hasSkill(SkillType.S_DOCTOR)
                         ? Integer.toString(person.getSkill(SkillType.S_DOCTOR).getFinalSkillValue())
@@ -836,6 +844,7 @@ public enum PersonnelTableModelColumn {
                     case TECH_AERO:
                     case TECH_MECHANIC:
                     case TECH_BA:
+                    case TECH_VESSEL:
                     case MEDICAL:
                         return true;
                     default:
@@ -981,6 +990,7 @@ public enum PersonnelTableModelColumn {
             case TECH_AERO:
             case TECH_MECHANIC:
             case TECH_BA:
+            case TECH_VESSEL:
             case MEDICAL:
             case ADMINISTRATION:
             case NEGOTIATION:
