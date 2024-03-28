@@ -173,8 +173,50 @@ public class RetirementDefectionTracker {
             }
 
             TargetRoll target = new TargetRoll(3, "Target");
-            target.addModifier(p.getExperienceLevel(campaign, false) - campaign.getUnitRatingMod(),
-                    "Experience");
+
+            // Skill Rating modifier
+            int skillRating = p.getExperienceLevel(campaign, false);
+            String skillRatingDescription;
+
+            switch (skillRating) {
+                case -1:
+                   skillRatingDescription = "Unskilled";
+                    break;
+                case 0:
+                    skillRatingDescription = "Ultra-Green";
+                    break;
+                case 1:
+                    skillRatingDescription = "Green";
+                    break;
+                case 2:
+                    skillRatingDescription = "Regular";
+                    break;
+                case 3:
+                    skillRatingDescription = "Veteran";
+                    break;
+                case 4:
+                    skillRatingDescription = "Elite";
+                    break;
+                default:
+                    skillRatingDescription = "Error, please see log";
+                    LogManager.getLogger().error("Unable to parse skillRating in Retirement check: returning " + skillRating);
+            }
+
+            target.addModifier(skillRating, skillRatingDescription);
+
+            // Unit Rating modifier
+            int unitRating = 0;
+
+            if (campaign.getUnitRatingMod() < 1) {
+                unitRating = 2;
+            } else if (campaign.getUnitRatingMod() == 1) {
+                unitRating = 1;
+            } else if (campaign.getUnitRatingMod() > 3) {
+                unitRating = -1;
+            }
+
+            target.addModifier(unitRating, "Unit Rating");
+
             /* Retirement rolls are made before the contract status is set */
             if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
                 target.addModifier(1, "Failed mission");
@@ -403,13 +445,13 @@ public class RetirementDefectionTracker {
                 person.getPrimaryRole()).isMechWarrior();
         switch (person.getExperienceLevel(campaign, false)) {
             case SkillType.EXP_ELITE:
-                return Money.of(isMechWarriorProfession ? 115200 : 5920);
+                return Money.of(isMechWarriorProfession ? 115200 : 35520);
             case SkillType.EXP_VETERAN:
-                return Money.of(isMechWarriorProfession ? 57600 : 2960);
+                return Money.of(isMechWarriorProfession ? 57600 : 17760);
             case SkillType.EXP_REGULAR:
-                return Money.of(isMechWarriorProfession ? 36000 : 1850);
+                return Money.of(isMechWarriorProfession ? 36000 : 11100);
             default:
-                return Money.of(isMechWarriorProfession ? 19200 : 1110);
+                return Money.of(isMechWarriorProfession ? 19200 : 6660);
         }
     }
 
