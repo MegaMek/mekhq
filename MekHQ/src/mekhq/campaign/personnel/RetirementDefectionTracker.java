@@ -208,7 +208,7 @@ public class RetirementDefectionTracker {
             int unitRating = 0;
 
             if (campaign.getUnitRatingMod() < 1) {
-                unitRating = 2;
+                unitRating = 1;
             } else if (campaign.getUnitRatingMod() == 1) {
                 unitRating = 1;
             } else if (campaign.getUnitRatingMod() > 3) {
