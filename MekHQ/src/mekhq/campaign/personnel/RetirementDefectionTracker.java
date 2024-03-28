@@ -308,17 +308,20 @@ public class RetirementDefectionTracker {
         int ageMod = 0;
         if (age <= 20) {
             ageMod = -1;
-        } else if ((age >= 50) && (age < 70)) {
-            ageMod = 1;
-        } else if ((age >= 70) && (age < 80)) {
-            ageMod = 2;
-        } else if ((age >= 80) && (age < 90)) {
-            ageMod = 3;
-        } else if ((age >= 90) && (age < 100)) {
-            ageMod = 4;
-        } else if ((age >= 100)) {
-            ageMod = 5;
+        } else if ((age >= 50) && (age < 65)) {
+          ageMod = 1;
+        } else if ((age >= 65) && (age < 75)) {
+          ageMod = 2;
+        } else if ((age >= 75) && (age < 85)) {
+          ageMod = 3;
+        } else if ((age >= 85) && (age < 95)) {
+          ageMod = 4;
+        } else if ((age >= 95) && (age < 105)) {
+          ageMod = 5;
+        } else if (age >= 105) {
+          ageMod = 6;
         }
+
         return ageMod;
     }
 
