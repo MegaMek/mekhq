@@ -415,7 +415,7 @@ public class PersonnelTableModelColumnTest {
     }
 
     @Test
-    public void testIsechBABA() {
+    public void testIsTechBA() {
         for (final PersonnelTableModelColumn personnelTableModelColumn : columns) {
             if (personnelTableModelColumn == PersonnelTableModelColumn.TECH_BA) {
                 assertTrue(personnelTableModelColumn.isTechBA());
