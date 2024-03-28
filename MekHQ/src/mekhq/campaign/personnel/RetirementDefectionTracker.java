@@ -230,6 +230,10 @@ public class RetirementDefectionTracker {
                 target.addModifier(1, "Pirate");
             }
 
+            if (campaign.getFaction().isMercenary()) {
+                target.addModifier(1, "Mercenary");
+            }
+
             if (p.getRank().isOfficer()) {
                 target.addModifier(-1, "Officer");
             } else {
