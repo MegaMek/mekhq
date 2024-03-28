@@ -235,7 +235,7 @@ public class RetirementDefectionTracker {
             }
 
             if (campaign.getFaction().isClan()) {
-                target.addModifier(-1, "Clan");
+                target.addModifier(-2, "Clan");
             }
 
             if (p.getRank().isOfficer()) {
