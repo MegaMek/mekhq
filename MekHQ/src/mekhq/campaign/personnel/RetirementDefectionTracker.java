@@ -262,7 +262,7 @@ public class RetirementDefectionTracker {
                         }
                     }
                 }
-                if ((c != null) && (c.getSharesPct() > 20)) {
+                if (c != null) {
                     target.addModifier(-((c.getSharesPct() - 20) / 10), "Shares");
                 }
             } else {
