@@ -245,8 +245,24 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            if (p.getAge(campaign.getLocalDate()) >= 50) {
-                target.addModifier(1, "Over 50");
+            // Old Age modifier
+            int age = p.getAge(campaign.getLocalDate());
+            int oldAgeMod = 0;
+
+            if ((age >= 50) && (age < 70)) {
+                oldAgeMod = 1;
+            } else if ((age >= 70) && (age < 80)) {
+                oldAgeMod = 2;
+            } else if ((age >= 80) && (age < 90)) {
+                oldAgeMod = 3;
+            } else if ((age >= 90) && (age < 100)) {
+                oldAgeMod = 4;
+            } else if ((age >= 100)) {
+                oldAgeMod = 5;
+            }
+
+            if (oldAgeMod > 0) {
+                target.addModifier(oldAgeMod, "Old Age");
             }
 
             if (campaign.getCampaignOptions().isUseShareSystem()) {
@@ -263,7 +279,7 @@ public class RetirementDefectionTracker {
                         }
                     }
                 }
-                if ((c != null) && (c.getSharesPct() > 20)) {
+                if ((c != null) && (c.getSharesPct() >= 20)) {
                     target.addModifier(-((c.getSharesPct() - 20) / 10), "Shares");
                 }
             }
