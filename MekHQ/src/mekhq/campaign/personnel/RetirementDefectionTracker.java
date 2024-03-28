@@ -161,115 +161,115 @@ public class RetirementDefectionTracker {
         }
 
         for (Person p : campaign.getActivePersonnel()) {
-          if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed() || (p.isFounder() && !campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
-            continue;
-          }
-
-          /* Infantry units retire or defect by platoon */
-          if ((null != p.getUnit()) && p.getUnit().usesSoldiers() && !p.getUnit().isCommander(p)) {
-            continue;
-          }
-
-          TargetRoll target = new TargetRoll(3, "Target");
-
-          // Skill Rating modifier
-          int skillRating = p.getExperienceLevel(campaign, false);
-          String skillRatingDescription;
-
-          switch (skillRating) {
-            case -1:
-              skillRatingDescription = "Unskilled";
-              break;
-            case 0:
-              skillRatingDescription = "Ultra-Green";
-              break;
-            case 1:
-              skillRatingDescription = "Green";
-              break;
-            case 2:
-              skillRatingDescription = "Regular";
-              break;
-            case 3:
-              skillRatingDescription = "Veteran";
-              break;
-            case 4:
-              skillRatingDescription = "Elite";
-              break;
-            default:
-              skillRatingDescription = "Error, please see log";
-              LogManager.getLogger().error("Unable to parse skillRating in Retirement check: returning " + skillRating);
-          }
-
-          target.addModifier(skillRating, skillRatingDescription);
-
-          // Unit Rating modifier
-          int unitRating = 0;
-
-          if (campaign.getUnitRatingMod() < 1) {
-            unitRating = 2;
-          } else if (campaign.getUnitRatingMod() == 1) {
-            unitRating = 1;
-          } else if (campaign.getUnitRatingMod() > 3) {
-            unitRating = -1;
-          }
-
-          target.addModifier(unitRating, "Unit Rating");
-
-          /* Retirement rolls are made before the contract status is set */
-          if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
-            target.addModifier(1, "Failed mission");
-          }
-
-          if (campaign.getCampaignOptions().isTrackUnitFatigue() && (campaign.getFatigueLevel() >= 10)) {
-            target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
-          }
-
-          if (campaign.getFaction().isPirate()) {
-            target.addModifier(1, "Pirate");
-          }
-
-          if (campaign.getFaction().isMercenary()) {
-            target.addModifier(1, "Mercenary");
-          }
-
-          if (campaign.getFaction().isClan()) {
-            target.addModifier(-2, "Clan");
-          }
-
-          if (p.getRank().isOfficer()) {
-            target.addModifier(-1, "Officer");
-          } else {
-            for (Enumeration<IOption> i = p.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
-              IOption ability = i.nextElement();
-              if (ability.booleanValue()) {
-                if (ability.getName().equals("tactical_genius")) {
-                  target.addModifier(1, "Non-officer tactical genius");
-                  break;
-                }
-              }
+            if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed() || (p.isFounder() && !campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
+                continue;
             }
-          }
 
-          // Old Age modifier
-          int age = p.getAge(campaign.getLocalDate());
-          int ageMod = 0;
-              if (age <= 20) {
-                  ageMod = -1;
-              } else if ((age >= 50) && (age < 70)) {
-                  ageMod = 1;
-              } else if ((age >= 70) && (age < 80)) {
-                  ageMod = 2;
-              } else if ((age >= 80) && (age < 90)) {
-                  ageMod = 3;
-              } else if ((age >= 90) && (age < 100)) {
-                  ageMod = 4;
-              } else if ((age >= 100)) {
-                  ageMod = 5;
-              }
+            /* Infantry units retire or defect by platoon */
+            if ((null != p.getUnit()) && p.getUnit().usesSoldiers() && !p.getUnit().isCommander(p)) {
+                continue;
+            }
 
-          if (ageMod > 0) {
-              target.addModifier(ageMod, "Age");
-          }
+            TargetRoll target = new TargetRoll(3, "Target");
+
+            // Skill Rating modifier
+            int skillRating = p.getExperienceLevel(campaign, false);
+            String skillRatingDescription;
+
+            switch (skillRating) {
+                case -1:
+                    skillRatingDescription = "Unskilled";
+                    break;
+                case 0:
+                    skillRatingDescription = "Ultra-Green";
+                    break;
+                case 1:
+                    skillRatingDescription = "Green";
+                    break;
+                case 2:
+                    skillRatingDescription = "Regular";
+                    break;
+                case 3:
+                    skillRatingDescription = "Veteran";
+                    break;
+                case 4:
+                    skillRatingDescription = "Elite";
+                    break;
+                default:
+                    skillRatingDescription = "Error, please see log";
+                    LogManager.getLogger().error("Unable to parse skillRating in Retirement check: returning " + skillRating);
+            }
+
+            target.addModifier(skillRating, skillRatingDescription);
+
+            // Unit Rating modifier
+            int unitRating = 0;
+
+            if (campaign.getUnitRatingMod() < 1) {
+                unitRating = 2;
+            } else if (campaign.getUnitRatingMod() == 1) {
+                unitRating = 1;
+            } else if (campaign.getUnitRatingMod() > 3) {
+                unitRating = -1;
+            }
+
+            target.addModifier(unitRating, "Unit Rating");
+
+            /* Retirement rolls are made before the contract status is set */
+            if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
+                target.addModifier(1, "Failed mission");
+            }
+
+            if (campaign.getCampaignOptions().isTrackUnitFatigue() && (campaign.getFatigueLevel() >= 10)) {
+                target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
+            }
+
+            if (campaign.getFaction().isPirate()) {
+                target.addModifier(1, "Pirate");
+            }
+
+            if (campaign.getFaction().isMercenary()) {
+                target.addModifier(1, "Mercenary");
+            }
+
+            if (campaign.getFaction().isClan()) {
+                target.addModifier(-2, "Clan");
+            }
+
+            if (p.getRank().isOfficer()) {
+                target.addModifier(-1, "Officer");
+            } else {
+                for (Enumeration<IOption> i = p.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
+                    IOption ability = i.nextElement();
+                    if (ability.booleanValue()) {
+                        if (ability.getName().equals("tactical_genius")) {
+                            target.addModifier(1, "Non-officer tactical genius");
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Old Age modifier
+            int age = p.getAge(campaign.getLocalDate());
+            int ageMod = 0;
+                if (age <= 20) {
+                    ageMod = -1;
+                } else if ((age >= 50) && (age < 70)) {
+                    ageMod = 1;
+                } else if ((age >= 70) && (age < 80)) {
+                    ageMod = 2;
+                } else if ((age >= 80) && (age < 90)) {
+                    ageMod = 3;
+                } else if ((age >= 90) && (age < 100)) {
+                    ageMod = 4;
+                } else if ((age >= 100)) {
+                    ageMod = 5;
+                }
+
+            if (ageMod > 0) {
+                target.addModifier(ageMod, "Age");
+            }
 
             if (campaign.getCampaignOptions().isUseShareSystem()) {
                 /* If this retirement roll is not being made at the end
