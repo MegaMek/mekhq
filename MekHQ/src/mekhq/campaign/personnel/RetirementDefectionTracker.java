@@ -161,20 +161,60 @@ public class RetirementDefectionTracker {
         }
 
         for (Person p : campaign.getActivePersonnel()) {
-            if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()
-                    || (p.isFounder() && !campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
+            if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed() || (p.isFounder() && !campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
                 continue;
             }
 
             /* Infantry units retire or defect by platoon */
-            if ((null != p.getUnit()) && p.getUnit().usesSoldiers()
-                    && !p.getUnit().isCommander(p)) {
+            if ((null != p.getUnit()) && p.getUnit().usesSoldiers() && !p.getUnit().isCommander(p)) {
                 continue;
             }
 
             TargetRoll target = new TargetRoll(3, "Target");
-            target.addModifier(p.getExperienceLevel(campaign, false) - campaign.getUnitRatingMod(),
-                    "Experience");
+
+            // Skill Rating modifier
+            int skillRating = p.getExperienceLevel(campaign, false);
+            String skillRatingDescription;
+
+            switch (skillRating) {
+                case -1:
+                    skillRatingDescription = "Unskilled";
+                    break;
+                case 0:
+                    skillRatingDescription = "Ultra-Green";
+                    break;
+                case 1:
+                    skillRatingDescription = "Green";
+                    break;
+                case 2:
+                    skillRatingDescription = "Regular";
+                    break;
+                case 3:
+                    skillRatingDescription = "Veteran";
+                    break;
+                case 4:
+                    skillRatingDescription = "Elite";
+                    break;
+                default:
+                    skillRatingDescription = "Error, please see log";
+                    LogManager.getLogger().error("Unable to parse skillRating in Retirement check: returning " + skillRating);
+            }
+
+            target.addModifier(skillRating, skillRatingDescription);
+
+            // Unit Rating modifier
+            int unitRating = 0;
+
+            if (campaign.getUnitRatingMod() < 1) {
+                unitRating = 2;
+            } else if (campaign.getUnitRatingMod() == 1) {
+                unitRating = 1;
+            } else if (campaign.getUnitRatingMod() > 3) {
+                unitRating = -1;
+            }
+
+            target.addModifier(unitRating, "Unit Rating");
+
             /* Retirement rolls are made before the contract status is set */
             if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
                 target.addModifier(1, "Failed mission");
@@ -186,6 +226,14 @@ public class RetirementDefectionTracker {
 
             if (campaign.getFaction().isPirate()) {
                 target.addModifier(1, "Pirate");
+            }
+
+            if (campaign.getFaction().isMercenary()) {
+                target.addModifier(1, "Mercenary");
+            }
+
+            if (campaign.getFaction().isClan()) {
+                target.addModifier(-2, "Clan");
             }
 
             if (p.getRank().isOfficer()) {
@@ -202,8 +250,12 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            if (p.getAge(campaign.getLocalDate()) >= 50) {
-                target.addModifier(1, "Over 50");
+            // Old Age modifier
+            int age = p.getAge(campaign.getLocalDate());
+            int ageMod = getAgeMod(age);
+
+            if (ageMod > 0) {
+                target.addModifier(ageMod, "Age");
             }
 
             if (campaign.getCampaignOptions().isUseShareSystem()) {
@@ -220,11 +272,9 @@ public class RetirementDefectionTracker {
                         }
                     }
                 }
-                if ((c != null) && (c.getSharesPct() > 20)) {
+                if (c != null) {
                     target.addModifier(-((c.getSharesPct() - 20) / 10), "Shares");
                 }
-            } else {
-                // Bonus payments handled by dialog
             }
 
             if (p.getPrimaryRole().isSoldier()) {
@@ -254,7 +304,25 @@ public class RetirementDefectionTracker {
         return targets;
     }
 
-    /**
+    private static int getAgeMod(int age) {
+        int ageMod = 0;
+        if (age <= 20) {
+            ageMod = -1;
+        } else if ((age >= 50) && (age < 70)) {
+            ageMod = 1;
+        } else if ((age >= 70) && (age < 80)) {
+            ageMod = 2;
+        } else if ((age >= 80) && (age < 90)) {
+            ageMod = 3;
+        } else if ((age >= 90) && (age < 100)) {
+            ageMod = 4;
+        } else if ((age >= 100)) {
+            ageMod = 5;
+        }
+        return ageMod;
+    }
+
+  /**
      * Makes rolls for retirement/defection based on previously calculated target rolls,
      * and tracks all retirees in the unresolvedPersonnel hash in case the dialog
      * is closed before payments are resolved, to avoid rerolling the results.
@@ -403,14 +471,13 @@ public class RetirementDefectionTracker {
                 person.getPrimaryRole()).isMechWarrior();
         switch (person.getExperienceLevel(campaign, false)) {
             case SkillType.EXP_ELITE:
-                return Money.of(isMechWarriorProfession ? 9600 : 5920);
+                return Money.of(isMechWarriorProfession ? 115200 : 35520);
             case SkillType.EXP_VETERAN:
-                return Money.of(isMechWarriorProfession ? 4800 : 2960);
+                return Money.of(isMechWarriorProfession ? 57600 : 17760);
             case SkillType.EXP_REGULAR:
-                return Money.of(isMechWarriorProfession ? 3000 : 1850);
-            case SkillType.EXP_GREEN:
+                return Money.of(isMechWarriorProfession ? 36000 : 11100);
             default:
-                return Money.of(isMechWarriorProfession ? 1800 : 1110);
+                return Money.of(isMechWarriorProfession ? 19200 : 6660);
         }
     }
 
