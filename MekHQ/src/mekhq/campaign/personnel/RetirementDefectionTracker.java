@@ -403,14 +403,13 @@ public class RetirementDefectionTracker {
                 person.getPrimaryRole()).isMechWarrior();
         switch (person.getExperienceLevel(campaign, false)) {
             case SkillType.EXP_ELITE:
-                return Money.of(isMechWarriorProfession ? 9600 : 5920);
+                return Money.of(isMechWarriorProfession ? 115200 : 5920);
             case SkillType.EXP_VETERAN:
-                return Money.of(isMechWarriorProfession ? 4800 : 2960);
+                return Money.of(isMechWarriorProfession ? 57600 : 2960);
             case SkillType.EXP_REGULAR:
-                return Money.of(isMechWarriorProfession ? 3000 : 1850);
-            case SkillType.EXP_GREEN:
+                return Money.of(isMechWarriorProfession ? 36000 : 1850);
             default:
-                return Money.of(isMechWarriorProfession ? 1800 : 1110);
+                return Money.of(isMechWarriorProfession ? 19200 : 1110);
         }
     }
 
