@@ -252,20 +252,7 @@ public class RetirementDefectionTracker {
 
             // Old Age modifier
             int age = p.getAge(campaign.getLocalDate());
-            int ageMod = 0;
-                if (age <= 20) {
-                    ageMod = -1;
-                } else if ((age >= 50) && (age < 70)) {
-                    ageMod = 1;
-                } else if ((age >= 70) && (age < 80)) {
-                    ageMod = 2;
-                } else if ((age >= 80) && (age < 90)) {
-                    ageMod = 3;
-                } else if ((age >= 90) && (age < 100)) {
-                    ageMod = 4;
-                } else if ((age >= 100)) {
-                    ageMod = 5;
-                }
+            int ageMod = getAgeMod(age);
 
             if (ageMod > 0) {
                 target.addModifier(ageMod, "Age");
@@ -317,7 +304,25 @@ public class RetirementDefectionTracker {
         return targets;
     }
 
-    /**
+    private static int getAgeMod(int age) {
+        int ageMod = 0;
+        if (age <= 20) {
+            ageMod = -1;
+        } else if ((age >= 50) && (age < 70)) {
+            ageMod = 1;
+        } else if ((age >= 70) && (age < 80)) {
+            ageMod = 2;
+        } else if ((age >= 80) && (age < 90)) {
+            ageMod = 3;
+        } else if ((age >= 90) && (age < 100)) {
+            ageMod = 4;
+        } else if ((age >= 100)) {
+            ageMod = 5;
+        }
+        return ageMod;
+    }
+
+  /**
      * Makes rolls for retirement/defection based on previously calculated target rolls,
      * and tracks all retirees in the unresolvedPersonnel hash in case the dialog
      * is closed before payments are resolved, to avoid rerolling the results.
