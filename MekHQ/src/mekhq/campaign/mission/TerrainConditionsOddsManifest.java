@@ -181,8 +181,10 @@ public class TerrainConditionsOddsManifest  {
 
         odds = Map.of(Light.DAY.getExternalId(), 600,
                 Light.DUSK.getExternalId(),200,
-                Light.FULL_MOON.getExternalId(),100,
-                Light.MOONLESS.getExternalId(),99,
+                Light.FULL_MOON.getExternalId(),70,
+                Light.GLARE.getExternalId(),30,
+                Light.MOONLESS.getExternalId(),69,
+                Light.SOLAR_FLARE.getExternalId(),30,
                 Light.PITCH_BLACK.getExternalId(),1);
         terrain = List.of("ArcticDesert", "Badlands", "ColdFacility", "ColdForest", "ColdHills",
                 "ColdSea", "ColdUrban", "Desert", "Forest", "FrozenFacility", "FrozenSea",
@@ -198,8 +200,10 @@ public class TerrainConditionsOddsManifest  {
 
         odds = Map.of(Light.DAY.getExternalId(), 50,
                 Light.DUSK.getExternalId(),20,
-                Light.FULL_MOON.getExternalId(),10,
-                Light.MOONLESS.getExternalId(),10,
+                Light.FULL_MOON.getExternalId(),9,
+                Light.GLARE.getExternalId(),1,
+                Light.MOONLESS.getExternalId(),9,
+                Light.SOLAR_FLARE.getExternalId(), 1,
                 Light.PITCH_BLACK.getExternalId(),10);
         terrain = List.of("ColdMountain", "Glacier", "HotMountainsDry", "HotMountainsWet", "Mountain");
         t = new TerrainConditionsOdds();
