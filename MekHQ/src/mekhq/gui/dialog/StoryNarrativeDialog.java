@@ -56,6 +56,7 @@ public class StoryNarrativeDialog extends StoryDialog {
         txtDesc.setContentType("text/html");
         String text = StoryArc.replaceTokens(((NarrativeStoryPoint) getStoryPoint()).getNarrative(), getStoryPoint().getCampaign());
         txtDesc.setText(MarkdownRenderer.getRenderedHtml(text));
+        txtDesc.setCaretPosition(0);
         JScrollPane scrollPane = new JScrollPane(txtDesc);
         mainPanel.add(scrollPane, gbc);
 
