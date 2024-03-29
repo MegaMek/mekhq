@@ -484,18 +484,7 @@ public class RetirementDefectionTracker {
      * @return The amount in C-bills required to get a bonus to the Employee Turnover roll
      */
     public static Money getBonusCost(final Campaign campaign, Person person) {
-        final boolean isMechWarriorProfession = Profession.getProfessionFromPersonnelRole(
-                person.getPrimaryRole()).isMechWarrior();
-        switch (person.getExperienceLevel(campaign, false)) {
-            case SkillType.EXP_ELITE:
-                return Money.of(isMechWarriorProfession ? 115200 : 35520);
-            case SkillType.EXP_VETERAN:
-                return Money.of(isMechWarriorProfession ? 57600 : 17760);
-            case SkillType.EXP_REGULAR:
-                return Money.of(isMechWarriorProfession ? 36000 : 11100);
-            default:
-                return Money.of(isMechWarriorProfession ? 19200 : 6660);
-        }
+        return person.getSalary(campaign).multipliedBy(24);
     }
 
     /**
