@@ -146,7 +146,7 @@ public class AtBDynamicScenarioFactory {
             if (template.mapParameters.getMapLocation() == MapLocation.LowAtmosphere) {
                 defaultReinforcements.setAllowedUnitType(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX);
             } else if (template.mapParameters.getMapLocation() == MapLocation.Space) {
-                defaultReinforcements.setAllowedUnitType(UnitType.AERO);
+                defaultReinforcements.setAllowedUnitType(UnitType.AEROSPACEFIGHTER);
             }
 
 
@@ -362,7 +362,7 @@ public class AtBDynamicScenarioFactory {
         boolean isPlanetOwner = isPlanetOwner(contract, currentDate, factionCode);
         boolean usingAerospace = forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                 forceTemplate.getAllowedUnitType() == UnitType.CONV_FIGHTER ||
-                forceTemplate.getAllowedUnitType() == UnitType.AERO;
+                forceTemplate.getAllowedUnitType() == UnitType.AEROSPACEFIGHTER;
 
         // here we determine the "lance size". Aircraft almost always come in pairs, mechs and tanks, not so much.
         int lanceSize = usingAerospace ? getAeroLanceSize(forceTemplate.getAllowedUnitType(), isPlanetOwner, factionCode) :
@@ -404,9 +404,9 @@ public class AtBDynamicScenarioFactory {
             int actualUnitType = forceTemplate.getAllowedUnitType();
             if (isPlanetOwner && actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX &&
                     scenario.getTemplate().mapParameters.getMapLocation() != MapLocation.Space) {
-                actualUnitType = Compute.d6() > 3 ? UnitType.AERO : UnitType.CONV_FIGHTER;
+                actualUnitType = Compute.d6() > 3 ? UnitType.AEROSPACEFIGHTER : UnitType.CONV_FIGHTER;
             } else if (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-                actualUnitType = UnitType.AERO;
+                actualUnitType = UnitType.AEROSPACEFIGHTER;
             }
 
             // some special cases that don't fit into the regular RAT generation mechanism
@@ -1362,7 +1362,7 @@ public class AtBDynamicScenarioFactory {
                 case UnitType.BATTLE_ARMOR:
                     phenotype = Phenotype.ELEMENTAL;
                     break;
-                case UnitType.AERO:
+                case UnitType.AEROSPACEFIGHTER:
                 case UnitType.CONV_FIGHTER:
                     phenotype = Phenotype.AEROSPACE;
                     break;
@@ -2324,7 +2324,7 @@ public class AtBDynamicScenarioFactory {
         // TODO: except maybe clans?
         int numFightersPerFlight = factionCode.equals("CC") ? 3 : 2;
 
-        if (unitTypeCode == UnitType.AERO) {
+        if (unitTypeCode == UnitType.AEROSPACEFIGHTER) {
             return numFightersPerFlight;
         } else if (unitTypeCode == UnitType.CONV_FIGHTER) {
             return (Compute.randomInt(3) + 1) * numFightersPerFlight;

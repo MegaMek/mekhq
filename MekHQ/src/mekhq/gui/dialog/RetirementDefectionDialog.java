@@ -486,7 +486,7 @@ public class RetirementDefectionDialog extends JDialog {
                     unassignedMechs.add(u.getId());
                 }
             }
-            if (UnitType.AERO == u.getEntity().getUnitType()) {
+            if (UnitType.AEROSPACEFIGHTER == u.getEntity().getUnitType()) {
                 if (null == u.getCommander()) {
                     unassignedASF.add(u.getId());
                 }
@@ -844,7 +844,7 @@ public class RetirementDefectionDialog extends JDialog {
                     cbUnitCategory.setSelectedIndex(UnitType.VTOL + 1);
                     break;
                 case AEROSPACE_PILOT:
-                    cbUnitCategory.setSelectedIndex(UnitType.AERO + 1);
+                    cbUnitCategory.setSelectedIndex(UnitType.AEROSPACEFIGHTER + 1);
                     break;
                 case CONVENTIONAL_AIRCRAFT_PILOT:
                     cbUnitCategory.setSelectedIndex(UnitType.CONV_FIGHTER + 1);

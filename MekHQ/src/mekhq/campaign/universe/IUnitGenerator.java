@@ -79,7 +79,7 @@ public interface IUnitGenerator {
      * @return Whether or not the unit type supports weight class selection.
      */
     static boolean unitTypeSupportsWeightClass(final int unitType) {
-        return (unitType == UnitType.AERO) || (unitType == UnitType.MEK) || (unitType == UnitType.TANK);
+        return (unitType == UnitType.AEROSPACEFIGHTER) || (unitType == UnitType.MEK) || (unitType == UnitType.TANK);
     }
 
     /**

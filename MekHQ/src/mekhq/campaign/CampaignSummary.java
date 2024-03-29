@@ -123,7 +123,6 @@ public class CampaignSummary {
                     veeCount++;
                     break;
                 case UnitType.AEROSPACEFIGHTER:
-                case UnitType.AERO:
                 case UnitType.CONV_FIGHTER:
                     aeroCount++;
                     break;

@@ -35,10 +35,10 @@ public class DynamicScenarioFactoryTest {
     public void testGetOppositeEdge() {
         int startingEdge = Board.START_EDGE;
         assertEquals(Board.START_CENTER, AtBDynamicScenarioFactory.getOppositeEdge(startingEdge));
-        
+
         startingEdge = Board.START_CENTER;
         assertEquals(Board.START_EDGE, AtBDynamicScenarioFactory.getOppositeEdge(startingEdge));
-        
+
         startingEdge = Board.START_ANY;
         assertEquals(Board.START_ANY, AtBDynamicScenarioFactory.getOppositeEdge(startingEdge));
 
@@ -61,8 +61,8 @@ public class DynamicScenarioFactoryTest {
     @Disabled // This Test relies on randomness, and thus doesn't work properly.
     @Test
     public void testAeroLanceSize() {
-        assertEquals(2, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AERO, true, "FC"));
-        assertEquals(3, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AERO, true, "CC"));
+        assertEquals(2, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AEROSPACEFIGHTER, true, "FC"));
+        assertEquals(3, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AEROSPACEFIGHTER, true, "CC"));
         assertEquals(2,
                 AtBDynamicScenarioFactory.getAeroLanceSize(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX, false, "FC"));
         assertEquals(3,
