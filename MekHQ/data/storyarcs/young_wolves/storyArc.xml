@@ -257,8 +257,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             </storyOutcomes>
             <nextStoryPointId>0a42a453-1540-4e73-a98c-5388aad9735e</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="check_tobias_first_bid"
-                    type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+        <storyPoint name="check_tobias_first_bid" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
             <id>9ef236cf-ec08-4cf4-b28f-2522649447f1</id>
             <key>tobiasFirstBid</key>
             <storyOutcomes>
@@ -268,8 +267,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             </storyOutcomes>
             <nextStoryPointId>bb412d4b-7832-478b-bd8a-fd44cedcc779</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="check_tobias_final_bid"
-                    type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+        <storyPoint name="check_tobias_final_bid" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
             <id>667c05e9-ada2-481a-86d7-1a4136c0973e</id>
             <key>tobiasFinalBid</key>
             <storyOutcomes>
@@ -282,8 +280,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             </storyOutcomes>
             <nextStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="check_more_scen_denizli"
-                    type="mekhq.campaign.storyarc.storypoint.CheckMoreScenariosStoryPoint">
+        <storyPoint name="check_more_scen_denizli" type="mekhq.campaign.storyarc.storypoint.CheckMoreScenariosStoryPoint">
             <id>92635e96-03f2-4df4-877c-7f39cd6743ae</id>
             <missionStoryPointId>f80458cd-40f8-4d25-aa13-2821a518d42e</missionStoryPointId>
             <storyOutcomes>
@@ -321,8 +318,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             </storyOutcomes>
             <nextStoryPointId>3f9782a3-8b09-42e3-a337-a66e8bdf2b3d</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="check_deadly_felipe_w"
-                    type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
+        <storyPoint name="check_deadly_felipe_w" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">
             <id>f4d1a63a-451c-4f85-9371-78d0c3e785d5</id>
             <key>trothkinFight</key>
             <storyOutcomes>
@@ -363,8 +359,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>71591078-04e4-4caf-8baa-7851be233ea5</id>
             <nextStoryPointId>79360f28-c082-44f0-831b-83dfceadd09e</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="check_morges_interlude_tayyiba"
-                    type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+        <storyPoint name="check_morges_interlude_tayyiba" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
             <id>41a8d936-f02c-47e6-90b1-3c0327a79942</id>
             <nextStoryPointId>d6fb2fdf-d8d7-4a56-b813-6ed5b563c09b</nextStoryPointId>
         </storyPoint>
@@ -2478,8 +2473,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_denizli_debrief_equal_succ"
-                    type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_denizli_debrief_equal_succ" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>dc1747fd-20a2-467f-a927-998b2c81d6f4</id>
             <title>Post-Mission Report</title>
             <narrative>
@@ -2492,8 +2486,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>e8b26d16-e615-4579-bca2-537538fc2114</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_denizli_debrief_equal_fail"
-                    type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_denizli_debrief_equal_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>6016c437-9877-4c7e-b22c-d74b43811bd1</id>
             <title>Post-Mission Report</title>
             <narrative>
@@ -2505,8 +2498,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>31c98f3d-0373-4f53-8715-dd7e41566b1f</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_denizli_debrief_single_succ"
-                    type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_denizli_debrief_single_succ" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>91637f4e-ca7e-4bb9-bd87-74ca2e37f252</id>
             <title>Post-Mission Report</title>
             <narrative>
@@ -2519,8 +2511,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>e8b26d16-e615-4579-bca2-537538fc2114</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_denizli_debrief_single_fail"
-                    type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_denizli_debrief_single_fail" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>330dae64-5634-438d-ae1a-d38380cab2bb</id>
             <title>Post-Mission Report</title>
             <narrative>
@@ -2707,8 +2698,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
             <nextStoryPointId>319cd061-56cb-49ae-b86b-4df55defddb7</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_morges_convoy_debrief_success"
-                    type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_morges_convoy_debrief_success" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>9c8bfcf2-b805-4b52-86b4-a114ce543c00</id>
             <title>Post-Mission Report</title>
             <narrative>
@@ -2721,8 +2711,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <personalityId>e5ab5d97-2483-4358-85bd-cce8aa732e61</personalityId>
             <nextStoryPointId>072c70de-1f8e-4e9e-8301-6fb0bae02328</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_morges_convoy_debrief_failure"
-                    type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_morges_convoy_debrief_failure" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>9dff4cbe-4b7b-4725-9820-c1303ad8792e</id>
             <title>Post-Mission Report</title>
             <narrative>
@@ -3283,8 +3272,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <personalityId>05e7d636-977c-4ab0-a870-39fbb26224c7</personalityId>
             <nextStoryPointId>51b8a364-9be7-4ca3-8cb9-c7145db963dd</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_crichell_bloodname_restore"
-                    type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_crichell_bloodname_restore" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>6b1de6f1-0b5f-4083-b7e8-9769131f2fa6</id>
             <title>Bloodname Trial</title>
             <narrative>
@@ -4603,8 +4591,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 <hits>1</hits>
             </storyTrigger>
         </storyPoint>
-        <storyPoint name="narr_trothkin_div_unaug_felipe_w"
-                    type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_trothkin_div_unaug_felipe_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>9f3697af-0399-43c5-8157-ee568638e8ea</id>
             <title>Trothkin Divided</title>
             <narrative>
@@ -4747,8 +4734,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 <hits>1</hits>
             </storyTrigger>
         </storyPoint>
-        <storyPoint name="narr_trothkin_div_death_felipe_w"
-                    type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_trothkin_div_death_felipe_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>ac300d26-a564-4cda-8ea9-64f3c1e9c5c7</id>
             <title>Trothkin Divided</title>
             <narrative>
@@ -4861,8 +4847,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <personalityId>682a21b2-206d-4ee9-b8bd-7c31b5e23696</personalityId>
             <nextStoryPointId>ba403c01-23fe-46a1-b47a-dafc49b1eedf</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_wotan_blood_trial1_mathius"
-                    type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_wotan_blood_trial1_mathius" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>94463c00-1796-44e5-96a7-3d0899614e19</id>
             <title>Bloodname Trial</title>
             <narrative>
@@ -5764,8 +5749,7 @@ forces.
             </storyOutcomes>
             <nextStoryPointId>c7156af2-a37b-467f-ac91-d26300447862</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="scenario_baker3_hide_seek_success"
-                    type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+        <storyPoint name="scenario_baker3_hide_seek_success" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
             <id>d4db6ca7-6e54-4188-81c0-3b578b944435</id>
             <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
             <scenario type="mekhq.campaign.mission.Scenario">
@@ -6013,8 +5997,7 @@ forces after round 12 when all available reinforcements have arrived.
                 <missionStatus>FAILED</missionStatus>
             </storyTrigger>
         </storyPoint>
-        <storyPoint name="scenario_baker3_hide_seek_failure"
-                    type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+        <storyPoint name="scenario_baker3_hide_seek_failure" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
             <id>c7156af2-a37b-467f-ac91-d26300447862</id>
             <missionStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</missionStoryPointId>
             <scenario type="mekhq.campaign.mission.Scenario">
