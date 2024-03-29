@@ -195,7 +195,7 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            TargetRoll target = new TargetRoll(3, "Target");
+            TargetRoll target = new TargetRoll(3, "Base");
 
             // Skill Rating modifier
             int skillRating = p.getExperienceLevel(campaign, false);
