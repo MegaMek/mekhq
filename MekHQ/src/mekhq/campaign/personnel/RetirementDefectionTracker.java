@@ -96,6 +96,31 @@ public class RetirementDefectionTracker {
     }
 
     /**
+     * @param age the age of the employee
+     * @return the age-based modifier
+     */
+    private static int getAgeMod(int age) {
+        int ageMod = 0;
+        if (age <= 20) {
+            ageMod = -1;
+        } else if ((age >= 50) && (age < 65)) {
+            ageMod = 1;
+        } else if ((age >= 65) && (age < 75)) {
+            ageMod = 2;
+        } else if ((age >= 75) && (age < 85)) {
+            ageMod = 3;
+        } else if ((age >= 85) && (age < 95)) {
+            ageMod = 4;
+        } else if ((age >= 95) && (age < 105)) {
+            ageMod = 5;
+        } else if (age >= 105) {
+            ageMod = 6;
+        }
+
+        return ageMod;
+    }
+
+    /**
      * Computes the target for retirement rolls for all eligible personnel; this includes
      * all active personnel who are not dependents, prisoners, or bondsmen.
      *
@@ -220,22 +245,27 @@ public class RetirementDefectionTracker {
                 target.addModifier(1, "Failed mission");
             }
 
+            // Fatigue Modifiers
             if (campaign.getCampaignOptions().isTrackUnitFatigue() && (campaign.getFatigueLevel() >= 10)) {
                 target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
             }
 
+            // Faction Modifiers
             if (campaign.getFaction().isPirate()) {
-                target.addModifier(1, "Pirate");
+                target.addModifier(1, "Pirate Company");
+            } else if (p.getOriginFaction().isPirate()) {
+                target.addModifier(1,"Pirate");
             }
 
-            if (campaign.getFaction().isMercenary()) {
+            if (p.getOriginFaction().isMercenary()) {
                 target.addModifier(1, "Mercenary");
             }
 
-            if (campaign.getFaction().isClan()) {
+            if (p.getOriginFaction().isClan()) {
                 target.addModifier(-2, "Clan");
             }
 
+            // Officer Modifiers
             if (p.getRank().isOfficer()) {
                 target.addModifier(-1, "Officer");
             } else {
@@ -258,6 +288,7 @@ public class RetirementDefectionTracker {
                 target.addModifier(ageMod, "Age");
             }
 
+            // Shares Modifiers
             if (campaign.getCampaignOptions().isUseShareSystem()) {
                 /* If this retirement roll is not being made at the end
                  * of a contract (e.g. >12 months since last roll), the
@@ -277,9 +308,12 @@ public class RetirementDefectionTracker {
                 }
             }
 
+            // Role Modifiers
             if (p.getPrimaryRole().isSoldier()) {
                 target.addModifier(-1, p.getPrimaryRole().toString());
             }
+
+            // Injury Modifiers
             int injuryMod = 0;
             for (Injury i : p.getInjuries()) {
                 if (i.isPermanent()) {
@@ -291,38 +325,18 @@ public class RetirementDefectionTracker {
                 target.addModifier(injuryMod, "Permanent injuries");
             }
 
+            // Leadership Modifiers
             if ((combatLeadershipMod != 0) && p.getPrimaryRole().isCombat()) {
-                target.addModifier(combatLeadershipMod, "Leadership");
+                target.addModifier(combatLeadershipMod, "Leadership (Combatant)");
             }
 
             if ((supportLeadershipMod != 0) && p.getPrimaryRole().isSupport()) {
-                target.addModifier(supportLeadershipMod, "Leadership");
+                target.addModifier(supportLeadershipMod, "Leadership (Support)");
             }
 
             targets.put(p.getId(), target);
         }
         return targets;
-    }
-
-    private static int getAgeMod(int age) {
-        int ageMod = 0;
-        if (age <= 20) {
-            ageMod = -1;
-        } else if ((age >= 50) && (age < 65)) {
-          ageMod = 1;
-        } else if ((age >= 65) && (age < 75)) {
-          ageMod = 2;
-        } else if ((age >= 75) && (age < 85)) {
-          ageMod = 3;
-        } else if ((age >= 85) && (age < 95)) {
-          ageMod = 4;
-        } else if ((age >= 95) && (age < 105)) {
-          ageMod = 5;
-        } else if (age >= 105) {
-          ageMod = 6;
-        }
-
-        return ageMod;
     }
 
   /**
