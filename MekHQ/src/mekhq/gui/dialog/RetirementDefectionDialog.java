@@ -147,7 +147,7 @@ public class RetirementDefectionDialog extends JDialog {
                 instructions = resourceMap.getString("txtInstructions.Overview.text");
             }
             if (null == contract) {
-                instructions += "\n\nDays since last retirement roll: "
+                instructions += "\n\nDays since last Employee Turnover check: "
                         + ChronoUnit.DAYS.between(rdTracker.getLastRetirementRoll(),
                         hqView.getCampaign().getLocalDate());
             }
