@@ -380,6 +380,50 @@ public class Scenario {
 
     public void setMinWindStrength(Wind strength) { this.minWindStrength = strength; }
 
+    /**
+     * Create a PlanetaryConditions object from variables
+     * @return PlanetaryConditions object
+     */
+    public PlanetaryConditions createPlanetaryConditions() {
+        PlanetaryConditions planetaryConditions = new PlanetaryConditions();
+        planetaryConditions.setLight(getLight());
+        planetaryConditions.setWeather(getWeather());
+        planetaryConditions.setWind(getWind());
+        planetaryConditions.setFog(getFog());
+        planetaryConditions.setAtmosphere(getAtmosphere());
+        planetaryConditions.setTemperature(getModifiedTemperature());
+        planetaryConditions.setGravity(getGravity());
+        planetaryConditions.setEMI(getEMI());
+        planetaryConditions.setBlowingSand(getBlowingSand());
+        planetaryConditions.setShiftingWindDirection(canWindShiftDirection());
+        planetaryConditions.setShiftingWindStrength(canWindShiftStrength());
+        planetaryConditions.setWindMax(getMaxWindStrength());
+        planetaryConditions.setWindMin(getMinWindStrength());
+
+        return planetaryConditions;
+    }
+
+    /**
+     * Read the values from a PlanetaryConditions object into the Scenario variables for planetary conditions.
+     * This is necessary because MekHQ has XML and MegaMek doesn't.
+     * @param planetaryConditions A PlanetaryConditions object
+     */
+    public void readPlanetaryConditions(PlanetaryConditions planetaryConditions) {
+        this.setLight(planetaryConditions.getLight());
+        this.setWeather(planetaryConditions.getWeather());
+        this.setWind(planetaryConditions.getWind());
+        this.setFog(planetaryConditions.getFog());
+        this.setAtmosphere(planetaryConditions.getAtmosphere());
+        this.setTemperature(planetaryConditions.getTemperature());
+        this.setGravity(planetaryConditions.getGravity());
+        this.setEMI(planetaryConditions.getEMI());
+        this.setBlowingSand(planetaryConditions.getBlowingSand());
+        this.setShiftWindDirection(planetaryConditions.shiftingWindDirection());
+        this.setShiftWindStrength(planetaryConditions.shiftingWindStrength());
+        this.setMaxWindStrength(planetaryConditions.getWindMax());
+        this.setMinWindStrength(planetaryConditions.getWindMin());
+    }
+
     public ScenarioDeploymentLimit getDeploymentLimit() {
         return deploymentLimit;
     }
@@ -1029,4 +1073,5 @@ public class Scenario {
     public void setHasTrack(boolean b) {
         hasTrack = b;
     }
+
 }

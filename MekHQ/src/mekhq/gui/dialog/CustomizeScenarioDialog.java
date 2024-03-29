@@ -22,6 +22,8 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.client.ui.swing.PlanetaryConditionsDialog;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.*;
@@ -53,6 +55,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private Campaign campaign;
     private boolean newScenario;
     private LocalDate date;
+    private PlanetaryConditions planetaryConditions;
 
     private LootTableModel lootModel;
 
@@ -76,6 +79,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private JComboBox<ScenarioStatus> choiceStatus;
     private JLabel lblStatus;
     private JButton btnDate;
+    private JButton btnPlanetaryConditions;
 
     public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
@@ -93,6 +97,8 @@ public class CustomizeScenarioDialog extends JDialog {
             scenario.setDate(campaign.getLocalDate());
         }
         date = scenario.getDate();
+
+        planetaryConditions = scenario.createPlanetaryConditions();
 
         loots = new ArrayList<>();
         for (Loot loot : scenario.getLoot()) {
@@ -186,6 +192,19 @@ public class CustomizeScenarioDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panMain.add(btnDate, gridBagConstraints);
+
+        btnPlanetaryConditions = new JButton();
+        btnPlanetaryConditions.setText("Planetary Conditions");
+        btnPlanetaryConditions.addActionListener(evt -> changePlanetaryConditions());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        panMain.add(btnPlanetaryConditions, gridBagConstraints);
 
         if (scenario.getStatus().isCurrent()) {
             initLootPanel();
@@ -317,6 +336,7 @@ public class CustomizeScenarioDialog extends JDialog {
                 scenario.setStatus((ScenarioStatus) choiceStatus.getSelectedItem());
             }
         }
+        scenario.readPlanetaryConditions(planetaryConditions);
         scenario.setDate(date);
         scenario.resetLoot();
         for (Loot loot : lootModel.getAllLoot()) {
@@ -379,6 +399,13 @@ public class CustomizeScenarioDialog extends JDialog {
             }
             date = dc.getDate();
             btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+        }
+    }
+
+    private void changePlanetaryConditions() {
+        PlanetaryConditionsDialog pc = new PlanetaryConditionsDialog(frame, planetaryConditions);
+        if(pc.showDialog()) {
+            planetaryConditions = pc.getConditions();
         }
     }
 
