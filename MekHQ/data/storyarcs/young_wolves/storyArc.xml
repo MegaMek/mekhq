@@ -445,7 +445,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                     <nextStoryPointId>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
-            <nextStoryPointId>1206a1e7-a005-4455-9e8d-5f4fe0ec607f</nextStoryPointId>
+            <nextStoryPointId>2c6f5703-3a86-43b8-b7d7-e8cf04f06417</nextStoryPointId>
         </storyPoint>
         <storyPoint name="check_mathius_active2" type="mekhq.campaign.storyarc.storypoint.CheckPersonStatusStoryPoint">
             <id>95102bb4-fa5b-4ba0-afc3-137673c47333</id>
