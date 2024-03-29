@@ -46,7 +46,7 @@ import java.util.*;
  * @author Neoancient
  *
  * Against the Bot
- * Utility class that handles retirement/defection rolls and final payments
+ * Utility class that handles Employee Turnover rolls and final payments
  * to personnel who retire/defect/get sacked and families of those killed
  * in battle.
  */
@@ -340,7 +340,7 @@ public class RetirementDefectionTracker {
     }
 
   /**
-     * Makes rolls for retirement/defection based on previously calculated target rolls,
+     * Makes rolls for Employee Turnover based on previously calculated target rolls,
      * and tracks all retirees in the unresolvedPersonnel hash in case the dialog
      * is closed before payments are resolved, to avoid re-rolling the results.
      *
@@ -424,7 +424,7 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Worker function that clears out any orphan retirement/defection records
+     * Worker function that clears out any orphan Employee Turnover records
      */
     public void cleanupOrphans(Campaign campaign) {
         payouts.keySet().removeIf(personID -> campaign.getPerson(personID) == null);
@@ -481,7 +481,7 @@ public class RetirementDefectionTracker {
     /**
      * @param campaign the campaign the person is a part of
      * @param person the person to get the bonus cost for
-     * @return The amount in C-bills required to get a bonus to the retirement/defection roll
+     * @return The amount in C-bills required to get a bonus to the Employee Turnover roll
      */
     public static Money getBonusCost(final Campaign campaign, Person person) {
         final boolean isMechWarriorProfession = Profession.getProfessionFromPersonnelRole(
@@ -765,7 +765,7 @@ public class RetirementDefectionTracker {
         }
 
         if (retVal != null) {
-            // sometimes, a campaign may be loaded with orphan records in the retirement/defection tracker
+            // sometimes, a campaign may be loaded with orphan records in the Employee Turnover tracker
             // let's clean those up here.
             retVal.cleanupOrphans(c);
         }

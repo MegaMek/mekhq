@@ -3185,7 +3185,7 @@ public class Person {
     }
     //endregion injuries
 
-    /* For use by Against the Bot retirement/defection rolls */
+    /* For use by Against the Bot Employee Turnover rolls */
     public int getOriginalUnitWeight() {
         return originalUnitWeight;
     }
