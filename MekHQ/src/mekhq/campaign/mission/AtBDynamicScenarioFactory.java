@@ -2315,23 +2315,35 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Worker function to determine the "lance size" of a group of aircraft.
-     * Either 2 for ASF
+     * Either 2 for ASF, 3 for CC ASF,
+     * @param unitTypeCode
      * @param isPlanetOwner
+     * @param factionCode
      * @return
      */
     public static int getAeroLanceSize(int unitTypeCode, boolean isPlanetOwner, String factionCode) {
         // capellans use units of three aircraft at a time, others use two
         // TODO: except maybe clans?
         int numFightersPerFlight = factionCode.equals("CC") ? 3 : 2;
+        int weightCountRoll = (Compute.randomInt(3) + 1) * numFightersPerFlight;
+        int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
+        return getAeroLanceSize(unitTypeCode, numFightersPerFlight, weightCountRoll, useASFRoll);
+    }
 
+    /**
+     * Unwrapped inner logic of above function to be deterministic, for testing purposes.
+     * @param unitTypeCode
+     * @param numFightersPerFlight
+     * @param weightCountRoll
+     * @param useASFRoll
+     * @return
+     */
+    public static int getAeroLanceSize(int unitTypeCode, int numFightersPerFlight, int weightCountRoll, int useASFRoll) {
         if (unitTypeCode == UnitType.AEROSPACEFIGHTER) {
             return numFightersPerFlight;
         } else if (unitTypeCode == UnitType.CONV_FIGHTER) {
-            return (Compute.randomInt(3) + 1) * numFightersPerFlight;
+            return weightCountRoll;
         } else {
-            int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
-            int weightCountRoll = (Compute.randomInt(3) + 1) * numFightersPerFlight; // # of conventional fighters, just in case
-
             // if we are the planet owner, we may use ASF or conventional fighters
             boolean useASF = useASFRoll >= 4;
             // if we are using ASF, we "always" use 2 at a time, otherwise, use the # of conventional fighters
