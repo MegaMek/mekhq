@@ -76,6 +76,8 @@ public class ScenarioStoryPoint extends StoryPoint {
         if(null != missionStoryPoint && missionStoryPoint instanceof MissionStoryPoint) {
             Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
             if (null != m & null != scenario) {
+                // set date to today
+                scenario.setDate(getStoryArc().getCampaign().getLocalDate());
                 getStoryArc().getCampaign().addScenario(scenario, m);
                 Force force = getCampaign().getForce(deployedForceId);
                 if(null != force) {
