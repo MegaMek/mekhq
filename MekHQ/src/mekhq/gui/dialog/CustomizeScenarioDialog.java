@@ -174,20 +174,18 @@ public class CustomizeScenarioDialog extends JDialog {
             panMain.add(choiceStatus, gridBagConstraints);
         }
 
-        if (!scenario.getStatus().isCurrent() || (campaign.getCampaignOptions().isUseAtB() && (scenario instanceof AtBScenario))) {
-            btnDate = new JButton();
-            btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
-            btnDate.addActionListener(evt -> changeDate());
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy++;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 0.0;
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-            panMain.add(btnDate, gridBagConstraints);
-        }
+        btnDate = new JButton();
+        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+        btnDate.addActionListener(evt -> changeDate());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        panMain.add(btnDate, gridBagConstraints);
 
         if (scenario.getStatus().isCurrent()) {
             initLootPanel();
@@ -318,9 +316,8 @@ public class CustomizeScenarioDialog extends JDialog {
             if (choiceStatus.getSelectedItem() != null) {
                 scenario.setStatus((ScenarioStatus) choiceStatus.getSelectedItem());
             }
-
-            scenario.setDate(date);
         }
+        scenario.setDate(date);
         scenario.resetLoot();
         for (Loot loot : lootModel.getAllLoot()) {
             scenario.addLoot(loot);
