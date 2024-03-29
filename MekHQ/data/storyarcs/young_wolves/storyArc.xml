@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<storyArc version="0.49.7-SNAPSHOT">
+<storyArc version="0.49.19-SNAPSHOT">
     <title>Young Wolves</title>
-    <details>Clan Invasion era; Mechs only</details>
+    <details>BETA TEST v0.1</details>
     <description>
 # Young Wolves
 
@@ -16,9 +16,22 @@ belligerents to effect the balance of power in the Inner Sphere for a generation
 This is the story of a Trinary of young Wolf warriors eager to write their own line in the Remembrance through
 glory and sacrifice. The Refusal War will test their resolve, skill, and, most importantly, their loyalty.
 
-## Story Arc details
+## Details
 
-This is a story arc in active development. Try at your own risk!
+This story arc will take the user through the Clan Refusal War as a Wolf Star Captain. Most battles will involve
+between a trinary and a star of units, although there will also be several possibilities for individual duels. All combat
+will be mech only. Two main story endings are possible, depending on player choices.
+
+## Credits
+
+*Author:* Aaron Gullickson (Taharqa)
+
+*Art Credits:*
+
+- PhearTheHam
+- Florian "SpOoKy777" Mellies
+- Anthony Scroggins
+
     </description>
     <storyLoadingType>START_NEW</storyLoadingType>
     <startingPointId>a643f85c-5573-4f15-8eb2-2b55e1cbda05</startingPointId>
