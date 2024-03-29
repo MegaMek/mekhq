@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <storyArc version="0.49.19-SNAPSHOT">
     <title>Young Wolves</title>
-    <details>BETA TEST v0.1</details>
+    <details>BETA TEST v0.2</details>
     <description>
 # Young Wolves
 
@@ -89,7 +89,7 @@ will be mech only. Two main story endings are possible, depending on player choi
             <narrative>
 ## Young Wolves Story Arc Beta Test
 
-**Version**: 0.1
+**Version**: 0.2
 
 Welcome, mechwarriors! The new Story Arcs feature being developed for MekHQ offers the ability to create
 a branching narrative structure to lead a player through a set of missions and scenarios, allowing users
