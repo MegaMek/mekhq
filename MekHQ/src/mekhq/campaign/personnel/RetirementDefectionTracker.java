@@ -554,9 +554,6 @@ public class RetirementDefectionTracker {
                     }
                 } else {
                     payoutAmount = getBonusCost(campaign, person);
-                    if (person.getRank().isOfficer()) {
-                        payoutAmount = payoutAmount.multipliedBy(1.2);
-                    }
                 }
 
                 if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
