@@ -5316,7 +5316,7 @@ recover downed pilots, but not mechs or salvage.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
-                <mapSize>36,35</mapSize>
+                <mapSize>35,35</mapSize>
                 <map>/unofficial/Cartes/35x35 Lilith</map>
                 <botForce>
                     <name>Twelfth Falcon Regulars</name>
