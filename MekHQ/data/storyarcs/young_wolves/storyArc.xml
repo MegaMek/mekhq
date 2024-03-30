@@ -5328,7 +5328,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="e08dbd89-991f-4454-9e69-4c8fb2d70861" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Star Captain Syd" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Star Captain Syd" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="d0e93662-864f-477c-b1fc-80e9b58eef61" commandB="2"
                                    ejected="false" autoeject="true" condejectammo="false" condejectengine="true"
                                    condejectctdest="true" condejectctheadshot="true"/>
@@ -5354,7 +5354,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Mad Cat (Timber Wolf)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="0ad79198-1d9f-4ab3-87ff-f083119b8178" quirks="imp_target_med::weak_head_1">
-                            <pilot size="1" name="Alfred" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Alfred" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="8b3e5b9e-3a2b-4cdd-99a7-9b4218d25950" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5370,7 +5370,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Mad Cat (Timber Wolf)" model="C" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="c5f5bacd-9407-4f01-8953-1e7ef6c09447" quirks="imp_target_med::weak_head_1">
-                            <pilot size="1" name="Minh-Giao" nick="" gender="FEMALE" gunnery="4" piloting="4"
+                            <pilot size="1" name="Minh-Giao" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="4"
                                    artillery="4" externalId="445a37d9-2520-4d02-baac-6054f1057582" hits="1"
                                    ejected="false" autoeject="true" condejectammo="false" condejectengine="true"
                                    condejectctdest="true" condejectctheadshot="true"/>
@@ -5392,7 +5392,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="5aa9c785-53a7-4c38-b43c-59520d34ab15" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Chris" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Chris" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="5c9790cc-5899-4178-b48c-db2931ec419a" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5411,7 +5411,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="42a5a9d0-3518-49b0-aeb8-68f966ea4ac1" quirks="stable">
-                            <pilot size="1" name="Agathe" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="1" name="Agathe" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="eaebc26b-8f8a-435d-9bee-c18bba747243" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5434,7 +5434,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Phantom" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b2078d4e-00f4-4722-a968-a6f863699dcf" quirks="imp_sensors">
-                            <pilot size="1" name="Star Commander Daliah" nick="" gender="FEMALE" gunnery="3"
+                            <pilot size="1" name="Star Commander Daliah" nick="" gender="FEMALE" clanperson="true" gunnery="3"
                                    piloting="3" artillery="4" externalId="69ea6793-117c-42bc-b311-d9958a0cb783"
                                    commandB="1" ejected="false" autoeject="true" condejectammo="false"
                                    condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
@@ -5452,7 +5452,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Phantom" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="361f49d4-13ef-4d65-a285-e9bb3cdc9c36" quirks="imp_sensors">
-                            <pilot size="1" name="Brian" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="1" name="Brian" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="968ecaa1-3c15-4660-9d62-fbe843f6ffa9" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5469,7 +5469,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Shadow Cat" model="M" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="7d9ecf9f-0b65-4302-8336-6c0bd4c67765" quirks="low_profile">
-                            <pilot size="1" name="Vaclav" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Vaclav" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="6ee54017-25c4-44c7-bcfc-51714fdd942c" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5480,7 +5480,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="58be9f70-1b0e-4b97-8a3b-f50c7c20208e" quirks="stable">
-                            <pilot size="1" name="Joshua" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Joshua" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="0396da1b-1537-4cec-a5fa-455ae6e799e3" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5488,7 +5488,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Puma (Adder)" model="S" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="c0544a4b-6cc1-4df3-aebe-d36ced36b48e" quirks="low_profile::no_twist">
-                            <pilot size="1" name="Star Commander Hakeem" nick="" gender="MALE" gunnery="3" piloting="3"
+                            <pilot size="1" name="Star Commander Hakeem" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="3"
                                    artillery="4" externalId="192e7b11-a28e-4528-93e6-904fb2be8b1c" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5509,7 +5509,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Koshi (Mist Lynx)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="8e450776-ecee-4787-bdf8-594bf6a97d8a" quirks="imp_sensors::low_profile">
-                            <pilot size="1" name="Mushtaaqa" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Mushtaaqa" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="7f7be11d-8e84-4aa4-b1d1-0835528e5c14" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5525,7 +5525,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Koshi (Mist Lynx)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="65031a7c-1e3f-4df5-bf20-ade77229bc40" quirks="imp_sensors::low_profile">
-                            <pilot size="1" name="John" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="1" name="John" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="58019f2a-e0cf-4075-9404-d52691c36be6" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5541,7 +5541,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Dasher (Fire Moth)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="77d83971-75bb-47a9-9c99-3b75e6aaa5da" quirks="low_profile::overhead_arms">
-                            <pilot size="1" name="Feenat" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="1" name="Feenat" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="5b7c3d9b-f4af-44d7-87d9-bd0eab87f287" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5556,7 +5556,7 @@ recover downed pilots, but not mechs or salvage.
                         <entity chassis="Dasher (Fire Moth)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="3355f4db-3e88-40da-9bfe-222fda7bd904" quirks="low_profile::overhead_arms">
-                            <pilot size="1" name="Tatiana" nick="" gender="FEMALE" gunnery="4" piloting="4"
+                            <pilot size="1" name="Tatiana" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="4"
                                    artillery="4" externalId="a00b4af0-a05c-47d5-b39e-650299168ec8" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -5784,7 +5784,7 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Thor (Summoner)" model="D" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="8" deploymentZone="-1" neverDeployed="true"
                                 externalId="1ad2b211-d4b4-4f73-8453-439528c7a4aa">
-                            <pilot size="1" name="Star Captain Sagin" nick="" gender="MALE" gunnery="2" piloting="2"
+                            <pilot size="1" name="Star Captain Sagin" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="2"
                                    externalId="4cd054e4-3ade-455d-a813-047abc9fee8c" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="3">Left Torso
@@ -5798,7 +5798,7 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Puma (Adder)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true"
                                 externalId="54f23cb6-4abd-4386-8989-1c615cd42191">
-                            <pilot size="1" name="Warrior Estera" nick="" gender="FEMALE" gunnery="3" piloting="3"
+                            <pilot size="1" name="Warrior Estera" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="3"
                                    externalId="247d804a-0c9d-4d2e-ac0b-c35c9340bddb" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="4">Right Arm
@@ -5815,7 +5815,7 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Vulture (Mad Dog)" model="D" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="33a140c7-6100-4b24-b685-18d3eb80f9ec">
-                            <pilot size="1" name="Warrior Mujtaba" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Mujtaba" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="d87996c4-0669-4c27-a421-30d26d459f85" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="2">Right Torso
@@ -5834,7 +5834,7 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="4fa90abb-156c-44d8-875e-c1e08d0317cc">
-                            <pilot size="1" name="Warrior Anandaprada" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Anandaprada" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="749434d1-3439-4e48-a888-172fbfbeafda" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="3">Left Torso
@@ -5850,7 +5850,7 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="8" deploymentZone="-1" neverDeployed="true"
                                 externalId="8185b127-8eb8-4117-8c91-70d75871161a">
-                            <pilot size="1" name="Warrior Dympna" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Dympna" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="f42bf32c-583b-4299-abbd-b90f86c77b23" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="3">Left Torso
@@ -5866,7 +5866,7 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Elemental Battle Armor" model="[Laser]" type="Jump" commander="false"
                                 offboard="false" hidden="false" deployment="8" deploymentZone="-1" neverDeployed="true"
                                 externalId="7c66de2d-e9a5-4768-886e-b0b526125eb0">
-                            <pilot size="1" name="Star Commander Riika" nick="" gender="FEMALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Star Commander Riika" nick="" gender="FEMALE" clanperson="true" gunnery="2" piloting="3"
                                    externalId="af629ac6-e1dd-413a-94c2-4f1f671a6e4a" ejected="false"/>
                             <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle"/>
                             The first slot in a location is at index="1".
@@ -5880,7 +5880,7 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Elemental Battle Armor" model="[Flamer]" type="Jump" commander="false"
                                 offboard="false" hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true"
                                 externalId="55a009af-5a5a-4141-a108-bdd1657798be">
-                            <pilot size="1" name="Point Commander Romia" nick="" gender="FEMALE" gunnery="2"
+                            <pilot size="1" name="Point Commander Romia" nick="" gender="FEMALE" clanperson="true" gunnery="2"
                                    piloting="4" externalId="1aa06a3d-9e31-49d3-a3ca-b1b2cbf0aa69" ejected="false"/>
                             <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle"/>
                             The first slot in a location is at index="1".
@@ -5894,7 +5894,7 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="406de52c-6f5c-4c03-aa4b-aa0f6af85f43">
-                            <pilot size="1" name="Point Commander Irene" nick="" gender="FEMALE" gunnery="3"
+                            <pilot size="1" name="Point Commander Irene" nick="" gender="FEMALE" clanperson="true" gunnery="3"
                                    piloting="4" externalId="98f76941-0e20-427a-a82e-f60bdfa22fcb" ejected="false"/>
                             <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle"/>
                             The first slot in a location is at index="1".
@@ -5908,7 +5908,7 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="ef2227fe-c988-4459-b26f-a86532b34319">
-                            <pilot size="1" name="Point Commander Hansika" nick="" gender="FEMALE" gunnery="2"
+                            <pilot size="1" name="Point Commander Hansika" nick="" gender="FEMALE" clanperson="true" gunnery="2"
                                    piloting="4" externalId="1767cade-e849-4ace-9a78-9b7b4dfcf870" ejected="false"/>
                             <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle"/>
                             The first slot in a location is at index="1".
@@ -5922,7 +5922,7 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false"
                                 offboard="false" hidden="false" deployment="8" deploymentZone="-1" neverDeployed="true"
                                 externalId="de503832-39d7-4f11-88d6-262741ea2522">
-                            <pilot size="1" name="Point Commander Michihiro" nick="" gender="MALE" gunnery="3"
+                            <pilot size="1" name="Point Commander Michihiro" nick="" gender="MALE" clanperson="true" gunnery="3"
                                    piloting="4" externalId="ac840787-9663-4945-b7ce-baca6bad51ec" ejected="false"/>
                             <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle"/>
                             The first slot in a location is at index="1".
@@ -5936,14 +5936,14 @@ forces after round 12 when all available reinforcements have arrived.
                         <entity chassis="Locust IIC" model="(Standard)" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="12" deploymentZone="-1" neverDeployed="true"
                                 externalId="a8a85778-66c4-42cf-b832-625aac7c72b5">
-                            <pilot size="1" name="Warrior Franciszka" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Franciszka" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="6e4f6c41-855c-45bc-ad49-60bf7bb084c3" ejected="false" autoeject="true"/>
                             <Game id="11"/>
                         </entity>
                         <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="12" deploymentZone="-1" neverDeployed="true"
                                 externalId="6eb3c710-4bfd-4f91-b11d-1f7b87169e60">
-                            <pilot size="1" name="Star Commander Héctor" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Star Commander Héctor" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="0216f803-0165-4ae1-b725-959fadd82b7f" ejected="false" autoeject="true"/>
                             <Game id="12"/>
                         </entity>
@@ -6033,7 +6033,7 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Thor (Summoner)" model="D" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="1ad2b211-d4b4-4f73-8453-439528c7a4aa">
-                            <pilot size="1" name="Star Captain Sagin" nick="" gender="MALE" gunnery="2" piloting="2"
+                            <pilot size="1" name="Star Captain Sagin" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="2"
                                    externalId="4cd054e4-3ade-455d-a813-047abc9fee8c" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="3">Left Torso
@@ -6047,7 +6047,7 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Puma (Adder)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="54f23cb6-4abd-4386-8989-1c615cd42191">
-                            <pilot size="1" name="Warrior Estera" nick="" gender="FEMALE" gunnery="3" piloting="3"
+                            <pilot size="1" name="Warrior Estera" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="3"
                                    externalId="247d804a-0c9d-4d2e-ac0b-c35c9340bddb" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="4">Right Arm
@@ -6064,7 +6064,7 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Vulture (Mad Dog)" model="D" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="33a140c7-6100-4b24-b685-18d3eb80f9ec">
-                            <pilot size="1" name="Warrior Mujtaba" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Mujtaba" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="d87996c4-0669-4c27-a421-30d26d459f85" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="2">Right Torso
@@ -6083,7 +6083,7 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="4fa90abb-156c-44d8-875e-c1e08d0317cc">
-                            <pilot size="1" name="Warrior Anandaprada" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Anandaprada" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="749434d1-3439-4e48-a888-172fbfbeafda" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="3">Left Torso
@@ -6099,7 +6099,7 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="8185b127-8eb8-4117-8c91-70d75871161a">
-                            <pilot size="1" name="Warrior Dympna" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Dympna" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="f42bf32c-583b-4299-abbd-b90f86c77b23" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="3">Left Torso
@@ -6115,7 +6115,7 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Elemental Battle Armor" model="[Laser]" type="Jump" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="7c66de2d-e9a5-4768-886e-b0b526125eb0">
-                            <pilot size="1" name="Star Commander Riika" nick="" gender="FEMALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Star Commander Riika" nick="" gender="FEMALE" clanperson="true" gunnery="2" piloting="3"
                                    externalId="af629ac6-e1dd-413a-94c2-4f1f671a6e4a" ejected="false"/>
                             <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle"/>
                             The first slot in a location is at index="1".
@@ -6129,7 +6129,7 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Elemental Battle Armor" model="[Flamer]" type="Jump" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="55a009af-5a5a-4141-a108-bdd1657798be">
-                            <pilot size="1" name="Point Commander Romia" nick="" gender="FEMALE" gunnery="2"
+                            <pilot size="1" name="Point Commander Romia" nick="" gender="FEMALE" clanperson="true" gunnery="2"
                                    piloting="4" externalId="1aa06a3d-9e31-49d3-a3ca-b1b2cbf0aa69" ejected="false"/>
                             <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle"/>
                             The first slot in a location is at index="1".
@@ -6143,7 +6143,7 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="406de52c-6f5c-4c03-aa4b-aa0f6af85f43">
-                            <pilot size="1" name="Point Commander Irene" nick="" gender="FEMALE" gunnery="3"
+                            <pilot size="1" name="Point Commander Irene" nick="" gender="FEMALE" clanperson="true" gunnery="3"
                                    piloting="4" externalId="98f76941-0e20-427a-a82e-f60bdfa22fcb" ejected="false"/>
                             <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle"/>
                             The first slot in a location is at index="1".
@@ -6157,7 +6157,7 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="ef2227fe-c988-4459-b26f-a86532b34319">
-                            <pilot size="1" name="Point Commander Hansika" nick="" gender="FEMALE" gunnery="2"
+                            <pilot size="1" name="Point Commander Hansika" nick="" gender="FEMALE" clanperson="true" gunnery="2"
                                    piloting="4" externalId="1767cade-e849-4ace-9a78-9b7b4dfcf870" ejected="false"/>
                             <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle"/>
                             The first slot in a location is at index="1".
@@ -6171,7 +6171,7 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Elemental Battle Armor" model="[MG]" type="Jump" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="de503832-39d7-4f11-88d6-262741ea2522">
-                            <pilot size="1" name="Point Commander Michihiro" nick="" gender="MALE" gunnery="3"
+                            <pilot size="1" name="Point Commander Michihiro" nick="" gender="MALE" clanperson="true" gunnery="3"
                                    piloting="4" externalId="ac840787-9663-4945-b7ce-baca6bad51ec" ejected="false"/>
                             <antiPersonnelMount baAPMMountNum="4" baAPMTypeName="InfantryAssaultRifle"/>
                             The first slot in a location is at index="1".
@@ -6185,14 +6185,14 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Locust IIC" model="(Standard)" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true"
                                 externalId="a8a85778-66c4-42cf-b832-625aac7c72b5">
-                            <pilot size="1" name="Warrior Franciszka" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Franciszka" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="6e4f6c41-855c-45bc-ad49-60bf7bb084c3" ejected="false" autoeject="true"/>
                             <Game id="11"/>
                         </entity>
                         <entity chassis="Puma (Adder)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true"
                                 externalId="74bb948b-20f4-4811-99c2-01db07438d15">
-                            <pilot size="1" name="Warrior Bhajana" nick="" gender="MALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Bhajana" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5"
                                    externalId="a6db5b32-6195-4a5a-b882-4a2727fe5f5a" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="4">Right Arm
@@ -6208,14 +6208,14 @@ forces after round 14 when all available reinforcements have arrived.
                         <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="14" deploymentZone="-1" neverDeployed="true"
                                 externalId="6eb3c710-4bfd-4f91-b11d-1f7b87169e60">
-                            <pilot size="1" name="Star Commander Héctor" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Star Commander Héctor" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="0216f803-0165-4ae1-b725-959fadd82b7f" ejected="false" autoeject="true"/>
                             <Game id="13"/>
                         </entity>
                         <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="14" deploymentZone="-1" neverDeployed="true"
                                 externalId="d704cdd7-2ef0-4175-a2dd-52bc4cbb832b">
-                            <pilot size="1" name="Warrior Helen" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Helen" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    externalId="697f102d-62e7-46db-ac23-7cb694288bb4" ejected="false" autoeject="true"/>
                             <Game id="14"/>
                         </entity>
@@ -6320,7 +6320,7 @@ salvage.
                                 hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
                                 neverDeployed="true" externalId="d3b2706c-d762-46f1-b459-e6b0c97807e5"
                                 quirks="low_profile::no_twist">
-                            <pilot size="1" name="Star Commander Trevor" nick="" gender="FEMALE" gunnery="2"
+                            <pilot size="1" name="Star Commander Trevor" nick="" gender="FEMALE" clanperson="true" gunnery="2"
                                    piloting="3" artillery="4" externalId="220c2078-64ad-4d2f-8f08-ba58b78ee356"
                                    commandB="1" ejected="false" autoeject="true" condejectammo="false"
                                    condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
@@ -6343,7 +6343,7 @@ salvage.
                         <entity chassis="Uller (Kit Fox)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="442b6fd7-7f1c-48bf-93fa-131ae623cc0a" quirks="low_profile::no_twist">
-                            <pilot size="1" name="Warrior Bruin" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Bruin" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="ef140f43-92de-44b5-9d1d-52b9d4c40de6" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6364,7 +6364,7 @@ salvage.
                         <entity chassis="Firefly" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="3ea568eb-58fa-432b-8242-bf61ec049cdd" quirks="no_arms::no_twist">
-                            <pilot size="1" name="Warrior Pyotr" nick="" gender="MALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Pyotr" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="47298824-6194-4254-b2fa-bfc48a311a99" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6378,7 +6378,7 @@ salvage.
                         <entity chassis="Hankyu (Arctic Cheetah)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="464b3ff5-0148-4fa4-993b-711c63076bdc" quirks="pro_actuator">
-                            <pilot size="1" name="Warrior Gertrude" nick="" gender="FEMALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Warrior Gertrude" nick="" gender="FEMALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="08987f61-f900-4538-ab7d-04f1ffc16aa6" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6395,7 +6395,7 @@ salvage.
                         <entity chassis="Dasher (Fire Moth)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="f2d48b0b-dfe3-4af5-92d1-f314d14c4eed" quirks="low_profile::overhead_arms">
-                            <pilot size="1" name="Warrior Nherbert" nick="" gender="MALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Nherbert" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="254577bc-929f-4727-8256-a5cdea0b9cec" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6418,7 +6418,7 @@ salvage.
                         <entity chassis="Black Lanner" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true"
                                 externalId="a31d367f-c8cd-4f0a-bc5d-c5fe05c662dc" quirks="stable">
-                            <pilot size="1" name="Warrior Mary" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Mary" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="98749a8e-7ed0-45a1-9048-6a390c733d68" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6436,7 +6436,7 @@ salvage.
                         <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true"
                                 externalId="4d60eb9b-31ef-40a4-bd10-bf8bca69160d" quirks="stable">
-                            <pilot size="1" name="Star Commander Kumaragupta" nick="" gender="MALE" gunnery="2"
+                            <pilot size="1" name="Star Commander Kumaragupta" nick="" gender="MALE" clanperson="true" gunnery="2"
                                    piloting="3" artillery="4" externalId="af01f50d-368b-4529-afb3-f43438a6adc8"
                                    commandB="1" ejected="false" autoeject="true" condejectammo="false"
                                    condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
@@ -6455,7 +6455,7 @@ salvage.
                         <entity chassis="Black Lanner" model="D" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true"
                                 externalId="d96e9668-90fc-40b0-a450-9024c1225519" quirks="stable">
-                            <pilot size="1" name="Warrior Jehane" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Jehane" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="0298b6b5-5476-4b52-8409-10a9d39131e9" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6476,7 +6476,7 @@ salvage.
                         <entity chassis="Fenris (Ice Ferret)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true"
                                 externalId="5eaae6fe-a78b-465e-8c2a-df7706c67247" quirks="imp_sensors">
-                            <pilot size="1" name="Warrior Nadezhda" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Nadezhda" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="fd349ad7-8a2c-4d99-bcf5-5c19a3d90bb1" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6497,7 +6497,7 @@ salvage.
                         <entity chassis="Ryoken (Stormcrow)" model="D" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="3" deploymentZone="-1" neverDeployed="true"
                                 externalId="90c3ad4d-7ec6-421f-a517-f808096b746b" quirks="stable">
-                            <pilot size="1" name="Warrior Bill" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Bill" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="ac5c011d-82c9-4241-b22c-bbcd8f3c83e7" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6527,7 +6527,7 @@ salvage.
                         <entity chassis="Cauldron-Born (Ebon Jaguar)" model="C" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true"
                                 externalId="e003cd74-b4c7-46d7-8361-221490193259" quirks="low_profile">
-                            <pilot size="1" name="Warrior Bobbi" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Bobbi" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="c6fb8638-3bfd-4148-bf62-3175caa333ef" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6561,7 +6561,7 @@ salvage.
                         <entity chassis="Vulture (Mad Dog)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true"
                                 externalId="354297a2-3485-417a-bf23-e03d3bd1fe3a" quirks="imp_target_med">
-                            <pilot size="1" name="Warrior David" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior David" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="12b0d067-f2c6-4360-8af1-05546cac0e9e" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6580,7 +6580,7 @@ salvage.
                         <entity chassis="Mad Cat (Timber Wolf)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true"
                                 externalId="da7bed7a-e3ed-406e-b10d-e18fcbc056be" quirks="imp_target_med::weak_head_1">
-                            <pilot size="1" name="Warrior Reima" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Reima" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="91fb90e2-9a9f-4ecf-bdae-05e5f32073f4" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6605,7 +6605,7 @@ salvage.
                         <entity chassis="Thor (Summoner)" model="M" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true"
                                 externalId="50c8109d-0974-4073-a7be-629255d55aff" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Warrior Neema" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Neema" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="21ac831f-af65-43a8-aa08-26ff7982e4c5" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6629,7 +6629,7 @@ salvage.
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="5" hits="1" deploymentZone="-1" neverDeployed="true"
                                 externalId="eb2d25c9-f7d8-432a-96eb-39cf02894a7f" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Star Captain Matthew von Jankmon" nick="" gender="FEMALE" gunnery="1"
+                            <pilot size="1" name="Star Captain Matthew von Jankmon" nick="" gender="FEMALE" clanperson="true" gunnery="1"
                                    piloting="2" artillery="4" externalId="af56c112-7ffa-45b0-a72d-b5051de1d2a0"
                                    commandB="3" ejected="false" autoeject="true" condejectammo="false"
                                    condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
@@ -6659,7 +6659,7 @@ salvage.
                         <entity chassis="Battle Cobra" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true"
                                 externalId="634c8749-4426-4fc7-80d5-144bebc757ed" quirks="ext_twist">
-                            <pilot size="1" name="Warrior Constansie" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Constansie" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="bf3958dc-8342-45a7-990c-2c4774b875b4" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6681,7 +6681,7 @@ salvage.
                         <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="7" hits="1" deploymentZone="-1" neverDeployed="true"
                                 externalId="1d45b8b1-ff5d-43b2-9f5a-77802d40a3e6" quirks="stable">
-                            <pilot size="1" name="Star Commander Olaf" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Star Commander Olaf" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="27504ae2-ae88-47a8-8dc9-2a7df1b2f4eb" commandB="1"
                                    ejected="false" autoeject="true" condejectammo="false" condejectengine="true"
                                    condejectctdest="true" condejectctheadshot="true"/>
@@ -6709,7 +6709,7 @@ salvage.
                         <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true"
                                 externalId="fa95f18b-5dd5-4f12-87de-7d44d586f93d" quirks="stable">
-                            <pilot size="1" name="Warrior Celina" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Celina" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="1530c3b8-bfa4-4d9e-93cd-198b4b17e6b0" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6729,7 +6729,7 @@ salvage.
                                 hidden="false" deployment="7" hits="2" deploymentZone="-1" neverDeployed="true"
                                 externalId="5fc7eae2-0cad-40ea-869a-56da49a3cf01"
                                 quirks="combat_computer::low_profile::no_twist">
-                            <pilot size="1" name="Warrior Viktor" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Warrior Viktor" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="0c8a1243-158a-44be-9494-e4d6254861c3" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6754,7 +6754,7 @@ salvage.
                         <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true"
                                 externalId="5538fe58-694b-4362-8938-61ea4299e8dd" quirks="stable">
-                            <pilot size="1" name="Finlay" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Finlay" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="5e14441d-e147-48fc-8d4c-b731af48a433" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6773,7 +6773,7 @@ salvage.
                         <entity chassis="Night Gyr" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
                                 externalId="d56085d2-f31d-4693-884a-c31db48562ac" quirks="difficult_maintain">
-                            <pilot size="1" name="Star Commander Laura" nick="" gender="FEMALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Star Commander Laura" nick="" gender="FEMALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="1f9360d0-d763-4f4e-a793-5dde860693f4" commandB="2"
                                    ejected="false" autoeject="true" condejectammo="false" condejectengine="true"
                                    condejectctdest="true" condejectctheadshot="true"/>
@@ -6800,7 +6800,7 @@ salvage.
                         <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
                                 externalId="caf114e2-eeb3-46b2-b031-fb986d0d17f5" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Warrior Binta" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Binta" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="64df0b29-6742-4709-b599-53c2927d9b5e" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6827,7 +6827,7 @@ salvage.
                         <entity chassis="Vulture (Mad Dog)" model="S" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
                                 externalId="25524b05-f5a0-4383-bf9b-5ebd7230aca9" quirks="imp_target_med">
-                            <pilot size="1" name="Warrior Vallie" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Vallie" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="4caacffb-473a-41ec-aa32-22c42ec3c0fb" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6843,7 +6843,7 @@ salvage.
                         <entity chassis="Cauldron-Born (Ebon Jaguar)" model="A" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
                                 externalId="df726a51-3bd9-451f-98e5-1c9ccd4b35b3" quirks="low_profile">
-                            <pilot size="1" name="Warrior Anthon" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Anthon" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="324d36f2-bb06-46b8-9aee-4aa274984b13" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6866,7 +6866,7 @@ salvage.
                         <entity chassis="Thor (Summoner)" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
                                 externalId="6e5ad902-5870-4528-9d86-2851b4e0765e" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Warrior Rıfkı" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Warrior Rıfkı" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="214e8dd1-5edd-43e8-af2b-54b34d253174" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6891,7 +6891,7 @@ salvage.
                         <entity chassis="Turkina" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true"
                                 externalId="9e009f26-0957-4ab3-bff6-f1246ee47e16" quirks="no_twist">
-                            <pilot size="1" name="Star Captain Rama Chistu" nick="" gender="MALE" gunnery="2"
+                            <pilot size="1" name="Star Captain Rama Chistu" nick="" gender="MALE" clanperson="true" gunnery="2"
                                    piloting="3" artillery="4" externalId="e0955b03-052e-4def-a61b-979240be895f"
                                    commandB="3" ejected="false" advantages="sniper" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
@@ -6911,7 +6911,7 @@ salvage.
                         <entity chassis="Turkina" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true"
                                 externalId="f2c08ece-cdd7-4ae3-9b74-162670acbb27" quirks="no_twist">
-                            <pilot size="1" name="Warrior Marat" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Marat" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="40f8e246-af2a-4a24-bcce-c0ff5279201d" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6933,7 +6933,7 @@ salvage.
                         <entity chassis="Man O' War (Gargoyle)" model="A" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true"
                                 externalId="ed43eec2-dd73-4c3a-b918-b35d73839abb">
-                            <pilot size="1" name="Warrior Mezgebu" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Warrior Mezgebu" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="615dd911-dc60-4481-a1b5-50fad8fd4fbc" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -6960,7 +6960,7 @@ salvage.
                         <entity chassis="Man O' War (Gargoyle)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true"
                                 externalId="314e1682-4722-4cef-a775-33c5366a3ae6">
-                            <pilot size="1" name="Warrior Bjorn" hits="1" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Bjorn" hits="1" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="b13bb283-3eb6-4789-9201-c996095a90e5" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7004,7 +7004,7 @@ salvage.
                         <entity chassis="Turkina" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true"
                                 externalId="eae280b3-c4af-4abe-bd24-f0d0f145d1a7" quirks="no_twist">
-                            <pilot size="1" name="Warrior Sylvain" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Warrior Sylvain" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="435e4892-95a9-4f64-ac8b-8970fe000f31" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7110,7 +7110,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="ff583e22-4d2d-46c3-8173-6472b125b41a"
                                 quirks="battle_fists_la::battle_fists_ra">
-                            <pilot size="1" name="Star Commander Jelexiz" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Star Commander Jelexiz" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="8f5287b7-f78f-41ad-a20d-748a0be6514f" commandB="2"
                                    ejected="false" advantages="hopping_jack" autoeject="true" condejectammo="false"
                                    condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
@@ -7128,7 +7128,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b400b7ca-d594-4240-87d0-c69776a445ec"
                                 quirks="command_mech::cowl::reinforced_legs::difficult_eject">
-                            <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7151,7 +7151,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Champion" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="f9b6f298-982b-432d-a53b-1a2db02e6048" quirks="no_arms">
-                            <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="ab14bc7a-921e-4604-a5d2-ee5a47f0beca" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7169,7 +7169,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Loki (Hellbringer)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="4997c4c4-4606-4293-8b68-66a031c387d4" quirks="searchlight">
-                            <pilot size="1" name="Warrior Konstantin" nick="" gender="MALE" gunnery="3" piloting="5"
+                            <pilot size="1" name="Warrior Konstantin" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="5"
                                    artillery="4" externalId="345bcb50-a835-4c62-a506-2c3f9161fc3e" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7188,7 +7188,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="15dbf70d-56c4-4002-b5be-209e53d53669"
                                 quirks="battle_fists_la::battle_fists_ra::imp_life_support">
-                            <pilot size="1" name="Warrior Murniyani" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Murniyani" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="cf633420-b73d-44a9-98bb-bc0b85b34f22" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7205,7 +7205,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Koshi (Mist Lynx)" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="8690092a-2684-48ca-b317-a82a9998b46c" quirks="imp_sensors::low_profile">
-                            <pilot size="1" name="Warrior León" nick="" gender="MALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior León" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="a403cbc4-729e-48e2-ad5b-5bbadb8e779c" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7221,7 +7221,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="e8e61c6f-32e6-4054-912e-c5030371395d"
                                 quirks="battle_fists_la::battle_fists_ra::imp_life_support">
-                            <pilot size="1" name="Tania" nick="" gender="FEMALE" gunnery="3" piloting="5" artillery="4"
+                            <pilot size="1" name="Tania" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="5" artillery="4"
                                    externalId="1d0054f7-d5f0-484a-b930-e52325dc2bdf" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7239,7 +7239,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="ddfffbad-b58d-449c-bf62-6b06c4e0ecfd"
                                 quirks="easy_maintain::low_profile::no_arms::weak_legs">
-                            <pilot size="1" name="Hyacinth" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Hyacinth" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="4806b83d-965c-4535-9645-5eafa1be62e0" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7249,7 +7249,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Warhammer IIC" model="2" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="0059d026-f2b5-4482-b1dd-ff5d4929f7e3" quirks="searchlight::stable">
-                            <pilot size="1" name="Warrior Callum" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Warrior Callum" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="e2deb222-3114-4625-a905-f3b3c273cf8f" commandB="1"
                                    ejected="false" autoeject="true" condejectammo="false" condejectengine="true"
                                    condejectctdest="true" condejectctheadshot="true"/>
@@ -7268,7 +7268,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="dd1e5a9d-894a-4447-98d0-967392a393c0" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Star Captain Tobias Malthus" nick="" gender="MALE" gunnery="1"
+                            <pilot size="1" name="Star Captain Tobias Malthus" nick="" gender="MALE" clanperson="true" gunnery="1"
                                    piloting="2" artillery="4" externalId="624ea844-5cd4-49db-970c-51a0159758b3"
                                    commandB="2" ejected="false"
                                    edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion"
@@ -7377,7 +7377,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="ff583e22-4d2d-46c3-8173-6472b125b41a"
                                 quirks="battle_fists_la::battle_fists_ra">
-                            <pilot size="1" name="Star Commander Jelexiz" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Star Commander Jelexiz" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="8f5287b7-f78f-41ad-a20d-748a0be6514f" commandB="2"
                                    ejected="false" advantages="hopping_jack" autoeject="true" condejectammo="false"
                                    condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
@@ -7395,7 +7395,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b400b7ca-d594-4240-87d0-c69776a445ec"
                                 quirks="command_mech::cowl::reinforced_legs::difficult_eject">
-                            <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7418,7 +7418,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Champion" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="f9b6f298-982b-432d-a53b-1a2db02e6048" quirks="no_arms">
-                            <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="ab14bc7a-921e-4604-a5d2-ee5a47f0beca" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7436,7 +7436,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Loki (Hellbringer)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="4997c4c4-4606-4293-8b68-66a031c387d4" quirks="searchlight">
-                            <pilot size="1" name="Warrior Konstantin" nick="" gender="MALE" gunnery="3" piloting="5"
+                            <pilot size="1" name="Warrior Konstantin" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="5"
                                    artillery="4" externalId="345bcb50-a835-4c62-a506-2c3f9161fc3e" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7455,7 +7455,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="15dbf70d-56c4-4002-b5be-209e53d53669"
                                 quirks="battle_fists_la::battle_fists_ra::imp_life_support">
-                            <pilot size="1" name="Warrior Murniyani" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Murniyani" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="cf633420-b73d-44a9-98bb-bc0b85b34f22" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7472,7 +7472,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Koshi (Mist Lynx)" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="8690092a-2684-48ca-b317-a82a9998b46c" quirks="imp_sensors::low_profile">
-                            <pilot size="1" name="Warrior León" nick="" gender="MALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior León" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="a403cbc4-729e-48e2-ad5b-5bbadb8e779c" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7488,7 +7488,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="e8e61c6f-32e6-4054-912e-c5030371395d"
                                 quirks="battle_fists_la::battle_fists_ra::imp_life_support">
-                            <pilot size="1" name="Tania" nick="" gender="FEMALE" gunnery="3" piloting="5" artillery="4"
+                            <pilot size="1" name="Tania" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="5" artillery="4"
                                    externalId="1d0054f7-d5f0-484a-b930-e52325dc2bdf" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7506,7 +7506,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="ddfffbad-b58d-449c-bf62-6b06c4e0ecfd"
                                 quirks="easy_maintain::low_profile::no_arms::weak_legs">
-                            <pilot size="1" name="Hyacinth" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Hyacinth" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="4806b83d-965c-4535-9645-5eafa1be62e0" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7516,7 +7516,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Warhammer IIC" model="2" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="0059d026-f2b5-4482-b1dd-ff5d4929f7e3" quirks="searchlight::stable">
-                            <pilot size="1" name="Warrior Callum" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Warrior Callum" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="e2deb222-3114-4625-a905-f3b3c273cf8f" commandB="1"
                                    ejected="false" autoeject="true" condejectammo="false" condejectengine="true"
                                    condejectctdest="true" condejectctheadshot="true"/>
@@ -7535,7 +7535,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="dd1e5a9d-894a-4447-98d0-967392a393c0" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Star Captain Tobias Malthus" nick="" gender="MALE" gunnery="1"
+                            <pilot size="1" name="Star Captain Tobias Malthus" nick="" gender="MALE" clanperson="true" gunnery="1"
                                    piloting="2" artillery="4" externalId="624ea844-5cd4-49db-970c-51a0159758b3"
                                    commandB="2" ejected="false"
                                    edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion"
@@ -7642,7 +7642,7 @@ capturing the facility.
                         <entity chassis="Loki (Hellbringer)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="4997c4c4-4606-4293-8b68-66a031c387d4" quirks="searchlight">
-                            <pilot size="1" name="Warrior Konstantin" nick="" gender="MALE" gunnery="3" piloting="5"
+                            <pilot size="1" name="Warrior Konstantin" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="5"
                                    artillery="4" externalId="345bcb50-a835-4c62-a506-2c3f9161fc3e" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7738,7 +7738,7 @@ capturing the facility.
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="15dbf70d-56c4-4002-b5be-209e53d53669"
                                 quirks="battle_fists_la::battle_fists_ra::imp_life_support">
-                            <pilot size="1" name="Warrior Murniyani" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Murniyani" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="cf633420-b73d-44a9-98bb-bc0b85b34f22" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7833,7 +7833,7 @@ capturing the facility.
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b400b7ca-d594-4240-87d0-c69776a445ec"
                                 quirks="command_mech::cowl::reinforced_legs::difficult_eject">
-                            <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Guntur" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="d7ac7e34-cdb6-4e0a-ba25-dc9ac7a3cb5a" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7934,7 +7934,7 @@ capturing the facility.
                         <entity chassis="Champion" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="f9b6f298-982b-432d-a53b-1a2db02e6048" quirks="no_arms">
-                            <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="ab14bc7a-921e-4604-a5d2-ee5a47f0beca" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -8031,7 +8031,7 @@ capturing the facility.
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="ddfffbad-b58d-449c-bf62-6b06c4e0ecfd"
                                 quirks="easy_maintain::low_profile::no_arms::weak_legs">
-                            <pilot size="1" name="Hyacinth" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Hyacinth" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="4806b83d-965c-4535-9645-5eafa1be62e0" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -8118,7 +8118,7 @@ capturing the facility.
                         <entity chassis="Warhammer IIC" model="2" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="0059d026-f2b5-4482-b1dd-ff5d4929f7e3" quirks="searchlight::stable">
-                            <pilot size="1" name="Warrior Callum" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Warrior Callum" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="e2deb222-3114-4625-a905-f3b3c273cf8f" commandB="1"
                                    ejected="false" autoeject="true" condejectammo="false" condejectengine="true"
                                    condejectctdest="true" condejectctheadshot="true"/>
@@ -8215,7 +8215,7 @@ capturing the facility.
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="ff583e22-4d2d-46c3-8173-6472b125b41a"
                                 quirks="battle_fists_la::battle_fists_ra">
-                            <pilot size="1" name="Star Commander Jelexiz" nick="" gender="MALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Star Commander Jelexiz" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="8f5287b7-f78f-41ad-a20d-748a0be6514f" commandB="2"
                                    ejected="false" advantages="hopping_jack" autoeject="true" condejectammo="false"
                                    condejectengine="true" condejectctdest="true" condejectctheadshot="true"/>
@@ -8311,7 +8311,7 @@ capturing the facility.
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="e8e61c6f-32e6-4054-912e-c5030371395d"
                                 quirks="battle_fists_la::battle_fists_ra::imp_life_support">
-                            <pilot size="1" name="Tania" nick="" gender="FEMALE" gunnery="3" piloting="5" artillery="4"
+                            <pilot size="1" name="Tania" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="5" artillery="4"
                                    externalId="1d0054f7-d5f0-484a-b930-e52325dc2bdf" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -8406,7 +8406,7 @@ capturing the facility.
                         <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="dd1e5a9d-894a-4447-98d0-967392a393c0" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Star Captain Tobias Malthus" nick="" gender="MALE" gunnery="1"
+                            <pilot size="1" name="Star Captain Tobias Malthus" nick="" gender="MALE" clanperson="true" gunnery="1"
                                    piloting="2" artillery="4" externalId="624ea844-5cd4-49db-970c-51a0159758b3"
                                    commandB="2" ejected="false"
                                    edge="edge 2::edge_when_headhit::edge_when_tac::edge_when_ko::edge_when_explosion"
@@ -8498,7 +8498,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="07143318-7d21-47b0-9cdc-549dfc605f74">
-                            <pilot size="1" name="Star Captain Janos Danforth" nick="" gender="FEMALE" gunnery="2"
+                            <pilot size="1" name="Star Captain Janos Danforth" nick="" gender="FEMALE" clanperson="true" gunnery="2"
                                    piloting="3" externalId="51b7357e-b4b2-42b4-bd81-f77ac0db5bc8" commandB="2"
                                    ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
@@ -8515,7 +8515,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Black Hawk (Nova)" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="e2ca3f99-80c5-4da1-8584-9dc497e7a800">
-                            <pilot size="1" name="Sarrio Israa" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Sarrio Israa" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="e6c90cd9-f418-4fdd-b748-22de0adfc377" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="3">Left Torso
@@ -8530,7 +8530,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Loki (Hellbringer)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="17987382-2b99-4a99-9276-87a682b40d3a">
-                            <pilot size="1" name="Warrior Anton" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Anton" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="1eef7656-8609-4a97-a761-3266d4033fc3" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="1">Center Torso
@@ -8546,7 +8546,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Linebacker" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="9b79368a-e388-49e9-a628-0a602294efec">
-                            <pilot size="1" name="Warrior Emily" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Emily" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="c5a7e171-6a49-457f-abeb-ce337eaafb3d" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="2">Right Torso
@@ -8562,7 +8562,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="46130bed-0b28-4ea9-ab9d-22d2282b1d6c">
-                            <pilot size="1" name="Warrior Stanley" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Stanley" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="2f87d5ce-9810-4516-b788-61d1a7c21dba" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="3">Left Torso
@@ -8578,7 +8578,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Phoenix Hawk IIC" model="(Standard)" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="32527019-1f50-4170-b84f-d73d2acd55c2">
-                            <pilot size="1" name="Warrior Aklilu" nick="" gender="MALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Aklilu" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5"
                                    externalId="846ddb4e-f28c-463d-88d2-4e7d1cb7bcfe" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="2">Right Torso
@@ -8598,7 +8598,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Vulture (Mad Dog)" model="D" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="3f95e9de-6ace-422a-8917-8f2494628cac">
-                            <pilot size="1" name="Warrior Lucy" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Lucy" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    externalId="a0e293ba-3989-4224-a42f-a61b302058a8" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="2">Right Torso
@@ -8617,7 +8617,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Black Lanner" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="09dba0ca-0cf8-47fc-bae6-185653f53282">
-                            <pilot size="1" name="Warrior Shaherbano" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Shaherbano" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="8d387f69-0f94-4d49-b485-f8e047a72fc1" ejected="false" autoeject="true"/>
                             <Game id="8"/>
                             <Force force="Trinary Alpha|0||Alpha Beak 2|2||"/>
@@ -8625,7 +8625,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Mad Cat (Timber Wolf)" model="D" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="ec4e557f-debf-4e8c-af5e-0ae053d69df2">
-                            <pilot size="1" name="Star Commander Patricia" nick="" gender="FEMALE" gunnery="2"
+                            <pilot size="1" name="Star Commander Patricia" nick="" gender="FEMALE" clanperson="true" gunnery="2"
                                    piloting="3" externalId="c3f8d3d7-6500-4154-a992-6a8fada78e62" commandB="1"
                                    ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
@@ -8642,7 +8642,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="c6df9eb7-6dff-430a-96a0-b02b35b79401">
-                            <pilot size="1" name="Warrior Eula" nick="" gender="FEMALE" gunnery="4" piloting="4"
+                            <pilot size="1" name="Warrior Eula" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="4"
                                    externalId="5f74843c-6676-4ab1-a1d3-2b9bc44443cf" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="3">Left Torso
@@ -8658,7 +8658,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Vulture (Mad Dog)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true"
                                 externalId="1faa3ba3-603c-4859-94c3-78cc7d3e7df0">
-                            <pilot size="1" name="Star Commander Maxime" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Star Commander Maxime" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="1b66feea-b940-48d4-b309-a7bba4dbe6b3" commandB="1" ejected="false"
                                    autoeject="false"/>
                             The first slot in a location is at index="1".
@@ -8674,7 +8674,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Vixen (Incubus)" model="7" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true"
                                 externalId="d43e97e5-3fa2-49aa-988d-7c57bc323b3c">
-                            <pilot size="1" name="Warrior Stella" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Stella" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="702918fc-2e52-47f2-b436-d40a40b664e8" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="1">Center Torso
@@ -8689,7 +8689,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Fenris (Ice Ferret)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true"
                                 externalId="3e9cbaf1-15f9-4f42-87cc-523a6f471508">
-                            <pilot size="1" name="Luis" nick="" gender="MALE" gunnery="4" piloting="4"
+                            <pilot size="1" name="Luis" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="4"
                                    externalId="3749719e-0238-469b-8efc-fbd228baa7ce" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="4">Right Arm
@@ -8704,7 +8704,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true"
                                 externalId="657a4a85-83fd-48ef-9181-a573469b47a6">
-                            <pilot size="1" name="Warrior Birgul" nick="" gender="FEMALE" gunnery="3" piloting="3"
+                            <pilot size="1" name="Warrior Birgul" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="3"
                                    externalId="536aa3bf-0f5e-4543-bc13-7c38ebc0c657" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="3">Left Torso
@@ -8720,7 +8720,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Vulture (Mad Dog)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="10" deploymentZone="-1" neverDeployed="true"
                                 externalId="e0200d2c-626c-4c6f-910d-c5ef93525ed8">
-                            <pilot size="1" name="Warrior Sheila" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Sheila" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    externalId="9964d2f0-6a8d-4a3e-bcb3-5fed99044485" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="2">Right Torso
@@ -8741,7 +8741,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Black Lanner" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true"
                                 externalId="49c61fe5-4f1e-4dfb-b97c-7310adffddba">
-                            <pilot size="1" name="Star Commander Jennecke" nick="" gender="FEMALE" gunnery="3"
+                            <pilot size="1" name="Star Commander Jennecke" nick="" gender="FEMALE" clanperson="true" gunnery="3"
                                    piloting="4" externalId="a92e1144-8278-4754-b105-46ba3fe8fca5" ejected="false"
                                    autoeject="false"/>
                             The first slot in a location is at index="1".
@@ -8758,7 +8758,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Phantom" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true"
                                 externalId="7c181cd4-950e-46de-b374-a2af52a459e5">
-                            <pilot size="1" name="Warrior Lisa" nick="" gender="FEMALE" gunnery="4" piloting="4"
+                            <pilot size="1" name="Warrior Lisa" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="4"
                                    externalId="07b18a81-cec7-4565-a4cd-8f28630379b7" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="4">Right Arm
@@ -8773,7 +8773,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Phoenix Hawk" model="PXH-1" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true"
                                 externalId="b5271467-f813-4ac1-995a-2d2c46316bf3">
-                            <pilot size="1" name="Warrior Virginia" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="1" name="Warrior Virginia" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    externalId="72e6bb73-ee25-46b4-854a-a1a5dbd5aea4" ejected="false" autoeject="true"/>
                             The first slot in a location is at index="1".
                             <location index="1">Center Torso
@@ -8785,7 +8785,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Phantom" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true"
                                 externalId="9bead0b0-7cfe-4315-8f92-55a4ecec66fe">
-                            <pilot size="1" name="Warrior Utako" nick="" gender="FEMALE" gunnery="4" piloting="3"
+                            <pilot size="1" name="Warrior Utako" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="3"
                                    externalId="88f2999c-743a-453a-989b-5074ddc1bf43" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="2">Right Torso
@@ -8797,7 +8797,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                         <entity chassis="Dragonfly (Viper)" model="D" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true"
                                 externalId="113b293d-668c-4503-900c-899c4c3b344f">
-                            <pilot size="1" name="Warrior Brenden" nick="" gender="MALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Brenden" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    externalId="b58c0e8f-c5f6-40c8-95b8-f1573074ccdc" ejected="false" autoeject="false"/>
                             The first slot in a location is at index="1".
                             <location index="2">Right Torso
@@ -9261,7 +9261,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="c994808b-70f8-482c-b72a-1fbed82dbf0a" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Star Commander Letha" nick="" gender="FEMALE" gunnery="2" piloting="3"
+                            <pilot size="1" name="Star Commander Letha" nick="" gender="FEMALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="db0be97b-caba-4291-928e-2fc6d9087b63" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -9286,7 +9286,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="8859bd05-7447-41e0-b844-09164e16f6b9" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Karinda" nick="" gender="FEMALE" gunnery="3" piloting="3"
+                            <pilot size="1" name="Karinda" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="3"
                                    artillery="4" externalId="1a188952-2af1-4226-8515-0ae918249cb2" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -9307,7 +9307,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1"
                                 neverDeployed="true" externalId="fdff6a0a-f29e-4a59-ac03-bf545761ec6c"
                                 quirks="low_profile">
-                            <pilot size="1" name="Margaret" nick="" gender="FEMALE" gunnery="3" piloting="4"
+                            <pilot size="1" name="Margaret" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="3cc1422d-7184-4616-b06c-0c72bc032a9e" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -9331,7 +9331,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="c63de838-747f-46ca-809a-a62109dca63a" quirks="imp_target_med">
-                            <pilot size="1" name="François" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="François" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="54b3da69-8c51-4d1a-89cb-06c67b1a10d5" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -9361,7 +9361,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneOffset="15" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="fda0a23a-ce37-4f66-bf99-eca6a373c955" quirks="imp_target_med">
-                            <pilot size="1" name="Ebrahim" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Ebrahim" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="c7614afa-d7db-4b50-9c23-9c2757d90d58" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -9381,7 +9381,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="d2e1c334-be67-4a97-bb94-2d4dd690169c" quirks="stable">
-                            <pilot size="1" name="Star Commander Atindra" nick="" gender="MALE" gunnery="3" piloting="3"
+                            <pilot size="1" name="Star Commander Atindra" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="3"
                                    artillery="4" externalId="2c88cce8-70df-4575-894e-54a0e78b3272" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -9400,7 +9400,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="26b1c787-6d50-4d27-a2b8-fc488735758d" quirks="stable">
-                            <pilot size="1" name="Rhonda" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Rhonda" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="f3f8f62f-5b01-4b0d-b525-874b084449c4" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -9423,7 +9423,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="f702d356-1fa1-4322-ac72-4055a854ffb1" quirks="low_profile">
-                            <pilot size="1" name="Shakil" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Shakil" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="271ac3aa-6a9b-4c49-ab4f-429107482bf1" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -9444,7 +9444,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="5fffde7a-a9dd-43c6-a9ec-fce1f1ceaed6" quirks="low_profile">
-                            <pilot size="1" name="Jussi" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Jussi" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="48a5426a-c9d5-4413-bc10-21aeefa1e42a" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -9466,7 +9466,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneOffset="7" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="cff0024e-0687-4158-b3d1-28844363d640" quirks="weak_head_2">
-                            <pilot size="1" name="Mike" nick="" gender="MALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Mike" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="875c9f9e-c031-42fe-978c-3175bd1614e0" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectheadshot="true"/>
@@ -9506,7 +9506,7 @@ The player will not be granted *hegira* by the Jade Falcons.
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1"
                                 neverDeployed="true" externalId="437e1e40-052d-4c3b-b2c3-dfe23d6b64b5"
                                 quirks="combat_computer::low_profile">
-                            <pilot size="1" name="Phelan Ward" nick="" gender="MALE" gunnery="1" piloting="1"
+                            <pilot size="1" name="Phelan Ward" nick="" gender="MALE" clanperson="true" gunnery="1" piloting="1"
                                    artillery="4" portraitFile="Phelan.jpg"
                                    externalId="979aceda-cd08-4fa3-9054-5b4f75d6f0c9" ejected="false"
                                    advantages="maneuvering_ace"
@@ -9608,7 +9608,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="05ee6c3c-109d-424b-9a15-54cd052e5bfc">
-                            <pilot size="3" name="Joe" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="3" name="Joe" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="cfd4f918-1ba2-4e90-b89b-8d639dea8843" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9623,7 +9623,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="5566ef46-a23d-43a6-8969-c9ec8c06a700">
-                            <pilot size="3" name="Zahra" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="3" name="Zahra" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="23e9cfd5-0c10-4400-983b-096762f7b904" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9638,7 +9638,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="fac6ec18-560c-43fd-afb0-2887e8ffb0cc">
-                            <pilot size="3" name="Keira" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="3" name="Keira" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="e9863643-ddf5-4534-a62c-74a2e147d676" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9653,7 +9653,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="407700ec-6806-49d0-91af-fe16150b0cbd">
-                            <pilot size="3" name="Tansy" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="3" name="Tansy" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="3cf5118f-8786-4a9c-8331-0805c66525d7" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9668,7 +9668,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="f9eb5f3a-312f-423d-aa4a-bc841be59d0c">
-                            <pilot size="3" name="Guy" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="3" name="Guy" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="bf2fcab4-9e7f-4568-acfe-7ed1ea4bb55a" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9683,7 +9683,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="2bde49e8-d17d-4c98-af21-0316ceb15095">
-                            <pilot size="3" name="Erin" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="3" name="Erin" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="365f782d-7669-402f-a58c-b58dbb3cfc26" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9698,7 +9698,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="457b0a1e-cbae-4c84-8b29-530966606751">
-                            <pilot size="3" name="Stanislava" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="3" name="Stanislava" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="08b47f10-e2af-4ff5-9901-6972593e46e1" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9713,7 +9713,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="434a93f2-365f-406a-903e-25725f11fabf">
-                            <pilot size="3" name="Fadhila" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="3" name="Fadhila" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="43ea0528-3969-4c5f-9f88-45a3f1632369" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9728,7 +9728,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="aa91fea1-6d77-496d-8ea5-9986d523654c">
-                            <pilot size="3" name="Christovão" nick="" gender="MALE" gunnery="4" piloting="5"
+                            <pilot size="3" name="Christovão" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="47dd5083-929d-4799-8e54-c2b6e81eb72d" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9743,7 +9743,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="5faf8584-9bf1-415e-8ece-0917cd6d9c5e">
-                            <pilot size="3" name="Djordje" nick="" gender="MALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="3" name="Djordje" nick="" gender="MALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="62b021c1-905f-4524-8c10-89ebaf9ff144" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9758,7 +9758,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="7b8b55d5-04a0-423b-996d-8a8b31700681">
-                            <pilot size="3" name="Gigi" nick="" gender="FEMALE" gunnery="4" piloting="5" artillery="4"
+                            <pilot size="3" name="Gigi" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5" artillery="4"
                                    externalId="285491ff-a012-4548-896a-f48103bfd87f" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9773,7 +9773,7 @@ strike, you will not be able to claim battlefield salvage.
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="12"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="13" deploymentZoneAnySEy="2"
                                 neverDeployed="true" externalId="96fd2e56-48c2-4d19-b312-0c0a8ca02c11">
-                            <pilot size="3" name="Alexina" nick="" gender="FEMALE" gunnery="4" piloting="5"
+                            <pilot size="3" name="Alexina" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="1a04493b-d3eb-414a-a06e-bba1d75cedce" ejected="false"/>
                             <motive damage="0" penalty="0"/>
                             Tanks have special needs, so don't delete any ammo slots.
@@ -9888,7 +9888,7 @@ to the nature of the scenario, you may not collect *isorla.*
                                 deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1"
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1"
                                 neverDeployed="true" externalId="88fa1590-dd33-414c-824c-c6978e8577e4">
-                            <pilot size="1" name="Star Colonel Ulric Kerensky" nick="" gender="MALE" gunnery="1"
+                            <pilot size="1" name="Star Colonel Ulric Kerensky" nick="" gender="MALE" clanperson="true" gunnery="1"
                                    piloting="2" artillery="4" portraitFile="Ulric.jpg"
                                    externalId="a6ba2172-b510-4a9e-bd8a-d6693e9d2033" ejected="false"
                                    advantages="tm_mountaineer::human_tro Mek::tactical_genius" autoeject="true"
@@ -10156,7 +10156,7 @@ Aziza pilots an ancient second line *Warhammer IIC* that still presents a formid
                                 deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="f3a17b2c-6e3f-4b9e-9745-bc4d07b8ed65" quirks="searchlight::stable">
-                            <pilot size="1" name="Aziza" nick="" gender="FEMALE" gunnery="3" piloting="4" artillery="4"
+                            <pilot size="1" name="Aziza" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    portraitCat="Female/MechWarrior/" portraitFile="MW_F_34.png"
                                    externalId="db0c2d27-0ec8-484d-be13-001f8e14b680" ejected="false" autoeject="true"
                                    condejectammo="false" condejectengine="true" condejectctdest="true"
@@ -10282,7 +10282,7 @@ experience, he makes up for in enthusiasm. He likes speed and will be bringing a
                                 deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="9072cbba-59b4-4396-b458-4e0f39628ab1" quirks="low_profile">
-                            <pilot size="1" name="Damien" nick="" gender="MALE" gunnery="3" piloting="3" artillery="4"
+                            <pilot size="1" name="Damien" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="3" artillery="4"
                                    portraitCat="Male/MechWarrior/" portraitFile="MW_M_68.png"
                                    externalId="e9a1f09b-5fdf-496b-bc0a-7b094a74af3a" ejected="false"
                                    advantages="jumping_jack" autoeject="true" condejectammo="false"
@@ -10405,7 +10405,7 @@ quickly.
                                 deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1"
                                 deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true"
                                 externalId="662836bc-1268-45dd-9889-756c7a900d35" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Star Commander Jameel" nick="" gender="FEMALE" gunnery="2"
+                            <pilot size="1" name="Star Commander Jameel" nick="" gender="FEMALE" clanperson="true" gunnery="2"
                                    piloting="3" artillery="4" portraitCat="Male/Vehicle Crew/"
                                    portraitFile="VeeCrew_M_21.png" externalId="a0f6c3bf-9102-4a79-b1ac-4f01e09cdd91"
                                    ejected="false" advantages="tm_mountaineer" autoeject="true" condejectammo="false"
@@ -10535,7 +10535,7 @@ lasers.
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1"
                                 neverDeployed="true" externalId="567320de-1439-4387-b7cf-e52d3f75d1ff"
                                 quirks="distracting">
-                            <pilot size="1" name="Star Captain Olympia" nick="" gender="FEMALE" gunnery="1" piloting="2"
+                            <pilot size="1" name="Star Captain Olympia" nick="" gender="FEMALE" clanperson="true" gunnery="1" piloting="2"
                                    artillery="4" portraitCat="Female/MechWarrior/" portraitFile="MW_F_49.png"
                                    externalId="096cf76a-679d-4f3e-ba86-3edfa06606e5" ejected="false"
                                    advantages="tactical_genius" autoeject="true" condejectammo="false"
@@ -10667,7 +10667,7 @@ It is time to suit up and finish this.
                                 deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1"
                                 neverDeployed="true" externalId="554b8a27-d760-4cf0-ad8a-e19d375a6501"
                                 quirks="distracting">
-                            <pilot size="1" name="saKhan Vandervahn Chistu" nick="" gender="MALE" gunnery="2"
+                            <pilot size="1" name="saKhan Vandervahn Chistu" nick="" gender="MALE" clanperson="true" gunnery="2"
                                    piloting="2" artillery="4" externalId="67b64800-159f-4a6e-ab02-6af136fbbf14"
                                    portraitFile="Vandervahn.jpg" ejected="false" autoeject="true" condejectammo="false"
                                    condejectengine="true" condejectctdest="true" condejectheadshot="true"/>
