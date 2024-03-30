@@ -140,7 +140,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
             <assignedForceId>2</assignedForceId>
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-            <!--<nextStoryPointId>319cd061-56cb-49ae-b86b-4df55defddb7</nextStoryPointId>-->
+            <!--<nextStoryPointId>2ff0ee41-abb5-4fd9-82d0-e6ee88e739a9</nextStoryPointId>-->
             <!-- Real next story point Id. Can be commented out to test things -->
             <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
         </storyPoint>
@@ -313,7 +313,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <key>trothkinFight</key>
             <storyOutcomes>
                 <storyOutcome result="knives">
-                    <nextStoryPointId>b1852aab-910e-4620-9aa0-79e13a80fc38</nextStoryPointId>
+                    <nextStoryPointId>c68506fa-ef98-45ec-a8c9-c3e455ab0d54</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
             <nextStoryPointId>3f9782a3-8b09-42e3-a337-a66e8bdf2b3d</nextStoryPointId>
@@ -323,7 +323,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <key>trothkinFight</key>
             <storyOutcomes>
                 <storyOutcome result="knives">
-                    <nextStoryPointId>dc66c2ec-f5a8-49da-ba87-bc575a74be7c</nextStoryPointId>
+                    <nextStoryPointId>c73a6390-1b70-4bb9-b109-a828755dc73d</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
             <nextStoryPointId>9f3697af-0399-43c5-8157-ee568638e8ea</nextStoryPointId>
@@ -4623,8 +4623,8 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 <hits>2</hits>
             </storyTrigger>
         </storyPoint>
-        <storyPoint name="narr_trothkin_div_aug_ella_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>c5b9743e-0e01-4a79-b6b8-56a5f2eb7e63</id>
+        <storyPoint name="narr_trothkin_div_aug_ella_w_begin" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>c68506fa-ef98-45ec-a8c9-c3e455ab0d54</id>
             <title>Trothkin Divided</title>
             <narrative>
                 Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance
@@ -4639,7 +4639,13 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 rebounding, she spins 180 degrees and catches Felipe with her knife as he rises up and begins
                 backpedaling out of the way. A deep red cut blooms across Felipe's abdomen and he pauses momentarily to
                 feel his midsection.
-
+            </narrative>
+            <nextStoryPointId>b1852aab-910e-4620-9aa0-79e13a80fc38</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_trothkin_div_aug_ella_w_ko" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>c5b9743e-0e01-4a79-b6b8-56a5f2eb7e63</id>
+            <title>Trothkin Divided</title>
+            <narrative>
                 Seeing an opportunity to finish the fight, Ella brings her knife in for a vicious finishing blow. Felipe
                 rolls out of the way of a blow that would have gutted him, but there is a loud crack as Ella catches his
                 chin with her elbow. Felipe drops like a rock.
@@ -4661,58 +4667,10 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 <hits>1</hits>
             </storyTrigger>
         </storyPoint>
-        <storyPoint name="narr_trothkin_div_aug_felipe_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>09f46772-c6ad-48fb-bf0b-5f934768d8cb</id>
-            <title>Trothkin Divided</title>
-            <narrative>
-                Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance
-                around the Circle of Equals, each attempting to bait the other into an overreach with quick slashing
-                motions, but neither is able to make contact or lure the other into an overreach. The crowd shouts and
-                jeers, encouraging them to fully let loose.
-
-                Seeking to break the stalemate, Felipe darts in for a quick slash, but at the last second drops low for
-                a sweeping attack. Ella is not as quick as Felipe and is knocked flat on her back, stunned as she loses
-                her breath. Felipe quickly jumps on top of her and brings down his knife for a killing blow. At the last
-                second, Ella diverts the blow from its intended location, but it sinks deeply into her right shoulder.
-
-                Ella screams with rage and pain and throws Felipe off of her. She gets up, grunting with pain and woozy
-                with blood loss, while Felipe paces around her, waiting for another opportunity. Realizing she must end
-                the fight soon if she hopes to win. Ella charges Felipe hoping to take him by surprise. Felipe is ready,
-                however, and dodges out of the way, sticking out a foot to send Ella tumbling into the tables and chairs
-                outside of the Circle of Equals.
-
-                The crowd erupts with shouts of joy and loathing at Felipe's victory. He is toasted with cheers by many
-                of the other warriors for standing up for the Khan, while Ella is rushed to the medical bay.
-
-                It appears that the conflict has been resolved without further loss of life. What other consequences may
-                come of it, you know not.
-            </narrative>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
-                <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
-                <hits>1</hits>
-            </storyTrigger>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
-                <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
-                <hits>3</hits>
-            </storyTrigger>
-        </storyPoint>
-        <storyPoint name="narr_trothkin_div_death_ella_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_trothkin_div_aug_ella_w_death" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>c9acb074-fa8d-4dd0-a949-e2f19ba2720b</id>
             <title>Trothkin Divided</title>
             <narrative>
-                Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance
-                around the Circle of Equals, each attempting to bait the other into an overreach with quick slashing
-                motions, but neither is able to make contact or lure the other into an overreach. The crowd shouts and
-                jeers, encouraging them to fully let loose.
-
-                Seeking to break the stalemate, Felipe darts in for a quick slash, but at the last second drops low for
-                a sweeping attack. Ella is prepared for such deception, however, and leaps over his sweeping legs.
-                Seeing an opportunity, she brings her knife down to skewer his now exposed body, but Felipe rolls out of
-                the way at the last second and her knife bounces off the metal flooring of the mess hall. Quickly
-                rebounding, she spins 180 degrees and catches Felipe with her knife as he rises up and begins
-                backpedaling out of the way. A deep red cut blooms across Felipe's abdomen and he pauses momentarily to
-                feel his midsection.
-
                 Seeing an opportunity to finish the fight, Ella brings her knife in for a vicious finishing blow. Felipe
                 attempts to roll out of the way, but Ella adjust the aim of her strike and brings her knife up under
                 Felipe's chin. The blade sinks all the way into the hilt, clearly slicing directly into Felipe's brain.
@@ -4734,9 +4692,8 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 <hits>1</hits>
             </storyTrigger>
         </storyPoint>
-        <storyPoint name="narr_trothkin_div_death_felipe_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>ac300d26-a564-4cda-8ea9-64f3c1e9c5c7</id>
-            <title>Trothkin Divided</title>
+        <storyPoint name="narr_trothkin_div_aug_felipe_w_begin" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>c73a6390-1b70-4bb9-b109-a828755dc73d</id>
             <narrative>
                 Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance
                 around the Circle of Equals, each attempting to bait the other into an overreach with quick slashing
@@ -4747,7 +4704,38 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 a sweeping attack. Ella is not as quick as Felipe and is knocked flat on her back, stunned as she loses
                 her breath. Felipe quickly jumps on top of her and brings down his knife for a killing blow. At the last
                 second, Ella diverts the blow from its intended location, but it sinks deeply into her right shoulder.
+            </narrative>
+            <nextStoryPointId>dc66c2ec-f5a8-49da-ba87-bc575a74be7c</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="narr_trothkin_div_aug_felipe_w_ko" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>09f46772-c6ad-48fb-bf0b-5f934768d8cb</id>
+            <title>Trothkin Divided</title>
+            <narrative>
+                Ella screams with rage and pain and throws Felipe off of her. She gets up, grunting with pain and woozy
+                with blood loss, while Felipe paces around her, waiting for another opportunity. Realizing she must end
+                the fight soon if she hopes to win. Ella charges Felipe hoping to take him by surprise. Felipe is ready,
+                however, and dodges out of the way, sticking out a foot to send Ella tumbling into the tables and chairs
+                outside of the Circle of Equals.
 
+                The crowd erupts with shouts of joy and loathing at Felipe's victory. He is toasted with cheers by many
+                of the other warriors for standing up for the Khan, while Ella is rushed to the medical bay.
+
+                It appears that the conflict has been resolved without further loss of life. What other consequences may
+                come of it, you know not.
+            </narrative>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+                <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
+                <hits>1</hits>
+            </storyTrigger>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+                <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
+                <hits>3</hits>
+            </storyTrigger>
+        </storyPoint>
+        <storyPoint name="narr_trothkin_div_aug_felipe_w_death" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>ac300d26-a564-4cda-8ea9-64f3c1e9c5c7</id>
+            <title>Trothkin Divided</title>
+            <narrative>
                 Ella screams with rage and pain and throws Felipe off of her. She gets up, grunting with pain and woozy
                 with blood loss, while Felipe paces around her, waiting for another opportunity. Realizing she must end
                 the fight soon if she hopes to win. Ella charges Felipe hoping to take him by surprise. Felipe is ready,
