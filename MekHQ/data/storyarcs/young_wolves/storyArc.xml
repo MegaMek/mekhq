@@ -6513,7 +6513,7 @@ salvage.
                             <Force force="Trinary Charlie|0||Talon Star 2|2||"/>
                         </entity>
                         <entity chassis="Cauldron-Born (Ebon Jaguar)" model="C" type="Biped" commander="false"
-                                offboard="false" hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true"
+                                offboard="false" hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true"
                                 externalId="e003cd74-b4c7-46d7-8361-221490193259" quirks="low_profile">
                             <pilot size="1" name="Warrior Bobbi" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="c6fb8638-3bfd-4148-bf62-3175caa333ef" ejected="false"
@@ -6547,7 +6547,7 @@ salvage.
                             <Force force="Trinary Charlie|0||Beak Star 1|3||"/>
                         </entity>
                         <entity chassis="Vulture (Mad Dog)" model="C" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true"
+                                hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true"
                                 externalId="354297a2-3485-417a-bf23-e03d3bd1fe3a" quirks="imp_target_med">
                             <pilot size="1" name="Warrior David" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="12b0d067-f2c6-4360-8af1-05546cac0e9e" ejected="false"
@@ -6566,7 +6566,7 @@ salvage.
                             <Force force="Trinary Charlie|0||Beak Star 1|3||"/>
                         </entity>
                         <entity chassis="Mad Cat (Timber Wolf)" model="Prime" type="Biped" commander="false"
-                                offboard="false" hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true"
+                                offboard="false" hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true"
                                 externalId="da7bed7a-e3ed-406e-b10d-e18fcbc056be" quirks="imp_target_med::weak_head_1">
                             <pilot size="1" name="Warrior Reima" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="91fb90e2-9a9f-4ecf-bdae-05e5f32073f4" ejected="false"
@@ -6591,7 +6591,7 @@ salvage.
                             <Force force="Trinary Charlie|0||Beak Star 1|3||"/>
                         </entity>
                         <entity chassis="Thor (Summoner)" model="M" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="5" deploymentZone="-1" neverDeployed="true"
+                                hidden="false" deployment="6" deploymentZone="-1" neverDeployed="true"
                                 externalId="50c8109d-0974-4073-a7be-629255d55aff" quirks="imp_com::ubiquitous_clan">
                             <pilot size="1" name="Warrior Neema" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="21ac831f-af65-43a8-aa08-26ff7982e4c5" ejected="false"
@@ -6615,7 +6615,7 @@ salvage.
                             <Force force="Trinary Charlie|0||Beak Star 1|3||"/>
                         </entity>
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="5" hits="1" deploymentZone="-1" neverDeployed="true"
+                                hidden="false" deployment="6" hits="1" deploymentZone="-1" neverDeployed="true"
                                 externalId="eb2d25c9-f7d8-432a-96eb-39cf02894a7f" quirks="imp_com::ubiquitous_clan">
                             <pilot size="1" name="Star Captain Matthew von Jankmon" nick="" gender="FEMALE" clanperson="true" gunnery="1"
                                    piloting="2" artillery="4" externalId="af56c112-7ffa-45b0-a72d-b5051de1d2a0"
@@ -6645,7 +6645,7 @@ salvage.
                             <Force force="Trinary Charlie|0||Beak Star 1|3||"/>
                         </entity>
                         <entity chassis="Battle Cobra" model="A" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true"
+                                hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
                                 externalId="634c8749-4426-4fc7-80d5-144bebc757ed" quirks="ext_twist">
                             <pilot size="1" name="Warrior Constansie" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="bf3958dc-8342-45a7-990c-2c4774b875b4" ejected="false"
@@ -6667,7 +6667,7 @@ salvage.
                             <Force force="Trinary Bravo|4||Talon Star 1|7||"/>
                         </entity>
                         <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="7" hits="1" deploymentZone="-1" neverDeployed="true"
+                                hidden="false" deployment="9" hits="1" deploymentZone="-1" neverDeployed="true"
                                 externalId="1d45b8b1-ff5d-43b2-9f5a-77802d40a3e6" quirks="stable">
                             <pilot size="1" name="Star Commander Olaf" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="27504ae2-ae88-47a8-8dc9-2a7df1b2f4eb" commandB="1"
@@ -6714,7 +6714,7 @@ salvage.
                             <Force force="Trinary Bravo|4||Talon Star 1|7||"/>
                         </entity>
                         <entity chassis="Black Hawk (Nova)" model="A" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="7" hits="2" deploymentZone="-1" neverDeployed="true"
+                                hidden="false" deployment="9" hits="2" deploymentZone="-1" neverDeployed="true"
                                 externalId="5fc7eae2-0cad-40ea-869a-56da49a3cf01"
                                 quirks="combat_computer::low_profile::no_twist">
                             <pilot size="1" name="Warrior Viktor" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
@@ -6740,7 +6740,7 @@ salvage.
                             <Force force="Trinary Bravo|4||Talon Star 1|7||"/>
                         </entity>
                         <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="7" deploymentZone="-1" neverDeployed="true"
+                                hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
                                 externalId="5538fe58-694b-4362-8938-61ea4299e8dd" quirks="stable">
                             <pilot size="1" name="Finlay" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
                                    externalId="5e14441d-e147-48fc-8d4c-b731af48a433" ejected="false" autoeject="true"
@@ -6759,7 +6759,7 @@ salvage.
                             <Force force="Trinary Bravo|4||Talon Star 1|7||"/>
                         </entity>
                         <entity chassis="Night Gyr" model="Prime" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
+                                hidden="false" deployment="12" deploymentZone="-1" neverDeployed="true"
                                 externalId="d56085d2-f31d-4693-884a-c31db48562ac" quirks="difficult_maintain">
                             <pilot size="1" name="Star Commander Laura" nick="" gender="FEMALE" clanperson="true" gunnery="2" piloting="3"
                                    artillery="4" externalId="1f9360d0-d763-4f4e-a793-5dde860693f4" commandB="2"
@@ -6786,7 +6786,7 @@ salvage.
                             <Force force="Trinary Bravo|4||Beak Star 2|6||"/>
                         </entity>
                         <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
+                                hidden="false" deployment="12" deploymentZone="-1" neverDeployed="true"
                                 externalId="caf114e2-eeb3-46b2-b031-fb986d0d17f5" quirks="imp_com::ubiquitous_clan">
                             <pilot size="1" name="Warrior Binta" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="64df0b29-6742-4709-b599-53c2927d9b5e" ejected="false"
@@ -6813,7 +6813,7 @@ salvage.
                             <Force force="Trinary Bravo|4||Beak Star 2|6||"/>
                         </entity>
                         <entity chassis="Vulture (Mad Dog)" model="S" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
+                                hidden="false" deployment="12" deploymentZone="-1" neverDeployed="true"
                                 externalId="25524b05-f5a0-4383-bf9b-5ebd7230aca9" quirks="imp_target_med">
                             <pilot size="1" name="Warrior Vallie" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
                                    artillery="4" externalId="4caacffb-473a-41ec-aa32-22c42ec3c0fb" ejected="false"
@@ -6829,7 +6829,7 @@ salvage.
                             <Force force="Trinary Bravo|4||Beak Star 2|6||"/>
                         </entity>
                         <entity chassis="Cauldron-Born (Ebon Jaguar)" model="A" type="Biped" commander="false"
-                                offboard="false" hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
+                                offboard="false" hidden="false" deployment="12" deploymentZone="-1" neverDeployed="true"
                                 externalId="df726a51-3bd9-451f-98e5-1c9ccd4b35b3" quirks="low_profile">
                             <pilot size="1" name="Warrior Anthon" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="324d36f2-bb06-46b8-9aee-4aa274984b13" ejected="false"
@@ -6850,154 +6850,6 @@ salvage.
                             </location>
                             <Game id="24"/>
                             <Force force="Trinary Bravo|4||Beak Star 2|6||"/>
-                        </entity>
-                        <entity chassis="Thor (Summoner)" model="B" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="9" deploymentZone="-1" neverDeployed="true"
-                                externalId="6e5ad902-5870-4528-9d86-2851b4e0765e" quirks="imp_com::ubiquitous_clan">
-                            <pilot size="1" name="Warrior Rıfkı" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
-                                   artillery="4" externalId="214e8dd1-5edd-43e8-af2b-54b34d253174" ejected="false"
-                                   autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
-                                   condejectctheadshot="true"/>
-                            The first slot in a location is at index="1".
-                            <location index="3">Left Torso
-                                <slot index="5" type="CLAMS Ammo" shots="19"/>
-                                <slot index="6" type="ISNarc Pods" shots="3"/>
-                            </location>
-                            <location index="4">Right Arm
-                                <slot index="9" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="6"/>
-                                <slot index="10" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="6"/>
-                                <slot index="11" type="Clan Ammo SRM-4 (Clan) Narc-capable" shots="25"/>
-                            </location>
-                            <location index="5">Left Arm
-                                <slot index="9" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="0"/>
-                                <slot index="10" type="Clan Ammo LRM-20 (Clan) Narc-capable" shots="4"/>
-                                <slot index="11" type="Clan Ammo SRM-4 (Clan) Narc-capable" shots="3"/>
-                            </location>
-                            <Game id="25"/>
-                            <Force force="Trinary Bravo|4||Beak Star 2|6||"/>
-                        </entity>
-                        <entity chassis="Turkina" model="B" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true"
-                                externalId="9e009f26-0957-4ab3-bff6-f1246ee47e16" quirks="no_twist">
-                            <pilot size="1" name="Star Captain Rama Chistu" nick="" gender="MALE" clanperson="true" gunnery="2"
-                                   piloting="3" artillery="4" externalId="e0955b03-052e-4def-a61b-979240be895f"
-                                   commandB="3" ejected="false" advantages="sniper" autoeject="true"
-                                   condejectammo="false" condejectengine="true" condejectctdest="true"
-                                   condejectctheadshot="true"/>
-                            <location index="4">Right Arm
-                                <armor points="27"/>
-                            </location>
-                            <location index="6">Right Leg
-                                <armor points="35"/>
-                            </location>
-                            <location index="7">Left Leg
-                                <armor points="30"/>
-                            </location>
-                            <Game id="26"/>
-                            <Force force="Trinary Bravo|4||Beak Star 1|5||"/>
-                        </entity>
-                        <entity chassis="Turkina" model="B" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true"
-                                externalId="f2c08ece-cdd7-4ae3-9b74-162670acbb27" quirks="no_twist">
-                            <pilot size="1" name="Warrior Marat" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
-                                   artillery="4" externalId="40f8e246-af2a-4a24-bcce-c0ff5279201d" ejected="false"
-                                   autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
-                                   condejectctheadshot="true"/>
-                            <location index="1">Center Torso
-                                <armor points="40"/>
-                            </location>
-                            <location index="2">Right Torso
-                                <armor points="25"/>
-                            </location>
-                            <location index="6">Right Leg
-                                <armor points="35"/>
-                            </location>
-                            <location index="7">Left Leg
-                                <armor points="35"/>
-                            </location>
-                            <Game id="27"/>
-                            <Force force="Trinary Bravo|4||Beak Star 1|5||"/>
-                        </entity>
-                        <entity chassis="Man O' War (Gargoyle)" model="A" type="Biped" commander="false"
-                                offboard="false" hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true"
-                                externalId="ed43eec2-dd73-4c3a-b918-b35d73839abb">
-                            <pilot size="1" name="Warrior Mezgebu" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
-                                   artillery="4" externalId="615dd911-dc60-4481-a1b5-50fad8fd4fbc" ejected="false"
-                                   autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
-                                   condejectctheadshot="true"/>
-                            The first slot in a location is at index="1".
-                            <location index="4">Right Arm
-                                <slot index="3" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="4" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="5" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="6" type="CLERPPC" quirks="stable_weapon" isDestroyed="false"/>
-                            </location>
-                            <location index="5">Left Arm
-                                <slot index="5" type="CLLargePulseLaser" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="6" type="CLLargePulseLaser" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="7" type="CLMediumPulseLaser" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="8" type="CLERMediumLaser" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="9" type="CLERSmallLaser" quirks="stable_weapon" isDestroyed="false"/>
-                            </location>
-                            <location index="7">Left Leg
-                                <armor points="19"/>
-                            </location>
-                            <Game id="28"/>
-                            <Force force="Trinary Bravo|4||Beak Star 1|5||"/>
-                        </entity>
-                        <entity chassis="Man O' War (Gargoyle)" model="Prime" type="Biped" commander="false"
-                                offboard="false" hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true"
-                                externalId="314e1682-4722-4cef-a775-33c5366a3ae6">
-                            <pilot size="1" name="Warrior Bjorn" hits="1" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
-                                   artillery="4" externalId="b13bb283-3eb6-4789-9201-c996095a90e5" ejected="false"
-                                   autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
-                                   condejectctheadshot="true"/>
-                            The first slot in a location is at index="1".
-                            <location index="0">Head
-                                <armor points="4"/>
-                            </location>
-                            <location index="1">Center Torso
-                                <armor points="25"/>
-                            </location>
-                            <location index="2">Right Torso
-                                <armor points="19"/>
-                                <slot index="3" type="Clan Ammo SRM-6" shots="9"/>
-                                <slot index="4" type="Clan LB 5-X Cluster Ammo" shots="17"/>
-                            </location>
-                            <location index="3">Left Torso
-                                <armor points="19"/>
-                                <slot index="3" type="Clan Ammo SRM-6" shots="4"/>
-                                <slot index="4" type="Clan LB 5-X AC Ammo" shots="13"/>
-                            </location>
-                            <location index="4">Right Arm
-                                <slot index="3" type="CLSRM6" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="4" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="5" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="6" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="7" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
-                            </location>
-                            <location index="5">Left Arm
-                                <slot index="3" type="CLSRM6" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="4" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="5" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="6" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
-                                <slot index="7" type="CLLBXAC5" quirks="stable_weapon" isDestroyed="false"/>
-                            </location>
-                            <location index="6">Right Leg
-                                <armor points="19"/>
-                            </location>
-                            <Game id="29"/>
-                            <Force force="Trinary Bravo|4||Beak Star 1|5||"/>
-                        </entity>
-                        <entity chassis="Turkina" model="B" type="Biped" commander="false" offboard="false"
-                                hidden="false" deployment="11" deploymentZone="-1" neverDeployed="true"
-                                externalId="eae280b3-c4af-4abe-bd24-f0d0f145d1a7" quirks="no_twist">
-                            <pilot size="1" name="Warrior Sylvain" nick="" gender="MALE" clanperson="true" gunnery="2" piloting="3"
-                                   artillery="4" externalId="435e4892-95a9-4f64-ac8b-8970fe000f31" ejected="false"
-                                   autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
-                                   condejectctheadshot="true"/>
-                            <Game id="30"/>
-                            <Force force="Trinary Bravo|4||Beak Star 1|5||"/>
                         </entity>
                     </entities>
                 </botForce>
@@ -7036,8 +6888,8 @@ salvage.
                     </description>
                     <destinationEdge>SOUTH</destinationEdge>
                     <objectiveCriterion>PreventReachMapEdge</objectiveCriterion>
-                    <percentage>70</percentage>
-                    <timeLimit>12</timeLimit>
+                    <percentage>60</percentage>
+                    <timeLimit>15</timeLimit>
                     <timeLimitAtMost>false</timeLimitAtMost>
                     <timeLimitType>ScaledToPrimaryUnitCount</timeLimitType>
                 </scenarioObjective>
