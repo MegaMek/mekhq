@@ -21,12 +21,26 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 
 public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
+    public static boolean isUntreatedInjury (Campaign campaign) {
+        for (Person p : campaign.getActivePersonnel()) {
+            for (Injury i : p.getInjuries()) {
+                if (!i.isPermanent()) {
+                    if (p.getDoctorId() == null) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     //region Constructors
     public UntreatedPersonnelNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "UntreatedPersonnelNagDialog", "UntreatedPersonnelNagDialog.title",
@@ -37,6 +51,6 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
     @Override
     protected boolean checkNag() {
         return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && getCampaign().getHangar().getUnitsStream().anyMatch(Unit::isUnmaintained);
+                && isUntreatedInjury(getCampaign());
     }
 }
