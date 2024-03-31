@@ -3187,7 +3187,7 @@ public class Campaign implements ITechManager {
                 }
             }
 
-            final int roll = MathUtility.clamp(Compute.d6(2) + getUnitRatingMod() - 2, 2, 12);
+            final int roll = MathUtility.clamp(Compute.d6(2) + getUnitRatingMod() -  2, 2, 12);
 
             int change = numPersonnel * (roll - 5) / 100;
             if (change < 0) {
