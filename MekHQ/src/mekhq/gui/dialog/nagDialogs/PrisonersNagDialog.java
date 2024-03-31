@@ -30,7 +30,7 @@ public class PrisonersNagDialog extends AbstractMHQNagDialog {
     public static boolean hasPrisoners (Campaign campaign) {
         if (!campaign.hasActiveContract()) {
             for (Person p : campaign.getActivePersonnel()) {
-                if ((p.getPrisonerStatus().isCurrentPrisoner()) || (p.getPrisonerStatus().isBondsman())) {
+                if ((p.getPrisonerStatus().isCurrentPrisoner())) {
                     return true;
                 }
             }
