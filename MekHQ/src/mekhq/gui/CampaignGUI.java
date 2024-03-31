@@ -2371,7 +2371,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (new PregnantToeNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+        if (new PregnantCombatantNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
         }
