@@ -144,6 +144,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
     //region Nag Tab
     private JCheckBox optionUnmaintainedUnitsNag;
+    private JCheckBox optionPrisonersNag;
     private JCheckBox optionInsufficientAstechsNag;
     private JCheckBox optionInsufficientAstechTimeNag;
     private JCheckBox optionInsufficientMedicsNag;
@@ -842,6 +843,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionUnmaintainedUnitsNag.setToolTipText(resources.getString("optionUnmaintainedUnitsNag.toolTipText"));
         optionUnmaintainedUnitsNag.setName("optionUnmaintainedUnitsNag");
 
+        optionPrisonersNag = new JCheckBox(resources.getString("optionPrisonersNag.text"));
+        optionPrisonersNag.setToolTipText(resources.getString("optionPrisonersNag.toolTipText"));
+        optionPrisonersNag.setName("optionPrisonersNag");
+
         optionInsufficientAstechsNag = new JCheckBox(resources.getString("optionInsufficientAstechsNag.text"));
         optionInsufficientAstechsNag.setToolTipText(resources.getString("optionInsufficientAstechsNag.toolTipText"));
         optionInsufficientAstechsNag.setName("optionInsufficientAstechsNag");
@@ -877,6 +882,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(optionUnmaintainedUnitsNag)
+                        .addComponent(optionPrisonersNag)
                         .addComponent(optionInsufficientAstechsNag)
                         .addComponent(optionInsufficientAstechTimeNag)
                         .addComponent(optionInsufficientMedicsNag)
@@ -888,6 +894,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(optionUnmaintainedUnitsNag)
+                        .addComponent(optionPrisonersNag)
                         .addComponent(optionInsufficientAstechsNag)
                         .addComponent(optionInsufficientAstechTimeNag)
                         .addComponent(optionInsufficientMedicsNag)
@@ -1140,6 +1147,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setSaveMothballState(optionSaveMothballState.isSelected());
 
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNMAINTAINED_UNITS, optionUnmaintainedUnitsNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_PRISONERS, optionPrisonersNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS, optionInsufficientAstechsNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME, optionInsufficientAstechTimeNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS, optionInsufficientMedicsNag.isSelected());
@@ -1248,6 +1256,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionSaveMothballState.setSelected(MekHQ.getMHQOptions().getSaveMothballState());
 
         optionUnmaintainedUnitsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNMAINTAINED_UNITS));
+        optionPrisonersNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_PRISONERS));
         optionInsufficientAstechsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS));
         optionInsufficientAstechTimeNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME));
         optionInsufficientMedicsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS));
