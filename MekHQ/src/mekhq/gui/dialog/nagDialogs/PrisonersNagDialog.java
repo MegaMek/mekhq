@@ -21,22 +21,31 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
+import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 
 public class PrisonersNagDialog extends AbstractMHQNagDialog {
+    public static boolean hasPrisoners (Campaign campaign) {
+        if (!campaign.hasActiveContract()) {
+            for (Person p : campaign.getActivePersonnel()) {
+                if ((p.getPrisonerStatus().isCurrentPrisoner()) || (p.getPrisonerStatus().isBondsman())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     //region Constructors
     public PrisonersNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "PrisonersNagDialog", "PrisonersNagDialog.title",
                 "PrisonersNagDialog.text", campaign, MHQConstants.NAG_PRISONERS);
     }
-    //endregion Constructors
 
+    //endregion Constructors
     @Override
     protected boolean checkNag() {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && getCampaign().getHangar().getUnitsStream().anyMatch(Unit::isUnmaintained);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey()) && hasPrisoners(getCampaign());
     }
 }
