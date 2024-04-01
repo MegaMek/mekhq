@@ -123,10 +123,10 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
         // Attacker must destroy 50% and keep 66% alive
         // Defender must destroy 33% and keep 50% alive
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract,
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1,
                 isAttacker() ? 50 : 33);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(
-                campaign, contract, this, isAttacker() ? 66 : 50, false);
+                campaign, contract, this, 1, isAttacker() ? 66 : 50, false);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
                 this);
 

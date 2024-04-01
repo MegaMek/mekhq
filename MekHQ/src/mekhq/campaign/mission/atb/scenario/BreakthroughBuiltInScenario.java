@@ -120,7 +120,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
 
         ScenarioObjective destroyHostiles = isAttacker()
-                ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 66,
+                ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 1, 66,
                         OffBoardDirection.getOpposite(OffBoardDirection.translateBoardStart(getStart())))
                 : CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 1, 50,
                         OffBoardDirection.translateBoardStart(getEnemyHome()));
