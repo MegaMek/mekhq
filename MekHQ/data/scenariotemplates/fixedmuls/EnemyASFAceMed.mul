@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<unit version="0.49.19-SNAPSHOT" >
+
+		<entity chassis="Samurai" model="SL-25" type="Aerodyne" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" velocity="0" altitude="5" externalId="eab96f32-c155-4e14-b2a1-0791fd067ac5">
+			<pilot size="1" name="Ilmari Juutilainen" nick="Illu" gender="MALE" gunnery="3" piloting="2" externalId="f7ba9a8e-83a9-4de1-8b46-0c379ff9bfed" ejected="false" advantages="hot_dog::maneuvering_ace::golden_goose" edge="edge 2::edge_when_aero_alt_loss::edge_when_aero_explosion::edge_when_aero_ko::edge_when_aero_lucky_crit::edge_when_aero_unit_cargo_lost"/>
+			<fuel left="640"/>
+			<bombs>
+				<bomb type="HEBomb" load="4" Internal="false"/>
+				<bomb type="ClusterBomb" load="4" Internal="false"/>
+			</bombs>
+			<structural integrity="7"/>
+			<heat sinks="19"/>
+			<Game id="10"/>
+		</entity>
+
+</unit>

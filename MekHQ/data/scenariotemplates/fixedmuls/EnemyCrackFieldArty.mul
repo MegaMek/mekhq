@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<unit version="0.49.19-SNAPSHOT" >
+
+		<entity chassis="Field Artillery" model="(Sniper)" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="d793b194-a284-43c8-af46-b75532439f52">
+			<pilot size="1" name="Finnian Stainer" nick="" gender="MALE" gunnery="2" piloting="8" externalId="d74eee27-2094-4354-bd4b-2605b8b87830" ejected="false" advantages="oblique_artillery"/>
+      The first slot in a location is at index="1".
+			<location index="1"> Field Guns
+				<armor points="0" type="Internal"/>
+				<slot index="2" type="ISSniperAmmo" shots="10"/>
+			</location>
+			<Game id="1"/>
+		</entity>
+
+		<entity chassis="Field Artillery" model="(Sniper)" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="aae3add7-c409-48dc-82eb-44cb6a3f4b9d">
+			<pilot size="1" name="Zak Uthman" nick="" gender="MALE" gunnery="3" piloting="8" externalId="e830ce22-0ef6-4973-b4f6-f03f70adccc3" ejected="false" advantages="oblique_artillery"/>
+      The first slot in a location is at index="1".
+			<location index="1"> Field Guns
+				<armor points="0" type="Internal"/>
+				<slot index="2" type="ISSniperAmmo" shots="10"/>
+			</location>
+			<Game id="2"/>
+		</entity>
+
+		<entity chassis="Field Artillery" model="(Thumper)" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="18ac1d76-cb6b-4ee8-ac0e-72998016026c">
+			<pilot size="1" name="Greta Kluge" nick="" gender="FEMALE" gunnery="3" piloting="8" externalId="115e242f-0654-4f36-ac26-c955930a7c17" ejected="false" advantages="oblique_attacker"/>
+      The first slot in a location is at index="1".
+			<location index="1"> Field Guns
+				<armor points="0" type="Internal"/>
+				<slot index="2" type="ISThumperAmmo" shots="20"/>
+			</location>
+			<Game id="3"/>
+		</entity>
+
+		<entity chassis="Field Artillery" model="(Thumper)" type="Tracked" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="00d96377-7e06-4117-aea4-aa29fa52d5bf">
+			<pilot size="1" name="Robbie Berger" nick="" gender="MALE" gunnery="3" piloting="8" externalId="a1af0625-a18b-4039-a7af-0c9c2e516ede" ejected="false" advantages="oblique_attacker"/>
+      The first slot in a location is at index="1".
+			<location index="1"> Field Guns
+				<armor points="0" type="Internal"/>
+				<slot index="2" type="ISThumperAmmo" shots="20"/>
+			</location>
+			<Game id="4"/>
+		</entity>
+
+		<entity chassis="Foot Platoon" model="(Laser)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="ba256ab8-9e6a-449c-a7e8-9f49bb34d700">
+			<pilot size="1" name="Mirvat Chandio" nick="" gender="FEMALE" gunnery="3" piloting="6" externalId="f0989378-ccc4-499d-9e50-7b01e35be162" ejected="false" advantages="forward_observer"/>
+			<location index="1"> Field Guns
+				<armor points="0" type="Internal"/>
+			</location>
+			<Game id="5"/>
+		</entity>
+
+		<entity chassis="Foot Platoon" model="(Rifle)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="aa6baf0b-d0e2-4bce-92f7-3e128a431325">
+			<pilot size="1" name="Jerry Pilipo" nick="" gender="MALE" gunnery="3" piloting="6" externalId="2ea5e52a-3c35-407d-a113-d852a781eff6" ejected="false" advantages="forward_observer"/>
+			<location index="1"> Field Guns
+				<armor points="0" type="Internal"/>
+			</location>
+			<Game id="6"/>
+		</entity>
+
+		<entity chassis="Foot Platoon" model="(SRM)" type="Leg" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="dc70321a-f7ce-4452-b970-5f1cf3f65714">
+			<pilot size="1" name="Aimee Gilkes" nick="" gender="FEMALE" gunnery="3" piloting="6" externalId="cfbb62c7-cfca-42a8-ba00-e80c20f2b88e" ejected="false" advantages="forward_observer::foot_cav"/>
+			<location index="1"> Field Guns
+				<armor points="0" type="Internal"/>
+			</location>
+			<Game id="7"/>
+		</entity>
+
+		<entity chassis="Jump Platoon" model="(Rifle)" type="Jump" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" externalId="b8b7b6aa-576d-4335-b756-35aadccd6b5c">
+			<pilot size="1" name="Bill Bates" nick="" gender="MALE" gunnery="3" piloting="4" externalId="eee3cc75-a957-41bc-bb4e-1fc1a84b966f" ejected="false" advantages="forward_observer"/>
+			<location index="1"> Field Guns
+				<armor points="0" type="Internal"/>
+			</location>
+			<Game id="8"/>
+		</entity>
+
+</unit>
