@@ -1569,15 +1569,7 @@ public class Refit extends Part implements IAcquisitionWork {
         getCampaign().addCustom(newEntity.getChassis() + " " + newEntity.getModel());
 
         try {
-            MechSummaryCache.getInstance().loadMechData();
-
-            // I need to change the new entity to the one from the mtf file now, so that equipment numbers will match
-
-            MechSummary summary = MechSummaryCache.getInstance().getMech(newEntity.getChassis() + " " + newEntity.getModel());
-            if (null == summary) {
-                throw new EntityLoadingException(String.format("Could not load %s %s from the mech cache",
-                        newEntity.getChassis(), newEntity.getModel()));
-            }
+            MechSummary summary = Utilities.retrieveOriginalUnit(newEntity);
 
             newEntity = new MechFileParser(summary.getSourceFile(), summary.getEntryName()).getEntity();
             LogManager.getLogger().info(String.format("Saved %s %s to %s",
@@ -1601,6 +1593,7 @@ public class Refit extends Part implements IAcquisitionWork {
             throw ex;
         }
     }
+
 
     private int getTimeMultiplier() {
         int mult;
