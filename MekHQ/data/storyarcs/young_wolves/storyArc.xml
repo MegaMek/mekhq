@@ -141,7 +141,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
             <assignedForceId>2</assignedForceId>
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-            <!--<nextStoryPointId>3f30a129-419b-4093-a8f7-4da7e076a6b5</nextStoryPointId>-->
+            <!--<nextStoryPointId>508d4c18-54ba-41b1-a751-dec92f0d7b1f</nextStoryPointId>-->
             <!-- Real next story point id. Can be commented out to test things -->
             <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
         </storyPoint>
@@ -246,6 +246,8 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 <category></category>
                 <filename>splash-liftoff.jpg</filename>
             </storySplash>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.EndArcStoryTrigger">
+            </storyTrigger>
         </storyPoint>
         <!-- Variable checks -->
         <storyPoint name="check_ulric_intro" type="mekhq.campaign.storyarc.storypoint.CheckStringVariableStoryPoint">

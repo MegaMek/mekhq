@@ -4116,6 +4116,11 @@ public class Campaign implements ITechManager {
         }
     }
 
+    public void unloadStoryArc() {
+        MekHQ.unregisterHandler(storyArc);
+        storyArc = null;
+    }
+
     public List<String> getCurrentObjectives() {
         if(null != getStoryArc()) {
             return getStoryArc().getCurrentObjectives();
