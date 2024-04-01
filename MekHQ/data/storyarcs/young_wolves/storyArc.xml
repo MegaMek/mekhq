@@ -8988,7 +8988,7 @@ sight.
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
                 <mapSize>35,35</mapSize>
-                <map>/unofficial/deadborder/35x35 Pleasant Valley</map>
+                <map>/unofficial/Deadborder/35x35 Pleasant Valley</map>
                 <scenarioDeploymentLimit>
                     <quantityLimit>1</quantityLimit>
                     <quantityType>ABSOLUTE</quantityType>
@@ -9693,7 +9693,7 @@ to the nature of the scenario, you may not collect *isorla.*
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
                 <mapSize>35,35</mapSize>
-                <map>/unofficial/deadborder/35x35 Ancient City</map>
+                <map>/unofficial/Deadborder/35x35 Ancient City</map>
                 <scenarioDeploymentLimit>
                     <quantityLimit>15</quantityLimit>
                     <quantityType>ABSOLUTE</quantityType>
@@ -9849,7 +9849,7 @@ scenario resolution.
                 <start>10</start>
                 <usingFixedMap>true</usingFixedMap>
                 <mapSize>35,35</mapSize>
-                <map>/unofficial/deadborder/35x35 Occupy Paragon City</map>
+                <map>/unofficial/Deadborder/35x35 Occupy Paragon City</map>
                 <scenarioDeploymentLimit>
                     <quantityLimit>15</quantityLimit>
                     <quantityType>ABSOLUTE</quantityType>
