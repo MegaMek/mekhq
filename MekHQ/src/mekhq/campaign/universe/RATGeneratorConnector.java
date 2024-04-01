@@ -152,6 +152,12 @@ public class RATGeneratorConnector extends AbstractUnitGenerator {
                 final Set<String> parentFactions = new HashSet<>();
                 for (final String factionCode : factions) {
                     // Use the current Parent Faction
+                    FactionRecord newFaction = RATGenerator.getInstance().getFaction(factionCode);
+                    if (newFaction == null) {
+                        // No parent faction found
+                        LogManager.getLogger().warn("Failed lookup of faction code '" + factionCode + "', skipping...");
+                        continue;
+                    }
                     parameters.setFaction(RATGenerator.getInstance().getFaction(factionCode));
 
                     // Get the table for the new Parent Faction
