@@ -5315,6 +5315,18 @@ recover downed pilots, but not mechs or salvage.
                     <start>2</start>
                     <camoCategory>Clans/Jade Falcon</camoCategory>
                     <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <behaviorSettings>
+                        <name>BASIC_CLAN</name>
+                        <forcedWithdrawal>true</forcedWithdrawal>
+                        <goHome>false</goHome>
+                        <autoFlee>false</autoFlee>
+                        <fallShameIndex>5</fallShameIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
+                        <strategicTargets/>
+                    </behaviorSettings>
                     <entities>
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
@@ -5657,6 +5669,18 @@ forces.
                     <start>2</start>
                     <camoCategory>Clans/Jade Falcon</camoCategory>
                     <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <behaviorSettings>
+                        <name>BASIC_CLAN</name>
+                        <forcedWithdrawal>true</forcedWithdrawal>
+                        <goHome>false</goHome>
+                        <autoFlee>false</autoFlee>
+                        <fallShameIndex>5</fallShameIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
+                        <strategicTargets/>
+                    </behaviorSettings>
                     <botForceRandomizer>
                         <factionCode>CJF</factionCode>
                         <quality>2</quality>
@@ -5771,6 +5795,18 @@ forces after round 12 when all available reinforcements have arrived.
                     <start>6</start>
                     <camoCategory>Clans/Jade Falcon</camoCategory>
                     <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <behaviorSettings>
+                        <name>CLAN_STAY_BACK</name>
+                        <forcedWithdrawal>true</forcedWithdrawal>
+                        <goHome>false</goHome>
+                        <autoFlee>false</autoFlee>
+                        <fallShameIndex>5</fallShameIndex>
+                        <hyperAggressionIndex>4</hyperAggressionIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
+                        <strategicTargets/>
+                    </behaviorSettings>
                     <entities>
                         <entity chassis="Thor (Summoner)" model="D" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="8" deploymentZone="-1" neverDeployed="true"
@@ -6020,6 +6056,18 @@ forces after round 14 when all available reinforcements have arrived.
                     <start>6</start>
                     <camoCategory>Clans/Jade Falcon</camoCategory>
                     <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <behaviorSettings>
+                        <name>CLAN_STAY_BACK</name>
+                        <forcedWithdrawal>true</forcedWithdrawal>
+                        <goHome>false</goHome>
+                        <autoFlee>false</autoFlee>
+                        <fallShameIndex>5</fallShameIndex>
+                        <hyperAggressionIndex>4</hyperAggressionIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
+                        <strategicTargets/>
+                    </behaviorSettings>
                     <entities>
                         <entity chassis="Thor (Summoner)" model="D" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
@@ -6287,6 +6335,19 @@ salvage.
                 <emi>true</emi>
                 <blowingSand>true</blowingSand>
                 <wind>2</wind>
+                <behaviorSettings>
+                    <name>BREAKTHROUGH</name>
+                    <forcedWithdrawal>true</forcedWithdrawal>
+                    <goHome>false</goHome>
+                    <autoFlee>true</autoFlee>
+                    <destinationEdge>1</destinationEdge>
+                    <fallShameIndex>5</fallShameIndex>
+                    <hyperAggressionIndex>8</hyperAggressionIndex>
+                    <selfPreservationIndex>3</selfPreservationIndex>
+                    <herdMentalityIndex>3</herdMentalityIndex>
+                    <braveryIndex>2</braveryIndex>
+                    <strategicTargets/>
+                </behaviorSettings>
                 <botForce>
                     <name>Second Falcon Jaegers</name>
                     <team>2</team>
@@ -6936,16 +6997,15 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                     <camoCategory>Clans/Jade Falcon</camoCategory>
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
-                        <name>CHARGE</name>
-                        <homeEdge>0</homeEdge>
-                        <forcedWithdrawal>false</forcedWithdrawal>
+                        <name>BASIC_CLAN</name>
+                        <forcedWithdrawal>true</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
                         <hyperAggressionIndex>7</hyperAggressionIndex>
-                        <selfPreservationIndex>2</selfPreservationIndex>
-                        <herdMentalityIndex>4</herdMentalityIndex>
-                        <braveryIndex>8</braveryIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                     <entities>
@@ -7203,16 +7263,15 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                     <camoCategory>Clans/Jade Falcon</camoCategory>
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
-                        <name>CHARGE</name>
-                        <homeEdge>0</homeEdge>
-                        <forcedWithdrawal>false</forcedWithdrawal>
+                        <name>BASIC_CLAN</name>
+                        <forcedWithdrawal>true</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
                         <hyperAggressionIndex>7</hyperAggressionIndex>
-                        <selfPreservationIndex>2</selfPreservationIndex>
-                        <herdMentalityIndex>4</herdMentalityIndex>
-                        <braveryIndex>8</braveryIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                     <entities>
@@ -7470,15 +7529,14 @@ capturing the facility.
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
                         <name>TRIAL</name>
-                        <homeEdge>0</homeEdge>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
-                        <hyperAggressionIndex>5</hyperAggressionIndex>
-                        <selfPreservationIndex>5</selfPreservationIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>4</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>5</braveryIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                     <entities>
@@ -7565,15 +7623,14 @@ capturing the facility.
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
                         <name>TRIAL</name>
-                        <homeEdge>0</homeEdge>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
-                        <hyperAggressionIndex>5</hyperAggressionIndex>
-                        <selfPreservationIndex>5</selfPreservationIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>4</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>5</braveryIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                     <entities>
@@ -7660,15 +7717,14 @@ capturing the facility.
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
                         <name>TRIAL</name>
-                        <homeEdge>0</homeEdge>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
-                        <hyperAggressionIndex>5</hyperAggressionIndex>
-                        <selfPreservationIndex>5</selfPreservationIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>4</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>5</braveryIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                     <entities>
@@ -7762,15 +7818,14 @@ capturing the facility.
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
                         <name>TRIAL</name>
-                        <homeEdge>0</homeEdge>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
-                        <hyperAggressionIndex>5</hyperAggressionIndex>
-                        <selfPreservationIndex>5</selfPreservationIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>4</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>5</braveryIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                     <entities>
@@ -7858,15 +7913,14 @@ capturing the facility.
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
                         <name>TRIAL</name>
-                        <homeEdge>0</homeEdge>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
-                        <hyperAggressionIndex>5</hyperAggressionIndex>
-                        <selfPreservationIndex>5</selfPreservationIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>4</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>5</braveryIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                     <entities>
@@ -7946,15 +8000,14 @@ capturing the facility.
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
                         <name>TRIAL</name>
-                        <homeEdge>0</homeEdge>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
-                        <hyperAggressionIndex>5</hyperAggressionIndex>
-                        <selfPreservationIndex>5</selfPreservationIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>4</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>5</braveryIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                     <entities>
@@ -8042,15 +8095,14 @@ capturing the facility.
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
                         <name>TRIAL</name>
-                        <homeEdge>0</homeEdge>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
-                        <hyperAggressionIndex>5</hyperAggressionIndex>
-                        <selfPreservationIndex>5</selfPreservationIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>4</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>5</braveryIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                     <entities>
@@ -8138,16 +8190,14 @@ capturing the facility.
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
                         <name>TRIAL</name>
-                        <homeEdge>0</homeEdge>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
-                        <hyperAggressionIndex>5</hyperAggressionIndex>
-                        <selfPreservationIndex>5</selfPreservationIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>4</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>5</braveryIndex>
-                        <strategicTargets/>
+                        <braveryIndex>2</braveryIndex>
                     </behaviorSettings>
                     <entities>
                         <entity chassis="Shadow Hawk IIC" model="(Standard)" type="Biped" commander="false"
@@ -8234,15 +8284,14 @@ capturing the facility.
                     <camoFileName>Kappa Galaxy.jpg</camoFileName>
                     <behaviorSettings>
                         <name>TRIAL</name>
-                        <homeEdge>0</homeEdge>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>5</fallShameIndex>
-                        <hyperAggressionIndex>5</hyperAggressionIndex>
-                        <selfPreservationIndex>5</selfPreservationIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>4</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>5</braveryIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                     <entities>
@@ -8337,6 +8386,18 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                     <start>2</start>
                     <camoCategory>Clans/Jade Falcon</camoCategory>
                     <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <behaviorSettings>
+                        <name>BASIC_CLAN</name>
+                        <forcedWithdrawal>true</forcedWithdrawal>
+                        <goHome>false</goHome>
+                        <autoFlee>false</autoFlee>
+                        <fallShameIndex>5</fallShameIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
+                        <strategicTargets/>
+                    </behaviorSettings>
                     <entities>
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
@@ -8762,15 +8823,15 @@ so be sure to watch your step.
                     <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
                     <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
                     <behaviorSettings>
-                        <name>MENACE</name>
+                        <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
-                        <fallShameIndex>4</fallShameIndex>
+                        <fallShameIndex>5</fallShameIndex>
                         <hyperAggressionIndex>7</hyperAggressionIndex>
                         <selfPreservationIndex>4</selfPreservationIndex>
-                        <herdMentalityIndex>3</herdMentalityIndex>
-                        <braveryIndex>7</braveryIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                 </botForce>
@@ -8842,15 +8903,15 @@ the equator of Butler. The environment will make movement difficult, especially 
                     <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
                     <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
                     <behaviorSettings>
-                        <name>MENACE</name>
+                        <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
-                        <fallShameIndex>4</fallShameIndex>
+                        <fallShameIndex>5</fallShameIndex>
                         <hyperAggressionIndex>7</hyperAggressionIndex>
                         <selfPreservationIndex>4</selfPreservationIndex>
-                        <herdMentalityIndex>3</herdMentalityIndex>
-                        <braveryIndex>7</braveryIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                 </botForce>
@@ -8925,15 +8986,15 @@ breaches into your internal system.
                     <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
                     <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
                     <behaviorSettings>
-                        <name>MENACE</name>
+                        <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
-                        <fallShameIndex>6</fallShameIndex>
-                        <hyperAggressionIndex>5</hyperAggressionIndex>
+                        <fallShameIndex>5</fallShameIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
                         <selfPreservationIndex>4</selfPreservationIndex>
-                        <herdMentalityIndex>3</herdMentalityIndex>
-                        <braveryIndex>6</braveryIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                 </botForce>
@@ -9006,15 +9067,15 @@ sight.
                     <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
                     <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
                     <behaviorSettings>
-                        <name>MENACE</name>
+                        <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
-                        <fallShameIndex>4</fallShameIndex>
+                        <fallShameIndex>5</fallShameIndex>
                         <hyperAggressionIndex>7</hyperAggressionIndex>
                         <selfPreservationIndex>4</selfPreservationIndex>
-                        <herdMentalityIndex>3</herdMentalityIndex>
-                        <braveryIndex>7</braveryIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                 </botForce>
@@ -9088,15 +9149,15 @@ The player will not be granted *hegira* by the Jade Falcons.
                     <camoCategory>Clans/Jade Falcon</camoCategory>
                     <camoFileName>Vau Galaxy.jpg</camoFileName>
                     <behaviorSettings>
-                        <name>MENACE</name>
+                        <name>BASIC_CLAN</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
-                        <fallShameIndex>4</fallShameIndex>
+                        <fallShameIndex>5</fallShameIndex>
                         <hyperAggressionIndex>7</hyperAggressionIndex>
-                        <selfPreservationIndex>4</selfPreservationIndex>
-                        <herdMentalityIndex>3</herdMentalityIndex>
-                        <braveryIndex>7</braveryIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
                     </behaviorSettings>
                     <entities>
                         <entity chassis="Thor (Summoner)" model="Prime" type="Biped" commander="false" offboard="false"
@@ -9338,9 +9399,9 @@ The player will not be granted *hegira* by the Jade Falcons.
                         <autoFlee>false</autoFlee>
                         <fallShameIndex>7</fallShameIndex>
                         <hyperAggressionIndex>3</hyperAggressionIndex>
-                        <selfPreservationIndex>8</selfPreservationIndex>
+                        <selfPreservationIndex>9</selfPreservationIndex>
                         <herdMentalityIndex>2</herdMentalityIndex>
-                        <braveryIndex>5</braveryIndex>
+                        <braveryIndex>4</braveryIndex>
                     </behaviorSettings>
                     <entities>
                         <entity chassis="Black Hawk (Nova)" model="Phelan" type="Biped" commander="false"
@@ -9429,6 +9490,18 @@ strike, you will not be able to claim battlefield salvage.
                     <start>2</start>
                     <camoCategory>Clans/Jade Falcon</camoCategory>
                     <camoFileName>Omega Galaxy.jpg</camoFileName>
+                    <behaviorSettings>
+                        <name>CLAN_DEFENDER</name>
+                        <forcedWithdrawal>true</forcedWithdrawal>
+                        <goHome>false</goHome>
+                        <autoFlee>false</autoFlee>
+                        <fallShameIndex>5</fallShameIndex>
+                        <hyperAggressionIndex>6</hyperAggressionIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
+                        <strategicTargets/>
+                    </behaviorSettings>
                     <botForceRandomizer>
                         <factionCode>CJF</factionCode>
                         <quality>2</quality>
@@ -9633,8 +9706,8 @@ strike, you will not be able to claim battlefield salvage.
                         <goHome>false</goHome>
                         <autoFlee>true</autoFlee>
                         <destinationEdge>1</destinationEdge>
-                        <fallShameIndex>6</fallShameIndex>
-                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <fallShameIndex>7</fallShameIndex>
+                        <hyperAggressionIndex>5</hyperAggressionIndex>
                         <selfPreservationIndex>8</selfPreservationIndex>
                         <herdMentalityIndex>6</herdMentalityIndex>
                         <braveryIndex>7</braveryIndex>
@@ -9709,6 +9782,17 @@ to the nature of the scenario, you may not collect *isorla.*
                     <start>2</start>
                     <camoCategory>Clans/Jade Falcon</camoCategory>
                     <camoFileName>Delta Galaxy.jpg</camoFileName>
+                    <behaviorSettings>
+                        <name>BASIC_CLAN</name>
+                        <forcedWithdrawal>true</forcedWithdrawal>
+                        <goHome>false</goHome>
+                        <autoFlee>false</autoFlee>
+                        <fallShameIndex>5</fallShameIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
+                        <herdMentalityIndex>5</herdMentalityIndex>
+                        <braveryIndex>2</braveryIndex>
+                    </behaviorSettings>
                     <botForceRandomizer>
                         <factionCode>CJF</factionCode>
                         <quality>4</quality>
@@ -9875,17 +9959,15 @@ scenario resolution.
                         <balancingMethod>WEIGHT_ADJ</balancingMethod>
                     </botForceRandomizer>
                     <behaviorSettings>
-                        <name>AGGRO</name>
+                        <name>BASIC_CLAN</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
-                        <destinationEdge>1</destinationEdge>
-                        <fallShameIndex>4</fallShameIndex>
+                        <fallShameIndex>5</fallShameIndex>
                         <hyperAggressionIndex>7</hyperAggressionIndex>
-                        <selfPreservationIndex>4</selfPreservationIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>7</braveryIndex>
-                        <strategicTargets/>
+                        <braveryIndex>2</braveryIndex>
                     </behaviorSettings>
                 </botForce>
                 <botForce>
@@ -9905,17 +9987,15 @@ scenario resolution.
                         <balancingMethod>WEIGHT_ADJ</balancingMethod>
                     </botForceRandomizer>
                     <behaviorSettings>
-                        <name>AGGRO</name>
+                        <name>BASIC_CLAN</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
                         <goHome>false</goHome>
                         <autoFlee>false</autoFlee>
-                        <destinationEdge>1</destinationEdge>
-                        <fallShameIndex>4</fallShameIndex>
+                        <fallShameIndex>5</fallShameIndex>
                         <hyperAggressionIndex>7</hyperAggressionIndex>
-                        <selfPreservationIndex>4</selfPreservationIndex>
+                        <selfPreservationIndex>3</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>7</braveryIndex>
-                        <strategicTargets/>
+                        <braveryIndex>2</braveryIndex>
                     </behaviorSettings>
                 </botForce>
                 <scenarioObjective>
@@ -10397,10 +10477,10 @@ lasers.
                         <autoFlee>false</autoFlee>
                         <destinationEdge>1</destinationEdge>
                         <fallShameIndex>5</fallShameIndex>
-                        <hyperAggressionIndex>6</hyperAggressionIndex>
+                        <hyperAggressionIndex>7</hyperAggressionIndex>
                         <selfPreservationIndex>4</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>6</braveryIndex>
+                        <braveryIndex>7</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                 </botForce>
@@ -10532,9 +10612,9 @@ It is time to suit up and finish this.
                         <destinationEdge>1</destinationEdge>
                         <fallShameIndex>6</fallShameIndex>
                         <hyperAggressionIndex>4</hyperAggressionIndex>
-                        <selfPreservationIndex>7</selfPreservationIndex>
+                        <selfPreservationIndex>5</selfPreservationIndex>
                         <herdMentalityIndex>5</herdMentalityIndex>
-                        <braveryIndex>4</braveryIndex>
+                        <braveryIndex>6</braveryIndex>
                         <strategicTargets/>
                     </behaviorSettings>
                 </botForce>
