@@ -5,7 +5,7 @@
     <description>
 # Young Wolves
 
-In June of 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Khan
+In June 3057, tension between the Wolf and Jade Falcon clans led to the outbreak of the Refusal War. Khan
 Elias Crichell of Clan Jade Falcon fought the war to destroy his most powerful rival to power. IlKhan Ulric
 Kerensky fought the war to weaken the fighting capability of the Crusader movement and thus delay the resumption
 of the drive to Terra. Far more than just a simple Trial of Refusal, the Refusal War at some point involved
@@ -134,14 +134,15 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <limitFaction>true</limitFaction>
             <nameRestrictions>FIRST_NAME</nameRestrictions>
             <instructions>
-                Use this form to create a new Clan Wolf mechwarrior for the story arc. You have a pool of XP that you
-                can use to buy skills and special abilities. Any leftover XP will be added to your character.
+                Use this form to create a Clan Wolf mechwarrior. You have a pool of XP that you
+                can use to buy skills and special abilities. Any leftover XP will be added to your character. Only
+                Gunnery and Piloting will have in-game effects in the story arc.
             </instructions>
             <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
             <assignedForceId>2</assignedForceId>
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
             <!--<nextStoryPointId>3f30a129-419b-4093-a8f7-4da7e076a6b5</nextStoryPointId>-->
-            <!-- Real next story point Id. Can be commented out to test things -->
+            <!-- Real next story point id. Can be commented out to test things -->
             <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
         </storyPoint>
         <!-- Game over check -->
@@ -172,7 +173,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>d13f379e-3035-4637-a7e7-e6f9b205a8d6</id>
             <title>Khan Ward has Fallen</title>
             <narrative>
-                Khan Phelan Ward has fallen in battle. The remaining Wolf forces are in disarray and it is only a matter
+                Khan Phelan Ward has fallen in battle. The remaining Wolf forces are in disarray, and it is only a matter
                 of time before they are overwhelmed by the Jade Falcons. The story ends here.
             </narrative>
             <storySplash>
@@ -650,7 +651,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
 
                 Greetings, {commander}. Welcome to Colmar, first of the tombs in which we will bury the Jade Falcons.
                 You have been assigned to my task force for this offensive. Before we get started, let me ask you a
-                simple question. Do you have a problem serving under a Khan older than your generparents' geneparents
+                simple question. Do you have a problem serving under a Khan older than your geneparents' geneparents
                 and tainted by the Inner Sphere?
             </question>
             <choice id="honor">No, My Khan. I consider it a great honor.</choice>
@@ -688,7 +689,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 You are clearly a formidable warrior as well as a competent commander, {commanderRank}. Yet, you possess
                 no bloodname. Why is this?
             </question>
-            <choice id="loser">I have entered five bloodname trials but I have never earned the final prize.</choice>
+            <choice id="loser">I have entered five bloodname trials, but I have never earned the final prize.</choice>
             <choice id="wound">I was severely wounded at Tukayyid and my recovery took a long time, preventing me from
                 participating in any trials.
             </choice>
@@ -798,7 +799,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <title>A Disgrace?</title>
             <question>
                 Did you hear that stravag woman's use of contractions? She is a disgrace to the clan. How dare she call
-                herself a Wolf! She should have died honorably in a solahma unit years ago. Instead she lives on as a
+                herself a Wolf! She should have died honorably in a solahma unit years ago. Instead, she lives on as a
                 testament to the corruption of the Inner Sphere. If she had not placed a moratorium on trials until
                 after this conflict, I would challenge her to a trial of grievance immediately.
             </question>
@@ -835,13 +836,13 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <title>Trial of Refusal</title>
             <question>
                 *As the screen goes dark, you realize that all the warriors of your trinary are gathered around you in a
-                semi-circle. Mathius steps forward, seething with rage.*
+                semicircle. Mathius steps forward, seething with rage.*
 
                 You would dishonor us by fleeing into the Inner Sphere! I will not follow that Spheroid farce of a Khan
-                to live in exile and abjurement from the Clans! I demand a Trial of Refusal!
+                to live in exile and Abjurement from the Clans! I demand a Trial of Refusal!
 
                 *Glancing around, you see some of the warriors nod their heads in agreement, while others watch you
-                attentively. Is is clear that you cannot deny Mathius's demand without a mutiny amongst your troops.*
+                attentively. You cannot deny Mathius's demand without a mutiny amongst your troops.*
             </question>
             <choice id="relish">I relish the chance to finally teach you a lesson in humility.</choice>
             <choice id="warden">You will have your trial, and then the remainder of my trinary will join with Khan Ward
@@ -1063,8 +1064,8 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 *Tayyiba comes to see you later in your cabin.*
 
                 I understand why you made the decision that you made to go to Wotan, {commander}. However, I cannot make
-                the decision to die in futility when I can live to protect what I hold dear. I have asked Star Colonel
-                Ulric Kerensky for permission to join our fellow Wolves on Morges and he has granted it. The dropship
+                the decision to die in futility when I can live to protect what I hold dear. I asked Star Colonel
+                Ulric Kerensky for permission to join our fellow Wolves on Morges, which he has granted. The dropship
                 transporting me to another jumpship will be arriving shortly.
 
                 *You now notice the small bag over her shoulder.*
@@ -1093,7 +1094,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
 
                 We finally did it then? We won this war. How come it doesn't feel like a win, then?
             </question>
-            <choice id="worth_it">Because it came at a heavy cost. However, its a cost I would pay again, knowing the
+            <choice id="worth_it">Because it came at a heavy cost. However, I would pay this cost again, knowing the
                 alternative.
             </choice>
             <choice id="not_win">Because we have lost everything and can never return home. That is not really a win in
@@ -1171,7 +1172,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>4d5a0fee-873b-4c69-878d-717da08440e6</id>
             <title>Batchall</title>
             <question>
-                *He is momentarily taken aback by your brazen insult, before his eyes narrow and he leans in.*
+                *He is momentarily taken aback by your brazen insult. His eyes narrow as he leans in.*
 
                 You would dishonor our ways to issue petty insults? Truly, the Wolves have been corrupted. It remains to
                 me to teach you a lesson in humility.
@@ -1211,7 +1212,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <choice id="batchall_all">Clearly, you have had too much time to read old dusty books in your dotage. As I
                 said at the outset I will bid my full trinary.
             </choice>
-            <choice id="batchall_equal">I have not the time for such rituals but I have changed my mind and will honor
+            <choice id="batchall_equal">I have no the time for such complex rituals, but I have changed my mind and will honor
                 you with an equal combat. I will meet you on the field with a binary.
             </choice>
             <choice id="batchall_single">I accept your challenge. I will choose nine of my warriors to meet you in
@@ -1248,8 +1249,8 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <question>
                 What say you? Will you honor the old ways or have you been tainted by Spheroid "tactics?"
             </question>
-            <choice id="batchall_all">I am becoming annoyed by your addled ideas. I think that I will instead increase
-                my bid to a full trinary so I that can put you out of your miserable solahma existence quickly.
+            <choice id="batchall_all">I am becoming annoyed by your addled ideas. I think that I will increase
+                my bid to a full trinary, so that I may put you out of your miserable solahma existence.
             </choice>
             <choice id="batchall_equal">I have not the time for such rituals. I will meet you on the field as I
                 originally bid, binary vs. binary.
@@ -1488,7 +1489,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>283a324f-339b-4d53-a994-6a4bd8e647b4</id>
             <title>A Parting of Ways</title>
             <question>
-                {commander}, a dropship has pulled along side and has begun transferring some personnel and equipment.
+                {commander}, a dropship has pulled alongside and has begun transferring some personnel and equipment.
                 Apparently, Felipe and a few other warriors convinced Star Colonel Ulric to let them join the Wolves in
                 Morges. There is not much I can do about it, {commanderRank}, but I thought you should be aware.
             </question>
@@ -1518,7 +1519,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>4dc4408f-c277-48a9-ba74-412f17b20fe9</id>
             <title>A Parting of Ways</title>
             <question>
-                {commander}, a dropship has pulled along side and has begun transferring some personnel and equipment.
+                {commander}, a dropship has pulled alongside and has begun transferring some personnel and equipment.
                 Apparently, Felipe convinced Star Colonel Ulric to let him join the Wolves in Morges. He apparently
                 attempted to convince others to join him without success. There is not much I can do about it,
                 {commanderRank}, but I thought you should be aware.
@@ -1884,7 +1885,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 *As you walk over to Chistu's fallen Executioner, his voice comes across your comm from a tight-beam
                 transmission.*
 
-                You have defeated me. Make me your bondsman. You will find me very resourceful and you will need me to
+                You have defeated me. Make me your bondsman. You will find me very resourceful, and you will need me to
                 deal with Crichell. He is not to be trusted.
             </question>
             <choice id="death">Neg, Chistu. I know that I cannot trust *you*.</choice>
@@ -2262,9 +2263,9 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 the Inner Sphere where they will help prepare the Spheroids for a resumption of hostilities with our
                 brethren. He brought with him the entire genetic repository of our Clan.
 
-                Like every other damn warrior in this Touman, you may have your own opinions about this decision.
-                Frankly, I don't give a damn right now. From an operational standpoint, all it means is that we will not
-                have Khan Ward's forces available to us and so I will need to lean more heavily on my existing forces,
+                Like every other damn warrior in this Touman, you probably have your own opinions about my decision.
+                Frankly, I don't give a damn. From an operational standpoint, all it means is that we will not
+                have Khan Ward's forces available to us. I will, therefore, need to lean more heavily on my existing forces,
                 including yours. In other words, I hope you got all the dents out of your mechs because I am going to
                 need them shortly.
             </narrative>
@@ -2301,7 +2302,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 I expected better from you, {commander}. Happily, despite your failure to achieve the objectives I gave
                 you, our little adventure has been a rousing success. The surprise attack has thrown the Falcons into
-                disarray, and at this point it is mop up work. Since clearly your units must be in dire need of repair
+                disarray, and all that is left to do is a bit of mopping up. Since your units clearly must be in dire need of repair
                 to leave the field so hastily, I am sending you back to your dropship for repair and resupply. Think on
                 your failure and do better next time.
             </narrative>
@@ -2315,7 +2316,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 Welcome back on board, {commanderRank}. From the way the Falcons are folding, I trust that you gave them
                 hell.
 
-                I just received a comm that Baker 3 has been secured and we are to begin transit to the jump point. Our
+                I just received a comm that Baker 3 has been secured, and we are to begin transit to the jump point. Our
                 next destination is Devin. Please secure all equipment and personnel for liftoff.
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
@@ -2333,13 +2334,13 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <title>Welcome to Devin</title>
             <narrative>
                 We have now arrived at the ball of dust and sand they call Devin. I am going to give the Silver Devils
-                the call up on this one, so you should just stand by in orbit. With luck, we should make short work of
+                the call-up on this one, so you should just stand by in orbit. With luck, we should make short work of
                 the Second Falcon Jaegers stationed on planet.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>e20ebd67-cd09-4c15-8d08-a7e1790ac66f</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_devin_sitep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_devin_sitrep" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>1b0d8804-b9f3-44c5-8ef4-58c67d344d37</id>
             <title>Devin Sitrep</title>
             <narrative>
@@ -2358,16 +2359,16 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <title>Devin Combat Drop</title>
             <narrative>
                 We are dropping into a major storm, {commanderRank}, so this is going to be a rough landing. Please be
-                sure everything is secured in the hangar bay and we will try to get you down in one piece.
+                sure everything is secured in the hangar bay, and we will try to get you down in one piece.
 
                 *Shortly after, you are buffeted about in your combat seat from the heavy winds hitting the descending
                 dropship.*
 
                 Bring us down tight and steady, pilot! You flip this egg, and you pay for it!
 
-                *You can hear the metal struts supporting the hull groan with the pressure. Then suddenly there is a
-                jerk and all is momentarily silent. The bay doors begin to open with a hydraulic whine and you hear the
-                howl of heavy winds from outside as sand is blown across the metal floor of the hangar bay.*
+                *You can hear the metal struts supporting the hull groan with the pressure. Then you feel an abrupt and
+                heavy jerk as your mech rocks on its actuators. As the bay doors begin to open, sand is blown across the
+                metal floors of the hangar bay by the howling winds outside.*
 
                 And that is touchdown! You are clear for egress, {commanderRank}. Good hunting!
             </narrative>
@@ -2398,7 +2399,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 I am sorry to say we got our asses handed to us on Devin. We were not prepared for that storm. It was
                 bound to happen at some point in this campaign. I know your young pups fought hard, but unfortunately
                 enough of their forces made it through your blockade to take out one of the Third Battle Cluster's
-                dropships. They are now a shadow of their former selves and I am going to send the remainder of that
+                dropships. They are now a shadow of their former selves, and I am going to send the remainder of that
                 cluster to join Khan Ward.
 
                 Now we lick our wounds and move on to Denizli.
@@ -2413,12 +2414,12 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>47e20ee0-37b3-4327-b399-2f5a670620d6</id>
             <title>Welcome to Denizli</title>
             <narrative>
-                Welcome to Denizli, {commander}. The garrison forces here should not prove too difficult. I do not think
-                I will need you for the main assault, but I am going to throw your forces a bone to chew on.
+                Welcome to Denizli, {commander}. The garrison forces here should not prove too difficult. I will not
+                need you for the main assault, but I am going to throw your forces a bone to chew on.
 
                 There is an important oil refinery in the northern continent that is being guarded by a small garrison
                 unit. The commander of that force is ... well, best you see for yourself. I am assigning your forces to
-                take that facility. I'm giving you free reign to handle it as you see fit.
+                take that facility. I'm also giving you free rein to handle it as you see fit.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>1851ab3e-b0ff-43ff-a41a-33b15313c767</nextStoryPointId>
@@ -2448,10 +2449,10 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 *Natasha fixes you with an incredulous stare.*
 
-                An old man with ten beat-up second class mechs and mostly freebirth warriors and you decide to go after
+                An old man with ten beat-up second class mechs and mostly freebirth warriors, and you decide to go after
                 him with everything you have? Well, that wasn't exactly honorable, but I guess I can appreciate your
                 ruthlessness. Well done, {commanderRank}. I always figured that was a milk run for you, but it ought to
-                bolster the morale of your troops. They are going to need it because Twyross is going to be a lot harder
+                bolster the morale of your troops. They are going to need it because Twycross is going to be a lot harder
                 nut to crack. Prepare for liftoff.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -2481,7 +2482,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 overwhelmed them with numbers. It could have also been a tactical error to give up your advantage,
                 except for the fact that you outclassed your opponent in unit and pilot quality. Just don't make that
                 tactical error when it matters. Speaking of which, we are off to Twycross well we will face a far more
-                fearsome foe than an old man with a tast for ancient legends. Prepare for liftoff.
+                fearsome foe than an old man with a taste for ancient legends. Prepare for liftoff.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>e8b26d16-e615-4579-bca2-537538fc2114</nextStoryPointId>
@@ -2560,13 +2561,13 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>2a0c3e33-af7f-46d3-bd55-df3b46f9ac4f</id>
             <title>Secure for Liftoff</title>
             <narrative>
-                {commander}, welcome back on board. Star Colonel Marco Hall has taken command of our task force and we
+                {commander}, welcome back on board. Star Colonel Marco Hall has taken command of our task force, and we
                 have orders to rendezvous with Star Colonel Ulric Kerensky in the Butler system.
 
                 *She pauses briefly and then her face turns ashen.*
 
                 We have just received word that Khan Kerensky has fallen in the Great Gash to a Falcon warrior named
-                Joanna. It is .. It is just hard to believe that she is gone.
+                Joanna. It is ... It is just hard to believe that she is gone.
 
                 *She seems to pull herself together.*
 
@@ -2583,7 +2584,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>84f5f6a3-9f33-478a-b3ba-a0e4ba6917e8</id>
             <title>Arrival at Butler</title>
             <narrative>
-                You arrive on Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to
+                You arrive at Butler, along with the remnants of Khan Natasha Kerensky's task force. Here you are to
                 meet up and join forces with Star Colonel Ulric Kerensky's task force. You arrive at the jump point to
                 find it teeming with Wolf transports. Shortly, you receive an urgent message from Star Captain Vlad.
             </narrative>
@@ -2622,7 +2623,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <title>Onward to Exile</title>
             <narrative>
                 I am glad to see that it is you I am welcoming back on board, {commander}. Once you are secured, we are
-                ready for liftoff. A jumpship is waiting at the nadir point to carry us to Morges. I for one will be
+                ready for liftoff. A jumpship is waiting at the nadir point to carry us to Morges. I will be
                 proud to stand with Khan Phelan's Wolves.
             </narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
@@ -2637,7 +2638,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 Aye, {commanderRank}. I am not sad to see them go frankly, although I wish I could have prevented their
                 stravag theft of equipment. Once you are secured, we are ready for liftoff. A jumpship is waiting at the
-                nadir point to carry us to Morges. I for one will be proud to stand with Khan Phelan's Wolves.
+                nadir point to carry us to Morges. I will be proud to stand with Khan Phelan's Wolves.
             </narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
             <nextStoryPointId>c50d628f-b14f-47a9-accb-79057dbf81b3</nextStoryPointId>
@@ -2665,7 +2666,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 Greetings, {commanderRank}. A jumpship is waiting at the nadir point to carry us to Morges. Please,
                 prepare for acceleration.
 
-                I for one will be proud to stand with Khan Phelan's Wolves.
+                I will be proud to stand with Khan Phelan's Wolves.
             </narrative>
             <personalityId>7abdf95e-bbac-4419-a7bc-9b7542ee9e87</personalityId>
             <nextStoryPointId>bffa600a-34b3-4706-837c-4e6380924e93</nextStoryPointId>
@@ -2688,9 +2689,9 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
         </storyPoint>
         <storyPoint name="narr_morges_arrival" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>cbcaca85-766a-4216-9486-440a16b07b3b</id>
-            <title>Welome to Morges</title>
+            <title>Welcome to Morges</title>
             <narrative>
-                Welcome to Morges, {commander}. We are entering orbit and I am trying to raise communication with--
+                Welcome to Morges, {commander}. We are entering orbit, and I am trying to raise communication with--
 
                 Wait! I have an urgent incoming communication directly from Khan Phelan. I am routing it directly to
                 you.
@@ -2702,7 +2703,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>9c8bfcf2-b805-4b52-86b4-a114ce543c00</id>
             <title>Post-Mission Report</title>
             <narrative>
-                Excellent work, {commanderRank}. With their supply line cut, the Falcon mechs started running dry and we
+                Excellent work, {commanderRank}. With their supply line cut, the Falcon mechs started running dry, and we
                 pushed them all the way back to their rally point at the Bay of Broken Hope.
 
                 Now I have something special planned for the Falcons. You should join my forces as we march on the Bay
@@ -2731,7 +2732,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 *Ulric's face flickers onto your screen and the screen of every member of this strike force.*
 
-                We have arrived on Wotan. As I predicted, we have caught the Jade Falcons by surprise. Lacking the guile
+                We have arrived at Wotan. As I predicted, we have caught the Jade Falcons by surprise. Lacking the guile
                 of the Wolves, they could not envision such a bold maneuver.
 
                 We will keep them off-guard by immediately dropping everything we have onto Wotan. The goal is the
@@ -2851,7 +2852,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
 
                 Get in line, {commanderRank}. I do appreciate your honesty. If I had more time to deal with you and all
                 the rest of my critics, I might honor you with a proper ass whooping, as they say in the Inner Sphere.
-                As it is, you will have to take a raincheck.
+                As it is, you will have to take a rain check.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>2b13807e-8bf0-4b87-aba7-949b54d4af4a</nextStoryPointId>
@@ -2940,13 +2941,13 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>0db83fde-fda0-43d6-a3fb-9664da8e9a27</nextStoryPointId>
         </storyPoint>
-        <storyPoint name="narr_natasha_rememberance" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="narr_natasha_remembrance" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>95b8e699-5391-4111-93bf-1909e17938fa</id>
             <title>Time to Withdraw</title>
             <narrative>
                 Hah, sounds good, although they might have to edit out a few parts of my life story for it to be solemn
                 enough for that dusty old book. It satisfies me enough to know that I lived a full life and maybe today
-                I will have a glorious death. Or maybe not, because these Falcons don't look too eager to dance today.
+                I will have a glorious death. Or maybe not, because these Falcons don't look too eager to dance.
 
                 You have proven yourself a skilled leader, {commander}. Go finish off the rest of these birds with Ulric
                 and then come back for me. Black Widow, out.
@@ -2959,10 +2960,10 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <title>Time to Withdraw</title>
             <narrative>
                 You're going to be a cuss right to the end, aren't you? Oh well, you may have a point. I can feel the
-                strain in my back and legs today and maybe I would rather die a glorious death here now then in some
+                strain in my back and legs today, and maybe I would rather die a glorious death here now then in some
                 nursery, wiping the noses of sibko brats.
 
-                You may be a cantankerous son of a bitch, but you have proven yourself a skill leader, {commander}. Go
+                You may be a cantankerous son of a bitch, but you have proven yourself a skilled leader, {commander}. Go
                 finish off the rest of these birds with Ulric. Black Widow, out.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -3021,7 +3022,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 Stubborn to your Crusader's loyalties until the last. No matter. We need not talk of other's sacrifices
                 when there are so many more that lie ahead of us.
 
-                You will join my task force for the final assault on Wotan. It is unlikely that we will survive but we
+                You will join my task force for the final assault on Wotan. It is unlikely that we will survive, but we
                 will make them pay for our deaths dearly. I suggest you return to your dropship and prepare your
                 warriors for battle. We lift in an hour.
             </narrative>
@@ -3122,7 +3123,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <title>Meeting with the Khans</title>
             <narrative>
                 *Some time later, you sit in Khan Elias Crichell's private chambers. Across from you sit the two Jade
-                Falcon Khans. Vandervahn Chistu regards you both with a contemptous air. He looks at Vlad.*
+                Falcon Khans. Vandervahn Chistu regards you both with a contemptuous air. He looks at Vlad.*
 
                 So you are the last Wolf? I do not believe we have met before.
             </narrative>
@@ -3165,7 +3166,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 *I* am a Khan as well, in case you have forgotten, Elias. *I* grant this request to challenge me over
                 the absorption.
 
-                *Chistu looks disparaginly at Vlad.*
+                *Chistu looks disparagingly at Vlad.*
 
                 However, I cannot fight a crippled warrior, nor wait for your recovery. I must fight your second
                 instead.
@@ -3248,7 +3249,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 *The crowd parts as Khan Elias Crichell pushes his way through. He wears a smile that does not reach his
                 eyes.*
 
-                Well fought, {commander}. You have a won a Trial of Refusal over the Absoption of the Wolves. I hereby
+                Well fought, {commander}. You have a won a Trial of Refusal over the Absorption of the Wolves. I hereby
                 declare Clan Wolf restored, although the cowards who fled into the Inner Sphere will remain Abjured.
 
                 *A cheer goes up from all those around you.*
@@ -3306,7 +3307,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 *Mathius's eyes narrow dangerously.*
 
                 Our clan is being corrupted from within by these surat Wardens and yet you would defend her? It is good
-                at least to know where your loyalties lie. Perhaps, when this is all over, a trial of annhiliation will
+                at least to know where your loyalties lie. Perhaps, when this is all over, a trial of annihilation will
                 wipe the taint from our ranks.
             </narrative>
             <personalityId>e73e4041-d7f1-435c-9ee5-3d3489e73f71</personalityId>
@@ -3326,7 +3327,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>0d1c4875-ec92-4146-89bc-15683a635b39</id>
             <title>You Awaken</title>
             <narrative>
-                *Mathius leans over Vlad's shoulder. His face is battered and bruised and he is holding one of his arms
+                *Mathius leans over Vlad's shoulder. His face is battered and bruised, and he is holding one of his arms
                 gingerly.*
 
                 {commander}! You are alive, thank the Great Father. Vlad has just returned to us as well after digging
@@ -3450,12 +3451,12 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <title>Tayyiba's Concern</title>
             <narrative>
                 They did not care that I was the enemy. I was just a person in need of help. They nursed me back to
-                health. They had two children. Their names were Kate and Tynan. They would sit at the foot of my bed and
+                health. They had two children named Kate and Tynan. They would sit at the foot of my bed and
                 ask me questions about life in the Clans for hours. They were curious, not afraid. When they were not
                 questioning me, they would play games with me to keep me from getting bored. Kate would come in at night
                 with a book so that I could read her a bedtime story.
 
-                Eventually, I recovered enough to travel and I was returned to our clan in a prisoner exchange. I felt a
+                Eventually, I recovered enough to travel, and I was returned to our clan in a prisoner exchange. I felt a
                 pit in my stomach when I had to leave that family, knowing that I would likely never see them again.
             </narrative>
             <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
@@ -3506,7 +3507,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
         <storyPoint name="narr_tayyiba_coward" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>1e2db04a-a137-4018-982e-cd54145818ac</id>
             <narrative>
-                *She looks down not wanting to look you in the eye.*
+                *She looks down, avoiding your gaze.*
 
                 I had hoped you would not feel that way, even if I knew you probably would.
 
@@ -3514,7 +3515,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
 
                 I am no coward, but I do not expect you to understand.
 
-                *She turn quickly on her heel and exits your quarters, the door slowly sliding shut behind her.*
+                *She turns quickly on her heel and exits your quarters, the door slowly sliding shut behind her.*
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>072e934d-3dec-4f47-b7b6-3d53dc4e061d</personId>
@@ -3528,8 +3529,8 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>160c2a21-80d5-475c-8795-696f00f0a5d9</id>
             <narrative>
                 I know that must have been difficult, {commander}. Star Commander Mathius and I came up in the same
-                sibko and it has been hard to watch our views grow apart over the years. I felt like something such as
-                this was inevitable. I hope you at least gave him a warrior's death.
+                sibko, and it has been hard to watch our views grow apart over the years. I felt like this conflict was
+                inevitable. I hope you at least gave him a warrior's death.
 
                 I am thankful that we will be joining Khan Phelan on Morges. You can count on me in the coming fight,
                 {commanderRank}.
@@ -3542,13 +3543,13 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 *Tayyiba drops her head.*
 
-                I want to believe that, but given everything that has happened, its hard to accept. To live in exile
+                I want to believe that, but given everything that has happened, it is hard to accept. To live in exile
                 away from our kin? To lose Ulric and Natasha? I hope that time will heal these wounds and show the
                 wisdom of the decision.
 
                 *She stands up straight and looks intently at you.*
 
-                Regardless, it has been a pleasure to serve with your, {commander}. I hope that I will be able to
+                Regardless, it has been a pleasure to serve with you, {commander}. I hope that I will be able to
                 continue to serve with you in our uncertain future.
             </narrative>
             <personalityId>310690f1-8ac4-49a1-b401-126981c42031</personalityId>
@@ -3558,7 +3559,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 *Tayyiba drops her head.*
 
-                Thats how I feel, as well. We may have survived but I cannot call this a win. Then I think about Kate
+                I feel the same. We may have survived, but I cannot call this a win. Then I think about Kate
                 and Tynan on Tukkayid. I may be exiled from my kin, but not from the family I have gained along the way.
 
                 *She stands up straight and looks intently at you.*
@@ -3805,7 +3806,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 You did it! I knew you were more than capable. It seems that your time has come, {commander}.
 
-                Yes, you heard that right - Star Colonel. Don't looks so confused. I can hardly have a Star Captain
+                Yes, you heard that right - Star Colonel. Don't look so confused. I can hardly have a Star Captain
                 commanding the Eleventh Wolf Guards, can I? Consider yourself their new commander, {commanderRank}. As
                 part of our re-organization, I am going to assign all surviving members of your trinary to the Eleventh,
                 so that they can continue to serve under you.
@@ -3859,7 +3860,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 *The crowd erupts in cries of confusion and disbelief. Phelan quiets them with a hand.*
 
                 Thankfully, among the survivors of Wotan was one Wolf warrior named Vlad. He witnessed the treachery of
-                Khan Chistu, firstand, when he murdered Ulric Kerensky. He challenged Chistu to a Trial of Refusal over
+                Khan Chistu, firsthand, when he murdered Ulric Kerensky. He challenged Chistu to a Trial of Refusal over
                 the absorption. Chistu was forced to accept and was slain in the fight.
 
                 *Cheers erupt from the crowd again.*
@@ -3911,16 +3912,16 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <title>Final Kurultai</title>
             <narrative>
                 *As the crowd wails in protest, there is a commotion at the front of the crowd as an older man with an
-                eyepatch in white robes approaches the podium. He waves the shocked Phelan aside.*
+                eye patch in white robes approaches the podium. He waves the shocked Phelan aside.*
 
-                Thank you, Khan Phelan. I am Precentor Martial Anastasius Focht and I am here to deliver a message
-                entrusted to me by Ulrick Kerensky. None have yet seen the message I display.
+                Thank you, Khan Phelan. I am Precentor Martial Anastasius Focht, and I am here to deliver a message
+                entrusted to me by Ulric Kerensky. None have yet seen the message I display.
 
                 *A screen descends behind the Precentor Martial and, after a moment, the face of Ulric Kerensky
                 appears.*
 
                 Greetings, my friends. If you are seeing this, I have been slain by the Jade Falcons and Phelan Ward has
-                successfully moved our touman to the Inner Sphere.
+                successfully moved our Touman to the Inner Sphere.
             </narrative>
             <nextStoryPointId>1c5f6daf-23d9-4642-9ba0-587011573969</nextStoryPointId>
             <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
@@ -3947,10 +3948,10 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <title>Final Kurultai</title>
             <narrative>
                 You mission is now to defend the Inner Sphere from the threat represented by the Clans. Who else could
-                it be? You must stand united to prevent the Crusaders from their path to destruction. You have Khan
+                it be? You must stand united against the Crusaders on their path to destruction. You have Khan
                 Phelan Kell to lead you and the courage to follow.
 
-                This is your destiny as Wolves and from it you shall not shy.
+                This is your destiny as Wolves and from it, you shall not shy.
 
                 *As Ulric's image fades out, the entire auditorium is momentarily silent. Then a single word spoken in
                 absolute unity echoes out from every throat.*
@@ -3964,11 +3965,11 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>88dfc686-8fce-40e5-a01a-7e1506726990</id>
             <title>Batchall</title>
             <narrative>
-                It is your right of course to commit what forces you wish, but little honor will come to the coward that
+                Of course, it is your right to commit what forces you wish, but little honor will come to the coward that
                 simply overwhelms his opponent with superior numbers.
 
                 Perhaps I can offer an alternative that will restore your tattered honor. I propose we do as they did in
-                the olden days. I have read much in my time as garrison commander and I am particularly drawn to the
+                the olden days. I have read much in my time as garrison commander, and I am particularly drawn to the
                 stories of Greek history. Have you ever read of the fall of Troy by Homer? No, probably not I am
                 guessing. There, the men fought honorably in one on one duels each striving to slay the other and claim
                 more honor for himself. These duels were repeated over and over until one side proved victorious. This
@@ -3990,7 +3991,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 You are an honorable warrior to offer to fight me on equal terms when you could simply push your
                 numerical advantage. Yet, I wish to offer you an alternative that would reap more glory and honor still.
 
-                I propose we do as they did in the olden days. I have read much in my time as garrison commander and I
+                I propose we do as they did in the olden days. I have read much in my time as garrison commander, and I
                 am particularly drawn to the stories of Greek history. Have you ever read of the fall of Troy by Homer?
                 No, probably not I am guessing. There, the men fought honorably in one on one duels each striving to
                 slay the other and claim more honor for himself. These duels were repeated over and over until one side
@@ -4065,7 +4066,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 the advantages that could accrue should you decide to cut my bondcord. My tactical expertise is quite
                 extensive. I feel that it would be best, perhaps, if I serve in a capacity that would put me in close
                 proximity to you so that I could share my wealth of tactical and strategic knowledge. Something like an
-                adie-de-camp, quiaff? Yes, I think that would be most bene--
+                aide-de-camp, quiaff? Yes, I think that would be most bene--
 
                 *You cut the mike, questioning what you have done.*
             </narrative>
@@ -4193,7 +4194,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
 
                 I cannot imagine a better end to one such as Natasha Kerensky. May her name be stricken from the
                 Remembrance. Now, if only the old man would do us the favor of dying as well so that we could repudiate
-                this farcial "truce" and march again on--
+                this farcical "truce" and march again on--
             </narrative>
             <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
             <nextStoryPointId>ab898654-cf0b-4404-956d-72f160d3f1ee</nextStoryPointId>
@@ -4232,7 +4233,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>098ff77b-519e-4448-8d63-a2748107ce78</id>
             <title>Its a Trap!</title>
             <narrative>
-                *Caught offguard by this strange comment, you suddenly notice a small light emanating from Chistu's mech
+                *Caught off guard by this strange comment, you suddenly notice a small light emanating from Chistu's mech
                 and seeming to probe Ulric's Gargoyle. Your heart races, as you realize something is wrong. Vlad,
                 however, realizes it a second sooner.*
 
@@ -4268,7 +4269,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>4221987e-8a7b-4531-a0df-c240e36dd79a</id>
             <title>You Awaken</title>
             <narrative>
-                Your Spheroid sense of humor was not affected apparently. You are not dead, and our work is not done.
+                Your Spheroid sense of humor was not affected, apparently. You are not dead, and our work is not done.
                 Get up, I have need of you.
             </narrative>
             <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
@@ -4280,7 +4281,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 After he treacherously murdered Ulric, saKhan Vandervahn Chistu claimed that this whole Trial of Refusal
                 was actually a Trial of Absorption. The Wolves who followed the *stravag* Phelan with their tails
-                between their legs have been Abjured. If we remaining Wolves are Absorbed, then Clan Wolf will cease to
+                between their legs have been Abjured. If the remaining Wolves are Absorbed, then Clan Wolf will cease to
                 exist. You and I are going to ensure that does not happen.
             </narrative>
             <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
@@ -4293,7 +4294,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 *Vlad offers a predatory smile.*
 
                 He assumed I was dead, after being buried under a building. He ordered his troops to kill you and your
-                trinary to the last man. In this, he underestimated the resolve of the Wolf.
+                forces to the last pilot. In this, he underestimated the resolve of the Wolf.
 
                 I survived and was freed by a salvage team. You fought so bravely that you earned the respect of the
                 Star Colonel leading the assault. He refused to kill your warriors needlessly.
@@ -4442,17 +4443,17 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>cd24123b-1439-49d1-be16-8c66869bb091</id>
             <title>Demand of Bondsref</title>
             <narrative>
-                What!? I will never serve you and your warden ways! You may choose to live in exile but I will die a
+                What!? I will never serve you and your warden ways! You may choose to live in exile, but I will die a
                 clan warrior. I demand the right of *bondsref*!
 
-                *There is a rustling in the cabin and then you hear a loud gunshot accompanied by a flash in Mathius's
+                *There is a rustling in the cabin, and then you hear a loud gunshot accompanied by a flash in Mathius's
                 cockpit. Through the glazed glasteel, you can see his body slump over lifelessly.*
 
                 *You stand for a moment in silent shock at Mathius's unexpected rashness. Then you note movement out of
                 the corner of your eye and look up to see several Jade Falcon mechs approaching. Fearing a trap, you
                 begin cycling your weapons online before realizing that the Jade Falcons do not have weapons raised and
-                instead their mechs have formed something like a cicle of equals. Slowly, they bow their heads in
-                recognition of a warrior's life lost in the honorable combat of a trial of refusal. Then without a word,
+                instead their mechs have formed something like a Circle of Equals. Slowly, they bow their heads in
+                recognition of a warrior's life lost in the honorable combat of a Trial of Refusal. Then without a word,
                 they salute your mech and withdraw.*
 
                 *As the salvage crews arrive to recover what is left of Mathius's mech, you return slowly to the
@@ -4499,7 +4500,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <id>8b060124-1d9d-4f8d-a56b-2403bb7c7145</id>
             <title>Trothkin Divided</title>
             <narrative>
-                *Having just left the Turn Over party in the mess, you are settling into your bunk when a message comes
+                *Having just left the Turn-Over party in the mess, you are settling into your bunk when a message comes
                 through from the bridge.*
 
                 {commander}, it looks like there is some kind of interpersonal conflict in the mess. I think you are
@@ -4530,7 +4531,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 You hear murmuring across the deck. With tensions running high since Khan Phelan's departure, it is
                 clear that some were looking forward to a violent outlet. After giving you a hard stare, both of the
-                belligerents sheathe their weapons and depart. The rest of the crowd then slowly disippates.
+                belligerents sheathe their weapons and depart. The rest of the crowd then slowly dissipates.
 
                 You have resolved the conflict for the moment, but you do not know what consequences it may have for
                 long term morale.
@@ -4623,7 +4624,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance
                 around the Circle of Equals, each attempting to bait the other into an overreach with quick slashing
-                motions, but neither is able to make contact or lure the other into an overreach. The crowd shouts and
+                motions, but neither is able to make contact nor lure the other into an overreach. The crowd shouts and
                 jeers, encouraging them to fully let loose.
 
                 Seeking to break the stalemate, Felipe darts in for a quick slash, but at the last second drops low for
@@ -4631,7 +4632,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 Seeing an opportunity, she brings her knife down to skewer his now exposed body, but Felipe rolls out of
                 the way at the last second and her knife bounces off the metal flooring of the mess hall. Quickly
                 rebounding, she spins 180 degrees and catches Felipe with her knife as he rises up and begins
-                backpedaling out of the way. A deep red cut blooms across Felipe's abdomen and he pauses momentarily to
+                backpedaling out of the way. A deep red cut blooms across Felipe's abdomen, and he pauses momentarily to
                 feel his midsection.
             </narrative>
             <nextStoryPointId>b1852aab-910e-4620-9aa0-79e13a80fc38</nextStoryPointId>
@@ -4694,7 +4695,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 Every sibko trains extensively for these kinds of fights. With practiced ease, Felipe and Ella dance
                 around the Circle of Equals, each attempting to bait the other into an overreach with quick slashing
-                motions, but neither is able to make contact or lure the other into an overreach. The crowd shouts and
+                motions, but neither is able to make contact nor lure the other into an overreach. The crowd shouts and
                 jeers, encouraging them to fully let loose.
 
                 Seeking to break the stalemate, Felipe darts in for a quick slash, but at the last second drops low for
@@ -4712,7 +4713,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 with blood loss, while Felipe paces around her, waiting for another opportunity. Realizing she must end
                 the fight soon if she hopes to win. Ella charges Felipe hoping to take him by surprise. Felipe is ready,
                 however, and dodges out of the way, sticking out a foot to send Ella tumbling into the tables and chairs
-                outside of the Circle of Equals.
+                outside the Circle of Equals.
 
                 The crowd erupts with shouts of joy and loathing at Felipe's victory. He is toasted with cheers by many
                 of the other warriors for standing up for the Khan, while Ella is rushed to the medical bay.
@@ -4739,8 +4740,8 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 with blood loss, while Felipe paces around her, waiting for another opportunity. Realizing she must end
                 the fight soon if she hopes to win. Ella charges Felipe hoping to take him by surprise. Felipe is ready,
                 however, and with a deft movement, throws his knife at the charging Ella. It catches her in the neck,
-                cutting off her windpipe. She tumbles to the floor and feebly attempts to pull it out as her life blood
-                leaks out beside her before going still.
+                cutting off her windpipe. She tumbles to the floor and feebly attempts to pull it out as her lifeblood
+                gushes from her wound before going still.
 
                 There is a moment of stunned silence before the mess hall erupts in both cheers and groans. Despite (or
                 perhaps because of) the lethal outcome, Felipe is toasted with cheers by many of the other warriors for
@@ -4765,7 +4766,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <narrative>
                 *When your vision returns, you can see that Ulric's Gargoyle is nothing but ash and liquid metal.
                 Quickly, Chistu turns and fires upon Vlad's Timber Wolf, knocking it back into a building. You are about
-                to rush to his aid, when your sensors ping with multiple enemy contacts. Its an ambush!*
+                to rush to his aid, when your sensors ping with multiple enemy contacts. It is an ambush!*
             </narrative>
             <storySplash>
                 <category></category>
@@ -5035,7 +5036,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 <type>Planetary Assault</type>
                 <systemId>Denizli</systemId>
                 <desc>While the main Wolf forces engages the Jade Falcons elsewhere on the planet, you have been tasked
-                    with capturing an oil refinery gaurded by a unique Jade Falcon Warrior named Tobias Malthus. You
+                    with capturing an oil refinery guarded by a unique Jade Falcon Warrior named Tobias Malthus. You
                     have bid your full forces to take the oil refinery from his forces.
                 </desc>
             </mission>
@@ -5056,7 +5057,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 <type>Planetary Assault</type>
                 <systemId>Denizli</systemId>
                 <desc>While the main Wolf forces engages the Jade Falcons elsewhere on the planet, you have been tasked
-                    with capturing an oil refinery gaurded by a unique Jade Falcon Warrior named Tobias Malthus. You
+                    with capturing an oil refinery guarded by a unique Jade Falcon Warrior named Tobias Malthus. You
                     have bid forces to take the oil refinery equal to the defending forces.
                 </desc>
             </mission>
@@ -5077,7 +5078,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 <type>Planetary Assault</type>
                 <systemId>Denizli</systemId>
                 <desc>While the main Wolf forces engages the Jade Falcons elsewhere on the planet, you have been tasked
-                    with capturing an oil refinery gaurded by a unique Jade Falcon Warrior named Tobias Malthus. You
+                    with capturing an oil refinery guarded by a unique Jade Falcon Warrior named Tobias Malthus. You
                     have agreed to face his forces in a series of single combat trials. Each trial will be fought in the
                     arctic tundra near the target facility.
                 </desc>
@@ -5110,7 +5111,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                     Hoping to draw the Jade Falcons into the same error that cost them Twycross during the Clan
                     invasion, Khan Kerensky placed mechs in strategic locations all throughout the Great Gash. She then
                     organized her remaining forces on the Plain of Curtains in front of the Gash to try to lure the Jade
-                    Falcons into the killzone.
+                    Falcons into the kill zone.
                 </desc>
             </mission>
             <scenarioStoryPointId>93c31ab2-50ef-44ce-8241-5cfcb5d3b378</scenarioStoryPointId>
@@ -5239,7 +5240,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 <type>Clan Trial</type>
                 <systemId>Morges</systemId>
                 <desc>You fight for a bloodname! If you are victorious, a new trial will appear each day until you beat
-                    all of the competition.
+                    all the competition.
                 </desc>
             </mission>
             <scenarioStoryPointId>1e3fd5e1-8c30-4f8f-a193-1e3332c81f39</scenarioStoryPointId>
@@ -5295,7 +5296,7 @@ Kerensky has called in your unit to deal with the situation.
 The 12th Falcon Regulars should ask for *hegira* if reduced to less than half their original force
 size while the player has more BV remaining. This can be simulated in MegaMek with the `/victory`
 command. If the player does not wish to grant *hegira*, then the bot settings for the 12th Falcon
-Regulars should be changed to RETREAT and they should begin a fighting withdrawal. In either case,
+Regulars should be changed to RETREAT, and they should begin a fighting withdrawal. In either case,
 the player can claim control of the battlefield for *isorla*.
 
 The player may be granted *hegira* from the Falcon forces at any point by using the `/defeat`
@@ -6991,7 +6992,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Champion" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="f9b6f298-982b-432d-a53b-1a2db02e6048" quirks="no_arms">
-                            <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Joscelyn" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="ab14bc7a-921e-4604-a5d2-ee5a47f0beca" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7258,7 +7259,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                         <entity chassis="Champion" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="f9b6f298-982b-432d-a53b-1a2db02e6048" quirks="no_arms">
-                            <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Joscelyn" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="ab14bc7a-921e-4604-a5d2-ee5a47f0beca" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -7774,7 +7775,7 @@ capturing the facility.
                         <entity chassis="Champion" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="f9b6f298-982b-432d-a53b-1a2db02e6048" quirks="no_arms">
-                            <pilot size="1" name="Warrio Joscelyn" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
+                            <pilot size="1" name="Warrior Joscelyn" nick="" gender="FEMALE" clanperson="true" gunnery="3" piloting="4"
                                    artillery="4" externalId="ab14bc7a-921e-4604-a5d2-ee5a47f0beca" ejected="false"
                                    autoeject="true" condejectammo="false" condejectengine="true" condejectctdest="true"
                                    condejectctheadshot="true"/>
@@ -9068,7 +9069,7 @@ The Jade Falcon forces should ask for *hegira* if reduced to less
 than half their original force size while the player has more BV
 remaining. This can be simulated in MegaMek with the `/victory`
 command. If the player does not wish to grant *hegira*, then the
-bot settings for the Jade Falcons should be changed to RETREAT and
+bot settings for the Jade Falcons should be changed to RETREAT, and
 they should begin a fighting withdrawal. In either case, the
 player can claim control of the battlefield for *isorla*.
 
