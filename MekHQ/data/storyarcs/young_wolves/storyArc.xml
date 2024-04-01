@@ -7431,7 +7431,7 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
             <storyOutcomes>
                 <storyOutcome result="PYRRHIC_VICTORY">
                     <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
-                        <missionStoryPointId>a5776ce4-5b16-11ec-bf63-0242ac130002</missionStoryPointId>
+                        <missionStoryPointId>5cef43d1-947b-481c-b496-97d4fce04520</missionStoryPointId>
                         <missionStatus>SUCCESS</missionStatus>
                     </storyTrigger>
                 </storyOutcome>
