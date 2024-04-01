@@ -56,9 +56,19 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
     boolean takeUnit = false;
 
     /**
-     * The number of hits the person should have. Will only change if higher than current hits
+     * Add the number of hits to the current person, which could kill them
      */
-    private int hits;
+    private int addHits;
+
+    /**
+     * The reason for death if adding hits kills a person
+     */
+    private PersonnelStatus deathStatusHits;
+
+    /**
+     * heal the number of hits to the current person
+     */
+    private int healHits;
 
     /**
      * The rank the person should have
@@ -85,9 +95,20 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                     getCampaign().removeUnit(u.getId());
                 }
             }
-            // only change hits if it is higher than current hits
-            if (hits > 0 && hits > p.getHits()) {
-                p.setHits(hits);
+
+            if(addHits > 0) {
+                p.setHits(p.getHits() + addHits);
+                if(p.getHits() >= 6) {
+                    if(null == deathStatusHits) {
+                        deathStatusHits = PersonnelStatus.KIA;
+                    }
+                    p.changeStatus(getCampaign(), getCampaign().getLocalDate(), deathStatusHits);
+                    p.setHits(6);
+                }
+            }
+
+            if(healHits > 0) {
+                p.setHits(Math.max(0, p.getHits() - healHits));
             }
 
             if(rank > 0) {
@@ -115,7 +136,11 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "status", status.name());
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "takeUnit", takeUnit);
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "hits", hits);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "addHits", addHits);
+        if(null != deathStatusHits) {
+            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "status", deathStatusHits.name());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "healHits", healHits);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "rank", rank);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "bloodname", bloodname);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignKeyBloodname", assignKeyBloodname);
@@ -136,8 +161,12 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                     status = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("takeUnit")) {
                     takeUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("hits")) {
-                    hits = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("addHits")) {
+                    addHits = Integer.parseInt(wn2.getTextContent().trim());
+                }  else if (wn2.getNodeName().equalsIgnoreCase("deathStatusHits")) {
+                    deathStatusHits = PersonnelStatus.parseFromString(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("healHits")) {
+                    healHits = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rank")) {
                     rank = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {

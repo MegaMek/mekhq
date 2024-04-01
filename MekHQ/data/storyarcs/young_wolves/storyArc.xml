@@ -140,7 +140,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
             <assignedForceId>2</assignedForceId>
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-            <!--<nextStoryPointId>2ff0ee41-abb5-4fd9-82d0-e6ee88e739a9</nextStoryPointId>-->
+            <!--<nextStoryPointId>3f30a129-419b-4093-a8f7-4da7e076a6b5</nextStoryPointId>-->
             <!-- Real next story point Id. Can be commented out to test things -->
             <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
         </storyPoint>
@@ -1745,7 +1745,7 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             </storyOutcomes>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-                <hits>0</hits>
+                <healHits>3</healHits>
             </storyTrigger>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.RemoveUnitStoryTrigger">
                 <removeAll>true</removeAll>
@@ -4584,11 +4584,8 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
-                <hits>2</hits>
-            </storyTrigger>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
-                <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
-                <hits>1</hits>
+                <addHits>1</addHits>
+                <deathStatusHits>WOUNDS</deathStatusHits>
             </storyTrigger>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_unaug_felipe_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -4615,12 +4612,9 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
                 it, you know not.
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
-                <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
-                <hits>1</hits>
-            </storyTrigger>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
-                <hits>2</hits>
+                <addHits>1</addHits>
+                <deathStatusHits>WOUNDS</deathStatusHits>
             </storyTrigger>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_aug_ella_w_begin" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -4660,11 +4654,13 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
-                <hits>3</hits>
+                <addHits>3</addHits>
+                <deathStatusHits>WOUNDS</deathStatusHits>
             </storyTrigger>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
-                <hits>1</hits>
+                <addHits>1</addHits>
+                <deathStatusHits>WOUNDS</deathStatusHits>
             </storyTrigger>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_aug_ella_w_death" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -4689,7 +4685,8 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             </storyTrigger>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
-                <hits>1</hits>
+                <addHits>1</addHits>
+                <deathStatusHits>WOUNDS</deathStatusHits>
             </storyTrigger>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_aug_felipe_w_begin" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -4725,11 +4722,13 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
-                <hits>1</hits>
+                <addHits>1</addHits>
+                <deathStatusHits>WOUNDS</deathStatusHits>
             </storyTrigger>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
-                <hits>3</hits>
+                <addHits>3</addHits>
+                <deathStatusHits>WOUNDS</deathStatusHits>
             </storyTrigger>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_aug_felipe_w_death" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -4752,7 +4751,8 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             </narrative>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
-                <hits>1</hits>
+                <addHits>1</addHits>
+                <deathStatusHits>WOUNDS</deathStatusHits>
             </storyTrigger>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
