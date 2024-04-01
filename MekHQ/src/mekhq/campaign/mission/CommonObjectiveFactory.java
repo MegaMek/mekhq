@@ -71,7 +71,7 @@ public class CommonObjectiveFactory {
     /**
      * Generates a "keep at least X% or X of [force] units" objective from the bot force with the specified name
      */
-    public static ScenarioObjective getPreserveSpecificFriendlies(String forceName, int number, boolean fixedAmount) {
+    public static ScenarioObjective getPreserveSpecificFriendlies(String forceName, int OperationalVP, int number, boolean fixedAmount) {
         ScenarioObjective keepFriendliesAlive = new ScenarioObjective();
         if (fixedAmount) {
             keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, ""));
@@ -85,12 +85,12 @@ public class CommonObjectiveFactory {
 
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
-        successEffect.howMuch = 1;
+        successEffect.howMuch = OperationalVP;
         keepFriendliesAlive.addSuccessEffect(successEffect);
 
         ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
         friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        friendlyFailureEffect.howMuch = 1;
+        friendlyFailureEffect.howMuch = OperationalVP;
         keepFriendliesAlive.addFailureEffect(friendlyFailureEffect);
 
         return keepFriendliesAlive;

@@ -141,7 +141,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 100);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
                 1, true);
-        ScenarioObjective keepTechAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(TECH_FORCE_ID, 1, true);
+        ScenarioObjective keepTechAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(TECH_FORCE_ID, 1, 1, true);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);

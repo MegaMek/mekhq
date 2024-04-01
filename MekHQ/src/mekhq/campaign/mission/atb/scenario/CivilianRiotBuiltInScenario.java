@@ -135,7 +135,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
                 50, false);
         ScenarioObjective keepLoyalistsAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(LOYALIST_FORCE_ID,
-                1, true);
+                1, 1, true);
 
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();

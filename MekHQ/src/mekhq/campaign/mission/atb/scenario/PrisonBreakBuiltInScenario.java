@@ -119,7 +119,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
                 1, true);
         ScenarioObjective keepPrisonersAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(PRISONER_FORCE_ID,
-                1, true);
+                1, 1, true);
         ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(GUARD_FORCE_ID, 100);
         destroyHostiles.getSuccessEffects().clear();
         destroyHostiles.addDetail(getResourceBundle().getString("commonObjectives.battlefieldControl"));

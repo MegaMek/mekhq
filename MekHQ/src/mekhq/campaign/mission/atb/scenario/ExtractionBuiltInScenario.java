@@ -136,7 +136,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         ScenarioObjective civilianObjective;
 
         if (isAttacker()) {
-            civilianObjective = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 50, false);
+            civilianObjective = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 50, 1, false);
             keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 66, false);
 
             civilianObjective.setTimeLimit(12);
