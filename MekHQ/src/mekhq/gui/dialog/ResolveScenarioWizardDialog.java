@@ -816,7 +816,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
         // dynamically update victory/defeat dropdown based on objective checkboxes
         ScenarioStatus scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
-                new HashMap<>(), getObjectiveUnitCounts());
+                getObjectiveOverridesStatus(), getObjectiveUnitCounts());
         choiceStatus.setSelectedItem(scenarioStatus);
 
         pnlStatus.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5));
@@ -1452,6 +1452,24 @@ public class ResolveScenarioWizardDialog extends JDialog {
         return objectiveUnitCounts;
     }
 
+    /**
+     * Determine the status of each custom objective checkbox
+     * @return the true/false condition of custom objective checkboxes
+     */
+    private Map<ScenarioObjective, Boolean> getObjectiveOverridesStatus() {
+        Map<ScenarioObjective, Boolean> objectiveOverrides = new HashMap<>();
+
+        if (objectiveOverrideCheckboxes == null) {
+            return objectiveOverrides;
+        }
+
+        for (ScenarioObjective objective : objectiveOverrideCheckboxes.keySet()) {
+            objectiveOverrides.put(objective, objectiveOverrideCheckboxes.get(objective).isSelected());
+        }
+
+        return objectiveOverrides;
+    }
+
     private void checkPrisonerStatus() {
         for (int i = 0; i < prisonerCapturedBtns.size(); i++) {
             JCheckBox captured = prisonerCapturedBtns.get(i);
@@ -1565,7 +1583,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private void updatePreviewPanel() {
         // set victory/defeat status based on scenario objectives
         ScenarioStatus scenarioStatus = objectiveProcessor.determineScenarioStatus(tracker.getScenario(),
-                new HashMap<>(), getObjectiveUnitCounts());
+                getObjectiveOverridesStatus(), getObjectiveUnitCounts());
         choiceStatus.setSelectedItem(scenarioStatus);
 
         // do a "dry run" of the scenario objectives to output a report
