@@ -648,7 +648,7 @@ public class CampaignOptions {
 
         // Salary
         setSalaryAntiMekMultiplier(1.5);
-        setSalarySpecialistInfantryMultiplier(1.0);
+        setSalarySpecialistInfantryMultiplier(1.28);
         setSalaryXPMultipliers(new HashMap<>());
         getSalaryXPMultipliers().put(SkillLevel.NONE, 0.5);
         getSalaryXPMultipliers().put(SkillLevel.ULTRA_GREEN, 0.6);
@@ -660,7 +660,7 @@ public class CampaignOptions {
         getSalaryXPMultipliers().put(SkillLevel.LEGENDARY, 12.8);
         setRoleBaseSalaries(new Money[personnelRoles.length]);
         setRoleBaseSalary(PersonnelRole.MECHWARRIOR, 1500);
-        setRoleBaseSalary(PersonnelRole.LAM_PILOT, 3000);
+        setRoleBaseSalary(PersonnelRole.LAM_PILOT, 2250);
         setRoleBaseSalary(PersonnelRole.GROUND_VEHICLE_DRIVER, 900);
         setRoleBaseSalary(PersonnelRole.NAVAL_VEHICLE_DRIVER, 900);
         setRoleBaseSalary(PersonnelRole.VTOL_PILOT, 900);
