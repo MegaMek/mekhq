@@ -1926,35 +1926,47 @@ public class Person {
         // If the salary is negative, then use the standard amounts
         // TODO : Figure out a way to allow negative salaries... could be used to simulate a Holovid
         // TODO : star paying to be part of the company, for example
+        double salaryMultiplier = 0;
+
         Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getPrimaryRole().ordinal()];
-        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, false)));
+
+        // ATOW doesn't address secondary roles, halving this value to avoid inflated salaries
+        Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
+
+        // This approximates ATOW skill averaging. Having RAW accurate skill averaging would require rewriting getExperienceLevel()
+        if (campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, false)) > 0) {
+            salaryMultiplier += campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, false));
+        } else {
+            salaryMultiplier += (campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, false))
+                    + campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true))) / 2;
+        }
+
+        // Checking whether primary OR secondary role meets the criteria to avoid double-dipping
+        // ATOW is fuzzy on whether the total value should be multiplied by specialism or whether the multiplier is additive (like expertise)
+        // I opted to go with additive, but this may need to be changed if errata ever appears contradicting this decision.
         if (getPrimaryRole().isSoldierOrBattleArmour()) {
             if (hasSkill(SkillType.S_ANTI_MECH)) {
-                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                salaryMultiplier += campaign.getCampaignOptions().getSalaryAntiMekMultiplier();
             }
 
-            if ((getUnit() != null) && getUnit().isConventionalInfantry()
-                    && ((Infantry) getUnit().getEntity()).hasSpecialization()) {
-                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier());
+            // this specialisation doesn't appear in ATOW, but it was in our <49.19 implementation, so I kept it in
+            if (((getUnit() != null) && getUnit().isConventionalInfantry())
+                    && (((Infantry) getUnit().getEntity()).hasSpecialization())) {
+                salaryMultiplier += campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier();
             }
-        }
-
-        Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
-        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
-        if (getSecondaryRole().isSoldierOrBattleArmour()) {
+        } else if (getSecondaryRole().isSoldierOrBattleArmour()) {
             if (hasSkill(SkillType.S_ANTI_MECH)) {
-                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                salaryMultiplier = campaign.getCampaignOptions().getSalaryAntiMekMultiplier();
             }
 
-            if ((getUnit() != null) && getUnit().isConventionalInfantry()
-                    && ((Infantry) getUnit().getEntity()).hasSpecialization()) {
-                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier());
+            if (((getUnit() != null) && getUnit().isConventionalInfantry()) && (((Infantry) getUnit().getEntity()).hasSpecialization())) {
+                salaryMultiplier = campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier();
             }
         }
 
-        // TODO: distinguish DropShip, JumpShip, and WarShip crew
-        // TODO: Add era mod to salary calc..
-        return primaryBase.plus(secondaryBase).multipliedBy(getRank().getPayMultiplier());
+        salaryMultiplier += getRank().getPayMultiplier();
+
+        return primaryBase.plus(secondaryBase).multipliedBy(salaryMultiplier);
     }
 
     /**
