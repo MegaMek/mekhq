@@ -23,6 +23,7 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.PlanetaryConditionsDialog;
+import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -41,6 +42,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
@@ -69,6 +71,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private JPanel panLeft;
     private JPanel panRight;
     private JPanel panLoot;
+    private JPanel panPlanetaryConditions;
     private JPanel panBtn;
     // end: panels
 
@@ -76,6 +79,16 @@ public class CustomizeScenarioDialog extends JDialog {
     private JLabel lblName;
     private JLabel lblDate;
     private JLabel lblStatus;
+    private JLabel lblLightDesc;
+    private JLabel lblWindDesc;
+    private JLabel lblAtmosphereDesc;
+    private JLabel lblWeatherDesc;
+    private JLabel lblFogDesc;
+    private JLabel lblBlowingSandDesc;
+    private JLabel lblEMIDesc;
+    private JLabel lblTemperatureDesc;
+    private JLabel lblGravityDesc;
+    private JLabel lblOtherConditionsDesc;
     // end: labels
 
     // begin: textfields
@@ -230,15 +243,13 @@ public class CustomizeScenarioDialog extends JDialog {
             panLeft.add(addEventButton, gridBagConstraints);
         }
 
-        btnPlanetaryConditions = new JButton();
-        btnPlanetaryConditions.setText("Planetary Conditions");
-        btnPlanetaryConditions.addActionListener(evt -> changePlanetaryConditions());
-        btnPlanetaryConditions.setEnabled(scenario.getStatus().isCurrent());
+        initPlanetaryConditionsPanel(resourceMap);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        panLeft.add(btnPlanetaryConditions, gridBagConstraints);
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        panLeft.add(panPlanetaryConditions, gridBagConstraints);
 
         initLootPanel(resourceMap);
         gridBagConstraints.gridx = 0;
@@ -285,6 +296,7 @@ public class CustomizeScenarioDialog extends JDialog {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
             panRight.add(txtReport, gridBagConstraints);
+            txtReport.setEnabled(!scenario.getStatus().isCurrent());
         }
 
         // set up buttons
@@ -408,11 +420,154 @@ public class CustomizeScenarioDialog extends JDialog {
         }
     }
 
+    private void initPlanetaryConditionsPanel(ResourceBundle resourceMap) {
+        panPlanetaryConditions = new JPanel(new GridBagLayout());
+        panPlanetaryConditions.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
+                BorderFactory.createTitledBorder(resourceMap.getString("panPlanetaryConditions.title"))));
+
+        btnPlanetaryConditions = new JButton(resourceMap.getString("btnPlanetaryConditions.text"));
+        btnPlanetaryConditions.addActionListener(evt -> changePlanetaryConditions());
+        btnPlanetaryConditions.setEnabled(scenario.getStatus().isCurrent());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 4;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 0, 0, 0);
+        panPlanetaryConditions.add(btnPlanetaryConditions, gbc);
+
+        GridBagConstraints leftGbc = new GridBagConstraints();
+        leftGbc.gridx = 0;
+        leftGbc.gridy = 0;
+        leftGbc.gridwidth = 1;
+        leftGbc.weightx = 0.0;
+        leftGbc.weighty = 0.0;
+        leftGbc.insets = new Insets(0, 0, 5, 10);
+        leftGbc.fill = GridBagConstraints.NONE;
+        leftGbc.anchor = GridBagConstraints.NORTHWEST;
+
+        GridBagConstraints rightGbc = new GridBagConstraints();
+        rightGbc.gridx = 1;
+        rightGbc.gridy = 0;
+        rightGbc.gridwidth = 1;
+        rightGbc.weightx = 0.5;
+        rightGbc.weighty = 0.0;
+        rightGbc.insets = new Insets(0, 10, 5, 0);
+        rightGbc.fill = GridBagConstraints.NONE;
+        rightGbc.anchor = GridBagConstraints.NORTHWEST;
+
+        JLabel lblLight = new JLabel(resourceMap.getString("lblLight.text"));
+        leftGbc.gridy++;
+        panPlanetaryConditions.add(lblLight, leftGbc);
+
+        lblLightDesc = new JLabel(scenario.getLight().toString());
+        rightGbc.gridy++;
+        panPlanetaryConditions.add(lblLightDesc, rightGbc);
+
+        JLabel lblWeather = new JLabel(resourceMap.getString("lblWeather.text"));
+        leftGbc.gridy++;
+        panPlanetaryConditions.add(lblWeather, leftGbc);
+
+        lblWeatherDesc = new JLabel(scenario.getWeather().toString());
+        rightGbc.gridy++;
+        panPlanetaryConditions.add(lblWeatherDesc, rightGbc);
+
+        JLabel lblWind = new JLabel(resourceMap.getString("lblWind.text"));
+        leftGbc.gridy++;
+        panPlanetaryConditions.add(lblWind, leftGbc);
+
+        lblWindDesc = new JLabel(scenario.getWind().toString());
+        rightGbc.gridy++;
+        panPlanetaryConditions.add(lblWindDesc, rightGbc);
+
+        JLabel lblFog = new JLabel(resourceMap.getString("lblFog.text"));
+        leftGbc.gridy++;
+        panPlanetaryConditions.add(lblFog, leftGbc);
+
+        lblFogDesc = new JLabel(scenario.getFog().toString());
+        rightGbc.gridy++;
+        panPlanetaryConditions.add(lblFogDesc, rightGbc);
+
+        JLabel lblOtherConditions = new JLabel(resourceMap.getString("lblOtherConditions.text"));
+        leftGbc.gridy++;
+        panPlanetaryConditions.add(lblOtherConditions, leftGbc);
+
+        ArrayList<String> otherConditions = new ArrayList<>();
+        if (scenario.getEMI().isEMI()) {
+            otherConditions.add(resourceMap.getString("emi.text"));
+        }
+        if (scenario.getBlowingSand().isBlowingSand()) {
+            otherConditions.add(resourceMap.getString("sand.text"));
+        }
+
+        lblOtherConditionsDesc = new JLabel(String.join(", ", otherConditions));
+        if (otherConditions.isEmpty()) {
+            lblOtherConditionsDesc.setText("None");
+        }
+        rightGbc.gridy++;
+        rightGbc.gridwidth = 3;
+        panPlanetaryConditions.add(lblOtherConditionsDesc, rightGbc);
+
+        JLabel lblTemperature = new JLabel(resourceMap.getString("lblTemperature.text"));
+        leftGbc.gridx = 2;
+        leftGbc.gridy = 1;
+        panPlanetaryConditions.add(lblTemperature, leftGbc);
+
+        lblTemperatureDesc = new JLabel(PlanetaryConditions.getTemperatureDisplayableName(scenario.getModifiedTemperature()));
+        rightGbc.gridx = 3;
+        rightGbc.gridy = 1;
+        rightGbc.gridwidth = 1;
+        panPlanetaryConditions.add(lblTemperatureDesc, rightGbc);
+
+        JLabel lblGravity = new JLabel(resourceMap.getString("lblGravity.text"));
+        leftGbc.gridy++;
+        panPlanetaryConditions.add(lblGravity, leftGbc);
+
+        lblGravityDesc = new JLabel(DecimalFormat.getInstance().format(scenario.getGravity()));
+        rightGbc.gridy++;
+        panPlanetaryConditions.add(lblGravityDesc, rightGbc);
+
+        JLabel lblAtmosphere = new JLabel(resourceMap.getString("lblAtmosphere.text"));
+        leftGbc.gridy++;
+        panPlanetaryConditions.add(lblAtmosphere, leftGbc);
+
+        lblAtmosphereDesc = new JLabel(scenario.getAtmosphere().toString());
+        rightGbc.gridy++;
+        panPlanetaryConditions.add(lblAtmosphereDesc, rightGbc);
+
+
+    }
+
+    private void refreshPlanetaryConditions() {
+        lblLightDesc.setText(planetaryConditions.getLight().toString());
+        lblAtmosphereDesc.setText(planetaryConditions.getAtmosphere().toString());
+        lblWeatherDesc.setText(planetaryConditions.getWeather().toString());
+        lblFogDesc.setText(planetaryConditions.getFog().toString());
+        lblWindDesc.setText(planetaryConditions.getWind().toString());
+        lblGravityDesc.setText(DecimalFormat.getInstance().format(planetaryConditions.getGravity()));
+        lblTemperatureDesc.setText(PlanetaryConditions.getTemperatureDisplayableName(planetaryConditions.getTemperature()));
+        ArrayList<String> otherConditions = new ArrayList<>();
+        if (planetaryConditions.getEMI().isEMI()) {
+            otherConditions.add("Electromagnetic interference");
+        }
+        if (planetaryConditions.getBlowingSand().isBlowingSand()) {
+            otherConditions.add("Blowing sand");
+        }
+        if (otherConditions.isEmpty()) {
+            lblOtherConditionsDesc.setText("None");
+        } else {
+            lblOtherConditionsDesc.setText(String.join(", ", otherConditions));
+        }
+    }
+
     private void changePlanetaryConditions() {
         PlanetaryConditionsDialog pc = new PlanetaryConditionsDialog(frame, planetaryConditions);
         if(pc.showDialog()) {
             planetaryConditions = pc.getConditions();
         }
+        refreshPlanetaryConditions();
     }
 
     private void initLootPanel(ResourceBundle resourceMap) {
