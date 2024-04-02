@@ -134,8 +134,6 @@
 		<randomDependentMethod>AGAINST_THE_BOT</randomDependentMethod>
 		<useRandomDependentAddition>true</useRandomDependentAddition>
 		<useRandomDependentRemoval>true</useRandomDependentRemoval>
-		<salaryCommissionMultiplier>1.2</salaryCommissionMultiplier>
-		<salaryEnlistedMultiplier>1.0</salaryEnlistedMultiplier>
 		<salaryAntiMekMultiplier>1.5</salaryAntiMekMultiplier>
 		<salarySpecialistInfantryMultiplier>1.0</salarySpecialistInfantryMultiplier>
 		<salaryXPMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXPMultiplier>
