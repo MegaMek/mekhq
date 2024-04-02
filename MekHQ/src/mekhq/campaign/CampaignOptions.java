@@ -251,8 +251,6 @@ public class CampaignOptions {
     private boolean useRandomDependentRemoval;
 
     // Salary
-    private double salaryCommissionMultiplier;
-    private double salaryEnlistedMultiplier;
     private double salaryAntiMekMultiplier;
     private double salarySpecialistInfantryMultiplier;
     private Map<SkillLevel, Double> salaryXPMultipliers;
@@ -649,8 +647,6 @@ public class CampaignOptions {
         setUseRandomDependentRemoval(true);
 
         // Salary
-        setSalaryCommissionMultiplier(1.2);
-        setSalaryEnlistedMultiplier(1.0);
         setSalaryAntiMekMultiplier(1.5);
         setSalarySpecialistInfantryMultiplier(1.0);
         setSalaryXPMultipliers(new HashMap<>());
@@ -1598,22 +1594,6 @@ public class CampaignOptions {
     //endregion Dependent
 
     //region Salary
-    public double getSalaryCommissionMultiplier() {
-        return salaryCommissionMultiplier;
-    }
-
-    public void setSalaryCommissionMultiplier(final double salaryCommissionMultiplier) {
-        this.salaryCommissionMultiplier = salaryCommissionMultiplier;
-    }
-
-    public double getSalaryEnlistedMultiplier() {
-        return salaryEnlistedMultiplier;
-    }
-
-    public void setSalaryEnlistedMultiplier(final double salaryEnlistedMultiplier) {
-        this.salaryEnlistedMultiplier = salaryEnlistedMultiplier;
-    }
-
     public double getSalaryAntiMekMultiplier() {
         return salaryAntiMekMultiplier;
     }
@@ -3650,8 +3630,6 @@ public class CampaignOptions {
         //endregion Dependent
 
         //region Salary
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salaryXPMultipliers");
@@ -4234,10 +4212,6 @@ public class CampaignOptions {
                 //endregion Dependent
 
                 //region Salary
-                } else if (wn2.getNodeName().equalsIgnoreCase("salaryCommissionMultiplier")) {
-                    retVal.setSalaryCommissionMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("salaryEnlistedMultiplier")) {
-                    retVal.setSalaryEnlistedMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                     retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salarySpecialistInfantryMultiplier")) {
