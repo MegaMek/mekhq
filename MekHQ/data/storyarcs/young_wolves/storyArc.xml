@@ -2084,8 +2084,8 @@ That's it. I hope you enjoy the campaign!
                 pocket as a reserve force to be used as needed.
 
                 I had hoped to keep you in that pocket a little longer, but the dezgra Falcons on Colmar have called in
-                their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to go plug some
-                holes, immediately. Show these young pups what it means to be a warrior of Clan Wolf!
+                their reserve bid and are pushing through our lines in the Marakaa Valley. I need you to grab your command
+                star and go plug some holes, immediately. Show these young pups what it means to be a warrior of Clan Wolf!
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
             <nextStoryPointId>276345a4-6168-4999-9381-de5ac56a3d2f</nextStoryPointId>
@@ -5325,7 +5325,7 @@ That's it. I hope you enjoy the campaign!
         <storyPoint name="scenario_colmar_cutting_teeth" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
             <id>fd7158c2-1d1b-48e6-8eb3-8a72d580c172</id>
             <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
-            <deployedForceId>1</deployedForceId>
+            <deployedForceId>2</deployedForceId>
             <scenario type="mekhq.campaign.mission.Scenario">
                 <name>Cutting Teeth</name>
                 <desc>
@@ -5432,7 +5432,7 @@ recover downed pilots, but not mechs or salvage.
                                 <slot index="6" type="Clan Ultra AC/5 Ammo" shots="20"/>
                             </location>
                         </entity>
-                        <entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false"
+                        <!--<entity chassis="Thor (Summoner)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="5aa9c785-53a7-4c38-b43c-59520d34ab15" quirks="imp_com::ubiquitous_clan">
                             <pilot size="1" name="Chris" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
@@ -5450,7 +5450,7 @@ recover downed pilots, but not mechs or salvage.
                             <location index="5">Left Arm
                                 <slot index="9" type="Clan Gauss Ammo" shots="8"/>
                             </location>
-                        </entity>
+                        </entity>-->
                         <entity chassis="Ryoken (Stormcrow)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="42a5a9d0-3518-49b0-aeb8-68f966ea4ac1" quirks="stable">
@@ -5474,7 +5474,7 @@ recover downed pilots, but not mechs or salvage.
                                 <slot index="10" type="Clan LB 10-X Cluster Ammo" shots="10"/>
                             </location>
                         </entity>
-                        <entity chassis="Phantom" model="A" type="Biped" commander="false" offboard="false"
+                        <!--<entity chassis="Phantom" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="b2078d4e-00f4-4722-a968-a6f863699dcf" quirks="imp_sensors">
                             <pilot size="1" name="Star Commander Daliah" nick="" gender="FEMALE" clanperson="true" gunnery="3"
@@ -5508,7 +5508,7 @@ recover downed pilots, but not mechs or salvage.
                             <location index="7">Left Leg
                                 <armor points="8"/>
                             </location>
-                        </entity>
+                        </entity>-->
                         <entity chassis="Shadow Cat" model="M" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="7d9ecf9f-0b65-4302-8336-6c0bd4c67765" quirks="low_profile">
@@ -5520,7 +5520,7 @@ recover downed pilots, but not mechs or salvage.
                                 <armor points="15"/>
                             </location>
                         </entity>
-                        <entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false"
+                        <!--<entity chassis="Ryoken (Stormcrow)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="58be9f70-1b0e-4b97-8a3b-f50c7c20208e" quirks="stable">
                             <pilot size="1" name="Joshua" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4" artillery="4"
@@ -5610,12 +5610,12 @@ recover downed pilots, but not mechs or salvage.
                             <location index="5">Left Arm
                                 <slot index="6" type="CLAMS Ammo" shots="20"/>
                             </location>
-                        </entity>
+                        </entity>-->
                     </entities>
                 </botForce>
                 <scenarioDeploymentLimit>
-                    <quantityLimit>100</quantityLimit>
-                    <quantityType>PERCENT</quantityType>
+                    <quantityLimit>5</quantityLimit>
+                    <quantityType>ABSOLUTE</quantityType>
                     <countType>UNIT</countType>
                     <allowedUnitTypes>
                         <allowedUnitType>0</allowedUnitType>
