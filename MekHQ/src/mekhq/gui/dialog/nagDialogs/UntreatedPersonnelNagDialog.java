@@ -28,7 +28,7 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 import javax.swing.*;
 
 public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
-    public static boolean isUntreatedInjury (Campaign campaign) {
+    private static boolean isUntreatedInjury (Campaign campaign) {
         for (Person p : campaign.getActivePersonnel()) {
             for (Injury i : p.getInjuries()) {
                 if (!i.isPermanent()) {
