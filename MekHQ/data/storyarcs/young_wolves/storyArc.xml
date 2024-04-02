@@ -32,6 +32,10 @@ will be mech only. Two main story endings are possible, depending on player choi
 - Florian "SpOoKy777" Mellies
 - Anthony Scroggins
 
+This story arc is inspired by the Battletech novels *Bred for War* and *Malicious Intent* by Michael Stackpole, as well
+as the *The Falcon and the Wolf Battletech Scenario Pack* by Rodney Knox. The arc is generally consistent with official
+Battletech history, but some deviations have been made for narrative purposes.
+
     </description>
     <storyLoadingType>START_NEW</storyLoadingType>
     <startingPointId>a643f85c-5573-4f15-8eb2-2b55e1cbda05</startingPointId>
@@ -83,7 +87,7 @@ will be mech only. Two main story endings are possible, depending on player choi
     </customStringVariables>
     <storyPoints>
         <!-- Initial story events -->
-        <storyPoint name="welcome" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+        <storyPoint name="welcome_beta" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>a643f85c-5573-4f15-8eb2-2b55e1cbda05</id>
             <title>Welcome to the Beta Test</title>
             <narrative>
@@ -115,6 +119,42 @@ MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of t
             <storySplash>
                 <category></category>
                 <filename>splash-mechbay.png</filename>
+            </storySplash>
+            <nextStoryPointId>e9c2df78-df50-417e-aaf0-ed3e26dbeca3</nextStoryPointId>
+        </storyPoint>
+        <storyPoint name="welcome" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+            <id>e9c2df78-df50-417e-aaf0-ed3e26dbeca3</id>
+            <title>Young Wolves Story Arc</title>
+            <narrative>
+In this story arc, you will lead a trinary of Wolf mechwarriors into battle during the Refusal War.
+Momentarily you will create a character, but first I want to discuss some technical issues.
+
+You will start on an existing campaign file with campaign options already set. You are welcome to
+adjust many of those campaign settings to your own preferences, but you should keep in mind the
+following for the best experience:
+
+* You should have no access to additional units, parts, or personnel throughout the campaign, aside from
+what is already stored in your warehouse and what you can salvage on the battlefield. The settings
+are designed to reflect this fact.
+* You should not earn money during the campaign. You are clan, you have no use of it.
+* You should not take in prisoners and bondsmen during the campaign, except for possible narrative
+exceptions.
+* You can set MegaMek options as you like, but should consider two special cases:
+    * Double-blind play is integral to many of the scenarios and should not be adjusted.
+    * Clan physical attacks are disabled for both you and your opponents. You can turn them on if you
+      would prefer grittier and less honorable fights.
+* Scenario objectives will in most cases be automatically determined, but you may have to check
+custom objectives during scenario resolution in a few cases.
+* In the scenario description, pay attention to the *hegira* conditions. These dictate whether you can
+surrender to your opponents via a `defeat` command and if/when they will surrender to you allowing you
+to declare victory with a `victory` command. Also pay attention to the rules there about when you can
+claim a battlefield and thus salvage.
+
+That's it. I hope you enjoy the campaign!
+            </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-guardduty.png</filename>
             </storySplash>
             <nextStoryPointId>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</nextStoryPointId>
         </storyPoint>
