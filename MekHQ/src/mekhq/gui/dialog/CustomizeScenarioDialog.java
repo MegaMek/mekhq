@@ -50,6 +50,7 @@ import java.util.ResourceBundle;
  */
 public class CustomizeScenarioDialog extends JDialog {
     private JFrame frame;
+
     private Scenario scenario;
     private Mission mission;
     private Campaign campaign;
@@ -57,29 +58,49 @@ public class CustomizeScenarioDialog extends JDialog {
     private LocalDate date;
     private PlanetaryConditions planetaryConditions;
 
-    private LootTableModel lootModel;
-
-    private JButton btnAdd;
-    private JButton btnEdit;
-    private JButton btnDelete;
+    // begin: loot
     private ArrayList<Loot> loots;
     private JTable lootTable;
-    private JPanel panLoot;
+    private LootTableModel lootModel;
+    // end: loot
 
-    private JComboBox<String> modifierBox;
-
+    // begin: panels
     private JPanel panMain;
+    private JPanel panLeft;
+    private JPanel panRight;
+    private JPanel panLoot;
     private JPanel panBtn;
-    private JButton btnClose;
-    private JButton btnOK;
+    // end: panels
+
+    // begin: labels
     private JLabel lblName;
-    private JTextField txtName;
-    private MarkdownEditorPanel txtDesc;
-    private MarkdownEditorPanel txtReport;
-    private JComboBox<ScenarioStatus> choiceStatus;
+    private JLabel lblDate;
     private JLabel lblStatus;
+    // end: labels
+
+    // begin: textfields
+    private JTextField txtName;
+    // end: textfields
+
+    // begin: comboboxes
+    private JComboBox<String> modifierBox;
+    private JComboBox<ScenarioStatus> choiceStatus;
+    //end: comboboxes
+
+    // begin: buttons
     private JButton btnDate;
     private JButton btnPlanetaryConditions;
+    private JButton btnAddLoot;
+    private JButton btnEditLoot;
+    private JButton btnDeleteLoot;
+    private JButton btnClose;
+    private JButton btnOK;
+    // end: buttons
+
+    // begin: markdown editors
+    private MarkdownEditorPanel txtDesc;
+    private MarkdownEditorPanel txtReport;
+    // end: markdown editors
 
     public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
@@ -112,58 +133,51 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void initComponents() {
-        txtName = new JTextField();
-        lblName = new JLabel();
-        btnOK = new JButton();
-        btnClose = new JButton();
-        lblStatus = new JLabel();
-        panMain = new JPanel();
-        panBtn = new JPanel();
-        choiceStatus = new JComboBox<>();
-
+        getContentPane().setLayout(new BorderLayout());
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioDialog",
                 MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
         setTitle(resourceMap.getString("title.new"));
 
-        getContentPane().setLayout(new BorderLayout());
-        panMain.setLayout(new GridBagLayout());
-        panBtn.setLayout(new GridLayout(0,2));
+        // set up panels
+        panMain = new JPanel(new GridLayout(0, 2));
+        panLeft = new JPanel(new GridBagLayout());
+        panRight = new JPanel(new GridBagLayout());
+        panBtn = new JPanel(new GridLayout(0,2));
 
-        lblName.setText(resourceMap.getString("lblName.text"));
-        lblName.setName("lblName");
+        getContentPane().add(panMain, BorderLayout.CENTER);
+        getContentPane().add(panBtn, BorderLayout.PAGE_END);
+        panMain.add(panLeft);
+        panMain.add(panRight);
+
+        // set up left panel
+        lblName = new JLabel(resourceMap.getString("lblName.text"));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panMain.add(lblName, gridBagConstraints);
+        panLeft.add(lblName, gridBagConstraints);
 
+        txtName = new JTextField();
         txtName.setText(scenario.getName());
-        txtName.setName("txtName");
-        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panMain.add(txtName, gridBagConstraints);
+        panLeft.add(txtName, gridBagConstraints);
 
-        if (!scenario.getStatus().isCurrent()) {
-            lblStatus.setText(resourceMap.getString("lblStatus.text"));
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy++;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-            panMain.add(lblStatus, gridBagConstraints);
+        lblStatus = new JLabel(resourceMap.getString("lblStatus.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy++;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        panLeft.add(lblStatus, gridBagConstraints);
 
-            choiceStatus.setModel(new DefaultComboBoxModel<>(ScenarioStatus.values()));
-            choiceStatus.setName("choiceStatus");
-            choiceStatus.setSelectedItem(scenario.getStatus());
-            choiceStatus.setRenderer(new DefaultListCellRenderer() {
+        choiceStatus = new JComboBox<>(new DefaultComboBoxModel<>(ScenarioStatus.values()));
+        choiceStatus.setSelectedItem(scenario.getStatus());
+        choiceStatus.setRenderer(new DefaultListCellRenderer() {
                 @Override
                 public Component getListCellRendererComponent(final JList<?> list, final Object value,
                                                               final int index, final boolean isSelected,
@@ -174,66 +188,25 @@ public class CustomizeScenarioDialog extends JDialog {
                     }
                     return this;
                 }
-            });
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-            panMain.add(choiceStatus, gridBagConstraints);
-        }
-
-        btnDate = new JButton();
-        btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
-        btnDate.addActionListener(evt -> changeDate());
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        });
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        panMain.add(btnDate, gridBagConstraints);
+        choiceStatus.setEnabled(!scenario.getStatus().isCurrent());
+        panLeft.add(choiceStatus, gridBagConstraints);
 
-        btnPlanetaryConditions = new JButton();
-        btnPlanetaryConditions.setText("Planetary Conditions");
-        btnPlanetaryConditions.addActionListener(evt -> changePlanetaryConditions());
+        lblDate = new JLabel(resourceMap.getString("lblDate.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 0.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        panMain.add(btnPlanetaryConditions, gridBagConstraints);
-
-        if (scenario.getStatus().isCurrent()) {
-            initLootPanel();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy++;
-            gridBagConstraints.gridwidth = 2;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            panLoot.setPreferredSize(new Dimension(400,150));
-            panLoot.setMinimumSize(new Dimension(400,150));
-            panLoot.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createTitledBorder("Scenario Costs & Payouts"),
-                    BorderFactory.createEmptyBorder(5,5,5,5)));
-            panMain.add(panLoot, gridBagConstraints);
-        }
-
-        txtDesc = new MarkdownEditorPanel("Description");
-        txtDesc.setText(scenario.getDescription());
-        txtDesc.setMinimumSize(new Dimension(400, 100));
-        txtDesc.setPreferredSize(new Dimension(400, 250));
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panMain.add(txtDesc, gridBagConstraints);
+        panLeft.add(lblDate, gridBagConstraints);
+
+        btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+        btnDate.addActionListener(evt -> changeDate());
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        panLeft.add(btnDate, gridBagConstraints);
 
         if (scenario.getStatus().isCurrent() && (scenario instanceof AtBDynamicScenario)) {
             gridBagConstraints.gridx = 0;
@@ -249,13 +222,54 @@ public class CustomizeScenarioDialog extends JDialog {
                     modifierBox.addItem(modifierKey);
                 }
             }
-            panMain.add(modifierBox, gridBagConstraints);
+            panLeft.add(modifierBox, gridBagConstraints);
 
             JButton addEventButton = new JButton("Apply Modifier");
             addEventButton.addActionListener(this::btnAddModifierActionPerformed);
             gridBagConstraints.gridx = 1;
-            panMain.add(addEventButton, gridBagConstraints);
+            panLeft.add(addEventButton, gridBagConstraints);
         }
+
+        btnPlanetaryConditions = new JButton();
+        btnPlanetaryConditions.setText("Planetary Conditions");
+        btnPlanetaryConditions.addActionListener(evt -> changePlanetaryConditions());
+        btnPlanetaryConditions.setEnabled(scenario.getStatus().isCurrent());
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy++;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        panLeft.add(btnPlanetaryConditions, gridBagConstraints);
+
+        initLootPanel(resourceMap);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panLoot.setPreferredSize(new Dimension(400,150));
+        panLoot.setMinimumSize(new Dimension(400,150));
+        panLoot.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Scenario Costs & Payouts"),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+        panLeft.add(panLoot, gridBagConstraints);
+
+        //set up right panel
+        txtDesc = new MarkdownEditorPanel("Description");
+        txtDesc.setText(scenario.getDescription());
+        txtDesc.setMinimumSize(new Dimension(400, 100));
+        txtDesc.setPreferredSize(new Dimension(400, 250));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy++;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panRight.add(txtDesc, gridBagConstraints);
 
         if (!scenario.getStatus().isCurrent()) {
             txtReport = new MarkdownEditorPanel("After-Action Report");
@@ -264,15 +278,16 @@ public class CustomizeScenarioDialog extends JDialog {
             txtReport.setPreferredSize(new Dimension(400, 250));
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy++;
-            gridBagConstraints.gridwidth = 2;
+            gridBagConstraints.gridwidth = 1;
             gridBagConstraints.weightx = 1.0;
             gridBagConstraints.weighty = 1.0;
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            panMain.add(txtReport, gridBagConstraints);
+            panRight.add(txtReport, gridBagConstraints);
         }
 
+        // set up buttons
         if (newScenario && (mission instanceof AtBContract)) {
             JButton btnLoad = new JButton("Generate From Template");
             btnLoad.addActionListener(this::btnLoadActionPerformed);
@@ -292,22 +307,13 @@ public class CustomizeScenarioDialog extends JDialog {
             panBtn.add(btnFinalize);
         }
 
-        btnOK.setText(resourceMap.getString("btnOkay.text"));
-        btnOK.setName("btnOK");
+        btnOK = new JButton(resourceMap.getString("btnOkay.text"));
         btnOK.addActionListener(this::btnOKActionPerformed);
         panBtn.add(btnOK);
 
-        btnClose.setText(resourceMap.getString("btnCancel.text"));
-        btnClose.setName("btnClose");
+        btnClose = new JButton(resourceMap.getString("btnCancel.text"));
         btnClose.addActionListener(this::btnCloseActionPerformed);
-        gridBagConstraints.gridx = GridBagConstraints.RELATIVE;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.CENTER;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         panBtn.add(btnClose);
-
-        getContentPane().add(panMain, BorderLayout.CENTER);
-        getContentPane().add(panBtn, BorderLayout.PAGE_END);
 
         pack();
     }
@@ -409,23 +415,26 @@ public class CustomizeScenarioDialog extends JDialog {
         }
     }
 
-    private void initLootPanel() {
+    private void initLootPanel(ResourceBundle resourceMap) {
         panLoot = new JPanel(new BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
-        btnAdd = new JButton("Add Loot");
-        btnAdd.addActionListener(evt -> addLoot());
-        panBtns.add(btnAdd);
+        btnAddLoot = new JButton(resourceMap.getString("btnAddLoot.text"));
+        btnAddLoot.addActionListener(evt -> addLoot());
+        btnAddLoot.setEnabled(scenario.getStatus().isCurrent());
+        panBtns.add(btnAddLoot);
 
-        btnEdit = new JButton("Edit Loot");
-        btnEdit.setEnabled(false);
-        btnEdit.addActionListener(evt -> editLoot());
-        panBtns.add(btnEdit);
+        btnEditLoot = new JButton(resourceMap.getString("btnEditLoot.text"));
+        btnEditLoot.setEnabled(false);
+        btnEditLoot.addActionListener(evt -> editLoot());
+        btnEditLoot.setEnabled(scenario.getStatus().isCurrent());
+        panBtns.add(btnEditLoot);
 
-        btnDelete = new JButton("Delete Loot");
-        btnDelete.setEnabled(false);
-        btnDelete.addActionListener(evt -> deleteLoot());
-        panBtns.add(btnDelete);
+        btnDeleteLoot = new JButton(resourceMap.getString("btnDeleteLoot.text"));
+        btnDeleteLoot.setEnabled(false);
+        btnDeleteLoot.addActionListener(evt -> deleteLoot());
+        btnDeleteLoot.setEnabled(scenario.getStatus().isCurrent());
+        panBtns.add(btnDeleteLoot);
         panLoot.add(panBtns, BorderLayout.PAGE_START);
 
         lootTable = new JTable(lootModel);
@@ -445,8 +454,8 @@ public class CustomizeScenarioDialog extends JDialog {
 
     private void lootTableValueChanged(ListSelectionEvent evt) {
         int row = lootTable.getSelectedRow();
-        btnDelete.setEnabled(row != -1);
-        btnEdit.setEnabled(row != -1);
+        btnDeleteLoot.setEnabled(row != -1);
+        btnEditLoot.setEnabled(row != -1);
     }
 
     private void addLoot() {
