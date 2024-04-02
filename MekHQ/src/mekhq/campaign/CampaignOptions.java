@@ -648,19 +648,22 @@ public class CampaignOptions {
 
         // Salary
         setSalaryAntiMekMultiplier(1.5);
-        setSalarySpecialistInfantryMultiplier(1.0);
+        // the below multiplier will match the base pay for specialised infantry
+        setSalarySpecialistInfantryMultiplier(1.28);
         setSalaryXPMultipliers(new HashMap<>());
         getSalaryXPMultipliers().put(SkillLevel.NONE, 0.5);
         getSalaryXPMultipliers().put(SkillLevel.ULTRA_GREEN, 0.6);
-        getSalaryXPMultipliers().put(SkillLevel.GREEN, 0.6);
+        getSalaryXPMultipliers().put(SkillLevel.GREEN, 0.75);
         getSalaryXPMultipliers().put(SkillLevel.REGULAR, 1.0);
-        getSalaryXPMultipliers().put(SkillLevel.VETERAN, 1.6);
-        getSalaryXPMultipliers().put(SkillLevel.ELITE, 3.2);
-        getSalaryXPMultipliers().put(SkillLevel.HEROIC, 6.4);
-        getSalaryXPMultipliers().put(SkillLevel.LEGENDARY, 12.8);
+        getSalaryXPMultipliers().put(SkillLevel.VETERAN, 1.5);
+        getSalaryXPMultipliers().put(SkillLevel.ELITE, 2.0);
+        // Expertise >Elite doesn't appear in ATOW, so I made some numbers up
+        getSalaryXPMultipliers().put(SkillLevel.HEROIC, 3.5);
+        getSalaryXPMultipliers().put(SkillLevel.LEGENDARY, 5.0);
         setRoleBaseSalaries(new Money[personnelRoles.length]);
         setRoleBaseSalary(PersonnelRole.MECHWARRIOR, 1500);
-        setRoleBaseSalary(PersonnelRole.LAM_PILOT, 3000);
+        // LAM Pilot doesn't appear in ATOW, so I treated the Aero component as if it were a second role (i.e. halved the base salary)
+        setRoleBaseSalary(PersonnelRole.LAM_PILOT, 2250);
         setRoleBaseSalary(PersonnelRole.GROUND_VEHICLE_DRIVER, 900);
         setRoleBaseSalary(PersonnelRole.NAVAL_VEHICLE_DRIVER, 900);
         setRoleBaseSalary(PersonnelRole.VTOL_PILOT, 900);
@@ -671,21 +674,23 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.PROTOMECH_PILOT, 960);
         setRoleBaseSalary(PersonnelRole.BATTLE_ARMOUR, 960);
         setRoleBaseSalary(PersonnelRole.SOLDIER, 750);
+        // ATOW differentiates between DropShip, WarShip, and JumpShip crew, mhq doesn't.
+        // I used DropShip values as they were the closest to the median
         setRoleBaseSalary(PersonnelRole.VESSEL_PILOT, 1000);
         setRoleBaseSalary(PersonnelRole.VESSEL_GUNNER, 1000);
         setRoleBaseSalary(PersonnelRole.VESSEL_CREW, 1000);
         setRoleBaseSalary(PersonnelRole.VESSEL_NAVIGATOR, 1000);
         setRoleBaseSalary(PersonnelRole.MECH_TECH, 800);
-        setRoleBaseSalary(PersonnelRole.MECHANIC, 800);
+        setRoleBaseSalary(PersonnelRole.MECHANIC, 640);
         setRoleBaseSalary(PersonnelRole.AERO_TECH, 800);
         setRoleBaseSalary(PersonnelRole.BA_TECH, 800);
         setRoleBaseSalary(PersonnelRole.ASTECH, 400);
         setRoleBaseSalary(PersonnelRole.DOCTOR, 1500);
-        setRoleBaseSalary(PersonnelRole.MEDIC, 400);
-        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_COMMAND, 500);
-        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_LOGISTICS, 500);
-        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_TRANSPORT, 500);
-        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
+        setRoleBaseSalary(PersonnelRole.MEDIC, 640);
+        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_COMMAND, 640);
+        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_LOGISTICS, 640);
+        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_TRANSPORT, 640);
+        setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 640);
         setRoleBaseSalary(PersonnelRole.DEPENDENT, 0);
         setRoleBaseSalary(PersonnelRole.NONE, 0);
 
