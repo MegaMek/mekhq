@@ -1323,7 +1323,7 @@ public class ResolveScenarioTracker {
         }
     }
 
-    public void ransomUnit(int i) {
+    public void sellUnit(int i) {
         if (i < getPotentialSalvage().size()) {
             TestUnit ransomUnit = getPotentialSalvage().get(i);
             getRansomedSalvage().add(ransomUnit);
