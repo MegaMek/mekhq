@@ -1598,22 +1598,6 @@ public class CampaignOptions {
     //endregion Dependent
 
     //region Salary
-    public double getSalaryCommissionMultiplier() {
-        return salaryCommissionMultiplier;
-    }
-
-    public void setSalaryCommissionMultiplier(final double salaryCommissionMultiplier) {
-        this.salaryCommissionMultiplier = salaryCommissionMultiplier;
-    }
-
-    public double getSalaryEnlistedMultiplier() {
-        return salaryEnlistedMultiplier;
-    }
-
-    public void setSalaryEnlistedMultiplier(final double salaryEnlistedMultiplier) {
-        this.salaryEnlistedMultiplier = salaryEnlistedMultiplier;
-    }
-
     public double getSalaryAntiMekMultiplier() {
         return salaryAntiMekMultiplier;
     }
@@ -3650,8 +3634,6 @@ public class CampaignOptions {
         //endregion Dependent
 
         //region Salary
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryCommissionMultiplier", getSalaryCommissionMultiplier());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryEnlistedMultiplier", getSalaryEnlistedMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salaryXPMultipliers");
