@@ -30,11 +30,15 @@ import javax.swing.*;
 public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
     private static boolean isUntreatedInjury (Campaign campaign) {
         for (Person p : campaign.getActivePersonnel()) {
-            for (Injury i : p.getInjuries()) {
-                if (!i.isPermanent()) {
-                    if (p.getDoctorId() == null) {
-                        return true;
+            if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
+                for (Injury i : p.getInjuries()) {
+                    if (!i.isPermanent()) {
+                        return p.getDoctorId() == null;
                     }
+                }
+            } else if (!campaign.getCampaignOptions().isUseAdvancedMedical()) {
+                if(p.getHits() > 0) {
+                    return p.getDoctorId() == null;
                 }
             }
         }
