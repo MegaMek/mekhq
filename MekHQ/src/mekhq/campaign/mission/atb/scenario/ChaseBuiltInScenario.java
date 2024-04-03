@@ -140,9 +140,9 @@ public class ChaseBuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
 
         ScenarioObjective destroyHostiles = isAttacker()
-                ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 50,
+                ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 1, 50,
                         OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStart())))
-                : CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 50,
+                : CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 1, 50,
                         OffBoardDirection.translateBoardStart(getEnemyHome()));
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
                 this);

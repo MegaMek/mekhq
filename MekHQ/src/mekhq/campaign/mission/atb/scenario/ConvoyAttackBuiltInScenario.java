@@ -110,9 +110,9 @@ public class ConvoyAttackBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        ScenarioObjective destroyConvoy = CommonObjectiveFactory.getDestroyEnemies(CONVOY_FORCE_ID, 100);
+        ScenarioObjective destroyConvoy = CommonObjectiveFactory.getDestroyEnemies(CONVOY_FORCE_ID, 1, 100);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                50, false);
+                1, 50, false);
 
         getScenarioObjectives().add(destroyConvoy);
         getScenarioObjectives().add(keepFriendliesAlive);
