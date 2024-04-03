@@ -55,6 +55,11 @@ public class ScenarioStoryPoint extends StoryPoint {
      */
     private int deployedForceId;
 
+    /**
+     * Days ahead to set the date of the scenario. Will default to current date if nothing is entered.
+     */
+    private int days;
+
     public ScenarioStoryPoint() {
         super();
         // ensure that deployedForceId is not valid by default
@@ -76,8 +81,8 @@ public class ScenarioStoryPoint extends StoryPoint {
         if(null != missionStoryPoint && missionStoryPoint instanceof MissionStoryPoint) {
             Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
             if (null != m & null != scenario) {
-                // set date to today
-                scenario.setDate(getStoryArc().getCampaign().getLocalDate());
+                // set date for the scenario
+                scenario.setDate(getStoryArc().getCampaign().getLocalDate().plusDays(days));
                 getStoryArc().getCampaign().addScenario(scenario, m);
                 Force force = getCampaign().getForce(deployedForceId);
                 if(null != force) {
@@ -144,6 +149,7 @@ public class ScenarioStoryPoint extends StoryPoint {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "deployedForceId", deployedForceId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "deployedForceId", days);
         if(null != scenario) {
             //if the scenario has a valid id, then just save this because the scenario is saved
             //and loaded elsewhere so we need to link it
@@ -179,6 +185,8 @@ public class ScenarioStoryPoint extends StoryPoint {
                     missionStoryPointId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("deployedForceId")) {
                     deployedForceId = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("days")) {
+                    days = Integer.parseInt(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error(e);
