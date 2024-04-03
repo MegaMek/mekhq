@@ -5879,7 +5879,7 @@ forces after round 12 when all available reinforcements have arrived.
                             <Game id="2"/>
                             <Force force="Nova|0||"/>
                         </entity>
-                        <entity chassis="Vulture (Mad Dog)" model="D" type="Biped" commander="false" offboard="false"
+                        <entity chassis="Vulture (Mad Dog)" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="33a140c7-6100-4b24-b685-18d3eb80f9ec">
                             <pilot size="1" name="Warrior Mujtaba" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
@@ -6140,7 +6140,7 @@ forces after round 14 when all available reinforcements have arrived.
                             <Game id="2"/>
                             <Force force="Nova|0||"/>
                         </entity>
-                        <entity chassis="Vulture (Mad Dog)" model="D" type="Biped" commander="false" offboard="false"
+                        <entity chassis="Vulture (Mad Dog)" model="B" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="33a140c7-6100-4b24-b685-18d3eb80f9ec">
                             <pilot size="1" name="Warrior Mujtaba" nick="" gender="MALE" clanperson="true" gunnery="3" piloting="4"
@@ -8539,7 +8539,7 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                             <Game id="6"/>
                             <Force force="Trinary Alpha|0||Alpha Beak 2|2||"/>
                         </entity>
-                        <entity chassis="Vulture (Mad Dog)" model="D" type="Biped" commander="false" offboard="false"
+                        <entity chassis="Vulture (Mad Dog)" model="A" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" neverDeployed="true"
                                 externalId="3f95e9de-6ace-422a-8917-8f2494628cac">
                             <pilot size="1" name="Warrior Lucy" nick="" gender="FEMALE" clanperson="true" gunnery="4" piloting="5"
