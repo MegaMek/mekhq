@@ -200,7 +200,7 @@ public class AtBContract extends Contract {
                     numUnits += campaign.getFaction().isClan() ? 0.5 : 1;
                     break;
                 case UnitType.CONV_FIGHTER:
-                case UnitType.AERO:
+                case UnitType.AEROSPACEFIGHTER:
                     if (campaign.getCampaignOptions().isUseAero()) {
                         numUnits += campaign.getFaction().isClan() ? 0.5 : 1;
                     }

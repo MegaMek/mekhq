@@ -1138,7 +1138,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int unitsPerPoint;
         switch (unitType) {
             case UnitType.TANK:
-            case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
                 unitsPerPoint = 2;
                 break;
             case UnitType.PROTOMEK:
@@ -1318,7 +1318,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 int weightClass = randomAeroWeights[Compute.d6() - 1];
 
                 aero = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(),
-                        UnitType.AERO, weightClass, campaign);
+                        UnitType.AEROSPACEFIGHTER, weightClass, campaign);
                 if (aero != null) {
                     aircraft.add(aero);
                 }
