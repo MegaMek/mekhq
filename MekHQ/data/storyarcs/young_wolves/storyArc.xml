@@ -140,7 +140,9 @@ are designed to reflect this fact.
 * You should not take in prisoners and bondsmen during the campaign, except for possible narrative
 exceptions.
 * You can set MegaMek options as you like, but should consider two special cases:
-    * Double-blind play is integral to many of the scenarios and should not be adjusted.
+    * Blind play is integral to many of the scenarios and should not be adjusted. By default, the bot will
+      "cheat" and ignore double-blind. This prevents the bot from stalling out in the deployment zone. You can turn this
+      "single-blind" feature off in the game options if you prefer.
     * Clan physical attacks are disabled for both you and your opponents. You can turn them on if you
       would prefer grittier and less honorable fights.
 * Scenario objectives will in most cases be automatically determined, but you may have to check
