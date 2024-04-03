@@ -100,7 +100,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 50);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
                 this);
 
@@ -110,7 +110,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract,
-                    this, 75, false);
+                    this, 1, 75, false);
             getScenarioObjectives().add(keepFriendliesAlive);
 
             ScenarioObjective raidObjective = new ScenarioObjective();
