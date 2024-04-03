@@ -1,6 +1,7 @@
 MEKHQ VERSION HISTORY:
 ---------------
 0.49.19-SNAPSHOT
++ PR #3953: Add disabled option for Personnel Market
 + PR #3956: Change ransomed unit buttons to sold unit button in scenario resolve dialog
 + PR #3942: Added Nag Dialog for Prisoners of War Outside of Contracts
 + PR #3845: Adaptations for Adding Clan Personnel Tracking to MegaMek
