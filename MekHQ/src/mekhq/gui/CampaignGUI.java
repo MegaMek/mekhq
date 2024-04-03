@@ -2383,6 +2383,13 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
+        if(getCampaign().checkScenariosDue()) {
+            JOptionPane.showMessageDialog(null, getResourceMap().getString("dialogCheckDueScenarios.text"),
+                    getResourceMap().getString("dialogCheckDueScenarios.title"), JOptionPane.WARNING_MESSAGE);
+            evt.cancel();
+            return;
+        }
+
         if (new UnmaintainedUnitsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;

@@ -6819,6 +6819,19 @@ public class Campaign implements ITechManager {
         return false;
     }
 
+    public boolean checkScenariosDue() {
+        for(Mission m : getActiveMissions(true)) {
+            for(Scenario s : m.getCurrentScenarios()) {
+                if((s.getDate() != null)
+                        && !(s instanceof AtBScenario)
+                        && !getLocalDate().isBefore(s.getDate())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Sets the type of rating method used.
      */

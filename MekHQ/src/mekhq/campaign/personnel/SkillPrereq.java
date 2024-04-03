@@ -94,6 +94,7 @@ public class SkillPrereq {
     public boolean qualifies(int unitType) {
         switch (unitType) {
             case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
                 return skillSet.containsKey(SkillType.S_PILOT_AERO) ||
                         skillSet.containsKey(SkillType.S_GUN_AERO);
             case UnitType.BATTLE_ARMOR:
