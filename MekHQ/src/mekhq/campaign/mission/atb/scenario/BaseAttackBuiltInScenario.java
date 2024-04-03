@@ -169,7 +169,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
 
         ScenarioObjective preserveBaseUnits = null;
         if (!isAttacker()) {
-            preserveBaseUnits = CommonObjectiveFactory.getPreserveSpecificFriendlies(BASE_CIVILIAN_FORCE_ID, 1,3, true);
+            preserveBaseUnits = CommonObjectiveFactory.getPreserveSpecificFriendlies(BASE_CIVILIAN_FORCE_ID, 1, 3, true);
             preserveBaseUnits.addForce(BASE_TURRET_FORCE_ID);
 
             ObjectiveEffect defeatEffect = new ObjectiveEffect();
