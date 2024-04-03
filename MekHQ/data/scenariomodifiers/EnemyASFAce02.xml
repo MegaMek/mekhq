@@ -1,0 +1,37 @@
+<AtBScenarioModifier>
+	<additionalBriefingText>An enemy ASF Ace has been spotted.  Beware.</additionalBriefingText>
+	<allowedMapLocations>
+		<allowedMapLocation>AllGroundTerrain</allowedMapLocation>
+		<allowedMapLocation>SpecificGroundTerrain</allowedMapLocation>
+	</allowedMapLocations>
+	<benefitsPlayer>false</benefitsPlayer>
+	<eventTiming>PreForceGeneration</eventTiming>
+	<forceDefinition>
+		<actualDeploymentZone>-1</actualDeploymentZone>
+		<allowAeroBombs>false</allowAeroBombs>
+		<allowedUnitType>-3</allowedUnitType>
+		<arrivalTurn>0</arrivalTurn>
+		<canReinforceLinked>false</canReinforceLinked>
+		<contributesToBV>false</contributesToBV>
+		<contributesToMapSize>true</contributesToMapSize>
+		<contributesToUnitCount>false</contributesToUnitCount>
+		<deployOffboard>false</deployOffboard>
+        <deploymentZones/>
+		<destinationZone>5</destinationZone>
+		<fixedUnitCount>0</fixedUnitCount>
+		<forceAlignment>2</forceAlignment>
+		<forceName>Enemy ASF Ace</forceName>
+		<generationMethod>5</generationMethod>
+			<fixedMul>EnemyASFAceMed.mul</fixedMul>		
+		<generationOrder>1</generationOrder>
+		<maxWeightClass>4</maxWeightClass>		
+		<retreatThreshold>75</retreatThreshold>
+		<startingAltitude>0</startingAltitude>
+		<objectiveLinkedForces>
+			<objectiveLinkedForce>Primary Opfor</objectiveLinkedForce>
+		</objectiveLinkedForces>
+		<syncDeploymentType>SameEdge</syncDeploymentType>
+		<syncedForceName>Primary Opfor</syncedForceName>
+		<useArtillery>false</useArtillery>
+	</forceDefinition>
+</AtBScenarioModifier>

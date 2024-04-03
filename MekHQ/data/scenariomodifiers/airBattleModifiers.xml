@@ -73,6 +73,15 @@
 		</modifier>
 		<modifier>		
 			EnemyAirPatrol.xml
+		</modifier>
+		<modifier>
+			AlliedASFAce01.xml
 		</modifier>	
+		<modifier>
+			EnemyASFAce01.xml
+		</modifier>	
+		<modifier>
+			EnemyASFAce02.xml
+		</modifier>		
 	</modifiers>
 </scenarioModifierManifest>

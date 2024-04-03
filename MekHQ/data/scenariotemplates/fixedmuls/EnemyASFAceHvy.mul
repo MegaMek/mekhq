@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<unit version="0.49.19-SNAPSHOT" >
+
+		<entity chassis="Slayer" model="SL-15" type="Aerodyne" commander="false" offboard="false" hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3" deploymentZoneOffset="0" deploymentZoneAnyNWx="-1" deploymentZoneAnyNWy="-1" deploymentZoneAnySEx="-1" deploymentZoneAnySEy="-1" neverDeployed="true" velocity="0" altitude="5" externalId="6a5344dd-dce9-4a70-812f-cc360a9e8aba">
+			<pilot size="1" name="Lewis Sturgeon" nick="Maverick" gender="MALE" gunnery="2" piloting="3" externalId="71b72d48-3045-42fd-83e9-a7c1521bf4ea" ejected="false" advantages="aptitude_piloting::shaky_stick" edge="edge 2::edge_when_aero_alt_loss::edge_when_aero_explosion::edge_when_aero_ko::edge_when_aero_lucky_crit"/>
+			<fuel left="800"/>
+			<bombs>
+				<bomb type="HEBomb" load="6" Internal="false"/>
+				<bomb type="ClusterBomb" load="6" Internal="false"/>
+			</bombs>
+			<structural integrity="8"/>
+			<heat sinks="20"/>
+      The first slot in a location is at index="1".
+			<location index="5"> Fuselage
+				<slot index="1" type="IS Ammo AC/10" shots="10"/>
+				<slot index="2" type="IS Ammo AC/10" shots="10"/>
+			</location>
+			<Game id="9"/>
+		</entity>
+
+</unit>
