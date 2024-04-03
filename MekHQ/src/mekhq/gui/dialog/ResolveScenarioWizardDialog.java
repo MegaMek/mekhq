@@ -648,7 +648,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             JCheckBox sold = new JCheckBox("");
             sold.setName("sold");
             sold.getAccessibleContext().setAccessibleName(resourceMap.getString("lblSell.text"));
-            sold.setEnabled(!tracker.usesSalvageExchange());
+            sold.setEnabled(!tracker.usesSalvageExchange()  && tracker.getCampaign().getCampaignOptions().isSellUnits());
             sold.addItemListener(evt -> checkSalvageRights());
             soldUnitBoxes.add(sold);
             gridBagConstraints.gridx = gridx++;
@@ -1506,7 +1506,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
                 escaped.setEnabled(false);
             } else {
                 salvaged.setEnabled(!tracker.usesSalvageExchange());
-                sold.setEnabled(!tracker.usesSalvageExchange());
+                sold.setEnabled(!tracker.usesSalvageExchange() && tracker.getCampaign().getCampaignOptions().isSellUnits());
                 escaped.setEnabled(true);
                 btnsSalvageEditUnit.get(i).setEnabled(true);
             }
