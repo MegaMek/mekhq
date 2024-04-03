@@ -1,6 +1,11 @@
 MEKHQ VERSION HISTORY:
 ---------------
 0.49.19-SNAPSHOT
++ Bug #3958: No selling units in scenario resolution if campaign disallows selling
++ Fix #3949: Custom ScenarioObjectives do not change ScenarioStatus in ResolveScenarioWizardDialog
++ PR #3953: Add disabled option for Personnel Market
++ PR #3956: Change ransomed unit buttons to sold unit button in scenario resolve dialog
++ PR #3942: Added Nag Dialog for Prisoners of War Outside of Contracts
 + PR #3845: Adaptations for Adding Clan Personnel Tracking to MegaMek
 + Fix #3775: Non-superheavy Tripods can now be assigned crews; pilots can now be assigned to SH and Tripods in the personnel tab
 + Fix: #3848: Unable to assign Aerospace units to a transport in the TO&E
@@ -19,7 +24,11 @@ MEKHQ VERSION HISTORY:
 + Fix #2990: Stratcon draw counts as loss 
 + PR #3895: Correct Starting Cash Dice Count in Company Generator 
 + PR #3900: Disconnect quietly from GameThread for MekHQ 
-+ PR #3834: Update planetary conditions chance logic 
++ PR #3834: Update planetary conditions chance logic
++ Fix #3803: MekHQ fix for WOB.pm/.PM mismatch and missing parent faction check
++ Fix #3932: Added Nag for Wounded Personnel without Doctor
++ Fix #3890: Add Tech/Vessel Column to Tech Skills View 
++ PR #3951: Add OperationalVP variable to CommonObjectiveFactory.java (prep for later work)
 
 0.49.18 (2024-02-17 1800 UTC)
 + PR #3805: Adaptations for the Internal Bomb Bay quirk

@@ -893,7 +893,7 @@ public class CampaignOptions {
 
         //region Markets Tab
         // Personnel Market
-        setPersonnelMarketName(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_STRAT_OPS));
+        setPersonnelMarketName(PersonnelMarket.getTypeName(PersonnelMarket.TYPE_NONE));
         setPersonnelMarketReportRefresh(true);
         setPersonnelMarketRandomRemovalTargets(new HashMap<>());
         getPersonnelMarketRandomRemovalTargets().put(SkillLevel.NONE, 3);

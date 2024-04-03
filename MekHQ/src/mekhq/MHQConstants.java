@@ -162,6 +162,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_NODE = "mekhq/prefs/nags";
     public static final String NAG_UNMAINTAINED_UNITS = "nagUnmaintainedUnits";
     public static final String NAG_PREGNANT_COMBATANT = "nagPregnantCombatant";
+    public static final String NAG_PRISONERS = "nagPrisoners";
     public static final String NAG_INSUFFICIENT_ASTECHS = "nagInsufficientAstechs";
     public static final String NAG_INSUFFICIENT_ASTECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";
