@@ -29,7 +29,7 @@
 	</award>
 	<award>
 		<name>House Distinguished Service</name>
-		<description>432 battalion kills in a mission.</description>
+		<description>432 battalion kills in a contract.</description>
 		<medal>HouseDistinguishedServiceM.png</medal>
 		<ribbon>1-03-1-HouseDistinguishedService.png</ribbon>
 		<xp>6</xp>
@@ -38,11 +38,11 @@
 		<qty>432</qty>
 		<item>Kills</item>
 		<size>Battalion</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Distinguished Service</name>
-		<description>12 pilot kills in a mission.</description>
+		<description>12 pilot kills in a contract.</description>
 		<medal>DistinguishedServiceM.png</medal>
 		<ribbon>1-03-4-DistinguishedService.png</ribbon>
 		<xp>3</xp>
@@ -51,7 +51,7 @@
 		<qty>12</qty>
 		<item>Kills</item>
 		<size>Individual</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Silver Star</name>
@@ -68,7 +68,7 @@
 	</award>
 	<award>
 		<name>House Superior Service</name>
-		<description>324 battalion kills in a mission.</description>
+		<description>324 battalion kills in a contract.</description>
 		<medal>HouseSuperiorServiceM.png</medal>
 		<ribbon>1-05-1-HouseSuperiorService.png</ribbon>
 		<xp>5</xp>
@@ -77,11 +77,11 @@
 		<qty>324</qty>
 		<item>Kills</item>
 		<size>Battalion</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Legion of Merit</name>
-		<description>144 company kills in a mission.</description>
+		<description>144 company kills in a contract.</description>
 		<medal>LegionOfMeritM.png</medal>
 		<ribbon>1-05-2-LegionOfMerit.png</ribbon>
 		<xp>5</xp>
@@ -90,11 +90,11 @@
 		<qty>144</qty>
 		<item>Kills</item>
 		<size>Company</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Armed Forces</name>
-		<description>108 company kills in a mission.</description>
+		<description>108 company kills in a contract.</description>
 		<medal>ArmedForcesM.png</medal>
 		<ribbon>1-07-2-ArmedForces.png</ribbon>
 		<xp>4</xp>
@@ -103,7 +103,7 @@
 		<qty>108</qty>
 		<item>Kills</item>
 		<size>Company</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Bronze Star</name>
@@ -133,7 +133,7 @@
 	</award>
 	<award>
 		<name>House Meritorious Service</name>
-		<description>48 lance kills in a mission.</description>
+		<description>48 lance kills in a contract.</description>
 		<medal>HouseMeritoriousServiceM.png</medal>
 		<ribbon>1-10-1-HouseMeritoriousService.png</ribbon>
 		<xp>4</xp>
@@ -142,11 +142,11 @@
 		<qty>48</qty>
 		<item>Kills</item>
 		<size>Lance</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Meritorious Service</name>
-		<description>36 lance kills in a mission.</description>
+		<description>36 lance kills in a contract.</description>
 		<medal>MeritoriousServiceM.png</medal>
 		<ribbon>1-10-2-MeritoriousService.png</ribbon>
 		<xp>3</xp>
@@ -155,11 +155,11 @@
 		<qty>36</qty>
 		<item>Kills</item>
 		<size>Lance</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Combat Commendation</name>
-		<description>9 pilot kills in a mission.</description>
+		<description>9 pilot kills in a contract.</description>
 		<medal>CombatCommendationM.png</medal>
 		<ribbon>1-11-3-CombatCommendation.png</ribbon>
 		<xp>2</xp>
@@ -168,11 +168,11 @@
 		<qty>9</qty>
 		<item>Kills</item>
 		<size>Individual</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Combat Achievement</name>
-		<description>6 pilot kills in a mission.</description>
+		<description>6 pilot kills in a contract.</description>
 		<ribbon>1-12-3-CombatAchievement.png</ribbon>
 		<xp>1</xp>
 		<stackable>true</stackable>
@@ -180,7 +180,7 @@
 		<qty>6</qty>
 		<item>Kills</item>
 		<size>Individual</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Combat Action</name>
@@ -195,7 +195,7 @@
 	</award>
 	<award>
 		<name>House Unit Citation</name>
-		<description>216 battalion kills in a mission.</description>
+		<description>216 battalion kills in a contract.</description>
 		<ribbon>2-01-2-HouseUnitCitation.png</ribbon>
 		<xp>4</xp>
 		<stackable>true</stackable>
@@ -203,11 +203,11 @@
 		<qty>216</qty>
 		<item>Kills</item>
 		<size>Battalion</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Combat Unit Commendation</name>
-		<description>72 company kills in a mission.</description>
+		<description>72 company kills in a contract.</description>
 		<ribbon>2-01-7-CombatUnitCommendation.png</ribbon>
 		<xp>3</xp>
 		<stackable>true</stackable>
@@ -215,11 +215,11 @@
 		<qty>72</qty>
 		<item>Kills</item>
 		<size>Company</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Meritorious Unit Commendation</name>
-		<description>24 lance kills in a mission.</description>
+		<description>24 lance kills in a contract.</description>
 		<ribbon>2-02-2-MeritoriousUnitCommendation.png</ribbon>
 		<xp>2</xp>
 		<stackable>true</stackable>
@@ -227,7 +227,7 @@
 		<qty>24</qty>
 		<item>Kills</item>
 		<size>Lance</size>
-		<range>Mission</range>
+		<range>Contract</range>
 	</award>
 	<award>
 		<name>Prisoner of War</name>
