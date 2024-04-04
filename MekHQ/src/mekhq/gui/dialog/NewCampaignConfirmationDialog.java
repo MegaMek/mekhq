@@ -23,7 +23,7 @@ import javax.swing.JOptionPane;
 public class NewCampaignConfirmationDialog {
   public int YesNoOption() {
     return JOptionPane.showConfirmDialog(null, "Are you sure you want to start a new campaign?\n" +
-            "Do not save your campaign, if you cancel after this point", "Start New Campaign?",
+            "Do not save your current campaign if you cancel after this point!", "Start New Campaign?",
         JOptionPane.YES_NO_OPTION);
   }
 }
