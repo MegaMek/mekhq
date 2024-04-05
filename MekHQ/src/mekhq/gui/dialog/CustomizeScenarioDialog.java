@@ -76,9 +76,6 @@ public class CustomizeScenarioDialog extends JDialog {
     // end: panels
 
     // begin: labels
-    private JLabel lblName;
-    private JLabel lblDate;
-    private JLabel lblStatus;
     private JLabel lblLightDesc;
     private JLabel lblWindDesc;
     private JLabel lblAtmosphereDesc;
@@ -166,14 +163,13 @@ public class CustomizeScenarioDialog extends JDialog {
         panMain.add(panRight);
 
         // set up left panel
-        lblName = new JLabel(resourceMap.getString("lblName.text"));
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panLeft.add(lblName, gridBagConstraints);
+        panLeft.add(new JLabel(resourceMap.getString("lblName.text")), gridBagConstraints);
 
         txtName = new JTextField();
         txtName.setText(scenario.getName());
@@ -182,12 +178,11 @@ public class CustomizeScenarioDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         panLeft.add(txtName, gridBagConstraints);
 
-        lblStatus = new JLabel(resourceMap.getString("lblStatus.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        panLeft.add(lblStatus, gridBagConstraints);
+        panLeft.add(new JLabel(resourceMap.getString("lblStatus.text")), gridBagConstraints);
 
         choiceStatus = new JComboBox<>(new DefaultComboBoxModel<>(ScenarioStatus.values()));
         choiceStatus.setSelectedItem(scenario.getStatus());
@@ -208,12 +203,11 @@ public class CustomizeScenarioDialog extends JDialog {
         choiceStatus.setEnabled(!scenario.getStatus().isCurrent());
         panLeft.add(choiceStatus, gridBagConstraints);
 
-        lblDate = new JLabel(resourceMap.getString("lblDate.text"));
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy++;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panLeft.add(lblDate, gridBagConstraints);
+        panLeft.add(new JLabel(resourceMap.getString("lblDate.text")), gridBagConstraints);
 
         btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(evt -> changeDate());
@@ -459,41 +453,36 @@ public class CustomizeScenarioDialog extends JDialog {
         rightGbc.fill = GridBagConstraints.NONE;
         rightGbc.anchor = GridBagConstraints.NORTHWEST;
 
-        JLabel lblLight = new JLabel(resourceMap.getString("lblLight.text"));
         leftGbc.gridy++;
-        panPlanetaryConditions.add(lblLight, leftGbc);
+        panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblLight.text")), leftGbc);
 
         lblLightDesc = new JLabel(scenario.getLight().toString());
         rightGbc.gridy++;
         panPlanetaryConditions.add(lblLightDesc, rightGbc);
 
-        JLabel lblWeather = new JLabel(resourceMap.getString("lblWeather.text"));
         leftGbc.gridy++;
-        panPlanetaryConditions.add(lblWeather, leftGbc);
+        panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblWeather.text")), leftGbc);
 
         lblWeatherDesc = new JLabel(scenario.getWeather().toString());
         rightGbc.gridy++;
         panPlanetaryConditions.add(lblWeatherDesc, rightGbc);
 
-        JLabel lblWind = new JLabel(resourceMap.getString("lblWind.text"));
         leftGbc.gridy++;
-        panPlanetaryConditions.add(lblWind, leftGbc);
+        panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblWind.text")), leftGbc);
 
         lblWindDesc = new JLabel(scenario.getWind().toString());
         rightGbc.gridy++;
         panPlanetaryConditions.add(lblWindDesc, rightGbc);
 
-        JLabel lblFog = new JLabel(resourceMap.getString("lblFog.text"));
         leftGbc.gridy++;
-        panPlanetaryConditions.add(lblFog, leftGbc);
+        panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblFog.text")), leftGbc);
 
         lblFogDesc = new JLabel(scenario.getFog().toString());
         rightGbc.gridy++;
         panPlanetaryConditions.add(lblFogDesc, rightGbc);
 
-        JLabel lblOtherConditions = new JLabel(resourceMap.getString("lblOtherConditions.text"));
         leftGbc.gridy++;
-        panPlanetaryConditions.add(lblOtherConditions, leftGbc);
+        panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblOtherConditions.text")), leftGbc);
 
         ArrayList<String> otherConditions = new ArrayList<>();
         if (scenario.getEMI().isEMI()) {
@@ -511,10 +500,9 @@ public class CustomizeScenarioDialog extends JDialog {
         rightGbc.gridwidth = 3;
         panPlanetaryConditions.add(lblOtherConditionsDesc, rightGbc);
 
-        JLabel lblTemperature = new JLabel(resourceMap.getString("lblTemperature.text"));
         leftGbc.gridx = 2;
         leftGbc.gridy = 1;
-        panPlanetaryConditions.add(lblTemperature, leftGbc);
+        panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblTemperature.text")), leftGbc);
 
         lblTemperatureDesc = new JLabel(PlanetaryConditions.getTemperatureDisplayableName(scenario.getModifiedTemperature()));
         rightGbc.gridx = 3;
@@ -522,17 +510,15 @@ public class CustomizeScenarioDialog extends JDialog {
         rightGbc.gridwidth = 1;
         panPlanetaryConditions.add(lblTemperatureDesc, rightGbc);
 
-        JLabel lblGravity = new JLabel(resourceMap.getString("lblGravity.text"));
         leftGbc.gridy++;
-        panPlanetaryConditions.add(lblGravity, leftGbc);
+        panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblGravity.text")), leftGbc);
 
         lblGravityDesc = new JLabel(DecimalFormat.getInstance().format(scenario.getGravity()));
         rightGbc.gridy++;
         panPlanetaryConditions.add(lblGravityDesc, rightGbc);
 
-        JLabel lblAtmosphere = new JLabel(resourceMap.getString("lblAtmosphere.text"));
         leftGbc.gridy++;
-        panPlanetaryConditions.add(lblAtmosphere, leftGbc);
+        panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblAtmosphere.text")), leftGbc);
 
         lblAtmosphereDesc = new JLabel(scenario.getAtmosphere().toString());
         rightGbc.gridy++;
