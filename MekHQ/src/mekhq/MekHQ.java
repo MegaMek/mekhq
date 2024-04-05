@@ -486,6 +486,8 @@ public class MekHQ implements GameListener {
                     getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
                 }
             }
+            // we need to trigger ScenarioResolvedEvent before stopping the thread or currentScenario may become null
+            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
             gameThread.requestStop();
             // MegaMek dumps these in the deployment phase to free memory
             if (getCampaign().getCampaignOptions().isUseAtB()) {
@@ -498,7 +500,6 @@ public class MekHQ implements GameListener {
                 // This can't be null because of the above
                 Stream.of(tempImageDirectory.listFiles()).filter(file -> file.getName().endsWith(".png")).forEach(File::delete);
             }
-            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
