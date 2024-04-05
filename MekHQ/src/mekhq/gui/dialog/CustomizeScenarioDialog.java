@@ -115,6 +115,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private MarkdownEditorPanel txtReport;
     // end: markdown editors
 
+
     public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
         this.frame = parent;

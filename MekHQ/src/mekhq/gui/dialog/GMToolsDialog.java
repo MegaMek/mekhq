@@ -666,7 +666,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         getComboUnitType().addItemListener(ev -> {
             final int unitType = getComboUnitType().getSelectedIndex();
             getComboUnitWeight().setEnabled((unitType == UnitType.MEK) || (unitType == UnitType.TANK)
-                    || (unitType == UnitType.AERO));
+                    || (unitType == UnitType.AEROSPACEFIGHTER));
         });
         gbc.gridx++;
         panel.add(getComboUnitType(), gbc);
@@ -1272,6 +1272,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private boolean doesPersonPrimarilyDriveUnitType(final int unitType) {
         switch (unitType) {
             case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
                 return getPerson().getPrimaryRole().isAerospacePilot();
             case UnitType.BATTLE_ARMOR:
                 return getPerson().getPrimaryRole().isBattleArmour();

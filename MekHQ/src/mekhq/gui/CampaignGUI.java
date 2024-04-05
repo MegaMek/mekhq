@@ -116,6 +116,7 @@ public class CampaignGUI extends JPanel {
     /* For the menu bar */
     private JMenuBar menuBar;
     private JMenu menuThemes;
+    private JMenuItem miPersonnelMarket;
     private JMenuItem miContractMarket;
     private JMenuItem miUnitMarket;
     private JMenuItem miShipSearch;
@@ -673,10 +674,11 @@ public class CampaignGUI extends JPanel {
         JMenu menuMarket = new JMenu(resourceMap.getString("menuMarket.text"));
         menuMarket.setMnemonic(KeyEvent.VK_M);
 
-        JMenuItem miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
+        miPersonnelMarket = new JMenuItem(resourceMap.getString("miPersonnelMarket.text"));
         miPersonnelMarket.setMnemonic(KeyEvent.VK_P);
         miPersonnelMarket.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK));
         miPersonnelMarket.addActionListener(evt -> hirePersonMarket());
+        miPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
         menuMarket.add(miPersonnelMarket);
 
         miContractMarket = new JMenuItem(resourceMap.getString("miContractMarket.text"));
@@ -1504,6 +1506,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
+        miPersonnelMarket.setVisible(!getCampaign().getPersonnelMarket().isNone());
+
         final AbstractUnitMarket unitMarket = getCampaign().getUnitMarket();
         if (unitMarket.getMethod() != newOptions.getUnitMarketMethod()) {
             getCampaign().setUnitMarket(newOptions.getUnitMarketMethod().getUnitMarket());
@@ -1581,7 +1585,7 @@ public class CampaignGUI extends JPanel {
                 }
             }
 
-            String s = (String) JOptionPane.showInputDialog(frame,
+            String s = (techList.isEmpty()) ? null : (String) JOptionPane.showInputDialog(frame,
                     "Which tech should work on the refit?", "Select Tech",
                     JOptionPane.PLAIN_MESSAGE, null, techList.toArray(), techList.get(0));
 
@@ -2366,7 +2370,24 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
+        if(getCampaign().checkScenariosDue()) {
+            JOptionPane.showMessageDialog(null, getResourceMap().getString("dialogCheckDueScenarios.text"),
+                    getResourceMap().getString("dialogCheckDueScenarios.title"), JOptionPane.WARNING_MESSAGE);
+            evt.cancel();
+            return;
+        }
+
         if (new UnmaintainedUnitsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new PrisonersNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new UntreatedPersonnelNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
         }

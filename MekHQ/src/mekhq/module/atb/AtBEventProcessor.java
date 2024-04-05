@@ -150,7 +150,7 @@ public class AtBEventProcessor {
                 if (!campaign.getCampaignOptions().isAeroRecruitsHaveUnits()) {
                     return;
                 }
-                unitType = UnitType.AERO;
+                unitType = UnitType.AEROSPACEFIGHTER;
                 break;
             case PROTOMECH_PILOT:
                 unitType = UnitType.PROTOMEK;
@@ -173,7 +173,7 @@ public class AtBEventProcessor {
         int weight = -1;
         if (unitType == UnitType.MEK
                 || unitType == UnitType.TANK
-                || unitType == UnitType.AERO) {
+                || unitType == UnitType.AEROSPACEFIGHTER) {
             int roll = Compute.d6(2);
             if (roll < 8) {
                 return;
