@@ -49,6 +49,7 @@ import java.awt.*;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -217,8 +218,8 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlLog.setName("pnlLog");
             pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title")));
 
-            toggleLog(pnlLogHeader, pnlLog);
-            toggleLog(pnlLog, pnlLogHeader);
+            pnlLogHeader.addMouseListener(getSwitchListener(pnlLogHeader, pnlLog));
+            pnlLog.addMouseListener(getSwitchListener(pnlLog, pnlLogHeader));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -245,8 +246,8 @@ public class PersonViewPanel extends JScrollablePanel {
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             pnlScenariosLog.setVisible(false);
 
-            toggleLog(pnlScenariosLogHeader, pnlScenariosLog);
-            toggleLog(pnlScenariosLog, pnlScenariosLogHeader);
+            pnlScenariosLogHeader.addMouseListener(getSwitchListener(pnlScenariosLogHeader, pnlScenariosLog));
+            pnlScenariosLog.addMouseListener(getSwitchListener(pnlScenariosLog, pnlScenariosLogHeader));
 
 
             gridBagConstraints = new GridBagConstraints();
@@ -274,8 +275,8 @@ public class PersonViewPanel extends JScrollablePanel {
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             pnlKills.setVisible(false);
 
-            toggleLog(pnlKillsHeader, pnlKills);
-            toggleLog(pnlKills, pnlKillsHeader);
+            pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
+            pnlKills.addMouseListener(getSwitchListener(pnlKills, pnlKillsHeader));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -300,16 +301,16 @@ public class PersonViewPanel extends JScrollablePanel {
         add(Box.createGlue(), gridBagConstraints);
     }
 
-    private void toggleLog(JPanel panelA, JPanel panelB) {
-        panelA.addMouseListener(new MouseAdapter() {
+    private MouseListener getSwitchListener(JPanel current, JPanel switchTo) {
+        return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(panelA.isVisible()) {
-                    panelB.setVisible(true);
-                    panelA.setVisible(false);
+                if (current.isVisible()) {
+                    current.setVisible(false);
+                    switchTo.setVisible(true);
                 }
             }
-        });
+        };
     }
 
     /**
