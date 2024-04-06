@@ -217,25 +217,8 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlLog.setName("pnlLog");
             pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title")));
 
-            pnlLogHeader.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if(pnlLogHeader.isVisible()) {
-                        pnlLogHeader.setVisible(false);
-                        pnlLog.setVisible(true);
-                    }
-                }
-            });
-
-            pnlLog.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if(pnlLog.isVisible()) {
-                        pnlLogHeader.setVisible(true);
-                        pnlLog.setVisible(false);
-                    }
-                }
-            });
+            toggleLog(pnlLogHeader, pnlLog);
+            toggleLog(pnlLog, pnlLogHeader);
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -262,25 +245,8 @@ public class PersonViewPanel extends JScrollablePanel {
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             pnlScenariosLog.setVisible(false);
 
-            pnlScenariosLogHeader.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if(pnlScenariosLogHeader.isVisible()) {
-                        pnlScenariosLogHeader.setVisible(false);
-                        pnlScenariosLog.setVisible(true);
-                    }
-                }
-            });
-
-            pnlScenariosLog.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if(pnlScenariosLog.isVisible()) {
-                        pnlScenariosLogHeader.setVisible(true);
-                        pnlScenariosLog.setVisible(false);
-                    }
-                }
-            });
+            toggleLog(pnlScenariosLogHeader, pnlScenariosLog);
+            toggleLog(pnlScenariosLog, pnlScenariosLogHeader);
 
 
             gridBagConstraints = new GridBagConstraints();
@@ -308,25 +274,8 @@ public class PersonViewPanel extends JScrollablePanel {
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
             pnlKills.setVisible(false);
 
-            pnlKillsHeader.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if(pnlKillsHeader.isVisible()) {
-                        pnlKillsHeader.setVisible(false);
-                        pnlKills.setVisible(true);
-                    }
-                }
-            });
-
-            pnlKills.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if(pnlKills.isVisible()) {
-                        pnlKillsHeader.setVisible(true);
-                        pnlKills.setVisible(false);
-                    }
-                }
-            });
+            toggleLog(pnlKillsHeader, pnlKills);
+            toggleLog(pnlKills, pnlKillsHeader);
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -349,6 +298,18 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(Box.createGlue(), gridBagConstraints);
+    }
+
+    private void toggleLog(JPanel panelA, JPanel panelB) {
+        panelA.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if(panelA.isVisible()) {
+                    panelB.setVisible(true);
+                    panelA.setVisible(false);
+                }
+            }
+        });
     }
 
     /**
