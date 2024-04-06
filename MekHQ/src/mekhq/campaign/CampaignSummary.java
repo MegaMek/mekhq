@@ -251,6 +251,14 @@ public class CampaignSummary {
         return (int) Math.round(cargoTons) + " tons (" + (int) Math.round(cargoCapacity) + " tons capacity)";
     }
 
+    public int getCargoTons() {
+        return (int) Math.round(cargoTons);
+    }
+
+    public int getCargoCapacity() {
+        return (int) Math.round(cargoCapacity);
+    }
+
     /**
      * A report that gives information about the transportation capacity
      * @return a <code>String</code> of the report
