@@ -30,8 +30,6 @@ import megamek.common.planetaryconditions.PlanetaryConditions;
 import megamek.common.preference.PreferenceManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.force.Lance;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.unit.Unit;
@@ -290,6 +288,10 @@ class GameThread extends Thread implements CloseClientListener {
         }
     }
 
+    protected int getLanceSize(BotForce botForce) {
+        return 4;
+    }
+
     protected List<Entity> setupBotEntities(BotClient botClient, BotForce botForce, Scenario scenario) {
         String forceName = botClient.getLocalPlayer().getName() + "|0||%s Lance|%s||";
         var entities = new ArrayList<Entity>();
@@ -299,14 +301,7 @@ class GameThread extends Thread implements CloseClientListener {
         final RandomCallsignGenerator RCG = RandomCallsignGenerator.getInstance();
         String lanceName = RCG.generate();
         List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
-        AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
-        int lanceSize;
-
-        if (botForce.getTeam() == 2) {
-            lanceSize = Lance.getStdLanceSize(contract.getEnemy());
-        } else {
-            lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
-        }
+        int lanceSize = getLanceSize(botForce);
 
         Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
         comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());

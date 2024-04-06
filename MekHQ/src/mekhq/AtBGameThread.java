@@ -25,6 +25,7 @@ import megamek.client.ui.swing.ClientGUI;
 import megamek.common.*;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -408,6 +409,16 @@ public class AtBGameThread extends GameThread {
             client = null;
             swingGui = null;
             controller = null;
+        }
+    }
+
+    @Override
+    protected int getLanceSize(BotForce botForce) {
+        AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
+        if (botForce.getTeam() == 2) {
+            return Lance.getStdLanceSize(contract.getEnemy());
+        } else {
+            return Lance.getStdLanceSize(contract.getEmployerFaction());
         }
     }
 
