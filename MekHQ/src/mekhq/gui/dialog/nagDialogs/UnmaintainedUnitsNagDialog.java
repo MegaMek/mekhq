@@ -27,6 +27,15 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 import javax.swing.*;
 
 public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
+    private boolean checkHanger() {
+        for (Unit u : getCampaign().getHangar().getUnits()) {
+            if((u.isUnmaintained()) && (!u.isSalvage())) {
+                    return true;
+            }
+        }
+        return false;
+    }
+
     //region Constructors
     public UnmaintainedUnitsNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "UnmaintainedUnitsNagDialog", "UnmaintainedUnitsNagDialog.title",
@@ -37,6 +46,6 @@ public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     @Override
     protected boolean checkNag() {
         return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && getCampaign().getHangar().getUnitsStream().anyMatch(Unit::isUnmaintained);
+                && checkHanger();
     }
 }
