@@ -5329,7 +5329,7 @@ public class Campaign implements ITechManager {
 
     public int getAvailableAstechs(final int minutes, final boolean alreadyOvertime) {
         if (minutes == 0) {
-            LogManager.getLogger().error("Tried to getAvailableAstechs with 0 minutes. Returning 0 Astechs.");
+            // If 0 Astechs are assigned to the task, return 0 minutes used
             return 0;
         }
 
@@ -5351,7 +5351,6 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-
         return Math.min(Math.min(availableHelp, MHQConstants.ASTECH_TEAM_SIZE), getNumberAstechs());
     }
 
