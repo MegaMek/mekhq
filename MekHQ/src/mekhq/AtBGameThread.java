@@ -21,6 +21,7 @@ package mekhq;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.*;
 import megamek.common.planetaryconditions.PlanetaryConditions;
@@ -412,14 +413,54 @@ public class AtBGameThread extends GameThread {
         }
     }
 
-    @Override
-    protected int getLanceSize(BotForce botForce) {
+    protected List<Entity> setupBotEntities(BotClient botClient, BotForce botForce, Scenario scenario) {
+        String forceName = botClient.getLocalPlayer().getName() + "|0||%s Lance|%s||";
+        var entities = new ArrayList<Entity>();
+        int i = 0;
+        int forceIdLance = 1;
+        String lastType = "";
+        final RandomCallsignGenerator RCG = RandomCallsignGenerator.getInstance();
+        String lanceName = RCG.generate();
+        List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
+        int lanceSize;
         AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
         if (botForce.getTeam() == 2) {
-            return Lance.getStdLanceSize(contract.getEnemy());
+            lanceSize = Lance.getStdLanceSize(contract.getEnemy());
         } else {
-            return Lance.getStdLanceSize(contract.getEmployerFaction());
+            lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
         }
+
+        Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
+        comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
+        comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
+        entitiesSorted.sort(comp);
+
+        for (Entity entity : entitiesSorted) {
+            if (null == entity) {
+                continue;
+            }
+
+            if ((i != 0)
+                    && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
+                forceIdLance++;
+                lanceName = RCG.generate();
+                i = forceIdLance * lanceSize;
+            }
+
+            lastType = entity.getEntityMajorTypeName(entity.getEntityType());
+            entity.setOwner(botClient.getLocalPlayer());
+            String fName = String.format(forceName, lanceName, forceIdLance);
+            entity.setForceString(fName);
+            entities.add(entity);
+            i++;
+
+            if (i % lanceSize == 0) {
+                forceIdLance++;
+                lanceName = RCG.generate();
+            }
+        }
+
+        return entities;
     }
 
     /**
