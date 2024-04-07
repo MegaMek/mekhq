@@ -248,7 +248,7 @@ public class AtBGameThread extends GameThread {
                     // deployment parameters to this entity.
                     if ((scenario instanceof AtBDynamicScenario) &&
                             ((AtBDynamicScenario) scenario).getPlayerUnitSwaps().
-                                    containsKey(UUID.fromString(entity.getExternalIdAsString()))) {
+                                containsKey(UUID.fromString(entity.getExternalIdAsString()))) {
                         Entity benchedEntity = ((AtBDynamicScenario) scenario).getPlayerUnitSwaps().
                                 get(UUID.fromString(entity.getExternalIdAsString())).entity;
                         copyDeploymentParameters(benchedEntity, entity);
