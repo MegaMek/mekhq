@@ -278,29 +278,31 @@ class GameThread extends Thread implements CloseClientListener {
 
                 botClient.sendPlayerInfo();
 
-                String forceName = botClient.getLocalPlayer().getName() + "|1";
-                var entities = new ArrayList<Entity>();
-                // generate any random units
-                botForce.generateRandomForces(units, campaign);
-                for (Entity entity : botForce.getFullEntityList(campaign)) {
-                    if (null == entity) {
-                        continue;
-                    }
-                    entity.setOwner(botClient.getLocalPlayer());
-                    entity.setForceString(forceName);
-                    // only overwrite deployment round for entities with the botForce default if they
-                    // have an individual deployment round of zero. Otherwise, we will overwrite entity
-                    // specific deployment information.
-                    if(entity.getDeployRound() == 0) {
-                        entity.setDeployRound(botForce.getDeployRound());
-                    }
-                    entities.add(entity);
-                }
+                List<Entity> entities = setupBotEntities(botClient, botForce, scenario);
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
+    }
+
+    protected List<Entity> setupBotEntities(BotClient botClient, BotForce botForce, Scenario scenario) {
+        String forceName = botClient.getLocalPlayer().getName() + "|1";
+        var entities = new ArrayList<Entity>();
+        botForce.generateRandomForces(units, campaign);
+        for (Entity entity : botForce.getFullEntityList(campaign)) {
+            entity.setOwner(botClient.getLocalPlayer());
+            entity.setForceString(forceName);
+            // only overwrite deployment round for entities with the botForce default if they
+            // have an individual deployment round of zero. Otherwise, we will overwrite entity
+            // specific deployment information.
+            if(entity.getDeployRound() == 0) {
+                entity.setDeployRound(botForce.getDeployRound());
+            }
+            entities.add(entity);
+        }
+
+        return entities;
     }
 
     /*

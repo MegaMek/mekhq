@@ -1306,7 +1306,7 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if (campaign.getCampaignOptions().isUseToughness()) {
+        if ((campaign.getCampaignOptions().isUseToughness()) && (person.getToughness() > 0)) {
             lblTough1.setName("lblTough1");
             lblTough1.setText(resourceMap.getString("lblTough1.text"));
             gridBagConstraints = new GridBagConstraints();

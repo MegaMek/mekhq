@@ -21,14 +21,13 @@ package mekhq;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.*;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.force.Lance;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
@@ -39,6 +38,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.Comparator;
+
 
 /**
  * Enhanced version of GameThread which imports settings and non-player units into the MM game
@@ -247,7 +248,7 @@ public class AtBGameThread extends GameThread {
                     // deployment parameters to this entity.
                     if ((scenario instanceof AtBDynamicScenario) &&
                             ((AtBDynamicScenario) scenario).getPlayerUnitSwaps().
-                                containsKey(UUID.fromString(entity.getExternalIdAsString()))) {
+                                    containsKey(UUID.fromString(entity.getExternalIdAsString()))) {
                         Entity benchedEntity = ((AtBDynamicScenario) scenario).getPlayerUnitSwaps().
                                 get(UUID.fromString(entity.getExternalIdAsString())).entity;
                         copyDeploymentParameters(benchedEntity, entity);
@@ -329,7 +330,7 @@ public class AtBGameThread extends GameThread {
 
                     // chill out while bot is created and connects to megamek
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
-                    configureBot(botClient, bf);
+                    configureBot(botClient, bf, scenario);
 
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
@@ -421,7 +422,7 @@ public class AtBGameThread extends GameThread {
      * @param botClient
      * @param botForce
      */
-    private void configureBot(BotClient botClient, BotForce botForce) {
+    private void configureBot(BotClient botClient, BotForce botForce, Scenario scenario) {
         try {
             // Wait for the server to add the bot client, but allow a timeout rather than blocking
             int retryCount = 0;
@@ -445,22 +446,65 @@ public class AtBGameThread extends GameThread {
 
                 botClient.sendPlayerInfo();
 
-                String forceName = botClient.getLocalPlayer().getName() + "|1";
-                var entities = new ArrayList<Entity>();
-                for (Entity entity : botForce.getFullEntityList(campaign)) {
-                    if (null == entity) {
-                        continue;
-                    }
-                    entity.setOwner(botClient.getLocalPlayer());
-                    entity.setForceString(forceName);
-                    entity.setDeployRound(botForce.getDeployRound());
-                    entities.add(entity);
-                }
+                List<Entity> entities = setupBotEntities(botClient, botForce, scenario);
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
+    }
+
+    @Override
+    protected List<Entity> setupBotEntities(BotClient botClient, BotForce botForce, Scenario scenario) {
+        String forceName = botClient.getLocalPlayer().getName() + "|0||%s Lance|%s||";
+        var entities = new ArrayList<Entity>();
+        int i = 0;
+        int forceIdLance = 1;
+        String lastType = "";
+        final RandomCallsignGenerator RCG = RandomCallsignGenerator.getInstance();
+        String lanceName = RCG.generate();
+        botForce.generateRandomForces(units, campaign);
+        List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
+        AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
+        int lanceSize;
+
+        if (botForce.getTeam() == 2) {
+            lanceSize = Lance.getStdLanceSize(contract.getEnemy());
+        } else {
+            lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
+        }
+
+        Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
+        comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
+        comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
+        entitiesSorted.sort(comp);
+
+        for (Entity entity : entitiesSorted) {
+            if (null == entity) {
+                continue;
+            }
+
+            if ((i != 0)
+                    && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
+                forceIdLance++;
+                lanceName = RCG.generate();
+                i = forceIdLance * lanceSize;
+            }
+
+            lastType = entity.getEntityMajorTypeName(entity.getEntityType());
+            entity.setOwner(botClient.getLocalPlayer());
+            String fName = String.format(forceName, lanceName, forceIdLance);
+            entity.setForceString(fName);
+            entities.add(entity);
+            i++;
+
+            if (i % lanceSize == 0) {
+                forceIdLance++;
+                lanceName = RCG.generate();
+            }
+        }
+
+        return entities;
     }
 
     /**
