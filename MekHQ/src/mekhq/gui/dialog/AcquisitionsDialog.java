@@ -269,7 +269,7 @@ public class AcquisitionsDialog extends JDialog {
                 return;
             }
 
-            if ((partCountInfo.getMissingCount() > 0) && partCountInfo.isCanBeAcquired()) {
+            if (partCountInfo.getMissingCount() > 0) {
                 campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(),
                         partCountInfo.getMissingCount(), campaignGUI.getCampaign());
 
@@ -501,10 +501,23 @@ public class AcquisitionsDialog extends JDialog {
                 gbcActions.gridy++;
             }
 
+            if (!partCountInfo.isCanBeAcquired()) {
+                JButton btnOrderOne = new JButton("Order One (TN: Impossible)");
+                btnOrderOne.setToolTipText("Order one item");
+                btnOrderOne.setName("btnOrderOne");
+                btnOrderOne.addActionListener(ev -> {
+                    campaignGUI.getCampaign().getShoppingList().addShoppingItem(part.getAcquisitionWork(),
+                            1, campaignGUI.getCampaign());
+                    refresh();
+                });
+                actionButtons.add(btnOrderOne, gbcActions);
+                gbcActions.gridy++;
+            }
+
             btnOrderAll = new JButton("Order All (" + partCountInfo.getMissingCount() + ")");
             btnOrderAll.setToolTipText("Order all missing");
             btnOrderAll.setName("btnOrderAll");
-            btnOrderAll.setVisible(partCountInfo.isCanBeAcquired() && (partCountInfo.getMissingCount() > 1));
+            btnOrderAll.setVisible(partCountInfo.getMissingCount() > 1);
             btnOrderAll.addActionListener(ev -> orderAllMissing());
             actionButtons.add(btnOrderAll, gbcActions);
             gbcActions.gridy++;
