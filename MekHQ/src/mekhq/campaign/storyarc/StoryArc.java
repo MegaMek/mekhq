@@ -38,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -163,7 +164,7 @@ public class StoryArc {
     }
 
     private ScenarioStoryPoint findStoryPointByScenarioId(int scenarioId) {
-        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+        for (Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             if (entry.getValue() instanceof ScenarioStoryPoint) {
                 ScenarioStoryPoint storyPoint = (ScenarioStoryPoint) entry.getValue();
                 if (null != storyPoint.getScenario() && storyPoint.getScenario().getId() == scenarioId) {
@@ -176,7 +177,7 @@ public class StoryArc {
 
     public List<String> getCurrentObjectives() {
         ArrayList<String> currentObjectives = new ArrayList<>();
-        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+        for (Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             if (entry.getValue().isActive()) {
                 String objective = entry.getValue().getObjective();
                 if (!objective.isEmpty()) {
@@ -206,7 +207,7 @@ public class StoryArc {
     public void handleTransitComplete(TransitCompleteEvent ev) {
         //search through StoryPoints for a matching TravelStoryPoint
         TravelStoryPoint storyPoint;
-        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+        for (Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             if (entry.getValue() instanceof TravelStoryPoint) {
                  storyPoint = (TravelStoryPoint) entry.getValue();
                  if(ev.getLocation().getCurrentSystem().getId().equals(storyPoint.getDestinationId()) &&
@@ -223,7 +224,7 @@ public class StoryArc {
     public void handleNewDay(NewDayEvent ev) {
         // search through StoryPoints for a matching CheckDateReachedStoryPoint
         CheckDateReachedStoryPoint dateStoryPoint;
-        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+        for (Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             if (entry.getValue() instanceof CheckDateReachedStoryPoint) {
                 dateStoryPoint = (CheckDateReachedStoryPoint) entry.getValue();
                 if (null != dateStoryPoint.getDate() && ev.getCampaign().getLocalDate().equals(dateStoryPoint.getDate())) {
@@ -234,7 +235,7 @@ public class StoryArc {
         // search through StoryPoints and see if we have any active waiting story points
         ArrayList<WaitStoryPoint> toProcess = new ArrayList<WaitStoryPoint>();
         WaitStoryPoint waitStoryPoint;
-        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+        for (Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             if (entry.getValue() instanceof WaitStoryPoint) {
                 waitStoryPoint = (WaitStoryPoint) entry.getValue();
                 if(!waitStoryPoint.isActive()) {
@@ -252,7 +253,7 @@ public class StoryArc {
         Person p = ev.getPerson();
         if (null != p) {
             PersonStatusStoryPoint storyPoint;
-            for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+            for (Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
                 if (entry.getValue() instanceof PersonStatusStoryPoint) {
                     storyPoint = (PersonStatusStoryPoint) entry.getValue();
                     // is this the right person?
@@ -280,20 +281,20 @@ public class StoryArc {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "startingPointId", startingPointId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "directoryPath", directoryPath);
         MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyPoints");
-        for (Map.Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
+        for (Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             entry.getValue().writeToXml(pw1, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "storyPoints");
         if(!personalities.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "personalities");
-            for (Map.Entry<UUID, Personality> entry : personalities.entrySet()) {
+            for (Entry<UUID, Personality> entry : personalities.entrySet()) {
                 entry.getValue().writeToXml(pw1, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "personalities");
         }
         if(!customStringVariables.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "customStringVariables");
-            for (Map.Entry<String, String> entry : customStringVariables.entrySet()) {
+            for (Entry<String, String> entry : customStringVariables.entrySet()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "customStringVariable");
                 MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "key", entry.getKey());
                 MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "value", entry.getValue());
@@ -468,7 +469,7 @@ public class StoryArc {
         // tokens for customStringVariables
         Map<String, String> customVariables = c.getStoryArc().getCustomStringVariables();
         if(!customVariables.isEmpty()) {
-            for (Map.Entry<String, String> entry : customVariables.entrySet()) {
+            for (Entry<String, String> entry : customVariables.entrySet()) {
                 if (null != entry.getValue()) {
                     replacementTokens.put("\\{" + entry.getKey() + "\\}", entry.getValue());
                 }
@@ -488,7 +489,7 @@ public class StoryArc {
 
         Pattern pattern;
         Matcher matcher;
-        for (Map.Entry<String, String> replacement : replacementTokens.entrySet()) {
+        for (Entry<String, String> replacement : replacementTokens.entrySet()) {
             pattern = Pattern.compile(replacement.getKey());
             matcher = pattern.matcher(text);
             text = matcher.replaceAll(replacement.getValue());
