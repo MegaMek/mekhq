@@ -26,7 +26,6 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;

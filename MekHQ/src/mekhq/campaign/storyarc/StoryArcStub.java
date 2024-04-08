@@ -142,7 +142,7 @@ public class StoryArcStub {
     }
 
     /**
-     * @return a list of all of the story arcs in the default and userdata folders
+     * @return a list of all the story arcs in the default and userdata folders
      */
     public static List<StoryArcStub> getStoryArcStubs(boolean startNew) {
         final List<StoryArcStub> stubs = loadStoryArcStubsFromDirectory(
@@ -171,23 +171,20 @@ public class StoryArcStub {
         final List<StoryArcStub> storyArcStubs = new ArrayList<>();
         for (String arcDirectoryName : arcDirectories) {
             //find the expected items within this story arc directory
-            final File storyArcFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MHQConstants.STORY_ARC_FILE);
+            final File storyArcFile = new File(directory.getPath() + '/' +  arcDirectoryName + '/' + MHQConstants.STORY_ARC_FILE);
             if (!storyArcFile.exists()) {
                 continue;
             }
             final StoryArcStub storyArcStub = parseFromFile(storyArcFile);
-            final File initCampaignFile = new File(directory.getPath() + "/" +  arcDirectoryName + "/" + MHQConstants.STORY_ARC_CAMPAIGN_FILE);
+            final File initCampaignFile = new File(directory.getPath() + '/' +  arcDirectoryName + '/' + MHQConstants.STORY_ARC_CAMPAIGN_FILE);
             if (storyArcStub != null) {
-                storyArcStub.setDirectoryPath(directory.getPath() + "/" +  arcDirectoryName);
+                storyArcStub.setDirectoryPath(directory.getPath() + '/' +  arcDirectoryName);
                 if (initCampaignFile.exists()) {
                     storyArcStub.setInitCampaignPath(initCampaignFile.getPath());
                 }
-                if ((startNew && storyArcStub.getStoryLoadingType().canStartNew()) ||
-                        (!startNew && storyArcStub.getStoryLoadingType().canLoadExisting())) {
+                if (startNew ? storyArcStub.getStoryLoadingType().canStartNew() : storyArcStub.getStoryLoadingType().canLoadExisting()) {
                     storyArcStubs.add(storyArcStub);
                 }
-            } else {
-                int bob = 1;
             }
         }
 
@@ -195,7 +192,7 @@ public class StoryArcStub {
     }
 
     public StoryArc loadStoryArc(Campaign c) {
-        String filePath = getDirectoryPath() + "/" + MHQConstants.STORY_ARC_FILE;
+        String filePath = getDirectoryPath() + '/' + MHQConstants.STORY_ARC_FILE;
         StoryArc storyArc = StoryArc.parseFromFile(new File(filePath), c);
         if (null != storyArc) {
             storyArc.setDirectoryPath(getDirectoryPath());

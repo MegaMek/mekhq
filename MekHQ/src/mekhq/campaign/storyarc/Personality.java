@@ -57,8 +57,6 @@ public class Personality {
      * this person
      */
     private UUID personCampaignId;
-
-    protected static final String NL = System.lineSeparator();
     //endregion Variable Declarations
 
     //region Constructors

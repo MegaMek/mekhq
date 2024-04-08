@@ -69,7 +69,7 @@ public class StoryPortrait extends Portrait {
                     portrait = (Image) MHQStaticDirectoryManager.getUserStoryPortraits().getItem(category, filename);
                 }
                 if(portrait == null) {
-                    //if its still null, then try the default image
+                    //if it's still null, then try the default image
                     portrait = (Image) MMStaticDirectoryManager.getPortraits().getItem("",
                             DEFAULT_PORTRAIT_FILENAME);
                 }

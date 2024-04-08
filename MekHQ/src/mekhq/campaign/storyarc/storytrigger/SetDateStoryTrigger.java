@@ -35,7 +35,7 @@ import java.util.UUID;
 
 /**
  * This StoryTrigger will set the date in a
- * {@link mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint CheckDateReachedStoryPoint} identified by its id.
+ * {@link CheckDateReachedStoryPoint CheckDateReachedStoryPoint} identified by its id.
  * This can be used to assign dates to events where the date might not be known in advance. The date can be assigned
  * either by an actual date or by the number of days into the future from the point of this trigger.
  */
@@ -63,7 +63,7 @@ public class SetDateStoryTrigger extends StoryTrigger {
     @Override
     protected void execute() {
         StoryPoint storyPoint = getStoryArc().getStoryPoint(storyPointId);
-        if ((null == storyPoint) || !(storyPoint instanceof CheckDateReachedStoryPoint)) {
+        if (!(storyPoint instanceof CheckDateReachedStoryPoint)) {
             return;
         }
         if (null == date) {

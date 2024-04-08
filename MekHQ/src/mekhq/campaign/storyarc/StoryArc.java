@@ -256,7 +256,6 @@ public class StoryArc {
             }
         }
         // search through StoryPoints and see if we have any active waiting story points
-        ArrayList<WaitStoryPoint> toProcess = new ArrayList<WaitStoryPoint>();
         WaitStoryPoint waitStoryPoint;
         for (Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             if (entry.getValue() instanceof WaitStoryPoint) {
@@ -356,16 +355,14 @@ public class StoryArc {
                     continue;
                 }
                 Personality personality = Personality.generateInstanceFromXML(wn, c);
-                if(null != personality) {
-                    personalities.put(personality.getId(), personality);
-                }
+                personalities.put(personality.getId(), personality);
             }
         } catch (Exception e) {
             LogManager.getLogger().error(e);
         }
     }
 
-    protected void parseCustomStringVariables(NodeList nl, Campaign c) {
+    protected void parseCustomStringVariables(NodeList nl) {
         try {
             for (int x = 0; x < nl.getLength(); x++) {
                 final Node wn = nl.item(x);
@@ -373,14 +370,14 @@ public class StoryArc {
                         !wn.getNodeName().equals("customStringVariable")) {
                     continue;
                 }
-                parseCustomStringVariable(wn.getChildNodes(), c);
+                parseCustomStringVariable(wn.getChildNodes());
             }
         } catch (Exception e) {
             LogManager.getLogger().error(e);
         }
     }
 
-    protected void parseCustomStringVariable(NodeList nl, Campaign c) {
+    protected void parseCustomStringVariable(NodeList nl) {
         String key = null;
         String value = null;
         try {
@@ -435,7 +432,7 @@ public class StoryArc {
                         storyArc.parsePersonalities(wn.getChildNodes(), c);
                         break;
                     case "customStringVariables":
-                        storyArc.parseCustomStringVariables(wn.getChildNodes(), c);
+                        storyArc.parseCustomStringVariables(wn.getChildNodes());
                         break;
                     default:
                         break;
@@ -502,9 +499,9 @@ public class StoryArc {
     }
 
     /**
-     * This will replace tokens in narrative text
-     * @param text
-     * @return
+     * This method will replace tokens in narrative text
+     * @param text <code>String</code> containing the original text with tokens.
+     * @return <code>String</code> containing the text with tokens replaced.
      */
     public static String replaceTokens(String text, Campaign c) {
 

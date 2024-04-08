@@ -35,6 +35,7 @@ import java.text.ParseException;
 
 import java.util.*;
 import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * <p>The StoryPoint abstract class is the basic building block of a StoryArc. StoryPoints can do different things when
@@ -55,7 +56,7 @@ import java.util.List;
  * the default ones set in this class. This feature is what allows for branching.
  * <p>A StoryPoint can also contain a list of {@link StoryTrigger StoryTrigger} objects. StoryTriggers can be used to make
  * various changes to the campaign. These StoryTriggers will be processed upon the completion of the StoryPoint. Note
- * that if a StoryOutcome is found that matches the @link StoryPoint#getResult() getResult} method, the default
+ * that if a StoryOutcome is found that matches the {@link StoryPoint#getResult() getResult} method, the default
  * StoryTriggers specified will be replaced by those from the StoryOutcome.
  */
 public abstract class StoryPoint {
@@ -92,8 +93,6 @@ public abstract class StoryPoint {
     /** A list of StoryTriggers to execute on completion, can be overwritten by StoryOutcome */
     List<StoryTrigger> storyTriggers;
 
-    protected static final String NL = System.lineSeparator();
-
     public StoryPoint() {
         active = false;
         storyOutcomes =  new LinkedHashMap<>();
@@ -108,7 +107,7 @@ public abstract class StoryPoint {
             storyTrigger.setStoryArc(a);
         }
         //also might need to apply it to triggers in storyOutcomes
-        for (Map.Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
+        for (Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
             entry.getValue().setStoryArc(a);
         }
     }
@@ -238,7 +237,7 @@ public abstract class StoryPoint {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
         if(!storyOutcomes.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcomes");
-            for (Map.Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
+            for (Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
                 entry.getValue().writeToXml(pw1, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "storyOutcomes");
@@ -296,12 +295,13 @@ public abstract class StoryPoint {
                     for (int y = 0; y < nl2.getLength(); y++) {
                         Node wn3 = nl2.item(y);
                         // If it's not an element node, we ignore it.
-                        if (wn3.getNodeType() != Node.ELEMENT_NODE)
+                        if (wn3.getNodeType() != Node.ELEMENT_NODE) {
                             continue;
+                        }
 
                         if (!wn3.getNodeName().equalsIgnoreCase("storyOutcome")) {
                             // Error condition of sorts!
-                            // Errr, what should we do here?
+                            // Error, what should we do here?
                             LogManager.getLogger().error("Unknown node type not loaded in storyOutcomes nodes: " + wn3.getNodeName());
 
                             continue;

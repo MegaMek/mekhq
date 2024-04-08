@@ -30,7 +30,6 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
-import java.util.UUID;
 
 /**
  * This StoryTrigger will advance time a certain number of days.

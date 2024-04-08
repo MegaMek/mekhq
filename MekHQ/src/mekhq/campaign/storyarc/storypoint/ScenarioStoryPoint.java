@@ -78,7 +78,7 @@ public class ScenarioStoryPoint extends StoryPoint {
     public void start() {
         super.start();
         StoryPoint missionStoryPoint = getStoryArc().getStoryPoint(missionStoryPointId);
-        if(null != missionStoryPoint && missionStoryPoint instanceof MissionStoryPoint) {
+        if(missionStoryPoint instanceof MissionStoryPoint) {
             Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
             if (null != m & null != scenario) {
                 // set date for the scenario
@@ -115,7 +115,7 @@ public class ScenarioStoryPoint extends StoryPoint {
         //the StoryOutcomes may not include this particular outcome so if this is the case we want to find the next
         //highest enum that is present.
 
-        //if storyOutcomes are empty, then it doesn't really matter. Also if this status has an entry
+        //if storyOutcomes are empty, then it doesn't really matter. Also, if this status has an entry
         //in storyOutcomes then return it
         if(storyOutcomes.isEmpty() || null != storyOutcomes.get(status.name())) {
             return status.name();
@@ -152,7 +152,7 @@ public class ScenarioStoryPoint extends StoryPoint {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "deployedForceId", days);
         if(null != scenario) {
             //if the scenario has a valid id, then just save this because the scenario is saved
-            //and loaded elsewhere so we need to link it
+            //and loaded elsewhere so, we need to link it
             if (scenario.getId() > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenario.getId());
             } else {

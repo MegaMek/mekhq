@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * This StoryPoint creates a {@link StoryChoiceDialog StoryChoiceDialog} which offers the player
@@ -81,7 +82,7 @@ public class ChoiceStoryPoint extends StoryPoint {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "title", title);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "question", question);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "chosen", chosen);
-        for (Map.Entry<String, String> entry : choices.entrySet()) {
+        for (Entry<String, String> entry : choices.entrySet()) {
             // FIXME: not sue how to do this with attribute using new XML writing methods
             pw1.println(MHQXMLUtility.indentStr(indent)
                     +"<choice id=\""

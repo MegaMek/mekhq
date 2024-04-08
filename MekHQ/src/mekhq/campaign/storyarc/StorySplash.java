@@ -20,7 +20,6 @@
  */
 package mekhq.campaign.storyarc;
 
-import megamek.MegaMek;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.AbstractIcon;
 import mekhq.MHQStaticDirectoryManager;

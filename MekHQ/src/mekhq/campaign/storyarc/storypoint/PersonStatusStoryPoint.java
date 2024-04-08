@@ -38,8 +38,8 @@ import java.util.UUID;
 /**
  * This StoryPoint is started and completed whenever the status of a Person with a certain UUID is in a certain state.
  * Most typically this would be used to end the game if the main character is killed.
- * <p>This class differs from {@link mekhq.campaign.storyarc.storypoint.CheckPersonStatusStoryPoint} in that
- * it is activated by the listener in StoryArc rather than being called explicitly in a chain of StoryPoints.</p>
+ * <p>This class differs from {@link CheckPersonStatusStoryPoint CheckPersonStatusStoryPoint} in that it is activated by
+ * the listener in StoryArc rather than being called explicitly in a chain of StoryPoints.</p>
  */
 public class PersonStatusStoryPoint extends StoryPoint {
 
@@ -85,7 +85,7 @@ public class PersonStatusStoryPoint extends StoryPoint {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personId", personId);
         for(PersonnelStatus status : statusConditions) {
-            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "statusCondition", personId);
+            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "statusCondition", status.toString());
         }
         writeToXmlEnd(pw1, --indent);
     }

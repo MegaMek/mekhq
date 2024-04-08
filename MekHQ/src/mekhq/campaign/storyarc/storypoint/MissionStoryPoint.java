@@ -24,7 +24,6 @@ import megamek.Version;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
-import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.storyarc.StoryPoint;
 import org.apache.logging.log4j.LogManager;
@@ -44,13 +43,11 @@ import java.util.ArrayList;
  * determine success based on the percentage of successful scenarios. The default will be 50%, but this can be adjusted
  * with the <code>percentWin</code> variable.
  * <p>A MissionStoryPoint can also include a list of starting UUIDs that identify
- * {@link mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint ScenarioStoryPoint} objects, but is not required to do
- * so as scenarios can also be assigned to the mission later through a
- * {@link mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint ScenarioStoryPoint}. If multiple scenarios are included,
+ * {@link ScenarioStoryPoint ScenarioStoryPoint} objects, but is not required to do so as scenarios can also be assigned
+ * to the mission later through a{@link ScenarioStoryPoint ScenarioStoryPoint}. If multiple scenarios are included,
  * keep in mind that the player can decide which order they are completed. If the author wants to specify order, it is
  * better to start with one scenario and when that scenario is completed it can point to another
- * {@link mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint ScenarioStoryPoint}, and so on until the final scenario
- * is reached at which point a
+ * {@link ScenarioStoryPoint ScenarioStoryPoint}, and so on until the final scenario is reached at which point a
  * {@link mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger CompleteMissionStoryTrigger} is triggered.</p>
  */
 public class MissionStoryPoint extends StoryPoint {
@@ -62,7 +59,7 @@ public class MissionStoryPoint extends StoryPoint {
      * A double that tracks what percent of scenarios must be successful for successful mission. This
      * may not be relevant if mission will be closed in other ways.
      **/
-    public double percentWin;
+    private double percentWin;
 
     /**
      * A list of ScenarioStoryPoint ids to add to this mission when it is created. not all Scenarios
@@ -105,13 +102,8 @@ public class MissionStoryPoint extends StoryPoint {
         if (null != mission && mission.getStatus().isActive()) {
             //if mission status is still active then we need to figure out the correct status based on percent
             //of successful scenarios
-            double wins = 0;
-            for (Scenario s : mission.getCompletedScenarios()) {
-                if (s.getStatus().isOverallVictory()) {
-                    wins++;
-                }
-            }
-            if ((mission.getCompletedScenarios().size() > 0) &&
+            double wins = mission.getCompletedScenarios().stream().filter(s -> s.getStatus().isOverallVictory()).count();
+            if ((!mission.getCompletedScenarios().isEmpty()) &&
                     ((wins/mission.getCompletedScenarios().size()) >= percentWin)) {
                 mission.setStatus(MissionStatus.SUCCESS);
             } else {
@@ -145,7 +137,7 @@ public class MissionStoryPoint extends StoryPoint {
         }
         if(null != mission) {
             //if the mission has a valid id, then just save this because the mission is saved
-            //and loaded elsewhere so we need to link it
+            //and loaded elsewhere, so we need to link it
             if(mission.getId() > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionId", mission.getId());
             } else {

@@ -52,7 +52,7 @@ public class CheckMoreScenariosStoryPoint extends StoryPoint {
     @Override
     protected String getResult() {
         StoryPoint missionStoryPoint = getStoryArc().getStoryPoint(missionStoryPointId);
-        if ((null != missionStoryPoint) && (missionStoryPoint instanceof MissionStoryPoint)) {
+        if (missionStoryPoint instanceof MissionStoryPoint) {
             Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
             if ((null != m) && (m.getCurrentScenarios().isEmpty())) {
                 return "false";

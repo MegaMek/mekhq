@@ -22,7 +22,6 @@ package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -43,7 +42,7 @@ public class RemoveUnitStoryTrigger extends StoryTrigger {
     /** ArrayList of UUID unit ids to remove **/
     ArrayList<UUID> unitIds = new ArrayList<UUID>();
 
-    /** booolean to remove all units **/
+    /** boolean to remove all units **/
     boolean removeAll = false;
 
     @Override

@@ -60,7 +60,7 @@ public class StoryOutcome {
 
     /**
      * Set the StoryArc on all StoryTriggers here
-     * @param a
+     * @param a a {@link StoryArc StoryArc}
      */
     public void setStoryArc(StoryArc a) {
         for(StoryTrigger storyTrigger : storyTriggers) {

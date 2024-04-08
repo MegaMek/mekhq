@@ -24,6 +24,7 @@ import megamek.Version;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import mekhq.MekHQ;
+import mekhq.gui.dialog.CreateCharacterDialog.NameRestrictions;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomSkillPreferences;
@@ -41,14 +42,12 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.CreateCharacterDialog;
-import org.apache.commons.math3.genetics.RandomKey;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.Enumeration;
 import java.util.UUID;
 
@@ -91,7 +90,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     private boolean editBirthday;
     private boolean editGender;
     private boolean limitFaction;
-    private CreateCharacterDialog.NameRestrictions nameRestrictions;
+    private NameRestrictions nameRestrictions;
 
     /** ids to assign person to unit and force **/
     private UUID assignedUnitId;
@@ -111,9 +110,8 @@ public class CreateCharacterStoryPoint extends StoryPoint {
 
         editOrigin = false;
         editBirthday = false;
-        editBirthday = false;
         limitFaction = false;
-        nameRestrictions = CreateCharacterDialog.NameRestrictions.NONE;
+        nameRestrictions = NameRestrictions.NONE;
 
     }
 
@@ -155,7 +153,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
             p.setId(personId);
         }
 
-        // need to generate basic skills in order to get any phenotype bonuses
+        // We need to generate basic skills in order to get any phenotype bonuses
         // everything will be set to just produce the minimum proficiency in the role's
         // necessary skills
         RandomSkillPreferences skillPrefs = new RandomSkillPreferences();
@@ -173,7 +171,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(skillPrefs);
         skillGenerator.generateSkills(getCampaign(), p, SkillType.EXP_ULTRA_GREEN);
 
-        p.setBirthday(getCampaign().getLocalDate().minus(age, ChronoUnit.YEARS));
+        p.setBirthday(getCampaign().getLocalDate().minusYears(age));
 
         return p;
     }
@@ -295,7 +293,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitFaction")) {
                     limitFaction = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }  else if (wn2.getNodeName().equalsIgnoreCase("nameRestrictions")) {
-                    nameRestrictions = CreateCharacterDialog.NameRestrictions.valueOf(wn2.getTextContent().trim());
+                    nameRestrictions = NameRestrictions.valueOf(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("instructions")) {
                     instructions = wn2.getTextContent().trim();
                 } else if (wn2.getNodeName().equalsIgnoreCase("assignedUnitId")) {

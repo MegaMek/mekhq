@@ -18,8 +18,6 @@
  */
 package mekhq.campaign.storyarc.enums;
 
-import megamek.common.Compute;
-
 /**
  * This enum indicates whether a story arc has to start a new campaign, can be added to an existing
  * campaign or both.
