@@ -31,6 +31,9 @@ import java.io.PrintWriter;
 import java.io.Serializable;
 import java.text.ParseException;
 
+/**
+ * This StoryPoint rolls some dice and returns the result. It can be used when some randomization is required.
+ */
 public class RollDiceStoryPoint extends StoryPoint {
 
     private int ndice;

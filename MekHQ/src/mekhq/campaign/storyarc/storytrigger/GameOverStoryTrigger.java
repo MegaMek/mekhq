@@ -29,6 +29,10 @@ import org.w3c.dom.Node;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+/**
+ * A StoryTrigger to end the game by killing the current campaign and putting the player back in the startup screen.
+ * This would typically be used for game failure (i.e. main character is killed).
+ */
 public class GameOverStoryTrigger extends StoryTrigger {
 
     @Override

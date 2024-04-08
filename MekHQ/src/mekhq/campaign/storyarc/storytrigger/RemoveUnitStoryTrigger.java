@@ -35,6 +35,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * A StoryTrigger to remove a set of Units from the Campaign.
+ */
 public class RemoveUnitStoryTrigger extends StoryTrigger {
 
     /** ArrayList of UUID unit ids to remove **/

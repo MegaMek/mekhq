@@ -33,8 +33,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 
 /**
- * Extends the StoryPoint class and implements a simple narrative description that will be made visible to the player
- * immediately.
+ * This story point creates a {@link StoryNarrativeDialog StoryNarrativeDialog} with a simple narrative description.
  */
 public class NarrativeStoryPoint extends StoryPoint {
 

@@ -36,6 +36,9 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+/**
+ * A StoryTrigger that adds a Unit to the Campaign.
+ */
 public class AddUnitStoryTrigger extends StoryTrigger {
 
     String entityName;

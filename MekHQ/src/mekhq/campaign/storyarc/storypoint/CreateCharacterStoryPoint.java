@@ -52,6 +52,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Enumeration;
 import java.util.UUID;
 
+/**
+ * This StoryPoint opens a {@link CreateCharacterDialog CreateCharacterDialog} which allows a player to create a new
+ * character. Various initial values can be set, as well as an initial experience point pool. Additionally, the ability
+ * to edit certain parts of the character can be restricted.
+ */
 public class CreateCharacterStoryPoint extends StoryPoint {
 
     /** how much XP does the player have to spend on the character **/

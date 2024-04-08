@@ -34,9 +34,10 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 /**
- * This StoryTrigger subclass will set the date in a CheckDateReachedStoryPoint identified by its id. This can be used
- * to assign dates to events where the date might not be known in advance. The date can be assigned either by an
- * actual date or by the number of days into the future from the point of this trigger.
+ * This StoryTrigger will set the date in a
+ * {@link mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint CheckDateReachedStoryPoint} identified by its id.
+ * This can be used to assign dates to events where the date might not be known in advance. The date can be assigned
+ * either by an actual date or by the number of days into the future from the point of this trigger.
  */
 public class SetDateStoryTrigger extends StoryTrigger {
 

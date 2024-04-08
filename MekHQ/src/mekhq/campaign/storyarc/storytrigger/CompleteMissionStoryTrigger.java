@@ -37,7 +37,7 @@ import java.util.UUID;
 
 /**
  * A trigger that completes a mission. It can optionally include information on the final victory
- * status of the mission
+ * status of the mission.
  */
 public class CompleteMissionStoryTrigger extends StoryTrigger {
 

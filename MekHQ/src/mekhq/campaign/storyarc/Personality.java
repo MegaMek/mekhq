@@ -36,9 +36,8 @@ import java.util.UUID;
  * The personality class holds information about a personality that may interact with the players during the
  * story arc. This personality may be drawn from the campaign's own personnel, but does not necessarily need to
  * do so. So it could be an employer, a liaison, a rival, etc.
- *
- * The Personality class mainly contains a Portrait and a title that is used when displaying story related dialogs
- * associated with the Personality
+ * <p>The Personality class mainly contains a Portrait and a title that is used when displaying story related dialogs
+ * associated with the Personality</p>
  */
 public class Personality {
 

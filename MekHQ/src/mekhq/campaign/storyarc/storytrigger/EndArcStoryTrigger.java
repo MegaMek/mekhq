@@ -28,6 +28,10 @@ import org.w3c.dom.Node;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+/**
+ * A StoryTrigger to end the story arc. This is usually used for successful completion as the campaign will remain
+ * open but the arc will be unloaded from the campaign.
+ */
 public class EndArcStoryTrigger extends StoryTrigger {
 
     @Override

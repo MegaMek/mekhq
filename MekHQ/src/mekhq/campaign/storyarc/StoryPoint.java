@@ -37,12 +37,27 @@ import java.util.*;
 import java.util.List;
 
 /**
- * The StoryPoint abstract class is the basic building block of a StoryArc. StoryPoints can do
- * different things when they are started. When they are completed they may start other story points as
- * determined by the specific class and user input. StoryPoints are started in one of the following ways:
- *  - By being selected as the next story point by a prior StoryPoint
- *  - By meeting the trigger conditions that are checked in various places in Campaign such as a specific date
- **/
+ * <p>The StoryPoint abstract class is the basic building block of a StoryArc. StoryPoints can do different things when
+ * they are started. When they are completed they may start other story points as determined by the specific class and
+ * user input. StoryPoints are started in one of the following ways: (1) by being selected as the next story point by
+ * a prior StoryPoint; (2) by meeting the trigger conditions that {@link StoryArc StoryArc} listens for.
+ * <p>When a StoryPoint is started, it runs the {@link StoryPoint#start() start} method. This method will often be
+ * overridden by extending classes, but overriding methods should include `super.start()` at the beginning.
+ * <p>When a StoryPoint is done, it runs the {@link StoryPoint#complete() complete} method. This method will also
+ * often be overwritten by extending classes, but such methods should include `super.complete()` at the end to ensure
+ * StoryTriggers and StoryOutcomes are processed.
+ * <p>A StoryPoint should always return a String with the {@link StoryPoint#getResult() getResult} method. This abstract
+ * method must be supplied in all concrete classes. It can be used to indicate different possible outcomes from the
+ * StoryPoint.
+ * <p>A StoryPoint can contain a hash of {@link StoryOutcome StoryOutcome} objects. The key for the hash is a particular
+ * result from the {@link StoryPoint#getResult() getResult} method. When a story point is completed, a StoryOutcome
+ * matching the result will be looked for. If one is found, its `nextStoryPointId` and StoryTriggers will replace
+ * the default ones set in this class. This feature is what allows for branching.
+ * <p>A StoryPoint can also contain a list of {@link StoryTrigger StoryTrigger} objects. StoryTriggers can be used to make
+ * various changes to the campaign. These StoryTriggers will be processed upon the completion of the StoryPoint. Note
+ * that if a StoryOutcome is found that matches the @link StoryPoint#getResult() getResult} method, the default
+ * StoryTriggers specified will be replaced by those from the StoryOutcome.
+ */
 public abstract class StoryPoint {
 
     /** The story arc that this story point is a part of **/
@@ -127,7 +142,8 @@ public abstract class StoryPoint {
     }
 
     /**
-     * Complete the storyp point. Specific story point types may need to override this.
+     * Complete the story point, by processing outcomes, triggers, and proceeding to the next story point. Specific
+     * story point types may need to override this.
      */
     public void complete() {
         active = false;
@@ -139,6 +155,10 @@ public abstract class StoryPoint {
 
     }
 
+    /**
+     * Identify if a {@link StoryOutcome StoryOutcome} has a key matching the result and replace default nextStoryPointId
+     * and StoryTriggers if found.
+     */
     private void processOutcomes() {
         StoryOutcome chosenOutcome = storyOutcomes.get(getResult());
         if(null != chosenOutcome) {
@@ -147,14 +167,27 @@ public abstract class StoryPoint {
         }
     }
 
+    /**
+     * Iterate through current list of {@link StoryTrigger StoryTrigger} objects and execute each of them in turn.
+     */
     private void processTriggers() {
         for(StoryTrigger storyTrigger : storyTriggers) {
             storyTrigger.execute();
         }
     }
 
+    /**
+     * Returns a string specifying the result from this StoryPoint. This can be used to identify different possible
+     * results, when multiple results are possible. If different results are not possible, an empty string can be
+     * returned.
+     * @return A String specifying the result
+     */
     protected abstract String getResult();
 
+    /**
+     * Returns a string to be used in the "Objectives" panel so players know what they should be doing next.
+     * @return a <code>String</code> indicating what to show in the objective screen.
+     */
     protected String getObjective() {
         return "";
     }
@@ -179,6 +212,10 @@ public abstract class StoryPoint {
     }
 
 
+    /**
+     * Get the {@link Personality Personality} associated with this StoryPoint.
+     * @return A {@link Personality Personality} or null if no Personality is associated with the StoryPoint.
+     */
     public Personality getPersonality() {
         if(null == personalityId) {
             return null;

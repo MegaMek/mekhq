@@ -34,6 +34,10 @@ import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * This StoryPoint creates a {@link StoryChoiceDialog StoryChoiceDialog} which offers the player
+ * potentially more than one possible choice or response.
+ */
 public class ChoiceStoryPoint extends StoryPoint {
 
     private String title;

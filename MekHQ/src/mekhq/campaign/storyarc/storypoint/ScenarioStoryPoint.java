@@ -38,8 +38,8 @@ import java.text.ParseException;
 import java.util.UUID;
 
 /**
- * Adds a scenario to the identified mission. Note that it will also create an id on the given scenario in campaign and
- * that scenario will trigger complete upon completion.
+ * Adds a scenario to the identified mission. The listener in StoryArc will listen for the completion of the
+ * added scenario and then complete the StoryPoint.
  */
 public class ScenarioStoryPoint extends StoryPoint {
 

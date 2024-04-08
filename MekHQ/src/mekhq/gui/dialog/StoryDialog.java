@@ -28,8 +28,7 @@ import java.awt.event.ActionListener;
 
 
 /**
- * This is the base class for dialogs related to the Story Arc, to help create a similar look and feel
- *
+ * This is the base class for dialogs related to the Story Arc, to help create a similar look and feel.
  * Inheriting classes must call initialize() in their constructors and override getMainPanel()
  */
 public abstract class StoryDialog extends JDialog implements ActionListener {

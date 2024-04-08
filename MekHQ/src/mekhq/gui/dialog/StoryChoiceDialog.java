@@ -31,6 +31,10 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Map;
 
+/**
+ * Creates a {@link StoryDialog StoryDialog} with an optional image, text, and choices from which the player can
+ * choose a response.
+ */
 public class StoryChoiceDialog extends StoryDialog implements KeyListener {
 
     private JList<String> choiceList;

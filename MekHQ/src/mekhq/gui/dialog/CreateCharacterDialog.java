@@ -57,7 +57,6 @@ import java.util.stream.Collectors;
 
 /**
  * This dialog is used to create a character in story arcs from a pool of XP
- * @author  Jay Lawson <jaylawson39 at yahoo.com>
  */
 public class CreateCharacterDialog extends JDialog implements DialogOptionListener {
 

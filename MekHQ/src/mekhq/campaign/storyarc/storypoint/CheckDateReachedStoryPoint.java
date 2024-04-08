@@ -33,8 +33,20 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDate;
 
+/**
+ * StoryPoint to check whether a certain date has been reached. The {@link mekhq.campaign.storyarc.StoryArc StoryArc} will
+ * check for StoryPoints of this class whenever a new day is reached and if the date matches, this StoryPoint will start
+ * and complete.
+ * <p>if the exact date cannot be known ahead of time, date can be left null initially and a
+ * {@link mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger SetDateStoryTrigger} can be used by another story
+ * point to assign a date some specified number of days in the future.
+ */
 public class CheckDateReachedStoryPoint extends StoryPoint {
 
+    /**
+     * The date to be checked. If null, this StoryPoint will be ignored when checking a new day. Date can be
+     * set later with {@link mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger SetDateStoryTrigger}.
+     */
     private LocalDate date;
 
     public CheckDateReachedStoryPoint() {

@@ -38,9 +38,20 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * A StoryPoint class to start a new mission. This will pull from hash of possible missions in StoryArc. Because
- * Story missions need to be related to an actual integer id in the campaign, all story missions should be unique,
- * i.e. non-repeatable. Scenarios however can be repeatable.
+ * A StoryPoint class to start a new mission. A MissionStoryPoint will not complete until triggered by a
+ * {@link mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger CompleteMissionStoryTrigger}. That trigger
+ * may include the final status of the mission (i.e. Success, Failure). If it does not, the MissionStoryPoint will
+ * determine success based on the percentage of successful scenarios. The default will be 50%, but this can be adjusted
+ * with the <code>percentWin</code> variable.
+ * <p>A MissionStoryPoint can also include a list of starting UUIDs that identify
+ * {@link mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint ScenarioStoryPoint} objects, but is not required to do
+ * so as scenarios can also be assigned to the mission later through a
+ * {@link mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint ScenarioStoryPoint}. If multiple scenarios are included,
+ * keep in mind that the player can decide which order they are completed. If the author wants to specify order, it is
+ * better to start with one scenario and when that scenario is completed it can point to another
+ * {@link mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint ScenarioStoryPoint}, and so on until the final scenario
+ * is reached at which point a
+ * {@link mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger CompleteMissionStoryTrigger} is triggered.</p>
  */
 public class MissionStoryPoint extends StoryPoint {
 

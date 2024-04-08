@@ -31,6 +31,9 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+/**
+ * A StoryTrigger that adds a Person to the Campaign.
+ */
 public class AddPersonStoryTrigger extends StoryTrigger {
 
     private Person person;

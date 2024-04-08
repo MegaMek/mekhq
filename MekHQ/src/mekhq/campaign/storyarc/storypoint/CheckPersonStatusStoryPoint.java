@@ -33,6 +33,11 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.UUID;
 
+/**
+ * This StoryPoint checks the status of a Person in the campaign by their UUID and returns the raw status enum value
+ * (e.g. ACTIVE, KIA) as the result. Can be used, for example, to check whether a person is active before assigning
+ * them a dialog.
+ */
 public class CheckPersonStatusStoryPoint extends StoryPoint {
 
     private UUID personId;

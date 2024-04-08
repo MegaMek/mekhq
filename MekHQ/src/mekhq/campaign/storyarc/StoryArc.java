@@ -43,7 +43,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The Story Arc class manages a given story arc campaign
+ * The Story Arc class manages a given story arc campaign.
+ * <p>The main component that makes up a story arc is a series of {@link StoryPoint StoryPoint} objects. These objects are
+ * tracked in a hash on StoryArc by their uuid. Each StoryPoint can point to other StoryPoints and this can be used
+ * to chain StoryPoints together into a (potentially branching) narrative. More information on how StoryPoints work is
+ * provided in that class.
+ * <p>A secondary hash of {@link Personality Personality} objects contains information on characters that may be associated
+ * with the story arc.
+ * <p>The StoryArc uses listeners to implement several handle methods that are waiting for various events to happen
+ * in the game. These are used to complete certain StoryPoints that are left active after starting (e.g. wait for a
+ * scenario to be completed).
+ * <p>The StoryArc also tracks a has of string variables that can be used to track variables associated with the story
+ * arc that might change (e.g. said yes or no to some question).
+ * <p><strong>A note to future developers:</strong> I have tried to implement story arcs in a way that makes adding future
+ * features straightforward and avoids creating complexity and bloat. Most questions of "How can I add this feature?"
+ * should be addressable by creating new StoryPoint and/or StoryTrigger classes and should not require modifying the
+ * fundamental architecture of Story Arcs.
+ *
+ * @author Aaron Gullickson (Taharqa)
+ *
  */
 public class StoryArc {
 
@@ -74,7 +92,12 @@ public class StoryArc {
     /** directory path to this story arc **/
     private String directoryPath;
 
-    /** a hash map of replacements for tokens in the narrative strings */
+    /**
+     * A hash map of replacements for tokens in the narrative strings. The text will be searched for passages matching
+     * the String used for the key and will replace this with the String supplied by the value. Tokens in the text should
+     * be surrounded by curly brackets. For example, &#123;commanderName&#125; in the text would be replaced with the full
+     * name of the most senior active commander in the campaign.
+    **/
     private static Map<String, String> replacementTokens;
 
     public StoryArc() {

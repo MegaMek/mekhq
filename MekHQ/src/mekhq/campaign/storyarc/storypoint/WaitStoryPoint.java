@@ -33,7 +33,7 @@ import java.text.ParseException;
 import java.time.LocalDate;
 
 /**
- * A StoryPoint that waits until a certain number of days pass before completing
+ * A StoryPoint that waits until a certain number of days pass before completing.
  */
 public class WaitStoryPoint extends StoryPoint {
 

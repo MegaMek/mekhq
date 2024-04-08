@@ -31,6 +31,9 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+/**
+ * A StoryTrigger to change the value of a stored string variable in StoryArc.
+ */
 public class ChangeStringVariableStoryTrigger extends StoryTrigger {
 
     String key;

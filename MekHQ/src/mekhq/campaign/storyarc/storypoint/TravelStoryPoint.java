@@ -35,6 +35,10 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+/**
+ * This StoryPoint begins transit to some destination on the map. It completes when the campaign arrives at this
+ * destination.
+ */
 public class TravelStoryPoint extends StoryPoint {
 
     //region Variable Declarations

@@ -31,9 +31,16 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+/**
+ * This StoryPoint checks the value of a stored string variable from the
+ * {@link mekhq.campaign.storyarc.StoryArc StoryArc}. It returns the result of that value.
+ */
 public class CheckStringVariableStoryPoint extends StoryPoint {
 
-    String key;
+    /**
+     * the key of the desired variable
+     */
+    private String key;
 
     public CheckStringVariableStoryPoint() {
         super();

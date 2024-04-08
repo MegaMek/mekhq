@@ -31,7 +31,7 @@ import java.awt.*;
 import java.io.PrintWriter;
 
 /**
- * This class just extends the Portrait class to look in the story arc data directory
+ * This class extends the Portrait class to look in the story arc data directory
  * for additional portraits that may be available. It could be extended in other ways in the future
  * if needed.
  */

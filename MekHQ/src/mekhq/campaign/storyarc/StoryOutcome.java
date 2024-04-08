@@ -33,8 +33,9 @@ import java.util.UUID;
 import java.util.ArrayList;
 
 /**
- * This class governs what happens when a story point is completed. It will override the default outcomes for that
- * story point
+ * This class controls what happens when a story point is completed and a certain result is achieved. Basically, it
+ * tracks an alternate `nextStoryPointId` and a list of {@link StoryTrigger StoryTrigger} objects that will replace
+ *  the default
  */
 public class StoryOutcome {
 

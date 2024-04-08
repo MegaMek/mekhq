@@ -25,6 +25,9 @@ import mekhq.gui.utilities.MarkdownRenderer;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Creates a simple narrative {@link StoryDialog StoryDialog} with an optional image and text.
+ */
 public class StoryNarrativeDialog extends StoryDialog {
 
     //region Constructors

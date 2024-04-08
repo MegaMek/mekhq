@@ -32,6 +32,10 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
+/**
+ * This StoryTrigger will switch the active tab in the main CampaignGUI. It is useful if you want to direct the player's
+ * attention somewhere.
+ */
 public class SwitchTabStoryTrigger extends StoryTrigger {
 
     MHQTabType tab;
