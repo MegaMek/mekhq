@@ -64,9 +64,7 @@ public class StoryArc {
     /** A hash of possible personalities that the player might interact with in this story arc **/
     private Map<UUID, Personality> personalities;
 
-    /**
-     * a hash of custom string variables that the creator might specify with a string key
-     */
+    /** a hash of custom string variables that the creator might specify with a string key **/
     private Map<String, String> customStringVariables;
 
     /** directory path to the initial campaign data for this StoryArc - can be null **/
@@ -152,7 +150,10 @@ public class StoryArc {
 
     public void begin() {
         MekHQ.registerHandler(this);
-        getStoryPoint(getStartingPointId()).start();
+        // starting point can be null if the arc depends on a check to get started
+        if(getStartingPointId() != null ) {
+            getStoryPoint(getStartingPointId()).start();
+        }
     }
 
     public void initializeDataDirectories() {
