@@ -23,7 +23,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
 import mekhq.gui.baseComponents.AbstractMHQScrollPane;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
-import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.renderers.StoryArcRenderer;
 import mekhq.campaign.storyarc.StoryArcStub;
 

@@ -76,7 +76,7 @@ public class StoryArcPanel extends AbstractMHQPanel {
     //region Initialization
     @Override
     protected void initialize() {
-        // Setup the Panel
+        // Set up the Panel
         setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createLineBorder(Color.BLACK, 2)));

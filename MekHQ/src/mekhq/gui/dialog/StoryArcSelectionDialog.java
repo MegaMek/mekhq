@@ -22,7 +22,6 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.gui.baseComponents.AbstractMHQButtonDialog;
 import mekhq.gui.panes.StoryArcSelectionPane;
-import mekhq.campaign.storyarc.StoryArc;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;

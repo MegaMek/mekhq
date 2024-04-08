@@ -21,7 +21,6 @@ package mekhq.gui.dialog;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
-import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
@@ -29,7 +28,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * Creates a {@link StoryDialog StoryDialog} with an optional image, text, and choices from which the player can
@@ -38,7 +38,7 @@ import java.util.Map;
 public class StoryChoiceDialog extends StoryDialog implements KeyListener {
 
     private JList<String> choiceList;
-    private java.util.List<String> choices;
+    private List<String> choices;
 
     //region Constructors
     public StoryChoiceDialog(final JFrame parent, ChoiceStoryPoint sEvent) {
@@ -90,7 +90,7 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
         choicePanel.setLayout(new BoxLayout(choicePanel, BoxLayout.PAGE_AXIS));
         DefaultListModel<String> listModel = new DefaultListModel<>();
         int idx = 1;
-        for (Map.Entry<String, String> entry : ((ChoiceStoryPoint) getStoryPoint()).getChoices().entrySet()) {
+        for (Entry<String, String> entry : ((ChoiceStoryPoint) getStoryPoint()).getChoices().entrySet()) {
             choices.add(entry.getKey());
             listModel.addElement(idx + "- " + entry.getValue());
             idx++;

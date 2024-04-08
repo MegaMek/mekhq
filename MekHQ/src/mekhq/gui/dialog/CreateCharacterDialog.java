@@ -37,7 +37,6 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.storyarc.storypoint.CreateCharacterStoryPoint;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
@@ -53,6 +52,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /**
@@ -157,7 +157,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
         setTitle(resourceMap.getString("Form.title"));
 
@@ -175,19 +175,17 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private JPanel getDemogPanel() {
 
-        GridBagConstraints gridBagConstraints;
-
         JPanel demogPanel = new JPanel(new GridBagLayout());
         JLabel lblName = new JLabel();
         JLabel lblGender = new JLabel();
         JLabel lblBday = new JLabel();
-        lblAge = new javax.swing.JLabel();
+        lblAge = new JLabel();
         JLabel lblNickname = new JLabel();
         JLabel lblBloodname = new JLabel();
-        JPanel panName = new javax.swing.JPanel(new java.awt.GridBagLayout());
-        textNickname = new javax.swing.JTextField();
-        textBloodname = new javax.swing.JTextField();
-        textToughness = new javax.swing.JTextField();
+        JPanel panName = new JPanel(new GridBagLayout());
+        textNickname = new JTextField();
+        textBloodname = new JTextField();
+        textToughness = new JTextField();
         JLabel lblToughness = new JLabel();
 
         JButton btnRandomName = new JButton();
@@ -197,11 +195,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         lblName.setText(resourceMap.getString("lblName.text"));
         lblName.setName("lblName");
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         demogPanel.add(lblName, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
@@ -242,24 +240,24 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         gridBagConstraints.gridx = 4;
         panName.add(textPostNominal, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         demogPanel.add(panName, gridBagConstraints);
 
         btnRandomName.setText(resourceMap.getString("btnRandomName.text")); // NOI18N
         btnRandomName.setName("btnRandomName"); // NOI18N
         btnRandomName.addActionListener(evt -> randomName());
         btnRandomName.setEnabled(nameRestrictions != NameRestrictions.NONE);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
         demogPanel.add(btnRandomName, gridBagConstraints);
 
         y++;
@@ -267,11 +265,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         if (person.isClanPersonnel()) {
             lblBloodname.setText(resourceMap.getString("lblBloodname.text")); // NOI18N
             lblBloodname.setName("lblBloodname"); // NOI18N
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demogPanel.add(lblBloodname, gridBagConstraints);
 
             textBloodname.setMinimumSize(new Dimension(150, 28));
@@ -296,21 +294,21 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         } else {
             lblNickname.setText(resourceMap.getString("lblNickname.text"));
             lblNickname.setName("lblNickname");
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demogPanel.add(lblNickname, gridBagConstraints);
 
             textNickname.setText(person.getCallsign());
             textNickname.setName("textNickname");
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
             gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.BOTH;
             demogPanel.add(textNickname, gridBagConstraints);
 
             JButton btnRandomCallsign = new JButton(resourceMap.getString("btnRandomCallsign.text"));
@@ -324,11 +322,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         lblGender.setText(resourceMap.getString("lblGender.text")); // NOI18N
         lblGender.setName("lblGender"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         demogPanel.add(lblGender, gridBagConstraints);
 
         DefaultComboBoxModel<Gender> genderModel = new DefaultComboBoxModel<>();
@@ -339,23 +337,23 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         choiceGender.setName("choiceGender");
         choiceGender.setSelectedItem(person.getGender().isExternal() ? person.getGender()
                 : person.getGender().getExternalVariant());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         demogPanel.add(choiceGender, gridBagConstraints);
         choiceGender.setEnabled(editGender);
 
         y++;
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         demogPanel.add(new JLabel("Origin Faction:"), gridBagConstraints);
 
         DefaultComboBoxModel<Faction> factionsModel = getFactionsComboBoxModel();
@@ -393,23 +391,23 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
                 filterPlanetarySystemsForOurFaction(true);
             }
         });
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         demogPanel.add(choiceFaction, gridBagConstraints);
         choiceFaction.setEnabled(editOrigin);
 
         y++;
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         demogPanel.add(new JLabel("Origin System:"), gridBagConstraints);
 
         DefaultComboBoxModel<Planet> planetsModel = new DefaultComboBoxModel<>();
@@ -447,34 +445,34 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             updatePlanetsComboBoxModel(planetsModel, selectedSystem);
         });
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         demogPanel.add(choiceSystem, gridBagConstraints);
 
         chkOnlyOurFaction = new JCheckBox("Faction Specific");
         chkOnlyOurFaction.addActionListener(e -> filterPlanetarySystemsForOurFaction(chkOnlyOurFaction.isSelected()));
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         demogPanel.add(chkOnlyOurFaction, gridBagConstraints);
 
         y++;
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         demogPanel.add(new JLabel("Origin Planet:"), gridBagConstraints);
 
         choicePlanet.setRenderer(new DefaultListCellRenderer() {
@@ -538,13 +536,13 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         chkClan = new JCheckBox("Clanner");
         chkClan.setSelected(person.isClanPersonnel());
         chkClan.addItemListener(et -> backgroundChanged());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
         demogPanel.add(chkClan, gridBagConstraints);
         chkClan.setEnabled(editOrigin);
 
@@ -552,30 +550,30 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         lblBday.setText(resourceMap.getString("lblBday.text")); // NOI18N
         lblBday.setName("lblBday"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         demogPanel.add(lblBday, gridBagConstraints);
 
         btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(birthdate));
         btnDate.setName("btnDate");
         btnDate.addActionListener(this::btnDateActionPerformed);
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
         demogPanel.add(btnDate, gridBagConstraints);
         btnDate.setEnabled(editBirthday);
 
         lblAge.setText(person.getAge(campaign.getLocalDate()) + " " + resourceMap.getString("age")); // NOI18N
         lblAge.setName("lblAge"); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = y;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(0, 5, 0, 0);
         demogPanel.add(lblAge, gridBagConstraints);
 
         y++;
@@ -587,17 +585,17 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textToughness.setName("textToughness"); // NOI18N
 
         if (campaign.getCampaignOptions().isUseToughness()) {
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
             demogPanel.add(lblToughness, gridBagConstraints);
-            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             demogPanel.add(textToughness, gridBagConstraints);
         }
 
@@ -605,15 +603,15 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         txtBio = new MarkdownEditorPanel("Biography");
         txtBio.setText(person.getBiography());
-        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = y;
         gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         demogPanel.add(txtBio, gridBagConstraints);
 
         return demogPanel;
@@ -662,23 +660,23 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         rightPanel.add(topPanel, BorderLayout.PAGE_START);
 
         JScrollPane scrOptions = new JScrollPane();
-        panOptions = new javax.swing.JPanel();
+        panOptions = new JPanel();
         JScrollPane scrSkills = new JScrollPane();
-        panSkills = new javax.swing.JPanel();
+        panSkills = new JPanel();
 
         JTabbedPane tabStats = new JTabbedPane();
 
         panSkills.setName("panSkills"); // NOI18N
         refreshSkills();
         scrSkills.setViewportView(panSkills);
-        scrSkills.setMinimumSize(new java.awt.Dimension(500, 500));
-        scrSkills.setPreferredSize(new java.awt.Dimension(500, 500));
+        scrSkills.setMinimumSize(new Dimension(500, 500));
+        scrSkills.setPreferredSize(new Dimension(500, 500));
 
         panOptions.setName("panOptions"); // NOI18N
         refreshOptions();
         scrOptions.setViewportView(panOptions);
-        scrOptions.setMinimumSize(new java.awt.Dimension(500, 500));
-        scrOptions.setPreferredSize(new java.awt.Dimension(500, 500));
+        scrOptions.setMinimumSize(new Dimension(500, 500));
+        scrOptions.setPreferredSize(new Dimension(500, 500));
 
         tabStats.addTab(resourceMap.getString("scrSkills.TabConstraints.tabTitle"), scrSkills); // NOI18N
         if (campaign.getCampaignOptions().isUseAbilities() || campaign.getCampaignOptions().isUseImplants()) {
@@ -819,7 +817,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         c.gridwidth = 1;
         c.fill = GridBagConstraints.NONE;
-        c.insets = new java.awt.Insets(0, 10, 0, 0);
+        c.insets = new Insets(0, 10, 0, 0);
         c.gridx = 0;
 
         SkillType stype;
@@ -861,32 +859,32 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             skillLvls.put(type, spnLevel);
             skillBonus.put(type, spnBonus);
 
-            c.anchor = java.awt.GridBagConstraints.WEST;
+            c.anchor = GridBagConstraints.WEST;
             c.weightx = 0;
             panSkills.add(chkSkill, c);
 
             c.gridx = 1;
-            c.anchor = java.awt.GridBagConstraints.WEST;
+            c.anchor = GridBagConstraints.WEST;
             panSkills.add(lblName, c);
 
             c.gridx = 2;
-            c.anchor = java.awt.GridBagConstraints.CENTER;
+            c.anchor = GridBagConstraints.CENTER;
             panSkills.add(lblValue, c);
 
             c.gridx = 3;
-            c.anchor = java.awt.GridBagConstraints.WEST;
+            c.anchor = GridBagConstraints.WEST;
             panSkills.add(lblLevel, c);
 
             c.gridx = 4;
-            c.anchor = java.awt.GridBagConstraints.WEST;
+            c.anchor = GridBagConstraints.WEST;
             panSkills.add(spnLevel, c);
 
             c.gridx = 5;
-            c.anchor = java.awt.GridBagConstraints.WEST;
+            c.anchor = GridBagConstraints.WEST;
             panSkills.add(lblBonus, c);
 
             c.gridx = 6;
-            c.anchor = java.awt.GridBagConstraints.WEST;
+            c.anchor = GridBagConstraints.WEST;
             c.weightx = 1.0;
             panSkills.add(spnBonus, c);
         }
@@ -1043,7 +1041,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
         //first figure out skills
         SkillType stype;
-        for (Map.Entry<String, JSpinner> entry : skillLvls.entrySet()) {
+        for (Entry<String, JSpinner> entry : skillLvls.entrySet()) {
             stype = SkillType.getType(entry.getKey());
             if(skillChks.get(stype.getName()).isSelected()) {
                 int lvl = (Integer) entry.getValue().getModel().getValue();

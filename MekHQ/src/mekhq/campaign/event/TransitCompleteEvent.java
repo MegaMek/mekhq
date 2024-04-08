@@ -22,15 +22,13 @@ package mekhq.campaign.event;
 import megamek.common.event.MMEvent;
 import mekhq.campaign.CurrentLocation;
 
+/**
+ * Triggered when a jump path is completed
+ */
 public class TransitCompleteEvent extends MMEvent {
 
     private final CurrentLocation location;
 
-    /**
-     * An event that is triggered when a jump path is complete (arriving on destination planet in planetary system).
-     *
-     * @param location The campaign location object.
-     */
     public TransitCompleteEvent(CurrentLocation location) {
         this.location = location;
     }
