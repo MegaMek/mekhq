@@ -201,4 +201,9 @@ public class StoryArcStub {
         return storyArc;
     }
 
+    // need this method for proper sorting of story arcs
+    @Override
+    public String toString() {
+        return getTitle();
+    }
 }
