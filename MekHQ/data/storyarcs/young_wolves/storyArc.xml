@@ -818,7 +818,7 @@ That's it. I hope you enjoy the campaign!
                 destroy them all, at least we can cut off the head. Give them hell until the end, my wolves!
             </question>
             <choice id="sacrifice">You cannot sacrifice yourself, my Khan. We need your leadership!</choice>
-            <choice id="remberance">They will sing of you in the Remberance, my Khan.</choice>
+            <choice id="remembrance">They will sing of you in the Remembrance, my Khan.</choice>
             <choice id="solahma">It pleases me that you are finally taking the honorable path of a *solahma* warrior.
             </choice>
             <choice id="nothing">*Say nothing.*</choice>
@@ -826,7 +826,7 @@ That's it. I hope you enjoy the campaign!
                 <storyOutcome result="sacrifice">
                     <nextStoryPointId>9081c4f9-0eb2-419f-b2e1-38761db76c8c</nextStoryPointId>
                 </storyOutcome>
-                <storyOutcome result="remberance">
+                <storyOutcome result="remembrance">
                     <nextStoryPointId>95b8e699-5391-4111-93bf-1909e17938fa</nextStoryPointId>
                 </storyOutcome>
                 <storyOutcome result="solahma">
@@ -945,7 +945,7 @@ That's it. I hope you enjoy the campaign!
                 after fighting with her and witnessing her sacrifice, what do you think of Khan Natasha Kerensky, the
                 Black Widow?
             </question>
-            <choice id="warrior_death">I agree that she died a warrior's death and earned a place in the Remberance.
+            <choice id="warrior_death">I agree that she died a warrior's death and earned a place in the Remembrance.
             </choice>
             <choice id="failure">She failed in her mission and reaped her reward.</choice>
             <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
@@ -3035,7 +3035,7 @@ That's it. I hope you enjoy the campaign!
             <title>Sad Tidings</title>
             <narrative>
                 I was deeply saddened to hear of Khan Kerensky's death on Twycross. It is, however, some consolation
-                that she met a warrior's end and certainly earned a place in the Remberance.
+                that she met a warrior's end and certainly earned a place in the Remembrance.
 
                 She spoke highly of your abilities in combat, and I believe it is due in part to you that Twycross did
                 not turn out worse for our forces. For that, you have my respect and gratitude.
