@@ -28,6 +28,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -48,8 +49,8 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private Kill kill;
     private LocalDate date;
     private int missionId;
-    private ArrayList<Integer> missionIdList;
     private int scenarioId;
+    private Campaign campaign;
 
     private JButton btnClose;
     private JButton btnOK;
@@ -61,12 +62,13 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private JButton btnDate;
     private JLabel lblMissionId;
     private MMComboBox<Mission> cboMissionId;
+    private ArrayList<Integer> missionIdList;
     private JLabel lblScenarioId;
-    private JSpinner spnScenarioId;
+    private MMComboBox<String> cboScenarioId;
+    private ArrayList<Integer> scenarioIdList;
 
     public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit, LocalDate entryDate, Campaign campaign) {
-        // We default to 0 for missionId and scenarioId so that we don't need to unnecessarily feed that information into...
-        // ...PersonnelTableMouseAdapter.java and EditKillLogControl.java
+        // We default missionId & scenarioId to 0 when adding new kills
         this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate, 0, 0), campaign);
     }
 
@@ -74,8 +76,10 @@ public class AddOrEditKillEntryDialog extends JDialog {
         this(parent, modal, EDIT_OPERATION, kill, campaign);
     }
 
-    private AddOrEditKillEntryDialog(JFrame parent, boolean modal, int operationType, Kill kill, Campaign campaign) {
+    private AddOrEditKillEntryDialog(JFrame parent, boolean modal, int operationType, Kill kill, Campaign c) {
         super(parent, modal);
+
+        campaign = c;
 
         this.frame = parent;
         this.kill = Objects.requireNonNull(kill);
@@ -83,7 +87,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         this.missionId = this.kill.getMissionId();
         this.scenarioId = this.kill.getScenarioId();
         this.operationType = operationType;
-        initComponents(campaign, missionId);
+        initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
@@ -92,7 +96,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         return Optional.ofNullable(kill);
     }
 
-    private void initComponents(Campaign campaign, int missionId) {
+    private void initComponents() {
         GridBagConstraints gridBagConstraints;
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditKillEntryDialog",
@@ -185,12 +189,19 @@ public class AddOrEditKillEntryDialog extends JDialog {
         getContentPane().add(lblMissionId, gridBagConstraints);
 
         cboMissionId = new MMComboBox<>("cboMissionId");
-        missionIdList = listMissionId(campaign);
+        missionIdList = createIdList(true);
         for (int id : missionIdList) {
-            cboMissionId.addItem(campaign.getMission(id));
+            if (id == 0) {
+                cboMissionId.addItem(null);
+            } else {
+                cboMissionId.addItem(campaign.getMission(id));
+            }
         }
 
-        cboMissionId.setSelectedItem(campaign.getMission(missionId));
+        // if missionId is valid, default to the option matching missionId
+        if (campaign.getMission(missionId) != null) {
+            cboMissionId.setSelectedItem(campaign.getMission(missionId));
+        }
         cboMissionId.setMinimumSize(new Dimension(150, 28));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -212,7 +223,22 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblScenarioId, gridBagConstraints);
 
-        spnScenarioId = new JSpinner (new SpinnerNumberModel(kill.getScenarioId(), 0, 9999, 1));
+        cboScenarioId = new MMComboBox<>("cboScenarioId");
+        scenarioIdList = createIdList(false);
+        for (int id : scenarioIdList) {
+            if (id == 0) {
+                cboScenarioId.addItem(null);
+            } else {
+                cboScenarioId.addItem("(" + campaign.getScenario(id).getDate() + ") " + campaign.getScenario(id).getName());
+            }
+        }
+
+        // if scenarioId is valid, default to the option matching scenarioId
+        if (campaign.getScenario(scenarioId) != null) {
+            cboScenarioId.setSelectedItem("(" + campaign.getScenario(scenarioId).getDate() + ") "
+                    + campaign.getScenario(scenarioId).getName());
+        }
+        cboScenarioId.setMinimumSize(new Dimension(150, 28));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -221,9 +247,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(spnScenarioId, gridBagConstraints);
-
-        LogManager.getLogger().error("Scenario: " + campaign.getScenario(1));
+        getContentPane().add(cboScenarioId, gridBagConstraints);
 
         btnOK = new JButton();
         btnOK.setText(resourceMap.getString("btnOK.text"));
@@ -267,14 +291,20 @@ public class AddOrEditKillEntryDialog extends JDialog {
         kill.setWhatKilled(txtKill.getText());
         kill.setKilledByWhat(txtKiller.getText());
         kill.setDate(date);
-        kill.setMissionId(missionIdList.get(cboMissionId.getSelectedIndex()));
-        try {
-            spnScenarioId.commitEdit();
-        } catch ( Exception e ) {
-            LogManager.getLogger().error("Failed to commit user changes to spnScenarioId");
+
+        // if an invalid mission or scenario was selected default to 0
+        if (cboMissionId.getSelectedIndex() == -1) {
+            kill.setMissionId(0);
+        } else {
+            kill.setMissionId(missionIdList.get(cboMissionId.getSelectedIndex()));
         }
 
-        kill.setScenarioId((Integer) spnScenarioId.getValue());
+        if (cboScenarioId.getSelectedIndex() == -1) {
+            kill.setScenarioId(0);
+        } else {
+            kill.setScenarioId(scenarioIdList.get(cboScenarioId.getSelectedIndex()));
+        }
+
         this.setVisible(false);
     }
 
@@ -291,13 +321,25 @@ public class AddOrEditKillEntryDialog extends JDialog {
         }
     }
 
-    private ArrayList<Integer> listMissionId(Campaign campaign) {
-        ArrayList<Integer> missionIdList = new ArrayList<>();
+    private ArrayList<Integer> createIdList(boolean isMission) {
+        ArrayList<Integer> idList = new ArrayList<>();
 
-        for (Mission mission : campaign.getSortedMissions()) {
-            missionIdList.add(mission.getId());
+        if (isMission) {
+            // the default value should be the first value
+            idList.add(0);
+
+            for (Mission mission : campaign.getSortedMissions()) {
+                idList.add(mission.getId());
+            }
+        } else {
+            for (Scenario scenario : campaign.getScenarios()) {
+                idList.add(scenario.getId());
+            }
+            // this ensures the default value becomes the first value, when we reverse
+            idList.add(0);
+            Collections.reverse(idList);
         }
 
-        return missionIdList;
+        return idList;
     }
 }
