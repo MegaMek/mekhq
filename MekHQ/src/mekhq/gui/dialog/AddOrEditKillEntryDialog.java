@@ -24,17 +24,16 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
+import mekhq.campaign.mission.Mission;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Taharqa
@@ -47,6 +46,8 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private int operationType;
     private Kill kill;
     private LocalDate date;
+    private int missionId;
+    private int scenarioId;
 
     private JButton btnClose;
     private JButton btnOK;
@@ -55,9 +56,16 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private JLabel lblKiller;
     private JTextField txtKiller;
     private JButton btnDate;
+    private JLabel lblMissionId;
+    private JTextField txtMissionId;
+    private JLabel lblScenarioId;
+    private JTextField txtScenarioId;
+    private Campaign campaign;
 
     public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit, LocalDate entryDate) {
-        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate));
+        // We default to 0 for missionId and scenarioId so that we don't need to unnecessarily feed that information into...
+        // ...PersonnelTableMouseAdapter.java and EditKillLogControl.java
+        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate, 0, 0));
     }
 
     public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Kill kill) {
@@ -70,6 +78,8 @@ public class AddOrEditKillEntryDialog extends JDialog {
         this.frame = parent;
         this.kill = Objects.requireNonNull(kill);
         this.date = this.kill.getDate();
+        this.missionId = this.kill.getMissionId();
+        this.scenarioId = this.kill.getScenarioId();
         this.operationType = operationType;
         initComponents();
         setLocationRelativeTo(parent);
@@ -81,12 +91,16 @@ public class AddOrEditKillEntryDialog extends JDialog {
     }
 
     private void initComponents() {
-         GridBagConstraints gridBagConstraints;
+        GridBagConstraints gridBagConstraints;
 
         txtKill = new JTextField();
         lblKill = new JLabel();
         txtKiller = new JTextField();
         lblKiller = new JLabel();
+        txtMissionId = new JTextField();
+        lblMissionId = new JLabel();;
+        txtScenarioId = new JTextField();
+        lblScenarioId = new JLabel();
         btnOK = new JButton();
         btnClose = new JButton();
         btnDate = new JButton();
@@ -155,12 +169,54 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(btnDate, gridBagConstraints);
 
+        lblMissionId.setText(resourceMap.getString("lblMissionId.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(lblMissionId, gridBagConstraints);
+
+        txtMissionId.setText(String.valueOf(kill.getMissionId()));
+        txtMissionId.setMinimumSize(new Dimension(150, 28));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(txtMissionId, gridBagConstraints);
+
+        lblScenarioId.setText(resourceMap.getString("lblScenarioId.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(lblScenarioId, gridBagConstraints);
+
+        txtScenarioId.setText(String.valueOf(kill.getScenarioId()));
+        txtScenarioId.setMinimumSize(new Dimension(150, 28));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(txtScenarioId, gridBagConstraints);
+
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -171,7 +227,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         btnClose.addActionListener(this::btnCloseActionPerformed);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -195,6 +251,8 @@ public class AddOrEditKillEntryDialog extends JDialog {
         kill.setWhatKilled(txtKill.getText());
         kill.setKilledByWhat(txtKiller.getText());
         kill.setDate(date);
+        kill.setMissionId(Integer.parseInt(txtMissionId.getText()));
+        kill.setScenarioId(Integer.parseInt(txtScenarioId.getText()));
         this.setVisible(false);
     }
 
