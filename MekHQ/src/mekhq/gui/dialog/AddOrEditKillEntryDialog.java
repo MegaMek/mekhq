@@ -26,7 +26,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
-import mekhq.campaign.mission.Mission;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -62,17 +61,17 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private JTextField txtScenarioId;
     private Campaign campaign;
 
-    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit, LocalDate entryDate) {
+    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit, LocalDate entryDate, Campaign campaign) {
         // We default to 0 for missionId and scenarioId so that we don't need to unnecessarily feed that information into...
         // ...PersonnelTableMouseAdapter.java and EditKillLogControl.java
-        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate, 0, 0));
+        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate, 0, 0), campaign);
     }
 
-    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Kill kill) {
-        this(parent, modal, EDIT_OPERATION, kill);
+    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Kill kill, Campaign campaign) {
+        this(parent, modal, EDIT_OPERATION, kill, campaign);
     }
 
-    private AddOrEditKillEntryDialog(JFrame parent, boolean modal, int operationType, Kill kill) {
+    private AddOrEditKillEntryDialog(JFrame parent, boolean modal, int operationType, Kill kill, Campaign campaign) {
         super(parent, modal);
 
         this.frame = parent;
@@ -98,7 +97,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         txtKiller = new JTextField();
         lblKiller = new JLabel();
         txtMissionId = new JTextField();
-        lblMissionId = new JLabel();;
+        lblMissionId = new JLabel();
         txtScenarioId = new JTextField();
         lblScenarioId = new JLabel();
         btnOK = new JButton();
