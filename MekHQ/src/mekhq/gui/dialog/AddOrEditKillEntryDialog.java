@@ -31,6 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -54,11 +55,12 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private JTextField txtKill;
     private JLabel lblKiller;
     private JTextField txtKiller;
+    private JLabel lblDate;
     private JButton btnDate;
     private JLabel lblMissionId;
     private JTextField txtMissionId;
     private JLabel lblScenarioId;
-    private JTextField txtScenarioId;
+    private JSpinner spnScenarioId;
     private Campaign campaign;
 
     public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit, LocalDate entryDate, Campaign campaign) {
@@ -80,7 +82,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         this.missionId = this.kill.getMissionId();
         this.scenarioId = this.kill.getScenarioId();
         this.operationType = operationType;
-        initComponents();
+        initComponents(operationType, campaign);
         setLocationRelativeTo(parent);
         setUserPreferences();
     }
@@ -89,20 +91,21 @@ public class AddOrEditKillEntryDialog extends JDialog {
         return Optional.ofNullable(kill);
     }
 
-    private void initComponents() {
+    private void initComponents(int operationType, Campaign campaign) {
         GridBagConstraints gridBagConstraints;
 
-        txtKill = new JTextField();
         lblKill = new JLabel();
-        txtKiller = new JTextField();
+        txtKill = new JTextField();
         lblKiller = new JLabel();
-        txtMissionId = new JTextField();
+        txtKiller = new JTextField();
+        lblDate = new JLabel();
+        btnDate = new JButton();
         lblMissionId = new JLabel();
-        txtScenarioId = new JTextField();
+        txtMissionId = new JTextField();
         lblScenarioId = new JLabel();
+        spnScenarioId = new JSpinner (new SpinnerNumberModel(kill.getScenarioId(), 0, 9999, 1));
         btnOK = new JButton();
         btnClose = new JButton();
-        btnDate = new JButton();
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditKillEntryDialog",
                 MekHQ.getMHQOptions().getLocale());
@@ -157,13 +160,22 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtKiller, gridBagConstraints);
 
+        lblDate.setText(resourceMap.getString("lblDate.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(lblDate, gridBagConstraints);
+
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeDate());
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(btnDate, gridBagConstraints);
@@ -198,8 +210,6 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblScenarioId, gridBagConstraints);
 
-        txtScenarioId.setText(String.valueOf(kill.getScenarioId()));
-        txtScenarioId.setMinimumSize(new Dimension(150, 28));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
@@ -208,7 +218,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        getContentPane().add(txtScenarioId, gridBagConstraints);
+        getContentPane().add(spnScenarioId, gridBagConstraints);
 
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
@@ -251,7 +261,13 @@ public class AddOrEditKillEntryDialog extends JDialog {
         kill.setKilledByWhat(txtKiller.getText());
         kill.setDate(date);
         kill.setMissionId(Integer.parseInt(txtMissionId.getText()));
-        kill.setScenarioId(Integer.parseInt(txtScenarioId.getText()));
+
+        try {
+            spnScenarioId.commitEdit();
+        } catch ( Exception e ) {
+            LogManager.getLogger().error("Failed to commit user changes to spnScenarioId");
+        }
+        kill.setScenarioId((Integer) spnScenarioId.getValue());
         this.setVisible(false);
     }
 
