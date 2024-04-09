@@ -149,7 +149,7 @@ public class ScenarioStoryPoint extends StoryPoint {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "deployedForceId", deployedForceId);
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "deployedForceId", days);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "days", days);
         if(null != scenario) {
             //if the scenario has a valid id, then just save this because the scenario is saved
             //and loaded elsewhere so, we need to link it
