@@ -206,31 +206,31 @@ class GameThread extends Thread implements CloseClientListener {
                 }
                 client.sendAddEntity(entities);
                 client.sendPlayerInfo();
-            }
 
-            // Add bots
-            for (int i = 0; i < scenario.getNumBots(); i++) {
-                BotForce bf = scenario.getBotForce(i);
-                String name = bf.getName();
-                if (swingGui.getLocalBots().containsKey(name)) {
-                    int append = 2;
-                    while (swingGui.getLocalBots().containsKey(name + append)) {
-                        append++;
+                // Add bots
+                for (int i = 0; i < scenario.getNumBots(); i++) {
+                    BotForce bf = scenario.getBotForce(i);
+                    String name = bf.getName();
+                    if (swingGui.getLocalBots().containsKey(name)) {
+                        int append = 2;
+                        while (swingGui.getLocalBots().containsKey(name + append)) {
+                            append++;
+                        }
+                        name += append;
                     }
-                    name += append;
-                }
-                Princess botClient = new Princess(name, client.getHost(), client.getPort());
-                botClient.setBehaviorSettings(bf.getBehaviorSettings());
-                try {
-                    botClient.connect();
-                } catch (Exception e) {
-                    LogManager.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
-                }
-                swingGui.getLocalBots().put(name, botClient);
+                    Princess botClient = new Princess(name, client.getHost(), client.getPort());
+                    botClient.setBehaviorSettings(bf.getBehaviorSettings());
+                    try {
+                        botClient.connect();
+                    } catch (Exception e) {
+                        LogManager.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
+                    }
+                    swingGui.getLocalBots().put(name, botClient);
 
-                // chill out while bot is created and connects to megamek
-                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
-                configureBot(botClient, bf);
+                    // chill out while bot is created and connects to megamek
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
+                    configureBot(botClient, bf);
+                }
             }
 
             while (!stop) {
