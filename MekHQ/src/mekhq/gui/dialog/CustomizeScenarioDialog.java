@@ -32,6 +32,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.gui.FileDialogs;
+import mekhq.gui.model.BotForceTableModel;
 import mekhq.gui.model.LootTableModel;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import org.apache.logging.log4j.LogManager;
@@ -39,43 +40,53 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
  * @author Taharqa
  */
 public class CustomizeScenarioDialog extends JDialog {
-    private JFrame frame;
 
+    // region Variable declarations
+    private JFrame frame;
     private Scenario scenario;
     private Mission mission;
     private Campaign campaign;
     private boolean newScenario;
     private LocalDate date;
     private PlanetaryConditions planetaryConditions;
+    private List<BotForce> botForces;
 
-    // begin: loot
+    // loot
     private ArrayList<Loot> loots;
     private JTable lootTable;
     private LootTableModel lootModel;
-    // end: loot
 
-    // begin: panels
+    // other forces
+    private JTable forcesTable;
+    private BotForceTableModel forcesModel;
+
+    // panels
     private JPanel panMain;
     private JPanel panLeft;
+    private JPanel panCenter;
     private JPanel panRight;
     private JPanel panLoot;
+    private JPanel panOtherForces;
     private JPanel panPlanetaryConditions;
     private JPanel panBtn;
-    // end: panels
 
-    // begin: labels
+    // labels
     private JLabel lblLightDesc;
     private JLabel lblWindDesc;
     private JLabel lblAtmosphereDesc;
@@ -88,30 +99,29 @@ public class CustomizeScenarioDialog extends JDialog {
     private JLabel lblOtherConditionsDesc;
     // end: labels
 
-    // begin: textfields
+    // textfields
     private JTextField txtName;
-    // end: textfields
 
-    // begin: comboboxes
+    // comboboxes
     private JComboBox<String> modifierBox;
     private JComboBox<ScenarioStatus> choiceStatus;
-    //end: comboboxes
 
-    // begin: buttons
+    // buttons
     private JButton btnDate;
     private JButton btnPlanetaryConditions;
     private JButton btnAddLoot;
     private JButton btnEditLoot;
     private JButton btnDeleteLoot;
+    private JButton btnAddForce;
+    private JButton btnEditForce;
+    private JButton btnDeleteForce;
     private JButton btnClose;
     private JButton btnOK;
-    // end: buttons
 
-    // begin: markdown editors
+    // markdown editors
     private MarkdownEditorPanel txtDesc;
     private MarkdownEditorPanel txtReport;
-    // end: markdown editors
-
+    //endregion Variable declarations
 
     public CustomizeScenarioDialog(JFrame parent, boolean modal, Scenario s, Mission m, Campaign c) {
         super(parent, modal);
@@ -131,6 +141,9 @@ public class CustomizeScenarioDialog extends JDialog {
         date = scenario.getDate();
 
         planetaryConditions = scenario.createPlanetaryConditions();
+
+        botForces = scenario.getBotForces();
+        forcesModel = new BotForceTableModel(botForces, campaign);
 
         loots = new ArrayList<>();
         for (Loot loot : scenario.getLoot()) {
@@ -152,17 +165,19 @@ public class CustomizeScenarioDialog extends JDialog {
         setTitle(resourceMap.getString("title.new"));
 
         // set up panels
-        panMain = new JPanel(new GridLayout(0, 2));
+        panMain = new JPanel(new GridLayout(0, 3));
         panLeft = new JPanel(new GridBagLayout());
+        panCenter = new JPanel(new GridBagLayout());
         panRight = new JPanel(new GridBagLayout());
         panBtn = new JPanel(new GridLayout(0,2));
 
         getContentPane().add(panMain, BorderLayout.CENTER);
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
         panMain.add(panLeft);
+        panMain.add(panCenter);
         panMain.add(panRight);
 
-        // set up left panel
+        // region Set up left panel
         GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -260,8 +275,27 @@ public class CustomizeScenarioDialog extends JDialog {
                 BorderFactory.createTitledBorder("Scenario Costs & Payouts"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         panLeft.add(panLoot, gridBagConstraints);
+        // endregion Set up left panel
 
-        //set up right panel
+        // region Set up center panel
+        initOtherForcesPanel(resourceMap);
+        panOtherForces.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
+                BorderFactory.createTitledBorder(resourceMap.getString("panOtherForces.title"))));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        panCenter.add(panOtherForces, gridBagConstraints);
+
+        // endregion Set up center panel
+
+        // region Set up right panel
         txtDesc = new MarkdownEditorPanel("Description");
         txtDesc.setText(scenario.getDescription());
         txtDesc.setMinimumSize(new Dimension(400, 100));
@@ -293,8 +327,9 @@ public class CustomizeScenarioDialog extends JDialog {
             panRight.add(txtReport, gridBagConstraints);
             txtReport.setEnabled(!scenario.getStatus().isCurrent());
         }
+        // endregion Set up right panel
 
-        // set up buttons
+        // region Set up buttons
         if (newScenario && (mission instanceof AtBContract)) {
             JButton btnLoad = new JButton("Generate From Template");
             btnLoad.addActionListener(this::btnLoadActionPerformed);
@@ -321,6 +356,7 @@ public class CustomizeScenarioDialog extends JDialog {
         btnClose = new JButton(resourceMap.getString("btnCancel.text"));
         btnClose.addActionListener(this::btnCloseActionPerformed);
         panBtn.add(btnClose);
+        //endregion Set up buttons
 
         pack();
     }
@@ -606,7 +642,7 @@ public class CustomizeScenarioDialog extends JDialog {
         if (null != ekld.getLoot()) {
             lootModel.addLoot(ekld.getLoot());
         }
-        refreshTable();
+        refreshLootTable();
     }
 
     private void editLoot() {
@@ -614,7 +650,7 @@ public class CustomizeScenarioDialog extends JDialog {
         if (null != loot) {
             LootDialog ekld = new LootDialog(frame, true, loot, campaign);
             ekld.setVisible(true);
-            refreshTable();
+            refreshLootTable();
         }
     }
 
@@ -623,10 +659,10 @@ public class CustomizeScenarioDialog extends JDialog {
         if (-1 != row) {
             loots.remove(row);
         }
-        refreshTable();
+        refreshLootTable();
     }
 
-    private void refreshTable() {
+    private void refreshLootTable() {
         int selectedRow = lootTable.getSelectedRow();
         lootModel.setData(loots);
         if (selectedRow != -1) {
@@ -635,6 +671,81 @@ public class CustomizeScenarioDialog extends JDialog {
                     lootTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
                 } else {
                     lootTable.setRowSelectionInterval(selectedRow, selectedRow);
+                }
+            }
+        }
+    }
+
+    private void initOtherForcesPanel(ResourceBundle resourceMap) {
+        panOtherForces = new JPanel(new BorderLayout());
+
+        JPanel panBtns = new JPanel(new GridLayout(1,0));
+        btnAddForce = new JButton(resourceMap.getString("btnAddForce.text"));
+        btnAddForce.addActionListener(evt -> addForce());
+        btnAddForce.setEnabled(scenario.getStatus().isCurrent());
+        panBtns.add(btnAddForce);
+
+        btnEditForce = new JButton(resourceMap.getString("btnEditForce.text"));
+        btnEditForce.setEnabled(false);
+        btnEditForce.addActionListener(evt -> editForce());
+        btnEditForce.setEnabled(scenario.getStatus().isCurrent());
+        panBtns.add(btnEditForce);
+
+        btnDeleteForce = new JButton(resourceMap.getString("btnDeleteForce.text"));
+        btnDeleteForce.setEnabled(false);
+        btnDeleteForce.addActionListener(evt -> deleteForce());
+        btnDeleteForce.setEnabled(scenario.getStatus().isCurrent());
+        panBtns.add(btnDeleteForce);
+        panOtherForces.add(panBtns, BorderLayout.PAGE_START);
+
+        forcesTable = new JTable(forcesModel);
+        TableColumn column;
+        for (int i = 0; i < BotForceTableModel.N_COL; i++) {
+            column = forcesTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(forcesModel.getColumnWidth(i));
+            column.setCellRenderer(forcesModel.getRenderer());
+        }
+        forcesTable.setIntercellSpacing(new Dimension(0, 0));
+        forcesTable.setShowGrid(false);
+        forcesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        forcesTable.getSelectionModel().addListSelectionListener(this::forcesTableValueChanged);
+
+        panOtherForces.add(new JScrollPane(forcesTable), BorderLayout.CENTER);
+    }
+
+    private void forcesTableValueChanged(ListSelectionEvent evt) {
+        int row = forcesTable.getSelectedRow();
+        btnDeleteForce.setEnabled(row != -1);
+        btnEditForce.setEnabled(row != -1);
+    }
+
+    private void addForce() {
+        // TODO: BotForceEditorDialog
+        refreshForcesTable();
+    }
+
+    private void editForce() {
+        // TODO: BotForceEditorDialog
+        refreshForcesTable();
+    }
+
+    private void deleteForce() {
+        int row = forcesTable.getSelectedRow();
+        if (-1 != row) {
+            botForces.remove(row);
+        }
+        refreshForcesTable();
+    }
+
+    private void refreshForcesTable() {
+        int selectedRow = forcesTable.getSelectedRow();
+        forcesModel.setData(botForces);
+        if (selectedRow != -1) {
+            if (forcesTable.getRowCount() > 0) {
+                if (forcesTable.getRowCount() == selectedRow) {
+                    forcesTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
+                } else {
+                    forcesTable.setRowSelectionInterval(selectedRow, selectedRow);
                 }
             }
         }
