@@ -5355,8 +5355,10 @@ recover downed pilots, but not mechs or salvage.
                     <name>Twelfth Falcon Regulars</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Gamma Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>BASIC_CLAN</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -5709,8 +5711,10 @@ forces.
                     <name>Jade Eyrie Cluster</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Gamma Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>BASIC_CLAN</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -5835,8 +5839,10 @@ forces after round 12 when all available reinforcements have arrived.
                     <name>Jade Eyrie Cluster</name>
                     <team>2</team>
                     <start>6</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Gamma Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>CLAN_STAY_BACK</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -6096,8 +6102,10 @@ forces after round 14 when all available reinforcements have arrived.
                     <name>Jade Eyrie Cluster</name>
                     <team>2</team>
                     <start>6</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Gamma Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>CLAN_STAY_BACK</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -6394,8 +6402,10 @@ salvage.
                     <name>Second Falcon Jaegers</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Delta Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Delta Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>BREAKTHROUGH</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -7036,8 +7046,10 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>6</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>BASIC_CLAN</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -7302,8 +7314,10 @@ The Jade Falcon units will grant hegira but not ask for it and they will continu
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>6</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>BASIC_CLAN</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -7567,8 +7581,10 @@ capturing the facility.
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>6</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
@@ -7661,8 +7677,10 @@ capturing the facility.
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>6</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
@@ -7755,8 +7773,10 @@ capturing the facility.
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>6</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
@@ -7856,8 +7876,10 @@ capturing the facility.
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>8</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
@@ -7951,8 +7973,10 @@ capturing the facility.
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>4</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
@@ -8038,8 +8062,10 @@ capturing the facility.
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>8</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
@@ -8133,8 +8159,10 @@ capturing the facility.
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
@@ -8228,8 +8256,10 @@ capturing the facility.
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
@@ -8322,8 +8352,10 @@ capturing the facility.
                     <name>Jade Falcon Garrison Binary</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Kappa Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Kappa Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>TRIAL</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
@@ -8426,8 +8458,10 @@ will grant it. The wolf forces must withdraw and will not be able to claim battl
                     <name>Falcon Guards</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Gamma Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Gamma Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>BASIC_CLAN</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -8861,8 +8895,10 @@ so be sure to watch your step.
                     <name>Star Commander Mathius</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Wolf/Beta Galaxy/</camoCategory>
-                    <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
+                    <camouflage>
+                        <category>Clans/Wolf/Beta Galaxy/</category>
+                        <filename>Beta Galaxy - 2nd Wolf Assault.png</filename>
+                    </camouflage>
                     <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
                     <behaviorSettings>
                         <name>TRIAL</name>
@@ -8941,8 +8977,10 @@ the equator of Butler. The environment will make movement difficult, especially 
                     <name>Star Commander Mathius</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Wolf/Beta Galaxy/</camoCategory>
-                    <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
+                    <camouflage>
+                        <category>Clans/Wolf/Beta Galaxy/</category>
+                        <filename>Beta Galaxy - 2nd Wolf Assault.png</filename>
+                    </camouflage>
                     <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
                     <behaviorSettings>
                         <name>TRIAL</name>
@@ -9024,8 +9062,10 @@ breaches into your internal system.
                     <name>Star Commander Mathius</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Wolf/Beta Galaxy/</camoCategory>
-                    <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
+                    <camouflage>
+                        <category>Clans/Wolf/Beta Galaxy/</category>
+                        <filename>Beta Galaxy - 2nd Wolf Assault.png</filename>
+                    </camouflage>
                     <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
                     <behaviorSettings>
                         <name>TRIAL</name>
@@ -9105,8 +9145,10 @@ sight.
                     <name>Star Commander Mathius</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Wolf/Beta Galaxy/</camoCategory>
-                    <camoFileName>Beta Galaxy - 2nd Wolf Assault.png</camoFileName>
+                    <camouflage>
+                        <category>Clans/Wolf/Beta Galaxy/</category>
+                        <filename>Beta Galaxy - 2nd Wolf Assault.png</filename>
+                    </camouflage>
                     <traitor>02f8af55-9c4f-41d7-8bd1-06b0d784463b</traitor>
                     <behaviorSettings>
                         <name>TRIAL</name>
@@ -9188,8 +9230,10 @@ The player will not be granted *hegira* by the Jade Falcons.
                     <name>Fourth Talon Cluster</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Vau Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Vau Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>BASIC_CLAN</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -9432,8 +9476,10 @@ The player will not be granted *hegira* by the Jade Falcons.
                     <name>Phelan</name>
                     <team>1</team>
                     <start>6</start>
-                    <camoCategory>Clans/Wolf/Delta Galaxy</camoCategory>
-                    <camoFileName>Delta Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Wolf/Delta Galaxy</category>
+                        <filename>Delta Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>CAUTIOUS</name>
                         <forcedWithdrawal>false</forcedWithdrawal>
@@ -9530,8 +9576,10 @@ strike, you will not be able to claim battlefield salvage.
                     <name>Eyrie Garrison Cluster</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Omega Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Omega Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>CLAN_DEFENDER</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -9558,8 +9606,10 @@ strike, you will not be able to claim battlefield salvage.
                     <name>Jade Falcon Logistical Team</name>
                     <team>2</team>
                     <start>0</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Omega Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Omega Galaxy.jpg</filename>
+                    </camouflage>
                     <entities>
                         <entity chassis="Sherpa Armored Truck" model="" type="Tracked" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="0"
@@ -9822,8 +9872,10 @@ to the nature of the scenario, you may not collect *isorla.*
                     <name>Delta Galaxy</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Delta Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Delta Galaxy.jpg</filename>
+                    </camouflage>
                     <behaviorSettings>
                         <name>BASIC_CLAN</name>
                         <forcedWithdrawal>true</forcedWithdrawal>
@@ -9849,8 +9901,10 @@ to the nature of the scenario, you may not collect *isorla.*
                     <name>Star Colonel Ulric Kerensky</name>
                     <team>1</team>
                     <start>6</start>
-                    <camoCategory>Clans/Wolf/Alpha Galaxy</camoCategory>
-                    <camoFileName>Golden Keshik.png</camoFileName>
+                    <camouflage>
+                        <category>Clans/Wolf/Alpha Galaxy</category>
+                        <filename>Golden Keshik.png</filename>
+                    </camouflage>
                     <entities>
                         <entity chassis="Man O' War (Gargoyle)" model="A" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1"
@@ -9989,8 +10043,10 @@ scenario resolution.
                     <name>Jade Falcons, Wave I</name>
                     <team>2</team>
                     <start>9</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Delta Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Delta Galaxy.jpg</filename>
+                    </camouflage>
                     <botForceRandomizer>
                         <factionCode>CJF</factionCode>
                         <quality>4</quality>
@@ -10017,8 +10073,10 @@ scenario resolution.
                     <team>2</team>
                     <start>9</start>
                     <deployRound>7</deployRound>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Delta Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Delta Galaxy.jpg</filename>
+                    </camouflage>
                     <botForceRandomizer>
                         <factionCode>CJF</factionCode>
                         <quality>4</quality>
@@ -10113,8 +10171,10 @@ Aziza pilots an ancient second line *Warhammer IIC* that still presents a formid
                     <name>Mechwarrior Aziza</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Wolf/Gamma Galaxy</camoCategory>
-                    <camoFileName>Gamma Galaxy - 7th Wolf Guard.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Wolf/Gamma Galaxy</category>
+                        <filename>Gamma Galaxy - 7th Wolf Guard.jpg</filename>
+                    </camouflage>
                     <entities>
                         <entity chassis="Warhammer IIC" model="" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
@@ -10239,8 +10299,10 @@ experience, he makes up for in enthusiasm. He likes speed and will be bringing a
                     <name>Mechwarrior Damien</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Wolf/Alpha Galaxy</camoCategory>
-                    <camoFileName>Alpha Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Wolf/Alpha Galaxy</category>
+                        <filename>Alpha Galaxy.jpg</filename>
+                    </camouflage>
                     <entities>
                         <entity chassis="Shadow Cat" model="M" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
@@ -10362,8 +10424,10 @@ quickly.
                     <name>Star Commander Jameel</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Wolf/Beta Galaxy</camoCategory>
-                    <camoFileName>Beta Galaxy.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Wolf/Beta Galaxy</category>
+                        <filename>Beta Galaxy.jpg</filename>
+                    </camouflage>
                     <entities>
                         <entity chassis="Thor (Summoner)" model="C" type="Biped" commander="false" offboard="false"
                                 hidden="false" deployment="0" deploymentZone="-1" deploymentZoneWidth="3"
@@ -10491,8 +10555,10 @@ lasers.
                     <name>Star Captain Olympia</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Wolf/Gamma Galaxy</camoCategory>
-                    <camoFileName>Bronze Keshik.png</camoFileName>
+                    <camouflage>
+                        <category>Clans/Wolf/Gamma Galaxy</category>
+                        <filename>Bronze Keshik.png</filename>
+                    </camouflage>
                     <entities>
                         <entity chassis="Gladiator (Executioner)" model="A" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1"
@@ -10623,8 +10689,10 @@ It is time to suit up and finish this.
                     <name>saKhan Vandervahn Chistu</name>
                     <team>2</team>
                     <start>2</start>
-                    <camoCategory>Clans/Jade Falcon</camoCategory>
-                    <camoFileName>Turkina Keshik.jpg</camoFileName>
+                    <camouflage>
+                        <category>Clans/Jade Falcon</category>
+                        <filename>Turkina Keshik.jpg</filename>
+                    </camouflage>
                     <entities>
                         <entity chassis="Gladiator (Executioner)" model="Prime" type="Biped" commander="false"
                                 offboard="false" hidden="false" deployment="0" deploymentZone="-1"
