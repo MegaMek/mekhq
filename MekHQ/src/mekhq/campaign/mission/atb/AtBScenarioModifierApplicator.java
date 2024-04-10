@@ -68,7 +68,7 @@ public class AtBScenarioModifierApplicator {
 
         // the most recently added bot force is the one we just generated
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
-        generatedBotForce.setStart(deploymentZone);
+        generatedBotForce.setStartingPos(deploymentZone);
         AtBDynamicScenarioFactory.setDeploymentTurns(generatedBotForce, templateToApply, scenario, campaign);
         AtBDynamicScenarioFactory.setDestinationZone(generatedBotForce, templateToApply);
 

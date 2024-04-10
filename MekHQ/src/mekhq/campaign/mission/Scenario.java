@@ -518,7 +518,7 @@ public class Scenario {
         return new BotForceStub("<html>" +
                 bf.getName() + " <i>" +
                 ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
-                " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStart()] +
+                " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStartingPos()] +
                 " Fixed BV: " + bf.getTotalBV(c) +
                 ((null == bf.getBotForceRandomizer()) ? "" : "<br>Random: " + bf.getBotForceRandomizer().getDescription()) +
                 "</html>", stubs);

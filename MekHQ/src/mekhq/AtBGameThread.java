@@ -439,8 +439,17 @@ public class AtBGameThread extends GameThread {
                 LogManager.getLogger().error("Could not configure bot " + botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
-                botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
+                //set deployment
+                botClient.getLocalPlayer().setStartingPos(botForce.getStartingPos());
+                botClient.getLocalPlayer().setStartOffset(botForce.getStartOffset());
+                botClient.getLocalPlayer().setStartWidth(botForce.getStartWidth());
+                botClient.getLocalPlayer().setStartingAnyNWx(botForce.getStartingAnyNWx());
+                botClient.getLocalPlayer().setStartingAnyNWy(botForce.getStartingAnyNWy());
+                botClient.getLocalPlayer().setStartingAnySEx(botForce.getStartingAnySEx());
+                botClient.getLocalPlayer().setStartingAnySEy(botForce.getStartingAnySEy());
+
+                // set camo
                 botClient.getLocalPlayer().setCamouflage(botForce.getCamouflage().clone());
                 botClient.getLocalPlayer().setColour(botForce.getColour());
 
