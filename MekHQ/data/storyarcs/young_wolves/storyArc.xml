@@ -183,7 +183,7 @@ That's it. I hope you enjoy the campaign!
             <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
             <assignedForceId>2</assignedForceId>
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-            <!--<nextStoryPointId>508d4c18-54ba-41b1-a751-dec92f0d7b1f</nextStoryPointId>-->
+            <!--<nextStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</nextStoryPointId>-->
             <!-- Real next story point id. Can be commented out to test things -->
             <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
         </storyPoint>
@@ -1788,16 +1788,6 @@ That's it. I hope you enjoy the campaign!
                     <nextStoryPointId>4221987e-8a7b-4531-a0df-c240e36dd79a</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
-                <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-                <healHits>3</healHits>
-            </storyTrigger>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.RemoveUnitStoryTrigger">
-                <removeAll>true</removeAll>
-            </storyTrigger>
-            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AdvanceTimeStoryTrigger">
-                <days>4</days>
-            </storyTrigger>
             <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
         </storyPoint>
         <storyPoint name="choice_vlad_medbay_alive" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
@@ -4328,6 +4318,16 @@ That's it. I hope you enjoy the campaign!
                 between their legs have been Abjured. If the remaining Wolves are Absorbed, then Clan Wolf will cease to
                 exist. You and I are going to ensure that does not happen.
             </narrative>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
+                <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
+                <healHits>3</healHits>
+            </storyTrigger>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.RemoveUnitStoryTrigger">
+                <removeAll>true</removeAll>
+            </storyTrigger>
+            <storyTrigger type="mekhq.campaign.storyarc.storytrigger.AdvanceTimeStoryTrigger">
+                <days>4</days>
+            </storyTrigger>
             <personalityId>f0814fab-9845-497a-bc99-f1f4ecb247eb</personalityId>
             <nextStoryPointId>16b9c7c6-3d6c-4570-b098-f84adf27b601</nextStoryPointId>
         </storyPoint>
