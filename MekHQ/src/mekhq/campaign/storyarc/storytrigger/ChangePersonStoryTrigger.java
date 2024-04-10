@@ -96,10 +96,10 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                 }
             }
 
-            if(addHits > 0) {
+            if (addHits > 0) {
                 p.setHits(p.getHits() + addHits);
-                if(p.getHits() >= 6) {
-                    if(null == deathStatusHits) {
+                if (p.getHits() >= 6) {
+                    if (null == deathStatusHits) {
                         deathStatusHits = PersonnelStatus.KIA;
                     }
                     p.changeStatus(getCampaign(), getCampaign().getLocalDate(), deathStatusHits);
@@ -107,18 +107,18 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
                 }
             }
 
-            if(healHits > 0) {
+            if (healHits > 0) {
                 p.setHits(Math.max(0, p.getHits() - healHits));
             }
 
-            if(rank > 0) {
+            if (rank > 0) {
                 p.setRank(rank);
             }
 
-            if(null != bloodname && !bloodname.isEmpty()) {
-                if(assignKeyBloodname) {
+            if (null != bloodname && !bloodname.isEmpty()) {
+                if (assignKeyBloodname) {
                     String name = getStoryArc().getCustomStringVariable(bloodname);
-                    if(null != name && !name.isEmpty()) {
+                    if (null != name && !name.isEmpty()) {
                         p.setBloodname(name);
                     }
                 } else {
@@ -132,12 +132,12 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personId", personId);
-        if(null != status) {
+        if (null != status) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "status", status.name());
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "takeUnit", takeUnit);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "addHits", addHits);
-        if(null != deathStatusHits) {
+        if (null != deathStatusHits) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "status", deathStatusHits.name());
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "healHits", healHits);

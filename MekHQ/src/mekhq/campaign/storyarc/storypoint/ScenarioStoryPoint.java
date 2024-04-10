@@ -68,7 +68,7 @@ public class ScenarioStoryPoint extends StoryPoint {
 
     @Override
     public String getTitle() {
-        if(null != scenario) {
+        if (null != scenario) {
             return scenario.getName();
         }
         return "";
@@ -78,14 +78,14 @@ public class ScenarioStoryPoint extends StoryPoint {
     public void start() {
         super.start();
         StoryPoint missionStoryPoint = getStoryArc().getStoryPoint(missionStoryPointId);
-        if(missionStoryPoint instanceof MissionStoryPoint) {
+        if (missionStoryPoint instanceof MissionStoryPoint) {
             Mission m = ((MissionStoryPoint) missionStoryPoint).getMission();
             if (null != m & null != scenario) {
                 // set date for the scenario
                 scenario.setDate(getStoryArc().getCampaign().getLocalDate().plusDays(days));
                 getStoryArc().getCampaign().addScenario(scenario, m);
                 Force force = getCampaign().getForce(deployedForceId);
-                if(null != force) {
+                if (null != force) {
                     scenario.addForces(force.getId());
                     force.setScenarioId(scenario.getId());
                     for (UUID uid : force.getAllUnits(true)) {
@@ -107,7 +107,7 @@ public class ScenarioStoryPoint extends StoryPoint {
 
     @Override
     protected String getResult() {
-        if(null == scenario || scenario.getStatus().isCurrent()) {
+        if (null == scenario || scenario.getStatus().isCurrent()) {
             return "";
         }
         ScenarioStatus status = scenario.getStatus();
@@ -117,18 +117,18 @@ public class ScenarioStoryPoint extends StoryPoint {
 
         //if storyOutcomes are empty, then it doesn't really matter. Also, if this status has an entry
         //in storyOutcomes then return it
-        if(storyOutcomes.isEmpty() || null != storyOutcomes.get(status.name())) {
+        if (storyOutcomes.isEmpty() || null != storyOutcomes.get(status.name())) {
             return status.name();
         }
 
         //ok if we are here then we have storyOutcomes but not an exact match. We want to compare ordinals to get
         //the next best choice
         for(ScenarioStatus nextStatus : ScenarioStatus.values()) {
-            if(nextStatus == ScenarioStatus.CURRENT) {
+            if (nextStatus == ScenarioStatus.CURRENT) {
                 //shouldn't happen, but ok
                 continue;
             }
-            if(null != storyOutcomes.get(nextStatus.name())) {
+            if (null != storyOutcomes.get(nextStatus.name())) {
                 if(status.ordinal() <= nextStatus.ordinal()) {
                     return nextStatus.name();
                 }
@@ -150,7 +150,7 @@ public class ScenarioStoryPoint extends StoryPoint {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "deployedForceId", deployedForceId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "days", days);
-        if(null != scenario) {
+        if (null != scenario) {
             //if the scenario has a valid id, then just save this because the scenario is saved
             //and loaded elsewhere so, we need to link it
             if (scenario.getId() > 0) {

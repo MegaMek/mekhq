@@ -103,7 +103,7 @@ public abstract class StoryPoint {
     public void setStoryArc(StoryArc a) {
         this.storyArc = a;
         //also apply it to any triggers
-        for(StoryTrigger storyTrigger : storyTriggers) {
+        for (StoryTrigger storyTrigger : storyTriggers) {
             storyTrigger.setStoryArc(a);
         }
         //also might need to apply it to triggers in storyOutcomes
@@ -160,7 +160,7 @@ public abstract class StoryPoint {
      */
     private void processOutcomes() {
         StoryOutcome chosenOutcome = storyOutcomes.get(getResult());
-        if(null != chosenOutcome) {
+        if (null != chosenOutcome) {
             nextStoryPointId = chosenOutcome.getNextStoryPointId();
             storyTriggers = chosenOutcome.getStoryTriggers();
         }
@@ -170,7 +170,7 @@ public abstract class StoryPoint {
      * Iterate through current list of {@link StoryTrigger StoryTrigger} objects and execute each of them in turn.
      */
     private void processTriggers() {
-        for(StoryTrigger storyTrigger : storyTriggers) {
+        for (StoryTrigger storyTrigger : storyTriggers) {
             storyTrigger.execute();
         }
     }
@@ -197,7 +197,7 @@ public abstract class StoryPoint {
     protected void proceedToNextStoryPoint() {
         // get the next story point
         StoryPoint nextStoryPoint = getNextStoryPoint();
-        if(null != nextStoryPoint) {
+        if (null != nextStoryPoint) {
             nextStoryPoint.start();
         }
     }
@@ -216,7 +216,7 @@ public abstract class StoryPoint {
      * @return A {@link Personality Personality} or null if no Personality is associated with the StoryPoint.
      */
     public Personality getPersonality() {
-        if(null == personalityId) {
+        if (null == personalityId) {
             return null;
         }
         return storyArc.getPersonality(personalityId);
@@ -235,14 +235,14 @@ public abstract class StoryPoint {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "active", active);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personalityId", personalityId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
-        if(!storyOutcomes.isEmpty()) {
+        if (!storyOutcomes.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcomes");
             for (Entry<String, StoryOutcome> entry : storyOutcomes.entrySet()) {
                 entry.getValue().writeToXml(pw1, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "storyOutcomes");
         }
-        if(!storyTriggers.isEmpty()) {
+        if (!storyTriggers.isEmpty()) {
             for (StoryTrigger trigger : storyTriggers) {
                 trigger.writeToXml(pw1, indent);
             }
@@ -285,7 +285,7 @@ public abstract class StoryPoint {
                     retVal.personalityId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("active")) {
                     retVal.active = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if(wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
+                } else if (wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
                     StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c, version);
                     retVal.storyTriggers.add(trigger);
                 } else if (wn2.getNodeName().equalsIgnoreCase(StorySplash.XML_TAG)) {

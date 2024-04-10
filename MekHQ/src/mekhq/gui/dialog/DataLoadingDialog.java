@@ -398,9 +398,9 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 getApplication().getCampaignController().setHost(campaign.getId());
                 getApplication().showNewView();
                 getFrame().dispose();
-                if(null != storyArcStub) {
+                if (null != storyArcStub) {
                     StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
-                    if(null != storyArc) {
+                    if (null != storyArc) {
                         campaign.useStoryArc(storyArc, true);
                     }
                 }

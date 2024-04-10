@@ -84,7 +84,7 @@ public class PersonStatusStoryPoint extends StoryPoint {
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personId", personId);
-        for(PersonnelStatus status : statusConditions) {
+        for (PersonnelStatus status : statusConditions) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "statusCondition", status.name());
         }
         writeToXmlEnd(pw1, --indent);

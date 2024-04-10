@@ -86,11 +86,11 @@ public class Personality {
     //endregion Getter/Setters
 
     public void updatePersonalityFromCampaign(Campaign c) {
-        if(null == personCampaignId) {
+        if (null == personCampaignId) {
             return;
         }
         Person p = c.getPerson(personCampaignId);
-        if(null == p) {
+        if (null == p) {
             return;
         }
         portrait.setCategory(p.getPortrait().getCategory());

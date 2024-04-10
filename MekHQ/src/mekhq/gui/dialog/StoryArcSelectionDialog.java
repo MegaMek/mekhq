@@ -99,7 +99,7 @@ public class StoryArcSelectionDialog extends AbstractMHQButtonDialog {
     }
 
     private void refreshDescription() {
-        if(null != getCurrentlySelectedStoryArc()) {
+        if (null != getCurrentlySelectedStoryArc()) {
             descriptionPane.setText(MarkdownRenderer.getRenderedHtml(getCurrentlySelectedStoryArc().getDescription()));
             descriptionPane.setCaretPosition(0);
         }

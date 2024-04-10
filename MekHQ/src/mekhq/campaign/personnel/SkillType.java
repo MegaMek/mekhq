@@ -231,7 +231,7 @@ public class SkillType {
     /** get the cost to acquire this skill at the given level from scratch **/
     public int getTotalCost(int lvl) {
         int totalCost = 0;
-        for(int i = 0; i<=lvl; i++) {
+        for (int i = 0; i<=lvl; i++) {
             totalCost = totalCost + costs[i];
         }
         return totalCost;

@@ -65,7 +65,7 @@ public class TravelStoryPoint extends StoryPoint {
     public String getTitle() {
         PlanetarySystem system = getDestination();
 
-        if(null != system) {
+        if (null != system) {
             return system.getName(getStoryArc().getCampaign().getLocalDate());
         }
         return "Unknown planetary system";
@@ -92,7 +92,7 @@ public class TravelStoryPoint extends StoryPoint {
     @Override
     public void start() {
         super.start();
-        if(null == getDestination()) {
+        if (null == getDestination()) {
             //if we don't have a valid destination, then complete the story point
             complete();
         }

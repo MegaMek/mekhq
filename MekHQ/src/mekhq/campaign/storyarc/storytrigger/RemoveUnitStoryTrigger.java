@@ -47,7 +47,7 @@ public class RemoveUnitStoryTrigger extends StoryTrigger {
 
     @Override
     protected void execute() {
-        if(removeAll) {
+        if (removeAll) {
             unitIds = new ArrayList<UUID>();
             for(Unit u : getCampaign().getUnits()) {
                 unitIds.add(u.getId());
@@ -81,7 +81,7 @@ public class RemoveUnitStoryTrigger extends StoryTrigger {
             try {
                 if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
                     UUID id = UUID.fromString(wn2.getTextContent().trim());
-                    if(null != id) {
+                    if (null != id) {
                         unitIds.add(id);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("removeAll")) {

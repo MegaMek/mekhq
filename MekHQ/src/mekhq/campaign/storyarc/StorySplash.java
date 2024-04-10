@@ -65,7 +65,7 @@ public class StorySplash extends AbstractIcon {
             storyIcon = (Image) MHQStaticDirectoryManager.getStorySplash().getItem(category, filename);
             if (storyIcon == null) {
                 //ok lets see if this image is in the story arc data
-                if(null != MHQStaticDirectoryManager.getUserStorySplash()) {
+                if (null != MHQStaticDirectoryManager.getUserStorySplash()) {
                     storyIcon = (Image) MHQStaticDirectoryManager.getUserStorySplash().getItem(category, filename);
                 }
 

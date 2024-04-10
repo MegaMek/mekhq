@@ -47,8 +47,8 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
     @Override
     protected void execute() {
         StoryPoint storyPoint = getStoryArc().getStoryPoint(missionStoryPointId);
-        if(storyPoint instanceof MissionStoryPoint) {
-            if(null != missionStatus) {
+        if (storyPoint instanceof MissionStoryPoint) {
+            if (null != missionStatus) {
                 ((MissionStoryPoint) storyPoint).getMission().setStatus(missionStatus);
             }
             storyPoint.complete();
@@ -59,7 +59,7 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);
-        if(null != missionStatus) {
+        if (null != missionStatus) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionStatus", missionStatus.name());
         }
         writeToXmlEnd(pw1, --indent);

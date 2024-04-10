@@ -41,7 +41,7 @@ public class AdvanceTimeStoryTrigger extends StoryTrigger {
     @Override
     protected void execute() {
         int i = 0;
-        while(i < days) {
+        while (i < days) {
             getCampaign().newDay();
             i++;
         }

@@ -82,11 +82,11 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
 
         //check for personality as this will override image
         Personality p = getStoryPoint().getPersonality();
-        if(null != p) {
+        if (null != p) {
             img = p.getImage();
         }
 
-        if(null != img) {
+        if (null != img) {
             ImageIcon icon = new ImageIcon(img);
             imgWidth = icon.getIconWidth();
             JLabel imgLbl = new JLabel();

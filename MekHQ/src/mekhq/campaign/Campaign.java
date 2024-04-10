@@ -3532,11 +3532,11 @@ public class Campaign implements ITechManager {
      */
     public Person getSeniorCommander() {
         Person commander = null;
-        for (Person p : getPersonnel()) {
-            if(p.isCommander()) {
+        for (Person p : getActivePersonnel()) {
+            if (p.isCommander()) {
                 return p;
             }
-            if(null == commander || p.getRankNumeric() > commander.getRankNumeric()) {
+            if (null == commander || p.getRankNumeric() > commander.getRankNumeric()) {
                 commander = p;
             }
         }
@@ -4111,7 +4111,7 @@ public class Campaign implements ITechManager {
         arc.setCampaign(this);
         arc.initializeDataDirectories();
         this.storyArc = arc;
-        if(initiate) {
+        if (initiate) {
             storyArc.begin();
         }
     }
@@ -4122,7 +4122,7 @@ public class Campaign implements ITechManager {
     }
 
     public List<String> getCurrentObjectives() {
-        if(null != getStoryArc()) {
+        if (null != getStoryArc()) {
             return getStoryArc().getCurrentObjectives();
         }
         return new ArrayList<String>();
@@ -4236,7 +4236,7 @@ public class Campaign implements ITechManager {
         getGameOptions().writeToXML(pw, indent);
 
         //current story arc
-        if(null != storyArc) {
+        if (null != storyArc) {
             storyArc.writeToXml(pw, indent);
         }
 

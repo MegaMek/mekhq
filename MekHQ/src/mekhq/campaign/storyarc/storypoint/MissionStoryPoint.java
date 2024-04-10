@@ -76,7 +76,7 @@ public class MissionStoryPoint extends StoryPoint {
 
     @Override
     public String getTitle() {
-        if(null != mission) {
+        if (null != mission) {
             return mission.getName();
         }
         return "";
@@ -85,13 +85,13 @@ public class MissionStoryPoint extends StoryPoint {
     @Override
     public void start() {
         super.start();
-        if(null != mission) {
+        if (null != mission) {
             getStoryArc().getCampaign().addMission(mission);
         }
         StoryPoint scenarioStoryPoint;
-        for(UUID scenarioStoryPointId : scenarioStoryPointIds) {
+        for (UUID scenarioStoryPointId : scenarioStoryPointIds) {
             scenarioStoryPoint = getStoryArc().getStoryPoint(scenarioStoryPointId);
-            if(null != scenarioStoryPoint) {
+            if (null != scenarioStoryPoint) {
                 scenarioStoryPoint.start();
             }
         }
@@ -117,7 +117,7 @@ public class MissionStoryPoint extends StoryPoint {
 
     @Override
     public String getResult() {
-        if(null == mission || mission.getStatus().isActive()) {
+        if (null == mission || mission.getStatus().isActive()) {
             return "";
         }
         return mission.getStatus().name();
@@ -132,13 +132,13 @@ public class MissionStoryPoint extends StoryPoint {
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "percentWin", percentWin);
-        for(UUID scenarioStoryPointId : scenarioStoryPointIds) {
+        for (UUID scenarioStoryPointId : scenarioStoryPointIds) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioStoryPointId", scenarioStoryPointId);
         }
-        if(null != mission) {
+        if (null != mission) {
             //if the mission has a valid id, then just save this because the mission is saved
             //and loaded elsewhere, so we need to link it
-            if(mission.getId() > 0) {
+            if (mission.getId() > 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionId", mission.getId());
             } else {
                 mission.writeToXML(pw1, indent);

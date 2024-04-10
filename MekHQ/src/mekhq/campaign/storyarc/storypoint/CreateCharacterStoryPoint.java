@@ -126,15 +126,15 @@ public class CreateCharacterStoryPoint extends StoryPoint {
     }
 
     public Person createPerson() {
-        if(null == faction) {
+        if (null == faction) {
             faction = getCampaign().getFaction();
         }
         Person p = new Person(getCampaign(), faction.getShortName());
-        if(null != primaryRole) {
+        if (null != primaryRole) {
             p.setPrimaryRole(getCampaign(), primaryRole);
         }
         p.setClanPersonnel(clan);
-        if(p.isClanPersonnel() && null != phenotype) {
+        if (p.isClanPersonnel() && null != phenotype) {
             p.setPhenotype(phenotype);
         }
 
@@ -144,12 +144,12 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         p.setBloodname(bloodname);
         p.setBiography(biography);
         p.setRank(rank);
-        if(edge > 0) {
+        if (edge > 0) {
             p.changeEdge(edge);
             setEdgeTriggers(p);
         }
 
-        if(null != personId) {
+        if (null != personId) {
             p.setId(personId);
         }
 
@@ -185,13 +185,13 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                 limitFaction);
         getCampaign().importPerson(person);
         personDialog.setVisible(true);
-        if(null != assignedUnitId) {
+        if (null != assignedUnitId) {
             Unit u = getCampaign().getUnit(assignedUnitId);
             if (null != u && u.isUnmanned()) {
                 u.addPilotOrSoldier(person, false);
                 //only assign to force if properly assigned to a unit
                 Force force = getCampaign().getForce(assignedForceId);
-                if(null != force && null != person.getUnit()) {
+                if (null != force && null != person.getUnit()) {
                     getCampaign().addUnitToForce(u, force.getId());
                 }
             }
@@ -215,7 +215,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
             IOption option;
             for (Enumeration<IOption> j = group.getOptions(); j.hasMoreElements();) {
                 option = j.nextElement();
-                if(null != option && option.getType() == IOption.BOOLEAN) {
+                if (null != option && option.getType() == IOption.BOOLEAN) {
                     p.setEdgeTrigger(option.getName(), true);
                 }
             }
@@ -246,7 +246,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignedForceId", assignedForceId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignedUnitId", assignedUnitId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "assignedUnitId", assignedUnitId);
-        if(null != faction) {
+        if (null != faction) {
             MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "faction", faction.getShortName());
         }
         writeToXmlEnd(pw1, --indent);

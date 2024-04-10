@@ -149,7 +149,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         selectedPhenotype = person.getPhenotype();
         options = person.getOptions();
         portrait = person.getPortrait();
-        if(null == instructions) {
+        if (null == instructions) {
             instructions = resourceMap.getString("instructions.text");
         }
         initComponents();
@@ -1064,10 +1064,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private void refreshXpSpent() {
         int xpLeft = xpPool - getSkillXpSpent();
         lblXpLeft.setText(Integer.toString(xpLeft));
-        if(xpLeft > 0) {
+        if (xpLeft > 0) {
             lblXpLeft.setForeground(new Color(0, 100, 0));
             doneButton.setEnabled(true);
-        } else if(xpLeft == 0) {
+        } else if (xpLeft == 0) {
             lblXpLeft.setForeground(Color.BLACK);
             doneButton.setEnabled(true);
         } else {
@@ -1262,7 +1262,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         } catch (NumberFormatException ignored) { }
         person.setPortrait(portrait);
         int xpSpent = xpPool - getSkillXpSpent();
-        if(xpSpent > 0) {
+        if (xpSpent > 0) {
             person.setXP(campaign, xpSpent);
         }
         setSkills();

@@ -134,7 +134,7 @@ public class StoryArc {
     public void setInitCampaignPath(String s) { this.initCampaignPath =s; }
 
     public File getInitCampaignFile() {
-        if(null == initCampaignPath) {
+        if (null == initCampaignPath) {
             return null;
         }
         return new File(initCampaignPath);
@@ -175,7 +175,7 @@ public class StoryArc {
     public void begin() {
         MekHQ.registerHandler(this);
         // starting point can be null if the arc depends on a check to get started
-        if(getStartingPointId() != null ) {
+        if (getStartingPointId() != null ) {
             getStoryPoint(getStartingPointId()).start();
         }
     }
@@ -221,7 +221,7 @@ public class StoryArc {
     public void handleScenarioResolved(ScenarioResolvedEvent ev) {
         // search through ScenarioStoryPoints for a match and if so complete it
         ScenarioStoryPoint storyPoint = findStoryPointByScenarioId(ev.getScenario().getId());
-        if(null != storyPoint && storyPoint.isActive()) {
+        if (null != storyPoint && storyPoint.isActive()) {
             storyPoint.complete();
         }
     }
@@ -233,7 +233,7 @@ public class StoryArc {
         for (Entry<UUID, StoryPoint> entry : storyPoints.entrySet()) {
             if (entry.getValue() instanceof TravelStoryPoint) {
                  storyPoint = (TravelStoryPoint) entry.getValue();
-                 if(ev.getLocation().getCurrentSystem().getId().equals(storyPoint.getDestinationId()) &&
+                 if (ev.getLocation().getCurrentSystem().getId().equals(storyPoint.getDestinationId()) &&
                          storyPoint.isActive()) {
                      storyPoint.complete();
                      break;
@@ -307,14 +307,14 @@ public class StoryArc {
             entry.getValue().writeToXml(pw1, indent);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "storyPoints");
-        if(!personalities.isEmpty()) {
+        if (!personalities.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "personalities");
             for (Entry<UUID, Personality> entry : personalities.entrySet()) {
                 entry.getValue().writeToXml(pw1, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(pw1, --indent, "personalities");
         }
-        if(!customStringVariables.isEmpty()) {
+        if (!customStringVariables.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "customStringVariables");
             for (Entry<String, String> entry : customStringVariables.entrySet()) {
                 MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "customStringVariable");
@@ -336,7 +336,7 @@ public class StoryArc {
                     continue;
                 }
                 StoryPoint storyPoint = StoryPoint.generateInstanceFromXML(wn, c, version);
-                if(null != storyPoint) {
+                if (null != storyPoint) {
                     storyPoint.setStoryArc(this);
                     storyPoints.put(storyPoint.getId(), storyPoint);
                 }
@@ -392,7 +392,7 @@ public class StoryArc {
         } catch (Exception e) {
             LogManager.getLogger().error(e);
         }
-        if(null != key && null != value) {
+        if (null != key && null != value) {
             addCustomStringVariable(key, value);
         }
     }
@@ -467,13 +467,13 @@ public class StoryArc {
     //endregion File I/O
 
     private static void updateReplacementTokens(Campaign c) {
-        if(null == replacementTokens) {
+        if (null == replacementTokens) {
             replacementTokens = new LinkedHashMap<>();
         }
 
         // get commander information
         Person commander = c.getSeniorCommander();
-        if(null == commander) {
+        if (null == commander) {
             //shouldn't happen unless there are no personnel, but just in case
             replacementTokens.put("\\{commanderCallsign\\}", "callsign(?)");
             replacementTokens.put("\\{commanderRank\\}", "rank(?)");
@@ -488,7 +488,7 @@ public class StoryArc {
 
         // tokens for customStringVariables
         Map<String, String> customVariables = c.getStoryArc().getCustomStringVariables();
-        if(!customVariables.isEmpty()) {
+        if (!customVariables.isEmpty()) {
             for (Entry<String, String> entry : customVariables.entrySet()) {
                 if (null != entry.getValue()) {
                     replacementTokens.put("\\{" + entry.getKey() + "\\}", entry.getValue());

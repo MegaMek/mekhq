@@ -113,7 +113,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             parseStorySplashDirectory = false;
             try {
                 File f = new File("data/images/storysplash");
-                if(f.exists()) {
+                if (f.exists()) {
                     storySplashDirectory = new DirectoryItems(f, new ImageFileFactory());
                 }
             } catch (Exception e) {
@@ -133,7 +133,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             parseUserStoryPortraitDirectory = false;
             try {
                 File f = new File(path);
-                if(f.exists()) {
+                if (f.exists()) {
                     userStoryPortraitDirectory = new DirectoryItems(f, new ImageFileFactory());
                 }
             } catch (Exception e) {
@@ -153,7 +153,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             parseUserStorySplashDirectory = false;
             try {
                 File f = new File(path);
-                if(f.exists()) {
+                if (f.exists()) {
                     userStorySplashDirectory = new DirectoryItems(f, new ImageFileFactory());
                 }
             } catch (Exception e) {

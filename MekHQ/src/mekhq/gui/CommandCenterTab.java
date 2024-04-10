@@ -311,7 +311,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panObjectives = new JPanel(new BorderLayout());
         panObjectives.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panObjectives.title")));
         listObjectives = new java.awt.List();
-        for(String objective : getCampaign().getCurrentObjectives()) {
+        for (String objective : getCampaign().getCurrentObjectives()) {
             listObjectives.add(objective);
         }
         panObjectives.add(listObjectives, BorderLayout.CENTER);
@@ -518,7 +518,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     private void refreshObjectives() {
         listObjectives.removeAll();
-        for(String objective : getCampaign().getCurrentObjectives()) {
+        for (String objective : getCampaign().getCurrentObjectives()) {
             listObjectives.add(objective);
         }
     }

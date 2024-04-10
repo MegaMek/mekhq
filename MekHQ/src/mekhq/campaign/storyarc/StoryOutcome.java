@@ -63,7 +63,7 @@ public class StoryOutcome {
      * @param a a {@link StoryArc StoryArc}
      */
     public void setStoryArc(StoryArc a) {
-        for(StoryTrigger storyTrigger : storyTriggers) {
+        for (StoryTrigger storyTrigger : storyTriggers) {
             storyTrigger.setStoryArc(a);
         }
     }
@@ -72,7 +72,7 @@ public class StoryOutcome {
     public void writeToXml(PrintWriter pw1, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcome", "result", result);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
-        if(!storyTriggers.isEmpty()) {
+        if (!storyTriggers.isEmpty()) {
             for (StoryTrigger trigger : storyTriggers) {
                 trigger.writeToXml(pw1, indent);
             }
