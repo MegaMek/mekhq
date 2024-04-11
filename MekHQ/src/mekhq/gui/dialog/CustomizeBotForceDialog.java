@@ -21,6 +21,7 @@ package mekhq.gui.dialog;
 import megamek.client.bot.princess.BehaviorSettings;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ui.dialogs.BotConfigDialog;
+import megamek.client.ui.dialogs.CamoChooserDialog;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.BotForce;
@@ -40,6 +41,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     //gui components
     private JTextField txtName;
     private JComboBox<String> choiceTeam;
+    private JButton btnCamo;
     private JPanel panBehavior;
     private JLabel lblCowardice;
     private JLabel lblSelfPreservation;
@@ -126,14 +128,25 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.weightx = 1.0;
         panLeft.add(choiceTeam, gbc);
 
-        intBehaviorPanel(resourceMap);
+        btnCamo = new JButton();
+        btnCamo.setIcon(botForce.getCamouflage().getImageIcon());
+        btnCamo.setMinimumSize(new Dimension(84, 72));
+        btnCamo.setPreferredSize(new Dimension(84, 72));
+        btnCamo.setMaximumSize(new Dimension(84, 72));
+        btnCamo.addActionListener(this::editCamo);
         gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.NONE;
+        panLeft.add(btnCamo, gbc);
+
+
+        intBehaviorPanel(resourceMap);
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
         panLeft.add(panBehavior, gbc);
 
 
@@ -224,6 +237,14 @@ public class CustomizeBotForceDialog  extends JDialog {
             lblPilotingRisk.setText(Integer.toString(botForce.getBehaviorSettings().getFallShameIndex()));
             lblForcedWithdrawal.setText(getForcedWithdrawalDescription(botForce.getBehaviorSettings()));
             lblAutoFlee.setText(getAutoFleeDescription(botForce.getBehaviorSettings()));
+        }
+    }
+
+    private void editCamo(ActionEvent evt) {
+        CamoChooserDialog ccd = new CamoChooserDialog(frame, botForce.getCamouflage());
+        if (ccd.showDialog().isConfirmed()) {
+            botForce.setCamouflage(ccd.getSelectedItem());
+            btnCamo.setIcon(botForce.getCamouflage().getImageIcon());
         }
     }
 
