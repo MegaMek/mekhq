@@ -1602,6 +1602,16 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Provides a filtered list of personnel including only deceased Persons.
+     * @return a {@link Person} <code>List</code> containing all dead personnel
+     */
+    public List<Person> getDeceasedPersonnel() {
+        return getPersonnel().stream()
+                .filter(p -> p.getStatus().isDead())
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Provides a filtered list of personnel including only active Persons.
      * @return a {@link Person} <code>List</code> containing all active personnel
      */

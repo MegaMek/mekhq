@@ -10,7 +10,7 @@
 		<stackable>true</stackable>
 		<precedence>1.01.1</precedence>
 		<qty>1</qty>
-		<item>Hero</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Scenario</range>
 	</award>
@@ -23,7 +23,7 @@
 		<stackable>true</stackable>
 		<precedence>1.02.1</precedence>
 		<qty>12</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Individual</size>
 		<range>Scenario</range>
 	</award>
@@ -36,7 +36,7 @@
 		<stackable>true</stackable>
 		<precedence>1.03.1</precedence>
 		<qty>432</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Battalion</size>
 		<range>Mission</range>
 	</award>
@@ -49,7 +49,7 @@
 		<stackable>true</stackable>
 		<precedence>1.03.4</precedence>
 		<qty>12</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Individual</size>
 		<range>Mission</range>
 	</award>
@@ -62,7 +62,7 @@
 		<stackable>true</stackable>
 		<precedence>1.04.1</precedence>
 		<qty>8</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Individual</size>
 		<range>Scenario</range>
 	</award>
@@ -75,7 +75,7 @@
 		<stackable>true</stackable>
 		<precedence>1.05.1</precedence>
 		<qty>324</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Battalion</size>
 		<range>Mission</range>
 	</award>
@@ -88,7 +88,7 @@
 		<stackable>true</stackable>
 		<precedence>1.05.2</precedence>
 		<qty>144</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Company</size>
 		<range>Mission</range>
 	</award>
@@ -101,7 +101,7 @@
 		<stackable>true</stackable>
 		<precedence>1.07.2</precedence>
 		<qty>108</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Company</size>
 		<range>Mission</range>
 	</award>
@@ -114,7 +114,7 @@
 		<stackable>true</stackable>
 		<precedence>1.08.1</precedence>
 		<qty>4</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Individual</size>
 		<range>Scenario</range>
 	</award>
@@ -127,7 +127,7 @@
 		<stackable>true</stackable>
 		<precedence>1.09.1</precedence>
 		<qty>1</qty>
-		<item>Wounded</item>
+		<item>Injury</item>
 		<size>Individual</size>
 		<range>Event</range>
 	</award>
@@ -140,7 +140,7 @@
 		<stackable>true</stackable>
 		<precedence>1.10.1</precedence>
 		<qty>48</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Lance</size>
 		<range>Mission</range>
 	</award>
@@ -153,7 +153,7 @@
 		<stackable>true</stackable>
 		<precedence>1.10.2</precedence>
 		<qty>36</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Lance</size>
 		<range>Mission</range>
 	</award>
@@ -166,7 +166,7 @@
 		<stackable>true</stackable>
 		<precedence>1.11.3</precedence>
 		<qty>9</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Individual</size>
 		<range>Mission</range>
 	</award>
@@ -178,7 +178,7 @@
 		<stackable>true</stackable>
 		<precedence>1.12.3</precedence>
 		<qty>6</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Individual</size>
 		<range>Mission</range>
 	</award>
@@ -189,7 +189,7 @@
 		<edge>1</edge>
 		<precedence>1.13.1</precedence>
 		<qty>1</qty>
-		<item>Combat</item>
+		<item>Scenario</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -201,7 +201,7 @@
 		<stackable>true</stackable>
 		<precedence>2.01.2</precedence>
 		<qty>216</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Battalion</size>
 		<range>Mission</range>
 	</award>
@@ -213,7 +213,7 @@
 		<stackable>true</stackable>
 		<precedence>2.01.7</precedence>
 		<qty>72</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Company</size>
 		<range>Mission</range>
 	</award>
@@ -225,7 +225,7 @@
 		<stackable>true</stackable>
 		<precedence>2.02.2</precedence>
 		<qty>24</qty>
-		<item>Kills</item>
+		<item>Kill</item>
 		<size>Lance</size>
 		<range>Mission</range>
 	</award>
@@ -239,7 +239,7 @@
 		<stackable>true</stackable>
 		<precedence>3.01.1</precedence>
 		<qty>1</qty>
-		<item>Prisoner</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Event</range>
 	</award>
@@ -252,7 +252,7 @@
 		<stackable>true</stackable>
 		<precedence>3.02.4</precedence>
 		<qty>72</qty>
-		<item>Conduct</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Months</range>
 	</award>
@@ -264,7 +264,7 @@
 		<edge>1</edge>
 		<precedence>3.02.8</precedence>
 		<qty>1</qty>
-		<item>Top</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -276,7 +276,7 @@
 		<xp>1</xp>
 		<precedence>3.04.2</precedence>
 		<qty>1</qty>
-		<item>House</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -288,7 +288,7 @@
 		<xp>1</xp>
 		<precedence>3.05.1</precedence>
 		<qty>1</qty>
-		<item>Enlist</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -300,7 +300,7 @@
 		<xp>1</xp>
 		<precedence>3.05.2</precedence>
 		<qty>1</qty>
-		<item>Pirates</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -312,7 +312,7 @@
 		<edge>2</edge>
 		<precedence>3.05.5</precedence>
 		<qty>1</qty>
-		<item>Civilian</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Event</range>
 	</award>
@@ -324,7 +324,7 @@
 		<xp>1</xp>
 		<precedence>3.07.4</precedence>
 		<qty>1</qty>
-		<item>Periphery</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -336,7 +336,7 @@
 		<xp>1</xp>
 		<precedence>3.08.01</precedence>
 		<qty>1</qty>
-		<item>3SW</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -348,7 +348,7 @@
 		<xp>1</xp>
 		<precedence>3.08.02</precedence>
 		<qty>1</qty>
-		<item>4SW</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -360,7 +360,7 @@
 		<xp>1</xp>
 		<precedence>3.08.03</precedence>
 		<qty>1</qty>
-		<item>AndurienWar</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -372,7 +372,7 @@
 		<xp>1</xp>
 		<precedence>3.08.04</precedence>
 		<qty>1</qty>
-		<item>RoninWar</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -384,7 +384,7 @@
 		<xp>1</xp>
 		<precedence>3.08.05</precedence>
 		<qty>1</qty>
-		<item>W39</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -396,7 +396,7 @@
 		<xp>1</xp>
 		<precedence>3.08.06</precedence>
 		<qty>1</qty>
-		<item>Clan</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -408,7 +408,7 @@
 		<xp>1</xp>
 		<precedence>3.08.07</precedence>
 		<qty>1</qty>
-		<item>W57</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -420,7 +420,7 @@
 		<xp>1</xp>
 		<precedence>3.08.08</precedence>
 		<qty>1</qty>
-		<item>TFS</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -432,7 +432,7 @@
 		<xp>1</xp>
 		<precedence>3.08.09</precedence>
 		<qty>1</qty>
-		<item>CSI</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -444,7 +444,7 @@
 		<xp>1</xp>
 		<precedence>3.08.10</precedence>
 		<qty>1</qty>
-		<item>FCCW</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -456,7 +456,7 @@
 		<xp>1</xp>
 		<precedence>3.08.11</precedence>
 		<qty>1</qty>
-		<item>Jihad</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -467,7 +467,7 @@
 		<xp>1</xp>
 		<precedence>4.01.2</precedence>
 		<qty>3</qty>
-		<item>Foreign</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Months</range>
 	</award>
@@ -478,7 +478,7 @@
 		<xp>1</xp>
 		<precedence>4.02.2</precedence>
 		<qty>12</qty>
-		<item>Foreign</item>
+		<item>TheatreOfWar</item>
 		<size>Individual</size>
 		<range>Months</range>
 	</award>
@@ -490,7 +490,7 @@
 		<edge>1</edge>
 		<precedence>4.02.8</precedence>
 		<qty>1</qty>
-		<item>Covert</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -514,7 +514,7 @@
 		<edge>1</edge>
 		<precedence>4.04.5</precedence>
 		<qty>1</qty>
-		<item>Drill</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -526,7 +526,7 @@
 		<edge>1</edge>
 		<precedence>4.04.6</precedence>
 		<qty>1</qty>
-		<item>Instructor</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -537,7 +537,7 @@
 		<xp>1</xp>
 		<precedence>4.05.1</precedence>
 		<qty>1</qty>
-		<item>Honor</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -549,7 +549,7 @@
 		<edge>1</edge>
 		<precedence>4.05.2</precedence>
 		<qty>1</qty>
-		<item>Security</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -582,7 +582,7 @@
 		<ribbon>4-07-1-NCOGraduate.png</ribbon>
 		<xp>2</xp>
 		<precedence>4.07.1</precedence>
-		<qty>10</qty>
+		<qty>1</qty>
 		<item>Rank</item>
 		<size>Individual</size>
 		<range>Career</range>
@@ -606,7 +606,7 @@
 		<xp>2</xp>
 		<precedence>5.02.4</precedence>
 		<qty>3</qty>
-		<item>Gunnery</item>
+		<item>Skill</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -617,7 +617,7 @@
 		<xp>1</xp>
 		<precedence>5.02.8</precedence>
 		<qty>1</qty>
-		<item>Gunnery</item>
+		<item>Skill</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>

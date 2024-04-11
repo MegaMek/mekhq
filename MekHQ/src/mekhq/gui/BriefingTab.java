@@ -35,6 +35,7 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.autoMedals.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
@@ -395,6 +396,13 @@ public final class BriefingTab extends CampaignGuiTab {
 
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             ((AtBContract) mission).checkForFollowup(getCampaign());
+        }
+
+        // for the purposes of Mission Accomplished awards, do not count partial Successes
+        if (Objects.equals(String.valueOf(cmd.getStatus()), "Success")) {
+            new AutoAwardsController(getCampaign(), true);
+        } else {
+            new AutoAwardsController(getCampaign(), false);
         }
 
         final List<Mission> missions = getCampaign().getSortedMissions();
