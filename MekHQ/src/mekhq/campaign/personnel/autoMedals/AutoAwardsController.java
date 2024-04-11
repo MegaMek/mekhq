@@ -15,36 +15,40 @@ public class AutoAwardsController {
     private Campaign campaign;
 
     private List<Award> killAwards = new ArrayList<>();
-    private List<Award> miscAwards = new ArrayList<>();
+    // As there are currently no Misc Awards coded, we skip this step
+//    private List<Award> miscAwards = new ArrayList<>();
     private List<Award> missionAccomplishedAwards = new ArrayList<>();
-    // MissionAwards are disabled until a way to track how many Missions a person has completed is introduced
+    // MissionAwards are disabled until a way to track how many Missions a person has completed has been introduced
 //    private List<Award> missionAwards = new ArrayList<>();
     private List<Award> scenarioAwards = new ArrayList<>();
     private List<Award> skillAwards = new ArrayList<>();
     private List<Award> theatreOfWarAwards = new ArrayList<>();
     private List<Award> timeAwards = new ArrayList<>();
 
-    public AutoAwardsController(Campaign c, Boolean missionWasSuccessful) {
-        campaign = c;
-
+    /**
+     * The primary controller for the automatic processing of Awards
+     * @param campaign the campaign to be processed
+     * @param missionWasSuccessful @Nullable true if Mission was a complete Success, otherwise false, should also be false if not run at the end of a Mission
+     */
+    public AutoAwardsController(Campaign campaign, Boolean missionWasSuccessful) {
         LogManager.getLogger().info("autoAwards has started");
 
         buildAwardLists();
 
         Collection<Person> personnel = campaign.getActivePersonnel();
+        removeDependentsAndPrisoners(personnel);
+
 
         if (!personnel.isEmpty()) {
             ProcessAwards(personnel, missionWasSuccessful);
 
             // TODO add Posthumous Awards to Campaign Options
-            boolean fakeCampaignOptionPosthumousAwardsIsEnabled = false;
+            boolean fakeCampaignOptionPosthumousAwardsIsEnabled = true;
             if (fakeCampaignOptionPosthumousAwardsIsEnabled) {
-                Collection<Person> deadPersonnel = campaign.getDeceasedPersonnel();
+                Collection<Person> deceasedPersonnel = campaign.getDeceasedPersonnel();
+                removeDependentsAndPrisoners(personnel);
 
-                if (deadPersonnel.isEmpty()) {
-                    // even dead Dependants don't get awards
-                    personnel.removeIf(person -> person.hasRole(PersonnelRole.DEPENDENT));
-
+                if (!deceasedPersonnel.isEmpty()) {
                     ProcessAwards(personnel, missionWasSuccessful);
                 } else {
                     LogManager.getLogger().info("AutoAwards found no deceased personnel, skipping this step");
@@ -79,9 +83,9 @@ public class AutoAwardsController {
                 new SkillAwards(campaign, skillAwards, person);
             }
 
-            if (!miscAwards.isEmpty()) {
-                new MiscAwards(campaign, miscAwards, person);
-            }
+//            if (!miscAwards.isEmpty()) {
+//                new MiscAwards(campaign, miscAwards, person);
+//            }
 
             // is person has no combat role, we don't need to check combat related medals
             if (person.hasCombatRole()) {
@@ -100,6 +104,7 @@ public class AutoAwardsController {
         }
         LogManager.getLogger().info("autoAwards has finished");
     }
+
     /**
      * Builds the award list and filters it, so we're not processing the same medals multiple times
      */
@@ -143,9 +148,9 @@ public class AutoAwardsController {
                             case "Time":
                                 timeAwards.add(award);
                                 break;
-                            case "Misc":
-                                miscAwards.add(award);
-                                break;
+//                            case "Misc":
+//                                miscAwards.add(award);
+//                                break;
                             default:
                                 // TODO add file directory for documentation
                                 LogManager.getLogger().info("AutoAwards failed to find a valid award type for {} from the {} set. Please see DOCUMENT ADDRESS", award.getName(), setName);
@@ -154,7 +159,7 @@ public class AutoAwardsController {
 
                     // These logs help users double-check that the number of awards found matches their records
                     LogManager.getLogger().info("autoAwards found {} Kill awards", killAwards.size());
-                    LogManager.getLogger().info("autoAwards found {} Misc awards", miscAwards.size());
+//                    LogManager.getLogger().info("autoAwards found {} Misc awards", miscAwards.size());
                     LogManager.getLogger().info("autoAwards found {} MissionAccomplished awards", missionAccomplishedAwards.size());
 //                    LogManager.getLogger().info("autoAwards found {} Mission awards", missionAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Scenario awards", scenarioAwards.size());
@@ -167,6 +172,16 @@ public class AutoAwardsController {
             }
         } else {
             LogManager.getLogger().info("AutoAwards failed to find any award sets");
+        }
+    }
+
+    /**
+     * Filters out anyone with the Prisoner status, or Dependent role
+     * @param personnel personnel to process
+     */
+    private void removeDependentsAndPrisoners (Collection<Person> personnel) {
+        if (!personnel.isEmpty()) {
+            personnel.removeIf(person -> (person.hasRole(PersonnelRole.DEPENDENT)) || (person.getPrisonerStatus().isPrisoner()));
         }
     }
 }
