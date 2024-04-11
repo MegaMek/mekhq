@@ -80,7 +80,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         botStubs = new ArrayList<>();
         if (s.getStatus().isCurrent()) {
             for (int i = 0; i < s.getNumBots(); i++) {
-                botStubs.add(s.generateBotStub(s.getBotForce(i), campaign));
+                botStubs.add(s.getBotForce(i).generateStub(campaign));
             }
         } else {
             botStubs = s.getBotForcesStubs();

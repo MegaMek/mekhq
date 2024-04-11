@@ -24,12 +24,9 @@ import megamek.client.bot.princess.BehaviorSettingsFactory;
 import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.swing.util.PlayerColour;
-import megamek.common.Board;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.UnitNameTracker;
-import megamek.common.EntityListFile;
+import megamek.common.*;
 import megamek.common.icons.Camouflage;
+import mekhq.Utilities;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -314,6 +311,17 @@ public class BotForce {
             }
         }
         return false;
+    }
+
+    public BotForceStub generateStub(Campaign c) {
+        List<String> stubs = Utilities.generateEntityStub(getFullEntityList(c));
+        return new BotForceStub("<html>" +
+                getName() + " <i>" +
+                ((getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
+                " Start: " + IStartingPositions.START_LOCATION_NAMES[getStart()] +
+                " Fixed BV: " + getTotalBV(c) +
+                ((null == getBotForceRandomizer()) ? "" : "<br>Random: " + getBotForceRandomizer().getDescription()) +
+                "</html>", stubs);
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {

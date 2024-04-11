@@ -1285,4 +1285,20 @@ public class Utilities {
 
         return summary;
     }
+
+    public static List<String> generateEntityStub(List<Entity> entities) {
+        List<String> stub = new ArrayList<>();
+        for (Entity en : entities) {
+            if (null == en) {
+                stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
+            } else {
+                stub.add("<html>" + en.getCrew().getName() + " (" +
+                        en.getCrew().getGunnery() + "/" +
+                        en.getCrew().getPiloting() + "), " +
+                        "<i>" + en.getShortName() + "</i>" +
+                        "</html>");
+            }
+        }
+        return stub;
+    }
 }

@@ -25,6 +25,7 @@ import megamek.client.ui.dialogs.CamoChooserDialog;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.mission.BotForceStub;
 import mekhq.campaign.mission.Mission;
 
 import javax.swing.*;

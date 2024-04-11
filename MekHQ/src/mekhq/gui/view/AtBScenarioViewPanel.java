@@ -28,6 +28,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.ForceStub;
 import mekhq.campaign.force.UnitStub;
@@ -123,9 +124,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         if (s.getStatus().isCurrent()) {
             s.refresh(c);
             this.playerForces = new ForceStub(s.getForces(campaign), campaign);
-            attachedAllyStub = s.generateEntityStub(s.getAlliesPlayer());
+            attachedAllyStub = Utilities.generateEntityStub(s.getAlliesPlayer());
             for (int i = 0; i < s.getNumBots(); i++) {
-                botStubs.add(s.generateBotStub(s.getBotForce(i), campaign));
+                botStubs.add(s.getBotForce(i).generateStub(campaign));
             }
         } else {
             this.playerForces = s.getForceStub();

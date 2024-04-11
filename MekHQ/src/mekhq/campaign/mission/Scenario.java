@@ -548,39 +548,12 @@ public class Scenario {
     public void generateStub(Campaign c) {
         stub = new ForceStub(getForces(c), c);
         for (BotForce bf : botForces) {
-            botForcesStubs.add(generateBotStub(bf, c));
+            botForcesStubs.add(bf.generateStub(c));
         }
         botForces.clear();
     }
 
     public ForceStub getForceStub() {
-        return stub;
-    }
-
-    public BotForceStub generateBotStub(BotForce bf, Campaign c) {
-        List<String> stubs = generateEntityStub(bf.getFullEntityList(c));
-        return new BotForceStub("<html>" +
-                bf.getName() + " <i>" +
-                ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
-                " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStart()] +
-                " Fixed BV: " + bf.getTotalBV(c) +
-                ((null == bf.getBotForceRandomizer()) ? "" : "<br>Random: " + bf.getBotForceRandomizer().getDescription()) +
-                "</html>", stubs);
-    }
-
-    public List<String> generateEntityStub(List<Entity> entities) {
-        List<String> stub = new ArrayList<>();
-        for (Entity en : entities) {
-            if (null == en) {
-                stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
-            } else {
-                stub.add("<html>" + en.getCrew().getName() + " (" +
-                        en.getCrew().getGunnery() + "/" +
-                        en.getCrew().getPiloting() + "), " +
-                        "<i>" + en.getShortName() + "</i>" +
-                        "</html>");
-            }
-        }
         return stub;
     }
 
