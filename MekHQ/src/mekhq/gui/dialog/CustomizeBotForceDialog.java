@@ -18,6 +18,9 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.bot.princess.BehaviorSettings;
+import megamek.client.bot.princess.CardinalEdge;
+import megamek.client.ui.dialogs.BotConfigDialog;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.BotForce;
@@ -30,17 +33,25 @@ import java.util.ResourceBundle;
 
 public class CustomizeBotForceDialog  extends JDialog {
 
+    private JFrame frame;
     private BotForce botForce;
     private Campaign campaign;
 
     //gui components
     private JTextField txtName;
     private JComboBox<String> choiceTeam;
-    private JButton btnClose;
-    private JButton btnOK;
+    private JPanel panBehavior;
+    private JLabel lblCowardice;
+    private JLabel lblSelfPreservation;
+    private JLabel lblAggression;
+    private JLabel lblHerdMentality;
+    private JLabel lblPilotingRisk;
+    private JLabel lblForcedWithdrawal;
+    private JLabel lblAutoFlee;
 
     public CustomizeBotForceDialog(JFrame parent, boolean modal, BotForce bf, Campaign c) {
         super(parent, modal);
+        this.frame = parent;
         if (null == bf) {
             botForce = new BotForce();
             botForce.setName("New Bot Force");
@@ -71,9 +82,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         getContentPane().add(panMain, BorderLayout.CENTER);
 
         JPanel panButtons = new JPanel(new GridLayout(0, 2));
-        btnOK = new JButton(resourceMap.getString("btnOK.text"));
+        JButton btnOK = new JButton(resourceMap.getString("btnOK.text"));
         btnOK.addActionListener(this::done);
-        btnClose = new JButton(resourceMap.getString("btnClose.text"));
+        JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
         btnClose.addActionListener(this::cancel);
         panButtons.add(btnOK);
         panButtons.add(btnClose);
@@ -115,10 +126,120 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.weightx = 1.0;
         panLeft.add(choiceTeam, gbc);
 
+        intBehaviorPanel(resourceMap);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.NONE;
+        panLeft.add(panBehavior, gbc);
+
+
+    }
+
+    private void intBehaviorPanel(ResourceBundle resourceMap) {
+        panBehavior = new JPanel(new GridBagLayout());
+        panBehavior.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resourceMap.getString("panBehavior.title")),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+
+        BehaviorSettings behavior = botForce.getBehaviorSettings();
+
+        GridBagConstraints gbcLeft = new GridBagConstraints();
+        gbcLeft.gridx = 0;
+        gbcLeft.gridy = 0;
+        gbcLeft.weightx = 0.0;
+        gbcLeft.weighty = 0.0;
+        gbcLeft.fill = GridBagConstraints.NONE;
+        gbcLeft.anchor = GridBagConstraints.WEST;
+        gbcLeft.insets = new Insets(0, 0, 0, 5);
+
+        GridBagConstraints gbcRight = new GridBagConstraints();
+        gbcRight.gridx = 1;
+        gbcRight.gridy = 0;
+        gbcRight.weightx = 1.0;
+        gbcRight.weighty = 0.0;
+        gbcRight.fill = GridBagConstraints.NONE;
+        gbcRight.anchor = GridBagConstraints.CENTER;
+        gbcRight.insets = new Insets(0, 5, 0, 0);
+
+        lblCowardice = new JLabel(Integer.toString(behavior.getBraveryIndex()));
+        lblSelfPreservation = new JLabel(Integer.toString(behavior.getSelfPreservationIndex()));
+        lblAggression = new JLabel(Integer.toString(behavior.getHyperAggressionIndex()));
+        lblHerdMentality = new JLabel(Integer.toString(behavior.getHerdMentalityIndex()));
+        lblPilotingRisk = new JLabel(Integer.toString(behavior.getFallShameIndex()));
+        lblForcedWithdrawal = new JLabel(getForcedWithdrawalDescription(behavior));
+        lblAutoFlee = new JLabel(getAutoFleeDescription(behavior));
+
+
+        panBehavior.add(new JLabel(resourceMap.getString("lblCowardice.text")), gbcLeft);
+        panBehavior.add(lblCowardice, gbcRight);
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panBehavior.add(new JLabel(resourceMap.getString("lblSelfPreservation.text")), gbcLeft);
+        panBehavior.add(lblSelfPreservation, gbcRight);
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panBehavior.add(new JLabel(resourceMap.getString("lblAggression.text")), gbcLeft);
+        panBehavior.add(lblAggression, gbcRight);
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panBehavior.add(new JLabel(resourceMap.getString("lblHerdMentality.text")), gbcLeft);
+        panBehavior.add(lblHerdMentality, gbcRight);
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panBehavior.add(new JLabel(resourceMap.getString("lblPilotingRisk.text")), gbcLeft);
+        panBehavior.add(lblPilotingRisk, gbcRight);
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panBehavior.add(new JLabel(resourceMap.getString("lblForcedWithdrawal.text")), gbcLeft);
+        panBehavior.add(lblForcedWithdrawal, gbcRight);
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panBehavior.add(new JLabel(resourceMap.getString("lblAutoFlee.text")), gbcLeft);
+        panBehavior.add(lblAutoFlee, gbcRight);
+
+        JButton btnBehavior = new JButton(resourceMap.getString("btnBehavior.text"));
+        btnBehavior.addActionListener(this::editBehavior);
+        gbcLeft.gridy++;
+        gbcLeft.gridwidth = 2;
+        panBehavior.add(btnBehavior, gbcLeft);
     }
 
     public BotForce getBotForce() {
         return botForce;
+    }
+
+    private void editBehavior(ActionEvent evt) {
+        BotConfigDialog bcd = new BotConfigDialog(frame, botForce.getName(), botForce.getBehaviorSettings(), null);
+        bcd.setVisible(true);
+        if(!bcd.getResult().isCancelled()) {
+            botForce.setBehaviorSettings(bcd.getBehaviorSettings());
+            lblCowardice.setText(Integer.toString(botForce.getBehaviorSettings().getBraveryIndex()));
+            lblSelfPreservation.setText(Integer.toString(botForce.getBehaviorSettings().getSelfPreservationIndex()));
+            lblAggression.setText(Integer.toString(botForce.getBehaviorSettings().getHyperAggressionIndex()));
+            lblHerdMentality.setText(Integer.toString(botForce.getBehaviorSettings().getHerdMentalityIndex()));
+            lblPilotingRisk.setText(Integer.toString(botForce.getBehaviorSettings().getFallShameIndex()));
+            lblForcedWithdrawal.setText(getForcedWithdrawalDescription(botForce.getBehaviorSettings()));
+            lblAutoFlee.setText(getAutoFleeDescription(botForce.getBehaviorSettings()));
+        }
+    }
+
+    private String getForcedWithdrawalDescription(BehaviorSettings behavior) {
+        if(!behavior.isForcedWithdrawal()) {
+            return "NONE";
+        } else {
+            return behavior.getRetreatEdge().toString();
+        }
+    }
+    private String getAutoFleeDescription(BehaviorSettings behavior) {
+        if(!behavior.shouldAutoFlee()) {
+            return "NO";
+        } else {
+            return behavior.getDestinationEdge().toString();
+        }
     }
 
     private void done(ActionEvent evt) {
