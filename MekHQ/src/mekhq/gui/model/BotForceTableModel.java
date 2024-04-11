@@ -94,7 +94,7 @@ public class BotForceTableModel extends AbstractTableModel {
             case COL_NAME:
                 return botForce.getName();
             case COL_RELATION:
-                return (botForce.getTeam() == 1) ? "Allied" : "Enemy";
+                return (botForce.getTeam() == 1) ? "Allied" : "Enemy (Team " + botForce.getTeam() + ")";
             case COL_FIXED:
                 return botForce.getTotalBV(campaign);
             case COL_RANDOM:

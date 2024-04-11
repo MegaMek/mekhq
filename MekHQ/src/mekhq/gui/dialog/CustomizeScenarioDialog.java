@@ -720,13 +720,21 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void addForce() {
-        // TODO: BotForceEditorDialog
+        CustomizeBotForceDialog cbfd = new CustomizeBotForceDialog(frame, true, null, campaign);
+        cbfd.setVisible(true);
+        if (null != cbfd.getBotForce()) {
+            forcesModel.addForce(cbfd.getBotForce());
+        }
         refreshForcesTable();
     }
 
     private void editForce() {
-        // TODO: BotForceEditorDialog
-        refreshForcesTable();
+        BotForce bf = forcesModel.getBotForceAt(forcesTable.getSelectedRow());
+        if (null != bf) {
+            CustomizeBotForceDialog cbfd = new CustomizeBotForceDialog(frame, true, bf, campaign);
+            cbfd.setVisible(true);
+            refreshForcesTable();
+        }
     }
 
     private void deleteForce() {
