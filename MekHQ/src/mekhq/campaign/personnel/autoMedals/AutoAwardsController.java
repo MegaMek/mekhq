@@ -10,16 +10,16 @@ import org.apache.logging.log4j.LogManager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AutoAwardsController {
     private Campaign campaign;
 
     private List<Award> killAwards = new ArrayList<>();
-    // As there are currently no Misc Awards coded, we skip this step
-//    private List<Award> miscAwards = new ArrayList<>();
+    private List<Award> miscAwards = new ArrayList<>();
     private List<Award> missionAccomplishedAwards = new ArrayList<>();
     // MissionAwards are disabled until a way to track how many Missions a person has completed has been introduced
-//    private List<Award> missionAwards = new ArrayList<>();
+    private List<Award> missionAwards = new ArrayList<>();
     private List<Award> scenarioAwards = new ArrayList<>();
     private List<Award> skillAwards = new ArrayList<>();
     private List<Award> theatreOfWarAwards = new ArrayList<>();
@@ -30,26 +30,44 @@ public class AutoAwardsController {
      * @param campaign the campaign to be processed
      * @param missionWasSuccessful @Nullable true if Mission was a complete Success, otherwise false, should also be false if not run at the end of a Mission
      */
-    public AutoAwardsController(Campaign campaign, Boolean missionWasSuccessful) {
+    public AutoAwardsController(Campaign c, Boolean missionWasSuccessful) {
         LogManager.getLogger().info("autoAwards has started");
+
+        campaign = c;
 
         buildAwardLists();
 
         Collection<Person> personnel = campaign.getActivePersonnel();
-        removeDependentsAndPrisoners(personnel);
-
 
         if (!personnel.isEmpty()) {
-            ProcessAwards(personnel, missionWasSuccessful);
+            // Prisoners and Dependents are not eligible for Awards
+            removeDependentsAndPrisoners(personnel);
+
+            // we have to do multiple isEmpty() checks as any point in the removal process could result in null personnel
+            if(!personnel.isEmpty()) {
+                // This is the main workhorse function
+                ProcessAwards(personnel, missionWasSuccessful);
+            }
 
             // TODO add Posthumous Awards to Campaign Options
-            boolean fakeCampaignOptionPosthumousAwardsIsEnabled = true;
+            boolean fakeCampaignOptionPosthumousAwardsIsEnabled = false;
+
             if (fakeCampaignOptionPosthumousAwardsIsEnabled) {
-                Collection<Person> deceasedPersonnel = campaign.getDeceasedPersonnel();
-                removeDependentsAndPrisoners(personnel);
+                personnel = campaign.getPersonnel();
+                ArrayList<Person> deceasedPersonnel = new ArrayList<>();
+
+                if (!personnel.isEmpty()) {
+                    // even dead Dependents and Prisoners aren't eligible for Awards
+                    removeDependentsAndPrisoners(personnel);
+                }
+
+                if(!personnel.isEmpty()) {
+                    deceasedPersonnel = personnel.stream().filter(person
+                            -> person.getStatus().isDead()).collect(Collectors.toCollection(ArrayList::new));
+                }
 
                 if (!deceasedPersonnel.isEmpty()) {
-                    ProcessAwards(personnel, missionWasSuccessful);
+                    ProcessAwards(deceasedPersonnel, missionWasSuccessful);
                 } else {
                     LogManager.getLogger().info("AutoAwards found no deceased personnel, skipping this step");
                 }
@@ -57,6 +75,8 @@ public class AutoAwardsController {
         } else {
             LogManager.getLogger().info("AutoAwards found no active personnel, skipping the award ceremony");
         }
+
+        LogManager.getLogger().info("autoAwards has finished");
     }
 
     /**
@@ -83,9 +103,9 @@ public class AutoAwardsController {
                 new SkillAwards(campaign, skillAwards, person);
             }
 
-//            if (!miscAwards.isEmpty()) {
-//                new MiscAwards(campaign, miscAwards, person);
-//            }
+            if (!miscAwards.isEmpty()) {
+                new MiscAwards(campaign, miscAwards, person);
+            }
 
             // is person has no combat role, we don't need to check combat related medals
             if (person.hasCombatRole()) {
@@ -97,12 +117,11 @@ public class AutoAwardsController {
                     new ScenarioAwards(campaign, scenarioAwards, person);
                 }
 
-//                if (!missionAwards.isEmpty()) {
-//                    new MissionAwards(campaign, missionAwards, person);
-//                }
+                if (!missionAwards.isEmpty()) {
+                    new MissionAwards(campaign, missionAwards, person);
+                }
             }
         }
-        LogManager.getLogger().info("autoAwards has finished");
     }
 
     /**
@@ -148,9 +167,9 @@ public class AutoAwardsController {
                             case "Time":
                                 timeAwards.add(award);
                                 break;
-//                            case "Misc":
-//                                miscAwards.add(award);
-//                                break;
+                            case "Misc":
+                                miscAwards.add(award);
+                                break;
                             default:
                                 // TODO add file directory for documentation
                                 LogManager.getLogger().info("AutoAwards failed to find a valid award type for {} from the {} set. Please see DOCUMENT ADDRESS", award.getName(), setName);
@@ -159,9 +178,9 @@ public class AutoAwardsController {
 
                     // These logs help users double-check that the number of awards found matches their records
                     LogManager.getLogger().info("autoAwards found {} Kill awards", killAwards.size());
-//                    LogManager.getLogger().info("autoAwards found {} Misc awards", miscAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Misc awards", miscAwards.size());
                     LogManager.getLogger().info("autoAwards found {} MissionAccomplished awards", missionAccomplishedAwards.size());
-//                    LogManager.getLogger().info("autoAwards found {} Mission awards", missionAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Mission awards", missionAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Scenario awards", scenarioAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Skill awards", skillAwards.size());
                     LogManager.getLogger().info("autoAwards found {} TheatreOfWar awards", theatreOfWarAwards.size());

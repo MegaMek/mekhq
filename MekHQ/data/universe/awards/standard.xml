@@ -605,10 +605,10 @@
 		<ribbon>5-02-4-ExpertMarksmanship.png</ribbon>
 		<xp>2</xp>
 		<precedence>5.02.4</precedence>
-		<qty>3</qty>
+		<qty>7</qty>
 		<item>Skill</item>
 		<size>Individual</size>
-		<range>Career</range>
+		<range>Accuracy</range>
 	</award>
 	<award>
 		<name>Marksmanship</name>
@@ -616,9 +616,9 @@
 		<ribbon>5-02-8-Marksmanship.png</ribbon>
 		<xp>1</xp>
 		<precedence>5.02.8</precedence>
-		<qty>1</qty>
+		<qty>5</qty>
 		<item>Skill</item>
 		<size>Individual</size>
-		<range>Career</range>
+		<range>Accuracy</range>
 	</award>
 </awards>
