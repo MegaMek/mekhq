@@ -343,53 +343,21 @@ public class CustomizeBotForceDialog  extends JDialog {
         });
         panRandomForces.add(chkUseRandomForces, gbc);
 
-        spnForceMultiplier = new JSpinner(new SpinnerNumberModel(randomizer.getForceMultiplier(),
-                0.05, 5, 0.05));
-        spnForceMultiplier.setEnabled(useRandomForces);
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.0;
-        gbc.gridy++;
-        panRandomForces.add(new JLabel("Force Multiplier:"), gbc);
-        gbc.gridx = 1;
-        panRandomForces.add(spnForceMultiplier, gbc);
-
-        spnPercentConventional = new JSpinner(new SpinnerNumberModel(randomizer.getPercentConventional(),
-                0, 75, 5));
-        spnPercentConventional.setEnabled(useRandomForces);
-        gbc.gridx = 0;
-        gbc.gridy++;
-        panRandomForces.add(new JLabel("Percent Conventional:"), gbc);
-        gbc.gridx = 1;
-        panRandomForces.add(spnPercentConventional, gbc);
-
-        spnBaChance = new JSpinner(new SpinnerNumberModel(randomizer.getBaChance(),
-                0, 100, 5));
-        spnBaChance.setEnabled(useRandomForces);
-        gbc.gridx = 0;
-        gbc.gridy++;
-        panRandomForces.add(new JLabel("Integrated BA Chance:"), gbc);
-        gbc.gridx = 1;
-        panRandomForces.add(spnBaChance, gbc);
-
-        spnLanceSize = new JSpinner(new SpinnerNumberModel(randomizer.getLanceSize(),
-                0, 6, 1));
-        spnLanceSize.setEnabled(useRandomForces);
-        gbc.gridx = 0;
-        gbc.gridy++;
-        panRandomForces.add(new JLabel("Lance Size:"), gbc);
-        gbc.gridx = 1;
-        panRandomForces.add(spnLanceSize, gbc);
-
         DefaultComboBoxModel<String> balancingMethodModel = new DefaultComboBoxModel<>();
         balancingMethodModel.addElement(BotForceRandomizer.BalancingMethod.BV.name());
         balancingMethodModel.addElement(BotForceRandomizer.BalancingMethod.WEIGHT_ADJ.name());
         choiceBalancingMethod = new MMComboBox("choiceBalancingMethod", balancingMethodModel);
         choiceBalancingMethod.setSelectedItem(randomizer.getBalancingMethod().toString());
         choiceBalancingMethod.setEnabled(useRandomForces);
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(1, 0, 0, 5);
         panRandomForces.add(new JLabel("Balancing Method:"), gbc);
-        gbc.gridx = 3;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         panRandomForces.add(choiceBalancingMethod, gbc);
 
         DefaultComboBoxModel<String> factionModel = new DefaultComboBoxModel<>();
@@ -397,10 +365,12 @@ public class CustomizeBotForceDialog  extends JDialog {
         choiceFaction = new MMComboBox("choiceFaction", factionModel);
         choiceFaction.setSelectedItem(randomizer.getFactionCode());
         choiceFaction.setEnabled(useRandomForces);
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridy++;
+        gbc.weightx = 0.0;
         panRandomForces.add(new JLabel("Faction:"), gbc);
-        gbc.gridx = 3;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         panRandomForces.add(choiceFaction, gbc);
 
         DefaultComboBoxModel<String> unitTypeModel = new DefaultComboBoxModel<>();
@@ -410,10 +380,12 @@ public class CustomizeBotForceDialog  extends JDialog {
         choiceUnitType = new MMComboBox("choiceUnitType", unitTypeModel);
         choiceUnitType.setSelectedItem(UnitType.getTypeName(randomizer.getUnitType()));
         choiceUnitType.setEnabled(useRandomForces);
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridy++;
+        gbc.weightx = 0.0;
         panRandomForces.add(new JLabel("Unit Type:"), gbc);
-        gbc.gridx = 3;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         panRandomForces.add(choiceUnitType, gbc);
 
         DefaultComboBoxModel<String> skillLevelModel = new DefaultComboBoxModel<>();
@@ -426,10 +398,12 @@ public class CustomizeBotForceDialog  extends JDialog {
         choiceSkillLevel = new MMComboBox("choiceSkillLevel", skillLevelModel);
         choiceSkillLevel.setSelectedItem(randomizer.getSkill().name());
         choiceSkillLevel.setEnabled(useRandomForces);
-        gbc.gridx = 2;
+        gbc.gridx = 0;
         gbc.gridy++;
+        gbc.weightx = 0.0;
         panRandomForces.add(new JLabel("Skill Level:"), gbc);
-        gbc.gridx = 3;
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
         panRandomForces.add(choiceSkillLevel, gbc);
 
         DefaultComboBoxModel<String> weightClassModel = new DefaultComboBoxModel<>();
@@ -446,11 +420,51 @@ public class CustomizeBotForceDialog  extends JDialog {
                     .getClassName((int) Math.round(randomizer.getFocalWeightClass())));
         }
         choiceFocalWeightClass.setEnabled(useRandomForces);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.weightx = 0.0;
+        panRandomForces.add(new JLabel("Focal Weight Class:"), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        panRandomForces.add(choiceFocalWeightClass, gbc);
+
+        spnForceMultiplier = new JSpinner(new SpinnerNumberModel(randomizer.getForceMultiplier(),
+                0.05, 5, 0.05));
+        spnForceMultiplier.setEnabled(useRandomForces);
+        gbc.gridx = 2;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.weightx = 0.0;
+        panRandomForces.add(new JLabel("Force Multiplier:"), gbc);
+        gbc.gridx = 3;
+        panRandomForces.add(spnForceMultiplier, gbc);
+
+        spnPercentConventional = new JSpinner(new SpinnerNumberModel(randomizer.getPercentConventional(),
+                0, 75, 5));
+        spnPercentConventional.setEnabled(useRandomForces);
         gbc.gridx = 2;
         gbc.gridy++;
-        panRandomForces.add(new JLabel("Focal Weight Class:"), gbc);
+        panRandomForces.add(new JLabel("Percent Conventional:"), gbc);
         gbc.gridx = 3;
-        panRandomForces.add(choiceFocalWeightClass, gbc);
+        panRandomForces.add(spnPercentConventional, gbc);
+
+        spnBaChance = new JSpinner(new SpinnerNumberModel(randomizer.getBaChance(),
+                0, 100, 5));
+        spnBaChance.setEnabled(useRandomForces);
+        gbc.gridx = 2;
+        gbc.gridy++;
+        panRandomForces.add(new JLabel("Integrated BA Chance:"), gbc);
+        gbc.gridx = 3;
+        panRandomForces.add(spnBaChance, gbc);
+
+        spnLanceSize = new JSpinner(new SpinnerNumberModel(randomizer.getLanceSize(),
+                0, 6, 1));
+        spnLanceSize.setEnabled(useRandomForces);
+        gbc.gridx = 2;
+        gbc.gridy++;
+        panRandomForces.add(new JLabel("Lance Size:"), gbc);
+        gbc.gridx = 3;
+        panRandomForces.add(spnLanceSize, gbc);
     }
 
     private void refreshFixedEntityPanel() {
