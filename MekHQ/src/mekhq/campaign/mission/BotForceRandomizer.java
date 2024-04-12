@@ -136,6 +136,7 @@ public class BotForceRandomizer {
         copy.baChance = this.baChance;
         copy.balancingMethod = this.balancingMethod;
         copy.lanceSize = this.lanceSize;
+        copy.quality = this.quality;
 
         return copy;
     }
@@ -147,6 +148,70 @@ public class BotForceRandomizer {
 
     public void setFactionCode(final String factionCode) {
         this.factionCode = factionCode;
+    }
+
+    public SkillLevel getSkill() {
+        return skill;
+    }
+
+    public void setSkill(SkillLevel s) {
+        skill = s;
+    }
+
+    public int getUnitType() {
+        return unitType;
+    }
+
+    public void setUnitType(int u) {
+        unitType = u;
+    }
+
+    public int getQuality() {
+        return quality;
+    }
+
+    public void setQuality(int q) {
+        quality = q;
+    }
+
+    public BalancingMethod getBalancingMethod() {
+        return balancingMethod;
+    }
+
+    public void setBalancingMethod(BalancingMethod bm) {
+        balancingMethod = bm;
+    }
+
+    public double getForceMultiplier() {
+        return forceMultiplier;
+    }
+
+    public void setForceMultiplier(double fm) {
+        forceMultiplier = fm;
+    }
+
+    public int getPercentConventional() {
+        return percentConventional;
+    }
+
+    public void setPercentConventional(int p) {
+        percentConventional = p;
+    }
+
+    public int getBaChance() {
+        return baChance;
+    }
+
+    public void setBaChance(int b) {
+        baChance = b;
+    }
+
+    public int getLanceSize() {
+        return lanceSize;
+    }
+
+    public void setLanceSize(int l) {
+        lanceSize = l;
     }
     //endregion Getters/Setters
 
