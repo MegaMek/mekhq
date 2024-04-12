@@ -55,7 +55,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     private Camouflage camo;
     private BehaviorSettings behavior;
     private BotForceRandomizer randomizer;
-    private boolean useRandomForces;
+    private boolean useRandomUnits;
     private List<Entity> fixedEntities;
 
     //gui components
@@ -63,8 +63,8 @@ public class CustomizeBotForceDialog  extends JDialog {
     private JComboBox<String> choiceTeam;
     private JButton btnCamo;
     private JPanel panBehavior;
-    private JPanel panRandomForces;
-    private DefaultMHQScrollablePanel panFixedEntity;
+    private JPanel panRandomUnits;
+    private DefaultMHQScrollablePanel panFixedUnits;
     private JButton btnLoadUnits;
     private JButton btnSaveUnits;
     private JButton btnDeleteUnits;
@@ -75,7 +75,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     private JLabel lblPilotingRisk;
     private JLabel lblForcedWithdrawal;
     private JLabel lblAutoFlee;
-    private JCheckBox chkUseRandomForces;
+    private JCheckBox chkUseRandomUnits;
     private JSpinner spnForceMultiplier;
     private JSpinner spnPercentConventional;
     private JSpinner spnBaChance;
@@ -105,8 +105,8 @@ public class CustomizeBotForceDialog  extends JDialog {
         } catch (PrincessException ex) {
             LogManager.getLogger().error("Error copying princess behaviors", ex);
         }
-        useRandomForces = botForce.getBotForceRandomizer() != null;
-        if(useRandomForces) {
+        useRandomUnits = botForce.getBotForceRandomizer() != null;
+        if(useRandomUnits) {
             randomizer = botForce.getBotForceRandomizer().getCopy();
         } else {
             randomizer = new BotForceRandomizer();
@@ -211,7 +211,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.gridwidth = 3;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
-        panCenter.add(panRandomForces, gbc);
+        panCenter.add(panRandomUnits, gbc);
         gbc.gridy++;
         gbc.weightx = 0.0;
         gbc.gridwidth = 1;
@@ -232,13 +232,13 @@ public class CustomizeBotForceDialog  extends JDialog {
         btnDeleteUnits.addActionListener(this::deleteUnits);
         panCenter.add(btnDeleteUnits, gbc);
 
-        panFixedEntity = new DefaultMHQScrollablePanel(frame, "panFixedEntity", new GridBagLayout());
+        panFixedUnits = new DefaultMHQScrollablePanel(frame, "panFixedEntity", new GridBagLayout());
         refreshFixedEntityPanel();
-        JScrollPane scrollFixedEntity = new JScrollPane(panFixedEntity);
-        scrollFixedEntity.setMinimumSize(new Dimension(400, 200));
-        scrollFixedEntity.setPreferredSize(new Dimension(400, 200));
-        scrollFixedEntity.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Fixed Units"),
+        JScrollPane scrollFixedUnits = new JScrollPane(panFixedUnits);
+        scrollFixedUnits.setMinimumSize(new Dimension(400, 200));
+        scrollFixedUnits.setPreferredSize(new Dimension(400, 200));
+        scrollFixedUnits.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resourceMap.getString("scrollFixedUnits.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
         gbc.gridx = 0;
         gbc.gridy++;
@@ -246,7 +246,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.weighty = 1.0;
         gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.BOTH;
-        panCenter.add(scrollFixedEntity, gbc);
+        panCenter.add(scrollFixedUnits, gbc);
 
     }
 
@@ -318,9 +318,9 @@ public class CustomizeBotForceDialog  extends JDialog {
     }
 
     private void initRandomForcesPanel(ResourceBundle resourceMap) {
-        panRandomForces = new JPanel(new GridBagLayout());
-        panRandomForces.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Random Units"),
+        panRandomUnits = new JPanel(new GridBagLayout());
+        panRandomUnits.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(resourceMap.getString("panRandomUnits.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -331,50 +331,50 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.gridwidth = 4;
-        chkUseRandomForces = new JCheckBox("Use randomly generated forces");
-        chkUseRandomForces.setSelected(useRandomForces);
-        chkUseRandomForces.addActionListener(evt -> {
-            spnForceMultiplier.setEnabled(chkUseRandomForces.isSelected());
-            spnPercentConventional.setEnabled(chkUseRandomForces.isSelected());
-            spnBaChance.setEnabled(chkUseRandomForces.isSelected());
-            spnLanceSize.setEnabled(chkUseRandomForces.isSelected());
-            choiceFaction.setEnabled(chkUseRandomForces.isSelected());
-            choiceBalancingMethod.setEnabled(chkUseRandomForces.isSelected());
-            choiceUnitType.setEnabled(chkUseRandomForces.isSelected());
-            choiceFocalWeightClass.setEnabled(chkUseRandomForces.isSelected());
-            choiceSkillLevel.setEnabled(chkUseRandomForces.isSelected());
+        chkUseRandomUnits = new JCheckBox(resourceMap.getString("chkUseRandomUnits.text"));
+        chkUseRandomUnits.setSelected(useRandomUnits);
+        chkUseRandomUnits.addActionListener(evt -> {
+            spnForceMultiplier.setEnabled(chkUseRandomUnits.isSelected());
+            spnPercentConventional.setEnabled(chkUseRandomUnits.isSelected());
+            spnBaChance.setEnabled(chkUseRandomUnits.isSelected());
+            spnLanceSize.setEnabled(chkUseRandomUnits.isSelected());
+            choiceFaction.setEnabled(chkUseRandomUnits.isSelected());
+            choiceBalancingMethod.setEnabled(chkUseRandomUnits.isSelected());
+            choiceUnitType.setEnabled(chkUseRandomUnits.isSelected());
+            choiceFocalWeightClass.setEnabled(chkUseRandomUnits.isSelected());
+            choiceSkillLevel.setEnabled(chkUseRandomUnits.isSelected());
         });
-        panRandomForces.add(chkUseRandomForces, gbc);
+        panRandomUnits.add(chkUseRandomUnits, gbc);
 
         DefaultComboBoxModel<String> balancingMethodModel = new DefaultComboBoxModel<>();
         balancingMethodModel.addElement(BotForceRandomizer.BalancingMethod.BV.name());
         balancingMethodModel.addElement(BotForceRandomizer.BalancingMethod.WEIGHT_ADJ.name());
         choiceBalancingMethod = new MMComboBox("choiceBalancingMethod", balancingMethodModel);
         choiceBalancingMethod.setSelectedItem(randomizer.getBalancingMethod().toString());
-        choiceBalancingMethod.setEnabled(useRandomForces);
+        choiceBalancingMethod.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(1, 0, 0, 5);
-        panRandomForces.add(new JLabel("Balancing Method:"), gbc);
+        panRandomUnits.add(new JLabel(resourceMap.getString("lblBalancingMethod.text")), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        panRandomForces.add(choiceBalancingMethod, gbc);
+        panRandomUnits.add(choiceBalancingMethod, gbc);
 
         DefaultComboBoxModel<String> factionModel = new DefaultComboBoxModel<>();
         factionModel.addAll(Factions.getInstance().getFactionList());
         choiceFaction = new MMComboBox("choiceFaction", factionModel);
         choiceFaction.setSelectedItem(randomizer.getFactionCode());
-        choiceFaction.setEnabled(useRandomForces);
+        choiceFaction.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 0.0;
-        panRandomForces.add(new JLabel("Faction:"), gbc);
+        panRandomUnits.add(new JLabel(resourceMap.getString("lblFaction.text")), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        panRandomForces.add(choiceFaction, gbc);
+        panRandomUnits.add(choiceFaction, gbc);
 
         DefaultComboBoxModel<String> unitTypeModel = new DefaultComboBoxModel<>();
         for(int i = 0; i < UnitType.SIZE; i++) {
@@ -382,14 +382,14 @@ public class CustomizeBotForceDialog  extends JDialog {
         }
         choiceUnitType = new MMComboBox("choiceUnitType", unitTypeModel);
         choiceUnitType.setSelectedItem(UnitType.getTypeName(randomizer.getUnitType()));
-        choiceUnitType.setEnabled(useRandomForces);
+        choiceUnitType.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 0.0;
-        panRandomForces.add(new JLabel("Unit Type:"), gbc);
+        panRandomUnits.add(new JLabel(resourceMap.getString("lblUnitType.text")), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        panRandomForces.add(choiceUnitType, gbc);
+        panRandomUnits.add(choiceUnitType, gbc);
 
         DefaultComboBoxModel<String> skillLevelModel = new DefaultComboBoxModel<>();
         for(SkillLevel skill : SkillLevel.values()) {
@@ -400,14 +400,14 @@ public class CustomizeBotForceDialog  extends JDialog {
         }
         choiceSkillLevel = new MMComboBox("choiceSkillLevel", skillLevelModel);
         choiceSkillLevel.setSelectedItem(randomizer.getSkill().name());
-        choiceSkillLevel.setEnabled(useRandomForces);
+        choiceSkillLevel.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 0.0;
-        panRandomForces.add(new JLabel("Skill Level:"), gbc);
+        panRandomUnits.add(new JLabel(resourceMap.getString("lblSkillLevel.text")), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        panRandomForces.add(choiceSkillLevel, gbc);
+        panRandomUnits.add(choiceSkillLevel, gbc);
 
         DefaultComboBoxModel<String> weightClassModel = new DefaultComboBoxModel<>();
         weightClassModel.addElement("Not Specified");
@@ -422,57 +422,57 @@ public class CustomizeBotForceDialog  extends JDialog {
             choiceFocalWeightClass.setSelectedItem(EntityWeightClass
                     .getClassName((int) Math.round(randomizer.getFocalWeightClass())));
         }
-        choiceFocalWeightClass.setEnabled(useRandomForces);
+        choiceFocalWeightClass.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 0.0;
-        panRandomForces.add(new JLabel("Focal Weight Class:"), gbc);
+        panRandomUnits.add(new JLabel(resourceMap.getString("lblFocalWeightClass.text")), gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
-        panRandomForces.add(choiceFocalWeightClass, gbc);
+        panRandomUnits.add(choiceFocalWeightClass, gbc);
 
         spnForceMultiplier = new JSpinner(new SpinnerNumberModel(randomizer.getForceMultiplier(),
                 0.05, 5, 0.05));
-        spnForceMultiplier.setEnabled(useRandomForces);
+        spnForceMultiplier.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.weightx = 0.0;
-        panRandomForces.add(new JLabel("Force Multiplier:"), gbc);
+        panRandomUnits.add(new JLabel(resourceMap.getString("lblForceMultiplier.text")), gbc);
         gbc.gridx = 3;
-        panRandomForces.add(spnForceMultiplier, gbc);
+        panRandomUnits.add(spnForceMultiplier, gbc);
 
         spnPercentConventional = new JSpinner(new SpinnerNumberModel(randomizer.getPercentConventional(),
                 0, 75, 5));
-        spnPercentConventional.setEnabled(useRandomForces);
+        spnPercentConventional.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
-        panRandomForces.add(new JLabel("Percent Conventional:"), gbc);
+        panRandomUnits.add(new JLabel(resourceMap.getString("lblPercentConventional.text")), gbc);
         gbc.gridx = 3;
-        panRandomForces.add(spnPercentConventional, gbc);
+        panRandomUnits.add(spnPercentConventional, gbc);
 
         spnBaChance = new JSpinner(new SpinnerNumberModel(randomizer.getBaChance(),
                 0, 100, 5));
-        spnBaChance.setEnabled(useRandomForces);
+        spnBaChance.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
-        panRandomForces.add(new JLabel("Integrated BA Chance:"), gbc);
+        panRandomUnits.add(new JLabel(resourceMap.getString("lblBaChance.text")), gbc);
         gbc.gridx = 3;
-        panRandomForces.add(spnBaChance, gbc);
+        panRandomUnits.add(spnBaChance, gbc);
 
         spnLanceSize = new JSpinner(new SpinnerNumberModel(randomizer.getLanceSize(),
                 0, 6, 1));
-        spnLanceSize.setEnabled(useRandomForces);
+        spnLanceSize.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
-        panRandomForces.add(new JLabel("Lance Size:"), gbc);
+        panRandomUnits.add(new JLabel(resourceMap.getString("lblLanceSize.text")), gbc);
         gbc.gridx = 3;
-        panRandomForces.add(spnLanceSize, gbc);
+        panRandomUnits.add(spnLanceSize, gbc);
     }
 
     private void refreshFixedEntityPanel() {
 
-        panFixedEntity.removeAll();
+        panFixedUnits.removeAll();
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -481,11 +481,11 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(2, 5, 0, 0);
         for(String en : Utilities.generateEntityStub(fixedEntities)) {
-            panFixedEntity.add(new JLabel(en), gbc);
+            panFixedUnits.add(new JLabel(en), gbc);
             gbc.gridy++;
         }
-        panFixedEntity.revalidate();
-        panFixedEntity.repaint();
+        panFixedUnits.revalidate();
+        panFixedUnits.repaint();
     }
 
     public BotForce getBotForce() {
@@ -570,8 +570,8 @@ public class CustomizeBotForceDialog  extends JDialog {
         botForce.setBehaviorSettings(behavior);
         botForce.setBotForceRandomizer(randomizer);
         botForce.setFixedEntityList(fixedEntities);
-        useRandomForces = chkUseRandomForces.isSelected();
-        if(useRandomForces) {
+        useRandomUnits = chkUseRandomUnits.isSelected();
+        if(useRandomUnits) {
             randomizer.setFactionCode((String) choiceFaction.getSelectedItem());
             randomizer.setForceMultiplier((double) spnForceMultiplier.getValue());
             randomizer.setPercentConventional((int) spnPercentConventional.getValue());
