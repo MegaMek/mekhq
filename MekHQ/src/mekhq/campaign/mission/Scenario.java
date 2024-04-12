@@ -570,6 +570,10 @@ public class Scenario {
         return botForces;
     }
 
+    public void setBotForces(List<BotForce> bf) {
+        botForces = bf;
+    }
+
     public void addBotForce(BotForce botForce, Campaign c) {
         botForces.add(botForce);
 

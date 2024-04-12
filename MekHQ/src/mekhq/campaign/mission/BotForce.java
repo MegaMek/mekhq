@@ -98,6 +98,18 @@ public class BotForce {
         behaviorSettings.setDestinationEdge(CardinalEdge.NONE);
     }
 
+    public BotForce getCopy() {
+        final BotForce copy = new BotForce();
+        copy.setName(this.getName());
+        copy.setTeam(this.getTeam());
+        copy.setStart(this.getStart());
+        copy.setCamouflage(this.getCamouflage());
+        copy.setColour(this.getColour());
+        //copy.setBehaviorSettings(getBehaviorSettings().getCopy());
+
+        return copy;
+    }
+
     /* Convert from MM's Board to Princess's HomeEdge */
     public CardinalEdge findCardinalEdge(int start) {
         switch (start) {

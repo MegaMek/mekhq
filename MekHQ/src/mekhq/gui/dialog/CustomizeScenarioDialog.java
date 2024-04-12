@@ -51,6 +51,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 /**
  * @author Taharqa
@@ -142,7 +143,7 @@ public class CustomizeScenarioDialog extends JDialog {
 
         planetaryConditions = scenario.createPlanetaryConditions();
 
-        botForces = scenario.getBotForces();
+        botForces = scenario.getBotForces().stream().collect(Collectors.toList());;
         forcesModel = new BotForceTableModel(botForces, campaign);
 
         loots = new ArrayList<>();
@@ -387,6 +388,7 @@ public class CustomizeScenarioDialog extends JDialog {
         }
         scenario.readPlanetaryConditions(planetaryConditions);
         scenario.setDate(date);
+        scenario.setBotForces(botForces);
         scenario.resetLoot();
         for (Loot loot : lootModel.getAllLoot()) {
             scenario.addLoot(loot);
