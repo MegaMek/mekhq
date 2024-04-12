@@ -126,6 +126,20 @@ public class BotForceRandomizer {
     }
     //endregion Constructors
 
+    public BotForceRandomizer getCopy() {
+        BotForceRandomizer copy = new BotForceRandomizer();
+        copy.setFactionCode(this.getFactionCode());
+        copy.skill = this.skill;
+        copy.unitType = this.unitType;
+        copy.forceMultiplier = this.forceMultiplier;
+        copy.percentConventional = this.percentConventional;
+        copy.baChance = this.baChance;
+        copy.balancingMethod = this.balancingMethod;
+        copy.lanceSize = this.lanceSize;
+
+        return copy;
+    }
+
     //region Getters/Setters
     public String getFactionCode() {
         return factionCode;
