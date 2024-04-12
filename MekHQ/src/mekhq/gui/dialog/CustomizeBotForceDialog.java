@@ -352,7 +352,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         balancingMethodModel.addElement(BotForceRandomizer.BalancingMethod.BV.name());
         balancingMethodModel.addElement(BotForceRandomizer.BalancingMethod.WEIGHT_ADJ.name());
         choiceBalancingMethod = new MMComboBox("choiceBalancingMethod", balancingMethodModel);
-        choiceBalancingMethod.setSelectedItem(randomizer.getBalancingMethod().toString());
+        choiceBalancingMethod.setSelectedItem(randomizer.getBalancingMethod().name());
         choiceBalancingMethod.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -360,7 +360,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(1, 0, 0, 5);
-        panRandomUnits.add(new JLabel(resourceMap.getString("lblBalancingMethod.text")), gbc);
+        JLabel lblBalancingMethod = new JLabel(resourceMap.getString("lblBalancingMethod.text"));
+        lblBalancingMethod.setToolTipText(resourceMap.getString("lblBalancingMethod.tooltip"));
+        panRandomUnits.add(lblBalancingMethod, gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceBalancingMethod, gbc);
@@ -373,7 +375,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 0.0;
-        panRandomUnits.add(new JLabel(resourceMap.getString("lblFaction.text")), gbc);
+        JLabel lblFaction = new JLabel(resourceMap.getString("lblFaction.text"));
+        lblFaction.setToolTipText(resourceMap.getString("lblFaction.tooltip"));
+        panRandomUnits.add(lblFaction, gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceFaction, gbc);
@@ -388,7 +392,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 0.0;
-        panRandomUnits.add(new JLabel(resourceMap.getString("lblUnitType.text")), gbc);
+        JLabel lblUnitType = new JLabel(resourceMap.getString("lblUnitType.text"));
+        lblUnitType.setToolTipText(resourceMap.getString("lblUnitType.tooltip"));
+        panRandomUnits.add(lblUnitType, gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceUnitType, gbc);
@@ -406,7 +412,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 0.0;
-        panRandomUnits.add(new JLabel(resourceMap.getString("lblSkillLevel.text")), gbc);
+        JLabel lblSkillLevel = new JLabel(resourceMap.getString("lblSkillLevel.text"));
+        lblSkillLevel.setToolTipText(resourceMap.getString("lblSkillLevel.tooltip"));
+        panRandomUnits.add(lblSkillLevel, gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceSkillLevel, gbc);
@@ -423,7 +431,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 0.0;
-        panRandomUnits.add(new JLabel(resourceMap.getString("lblQuality.text")), gbc);
+        JLabel lblQuality = new JLabel(resourceMap.getString("lblQuality.text"));
+        lblQuality.setToolTipText(resourceMap.getString("lblQuality.tooltip"));
+        panRandomUnits.add(lblQuality, gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceQuality, gbc);
@@ -445,7 +455,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 0.0;
-        panRandomUnits.add(new JLabel(resourceMap.getString("lblFocalWeightClass.text")), gbc);
+        JLabel lblFocalWeightClass = new JLabel(resourceMap.getString("lblFocalWeightClass.text"));
+        lblFocalWeightClass.setToolTipText(resourceMap.getString("lblFocalWeightClass.tooltip"));
+        panRandomUnits.add(lblFocalWeightClass, gbc);
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceFocalWeightClass, gbc);
@@ -457,7 +469,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.gridy = 1;
         gbc.gridwidth = 1;
         gbc.weightx = 0.0;
-        panRandomUnits.add(new JLabel(resourceMap.getString("lblForceMultiplier.text")), gbc);
+        JLabel lblForceMultiplier = new JLabel(resourceMap.getString("lblForceMultiplier.text"));
+        lblForceMultiplier.setToolTipText(resourceMap.getString("lblForceMultiplier.tooltip"));
+        panRandomUnits.add(lblForceMultiplier, gbc);
         gbc.gridx = 3;
         panRandomUnits.add(spnForceMultiplier, gbc);
 
@@ -466,7 +480,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         spnPercentConventional.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
-        panRandomUnits.add(new JLabel(resourceMap.getString("lblPercentConventional.text")), gbc);
+        JLabel lblPercentConventional = new JLabel(resourceMap.getString("lblPercentConventional.text"));
+        lblPercentConventional.setToolTipText(resourceMap.getString("lblPercentConventional.tooltip"));
+        panRandomUnits.add(lblPercentConventional, gbc);
         gbc.gridx = 3;
         panRandomUnits.add(spnPercentConventional, gbc);
 
@@ -475,7 +491,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         spnBaChance.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
-        panRandomUnits.add(new JLabel(resourceMap.getString("lblBaChance.text")), gbc);
+        JLabel lblBaChance = new JLabel(resourceMap.getString("lblBaChance.text"));
+        lblBaChance.setToolTipText(resourceMap.getString("lblBaChance.tooltip"));
+        panRandomUnits.add(lblBaChance, gbc);
         gbc.gridx = 3;
         panRandomUnits.add(spnBaChance, gbc);
 
@@ -484,7 +502,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         spnLanceSize.setEnabled(useRandomUnits);
         gbc.gridx = 2;
         gbc.gridy++;
-        panRandomUnits.add(new JLabel(resourceMap.getString("lblLanceSize.text")), gbc);
+        JLabel lblLanceSize = new JLabel(resourceMap.getString("lblLanceSize.text"));
+        lblLanceSize.setToolTipText(resourceMap.getString("lblLanceSize.tooltip"));
+        panRandomUnits.add(lblLanceSize, gbc);
         gbc.gridx = 3;
         panRandomUnits.add(spnLanceSize, gbc);
     }
