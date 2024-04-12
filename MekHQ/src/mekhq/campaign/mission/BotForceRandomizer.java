@@ -29,6 +29,7 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.rating.IUnitRating;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
@@ -115,6 +116,7 @@ public class BotForceRandomizer {
         factionCode = "MERC";
         skill = SkillLevel.REGULAR;
         unitType = UnitType.MEK;
+        quality = IUnitRating.DRAGOON_C;
         forceMultiplier = 1.0;
         percentConventional = 0;
         baChance = 0;
