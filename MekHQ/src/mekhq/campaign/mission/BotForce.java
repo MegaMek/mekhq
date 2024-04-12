@@ -243,6 +243,19 @@ public class BotForce {
         return bv;
     }
 
+    public int getFixedBV() {
+        int bv = 0;
+
+        for (Entity entity : getFixedEntityList()) {
+            if (entity == null) {
+                LogManager.getLogger().error("Null entity when calculating the BV a bot force, we should never find a null here. Please investigate");
+            } else {
+                bv += entity.calculateBattleValue(true, false);
+            }
+        }
+        return bv;
+    }
+
     public BehaviorSettings getBehaviorSettings() {
         return behaviorSettings;
     }

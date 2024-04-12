@@ -567,6 +567,15 @@ public class BotForceRandomizer {
         return sumWeightClass / ((double) nUnits);
     }
 
+    public String getShortDescription(Campaign campaign) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(forceMultiplier);
+        sb.append(" (");
+        sb.append(balancingMethod.toString());
+        sb.append(")");
+        return sb.toString();
+    }
+
     /**
      * This method returns a description of the random parameters of this object that will be shown in the
      * ScenarioViewPanel

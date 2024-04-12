@@ -78,14 +78,9 @@ public class CustomizeScenarioDialog extends JDialog {
     private BotForceTableModel forcesModel;
 
     // panels
-    private JPanel panMain;
-    private JPanel panLeft;
-    private JPanel panCenter;
-    private JPanel panRight;
     private JPanel panLoot;
     private JPanel panOtherForces;
     private JPanel panPlanetaryConditions;
-    private JPanel panBtn;
 
     // labels
     private JLabel lblLightDesc;
@@ -165,40 +160,32 @@ public class CustomizeScenarioDialog extends JDialog {
         setName("Form");
         setTitle(resourceMap.getString("title.new"));
 
-        // set up panels
-        panMain = new JPanel(new GridLayout(0, 3));
-        panLeft = new JPanel(new GridBagLayout());
-        panCenter = new JPanel(new GridBagLayout());
-        panRight = new JPanel(new GridBagLayout());
-        panBtn = new JPanel(new GridLayout(0,2));
+        JPanel panMain = new JPanel(new GridBagLayout());
+        JPanel panInfo = new JPanel(new GridBagLayout());
+        JPanel panWrite = new JPanel(new GridBagLayout());
+        JPanel panBtn = new JPanel(new GridLayout(0,2));
 
-        getContentPane().add(panMain, BorderLayout.CENTER);
-        getContentPane().add(panBtn, BorderLayout.PAGE_END);
-        panMain.add(panLeft);
-        panMain.add(panCenter);
-        panMain.add(panRight);
-
-        // region Set up left panel
-        GridBagConstraints gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.WEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panLeft.add(new JLabel(resourceMap.getString("lblName.text")), gridBagConstraints);
+        // region Set up info panel
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panInfo.add(new JLabel(resourceMap.getString("lblName.text")), gbc);
 
         txtName = new JTextField();
         txtName.setText(scenario.getName());
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panLeft.add(txtName, gridBagConstraints);
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panInfo.add(txtName, gbc);
 
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        panLeft.add(new JLabel(resourceMap.getString("lblStatus.text")), gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 0, 0);
+        panInfo.add(new JLabel(resourceMap.getString("lblStatus.text")), gbc);
 
         choiceStatus = new JComboBox<>(new DefaultComboBoxModel<>(ScenarioStatus.values()));
         choiceStatus.setSelectedItem(scenario.getStatus());
@@ -214,28 +201,28 @@ public class CustomizeScenarioDialog extends JDialog {
                     return this;
                 }
         });
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
+        gbc.gridx = 1;
+        gbc.insets = new Insets(5, 5, 0, 0);
         choiceStatus.setEnabled(!scenario.getStatus().isCurrent());
-        panLeft.add(choiceStatus, gridBagConstraints);
+        panInfo.add(choiceStatus, gbc);
 
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panLeft.add(new JLabel(resourceMap.getString("lblDate.text")), gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panInfo.add(new JLabel(resourceMap.getString("lblDate.text")), gbc);
 
         btnDate = new JButton(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.addActionListener(evt -> changeDate());
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.insets = new Insets(5, 5, 0, 0);
-        panLeft.add(btnDate, gridBagConstraints);
+        gbc.gridx = 1;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 5, 0, 0);
+        panInfo.add(btnDate, gbc);
 
         if (scenario.getStatus().isCurrent() && (scenario instanceof AtBDynamicScenario)) {
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy++;
-            gridBagConstraints.gridwidth = 1;
+            gbc.gridx = 0;
+            gbc.gridy++;
+            gbc.gridwidth = 1;
 
             modifierBox = new JComboBox<>();
             EventTiming scenarioState = ((AtBDynamicScenario) scenario).getNumBots() > 0 ?
@@ -246,89 +233,70 @@ public class CustomizeScenarioDialog extends JDialog {
                     modifierBox.addItem(modifierKey);
                 }
             }
-            panLeft.add(modifierBox, gridBagConstraints);
+            panInfo.add(modifierBox, gbc);
 
             JButton addEventButton = new JButton("Apply Modifier");
             addEventButton.addActionListener(this::btnAddModifierActionPerformed);
-            gridBagConstraints.gridx = 1;
-            panLeft.add(addEventButton, gridBagConstraints);
+            gbc.gridx = 1;
+            panInfo.add(addEventButton, gbc);
         }
 
         initPlanetaryConditionsPanel(resourceMap);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        panLeft.add(panPlanetaryConditions, gridBagConstraints);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        panInfo.add(panPlanetaryConditions, gbc);
+        // endregion Set up info panel
 
         initLootPanel(resourceMap);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panLoot.setPreferredSize(new Dimension(400,150));
-        panLoot.setMinimumSize(new Dimension(400,150));
+        panLoot.setPreferredSize(new Dimension(300,150));
+        panLoot.setMinimumSize(new Dimension(300,150));
         panLoot.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Scenario Costs & Payouts"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
-        panLeft.add(panLoot, gridBagConstraints);
-        // endregion Set up left panel
 
-        // region Set up center panel
         initOtherForcesPanel(resourceMap);
         panOtherForces.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("panOtherForces.title"))));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panCenter.add(panOtherForces, gridBagConstraints);
+        panOtherForces.setPreferredSize(new Dimension(600,150));
+        panOtherForces.setMinimumSize(new Dimension(600,150));
 
-        // endregion Set up center panel
-
-        // region Set up right panel
+        // region Set up writing panel
         txtDesc = new MarkdownEditorPanel("Description");
         txtDesc.setText(scenario.getDescription());
         txtDesc.setMinimumSize(new Dimension(400, 100));
         txtDesc.setPreferredSize(new Dimension(400, 250));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy++;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        panRight.add(txtDesc, gridBagConstraints);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panWrite.add(txtDesc, gbc);
 
         if (!scenario.getStatus().isCurrent()) {
             txtReport = new MarkdownEditorPanel("After-Action Report");
             txtReport.setText(scenario.getReport());
             txtReport.setMinimumSize(new Dimension(400, 100));
             txtReport.setPreferredSize(new Dimension(400, 250));
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy++;
-            gridBagConstraints.gridwidth = 1;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.weighty = 1.0;
-            gridBagConstraints.fill = GridBagConstraints.BOTH;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-            panRight.add(txtReport, gridBagConstraints);
+            gbc.gridx = 0;
+            gbc.gridy++;
+            gbc.gridwidth = 1;
+            gbc.weightx = 1.0;
+            gbc.weighty = 1.0;
+            gbc.fill = GridBagConstraints.BOTH;
+            gbc.anchor = GridBagConstraints.NORTHWEST;
+            gbc.insets = new Insets(5, 5, 5, 5);
+            panWrite.add(txtReport, gbc);
             txtReport.setEnabled(!scenario.getStatus().isCurrent());
         }
-        // endregion Set up right panel
+        // endregion Set up writing panel
 
         // region Set up buttons
         if (newScenario && (mission instanceof AtBContract)) {
@@ -358,6 +326,29 @@ public class CustomizeScenarioDialog extends JDialog {
         btnClose.addActionListener(this::btnCloseActionPerformed);
         panBtn.add(btnClose);
         //endregion Set up buttons
+
+        // layout main panel
+        getContentPane().add(panMain, BorderLayout.CENTER);
+        getContentPane().add(panBtn, BorderLayout.PAGE_END);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.BOTH;
+        panMain.add(panInfo, gbc);
+        gbc.gridx = 1;
+        panMain.add(panLoot, gbc);
+        gbc.gridx = 2;
+        gbc.gridheight = 2;
+        gbc.weighty = 1.0;
+        panMain.add(panWrite, gbc);
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.gridheight = 1;
+        panMain.add(panOtherForces, gbc);
 
         pack();
     }

@@ -25,13 +25,13 @@ package mekhq.gui.model;
 import megamek.common.IStartingPositions;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.BotForce;
+import mekhq.campaign.universe.Factions;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class BotForceTableModel extends AbstractTableModel {
 
@@ -41,7 +41,7 @@ public class BotForceTableModel extends AbstractTableModel {
     private Campaign campaign;
 
     public final static int COL_NAME         = 0;
-    public final static int COL_RELATION     = 1;
+    public final static int COL_IFF          = 1;
     public final static int COL_FIXED        = 2;
     public final static int COL_RANDOM       = 3;
     public final static int COL_DEPLOYMENT   = 4;
@@ -68,8 +68,8 @@ public class BotForceTableModel extends AbstractTableModel {
         switch (column) {
             case COL_NAME:
                 return "Name";
-            case COL_RELATION:
-                return "Relation";
+            case COL_IFF:
+                return "IFF";
             case COL_FIXED:
                 return "Fixed";
             case COL_RANDOM:
@@ -93,12 +93,13 @@ public class BotForceTableModel extends AbstractTableModel {
         switch (col) {
             case COL_NAME:
                 return botForce.getName();
-            case COL_RELATION:
+            case COL_IFF:
                 return (botForce.getTeam() == 1) ? "Allied" : "Enemy (Team " + botForce.getTeam() + ")";
             case COL_FIXED:
-                return botForce.getTotalBV(campaign);
+                return botForce.getFixedEntityList().size() + " Units, BV: " + botForce.getFixedBV();
             case COL_RANDOM:
-                return ((null == botForce.getBotForceRandomizer()) ? "" : botForce.getBotForceRandomizer().getDescription(campaign));
+                return ((null == botForce.getBotForceRandomizer()) ? "" : botForce.getBotForceRandomizer().
+                        getShortDescription(campaign));
             case COL_DEPLOYMENT:
                 return IStartingPositions.START_LOCATION_NAMES[botForce.getStart()];
             default:
@@ -132,16 +133,18 @@ public class BotForceTableModel extends AbstractTableModel {
     public int getColumnWidth(int col) {
         switch (col) {
             case COL_NAME:
-                return 100;
-            default:
+                return 80;
+            case COL_DEPLOYMENT:
                 return 20;
+            default:
+                return 30;
         }
     }
 
     public int getAlignment(int col) {
         switch (col) {
             case COL_NAME:
-            case COL_RELATION:
+            case COL_IFF:
                 return SwingConstants.LEFT;
             case COL_DEPLOYMENT:
                 return SwingConstants.CENTER;
@@ -151,7 +154,17 @@ public class BotForceTableModel extends AbstractTableModel {
     }
 
     public String getTooltip(int row, int col) {
+        BotForce botForce;
+        if (data.isEmpty()) {
+            return "";
+        } else {
+            botForce = getBotForceAt(row);
+        }
+
         switch (col) {
+            case COL_RANDOM:
+                return ((null == botForce.getBotForceRandomizer()) ? "" : botForce.getBotForceRandomizer().
+                        getDescription(campaign));
             default:
                 return null;
         }
