@@ -273,7 +273,7 @@ public class BotForce {
         List<Entity> existingEntityList = new ArrayList<>();
         existingEntityList.addAll(fixedEntityList);
         existingEntityList.addAll(getTraitorEntities(c));
-        generatedEntityList = bfRandomizer.generateForce(playerUnits, existingEntityList);
+        generatedEntityList = bfRandomizer.generateForce(playerUnits, existingEntityList, c);
     }
 
     public List<UUID> getTraitorPersons() {
@@ -332,7 +332,7 @@ public class BotForce {
                 ((getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
                 " Start: " + IStartingPositions.START_LOCATION_NAMES[getStart()] +
                 " Fixed BV: " + getTotalBV(c) +
-                ((null == getBotForceRandomizer()) ? "" : "<br>Random: " + getBotForceRandomizer().getDescription()) +
+                ((null == getBotForceRandomizer()) ? "" : "<br>Random: " + getBotForceRandomizer().getDescription(c)) +
                 "</html>", stubs);
     }
 

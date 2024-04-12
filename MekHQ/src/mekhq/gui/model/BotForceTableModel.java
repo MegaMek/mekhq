@@ -98,7 +98,7 @@ public class BotForceTableModel extends AbstractTableModel {
             case COL_FIXED:
                 return botForce.getTotalBV(campaign);
             case COL_RANDOM:
-                return ((null == botForce.getBotForceRandomizer()) ? "" : botForce.getBotForceRandomizer().getDescription());
+                return ((null == botForce.getBotForceRandomizer()) ? "" : botForce.getBotForceRandomizer().getDescription(campaign));
             case COL_DEPLOYMENT:
                 return IStartingPositions.START_LOCATION_NAMES[botForce.getStart()];
             default:

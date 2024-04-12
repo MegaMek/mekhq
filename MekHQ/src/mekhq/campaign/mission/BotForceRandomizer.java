@@ -98,9 +98,6 @@ public class BotForceRandomizer {
     /** balancing method **/
     private BalancingMethod balancingMethod;
 
-    /** convenience campaign pointer **/
-    private Campaign campaign;
-
     /**
      * what percent of mek and aero forces should actually be conventional?
      * (tanks and conventional aircraft respectively)
@@ -231,9 +228,10 @@ public class BotForceRandomizer {
      *                    is used to determine the total points allowed for this force.
      * @param botFixedEntities A List of The fixed Entities that might have also been declared in BotForce already.
      *                         This is used to calculate the starting points already used when generating the force.
+     * @param Campaign A Campaign object which is necessary for various information
      * @return A List of Entities that will be added to the game by GameThread.
      */
-    public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities) {
+    public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities, Campaign campaign) {
         ArrayList<Entity> entityList = new ArrayList<>();
 
         double maxPoints = calculateMaxPoints(playerUnits);
@@ -266,7 +264,7 @@ public class BotForceRandomizer {
                 uType = UnitType.CONV_FIGHTER;
             }
 
-            lanceList = generateLance(lanceSize, uType, weightClass);
+            lanceList = generateLance(lanceSize, uType, weightClass, campaign);
             for (Entity e : lanceList) {
                 entityList.add(e);
                 currentPoints += calculatePoints(e);
@@ -285,13 +283,14 @@ public class BotForceRandomizer {
      * @param uType The UnitType of generated units
      * @param weightClass an int giving the weight class of generated units. The function applies some randomness
      *                    to this, so some entities within the lance may be heavier or lighter.
+     * @param campaign a Campaign object for campaign related information
      * @return A List of generated entities.
      */
-    public List<Entity> generateLance(int size, int uType, int weightClass) {
+    public List<Entity> generateLance(int size, int uType, int weightClass, Campaign campaign) {
         ArrayList<Entity> lanceList = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
-            Entity e = getEntity(uType, weightClass);
+            Entity e = getEntity(uType, weightClass, campaign);
             if (null != e) {
                 lanceList.add(e);
             }
@@ -301,7 +300,7 @@ public class BotForceRandomizer {
         if ((unitType == UnitType.MEK) && (baChance > 0)
                 && (Compute.randomInt(100) <= baChance)) {
             for (int i = 0; i < size; i++) {
-                Entity e = getEntity(UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED);
+                Entity e = getEntity(UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED, campaign);
                 if (null != e) {
                     lanceList.add(e);
                 }
@@ -317,9 +316,10 @@ public class BotForceRandomizer {
      *
      * @param uType    The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
+     * @param campaign A campaign object
      * @return A new Entity with crew.
      */
-    public Entity getEntity(int uType, int weightClass) {
+    public Entity getEntity(int uType, int weightClass, Campaign campaign) {
         MechSummary ms;
 
         // allow some variation in actual weight class
@@ -344,16 +344,17 @@ public class BotForceRandomizer {
 
         ms = campaign.getUnitGenerator().generate(params);
 
-        return createEntityWithCrew(ms);
+        return createEntityWithCrew(ms, campaign);
     }
 
     /**
      * This creates the entity with a crew. Borrows heavily from AtBDynamicScenarioFactory#createEntityWithCrew
      *
      * @param ms Which entity to generate
+     * @param campaign A campaign file
      * @return A crewed entity
      */
-    public @Nullable Entity createEntityWithCrew(MechSummary ms) {
+    public @Nullable Entity createEntityWithCrew(MechSummary ms, Campaign campaign) {
         Entity en;
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
@@ -569,7 +570,7 @@ public class BotForceRandomizer {
      * ScenarioViewPanel
      * @return a String giving the description.
      */
-    public String getDescription() {
+    public String getDescription(Campaign campaign) {
         StringBuilder sb = new StringBuilder();
         sb.append(Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()));
         sb.append(" ");
@@ -607,7 +608,6 @@ public class BotForceRandomizer {
     public static BotForceRandomizer generateInstanceFromXML(Node wn, Campaign c, Version version) {
         BotForceRandomizer retVal = new BotForceRandomizer();
 
-        retVal.campaign = c;
         try {
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
