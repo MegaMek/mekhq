@@ -85,6 +85,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     private MMComboBox choiceSkillLevel;
     private MMComboBox choiceFocalWeightClass;
     private MMComboBox choiceFaction;
+    private MMComboBox choiceQuality;
 
     public CustomizeBotForceDialog(JFrame parent, boolean modal, BotForce bf, Campaign c) {
         super(parent, modal);
@@ -343,6 +344,7 @@ public class CustomizeBotForceDialog  extends JDialog {
             choiceUnitType.setEnabled(chkUseRandomUnits.isSelected());
             choiceFocalWeightClass.setEnabled(chkUseRandomUnits.isSelected());
             choiceSkillLevel.setEnabled(chkUseRandomUnits.isSelected());
+            choiceQuality.setEnabled(chkUseRandomUnits.isSelected());
         });
         panRandomUnits.add(chkUseRandomUnits, gbc);
 
@@ -408,6 +410,23 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceSkillLevel, gbc);
+
+        DefaultComboBoxModel<String> qualityModel = new DefaultComboBoxModel<>();
+        qualityModel.addElement("F");
+        qualityModel.addElement("D");
+        qualityModel.addElement("C");
+        qualityModel.addElement("B");
+        qualityModel.addElement("A");
+        choiceQuality = new MMComboBox("choiceQuality", qualityModel);
+        choiceQuality.setSelectedIndex(randomizer.getQuality());
+        choiceQuality.setEnabled(useRandomUnits);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.weightx = 0.0;
+        panRandomUnits.add(new JLabel(resourceMap.getString("lblQuality.text")), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        panRandomUnits.add(choiceQuality, gbc);
 
         DefaultComboBoxModel<String> weightClassModel = new DefaultComboBoxModel<>();
         weightClassModel.addElement("Not Specified");
@@ -579,6 +598,7 @@ public class CustomizeBotForceDialog  extends JDialog {
             randomizer.setLanceSize((int) spnLanceSize.getValue());
             randomizer.setFocalWeightClass(choiceFocalWeightClass.getSelectedIndex());
             randomizer.setSkill(SkillLevel.valueOf((String) choiceSkillLevel.getSelectedItem()));
+            randomizer.setQuality(choiceQuality.getSelectedIndex());
             randomizer.setUnitType(choiceUnitType.getSelectedIndex());
             randomizer.setBalancingMethod(BotForceRandomizer.BalancingMethod
                     .valueOf((String) choiceBalancingMethod.getSelectedItem()));
