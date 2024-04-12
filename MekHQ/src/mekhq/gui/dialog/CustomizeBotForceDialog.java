@@ -19,11 +19,13 @@
 package mekhq.gui.dialog;
 
 import megamek.client.bot.princess.BehaviorSettings;
+import megamek.client.bot.princess.PrincessException;
 import megamek.client.ui.dialogs.BotConfigDialog;
 import megamek.client.ui.dialogs.CamoChooserDialog;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.MULParser;
+import megamek.common.icons.Camouflage;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -46,6 +48,11 @@ public class CustomizeBotForceDialog  extends JDialog {
     private JFrame frame;
     private BotForce botForce;
     private Campaign campaign;
+    private Camouflage camo;
+    private BehaviorSettings behavior;
+
+
+    private List fixedEntities;
 
     //gui components
     private JTextField txtName;
@@ -76,6 +83,13 @@ public class CustomizeBotForceDialog  extends JDialog {
             botForce = bf;
         }
         campaign = c;
+        camo = botForce.getCamouflage();
+        behavior = new BehaviorSettings();
+        try {
+            behavior = botForce.getBehaviorSettings().getCopy();
+        } catch (PrincessException ex) {
+            LogManager.getLogger().error("Error copying princess behaviors", ex);
+        }
         initComponents();
         setLocationRelativeTo(parent);
         pack();
@@ -145,7 +159,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         panLeft.add(choiceTeam, gbc);
 
         btnCamo = new JButton();
-        btnCamo.setIcon(botForce.getCamouflage().getImageIcon());
+        btnCamo.setIcon(camo.getImageIcon());
         btnCamo.setMinimumSize(new Dimension(84, 72));
         btnCamo.setPreferredSize(new Dimension(84, 72));
         btnCamo.setMaximumSize(new Dimension(84, 72));
@@ -209,8 +223,6 @@ public class CustomizeBotForceDialog  extends JDialog {
         panBehavior.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("panBehavior.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
-
-        BehaviorSettings behavior = botForce.getBehaviorSettings();
 
         GridBagConstraints gbcLeft = new GridBagConstraints();
         gbcLeft.gridx = 0;
@@ -299,22 +311,22 @@ public class CustomizeBotForceDialog  extends JDialog {
         BotConfigDialog bcd = new BotConfigDialog(frame, botForce.getName(), botForce.getBehaviorSettings(), null);
         bcd.setVisible(true);
         if(!bcd.getResult().isCancelled()) {
-            botForce.setBehaviorSettings(bcd.getBehaviorSettings());
-            lblCowardice.setText(Integer.toString(botForce.getBehaviorSettings().getBraveryIndex()));
-            lblSelfPreservation.setText(Integer.toString(botForce.getBehaviorSettings().getSelfPreservationIndex()));
-            lblAggression.setText(Integer.toString(botForce.getBehaviorSettings().getHyperAggressionIndex()));
-            lblHerdMentality.setText(Integer.toString(botForce.getBehaviorSettings().getHerdMentalityIndex()));
-            lblPilotingRisk.setText(Integer.toString(botForce.getBehaviorSettings().getFallShameIndex()));
-            lblForcedWithdrawal.setText(getForcedWithdrawalDescription(botForce.getBehaviorSettings()));
-            lblAutoFlee.setText(getAutoFleeDescription(botForce.getBehaviorSettings()));
+            behavior = bcd.getBehaviorSettings();
+            lblCowardice.setText(Integer.toString(behavior.getBraveryIndex()));
+            lblSelfPreservation.setText(Integer.toString(behavior.getSelfPreservationIndex()));
+            lblAggression.setText(Integer.toString(behavior.getHyperAggressionIndex()));
+            lblHerdMentality.setText(Integer.toString(behavior.getHerdMentalityIndex()));
+            lblPilotingRisk.setText(Integer.toString(behavior.getFallShameIndex()));
+            lblForcedWithdrawal.setText(getForcedWithdrawalDescription(behavior));
+            lblAutoFlee.setText(getAutoFleeDescription(behavior));
         }
     }
 
     private void editCamo(ActionEvent evt) {
         CamoChooserDialog ccd = new CamoChooserDialog(frame, botForce.getCamouflage());
         if (ccd.showDialog().isConfirmed()) {
-            botForce.setCamouflage(ccd.getSelectedItem());
-            btnCamo.setIcon(botForce.getCamouflage().getImageIcon());
+            camo = ccd.getSelectedItem();
+            btnCamo.setIcon(camo.getImageIcon());
         }
     }
 
@@ -369,6 +381,8 @@ public class CustomizeBotForceDialog  extends JDialog {
     private void done(ActionEvent evt) {
         botForce.setName(txtName.getText());
         botForce.setTeam(choiceTeam.getSelectedIndex()+1);
+        botForce.setCamouflage(camo);
+        botForce.setBehaviorSettings(behavior);
         this.setVisible(false);
     }
     private void cancel(ActionEvent evt) {
