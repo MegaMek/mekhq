@@ -237,6 +237,9 @@ public class CustomizeBotForceDialog  extends JDialog {
         JScrollPane scrollFixedEntity = new JScrollPane(panFixedEntity);
         scrollFixedEntity.setMinimumSize(new Dimension(400, 200));
         scrollFixedEntity.setPreferredSize(new Dimension(400, 200));
+        scrollFixedEntity.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Fixed Units"),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 1.0;
@@ -317,7 +320,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     private void initRandomForcesPanel(ResourceBundle resourceMap) {
         panRandomForces = new JPanel(new GridBagLayout());
         panRandomForces.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Random Forces"),
+                BorderFactory.createTitledBorder("Random Units"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 
         GridBagConstraints gbc = new GridBagConstraints();
