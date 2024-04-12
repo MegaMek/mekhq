@@ -40,8 +40,10 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class CustomizeBotForceDialog  extends JDialog {
 
@@ -50,9 +52,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     private Campaign campaign;
     private Camouflage camo;
     private BehaviorSettings behavior;
-
-
-    private List fixedEntities;
+    private List<Entity> fixedEntities;
 
     //gui components
     private JTextField txtName;
@@ -90,6 +90,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         } catch (PrincessException ex) {
             LogManager.getLogger().error("Error copying princess behaviors", ex);
         }
+        fixedEntities = botForce.getFixedEntityListDirect().stream().collect(Collectors.toList());
         initComponents();
         setLocationRelativeTo(parent);
         pack();
@@ -295,7 +296,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(2, 5, 0, 0);
-        for(String en : Utilities.generateEntityStub(botForce.getFixedEntityList())) {
+        for(String en : Utilities.generateEntityStub(fixedEntities)) {
             panFixedEntity.add(new JLabel(en), gbc);
             gbc.gridy++;
         }
@@ -340,7 +341,7 @@ public class CustomizeBotForceDialog  extends JDialog {
                 LogManager.getLogger().error("Could not parse BotForce entities", ex);
                 return;
             }
-            botForce.setFixedEntityList(Collections.list(parser.getEntities().elements()));
+            fixedEntities = Collections.list(parser.getEntities().elements());
             refreshFixedEntityPanel();
         }
     }
@@ -351,7 +352,7 @@ public class CustomizeBotForceDialog  extends JDialog {
 
         if(saveUnits.isPresent() && saveUnits.get() != null) {
             try {
-                EntityListFile.saveTo(saveUnits.get(), (ArrayList<Entity>) botForce.getFixedEntityListDirect());
+                EntityListFile.saveTo(saveUnits.get(), (ArrayList<Entity>) fixedEntities);
             } catch (Exception ex) {
                 LogManager.getLogger().error("Could not save BotForce to file", ex);
             }
@@ -359,7 +360,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     }
 
     private void deleteUnits(ActionEvent evt) {
-        botForce.setFixedEntityList(new ArrayList<>());
+        fixedEntities = new ArrayList<Entity>();
         refreshFixedEntityPanel();
     }
 
@@ -383,6 +384,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         botForce.setTeam(choiceTeam.getSelectedIndex()+1);
         botForce.setCamouflage(camo);
         botForce.setBehaviorSettings(behavior);
+        botForce.setFixedEntityList(fixedEntities);
         this.setVisible(false);
     }
     private void cancel(ActionEvent evt) {
