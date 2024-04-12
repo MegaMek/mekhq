@@ -270,7 +270,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbcRight.weightx = 1.0;
         gbcRight.weighty = 0.0;
         gbcRight.fill = GridBagConstraints.NONE;
-        gbcRight.anchor = GridBagConstraints.CENTER;
+        gbcRight.anchor = GridBagConstraints.EAST;
         gbcRight.insets = new Insets(0, 5, 0, 0);
 
         lblCowardice = new JLabel(Integer.toString(behavior.getBraveryIndex()));
