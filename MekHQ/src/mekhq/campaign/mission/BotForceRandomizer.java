@@ -59,7 +59,7 @@ public class BotForceRandomizer {
     //region Variable declarations
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    private enum BalancingMethod {
+    public enum BalancingMethod {
         BV,
         WEIGHT_ADJ;
 
@@ -136,6 +136,7 @@ public class BotForceRandomizer {
         copy.baChance = this.baChance;
         copy.balancingMethod = this.balancingMethod;
         copy.lanceSize = this.lanceSize;
+        copy.focalWeightClass = this.focalWeightClass;
         copy.quality = this.quality;
 
         return copy;
@@ -212,6 +213,14 @@ public class BotForceRandomizer {
 
     public void setLanceSize(int l) {
         lanceSize = l;
+    }
+
+    public double getFocalWeightClass() {
+        return focalWeightClass;
+    }
+
+    public void setFocalWeightClass(double f) {
+        focalWeightClass = f;
     }
     //endregion Getters/Setters
 
