@@ -468,7 +468,7 @@ public class CustomizeScenarioDialog extends JDialog {
         leftGbc.gridwidth = 1;
         leftGbc.weightx = 0.0;
         leftGbc.weighty = 0.0;
-        leftGbc.insets = new Insets(0, 0, 5, 10);
+        leftGbc.insets = new Insets(0, 5, 5, 5);
         leftGbc.fill = GridBagConstraints.NONE;
         leftGbc.anchor = GridBagConstraints.NORTHWEST;
 
@@ -476,9 +476,9 @@ public class CustomizeScenarioDialog extends JDialog {
         rightGbc.gridx = 1;
         rightGbc.gridy = 0;
         rightGbc.gridwidth = 1;
-        rightGbc.weightx = 0.5;
+        rightGbc.weightx = 0.0;
         rightGbc.weighty = 0.0;
-        rightGbc.insets = new Insets(0, 10, 5, 0);
+        rightGbc.insets = new Insets(0, 5, 5, 0);
         rightGbc.fill = GridBagConstraints.NONE;
         rightGbc.anchor = GridBagConstraints.NORTHWEST;
 
@@ -508,6 +508,7 @@ public class CustomizeScenarioDialog extends JDialog {
 
         lblFogDesc = new JLabel(scenario.getFog().toString());
         rightGbc.gridy++;
+        rightGbc.weightx = 1.0;
         panPlanetaryConditions.add(lblFogDesc, rightGbc);
 
         leftGbc.gridy++;
