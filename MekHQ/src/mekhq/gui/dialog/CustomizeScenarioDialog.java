@@ -598,13 +598,11 @@ public class CustomizeScenarioDialog extends JDialog {
         btnEditLoot = new JButton(resourceMap.getString("btnEditLoot.text"));
         btnEditLoot.setEnabled(false);
         btnEditLoot.addActionListener(evt -> editLoot());
-        btnEditLoot.setEnabled(scenario.getStatus().isCurrent());
         panBtns.add(btnEditLoot);
 
         btnDeleteLoot = new JButton(resourceMap.getString("btnDeleteLoot.text"));
         btnDeleteLoot.setEnabled(false);
         btnDeleteLoot.addActionListener(evt -> deleteLoot());
-        btnDeleteLoot.setEnabled(scenario.getStatus().isCurrent());
         panBtns.add(btnDeleteLoot);
         panLoot.add(panBtns, BorderLayout.PAGE_START);
 
@@ -681,13 +679,13 @@ public class CustomizeScenarioDialog extends JDialog {
         btnEditForce = new JButton(resourceMap.getString("btnEditForce.text"));
         btnEditForce.setEnabled(false);
         btnEditForce.addActionListener(evt -> editForce());
-        btnEditForce.setEnabled(scenario.getStatus().isCurrent());
+        btnEditForce.setEnabled(false);
         panBtns.add(btnEditForce);
 
         btnDeleteForce = new JButton(resourceMap.getString("btnDeleteForce.text"));
         btnDeleteForce.setEnabled(false);
         btnDeleteForce.addActionListener(evt -> deleteForce());
-        btnDeleteForce.setEnabled(scenario.getStatus().isCurrent());
+        btnDeleteForce.setEnabled(false);
         panBtns.add(btnDeleteForce);
         panOtherForces.add(panBtns, BorderLayout.PAGE_START);
 
