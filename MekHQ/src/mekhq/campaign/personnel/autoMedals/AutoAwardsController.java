@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 public class AutoAwardsController {
     private Campaign campaign;
 
+    private List<Award> injuryAwards = new ArrayList<>();
     private List<Award> killAwards = new ArrayList<>();
     private List<Award> miscAwards = new ArrayList<>();
     private List<Award> missionAccomplishedAwards = new ArrayList<>();
-    // MissionAwards are disabled until a way to track how many Missions a person has completed has been introduced
     private List<Award> missionAwards = new ArrayList<>();
     private List<Award> scenarioAwards = new ArrayList<>();
     private List<Award> skillAwards = new ArrayList<>();
@@ -116,10 +116,6 @@ public class AutoAwardsController {
                 if (!scenarioAwards.isEmpty()) {
                     new ScenarioAwards(campaign, scenarioAwards, person);
                 }
-
-                if (!missionAwards.isEmpty()) {
-                    new MissionAwards(campaign, missionAwards, person);
-                }
             }
         }
     }
@@ -133,7 +129,7 @@ public class AutoAwardsController {
 
         // we start by building a master list of all awards
         if (!allSetNames.isEmpty()) {
-            LogManager.getLogger().info("Getting all set names");
+            LogManager.getLogger().info("Getting all Award Sets");
 
             for (String setName : AwardsFactory.getInstance().getAllSetNames()) {
                 if (!allSetNames.isEmpty()) {
@@ -145,7 +141,11 @@ public class AutoAwardsController {
                     for (Award award : awards) {
                         switch (award.getItem()) {
                             // TODO track InjuryAwards at the end of a scenario
-                            // InjuryAwards are missing because we issue those immediately after a scenario
+                            // InjuryAwards are issued immediately after a scenario
+                            // We include them here, for tracking purposes
+                            case "Injury":
+                                injuryAwards.add(award);
+                                break;
                             case "Kill":
                                 killAwards.add(award);
                                 break;
@@ -155,9 +155,11 @@ public class AutoAwardsController {
                             case "MissionAccomplished":
                                 missionAccomplishedAwards.add(award);
                                 break;
-//                            case "Mission":
-//                                missionAwards.add(award);
-//                                break;
+                            // Mission Awards are disabled until Mission tracking, on a personnel-level, is introduced
+                            // We include them here, for tracking purposes
+                            case "Mission":
+                                missionAwards.add(award);
+                                break;
                             case "TheatreOfWar":
                                 theatreOfWarAwards.add(award);
                                 break;
@@ -177,16 +179,17 @@ public class AutoAwardsController {
                     }
 
                     // These logs help users double-check that the number of awards found matches their records
-                    LogManager.getLogger().info("autoAwards found {} Kill awards", killAwards.size());
-                    LogManager.getLogger().info("autoAwards found {} Misc awards", miscAwards.size());
-                    LogManager.getLogger().info("autoAwards found {} MissionAccomplished awards", missionAccomplishedAwards.size());
-                    LogManager.getLogger().info("autoAwards found {} Mission awards", missionAwards.size());
-                    LogManager.getLogger().info("autoAwards found {} Scenario awards", scenarioAwards.size());
-                    LogManager.getLogger().info("autoAwards found {} Skill awards", skillAwards.size());
-                    LogManager.getLogger().info("autoAwards found {} TheatreOfWar awards", theatreOfWarAwards.size());
-                    LogManager.getLogger().info("autoAwards found {} Time awards", timeAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Injury Awards", injuryAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Kill Awards", killAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} MissionAccomplished Awards", missionAccomplishedAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Mission Awards", missionAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Scenario Awards", scenarioAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Skill Awards", skillAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Time Awards", timeAwards.size());
                 } else {
-                    LogManager.getLogger().info("AutoAwards failed to find any awards in set {}", setName);
+                    LogManager.getLogger().info("autoAwards failed to find any awards in set {}", setName);
                 }
             }
         } else {
