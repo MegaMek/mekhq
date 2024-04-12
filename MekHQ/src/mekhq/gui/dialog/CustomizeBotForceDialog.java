@@ -19,18 +19,26 @@
 package mekhq.gui.dialog;
 
 import megamek.client.bot.princess.BehaviorSettings;
-import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.ui.dialogs.BotConfigDialog;
 import megamek.client.ui.dialogs.CamoChooserDialog;
+import megamek.common.Entity;
+import megamek.common.EntityListFile;
+import megamek.common.MULParser;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.BotForceStub;
-import mekhq.campaign.mission.Mission;
+import mekhq.gui.FileDialogs;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class CustomizeBotForceDialog  extends JDialog {
@@ -44,6 +52,10 @@ public class CustomizeBotForceDialog  extends JDialog {
     private JComboBox<String> choiceTeam;
     private JButton btnCamo;
     private JPanel panBehavior;
+    private DefaultMHQScrollablePanel panFixedEntity;
+    private JButton btnLoadUnits;
+    private JButton btnSaveUnits;
+    private JButton btnDeleteUnits;
     private JLabel lblCowardice;
     private JLabel lblSelfPreservation;
     private JLabel lblAggression;
@@ -77,12 +89,16 @@ public class CustomizeBotForceDialog  extends JDialog {
         setTitle(resourceMap.getString("title"));
 
         getContentPane().setLayout(new BorderLayout());
-        JPanel panMain = new JPanel(new GridLayout(0, 2));
+        JPanel panName = new JPanel(new GridBagLayout());
         JPanel panLeft = new JPanel(new GridBagLayout());
-        JPanel panRight = new JPanel(new GridBagLayout());
-        panMain.add(panLeft);
-        panMain.add(panRight);
-        getContentPane().add(panMain, BorderLayout.CENTER);
+        JPanel panCenter = new JPanel(new GridBagLayout());
+
+        //panMain.add(panLeft);
+        //panMain.add(panRight);
+        //getContentPane().add(panMain, BorderLayout.CENTER);
+        getContentPane().add(panName, BorderLayout.NORTH);
+        getContentPane().add(panLeft, BorderLayout.WEST);
+        getContentPane().add(panCenter, BorderLayout.CENTER);
 
         JPanel panButtons = new JPanel(new GridLayout(0, 2));
         JButton btnOK = new JButton(resourceMap.getString("btnOK.text"));
@@ -102,16 +118,15 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panLeft.add(new JLabel(resourceMap.getString("lblName.text")), gbc);
+        panName.add(new JLabel(resourceMap.getString("lblName.text")), gbc);
 
         txtName = new JTextField(botForce.getName());
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        panLeft.add(txtName, gbc);
+        panName.add(txtName, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 1;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
         panLeft.add(new JLabel(resourceMap.getString("lblTeam.text")), gbc);
@@ -150,6 +165,42 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.weighty = 1.0;
         panLeft.add(panBehavior, gbc);
 
+
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.0;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.NONE;
+        btnLoadUnits = new JButton(resourceMap.getString("btnLoadUnits.text"));
+        btnLoadUnits.setToolTipText(resourceMap.getString("btnLoadUnits.tooltip"));
+        btnLoadUnits.addActionListener(this::loadUnits);
+        panCenter.add(btnLoadUnits);
+        gbc.gridx++;
+        btnSaveUnits = new JButton(resourceMap.getString("btnSaveUnits.text"));
+        btnSaveUnits.setToolTipText(resourceMap.getString("btnSaveUnits.tooltip"));
+        btnSaveUnits.addActionListener(this::saveUnits);
+        panCenter.add(btnSaveUnits);
+        gbc.gridx++;
+        gbc.weightx = 1.0;
+        btnDeleteUnits = new JButton(resourceMap.getString("btnDeleteUnits.text"));
+        btnDeleteUnits.setToolTipText(resourceMap.getString("btnDeleteUnits.tooltip"));
+        btnDeleteUnits.addActionListener(this::deleteUnits);
+        panCenter.add(btnDeleteUnits, gbc);
+
+        panFixedEntity = new DefaultMHQScrollablePanel(frame, "panFixedEntity", new GridBagLayout());
+        refreshFixedEntityPanel();
+        JScrollPane scrollFixedEntity = new JScrollPane(panFixedEntity);
+        scrollFixedEntity.setMinimumSize(new Dimension(400, 200));
+        scrollFixedEntity.setPreferredSize(new Dimension(400, 200));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.gridwidth = 3;
+        gbc.fill = GridBagConstraints.BOTH;
+        panCenter.add(scrollFixedEntity, gbc);
 
     }
 
@@ -222,6 +273,24 @@ public class CustomizeBotForceDialog  extends JDialog {
         panBehavior.add(btnBehavior, gbcLeft);
     }
 
+    private void refreshFixedEntityPanel() {
+
+        panFixedEntity.removeAll();
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(2, 5, 0, 0);
+        for(String en : Utilities.generateEntityStub(botForce.getFixedEntityList())) {
+            panFixedEntity.add(new JLabel(en), gbc);
+            gbc.gridy++;
+        }
+        panFixedEntity.revalidate();
+        panFixedEntity.repaint();
+    }
+
     public BotForce getBotForce() {
         return botForce;
     }
@@ -247,6 +316,39 @@ public class CustomizeBotForceDialog  extends JDialog {
             botForce.setCamouflage(ccd.getSelectedItem());
             btnCamo.setIcon(botForce.getCamouflage().getImageIcon());
         }
+    }
+
+    private void loadUnits(ActionEvent evt) {
+        Optional<File> units = FileDialogs.openUnits(frame);
+        if (units.isPresent() && units.get() != null) {
+            final MULParser parser;
+            try {
+                parser = new MULParser(units.get(), campaign.getGameOptions());
+            } catch (Exception ex) {
+                LogManager.getLogger().error("Could not parse BotForce entities", ex);
+                return;
+            }
+            botForce.setFixedEntityList(Collections.list(parser.getEntities().elements()));
+            refreshFixedEntityPanel();
+        }
+    }
+
+    private void saveUnits(ActionEvent evt) {
+        Optional<File> saveUnits = FileDialogs.saveUnits(frame,
+                (botForce.getName().length() > 0) ? botForce.getName() : "BotForce");
+
+        if(saveUnits.isPresent() && saveUnits.get() != null) {
+            try {
+                EntityListFile.saveTo(saveUnits.get(), (ArrayList<Entity>) botForce.getFixedEntityListDirect());
+            } catch (Exception ex) {
+                LogManager.getLogger().error("Could not save BotForce to file", ex);
+            }
+        }
+    }
+
+    private void deleteUnits(ActionEvent evt) {
+        botForce.setFixedEntityList(new ArrayList<>());
+        refreshFixedEntityPanel();
     }
 
     private String getForcedWithdrawalDescription(BehaviorSettings behavior) {
