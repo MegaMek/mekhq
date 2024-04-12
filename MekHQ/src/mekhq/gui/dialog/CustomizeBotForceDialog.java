@@ -34,6 +34,7 @@ import mekhq.campaign.mission.BotForceRandomizer;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
+import mekhq.gui.displayWrappers.FactionDisplay;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -84,7 +85,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     private MMComboBox choiceUnitType;
     private MMComboBox choiceSkillLevel;
     private MMComboBox choiceFocalWeightClass;
-    private MMComboBox choiceFaction;
+    private MMComboBox<FactionDisplay> choiceFaction;
     private MMComboBox choiceQuality;
 
     public CustomizeBotForceDialog(JFrame parent, boolean modal, BotForce bf, Campaign c) {
@@ -367,10 +368,12 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceBalancingMethod, gbc);
 
-        DefaultComboBoxModel<String> factionModel = new DefaultComboBoxModel<>();
-        factionModel.addAll(Factions.getInstance().getFactionList());
-        choiceFaction = new MMComboBox("choiceFaction", factionModel);
-        choiceFaction.setSelectedItem(randomizer.getFactionCode());
+        DefaultComboBoxModel<FactionDisplay> factionModel = new DefaultComboBoxModel<>();
+        factionModel.addAll(FactionDisplay.getSortedValidFactionDisplays(Factions.getInstance().getFactions(),
+                campaign.getLocalDate()));
+        choiceFaction = new MMComboBox<>("choiceFaction", factionModel);
+        choiceFaction.setSelectedItem(new FactionDisplay(Factions.getInstance().getFaction(randomizer.getFactionCode()),
+                campaign.getLocalDate()));
         choiceFaction.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy++;
@@ -611,7 +614,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         botForce.setFixedEntityList(fixedEntities);
         useRandomUnits = chkUseRandomUnits.isSelected();
         if(useRandomUnits) {
-            randomizer.setFactionCode((String) choiceFaction.getSelectedItem());
+            randomizer.setFactionCode(choiceFaction.getSelectedItem().getFaction().getShortName());
             randomizer.setForceMultiplier((double) spnForceMultiplier.getValue());
             randomizer.setPercentConventional((int) spnPercentConventional.getValue());
             randomizer.setBaChance((int) spnBaChance.getValue());
