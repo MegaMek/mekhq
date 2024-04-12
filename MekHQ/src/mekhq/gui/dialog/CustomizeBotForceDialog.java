@@ -41,11 +41,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class CustomizeBotForceDialog  extends JDialog {
@@ -81,9 +78,9 @@ public class CustomizeBotForceDialog  extends JDialog {
     private JSpinner spnPercentConventional;
     private JSpinner spnBaChance;
     private JSpinner spnLanceSize;
-    private MMComboBox choiceBalancingMethod;
+    private MMComboBox<BotForceRandomizer.BalancingMethod> choiceBalancingMethod;
     private MMComboBox choiceUnitType;
-    private MMComboBox choiceSkillLevel;
+    private MMComboBox<SkillLevel> choiceSkillLevel;
     private MMComboBox choiceFocalWeightClass;
     private MMComboBox<FactionDisplay> choiceFaction;
     private MMComboBox choiceQuality;
@@ -349,11 +346,8 @@ public class CustomizeBotForceDialog  extends JDialog {
         });
         panRandomUnits.add(chkUseRandomUnits, gbc);
 
-        DefaultComboBoxModel<String> balancingMethodModel = new DefaultComboBoxModel<>();
-        balancingMethodModel.addElement(BotForceRandomizer.BalancingMethod.BV.name());
-        balancingMethodModel.addElement(BotForceRandomizer.BalancingMethod.WEIGHT_ADJ.name());
-        choiceBalancingMethod = new MMComboBox("choiceBalancingMethod", balancingMethodModel);
-        choiceBalancingMethod.setSelectedItem(randomizer.getBalancingMethod().name());
+        choiceBalancingMethod = new MMComboBox("choiceBalancingMethod", BotForceRandomizer.BalancingMethod.values());
+        choiceBalancingMethod.setSelectedItem(randomizer.getBalancingMethod());
         choiceBalancingMethod.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -402,15 +396,11 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceUnitType, gbc);
 
-        DefaultComboBoxModel<String> skillLevelModel = new DefaultComboBoxModel<>();
-        for(SkillLevel skill : SkillLevel.values()) {
-            if(skill.isNone()) {
-                continue;
-            }
-            skillLevelModel.addElement(skill.name());
-        }
-        choiceSkillLevel = new MMComboBox("choiceSkillLevel", skillLevelModel);
-        choiceSkillLevel.setSelectedItem(randomizer.getSkill().name());
+        //leave out none as a skill option
+        ArrayList<SkillLevel> skills = Arrays.stream(SkillLevel.values()).
+                filter(skill -> !skill.isNone()).collect(Collectors.toCollection(() -> new ArrayList<SkillLevel>()));
+        choiceSkillLevel = new MMComboBox("choiceSkillLevel", skills.toArray());
+        choiceSkillLevel.setSelectedItem(randomizer.getSkill());
         choiceSkillLevel.setEnabled(useRandomUnits);
         gbc.gridx = 0;
         gbc.gridy++;
@@ -620,11 +610,10 @@ public class CustomizeBotForceDialog  extends JDialog {
             randomizer.setBaChance((int) spnBaChance.getValue());
             randomizer.setLanceSize((int) spnLanceSize.getValue());
             randomizer.setFocalWeightClass(choiceFocalWeightClass.getSelectedIndex());
-            randomizer.setSkill(SkillLevel.valueOf((String) choiceSkillLevel.getSelectedItem()));
+            randomizer.setSkill(choiceSkillLevel.getSelectedItem());
             randomizer.setQuality(choiceQuality.getSelectedIndex());
             randomizer.setUnitType(choiceUnitType.getSelectedIndex());
-            randomizer.setBalancingMethod(BotForceRandomizer.BalancingMethod
-                    .valueOf((String) choiceBalancingMethod.getSelectedItem()));
+            randomizer.setBalancingMethod(choiceBalancingMethod.getSelectedItem());
             botForce.setBotForceRandomizer(randomizer);
         } else {
             botForce.setBotForceRandomizer(null);
