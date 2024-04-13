@@ -428,6 +428,10 @@ public class Scenario {
         return deploymentLimit;
     }
 
+    public void setDeploymentLimit(ScenarioDeploymentLimit limit) {
+        this.deploymentLimit = limit;
+    }
+
     public Map<UUID, List<UUID>> getPlayerTransportLinkages() {
         return playerTransportLinkages;
     }

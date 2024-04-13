@@ -23,7 +23,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.PlanetaryConditionsDialog;
-import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -40,9 +39,6 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -65,6 +61,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private Campaign campaign;
     private boolean newScenario;
     private LocalDate date;
+    private ScenarioDeploymentLimit deploymentLimits;
     private PlanetaryConditions planetaryConditions;
     private List<BotForce> botForces;
 
@@ -78,11 +75,16 @@ public class CustomizeScenarioDialog extends JDialog {
     private BotForceTableModel forcesModel;
 
     // panels
+    private JPanel panDeploymentLimits;
     private JPanel panLoot;
     private JPanel panOtherForces;
     private JPanel panPlanetaryConditions;
 
     // labels
+    private JLabel lblAllowedUnitsDesc;
+    private JLabel lblQuantityLimitDesc;
+    private JLabel lblRequiredPersonnelDesc;
+    private JLabel lblRequiredUnitsDesc;
     private JLabel lblLightDesc;
     private JLabel lblWindDesc;
     private JLabel lblAtmosphereDesc;
@@ -114,7 +116,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private JButton btnClose;
     private JButton btnOK;
 
-    // markdown editors
+    //region markdown editors
     private MarkdownEditorPanel txtDesc;
     private MarkdownEditorPanel txtReport;
     //endregion Variable declarations
@@ -136,9 +138,13 @@ public class CustomizeScenarioDialog extends JDialog {
         }
         date = scenario.getDate();
 
+        if(scenario.getDeploymentLimit() != null) {
+            deploymentLimits = scenario.getDeploymentLimit().getCopy();
+        }
+
         planetaryConditions = scenario.createPlanetaryConditions();
 
-        botForces = scenario.getBotForces().stream().collect(Collectors.toList());;
+        botForces = scenario.getBotForces().stream().collect(Collectors.toList());
         forcesModel = new BotForceTableModel(botForces, campaign);
 
         loots = new ArrayList<>();
@@ -241,11 +247,16 @@ public class CustomizeScenarioDialog extends JDialog {
             panInfo.add(addEventButton, gbc);
         }
 
-        initPlanetaryConditionsPanel(resourceMap);
+        initDeployLimitPanel(resourceMap);
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 2;
         gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panInfo.add(panDeploymentLimits, gbc);
+
+        initPlanetaryConditionsPanel(resourceMap);
+        gbc.gridy++;
         gbc.fill = GridBagConstraints.BOTH;
         panInfo.add(panPlanetaryConditions, gbc);
         // endregion Set up info panel
@@ -377,6 +388,7 @@ public class CustomizeScenarioDialog extends JDialog {
                 scenario.setStatus((ScenarioStatus) choiceStatus.getSelectedItem());
             }
         }
+        scenario.setDeploymentLimit(deploymentLimits);
         scenario.readPlanetaryConditions(planetaryConditions);
         scenario.setDate(date);
         scenario.setBotForces(botForces);
@@ -442,6 +454,107 @@ public class CustomizeScenarioDialog extends JDialog {
             date = dc.getDate();
             btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         }
+    }
+
+    private void initDeployLimitPanel(ResourceBundle resourceMap) {
+
+        panDeploymentLimits = new JPanel(new GridBagLayout());
+        panDeploymentLimits.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
+                BorderFactory.createTitledBorder(resourceMap.getString("panDeploymentLimits.title"))));
+
+        JPanel panButtons = new JPanel(new GridLayout(0, 2));
+        JButton btnEditLimits = new JButton("Edit Limits");
+        btnEditLimits.addActionListener(this::editLimits);
+        panButtons.add(btnEditLimits);
+        JButton btnRemoveLimits = new JButton("Remove Limits");
+        btnRemoveLimits.addActionListener(this::removeLimits);
+        panButtons.add(btnRemoveLimits);
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.weightx = 0.0;
+        gbc.weighty = 0.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        panDeploymentLimits.add(panButtons, gbc);
+
+        GridBagConstraints leftGbc = new GridBagConstraints();
+        leftGbc.gridx = 0;
+        leftGbc.gridy = 1;
+        leftGbc.gridwidth = 1;
+        leftGbc.weightx = 0.0;
+        leftGbc.weighty = 0.0;
+        leftGbc.insets = new Insets(0, 0, 5, 10);
+        leftGbc.fill = GridBagConstraints.NONE;
+        leftGbc.anchor = GridBagConstraints.NORTHWEST;
+
+        GridBagConstraints rightGbc = new GridBagConstraints();
+        rightGbc.gridx = 1;
+        rightGbc.gridy = 1;
+        rightGbc.gridwidth = 1;
+        rightGbc.weightx = 1.0;
+        rightGbc.weighty = 0.0;
+        rightGbc.insets = new Insets(0, 10, 5, 0);
+        rightGbc.fill = GridBagConstraints.HORIZONTAL;
+        rightGbc.anchor = GridBagConstraints.NORTHWEST;
+
+        leftGbc.gridy++;
+        panDeploymentLimits.add(new JLabel(resourceMap.getString("lblAllowedUnits.text")), leftGbc);
+
+        lblAllowedUnitsDesc = new JLabel();
+        rightGbc.gridy++;
+        panDeploymentLimits.add(lblAllowedUnitsDesc, rightGbc);
+
+        leftGbc.gridy++;
+        panDeploymentLimits.add(new JLabel(resourceMap.getString("lblQuantityLimit.text")), leftGbc);
+
+        lblQuantityLimitDesc = new JLabel();
+        rightGbc.gridy++;
+        panDeploymentLimits.add(lblQuantityLimitDesc, rightGbc);
+
+        leftGbc.gridy++;
+        panDeploymentLimits.add(new JLabel(resourceMap.getString("lblRequiredPersonnel.text")), leftGbc);
+
+        lblRequiredPersonnelDesc = new JLabel();
+        rightGbc.gridy++;
+        panDeploymentLimits.add(lblRequiredPersonnelDesc, rightGbc);
+
+        leftGbc.gridy++;
+        panDeploymentLimits.add(new JLabel(resourceMap.getString("lblRequiredUnits.text")), leftGbc);
+
+        lblRequiredUnitsDesc = new JLabel();
+        rightGbc.gridy++;
+        panDeploymentLimits.add(lblRequiredUnitsDesc, rightGbc);
+
+        refreshDeploymentLimits();
+    }
+
+    private void refreshDeploymentLimits() {
+        if(deploymentLimits != null) {
+            lblAllowedUnitsDesc.setText(deploymentLimits.getAllowedUnitTypeDesc());
+            lblQuantityLimitDesc.setText(deploymentLimits.getQuantityLimitDesc(scenario, campaign));
+            lblRequiredPersonnelDesc.setText(deploymentLimits.getRequiredPersonnelDesc(campaign));
+            lblRequiredUnitsDesc.setText(deploymentLimits.getRequiredUnitDesc(campaign));
+        } else {
+            lblAllowedUnitsDesc.setText("All");
+            lblQuantityLimitDesc.setText("No Limits");
+            lblRequiredPersonnelDesc.setText("None");
+            lblRequiredUnitsDesc.setText("None");
+        }
+    }
+
+    private void editLimits(ActionEvent evt) {
+        EditScenarioDeploymentLimitDialog esdld = new EditScenarioDeploymentLimitDialog(frame, true, deploymentLimits);
+        esdld.setVisible(true);
+        deploymentLimits = esdld.getDeploymentLimit();
+        refreshDeploymentLimits();
+    }
+
+    private void removeLimits(ActionEvent evt) {
+        deploymentLimits = null;
+        refreshDeploymentLimits();
     }
 
     private void initPlanetaryConditionsPanel(ResourceBundle resourceMap) {
