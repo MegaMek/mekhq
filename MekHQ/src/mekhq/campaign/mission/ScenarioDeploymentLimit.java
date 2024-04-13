@@ -155,6 +155,14 @@ public class ScenarioDeploymentLimit {
         this.quantityType = quantityType;
     }
 
+    public List<Integer> getAllowedUnitTypes() {
+        return allowedUnitTypes;
+    }
+
+    public void setAllowedUnitTypes(List<Integer> allowedUnitTypes) {
+        this.allowedUnitTypes = allowedUnitTypes;
+    }
+
     //region Unit type methods
     /**
      * Add a UnitType integer to the allowed unit types list

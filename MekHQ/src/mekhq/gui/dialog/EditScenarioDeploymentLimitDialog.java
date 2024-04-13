@@ -19,12 +19,13 @@
 package mekhq.gui.dialog;
 
 import megamek.client.ui.baseComponents.MMComboBox;
-import mekhq.campaign.mission.BotForceRandomizer;
+import megamek.common.UnitType;
 import mekhq.campaign.mission.ScenarioDeploymentLimit;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 public class EditScenarioDeploymentLimitDialog extends JDialog {
 
@@ -35,6 +36,8 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
     private JSpinner spnQuantity;
     private MMComboBox<ScenarioDeploymentLimit.QuantityType> choiceQuantityType;
     private MMComboBox<ScenarioDeploymentLimit.CountType> choiceCountType;
+    private JCheckBox checkAllUnits;
+    private JCheckBox[] checkAllowedUnits;
 
     public EditScenarioDeploymentLimitDialog(JFrame parent, boolean modal, ScenarioDeploymentLimit limit) {
         super(parent, modal);
@@ -64,7 +67,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;
-        leftGbc.gridy = 1;
+        leftGbc.gridy = 0;
         leftGbc.gridwidth = 1;
         leftGbc.weightx = 0.0;
         leftGbc.weighty = 0.0;
@@ -74,7 +77,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
 
         GridBagConstraints rightGbc = new GridBagConstraints();
         rightGbc.gridx = 1;
-        rightGbc.gridy = 1;
+        rightGbc.gridy = 0;
         rightGbc.gridwidth = 1;
         rightGbc.weightx = 1.0;
         rightGbc.weighty = 0.0;
@@ -109,6 +112,33 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         rightGbc.gridy++;
         panMain.add(spnQuantity, rightGbc);
 
+        JPanel panAllowedUnits = new JPanel(new GridLayout(UnitType.SIZE+1, 1));
+        panAllowedUnits.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
+                BorderFactory.createTitledBorder("Allowed Units")));
+        checkAllUnits = new JCheckBox("Allow all units");
+        checkAllUnits.setSelected(deploymentLimit.getAllowedUnitTypes().isEmpty());
+        checkAllUnits.addActionListener(this::checkAllUnits);
+        panAllowedUnits.add(checkAllUnits);
+        checkAllowedUnits = new JCheckBox [UnitType.SIZE];
+        for(int i = UnitType.MEK; i < UnitType.SIZE; i++) {
+            JCheckBox check = new JCheckBox(UnitType.getTypeName(i));
+            check.setSelected(deploymentLimit.getAllowedUnitTypes().contains(i));
+            check.setEnabled(!checkAllUnits.isSelected());
+            checkAllowedUnits[i] = check;
+            panAllowedUnits.add(check);
+        }
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        gbc.weightx = 0.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.gridheight = 3;
+        panMain.add(panAllowedUnits, gbc);
+
         JButton btnOk = new JButton("OK");
         btnOk.addActionListener(this::complete);
         JButton btnClose = new JButton("Cancel");
@@ -118,6 +148,17 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
 
         getContentPane().add(panMain, BorderLayout.CENTER);
         getContentPane().add(panButtons, BorderLayout.PAGE_END);
+    }
+
+    private void checkAllUnits(ActionEvent evt) {
+        for(JCheckBox box : checkAllowedUnits) {
+            if(checkAllUnits.isSelected()) {
+                box.setSelected(false);
+                box.setEnabled(false);
+            } else {
+                box.setEnabled(true);
+            }
+        }
     }
 
     private void setQuantityModel(ActionEvent evt) {
@@ -145,6 +186,15 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         deploymentLimit.setQuantityLimit((int) spnQuantity.getValue());
         deploymentLimit.setQuantityType(choiceQuantityType.getSelectedItem());
         deploymentLimit.setCountType(choiceCountType.getSelectedItem());
+        ArrayList<Integer> allowed = new ArrayList<Integer>();
+        if(!checkAllUnits.isSelected()) {
+            for(int i = UnitType.MEK; i < UnitType.SIZE; i++) {
+                if(checkAllowedUnits[i].isSelected()) {
+                    allowed.add(i);
+                }
+            }
+        }
+        deploymentLimit.setAllowedUnitTypes(allowed);
         this.setVisible(false);
     }
 
