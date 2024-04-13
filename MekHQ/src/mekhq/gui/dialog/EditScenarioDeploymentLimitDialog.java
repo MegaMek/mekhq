@@ -86,6 +86,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         panMain.add(lblQuantityType, leftGbc);
         choiceQuantityType = new MMComboBox("choiceQuantityType", ScenarioDeploymentLimit.QuantityType.values());
         choiceQuantityType.setSelectedItem(deploymentLimit.getQuantityType());
+        choiceQuantityType.addActionListener(this::setQuantityModel);
         panMain.add(choiceQuantityType, rightGbc);
 
 
@@ -94,6 +95,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         panMain.add(lblCountType, leftGbc);
         choiceCountType = new MMComboBox("choiceCountType", ScenarioDeploymentLimit.CountType.values());
         choiceCountType.setSelectedItem(deploymentLimit.getCountType());
+        choiceCountType.addActionListener(this::setQuantityModel);
         rightGbc.gridy++;
         panMain.add(choiceCountType, rightGbc);
 
@@ -101,8 +103,9 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         JLabel lblQuantity = new JLabel("Maximum Quantity:");
         leftGbc.gridy++;
         panMain.add(lblQuantity, leftGbc);
-        spnQuantity = new JSpinner(new SpinnerNumberModel(deploymentLimit.getQuantityLimit(),
-                1, 100, 1));
+        spnQuantity = new JSpinner();
+        spnQuantity.setValue(deploymentLimit.getQuantityLimit());
+        setQuantityModel(null);
         rightGbc.gridy++;
         panMain.add(spnQuantity, rightGbc);
 
@@ -115,6 +118,27 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
 
         getContentPane().add(panMain, BorderLayout.CENTER);
         getContentPane().add(panButtons, BorderLayout.PAGE_END);
+    }
+
+    private void setQuantityModel(ActionEvent evt) {
+        int currentQuantity = (int) spnQuantity.getValue();
+        if(currentQuantity < 1) {
+            currentQuantity = 1;
+        }
+        ScenarioDeploymentLimit.CountType currentCountType = choiceCountType.getSelectedItem();
+        ScenarioDeploymentLimit.QuantityType currentQuantityType = choiceQuantityType.getSelectedItem();
+        if(currentQuantityType == ScenarioDeploymentLimit.QuantityType.PERCENT) {
+            if(currentQuantity > 100) {
+                currentQuantity = 100;
+            }
+            spnQuantity.setModel(new SpinnerNumberModel(currentQuantity, 1, 100, 5));
+        } else {
+            if(currentCountType == ScenarioDeploymentLimit.CountType.UNIT) {
+                spnQuantity.setModel(new SpinnerNumberModel(currentQuantity, 1, null, 1));
+            } else {
+                spnQuantity.setModel(new SpinnerNumberModel(currentQuantity, 1, null, 500));
+            }
+        }
     }
 
     private void complete(ActionEvent evt) {
