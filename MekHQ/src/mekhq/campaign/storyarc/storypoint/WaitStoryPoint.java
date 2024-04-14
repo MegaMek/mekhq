@@ -71,7 +71,9 @@ public class WaitStoryPoint extends StoryPoint {
         getCampaign().getApp().getCampaigngui().refreshAllTabs();
     }
 
-    public LocalDate getDate() { return date; }
+    public LocalDate getDate() {
+        return date;
+    }
 
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {

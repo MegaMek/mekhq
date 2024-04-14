@@ -1120,7 +1120,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
 
     private void changeValueEnabled(String type) {
         skillLvls.get(type).setEnabled(skillChks.get(type).isSelected());
-        //skillBonus.get(type).setEnabled(skillChks.get(type).isSelected());
     }
 
     private void btnDateActionPerformed(ActionEvent evt) {

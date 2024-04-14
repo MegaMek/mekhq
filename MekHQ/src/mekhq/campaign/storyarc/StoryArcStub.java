@@ -62,23 +62,41 @@ public class StoryArcStub {
         storyLoadingType = StoryLoadingType.BOTH;
     }
 
-    private void setTitle(String t) { this.title = t; }
+    private void setTitle(String t) {
+        this.title = t;
+    }
 
-    public String getTitle() { return this.title; }
+    public String getTitle() {
+        return this.title;
+    }
 
-    public String getDetails() { return details; }
+    public String getDetails() {
+        return details;
+    }
 
-    private void setDetails(String d) { this.details = d; }
+    private void setDetails(String d) {
+        this.details = d;
+    }
 
-    public String getDescription() { return this.description; }
+    public String getDescription() {
+        return this.description;
+    }
 
-    private void setDescription(String d) { this.description = d; }
+    private void setDescription(String d) {
+        this.description = d;
+    }
 
-    private void setStoryLoadingType(StoryLoadingType type) { this.storyLoadingType = type; }
+    private void setStoryLoadingType(StoryLoadingType type) {
+        this.storyLoadingType = type;
+    }
 
-    public StoryLoadingType getStoryLoadingType() { return storyLoadingType; }
+    public StoryLoadingType getStoryLoadingType() {
+        return storyLoadingType;
+    }
 
-    private void setInitCampaignPath(String s) { this.initCampaignPath =s; }
+    private void setInitCampaignPath(String s) {
+        this.initCampaignPath =s;
+    }
 
     public File getInitCampaignFile() {
         if(null == initCampaignPath) {
@@ -87,9 +105,13 @@ public class StoryArcStub {
         return new File(initCampaignPath);
     }
 
-    public void setDirectoryPath(String p) { this.directoryPath = p; }
+    public void setDirectoryPath(String p) {
+        this.directoryPath = p;
+    }
 
-    public String getDirectoryPath() { return directoryPath; }
+    public String getDirectoryPath() {
+        return directoryPath;
+    }
 
 
     public static @Nullable StoryArcStub parseFromXML(final NodeList nl, Campaign c) {

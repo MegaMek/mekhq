@@ -66,19 +66,33 @@ public class Personality {
     //endregion Constructors
 
     //region Getter/Setters
-    public void setTitle(String t) { this.title = t; }
+    public void setTitle(String t) {
+        this.title = t;
+    }
 
-    public String getTitle() { return title; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
-    public void setPortrait(StoryPortrait p) { this.portrait = p; }
+    public void setPortrait(StoryPortrait p) {
+        this.portrait = p;
+    }
 
-    public Portrait getPortrait() { return portrait; }
+    public Portrait getPortrait() {
+        return portrait;
+    }
 
-    public void setId(UUID id) { this.id = id; }
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
-    protected UUID getId() { return id; }
+    protected UUID getId() {
+        return id;
+    }
 
     public Image getImage() {
         return portrait.getBaseImage();

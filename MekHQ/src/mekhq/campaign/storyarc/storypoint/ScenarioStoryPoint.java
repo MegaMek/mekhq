@@ -103,7 +103,9 @@ public class ScenarioStoryPoint extends StoryPoint {
         this.scenario = s;
     }
 
-    public Scenario getScenario() { return scenario; }
+    public Scenario getScenario() {
+        return scenario;
+    }
 
     @Override
     protected String getResult() {

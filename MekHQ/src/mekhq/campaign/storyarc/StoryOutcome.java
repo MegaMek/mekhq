@@ -52,11 +52,17 @@ public class StoryOutcome {
         storyTriggers = new ArrayList<>();
     }
 
-    public String getResult() { return result; }
+    public String getResult() {
+        return result;
+    }
 
-    public UUID getNextStoryPointId() { return nextStoryPointId; }
+    public UUID getNextStoryPointId() {
+        return nextStoryPointId;
+    }
 
-    public List<StoryTrigger> getStoryTriggers() { return storyTriggers; }
+    public List<StoryTrigger> getStoryTriggers() {
+        return storyTriggers;
+    }
 
     /**
      * Set the StoryArc on all StoryTriggers here

@@ -63,7 +63,9 @@ public class PersonStatusStoryPoint extends StoryPoint {
         return "Person status check";
     }
 
-    public UUID getPersonId() { return personId; }
+    public UUID getPersonId() {
+        return personId;
+    }
 
     public List<PersonnelStatus> getStatusConditions() {
         return statusConditions;

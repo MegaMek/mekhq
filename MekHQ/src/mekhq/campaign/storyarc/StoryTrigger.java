@@ -44,9 +44,13 @@ public abstract class StoryTrigger {
         //nothing here at the moment
     }
 
-    public void setStoryArc(StoryArc a) { this.arc = a; }
+    public void setStoryArc(StoryArc a) {
+        this.arc = a;
+    }
 
-    protected StoryArc getStoryArc() { return arc; }
+    protected StoryArc getStoryArc() {
+        return arc;
+    }
 
     protected Campaign getCampaign() {
         return getStoryArc().getCampaign();

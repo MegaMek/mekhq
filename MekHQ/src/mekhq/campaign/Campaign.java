@@ -4105,7 +4105,9 @@ public class Campaign implements ITechManager {
         campaignOptions = options;
     }
 
-    public StoryArc getStoryArc() { return storyArc; }
+    public StoryArc getStoryArc() {
+        return storyArc;
+    }
 
     public void useStoryArc(StoryArc arc, boolean initiate) {
         arc.setCampaign(this);

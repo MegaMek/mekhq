@@ -54,9 +54,13 @@ public class ChoiceStoryPoint extends StoryPoint {
     }
 
     @Override
-    public String getTitle() { return title; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getQuestion() { return question; }
+    public String getQuestion() {
+        return question;
+    }
 
     public Map<String, String> getChoices() {
         return choices;

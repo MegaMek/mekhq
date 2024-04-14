@@ -112,13 +112,21 @@ public abstract class StoryPoint {
         }
     }
 
-    protected StoryArc getStoryArc() { return storyArc; }
+    protected StoryArc getStoryArc() {
+        return storyArc;
+    }
 
-    public void setId(UUID id) { this.id = id; }
+    public void setId(UUID id) {
+        this.id = id;
+    }
 
-    protected UUID getId() { return id; }
+    protected UUID getId() {
+        return id;
+    }
 
-    public Boolean isActive() { return active; }
+    public Boolean isActive() {
+        return active;
+    }
 
     public abstract String getTitle();
 

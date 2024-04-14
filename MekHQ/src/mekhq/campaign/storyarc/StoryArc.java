@@ -107,31 +107,57 @@ public class StoryArc {
         customStringVariables = new LinkedHashMap<>();
     }
 
-    public void setCampaign(Campaign c) { this.campaign = c; }
+    public void setCampaign(Campaign c) {
+        this.campaign = c;
+    }
 
-    public Campaign getCampaign() { return campaign; }
+    public Campaign getCampaign() {
+        return campaign;
+    }
 
-    private void setTitle(String t) { this.title = t; }
+    private void setTitle(String t) {
+        this.title = t;
+    }
 
-    public String getTitle() { return this.title; }
+    public String getTitle() {
+        return this.title;
+    }
 
-    public String getDetails() { return details; }
+    public String getDetails() {
+        return details;
+    }
 
-    private void setDetails(String d) { this.details = d; }
+    private void setDetails(String d) {
+        this.details = d;
+    }
 
-    public String getDescription() { return this.description; }
+    public String getDescription() {
+        return this.description;
+    }
 
-    private void setDescription(String d) { this.description = d; }
+    private void setDescription(String d) {
+        this.description = d;
+    }
 
-    private void setStoryLoadingType(StoryLoadingType type) { this.storyLoadingType = type; }
+    private void setStoryLoadingType(StoryLoadingType type) {
+        this.storyLoadingType = type;
+    }
 
-    public StoryLoadingType getStoryLoadingType() { return storyLoadingType; }
+    public StoryLoadingType getStoryLoadingType() {
+        return storyLoadingType;
+    }
 
-    private void setStartingPointId(UUID u) { this.startingPointId = u; }
+    private void setStartingPointId(UUID u) {
+        this.startingPointId = u;
+    }
 
-    private UUID getStartingPointId() { return startingPointId; }
+    private UUID getStartingPointId() {
+        return startingPointId;
+    }
 
-    public void setInitCampaignPath(String s) { this.initCampaignPath =s; }
+    public void setInitCampaignPath(String s) {
+        this.initCampaignPath =s;
+    }
 
     public File getInitCampaignFile() {
         if (null == initCampaignPath) {
@@ -140,9 +166,13 @@ public class StoryArc {
         return new File(initCampaignPath);
     }
 
-    public void setDirectoryPath(String p) { this.directoryPath = p; }
+    public void setDirectoryPath(String p) {
+        this.directoryPath = p;
+    }
 
-    public String getDirectoryPath() { return directoryPath; }
+    public String getDirectoryPath() {
+        return directoryPath;
+    }
 
     public StoryPoint getStoryPoint(UUID id) {
         if (id == null) {

@@ -45,9 +45,13 @@ public class NarrativeStoryPoint extends StoryPoint {
     }
 
     @Override
-    public String getTitle() { return title; }
+    public String getTitle() {
+        return title;
+    }
 
-    public String getNarrative() { return narrative; }
+    public String getNarrative() {
+        return narrative;
+    }
 
     @Override
     public void start() {
