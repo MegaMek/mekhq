@@ -60,7 +60,6 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
         JPanel buttonPanel = new JPanel(new BorderLayout());
 
         doneButton = new JButton("Done");
-        //doneButton.setMnemonic('o');
         doneButton.addActionListener(this);
         buttonPanel.add(doneButton, BorderLayout.LINE_END);
 
