@@ -51,7 +51,6 @@ public class BotForce {
     private List<Entity> generatedEntityList;
     private List<UUID> traitors;
     private int team;
-
     // deployment settings
     private int startingPos = Board.START_ANY;
     private int startOffset = 0;
