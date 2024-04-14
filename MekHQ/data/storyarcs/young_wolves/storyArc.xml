@@ -6999,7 +6999,7 @@ salvage.
                     <additionalDetails>
                         <additionalDetail>Crippled units do not count for this objective.</additionalDetail>
                     </additionalDetails>
-                    <description>Prevent 70% of the following force(s) and unit(s) from reaching the southern map
+                    <description>Prevent 60% of the following force(s) and unit(s) from reaching the southern map
                         edge:
                     </description>
                     <destinationEdge>SOUTH</destinationEdge>
