@@ -1849,7 +1849,7 @@ public class AtBDynamicScenarioFactory {
 
         for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
             BotForce botForce = scenario.getBotForce(botIndex);
-            botForce.setStart(scenario.getBotForceTemplates().get(botForce).getActualDeploymentZone());
+            botForce.setStartingPos(scenario.getBotForceTemplates().get(botForce).getActualDeploymentZone());
         }
     }
 
@@ -1924,7 +1924,7 @@ public class AtBDynamicScenarioFactory {
             // compute a random cardinal edge between 0 and 3 to avoid None
             actualDestinationEdge = Compute.randomInt(CardinalEdge.values().length - 1);
         } else if (forceTemplate.getDestinationZone() == ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT) {
-            actualDestinationEdge = getOppositeEdge(force.getStart());
+            actualDestinationEdge = getOppositeEdge(force.getStartingPos());
         } else {
             force.getBehaviorSettings().setDestinationEdge(CardinalEdge.getCardinalEdge(actualDestinationEdge));
             return;

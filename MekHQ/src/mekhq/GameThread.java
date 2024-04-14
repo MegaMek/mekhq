@@ -271,8 +271,17 @@ class GameThread extends Thread implements CloseClientListener {
                 LogManager.getLogger().error("Could not configure bot " + botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
-                botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
+                //set deployment
+                botClient.getLocalPlayer().setStartingPos(botForce.getStartingPos());
+                botClient.getLocalPlayer().setStartOffset(botForce.getStartOffset());
+                botClient.getLocalPlayer().setStartWidth(botForce.getStartWidth());
+                botClient.getLocalPlayer().setStartingAnyNWx(botForce.getStartingAnyNWx());
+                botClient.getLocalPlayer().setStartingAnyNWy(botForce.getStartingAnyNWy());
+                botClient.getLocalPlayer().setStartingAnySEx(botForce.getStartingAnySEx());
+                botClient.getLocalPlayer().setStartingAnySEy(botForce.getStartingAnySEy());
+
+                // set camo
                 botClient.getLocalPlayer().setCamouflage(botForce.getCamouflage().clone());
                 botClient.getLocalPlayer().setColour(botForce.getColour());
 
@@ -293,6 +302,13 @@ class GameThread extends Thread implements CloseClientListener {
         for (Entity entity : botForce.getFullEntityList(campaign)) {
             entity.setOwner(botClient.getLocalPlayer());
             entity.setForceString(forceName);
+            /*
+             Only overwrite deployment round for entities if they have an individual deployment round of zero.
+             Otherwise, we will overwrite entity specific deployment information.
+            */
+            if (entity.getDeployRound() == 0) {
+                entity.setDeployRound(botForce.getDeployRound());
+            }
             entities.add(entity);
         }
 
