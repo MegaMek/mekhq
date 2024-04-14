@@ -48,7 +48,15 @@ public class BotForce {
     private List<Entity> generatedEntityList;
     private List<UUID> traitors;
     private int team;
-    private int start;
+    // deployment settings
+    private int startingPos = Board.START_ANY;
+    private int startOffset = 0;
+    private int startWidth = 3;
+    private int startingAnyNWx = Entity.STARTING_ANY_NONE;
+    private int startingAnyNWy = Entity.STARTING_ANY_NONE;
+    private int startingAnySEx = Entity.STARTING_ANY_NONE;
+    private int startingAnySEy = Entity.STARTING_ANY_NONE;
+    private int deployRound;
     private Camouflage camouflage = new Camouflage(Camouflage.COLOUR_CAMOUFLAGE, PlayerColour.BLUE.name());
     private PlayerColour colour = PlayerColour.BLUE;
     private BehaviorSettings behaviorSettings;
@@ -83,7 +91,7 @@ public class BotForce {
                     Camouflage camouflage, PlayerColour colour) {
         this.name = name;
         this.team = team;
-        this.start = start;
+        this.startingPos = start;
         setFixedEntityList(entityList);
         setCamouflage(camouflage);
         setColour(colour);
@@ -102,7 +110,14 @@ public class BotForce {
         final BotForce copy = new BotForce();
         copy.setName(this.getName());
         copy.setTeam(this.getTeam());
-        copy.setStart(this.getStart());
+        copy.setStartingPos(this.getStartingPos());
+        copy.setStartOffset(this.getStartOffset());
+        copy.setStartWidth(this.getStartWidth());
+        copy.setStartingAnyNWx(this.getStartingAnyNWx());
+        copy.setStartingAnyNWy(this.getStartingAnyNWy());
+        copy.setStartingAnySEx(this.getStartingAnySEx());
+        copy.setStartingAnySEy(this.getStartingAnySEy());
+        copy.setDeployRound(this.getDeployRound());
         copy.setCamouflage(this.getCamouflage());
         copy.setColour(this.getColour());
         //copy.setBehaviorSettings(getBehaviorSettings().getCopy());
@@ -191,13 +206,41 @@ public class BotForce {
         this.team = team;
     }
 
-    public int getStart() {
-        return start;
+    public int getStartingPos() {
+        return startingPos;
     }
 
-    public void setStart(int start) {
-        this.start = start;
+    public void setStartingPos(int start) {
+        this.startingPos = start;
     }
+
+    public int getStartOffset() { return startOffset; }
+
+    public void setStartOffset(int startOffset) { this.startOffset = startOffset; }
+
+    public int getStartWidth() { return startWidth; }
+
+    public void setStartWidth(int startWidth) { this.startWidth = startWidth; }
+
+    public int getStartingAnyNWx() { return startingAnyNWx; }
+
+    public void setStartingAnyNWx(int startingAnyNWx) { this.startingAnyNWx = startingAnyNWx; }
+
+    public int getStartingAnyNWy() { return startingAnyNWy; }
+
+    public void setStartingAnyNWy(int startingAnyNWy) { this.startingAnyNWy = startingAnyNWy; }
+
+    public int getStartingAnySEx() { return startingAnySEx; }
+
+    public void setStartingAnySEx(int startingAnySEx) { this.startingAnySEx = startingAnySEx; }
+
+    public int getStartingAnySEy() { return startingAnySEy; }
+
+    public void setStartingAnySEy(int startingAnySEy) { this.startingAnySEy = startingAnySEy; }
+
+    public int getDeployRound() { return deployRound; }
+
+    public void setDeployRound(int round) { this.deployRound = round; }
 
     public String getTemplateName() {
         return templateName;
@@ -343,7 +386,7 @@ public class BotForce {
         return new BotForceStub("<html>" +
                 getName() + " <i>" +
                 ((getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
-                " Start: " + IStartingPositions.START_LOCATION_NAMES[getStart()] +
+                " Start: " + IStartingPositions.START_LOCATION_NAMES[getStartingPos()] +
                 " Fixed BV: " + getTotalBV(c) +
                 ((null == getBotForceRandomizer()) ? "" : "<br>Random: " + getBotForceRandomizer().getDescription(c)) +
                 "</html>", stubs);
@@ -353,7 +396,14 @@ public class BotForce {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "botForce");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "team", team);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "start", start);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingPos", startingPos);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startOffset", startOffset);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startWidth", startWidth);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnyNWx", startingAnyNWx);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnyNWy", startingAnyNWy);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnySEx", startingAnySEx);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnySEy", startingAnySEy);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deployRound", deployRound);
         getCamouflage().writeToXML(pw, indent);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "colour", getColour().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "templateName", templateName);
@@ -395,8 +445,23 @@ public class BotForce {
                     name = MHQXMLUtility.unEscape(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("team")) {
                     team = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("start")) {
-                    start = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("start") // Legacy - 0.49.19 removal
+                        || wn2.getNodeName().equalsIgnoreCase("startingPos")) {
+                    startingPos = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startOffset")) {
+                    startOffset = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startWidth")) {
+                    startWidth = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingAnyNWx")) {
+                    startingAnyNWx = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingAnyNWy")) {
+                    startingAnyNWy = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingAnySEx")) {
+                    startingAnySEx = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingAnySEy")) {
+                    startingAnySEy = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("deployRound")) {
+                    deployRound = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase(Camouflage.XML_TAG)) {
                     setCamouflage(Camouflage.parseFromXML(wn2));
                 } else if (wn2.getNodeName().equalsIgnoreCase("camoCategory")) { // Legacy - 0.49.3 removal

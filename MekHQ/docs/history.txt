@@ -32,6 +32,19 @@ MEKHQ VERSION HISTORY:
 + Fix #3925: update Aerospace handling and reporting in MHQ (for #3882)
 + PR #3930: Prevent advancing day with pending vanilla scenarios
 + PR #3937: Added Nag for Wounded Personnel without Doctor
++ PR #3901: add lances to the force string when sending data to megamek for bot forces
++ PR #3922: Add missing cockpit costs and weights 
++ PR #3944: Added Nag Dialog for Pregnant Combatants 
++ Fix #3943: Unmaintained Unit Nag Dialog Suppressed for Units set to Salvage
++ PR #3933: Fixes for #3729,#3817,#3753: Clamped Unit Rating Mod for CamOps (redux) 
++ PR #3923: Hide Toughness When 0 
++ PR #3915: Added Dialog to Confirm New Campaign (redux) 
++ PR #3908: Adjusted Default Tech Counts 
++ PR #3967: Adjusted Zoom Speed on Interstellar Map Panel 
++ PR #3973: Move new lance creation to AtBGameThread
++ Fix #3978: Fix a bug with saving
++ PR #3983: Load bot entities in the chat lounge
++ PR ##3991: Add all deployment variables to BotForce 
 
 0.49.18 (2024-02-17 1800 UTC)
 + PR #3805: Adaptations for the Internal Bomb Bay quirk

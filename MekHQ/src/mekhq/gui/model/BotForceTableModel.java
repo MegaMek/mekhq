@@ -101,7 +101,7 @@ public class BotForceTableModel extends AbstractTableModel {
                 return ((null == botForce.getBotForceRandomizer()) ? "" : botForce.getBotForceRandomizer().
                         getShortDescription(campaign));
             case COL_DEPLOYMENT:
-                return IStartingPositions.START_LOCATION_NAMES[botForce.getStart()];
+                return IStartingPositions.START_LOCATION_NAMES[botForce.getStartingPos()];
             default:
                 return "?";
         }

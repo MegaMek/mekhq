@@ -374,7 +374,7 @@ public class InterstellarMapPanel extends JPanel {
         addMouseWheelListener(new MouseAdapter() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                 zoom(Math.pow(1.5, -1 * e.getWheelRotation()), e.getPoint());
+                 zoom(Math.pow(1.175, -1 * e.getWheelRotation()), e.getPoint());
              }
         });
 

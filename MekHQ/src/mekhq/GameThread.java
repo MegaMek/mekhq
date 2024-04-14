@@ -191,31 +191,31 @@ class GameThread extends Thread implements CloseClientListener {
                 }
                 client.sendAddEntity(entities);
                 client.sendPlayerInfo();
-            }
 
-            // Add bots
-            for (int i = 0; i < scenario.getNumBots(); i++) {
-                BotForce bf = scenario.getBotForce(i);
-                String name = bf.getName();
-                if (swingGui.getLocalBots().containsKey(name)) {
-                    int append = 2;
-                    while (swingGui.getLocalBots().containsKey(name + append)) {
-                        append++;
+                // Add bots
+                for (int i = 0; i < scenario.getNumBots(); i++) {
+                    BotForce bf = scenario.getBotForce(i);
+                    String name = bf.getName();
+                    if (swingGui.getLocalBots().containsKey(name)) {
+                        int append = 2;
+                        while (swingGui.getLocalBots().containsKey(name + append)) {
+                            append++;
+                        }
+                        name += append;
                     }
-                    name += append;
-                }
-                Princess botClient = new Princess(name, client.getHost(), client.getPort());
-                botClient.setBehaviorSettings(bf.getBehaviorSettings());
-                try {
-                    botClient.connect();
-                } catch (Exception e) {
-                    LogManager.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
-                }
-                swingGui.getLocalBots().put(name, botClient);
+                    Princess botClient = new Princess(name, client.getHost(), client.getPort());
+                    botClient.setBehaviorSettings(bf.getBehaviorSettings());
+                    try {
+                        botClient.connect();
+                    } catch (Exception e) {
+                        LogManager.getLogger().error("Could not connect with Bot name " + bf.getName(), e);
+                    }
+                    swingGui.getLocalBots().put(name, botClient);
 
-                // chill out while bot is created and connects to megamek
-                Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
-                configureBot(botClient, bf);
+                    // chill out while bot is created and connects to megamek
+                    Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
+                    configureBot(botClient, bf);
+                }
             }
 
             while (!stop) {
@@ -256,30 +256,48 @@ class GameThread extends Thread implements CloseClientListener {
                 LogManager.getLogger().error("Could not configure bot " + botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
-                botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
+                //set deployment
+                botClient.getLocalPlayer().setStartingPos(botForce.getStartingPos());
+                botClient.getLocalPlayer().setStartOffset(botForce.getStartOffset());
+                botClient.getLocalPlayer().setStartWidth(botForce.getStartWidth());
+                botClient.getLocalPlayer().setStartingAnyNWx(botForce.getStartingAnyNWx());
+                botClient.getLocalPlayer().setStartingAnyNWy(botForce.getStartingAnyNWy());
+                botClient.getLocalPlayer().setStartingAnySEx(botForce.getStartingAnySEx());
+                botClient.getLocalPlayer().setStartingAnySEy(botForce.getStartingAnySEy());
+
+                // set camo
                 botClient.getLocalPlayer().setCamouflage(botForce.getCamouflage().clone());
                 botClient.getLocalPlayer().setColour(botForce.getColour());
 
                 botClient.sendPlayerInfo();
 
-                String forceName = botClient.getLocalPlayer().getName() + "|1";
-                var entities = new ArrayList<Entity>();
-                // generate any random units
-                botForce.generateRandomForces(units, campaign);
-                for (Entity entity : botForce.getFullEntityList(campaign)) {
-                    if (null == entity) {
-                        continue;
-                    }
-                    entity.setOwner(botClient.getLocalPlayer());
-                    entity.setForceString(forceName);
-                    entities.add(entity);
-                }
+                List<Entity> entities = setupBotEntities(botClient, botForce, scenario);
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
+    }
+
+    protected List<Entity> setupBotEntities(BotClient botClient, BotForce botForce, Scenario scenario) {
+        String forceName = botClient.getLocalPlayer().getName() + "|1";
+        var entities = new ArrayList<Entity>();
+        botForce.generateRandomForces(units, campaign);
+        for (Entity entity : botForce.getFullEntityList(campaign)) {
+            entity.setOwner(botClient.getLocalPlayer());
+            entity.setForceString(forceName);
+            /*
+             Only overwrite deployment round for entities if they have an individual deployment round of zero.
+             Otherwise, we will overwrite entity specific deployment information.
+            */
+            if (entity.getDeployRound() == 0) {
+                entity.setDeployRound(botForce.getDeployRound());
+            }
+            entities.add(entity);
+        }
+
+        return entities;
     }
 
     /*
