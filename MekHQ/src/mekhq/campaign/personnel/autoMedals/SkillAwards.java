@@ -127,6 +127,7 @@ public class SkillAwards {
 
             case "PilotingSpacecraft":
                 relevantSkills = List.of(SkillType.S_PILOT_SPACE);
+                break;
 
             case "GunneryMech":
                 relevantSkills = List.of(SkillType.S_GUN_MECH);
