@@ -320,7 +320,7 @@ public class Award implements Comparable<Award> {
     }
 
     /**
-     * @return the number of times this award has been awarded to the person.
+     * @return the number of times this award has been awarded.
      */
     public int getQuantity() {
         return dates.size();

@@ -55,12 +55,16 @@ public class RankAwards {
                         isEligible = true;
                     }
                 } else {
-                    if ((requiredRankNumeric <= 20) && (person.getRankNumeric() >= requiredRankNumeric)) {
+                    if ((requiredRankNumeric <= 20) && (person.getRankNumeric() <= 20)) {
                         isEligible = true;
-                    } else if ((requiredRankNumeric <= 30) && (person.getRankNumeric() >= requiredRankNumeric)) {
+                    } else if ((requiredRankNumeric <= 30) && (person.getRankNumeric() <= 30)) {
                         isEligible = true;
-                    } else if ((requiredRankNumeric >= 40) && (person.getRankNumeric() >= requiredRankNumeric)) {
+                    } else if ((requiredRankNumeric >= 31) && (person.getRankNumeric() >= 31)) {
                         isEligible = true;
+                    }
+
+                    if (isEligible) {
+                        isEligible = person.getRankNumeric() >= requiredRankNumeric;
                     }
                 }
             }

@@ -496,15 +496,15 @@
 	</award>
 	<award>
 		<name>Longevity</name>
-		<description>Award for every 4 years of service.</description>
+		<description>Awarded for every 4 years of service.</description>
 		<ribbon>4-03-1-Longevity.png</ribbon>
 		<xp>2</xp>
 		<stackable>true</stackable>
 		<precedence>4.03.1</precedence>
-		<qty>48</qty>
+		<qty>4</qty>
 		<item>Time</item>
 		<size>Individual</size>
-		<range>Months</range>
+		<range>True</range>
 	</award>
 	<award>
 		<name>Drill Instructor</name>

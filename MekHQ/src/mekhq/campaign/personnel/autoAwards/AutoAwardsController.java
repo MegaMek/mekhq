@@ -86,9 +86,6 @@ public class AutoAwardsController {
      */
     private void ProcessAwards(Collection<Person> personnel, Boolean missionWasSuccessful) {
         for (Person person : personnel) {
-            LogManager.getLogger().info("Rank Numeric {}", person.getRankNumeric());
-            LogManager.getLogger().info("Rank Level {}", person.getRankLevel());
-
             if (!theatreOfWarAwards.isEmpty()) {
                 new TheatreOfWarAwards(campaign, theatreOfWarAwards, person);
             }
@@ -154,7 +151,6 @@ public class AutoAwardsController {
                             case "Scenario":
                                 scenarioAwards.add(award);
                                 break;
-                            // TODO rank awards
                             case "Rank":
                                 rankAwards.add(award);
                                 break;
