@@ -26,19 +26,25 @@ public class SkillAwards {
 
         for (Award award : awards) {
             if (award.canBeAwarded(person)) {
-                int requiredSkillLevel = award.getQty();
+                int requiredSkillLevel;
 
-                // this allows the user to specify multiple skills to be checked against
+                try {
+                    requiredSkillLevel = award.getQty();
+                } catch (Exception e) {
+                    LogManager.getLogger().warn("Award {} from the {} set has invalid qty value {}",
+                            award.getName(), award.getSet(), award.getQty());
+                    break;
+                }
+
+                // this allows the user to specify multiple skills to be checked against, where all skill levels need to be met
                 List<String> skills = Arrays.asList(award.getRange().split(","));
 
                 boolean hasRequiredSkillLevel = true;
 
                 if (!skills.isEmpty()) {
                     for (String skill : skills) {
-                        if (getSkillLevel(award, person, skill) < requiredSkillLevel) {
-                            LogManager.getLogger().info("Skill {} vs. Required Skill {}", getSkillLevel(award, person, skill), requiredSkillLevel);
+                        if (processSkills(award, person, skill) < requiredSkillLevel) {
                             hasRequiredSkillLevel = false;
-                            LogManager.getLogger().info(hasRequiredSkillLevel);
                             // this break ensures that all required skills must be met/exceeded for Award eligibility
                             break;
                         }
@@ -56,425 +62,199 @@ public class SkillAwards {
     }
 
     /**
-     * This function uses switches to cycle through skills to find the relevant skill level
+     * This function uses switches to feed the relevant skill/s into getSkillLevel()
      *
      * @param award the award being processed, this is for error logging
      * @param person the person whose skill levels we want
      * @param skill the skill we're checking
      */
-    private int getSkillLevel(Award award, Person person, String skill) {
+    private int processSkills(Award award, Person person, String skill) {
+        List<String> relevantSkills;
+
         switch (skill) {
+            // These first couple of cases are for those instances where the users wants to check against multiple skills, but only needs one passing grade
             case "Piloting":
-                int[] pilotingLevels = new int[7];
-
-                // these checks are necessary as, if the person is unskilled, the check generates an exception
-                if (person.hasSkill(SkillType.S_PILOT_MECH)) {
-                    pilotingLevels[0] = person.getSkill(SkillType.S_PILOT_MECH).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_PILOT_AERO)) {
-                    pilotingLevels[1] = person.getSkill(SkillType.S_PILOT_AERO).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_PILOT_GVEE)) {
-                    pilotingLevels[2] = person.getSkill(SkillType.S_PILOT_GVEE).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_PILOT_VTOL)) {
-                    pilotingLevels[3] = person.getSkill(SkillType.S_PILOT_VTOL).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_PILOT_NVEE)) {
-                    pilotingLevels[4] = person.getSkill(SkillType.S_PILOT_NVEE).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_PILOT_JET)) {
-                    pilotingLevels[5] = person.getSkill(SkillType.S_PILOT_JET).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_PILOT_SPACE)) {
-                pilotingLevels[6] = person.getSkill(SkillType.S_PILOT_SPACE).getLevel();
-                }
-
-                return Arrays.stream(pilotingLevels).max().getAsInt();
+                relevantSkills = Arrays.asList(SkillType.S_PILOT_MECH, SkillType.S_PILOT_AERO, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_JET, SkillType.S_PILOT_SPACE);
+                break;
 
             case "Accuracy":
-                int[] gunneryLevels = new int[10];
-
-                if (person.hasSkill(SkillType.S_GUN_MECH)) {
-                    gunneryLevels[0] = person.getSkill(SkillType.S_GUN_MECH).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_GUN_AERO)) {
-                    gunneryLevels[1] = person.getSkill(SkillType.S_GUN_AERO).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_GUN_VEE)) {
-                    gunneryLevels[2] = person.getSkill(SkillType.S_GUN_VEE).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_GUN_JET)) {
-                    gunneryLevels[3] = person.getSkill(SkillType.S_GUN_JET).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_GUN_SPACE)) {
-                    gunneryLevels[4] = person.getSkill(SkillType.S_GUN_SPACE).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_GUN_BA)) {
-                    gunneryLevels[5] = person.getSkill(SkillType.S_GUN_BA).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_GUN_PROTO)) {
-                    gunneryLevels[6] = person.getSkill(SkillType.S_GUN_PROTO).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_ARTILLERY)) {
-                    gunneryLevels[7] = person.getSkill(SkillType.S_ARTILLERY).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_SMALL_ARMS)) {
-                    gunneryLevels[8] = person.getSkill(SkillType.S_SMALL_ARMS).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_ANTI_MECH)) {
-                    gunneryLevels[9] = person.getSkill(SkillType.S_ANTI_MECH).getLevel();
-                }
-
-                return Arrays.stream(gunneryLevels).max().getAsInt();
+                relevantSkills = Arrays.asList(SkillType.S_GUN_MECH, SkillType.S_GUN_AERO, SkillType.S_GUN_VEE, SkillType.S_GUN_JET, SkillType.S_GUN_SPACE, SkillType.S_GUN_BA, SkillType.S_GUN_PROTO, SkillType.S_ARTILLERY, SkillType.S_SMALL_ARMS, SkillType.S_ANTI_MECH);
+                break;
 
             case "Command":
-                int[] commandLevels = new int[3];
-
-
-                if (person.hasSkill(SkillType.S_LEADER)) {
-                    commandLevels[0] = person.getSkill(SkillType.S_LEADER).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_TACTICS)) {
-                    commandLevels[1] = person.getSkill(SkillType.S_TACTICS).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_STRATEGY)) {
-                    commandLevels[2] = person.getSkill(SkillType.S_STRATEGY).getLevel();
-                }
-
-                return Arrays.stream(commandLevels).max().getAsInt();
+                relevantSkills = Arrays.asList(SkillType.S_LEADER, SkillType.S_TACTICS, SkillType.S_STRATEGY);
+                break;
 
             case "TechWithMedical":
-                int[] TechWithMedicalLevels = new int[8];
-
-                if (person.hasSkill(SkillType.S_TECH_MECH)) {
-                    TechWithMedicalLevels[0] = person.getSkill(SkillType.S_TECH_MECH).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_TECH_AERO)) {
-                    TechWithMedicalLevels[1] = person.getSkill(SkillType.S_TECH_AERO).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_TECH_MECHANIC)) {
-                    TechWithMedicalLevels[2] = person.getSkill(SkillType.S_TECH_MECHANIC).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_TECH_VESSEL)) {
-                    TechWithMedicalLevels[3] = person.getSkill(SkillType.S_TECH_VESSEL).getLevel();
-                }
-                if (person.hasSkill(SkillType.S_TECH_BA)) {
-                    TechWithMedicalLevels[4] = person.getSkill(SkillType.S_TECH_BA).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_ASTECH)) {
-                    TechWithMedicalLevels[5] = person.getSkill(SkillType.S_ASTECH).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_DOCTOR)) {
-                    TechWithMedicalLevels[6] = person.getSkill(SkillType.S_DOCTOR).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_MEDTECH)) {
-                    TechWithMedicalLevels[7] = person.getSkill(SkillType.S_MEDTECH).getLevel();
-                }
-
-                return Arrays.stream(TechWithMedicalLevels).max().getAsInt();
+                relevantSkills = Arrays.asList(SkillType.S_TECH_MECH, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC, SkillType.S_TECH_VESSEL, SkillType.S_TECH_BA, SkillType.S_ASTECH, SkillType.S_DOCTOR, SkillType.S_MEDTECH);
+                break;
 
             case "Tech":
-                int[] TechLevels = new int[6];
-
-
-                if (person.hasSkill(SkillType.S_TECH_MECH)) {
-                    TechLevels[0] = person.getSkill(SkillType.S_TECH_MECH).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_TECH_AERO)) {
-                    TechLevels[1] = person.getSkill(SkillType.S_TECH_AERO).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_TECH_MECHANIC)) {
-                    TechLevels[2] = person.getSkill(SkillType.S_TECH_MECHANIC).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_TECH_VESSEL)) {
-                    TechLevels[3] = person.getSkill(SkillType.S_TECH_VESSEL).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_TECH_BA)) {
-                    TechLevels[4] = person.getSkill(SkillType.S_TECH_BA).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_ASTECH)) {
-                    TechLevels[5] = person.getSkill(SkillType.S_ASTECH).getLevel();
-                }
-
-                return Arrays.stream(TechLevels).max().getAsInt();
+                relevantSkills = Arrays.asList(SkillType.S_TECH_MECH, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC, SkillType.S_TECH_VESSEL, SkillType.S_TECH_BA, SkillType.S_ASTECH);
+                break;
 
             case "Medical":
-                int[] MedicalLevels = new int[2];
-
-                if (person.hasSkill(SkillType.S_DOCTOR)) {
-                    MedicalLevels[0] = person.getSkill(SkillType.S_DOCTOR).getLevel();
-                }
-
-                if (person.hasSkill(SkillType.S_MEDTECH)) {
-                    MedicalLevels[1] = person.getSkill(SkillType.S_MEDTECH).getLevel();
-                }
-
-                return Arrays.stream(MedicalLevels).max().getAsInt();
+                relevantSkills = Arrays.asList(SkillType.S_DOCTOR, SkillType.S_MEDTECH);
+                break;
 
             case "Assistant":
-                int[] assistantLevels = new int[2];
+                relevantSkills = Arrays.asList(SkillType.S_ASTECH, SkillType.S_MEDTECH);
+                break;
 
-                if (person.hasSkill(SkillType.S_ASTECH)) {
-                    assistantLevels[0] = person.getSkill(SkillType.S_ASTECH).getLevel();
-                }
+            case "PilotingMech":
+                relevantSkills = List.of(SkillType.S_PILOT_MECH);
+                break;
 
-                if (person.hasSkill(SkillType.S_MEDTECH)) {
-                    assistantLevels[1] = person.getSkill(SkillType.S_MEDTECH).getLevel();
-                }
+            case "PilotingAerospace":
+                relevantSkills = List.of(SkillType.S_PILOT_AERO);
+                break;
 
-                return Arrays.stream(assistantLevels).max().getAsInt();
+            case "PilotingGroundVehicle":
+                relevantSkills = List.of(SkillType.S_PILOT_GVEE);
+                break;
+
+            case "PilotingVTOL":
+                relevantSkills = List.of(SkillType.S_PILOT_VTOL);
+                break;
+
+            case "PilotingNaval":
+                relevantSkills = List.of(SkillType.S_PILOT_NVEE);
+                break;
+
+            case "PilotingAircraft":
+                relevantSkills = List.of(SkillType.S_PILOT_JET);
+                break;
+
+            case "PilotingSpacecraft":
+                relevantSkills = List.of(SkillType.S_PILOT_SPACE);
+
+            case "GunneryMech":
+                relevantSkills = List.of(SkillType.S_GUN_MECH);
+                break;
+
+            case "GunneryAerospace":
+                relevantSkills = List.of(SkillType.S_GUN_AERO);
+                break;
+
+            case "GunneryVehicle":
+                relevantSkills = List.of(SkillType.S_GUN_VEE);
+                break;
+
+            case "GunneryAircraft":
+                relevantSkills = List.of(SkillType.S_GUN_JET);
+                break;
+
+            case "GunnerySpacecraft":
+                relevantSkills = List.of(SkillType.S_GUN_SPACE);
+                break;
+
+            case "GunneryBattlesuit":
+                relevantSkills = List.of(SkillType.S_GUN_BA);
+                break;
+
+            case "GunneryProtoMech":
+                relevantSkills = List.of(SkillType.S_GUN_PROTO);
+                break;
+
+            case "TechMech":
+                relevantSkills = List.of(SkillType.S_TECH_MECH);
+                break;
+
+            case "TechMechanic":
+                relevantSkills = List.of(SkillType.S_TECH_MECHANIC);
+                break;
+
+            case "TechAero":
+                relevantSkills = List.of(SkillType.S_TECH_AERO);
+                break;
+
+            case "TechBA":
+                relevantSkills = List.of(SkillType.S_TECH_BA);
+                break;
+
+            case "TechVessel":
+                relevantSkills = List.of(SkillType.S_TECH_VESSEL);
+                break;
+
+            case "Artillery":
+                relevantSkills = List.of(SkillType.S_ARTILLERY);
+                break;
+
+            case "SmallArms":
+                relevantSkills = List.of(SkillType.S_SMALL_ARMS);
+                break;
+
+            case "AntiMech":
+                relevantSkills = List.of(SkillType.S_ANTI_MECH);
+                break;
+            case "Astech":
+                relevantSkills = List.of(SkillType.S_ASTECH);
+                break;
+
+            case "Doctor":
+                relevantSkills = List.of(SkillType.S_DOCTOR);
+                break;
+
+            case "Medtech":
+                relevantSkills = List.of(SkillType.S_MEDTECH);
+                break;
+
+            case "HyperspaceNavigation":
+                relevantSkills = List.of(SkillType.S_NAV);
+                break;
+
+            case "Administration":
+                relevantSkills = List.of(SkillType.S_ADMIN);
+                break;
+
+            case "Tactics":
+                relevantSkills = List.of(SkillType.S_TACTICS);
+                break;
+
+            case "Strategy":
+                relevantSkills = List.of(SkillType.S_STRATEGY);
+                break;
+
+            case "Negotiation":
+                relevantSkills = List.of(SkillType.S_NEG);
+                break;
+
+            case "Leadership":
+                relevantSkills = List.of(SkillType.S_LEADER);
+                break;
+
+            case "Scrounge":
+                relevantSkills = List.of(SkillType.S_SCROUNGE);
+                break;
+
             default:
-                if (skill.contains("Piloting")) {
-                    switch (skill) {
-                        case "PilotingMech":
-                            if (person.hasSkill(SkillType.S_PILOT_MECH)) {
-                                return person.getSkill(SkillType.S_PILOT_MECH).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "PilotingAerospace":
-                            if (person.hasSkill(SkillType.S_PILOT_AERO)) {
-                                return person.getSkill(SkillType.S_PILOT_AERO).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "PilotingGroundVehicle":
-                            if (person.hasSkill(SkillType.S_PILOT_GVEE)) {
-                                return person.getSkill(SkillType.S_PILOT_GVEE).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "PilotingVTOL":
-                            if (person.hasSkill(SkillType.S_PILOT_MECH)) {
-                                return person.getSkill(SkillType.S_PILOT_VTOL).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "PilotingNaval":
-                            if (person.hasSkill(SkillType.S_PILOT_NVEE)) {
-                                return person.getSkill(SkillType.S_PILOT_NVEE).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "PilotingAircraft":
-                            if (person.hasSkill(SkillType.S_PILOT_JET)) {
-                                return person.getSkill(SkillType.S_PILOT_JET).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "PilotingSpacecraft":
-                            if (person.hasSkill(SkillType.S_PILOT_SPACE)) {
-                                return person.getSkill(SkillType.S_PILOT_SPACE).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        default:
-                            LogManager.getLogger().warn("Award {} from the {} set has invalid skill {}", award.getName(), award.getSet(), skill);
+                LogManager.getLogger().warn("Award {} from the {} set has invalid skill {}", award.getName(), award.getSet(), skill);
 
-                            // this allows for an int to be returned, but ensures it's impossible to beat the required test.
-                            return -1;
-                    }
-                } else if (skill.contains("Gunnery")) {
-                    switch (skill) {
-                        case "GunneryMech":
-                            if (person.hasSkill(SkillType.S_GUN_MECH)) {
-                                return person.getSkill(SkillType.S_GUN_MECH).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "GunneryAerospace":
-                            if (person.hasSkill(SkillType.S_GUN_AERO)) {
-                                return person.getSkill(SkillType.S_GUN_AERO).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "GunneryVehicle":
-                            if (person.hasSkill(SkillType.S_GUN_VEE)) {
-                                return person.getSkill(SkillType.S_GUN_VEE).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "GunneryAircraft":
-                            if (person.hasSkill(SkillType.S_GUN_JET)) {
-                                return person.getSkill(SkillType.S_GUN_JET).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "GunnerySpacecraft":
-                            if (person.hasSkill(SkillType.S_GUN_SPACE)) {
-                                return person.getSkill(SkillType.S_GUN_SPACE).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "GunneryBattlesuit":
-                            if (person.hasSkill(SkillType.S_GUN_BA)) {
-                                return person.getSkill(SkillType.S_GUN_BA).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "GunneryProtoMech":
-                            if (person.hasSkill(SkillType.S_GUN_PROTO)) {
-                                return person.getSkill(SkillType.S_GUN_PROTO).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        default:
-                            LogManager.getLogger().warn("Award {} from the {} set has invalid skill {}", award.getName(), award.getSet(), skill);
-
-                            return -1;
-                    }
-                } else if (skill.contains("Tech")) {
-                    switch (skill) {
-                        case "TechMech":
-                            if (person.hasSkill(SkillType.S_TECH_MECH)) {
-                                return person.getSkill(SkillType.S_TECH_MECH).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "TechMechanic":
-                            if (person.hasSkill(SkillType.S_TECH_MECHANIC)) {
-                                return person.getSkill(SkillType.S_TECH_MECHANIC).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "TechAero":
-                            if (person.hasSkill(SkillType.S_TECH_AERO)) {
-                                return person.getSkill(SkillType.S_TECH_AERO).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "TechBA":
-                            if (person.hasSkill(SkillType.S_TECH_BA)) {
-                                return person.getSkill(SkillType.S_TECH_BA).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "TechVessel":
-                            if (person.hasSkill(SkillType.S_TECH_VESSEL)) {
-                                return person.getSkill(SkillType.S_TECH_VESSEL).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        default:
-                            LogManager.getLogger().warn("Award {} from the {} set has invalid skill {}", award.getName(), award.getSet(), skill);
-
-                            return -1;
-                    }
-                } else {
-                    switch (skill) {
-                        case "Artillery":
-                            if (person.hasSkill(SkillType.S_ARTILLERY)) {
-                                return person.getSkill(SkillType.S_ARTILLERY).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "SmallArms":
-                            if (person.hasSkill(SkillType.S_SMALL_ARMS)) {
-                                return person.getSkill(SkillType.S_SMALL_ARMS).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "AntiMech":
-                            if (person.hasSkill(SkillType.S_ANTI_MECH)) {
-                                return person.getSkill(SkillType.S_ANTI_MECH).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "Astech":
-                            if (person.hasSkill(SkillType.S_ASTECH)) {
-                                return person.getSkill(SkillType.S_ASTECH).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "Doctor":
-                            if (person.hasSkill(SkillType.S_DOCTOR)) {
-                                return person.getSkill(SkillType.S_DOCTOR).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "Medtech":
-                            if (person.hasSkill(SkillType.S_MEDTECH)) {
-                                return person.getSkill(SkillType.S_MEDTECH).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "HyperspaceNavigation":
-                            if (person.hasSkill(SkillType.S_NAV)) {
-                                return person.getSkill(SkillType.S_NAV).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "Administration":
-                            if (person.hasSkill(SkillType.S_ADMIN)) {
-                                return person.getSkill(SkillType.S_ADMIN).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "Tactics":
-                            if (person.hasSkill(SkillType.S_TACTICS)) {
-                                return person.getSkill(SkillType.S_TACTICS).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "Strategy":
-                            if (person.hasSkill(SkillType.S_STRATEGY)) {
-                                return person.getSkill(SkillType.S_STRATEGY).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "Negotiation":
-                            if (person.hasSkill(SkillType.S_NEG)) {
-                                return person.getSkill(SkillType.S_NEG).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "Leadership":
-                            if (person.hasSkill(SkillType.S_LEADER)) {
-                                return person.getSkill(SkillType.S_LEADER).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        case "Scrounge":
-                            if (person.hasSkill(SkillType.S_SCROUNGE)) {
-                                return person.getSkill(SkillType.S_SCROUNGE).getLevel();
-                            } else {
-                                return -1;
-                            }
-                        default:
-                            LogManager.getLogger().warn("Award {} from the {} set has invalid skill {}", award.getName(), award.getSet(), skill);
-
-                            return -1;
-                    }
-                }
+                return -1;
         }
+
+        return getSkillLevel(relevantSkills, person);
+    }
+
+    /**
+     * This function loops through all relevant skills, calculating the max skill level. If all skills are untrained
+     * the function will default to -1.
+     *
+     * @param relevantSkills the list of Skills to check
+     * @param person the person whose Skill Levels are being checked
+     */
+    private int getSkillLevel(List<String> relevantSkills, Person person) {
+        int[] skillLevels = new int[relevantSkills.size()];
+
+        for (int i = 0; i < relevantSkills.size(); i++) {
+            if (person.hasSkill(relevantSkills.get(i))) {
+                skillLevels[i] = person.getSkill(relevantSkills.get(i)).getLevel();
+            } else {
+                skillLevels[i] = -1;
+            }
+        }
+
+        // IntelliJ's NPE warning here is a false-positive. The code doesn't allow skillLevels to be empty.
+        return Arrays.stream(skillLevels).max().getAsInt();
     }
 }
