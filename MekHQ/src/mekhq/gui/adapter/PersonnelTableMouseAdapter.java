@@ -769,11 +769,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (people.length > 1) {
                     nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true, null,
                             (unit != null) ? unit.getName() : resources.getString("bareHands.text"),
-                            gui.getCampaign().getLocalDate());
+                            gui.getCampaign().getLocalDate(), gui.getCampaign());
                 } else {
                     nkd = new AddOrEditKillEntryDialog(gui.getFrame(), true, selectedPerson.getId(),
                             (unit != null) ? unit.getName() : resources.getString("bareHands.text"),
-                            gui.getCampaign().getLocalDate());
+                            gui.getCampaign().getLocalDate(), gui.getCampaign());
                 }
                 nkd.setVisible(true);
                 if (nkd.getKill().isPresent()) {

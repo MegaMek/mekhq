@@ -1033,6 +1033,10 @@ public class Campaign implements ITechManager {
         return scenarios.get(id);
     }
 
+    public Collection<Scenario> getScenarios() {
+        return scenarios.values();
+    }
+
     public void setLocation(CurrentLocation l) {
         location = l;
     }
