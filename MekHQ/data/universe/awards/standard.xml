@@ -561,7 +561,7 @@
 		<edge>1</edge>
 		<precedence>4.06.1</precedence>
 		<qty>31</qty>
-		<item>Rank</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -572,7 +572,7 @@
 		<xp>3</xp>
 		<precedence>4.06.2</precedence>
 		<qty>21</qty>
-		<item>Rank</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -583,7 +583,7 @@
 		<xp>2</xp>
 		<precedence>4.07.1</precedence>
 		<qty>1</qty>
-		<item>Rank</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -594,7 +594,7 @@
 		<xp>1</xp>
 		<precedence>4.08.1</precedence>
 		<qty>1</qty>
-		<item>Rank</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>

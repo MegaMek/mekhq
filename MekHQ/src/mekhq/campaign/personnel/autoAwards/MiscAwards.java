@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.autoMedals;
+package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -7,7 +7,6 @@ import mekhq.campaign.personnel.Person;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MiscAwards {
@@ -20,8 +19,11 @@ public class MiscAwards {
      */
     public MiscAwards(Campaign campaign, List<Award> awards, Person person, Boolean missionWasSuccessful) {
         for (Award award : awards) {
-            if ((Objects.equals(award.getRange(), "MissionAccomplished")) && (missionWasSuccessful)) {
-                MissionAccomplishedAward(campaign, award, person);
+            switch (award.getRange()) {
+                case "MissionAccomplished":
+                    if (missionWasSuccessful) {
+                        MissionAccomplishedAward(campaign, award, person);
+                    }
             }
         }
     }
@@ -32,7 +34,7 @@ public class MiscAwards {
      * @param award the award to be processed
      * @param person the person to check award eligibility for
      */
-    public void MissionAccomplishedAward(Campaign campaign, Award award, Person person) {
+    private void MissionAccomplishedAward(Campaign campaign, Award award, Person person) {
         final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
                 MekHQ.getMHQOptions().getLocale());
 

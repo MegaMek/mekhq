@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.autoMedals;
+package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -24,8 +24,7 @@ public class ScenarioAwards {
         int requiredScenarioCount;
 
         for (Award award : awards) {
-            // we do this, before checking for eligibility to receive the Award, as it allows us to better catch
-            // those Awards with malformed qty values
+            // we do this here to more reliably catch Awards with malformed qty values
             try {
                 requiredScenarioCount = award.getQty();
             } catch (Exception e) {

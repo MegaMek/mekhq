@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.autoMedals;
+package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
@@ -86,6 +86,9 @@ public class AutoAwardsController {
      */
     private void ProcessAwards(Collection<Person> personnel, Boolean missionWasSuccessful) {
         for (Person person : personnel) {
+            LogManager.getLogger().info("Rank Numeric {}", person.getRankNumeric());
+            LogManager.getLogger().info("Rank Level {}", person.getRankLevel());
+
             if (!theatreOfWarAwards.isEmpty()) {
                 new TheatreOfWarAwards(campaign, theatreOfWarAwards, person);
             }
@@ -99,22 +102,21 @@ public class AutoAwardsController {
             }
 
             if (!rankAwards.isEmpty()) {
-                new SkillAwards(campaign, rankAwards, person);
+                new RankAwards(campaign, rankAwards, person);
             }
 
             if (!miscAwards.isEmpty()) {
                 new MiscAwards(campaign, miscAwards, person, missionWasSuccessful);
             }
 
-            // is person has no combat role, we don't need to check combat related medals
-            if (person.hasCombatRole()) {
-                if (!killAwards.isEmpty()) {
-                    new KillAwards(campaign, killAwards, person);
-                }
+            // even if someone doesn't have a Combat Role, we still check combat-related Awards as we've no way to check
+            // whether Person previously held a Combat Role earlier in the Mission
+            if (!killAwards.isEmpty()) {
+                new KillAwards(campaign, killAwards, person);
+            }
 
-                if (!scenarioAwards.isEmpty()) {
-                    new ScenarioAwards(campaign, scenarioAwards, person);
-                }
+            if (!scenarioAwards.isEmpty()) {
+                new ScenarioAwards(campaign, scenarioAwards, person);
             }
         }
     }
@@ -145,13 +147,14 @@ public class AutoAwardsController {
                             case "Injury":
                                 injuryAwards.add(award);
                                 break;
-                            // TODO do kill awards
+                            // TODO kill awards
                             case "Kill":
                                 killAwards.add(award);
                                 break;
                             case "Scenario":
                                 scenarioAwards.add(award);
                                 break;
+                            // TODO rank awards
                             case "Rank":
                                 rankAwards.add(award);
                                 break;
@@ -160,15 +163,18 @@ public class AutoAwardsController {
                             case "Mission":
                                 missionAwards.add(award);
                                 break;
+                            // TODO theatre of war awards
                             case "TheatreOfWar":
                                 theatreOfWarAwards.add(award);
                                 break;
                             case "Skill":
                                 skillAwards.add(award);
                                 break;
+                            // TODO time awards
                             case "Time":
                                 timeAwards.add(award);
                                 break;
+                            // TODO hardcode more misc awards
                             case "Misc":
                                 miscAwards.add(award);
                                 break;

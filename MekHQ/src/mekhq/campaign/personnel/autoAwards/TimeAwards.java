@@ -1,4 +1,4 @@
-package mekhq.campaign.personnel.autoMedals;
+package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
