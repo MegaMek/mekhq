@@ -23,6 +23,7 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.client.ui.swing.lobby.LobbyUtility;
+import megamek.common.Board;
 import megamek.common.Entity;
 import megamek.common.IStartingPositions;
 import megamek.common.MapSettings;
@@ -112,8 +113,14 @@ public class Scenario {
     private Wind maxWindStrength;
     private Wind minWindStrength;
 
-    /** player starting position **/
-    private int start;
+    // player deployment information
+    private int startingPos;
+    private int startOffset;
+    private int startWidth;
+    private int startingAnyNWx;
+    private int startingAnyNWy;
+    private int startingAnySEx;
+    private int startingAnySEy;
 
     private boolean hasTrack;
 
@@ -153,6 +160,15 @@ public class Scenario {
         shiftWindStrength = false;
         maxWindStrength = Wind.TORNADO_F4;
         minWindStrength = Wind.CALM;
+
+        startingPos = Board.START_ANY;
+        startOffset = 0;
+        startWidth = 3;
+        startingAnyNWx = Entity.STARTING_ANY_NONE;
+        startingAnyNWy = Entity.STARTING_ANY_NONE;
+        startingAnySEx = Entity.STARTING_ANY_NONE;
+        startingAnySEy = Entity.STARTING_ANY_NONE;
+
         hasTrack = false;
     }
 
@@ -223,12 +239,60 @@ public class Scenario {
         return terrainType;
     }
 
-    public int getStart() {
-        return start;
+    public int getStartingPos() {
+        return startingPos;
     }
 
-    public void setStart(int start) {
-        this.start = start;
+    public void setStartingPos(int start) {
+        this.startingPos = start;
+    }
+
+    public int getStartOffset() {
+        return startOffset;
+    }
+
+    public void setStartOffset(int startOffset) {
+        this.startOffset = startOffset;
+    }
+
+    public int getStartWidth() {
+        return startWidth;
+    }
+
+    public void setStartWidth(int startWidth) {
+        this.startWidth = startWidth;
+    }
+
+    public int getStartingAnyNWx() {
+        return startingAnyNWx;
+    }
+
+    public void setStartingAnyNWx(int startingAnyNWx) {
+        this.startingAnyNWx = startingAnyNWx;
+    }
+
+    public int getStartingAnyNWy() {
+        return startingAnyNWy;
+    }
+
+    public void setStartingAnyNWy(int startingAnyNWy) {
+        this.startingAnyNWy = startingAnyNWy;
+    }
+
+    public int getStartingAnySEx() {
+        return startingAnySEx;
+    }
+
+    public void setStartingAnySEx(int startingAnySEx) {
+        this.startingAnySEx = startingAnySEx;
+    }
+
+    public int getStartingAnySEy() {
+        return startingAnySEy;
+    }
+
+    public void setStartingAnySEy(int startingAnySEy) {
+        this.startingAnySEy = startingAnySEy;
     }
 
     public void setTerrainType(String terrainType) {
@@ -761,7 +825,13 @@ public class Scenario {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "desc", desc);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "report", report);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "start", start);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingPos", startingPos);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startOffset", startOffset);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startWidth", startWidth);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnyNWx", startingAnyNWx);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnyNWy", startingAnyNWy);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnySEx", startingAnySEx);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "startingAnySEy", startingAnySEy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "status", getStatus().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
         if (null != stub) {
@@ -953,8 +1023,21 @@ public class Scenario {
                     retVal.mapSizeY = Integer.parseInt(xy[1]);
                 } else if (wn2.getNodeName().equalsIgnoreCase("map")) {
                     retVal.map = wn2.getTextContent().trim();
-                }  else if (wn2.getNodeName().equalsIgnoreCase("start")) {
-                    retVal.start = Integer.parseInt(wn2.getTextContent());
+                }  else if (wn2.getNodeName().equalsIgnoreCase("start")
+                        || wn2.getNodeName().equalsIgnoreCase("startingPos")) {
+                    retVal.startingPos = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startOffset")) {
+                    retVal.startOffset = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startWidth")) {
+                    retVal.startWidth = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingAnyNWx")) {
+                    retVal.startingAnyNWx = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingAnyNWy")) {
+                    retVal.startingAnyNWy = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingAnySEx")) {
+                    retVal.startingAnySEx = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("startingAnySEy")) {
+                    retVal.startingAnySEy = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("light")) {
                     retVal.light = Light.getLight(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("weather")) {

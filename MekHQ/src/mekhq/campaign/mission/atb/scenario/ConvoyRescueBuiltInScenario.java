@@ -85,7 +85,7 @@ public class ConvoyRescueBuiltInScenario extends AtBScenario {
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(Board.START_N);
+        setStartingPos(Board.START_N);
         setDeploymentDelay(7);
 
         for (int i = 0; i < 4; i++) {

@@ -88,12 +88,12 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         // the attacker starts on an edge, the defender starts in the center and
         // flees to the opposite edge of the attacker
         if (isAttacker()) {
-            setStart(attackerStart);
+            setStartingPos(attackerStart);
 
             setEnemyHome(defenderHome);
             enemyStart = defenderStart;
         } else {
-            setStart(defenderStart);
+            setStartingPos(defenderStart);
 
             setEnemyHome(attackerStart);
             enemyStart = attackerStart;
@@ -117,7 +117,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         // the ally is the "second force" and will flee either in the same
         // direction as the player (in case of the player being the defender)
         // or where it came from (in case of the player being the attacker
-        addBotForce(getAllyBotForce(getContract(campaign), isAttacker() ? secondAttackerForceStart : getStart(),
+        addBotForce(getAllyBotForce(getContract(campaign), isAttacker() ? secondAttackerForceStart : getStartingPos(),
                 isAttacker() ? secondAttackerForceStart : defenderHome, allyEntities), campaign);
 
         // "base" force gets 8 civilian units and six turrets

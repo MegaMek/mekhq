@@ -87,7 +87,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(Board.START_CENTER);
+        setStartingPos(Board.START_CENTER);
         int enemyStart = startPos[Compute.randomInt(4)];
 
         for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
@@ -109,7 +109,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
 
-        addBotForce(new BotForce(PRISONER_FORCE_ID, 1, getStart(), otherForce), campaign);
+        addBotForce(new BotForce(PRISONER_FORCE_ID, 1, getStartingPos(), otherForce), campaign);
     }
 
     @Override
