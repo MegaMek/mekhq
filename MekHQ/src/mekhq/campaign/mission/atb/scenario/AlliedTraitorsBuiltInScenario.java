@@ -57,7 +57,7 @@ public class AlliedTraitorsBuiltInScenario extends AtBScenario {
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(Board.START_CENTER);
+        setStartingPos(Board.START_CENTER);
         int enemyStart = Board.START_CENTER;
 
         for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
