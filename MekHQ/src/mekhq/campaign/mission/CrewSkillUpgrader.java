@@ -166,9 +166,11 @@ public class CrewSkillUpgrader {
                         spaValue = pickRandomWeapon(entity, true);
                         break;
                     default:
-                        // If we can't access the option, try a different one
-                        if ((entity.getCrew() == null) ||
-                                (entity.getCrew().getOptions() == null) ||
+                        // If there's no crew, stop looking for SPAs
+                        if (entity.getCrew() == null) {
+                            return 0;
+                            // If we can't access the option, try a different one
+                        } else if ((entity.getCrew().getOptions() == null) ||
                                 (entity.getCrew().getOptions(spa.getName()) == null) ||
                                 (!entity.getCrew().getOptions(spa.getName()).hasMoreElements())) {
                             continue;
