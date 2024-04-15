@@ -18,8 +18,8 @@ public class AutoAwardsController {
     private List<Award> injuryAwards = new ArrayList<>();
     private List<Award> killAwards = new ArrayList<>();
     private List<Award> miscAwards = new ArrayList<>();
-    private List<Award> missionAccomplishedAwards = new ArrayList<>();
     private List<Award> missionAwards = new ArrayList<>();
+    private List<Award> rankAwards = new ArrayList<>();
     private List<Award> scenarioAwards = new ArrayList<>();
     private List<Award> skillAwards = new ArrayList<>();
     private List<Award> theatreOfWarAwards = new ArrayList<>();
@@ -86,11 +86,6 @@ public class AutoAwardsController {
      */
     private void ProcessAwards(Collection<Person> personnel, Boolean missionWasSuccessful) {
         for (Person person : personnel) {
-            // If Mission was unsuccessful, there is no point in checking eligibility for Mission Accomplished awards
-            if ((missionWasSuccessful) && (!missionAccomplishedAwards.isEmpty())) {
-                new MissionAccomplishedAwards(campaign, missionAccomplishedAwards, person);
-            }
-
             if (!theatreOfWarAwards.isEmpty()) {
                 new TheatreOfWarAwards(campaign, theatreOfWarAwards, person);
             }
@@ -103,8 +98,12 @@ public class AutoAwardsController {
                 new SkillAwards(campaign, skillAwards, person);
             }
 
+            if (!rankAwards.isEmpty()) {
+                new SkillAwards(campaign, rankAwards, person);
+            }
+
             if (!miscAwards.isEmpty()) {
-                new MiscAwards(campaign, miscAwards, person);
+                new MiscAwards(campaign, miscAwards, person, missionWasSuccessful);
             }
 
             // is person has no combat role, we don't need to check combat related medals
@@ -146,14 +145,15 @@ public class AutoAwardsController {
                             case "Injury":
                                 injuryAwards.add(award);
                                 break;
+                            // TODO do kill awards
                             case "Kill":
                                 killAwards.add(award);
                                 break;
                             case "Scenario":
                                 scenarioAwards.add(award);
                                 break;
-                            case "MissionAccomplished":
-                                missionAccomplishedAwards.add(award);
+                            case "Rank":
+                                rankAwards.add(award);
                                 break;
                             // Mission Awards are disabled until Mission tracking, on a personnel-level, is introduced
                             // We include them here, for tracking purposes
@@ -182,8 +182,8 @@ public class AutoAwardsController {
                     LogManager.getLogger().info("autoAwards found {} Injury Awards", injuryAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Kill Awards", killAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
-                    LogManager.getLogger().info("autoAwards found {} MissionAccomplished Awards", missionAccomplishedAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Mission Awards", missionAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Rank Awards", rankAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Scenario Awards", scenarioAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Skill Awards", skillAwards.size());
                     LogManager.getLogger().info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());

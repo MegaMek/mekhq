@@ -24,18 +24,20 @@ public class SkillAwards {
         final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
                 MekHQ.getMHQOptions().getLocale());
 
+        int requiredSkillLevel;
+
         for (Award award : awards) {
+            // we do this, before checking for eligibility to receive the Award, as it allows us to better catch
+            // those Awards with malformed qty values
+            try {
+                requiredSkillLevel = award.getQty();
+            } catch (Exception e) {
+                LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}",
+                        award.getName(), award.getSet(), award.getQty());
+                break;
+            }
+
             if (award.canBeAwarded(person)) {
-                int requiredSkillLevel;
-
-                try {
-                    requiredSkillLevel = award.getQty();
-                } catch (Exception e) {
-                    LogManager.getLogger().warn("Award {} from the {} set has invalid qty value {}",
-                            award.getName(), award.getSet(), award.getQty());
-                    break;
-                }
-
                 // this allows the user to specify multiple skills to be checked against, where all skill levels need to be met
                 List<String> skills = Arrays.asList(award.getRange().split(","));
 
@@ -231,6 +233,7 @@ public class SkillAwards {
             default:
                 LogManager.getLogger().warn("Award {} from the {} set has invalid skill {}", award.getName(), award.getSet(), skill);
 
+                // this treats the malformed Skill as if Person was untrained
                 return -1;
         }
 
