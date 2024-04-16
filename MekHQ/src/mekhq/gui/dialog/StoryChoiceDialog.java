@@ -21,9 +21,11 @@ package mekhq.gui.dialog;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
+import mekhq.gui.panels.StoryChoicePanel;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -37,6 +39,7 @@ import java.util.Map.Entry;
  */
 public class StoryChoiceDialog extends StoryDialog implements KeyListener {
 
+    private JFrame frame;
     private JList<String> choiceList;
     private List<String> choices;
 
@@ -97,7 +100,7 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
         }
         choiceList = new JList<>(listModel);
         choiceList.setSelectionMode(DefaultListSelectionModel.SINGLE_SELECTION);
-        choiceList.setCellRenderer(new StoryChoiceRenderer());
+        choiceList.setCellRenderer(new StoryChoiceRenderer(frame));
         choiceList.setSelectedIndex(0);
         choiceList.addKeyListener(this);
         gbc.gridy = 1;
@@ -147,10 +150,10 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
 
     }
 
-    private class StoryChoiceRenderer extends JLabel implements ListCellRenderer<String> {
+    private class StoryChoiceRenderer extends StoryChoicePanel implements ListCellRenderer<String> {
 
-        public StoryChoiceRenderer() {
-            super();
+        public StoryChoiceRenderer(JFrame frame) {
+            super(frame);
         }
 
         @Override
@@ -158,23 +161,15 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
                                                       final String value, final int index,
                                                       final boolean isSelected,
                                                       final boolean cellHasFocus) {
-            // JTextArea::setForeground and JTextArea::setBackground don't work properly with the
-            // default return, but by recreating the colour it works properly
             final Color foreground = new Color((isSelected
-                    ? list.getSelectionBackground() : list.getForeground()).getRGB());
-            setOpaque(true);
-            setForeground(foreground);
+                    ? list.getSelectionForeground() : list.getForeground()).getRGB());
+            final Color background = new Color((isSelected
+                    ? list.getSelectionBackground() : list.getBackground()).getRGB());
+            //setOpaque(true);
+            //setForeground(foreground);
+            //setBackground(background);
 
-            String highlighter = isSelected ? "<b>" : "";
-            String endHighlighter = isSelected ? "</b>" : "";
-
-            setText("<html><body style='width: 295px'>" +
-                    highlighter +
-                    MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens(value, getStoryPoint().getCampaign())) +
-                    endHighlighter +
-                    "<p>&nbsp;</p></body></html>");
-
-            setBorder(BorderFactory.createEmptyBorder(5,5,0,0));
+            updateChoice(value, isSelected, getStoryPoint().getCampaign(), foreground, background);
 
             this.revalidate();
 
