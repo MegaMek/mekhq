@@ -69,7 +69,7 @@ public class TheatreOfWarAwards {
                     }
                 } else {
                     if ((processFaction(belligerents.get(0), employer, mission))
-                            && (processFaction(belligerents.get(1), employer, mission))) {
+                            && (processFaction(belligerents.get(1), enemy, mission))) {
                         isEligible = true;
                     }
                 }
