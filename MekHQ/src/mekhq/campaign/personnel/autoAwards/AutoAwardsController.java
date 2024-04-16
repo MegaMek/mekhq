@@ -8,7 +8,6 @@ import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.universe.Faction;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
@@ -196,6 +195,7 @@ public class AutoAwardsController {
                                 break;
                             // trainingAwards are not currently supported.
                             // We include them here for tracking purposes
+                            // TODO add training functionality
                             case "training":
                                 trainingAwards.add(award);
                                 break;
