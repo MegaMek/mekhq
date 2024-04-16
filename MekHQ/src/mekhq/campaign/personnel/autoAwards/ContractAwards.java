@@ -49,7 +49,7 @@ public class ContractAwards {
                     } catch (Exception e) {
                         LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}",
                                 award.getName(), award.getSet(), award.getQty());
-                        break;
+                        continue;
                     }
                 } else if (validTypes.contains(award.getRange().toLowerCase())) {
                     switch (award.getRange().toLowerCase()) {
@@ -71,7 +71,7 @@ public class ContractAwards {
                 } else {
                     LogManager.getLogger().warn("Award {} from the {} set has an invalid range value {}",
                             award.getName(), award.getSet(), award.getRange());
-                    break;
+                    continue;
                 }
             }
 

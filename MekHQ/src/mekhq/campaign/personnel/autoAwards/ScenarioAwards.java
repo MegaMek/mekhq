@@ -30,7 +30,7 @@ public class ScenarioAwards {
                 } catch (Exception e) {
                     LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}",
                             award.getName(), award.getSet(), award.getQty());
-                    break;
+                    continue;
                 }
 
                 if (person.getScenarioLog().size() >= requiredScenarioCount) {

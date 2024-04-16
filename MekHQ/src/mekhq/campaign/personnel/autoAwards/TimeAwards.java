@@ -32,7 +32,7 @@ public class TimeAwards {
             } catch (Exception e) {
                 LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}",
                         award.getName(), award.getSet(), award.getQty());
-                break;
+                continue;
             }
 
             if (award.getRange().equalsIgnoreCase("cumulative")) {

@@ -12,6 +12,7 @@ import mekhq.campaign.universe.Factions;
 import org.apache.logging.log4j.LogManager;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -27,11 +28,14 @@ public class TheatreOfWarAwards {
                 MekHQ.getMHQOptions().getLocale());
 
         boolean isEligible;
-        Faction enemy;
+
+        String employer = ((Contract) mission).getEmployer();
+
+        int currentYear = campaign.getGameYear();
 
         for (Award award : awards) {
-            isEligible = false;
-            enemy = null;
+            List<String> attackers = new ArrayList<>();
+            List<String> defenders = new ArrayList<>();
 
             List<String> wartime = List.of(award.getSize()
                     .replaceAll("\\s","")
@@ -40,43 +44,54 @@ public class TheatreOfWarAwards {
             if (wartime.size() != 2) {
                 LogManager.getLogger().warn("Award {} from the {} set has invalid start/end date {}",
                         award.getName(), award.getSet(), award.getSize());
-                break;
+                continue;
             }
 
-            int currentYear = campaign.getGameYear();
+            List<String> belligerents = List.of(award.getRange().split(","));
 
-            List<String> belligerents = List.of(award.getRange()
-                    .toLowerCase()
-                    .replaceAll("\\s","")
-                    .split(","));
+            if (!belligerents.isEmpty()) {
+                if (belligerents.size() > 1) {
+                    for (String belligerent : belligerents) {
+                        if (belligerent.replaceAll("[()]", "").contains("1")) {
+                            attackers.add(belligerent.replaceAll("[^. A-Za-z]", ""));
+                        } else if (belligerent.replaceAll("[()]", "").contains("2")) {
+                            defenders.add(belligerent.replaceAll("[^. A-Za-z]", ""));
+                        }
+                    }
 
-            if (belligerents.size() != 2) {
-                LogManager.getLogger().warn("Award {} from the {} set has invalid belligerents {}",
-                        award.getName(), award.getSet(), award.getSize());
-                break;
-            }
-
-            Faction employer = Factions.getInstance().getFaction(((Contract) mission).getEmployer());
-
-            if ((!campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
-                enemy = Factions.getInstance().getFaction(((AtBContract) mission).getEnemyName(campaign.getGameYear()));
+                    if ((attackers.isEmpty()) || (defenders.isEmpty())) {
+                        LogManager.getLogger().warn("Award {} from the {} set has incorrectly formated belligerents {}",
+                                award.getName(), award.getSet(), award.getRange());
+                        continue;
+                    }
+                }
+            } else {
+                LogManager.getLogger().warn("Award {} from the {} set has no belligerents",
+                        award.getName(), award.getSet());
+                continue;
             }
 
             if (award.canBeAwarded(person)) {
-                if ((belligerents.get(0).equals(belligerents.get(1))) || (!campaign.getCampaignOptions().isUseAtB())) {
-                    if (processFaction(belligerents.get(0), employer, mission)) {
-                        isEligible = true;
-                    }
+                if ((currentYear >= Integer.parseInt(wartime.get(0))) && (currentYear <= Integer.parseInt(wartime.get(1)))) {
+                    isEligible = true;
                 } else {
-                    if ((processFaction(belligerents.get(0), employer, mission))
-                            && (processFaction(belligerents.get(1), enemy, mission))) {
-                        isEligible = true;
-                    }
+                    continue;
                 }
 
-                if (isEligible) {
-                    isEligible = (currentYear >= Integer.parseInt(wartime.get(0)))
-                            && (currentYear <= Integer.parseInt(wartime.get(1)));
+                if (belligerents.size() == 1) {
+                    if(!processFaction(belligerents.get(0), employer)) {
+                        continue;
+                    }
+                } else if ((campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
+                    String enemy = ((AtBContract) mission).getEnemyName(campaign.getGameYear());
+
+                    if (isLoyalty(employer, attackers)) {
+                        isEligible = isLoyalty(enemy, defenders);
+                    } else if (isLoyalty(employer, defenders)) {
+                        isEligible = isLoyalty(enemy, attackers);
+                    } else {
+                        continue;
+                    }
                 }
 
                 if (isEligible) {
@@ -89,11 +104,22 @@ public class TheatreOfWarAwards {
         }
     }
 
-    private boolean processFaction(String belligerent, Faction faction, Mission mission) {
+    private boolean isLoyalty (String missionFaction, List<String> factions) {
+        return factions.contains(missionFaction);
+    }
+
+    private boolean processFaction(String missionFaction, String belligerent) {
+        Faction faction = Factions.getInstance().getFaction(missionFaction);
+
+        missionFaction = missionFaction.toLowerCase().replaceAll("\\s","");
+        belligerent = belligerent.toLowerCase().replaceAll("\\s","");
+
         switch (belligerent) {
+            case "majorpowers":
+                return faction.isMajorOrSuperPower();
             case "innersphere":
                 return faction.isInnerSphere();
-            case "clan":
+            case "clans":
                 return faction.isClan();
             case "periphery":
                 return faction.isPeriphery();
@@ -108,8 +134,7 @@ public class TheatreOfWarAwards {
             case "comstarorwob":
                 return faction.isComStarOrWoB();
             default:
-                return ((Contract) mission).getEmployer().replaceAll("\\s", "")
-                        .equalsIgnoreCase(belligerent);
+                return belligerent.equals(missionFaction);
         }
     }
 }

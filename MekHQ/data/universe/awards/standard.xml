@@ -276,7 +276,7 @@
 		<xp>1</xp>
 		<precedence>3.04.2</precedence>
 		<qty>1</qty>
-		<item>Theatre of War</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -324,7 +324,7 @@
 		<xp>1</xp>
 		<precedence>3.07.4</precedence>
 		<qty>1</qty>
-		<item>Theatre of War</item>
+		<item>Misc</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -338,7 +338,7 @@
 		<qty>1</qty>
 		<item>Theatre of War</item>
 		<size>2866, 3025</size>
-		<range>Inner Sphere, Inner Sphere</range>
+		<range>Inner Sphere</range>
 	</award>
 	<award>
 		<name>Fourth Succession War Campaign</name>
@@ -349,8 +349,8 @@
 		<precedence>3.08.02</precedence>
 		<qty>1</qty>
 		<item>Theatre of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>3028, 3030</size>
+		<range>Lyran Commonwealth(1),Federated Suns(1),Draconis Combine(2),Free Worlds League(2),Capellan Confederation(2)</range>
 	</award>
 	<award>
 		<name>Andurien Wars Campaign</name>
@@ -361,8 +361,8 @@
 		<precedence>3.08.03</precedence>
 		<qty>1</qty>
 		<item>Theatre Of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>3030, 3040</size>
+		<range>Duchy of Andurien(1),Magistracy of Canopus(1),Capellan Confederation(2),Free Worlds League(2)</range>
 	</award>
 	<award>
 		<name>Ronin Wars Campaign</name>
@@ -373,8 +373,8 @@
 		<precedence>3.08.04</precedence>
 		<qty>1</qty>
 		<item>Theatre Of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>3034, 3034</size>
+		<range>Free Rasalhague Republic(1),Draconis Combine(1),Ronin(2)</range>
 	</award>
 	<award>
 		<name>War of 3039 Campaign</name>
@@ -385,8 +385,8 @@
 		<precedence>3.08.05</precedence>
 		<qty>1</qty>
 		<item>Theatre Of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>3039, 3040</size>
+		<range>Federated Suns(1),Lyran Commonwealth(1),Draconis Combine(2)</range>
 	</award>
 	<award>
 		<name>Clan Invasion Campaign</name>
@@ -397,8 +397,8 @@
 		<precedence>3.08.06</precedence>
 		<qty>1</qty>
 		<item>Theatre Of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>3049, 3052</size>
+		<range>Inner Sphere(1),Clans(2)</range>
 	</award>
 	<award>
 		<name>War of 3057 Campaign</name>
@@ -409,8 +409,8 @@
 		<precedence>3.08.07</precedence>
 		<qty>1</qty>
 		<item>Theatre Of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>3057, 3057</size>
+		<range>Free Worlds League(1),Capellan Confederation(1),Federated Commonwealth(2)</range>
 	</award>
 	<award>
 		<name>Task Force Serpent Campaign</name>
@@ -421,8 +421,8 @@
 		<precedence>3.08.08</precedence>
 		<qty>1</qty>
 		<item>Theatre Of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>3059, 3059</size>
+		<range>Inner Sphere(1),Clan Nova Cat(1),Clan Smoke Jaguar(2)</range>
 	</award>
 	<award>
 		<name>Capellan-St. Ives Civil War Campaign</name>
@@ -433,8 +433,8 @@
 		<precedence>3.08.09</precedence>
 		<qty>1</qty>
 		<item>Theatre Of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>3061, 3063</size>
+		<range>Capellan Confederation(1),St. Ives Compact(2)</range>
 	</award>
 	<award>
 		<name>FedCom Civil War Campaign</name>
@@ -445,8 +445,8 @@
 		<precedence>3.08.10</precedence>
 		<qty>1</qty>
 		<item>Theatre Of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>3062, 3067</size>
+		<range>Federated Suns(1),Lyran Alliance(2)</range>
 	</award>
 	<award>
 		<name>Word of Blake Jihad Campaign</name>
@@ -457,8 +457,8 @@
 		<precedence>3.08.11</precedence>
 		<qty>1</qty>
 		<item>Theatre Of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>3067, 3081</size>
+		<range>Major Powers</range>
 	</award>
 	<award>
 		<name>Galactic Service Deployment</name>

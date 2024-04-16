@@ -24,6 +24,7 @@ public class MiscAwards {
                     if (missionWasSuccessful) {
                         MissionAccomplishedAward(campaign, award, person);
                     }
+                default:
             }
         }
     }

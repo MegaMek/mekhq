@@ -33,7 +33,7 @@ public class RankAwards {
                 requiredRankNumeric = award.getQty();
             } catch (Exception e) {
                 LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}", award.getName(), award.getSet(), award.getQty());
-                break;
+                continue;
             }
 
             if (award.getRange().equalsIgnoreCase("inclusive")) {
@@ -43,7 +43,7 @@ public class RankAwards {
             } else {
                 LogManager.getLogger().warn("Award {} from the {} set has the invalid range {}",
                         award.getName(), award.getSet(), award.getRange());
-                break;
+                continue;
             }
 
             if (award.canBeAwarded(person)) {
