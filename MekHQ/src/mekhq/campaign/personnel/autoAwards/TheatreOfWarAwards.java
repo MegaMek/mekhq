@@ -15,6 +15,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.IntStream;
 
 public class TheatreOfWarAwards {
     /**
@@ -31,6 +32,7 @@ public class TheatreOfWarAwards {
 
         String employer = ((Contract) mission).getEmployer();
 
+        int contractStartYear = ((Contract) mission).getStartDate().getYear();
         int currentYear = campaign.getGameYear();
 
         for (Award award : awards) {
@@ -72,7 +74,7 @@ public class TheatreOfWarAwards {
             }
 
             if (award.canBeAwarded(person)) {
-                if ((currentYear >= Integer.parseInt(wartime.get(0))) && (currentYear <= Integer.parseInt(wartime.get(1)))) {
+                if (isDuringWartime(wartime, contractStartYear, currentYear)) {
                     isEligible = true;
                 } else {
                     continue;
@@ -85,10 +87,10 @@ public class TheatreOfWarAwards {
                 } else if ((campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
                     String enemy = ((AtBContract) mission).getEnemyName(campaign.getGameYear());
 
-                    if (isLoyalty(employer, attackers)) {
-                        isEligible = isLoyalty(enemy, defenders);
-                    } else if (isLoyalty(employer, defenders)) {
-                        isEligible = isLoyalty(enemy, attackers);
+                    if (hasLoyalty(employer, attackers)) {
+                        isEligible = hasLoyalty(enemy, defenders);
+                    } else if (hasLoyalty(employer, defenders)) {
+                        isEligible = hasLoyalty(enemy, attackers);
                     } else {
                         continue;
                     }
@@ -104,10 +106,34 @@ public class TheatreOfWarAwards {
         }
     }
 
-    private boolean isLoyalty (String missionFaction, List<String> factions) {
-        return factions.contains(missionFaction);
+    /**
+     * Streams through years covered by Contract, returns true if at least one is during wartime
+     * @param wartime a list with two entries, war start year and war end year (can be identical)
+     * @param contractStartYear the contract's start yet
+     * @param currentYear the current campaign year
+     */
+    private boolean isDuringWartime (List<String> wartime, int contractStartYear, int currentYear) {
+        int contractLength = currentYear - contractStartYear;
+
+        return IntStream.rangeClosed(0, contractLength).map(year -> contractStartYear + year)
+                .anyMatch(checkYear -> (checkYear >= Integer.parseInt(wartime.get(0)))
+                        && (checkYear <= Integer.parseInt(wartime.get(1))));
     }
 
+    /**
+     * Streams through contents of factions and returns true if any match missionFaction
+     * @param missionFaction a single faction (either employer or enemy)
+     * @param factions a list of factions (either a list of attackers, or of defenders)
+     */
+    private boolean hasLoyalty(String missionFaction, List<String> factions) {
+        return factions.stream().anyMatch(faction -> processFaction(missionFaction, faction));
+    }
+
+    /**
+     * Checks whether missionFaction matches the requirements of belligerent
+     * @param missionFaction a single faction (either employer or enemy)
+     * @param belligerent the faction, or super-faction, to be matched against
+     */
     private boolean processFaction(String missionFaction, String belligerent) {
         Faction faction = Factions.getInstance().getFaction(missionFaction);
 
@@ -134,7 +160,7 @@ public class TheatreOfWarAwards {
             case "comstarorwob":
                 return faction.isComStarOrWoB();
             default:
-                return belligerent.equals(missionFaction);
+                return missionFaction.equals(belligerent);
         }
     }
 }
