@@ -134,7 +134,7 @@ public class TheatreOfWarAwards {
      * @param missionFaction a single faction (either employer or enemy)
      * @param belligerent the faction, or super-faction, to be matched against
      */
-    private boolean processFaction(String missionFaction, String belligerent) {
+    static boolean processFaction(String missionFaction, String belligerent) {
         Faction faction = Factions.getInstance().getFaction(missionFaction);
 
         missionFaction = missionFaction.toLowerCase().replaceAll("\\s","");
@@ -149,6 +149,10 @@ public class TheatreOfWarAwards {
                 return faction.isClan();
             case "periphery":
                 return faction.isPeriphery();
+            case "pirate":
+                return faction.isPirate();
+            case "mercenary":
+                return faction.isMercenary();
             case "independent":
                 return faction.isIndependent();
             case "deepperiphery":

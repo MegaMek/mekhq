@@ -1,12 +1,14 @@
 package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Faction;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ public class AutoAwardsController {
     private Mission mission;
 
     private List<Award> contractAwards = new ArrayList<>();
+    private List<Award> factionHunterAwards = new ArrayList<>();
     private List<Award> injuryAwards = new ArrayList<>();
     private List<Award> killAwards = new ArrayList<>();
     private List<Award> miscAwards = new ArrayList<>();
@@ -28,6 +31,7 @@ public class AutoAwardsController {
     private List<Award> theatreOfWarAwards = new ArrayList<>();
     private List<Award> timeAwards = new ArrayList<>();
     private List<Award> trainingAwards = new ArrayList<>();
+    private List<Award> ignoredAwards = new ArrayList<>();
 
     /**
      * The primary controller for the automatic processing of Awards
@@ -95,6 +99,10 @@ public class AutoAwardsController {
                 new ContractAwards(campaign, mission, contractAwards, person);
             }
 
+            if ((!factionHunterAwards.isEmpty()) && (campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
+                new FactionHunterAwards(campaign, mission, factionHunterAwards, person);
+            }
+
             // even if someone doesn't have a Combat Role, we still check combat-related Awards as we've no way to check
             // whether Person previously held a Combat Role earlier in the Mission
             if (!killAwards.isEmpty()) {
@@ -148,6 +156,15 @@ public class AutoAwardsController {
                     // next we begin to filter the awards into discrete lists
                     for (Award award : awards) {
                         switch (award.getItem().toLowerCase().replaceAll("\\s","")) {
+                            case "ignore":
+                                ignoredAwards.add(award);
+                                break;
+                            case "contract":
+                                contractAwards.add(award);
+                                break;
+                            case "factionhunter":
+                                factionHunterAwards.add(award);
+                                break;
                             // TODO track InjuryAwards at the end of a scenario
                             // InjuryAwards are issued immediately after a scenario
                             // We include them here, for tracking purposes
@@ -158,31 +175,29 @@ public class AutoAwardsController {
                             case "kill":
                                 killAwards.add(award);
                                 break;
-                            case "scenario":
-                                scenarioAwards.add(award);
+                            // TODO hardcode more misc awards
+                            case "misc":
+                                miscAwards.add(award);
                                 break;
                             case "rank":
                                 rankAwards.add(award);
                                 break;
-                            case "contract":
-                                contractAwards.add(award);
-                                break;
-                            // TODO theatre of war awards
-                            case "theatreofwar":
-                                theatreOfWarAwards.add(award);
+                            case "scenario":
+                                scenarioAwards.add(award);
                                 break;
                             case "skill":
                                 skillAwards.add(award);
                                 break;
+                            case "theatreofwar":
+                                theatreOfWarAwards.add(award);
+                                break;
                             case "time":
                                 timeAwards.add(award);
                                 break;
+                            // trainingAwards are not currently supported.
+                            // We include them here for tracking purposes
                             case "training":
                                 trainingAwards.add(award);
-                                break;
-                            // TODO hardcode more misc awards
-                            case "misc":
-                                miscAwards.add(award);
                                 break;
                             default:
                                 // TODO add file directory for documentation
@@ -201,6 +216,7 @@ public class AutoAwardsController {
                     LogManager.getLogger().info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Time Awards", timeAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
+                    LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
                 } else {
                     LogManager.getLogger().info("autoAwards failed to find any awards in set {}", setName);
                 }

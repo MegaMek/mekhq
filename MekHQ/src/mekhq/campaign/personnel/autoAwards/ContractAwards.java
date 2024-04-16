@@ -2,6 +2,7 @@ package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
@@ -16,8 +17,9 @@ import java.util.ResourceBundle;
 
 public class ContractAwards {
     /**
-     * This function loops through Kill Awards, checking whether the person is eligible to receive each type of award
+     * This function loops through Contract Awards, checking whether the person is eligible to receive each type of award
      * @param campaign the campaign to be processed
+     * @param mission the mission that just concluded
      * @param awards the awards to be processed (should only include awards where item == Kill)
      * @param person the person to check award eligibility for
      */
