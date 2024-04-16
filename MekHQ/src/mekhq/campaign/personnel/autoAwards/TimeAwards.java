@@ -27,7 +27,6 @@ public class TimeAwards {
         int yearsOfService;
 
         for (Award award : awards) {
-            // we do this here to more reliably catch Awards with malformed qty values
             try {
                 requiredYearsOfService = award.getQty();
             } catch (Exception e) {
@@ -36,13 +35,10 @@ public class TimeAwards {
                 break;
             }
 
-            // we do this here to more reliably catch Awards with malformed range values
-            if ((award.getRange().equalsIgnoreCase("true")) || (award.getRange().equalsIgnoreCase("false"))) {
+            if (award.getRange().equalsIgnoreCase("cumulative")) {
                 isCumulative = Boolean.parseBoolean(award.getRange());
             } else {
-                LogManager.getLogger().warn("Award {} from the {} set has an invalid range value {}",
-                        award.getName(), award.getSet(), award.getRange());
-                break;
+                isCumulative = false;
             }
 
             if (award.canBeAwarded(person)) {

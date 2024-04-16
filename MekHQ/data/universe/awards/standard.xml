@@ -251,10 +251,10 @@
 		<edge>1</edge>
 		<stackable>true</stackable>
 		<precedence>3.02.4</precedence>
-		<qty>72</qty>
-		<item>Misc</item>
+		<qty>6</qty>
+		<item>Time</item>
 		<size>Individual</size>
-		<range>Months</range>
+		<range>True</range>
 	</award>
 	<award>
 		<name>Support Person Of The Year</name>
@@ -276,7 +276,7 @@
 		<xp>1</xp>
 		<precedence>3.04.2</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -300,9 +300,9 @@
 		<xp>1</xp>
 		<precedence>3.05.2</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Contract</item>
 		<size>Individual</size>
-		<range>Career</range>
+		<range>Pirate Hunting</range>
 	</award>
 	<award>
 		<name>Humanitarian Service</name>
@@ -324,7 +324,7 @@
 		<xp>1</xp>
 		<precedence>3.07.4</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -336,7 +336,7 @@
 		<xp>1</xp>
 		<precedence>3.08.01</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -348,7 +348,7 @@
 		<xp>1</xp>
 		<precedence>3.08.02</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -360,7 +360,7 @@
 		<xp>1</xp>
 		<precedence>3.08.03</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre Of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -372,7 +372,7 @@
 		<xp>1</xp>
 		<precedence>3.08.04</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre Of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -384,7 +384,7 @@
 		<xp>1</xp>
 		<precedence>3.08.05</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre Of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -396,7 +396,7 @@
 		<xp>1</xp>
 		<precedence>3.08.06</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre Of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -408,7 +408,7 @@
 		<xp>1</xp>
 		<precedence>3.08.07</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre Of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -420,7 +420,7 @@
 		<xp>1</xp>
 		<precedence>3.08.08</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre Of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -432,7 +432,7 @@
 		<xp>1</xp>
 		<precedence>3.08.09</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre Of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -444,7 +444,7 @@
 		<xp>1</xp>
 		<precedence>3.08.10</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre Of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -456,7 +456,7 @@
 		<xp>1</xp>
 		<precedence>3.08.11</precedence>
 		<qty>1</qty>
-		<item>TheatreOfWar</item>
+		<item>Theatre Of War</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -467,7 +467,7 @@
 		<xp>1</xp>
 		<precedence>4.01.2</precedence>
 		<qty>3</qty>
-		<item>TheatreOfWar</item>
+		<item>Contract</item>
 		<size>Individual</size>
 		<range>Months</range>
 	</award>
@@ -478,7 +478,7 @@
 		<xp>1</xp>
 		<precedence>4.02.2</precedence>
 		<qty>12</qty>
-		<item>TheatreOfWar</item>
+		<item>Contract</item>
 		<size>Individual</size>
 		<range>Months</range>
 	</award>
@@ -549,9 +549,9 @@
 		<edge>1</edge>
 		<precedence>4.05.2</precedence>
 		<qty>1</qty>
-		<item>Misc</item>
+		<item>Contract</item>
 		<size>Individual</size>
-		<range>Career</range>
+		<range>Security Duty</range>
 	</award>
 	<award>
 		<name>Officer Graduate</name>
@@ -561,7 +561,7 @@
 		<edge>1</edge>
 		<precedence>4.06.1</precedence>
 		<qty>31</qty>
-		<item>Misc</item>
+		<item>Training</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -572,7 +572,7 @@
 		<xp>3</xp>
 		<precedence>4.06.2</precedence>
 		<qty>21</qty>
-		<item>Misc</item>
+		<item>Training</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -583,7 +583,7 @@
 		<xp>2</xp>
 		<precedence>4.07.1</precedence>
 		<qty>1</qty>
-		<item>Misc</item>
+		<item>Training</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>
@@ -594,7 +594,7 @@
 		<xp>1</xp>
 		<precedence>4.08.1</precedence>
 		<qty>1</qty>
-		<item>Misc</item>
+		<item>Training</item>
 		<size>Individual</size>
 		<range>Career</range>
 	</award>

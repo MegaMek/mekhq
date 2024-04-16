@@ -30,7 +30,6 @@ public class RankAwards {
         for (Award award : awards) {
             isEligible = false;
 
-            // we do this here to more reliably catch Awards with malformed qty values
             try {
                 requiredRankNumeric = award.getQty();
             } catch (Exception e) {
@@ -38,10 +37,9 @@ public class RankAwards {
                 break;
             }
 
-            // we do this here to more reliably catch Awards with malformed range values
-            if (Objects.equals(award.getRange(), "Inclusive")) {
+            if (award.getRange().equalsIgnoreCase("inclusive")) {
                 isInclusive = true;
-            } else if (Objects.equals(award.getRange(), "Exclusive")) {
+            } else if (award.getRange().equalsIgnoreCase("exclusive")) {
                 isInclusive = false;
             } else {
                 LogManager.getLogger().warn("Award {} from the {} set has the invalid range {}",

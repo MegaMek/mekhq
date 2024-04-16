@@ -19,8 +19,8 @@ public class MiscAwards {
      */
     public MiscAwards(Campaign campaign, List<Award> awards, Person person, Boolean missionWasSuccessful) {
         for (Award award : awards) {
-            switch (award.getRange()) {
-                case "MissionAccomplished":
+            switch (award.getRange().toLowerCase()) {
+                case "mission accomplished":
                     if (missionWasSuccessful) {
                         MissionAccomplishedAward(campaign, award, person);
                     }

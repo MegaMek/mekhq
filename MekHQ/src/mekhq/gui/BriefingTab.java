@@ -400,9 +400,9 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // for the purposes of Mission Accomplished awards, do not count partial Successes
         if (Objects.equals(String.valueOf(cmd.getStatus()), "Success")) {
-            new AutoAwardsController(getCampaign(), true);
+            new AutoAwardsController(getCampaign(), mission, true);
         } else {
-            new AutoAwardsController(getCampaign(), false);
+            new AutoAwardsController(getCampaign(), mission, false);
         }
 
         final List<Mission> missions = getCampaign().getSortedMissions();

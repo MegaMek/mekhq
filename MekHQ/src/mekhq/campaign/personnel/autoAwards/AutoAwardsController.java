@@ -1,6 +1,8 @@
 package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.Contract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.AwardsFactory;
@@ -15,22 +17,23 @@ import java.util.stream.Collectors;
 public class AutoAwardsController {
     private Campaign campaign;
 
+    private List<Award> contractAwards = new ArrayList<>();
     private List<Award> injuryAwards = new ArrayList<>();
     private List<Award> killAwards = new ArrayList<>();
     private List<Award> miscAwards = new ArrayList<>();
-    private List<Award> missionAwards = new ArrayList<>();
     private List<Award> rankAwards = new ArrayList<>();
     private List<Award> scenarioAwards = new ArrayList<>();
     private List<Award> skillAwards = new ArrayList<>();
     private List<Award> theatreOfWarAwards = new ArrayList<>();
     private List<Award> timeAwards = new ArrayList<>();
+    private List<Award> trainingAwards = new ArrayList<>();
 
     /**
      * The primary controller for the automatic processing of Awards
      * @param campaign the campaign to be processed
      * @param missionWasSuccessful @Nullable true if Mission was a complete Success, otherwise false, should also be false if not run at the end of a Mission
      */
-    public AutoAwardsController(Campaign c, Boolean missionWasSuccessful) {
+    public AutoAwardsController(Campaign c, Mission mission, Boolean missionWasSuccessful) {
         LogManager.getLogger().info("autoAwards has started");
 
         campaign = c;
@@ -46,7 +49,7 @@ public class AutoAwardsController {
             // we have to do multiple isEmpty() checks as any point in the removal process could result in null personnel
             if(!personnel.isEmpty()) {
                 // This is the main workhorse function
-                ProcessAwards(personnel, missionWasSuccessful);
+                ProcessAwards(personnel, mission, missionWasSuccessful);
             }
 
             // TODO add Posthumous Awards to Campaign Options
@@ -67,7 +70,7 @@ public class AutoAwardsController {
                 }
 
                 if (!deceasedPersonnel.isEmpty()) {
-                    ProcessAwards(deceasedPersonnel, missionWasSuccessful);
+                    ProcessAwards(deceasedPersonnel, mission, missionWasSuccessful);
                 } else {
                     LogManager.getLogger().info("AutoAwards found no deceased personnel, skipping this step");
                 }
@@ -84,26 +87,10 @@ public class AutoAwardsController {
      * @param personnel all personnel that should be checked for award eligibility
      * @param missionWasSuccessful whether the Mission ended in a Success
      */
-    private void ProcessAwards(Collection<Person> personnel, Boolean missionWasSuccessful) {
+    private void ProcessAwards(Collection<Person> personnel, Mission mission, Boolean missionWasSuccessful) {
         for (Person person : personnel) {
-            if (!theatreOfWarAwards.isEmpty()) {
-                new TheatreOfWarAwards(campaign, theatreOfWarAwards, person);
-            }
-
-            if (!timeAwards.isEmpty()) {
-                new TimeAwards(campaign, timeAwards, person);
-            }
-
-            if (!skillAwards.isEmpty()) {
-                new SkillAwards(campaign, skillAwards, person);
-            }
-
-            if (!rankAwards.isEmpty()) {
-                new RankAwards(campaign, rankAwards, person);
-            }
-
-            if (!miscAwards.isEmpty()) {
-                new MiscAwards(campaign, miscAwards, person, missionWasSuccessful);
+            if ((!contractAwards.isEmpty()) && (mission instanceof Contract)) {
+                new ContractAwards(campaign, mission, contractAwards, person);
             }
 
             // even if someone doesn't have a Combat Role, we still check combat-related Awards as we've no way to check
@@ -112,8 +99,28 @@ public class AutoAwardsController {
                 new KillAwards(campaign, killAwards, person);
             }
 
+            if (!miscAwards.isEmpty()) {
+                new MiscAwards(campaign, miscAwards, person, missionWasSuccessful);
+            }
+
+            if (!rankAwards.isEmpty()) {
+                new RankAwards(campaign, rankAwards, person);
+            }
+
             if (!scenarioAwards.isEmpty()) {
                 new ScenarioAwards(campaign, scenarioAwards, person);
+            }
+
+            if (!skillAwards.isEmpty()) {
+                new SkillAwards(campaign, skillAwards, person);
+            }
+
+            if (!theatreOfWarAwards.isEmpty()) {
+                new TheatreOfWarAwards(campaign, theatreOfWarAwards, person);
+            }
+
+            if (!timeAwards.isEmpty()) {
+                new TimeAwards(campaign, timeAwards, person);
             }
         }
     }
@@ -137,41 +144,41 @@ public class AutoAwardsController {
 
                     // next we begin to filter the awards into discrete lists
                     for (Award award : awards) {
-                        switch (award.getItem()) {
+                        switch (award.getItem().toLowerCase().replaceAll("\\s","")) {
                             // TODO track InjuryAwards at the end of a scenario
                             // InjuryAwards are issued immediately after a scenario
                             // We include them here, for tracking purposes
-                            case "Injury":
+                            case "injury":
                                 injuryAwards.add(award);
                                 break;
                             // TODO kill awards
-                            case "Kill":
+                            case "kill":
                                 killAwards.add(award);
                                 break;
-                            case "Scenario":
+                            case "scenario":
                                 scenarioAwards.add(award);
                                 break;
-                            case "Rank":
+                            case "rank":
                                 rankAwards.add(award);
                                 break;
-                            // Mission Awards are disabled until Mission tracking, on a personnel-level, is introduced
-                            // We include them here, for tracking purposes
-                            case "Mission":
-                                missionAwards.add(award);
+                            case "contract":
+                                contractAwards.add(award);
                                 break;
                             // TODO theatre of war awards
-                            case "TheatreOfWar":
+                            case "theatreofwar":
                                 theatreOfWarAwards.add(award);
                                 break;
-                            case "Skill":
+                            case "skill":
                                 skillAwards.add(award);
                                 break;
-                            // TODO time awards
-                            case "Time":
+                            case "time":
                                 timeAwards.add(award);
                                 break;
+                            case "training":
+                                trainingAwards.add(award);
+                                break;
                             // TODO hardcode more misc awards
-                            case "Misc":
+                            case "misc":
                                 miscAwards.add(award);
                                 break;
                             default:
@@ -184,12 +191,13 @@ public class AutoAwardsController {
                     LogManager.getLogger().info("autoAwards found {} Injury Awards", injuryAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Kill Awards", killAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
-                    LogManager.getLogger().info("autoAwards found {} Mission Awards", missionAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Contract Awards", contractAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Rank Awards", rankAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Scenario Awards", scenarioAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Skill Awards", skillAwards.size());
                     LogManager.getLogger().info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());
                     LogManager.getLogger().info("autoAwards found {} Time Awards", timeAwards.size());
+                    LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
                 } else {
                     LogManager.getLogger().info("autoAwards failed to find any awards in set {}", setName);
                 }

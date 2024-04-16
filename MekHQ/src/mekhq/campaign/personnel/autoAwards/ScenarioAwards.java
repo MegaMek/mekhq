@@ -24,16 +24,15 @@ public class ScenarioAwards {
         int requiredScenarioCount;
 
         for (Award award : awards) {
-            // we do this here to more reliably catch Awards with malformed qty values
-            try {
-                requiredScenarioCount = award.getQty();
-            } catch (Exception e) {
-                LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}",
-                        award.getName(), award.getSet(), award.getQty());
-                break;
-            }
-
             if (award.canBeAwarded(person)) {
+                try {
+                    requiredScenarioCount = award.getQty();
+                } catch (Exception e) {
+                    LogManager.getLogger().warn("Award {} from the {} set has an invalid qty value {}",
+                            award.getName(), award.getSet(), award.getQty());
+                    break;
+                }
+
                 if (person.getScenarioLog().size() >= requiredScenarioCount) {
                     // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString
                     campaign.addReport(person.getHyperlinkedName() + ' ' +
