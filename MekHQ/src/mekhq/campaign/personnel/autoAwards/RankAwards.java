@@ -8,7 +8,6 @@ import org.apache.logging.log4j.LogManager;
 
 import java.text.MessageFormat;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class RankAwards {

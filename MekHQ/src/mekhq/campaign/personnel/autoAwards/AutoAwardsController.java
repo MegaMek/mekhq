@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 public class AutoAwardsController {
     private Campaign campaign;
+    private Mission mission;
 
     private List<Award> contractAwards = new ArrayList<>();
     private List<Award> injuryAwards = new ArrayList<>();
@@ -33,10 +34,11 @@ public class AutoAwardsController {
      * @param campaign the campaign to be processed
      * @param missionWasSuccessful @Nullable true if Mission was a complete Success, otherwise false, should also be false if not run at the end of a Mission
      */
-    public AutoAwardsController(Campaign c, Mission mission, Boolean missionWasSuccessful) {
+    public AutoAwardsController(Campaign c, Mission m, Boolean missionWasSuccessful) {
         LogManager.getLogger().info("autoAwards has started");
 
         campaign = c;
+        mission = m;
 
         buildAwardLists();
 
@@ -49,7 +51,7 @@ public class AutoAwardsController {
             // we have to do multiple isEmpty() checks as any point in the removal process could result in null personnel
             if(!personnel.isEmpty()) {
                 // This is the main workhorse function
-                ProcessAwards(personnel, mission, missionWasSuccessful);
+                ProcessAwards(personnel, missionWasSuccessful);
             }
 
             // TODO add Posthumous Awards to Campaign Options
@@ -70,7 +72,7 @@ public class AutoAwardsController {
                 }
 
                 if (!deceasedPersonnel.isEmpty()) {
-                    ProcessAwards(deceasedPersonnel, mission, missionWasSuccessful);
+                    ProcessAwards(deceasedPersonnel, missionWasSuccessful);
                 } else {
                     LogManager.getLogger().info("AutoAwards found no deceased personnel, skipping this step");
                 }
@@ -87,7 +89,7 @@ public class AutoAwardsController {
      * @param personnel all personnel that should be checked for award eligibility
      * @param missionWasSuccessful whether the Mission ended in a Success
      */
-    private void ProcessAwards(Collection<Person> personnel, Mission mission, Boolean missionWasSuccessful) {
+    private void ProcessAwards(Collection<Person> personnel, Boolean missionWasSuccessful) {
         for (Person person : personnel) {
             if ((!contractAwards.isEmpty()) && (mission instanceof Contract)) {
                 new ContractAwards(campaign, mission, contractAwards, person);
@@ -115,8 +117,9 @@ public class AutoAwardsController {
                 new SkillAwards(campaign, skillAwards, person);
             }
 
-            if (!theatreOfWarAwards.isEmpty()) {
-                new TheatreOfWarAwards(campaign, theatreOfWarAwards, person);
+            // theatre of war awards are based on employer, only Contracts have employers
+            if ((!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
+                new TheatreOfWarAwards(campaign, mission, theatreOfWarAwards, person);
             }
 
             if (!timeAwards.isEmpty()) {

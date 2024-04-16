@@ -337,8 +337,8 @@
 		<precedence>3.08.01</precedence>
 		<qty>1</qty>
 		<item>Theatre of War</item>
-		<size>Individual</size>
-		<range>Career</range>
+		<size>2866, 3025</size>
+		<range>Inner Sphere, Inner Sphere</range>
 	</award>
 	<award>
 		<name>Fourth Succession War Campaign</name>
