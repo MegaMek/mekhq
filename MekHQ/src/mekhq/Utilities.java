@@ -21,6 +21,7 @@ package mekhq;
 
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.client.ui.swing.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
@@ -32,6 +33,7 @@ import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.IPlayerSettings;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -1300,5 +1302,71 @@ public class Utilities {
             }
         }
         return stub;
+    }
+
+    /**
+     * Display a descriptive character string for the deployment parameters in an object that implements IPlayerSettings
+     * @param settings object that implements IPlayerSettings
+     * @return A character string
+     */
+    public static String getDeploymentString(Player settings) {
+        StringBuilder result = new StringBuilder("");
+
+        if(settings.getStartingPos() >=0
+                && settings.getStartingPos() <= IStartingPositions.START_LOCATION_NAMES.length) {
+            result.append(IStartingPositions.START_LOCATION_NAMES[settings.getStartingPos()]);
+        }
+
+        if (settings.getStartingPos() == 0) {
+            int NWx = settings.getStartingAnyNWx() + 1;
+            int NWy = settings.getStartingAnyNWy() + 1;
+            int SEx = settings.getStartingAnySEx() + 1;
+            int SEy = settings.getStartingAnySEy() + 1;
+            if ((NWx + NWy + SEx + SEy) > 0) {
+                result.append(" (" + NWx + ", " + NWy + ")-(" + SEx + ", " + SEy + ")");
+            }
+        }
+        int so = settings.getStartOffset();
+        int sw = settings.getStartWidth();
+        if ((so != 0) || (sw != 3)) {
+            result.append(", " + so);
+            result.append(", " + sw);
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * Create a Player object from IPlayerSettings parameters. Useful for tracking these variables in dialogs.
+     * @param settings an object that implements IPlayerSettings
+     * @return A Player object
+     */
+    public static Player createPlayer(IPlayerSettings settings) {
+        Player p = new Player(1, "fake");
+        p.setStartingPos(settings.getStartingPos());
+        p.setStartWidth(settings.getStartWidth());
+        p.setStartOffset(settings.getStartOffset());
+        p.setStartingAnyNWx(settings.getStartingAnyNWx());
+        p.setStartingAnyNWy(settings.getStartingAnyNWy());
+        p.setStartingAnySEx(settings.getStartingAnySEx());
+        p.setStartingAnySEy(settings.getStartingAnySEy());
+
+        return p;
+    }
+
+    /**
+     * pdate values of an object that implements IPlayerSettings from a player object
+     * @param settings An object that implements IPlayerSettings
+     * @param player A Player object from which to read values
+     */
+    public static void updatePlayerSettings(IPlayerSettings settings, Player player) {
+        settings.setStartingPos(player.getStartingPos());
+        settings.setStartWidth(player.getStartWidth());
+        settings.setStartOffset(player.getStartOffset());
+        settings.setStartingAnyNWx(player.getStartingAnyNWx());
+        settings.setStartingAnyNWy(player.getStartingAnyNWy());
+        settings.setStartingAnySEx(player.getStartingAnySEx());
+        settings.setStartingAnySEy(player.getStartingAnySEy());
+
     }
 }

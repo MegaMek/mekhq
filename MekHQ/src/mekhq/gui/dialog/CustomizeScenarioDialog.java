@@ -23,8 +23,11 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.PlanetaryConditionsDialog;
+import megamek.client.ui.swing.lobby.PlayerSettingsDialog;
+import megamek.common.Player;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
@@ -63,6 +66,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private LocalDate date;
     private ScenarioDeploymentLimit deploymentLimits;
     private PlanetaryConditions planetaryConditions;
+    private Player player;
     private List<BotForce> botForces;
 
     // loot
@@ -106,6 +110,7 @@ public class CustomizeScenarioDialog extends JDialog {
 
     // buttons
     private JButton btnDate;
+    private JButton btnDeployment;
     private JButton btnPlanetaryConditions;
     private JButton btnAddLoot;
     private JButton btnEditLoot;
@@ -141,6 +146,8 @@ public class CustomizeScenarioDialog extends JDialog {
         if(scenario.getDeploymentLimit() != null) {
             deploymentLimits = scenario.getDeploymentLimit().getCopy();
         }
+
+        player = Utilities.createPlayer(scenario);
 
         planetaryConditions = scenario.createPlanetaryConditions();
 
@@ -224,6 +231,19 @@ public class CustomizeScenarioDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.insets = new Insets(5, 5, 0, 0);
         panInfo.add(btnDate, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panInfo.add(new JLabel(resourceMap.getString("lblDeployment.text")), gbc);
+
+        btnDeployment = new JButton(Utilities.getDeploymentString(player));
+        btnDeployment.addActionListener(evt -> changeDeployment());
+        gbc.gridx = 1;
+        gbc.gridwidth = 1;
+        gbc.insets = new Insets(5, 5, 0, 0);
+        panInfo.add(btnDeployment, gbc);
 
         if (scenario.getStatus().isCurrent() && (scenario instanceof AtBDynamicScenario)) {
             gbc.gridx = 0;
@@ -389,6 +409,7 @@ public class CustomizeScenarioDialog extends JDialog {
             }
         }
         scenario.setDeploymentLimit(deploymentLimits);
+        Utilities.updatePlayerSettings(scenario, player);
         scenario.readPlanetaryConditions(planetaryConditions);
         scenario.setDate(date);
         scenario.setBotForces(botForces);
@@ -454,6 +475,12 @@ public class CustomizeScenarioDialog extends JDialog {
             date = dc.getDate();
             btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         }
+    }
+
+    private void changeDeployment() {
+        EditDeploymentDialog edd = new EditDeploymentDialog(frame, true, player);
+        edd.setVisible(true);
+        btnDeployment.setText(Utilities.getDeploymentString(player));
     }
 
     private void initDeployLimitPanel(ResourceBundle resourceMap) {
