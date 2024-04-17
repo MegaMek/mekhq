@@ -120,7 +120,7 @@ public class BotForce implements IPlayerSettings {
         copy.setDeployRound(this.getDeployRound());
         copy.setCamouflage(this.getCamouflage());
         copy.setColour(this.getColour());
-        //copy.setBehaviorSettings(getBehaviorSettings().getCopy());
+        //copy.setBehaviorSettings(getBehaviorSettings().clone());
 
         return copy;
     }

@@ -23,6 +23,7 @@ package mekhq.gui.model;
 
 
 import megamek.common.IStartingPositions;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.BotForce;
 import mekhq.campaign.universe.Factions;
@@ -101,7 +102,7 @@ public class BotForceTableModel extends AbstractTableModel {
                 return ((null == botForce.getBotForceRandomizer()) ? "" : botForce.getBotForceRandomizer().
                         getShortDescription(campaign));
             case COL_DEPLOYMENT:
-                return IStartingPositions.START_LOCATION_NAMES[botForce.getStartingPos()];
+                return Utilities.getDeploymentString(botForce);
             default:
                 return "?";
         }

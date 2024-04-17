@@ -1306,34 +1306,38 @@ public class Utilities {
 
     /**
      * Display a descriptive character string for the deployment parameters in an object that implements IPlayerSettings
-     * @param settings object that implements IPlayerSettings
+     * @param player object that implements IPlayerSettings
      * @return A character string
      */
-    public static String getDeploymentString(Player settings) {
+    public static String getDeploymentString(Player player) {
         StringBuilder result = new StringBuilder("");
 
-        if(settings.getStartingPos() >=0
-                && settings.getStartingPos() <= IStartingPositions.START_LOCATION_NAMES.length) {
-            result.append(IStartingPositions.START_LOCATION_NAMES[settings.getStartingPos()]);
+        if(player.getStartingPos() >=0
+                && player.getStartingPos() <= IStartingPositions.START_LOCATION_NAMES.length) {
+            result.append(IStartingPositions.START_LOCATION_NAMES[player.getStartingPos()]);
         }
 
-        if (settings.getStartingPos() == 0) {
-            int NWx = settings.getStartingAnyNWx() + 1;
-            int NWy = settings.getStartingAnyNWy() + 1;
-            int SEx = settings.getStartingAnySEx() + 1;
-            int SEy = settings.getStartingAnySEy() + 1;
+        if (player.getStartingPos() == 0) {
+            int NWx = player.getStartingAnyNWx() + 1;
+            int NWy = player.getStartingAnyNWy() + 1;
+            int SEx = player.getStartingAnySEx() + 1;
+            int SEy = player.getStartingAnySEy() + 1;
             if ((NWx + NWy + SEx + SEy) > 0) {
                 result.append(" (" + NWx + ", " + NWy + ")-(" + SEx + ", " + SEy + ")");
             }
         }
-        int so = settings.getStartOffset();
-        int sw = settings.getStartWidth();
+        int so = player.getStartOffset();
+        int sw = player.getStartWidth();
         if ((so != 0) || (sw != 3)) {
             result.append(", " + so);
             result.append(", " + sw);
         }
 
         return result.toString();
+    }
+
+    public static String getDeploymentString(IPlayerSettings settings) {
+        return getDeploymentString(createPlayer(settings));
     }
 
     /**

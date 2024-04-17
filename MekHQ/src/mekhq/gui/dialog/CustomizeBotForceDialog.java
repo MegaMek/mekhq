@@ -51,6 +51,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     private BotForce botForce;
     private Campaign campaign;
     private Camouflage camo;
+    private Player player;
     private BehaviorSettings behavior;
     private BotForceRandomizer randomizer;
     private boolean useRandomUnits;
@@ -59,6 +60,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     //gui components
     private JTextField txtName;
     private JComboBox<String> choiceTeam;
+    private JButton btnDeployment;
     private JButton btnCamo;
     private JPanel panBehavior;
     private JPanel panRandomUnits;
@@ -97,6 +99,7 @@ public class CustomizeBotForceDialog  extends JDialog {
             botForce = bf;
         }
         campaign = c;
+        player = Utilities.createPlayer(bf);
         camo = botForce.getCamouflage();
         behavior = new BehaviorSettings();
         try {
@@ -178,6 +181,18 @@ public class CustomizeBotForceDialog  extends JDialog {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         panLeft.add(choiceTeam, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        panLeft.add(new JLabel("Deployment:"), gbc);
+
+        btnDeployment = new JButton(Utilities.getDeploymentString(player));
+        btnDeployment.addActionListener(evt -> changeDeployment());
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        panLeft.add(btnDeployment, gbc);
 
         btnCamo = new JButton();
         btnCamo.setIcon(camo.getImageIcon());
@@ -547,6 +562,12 @@ public class CustomizeBotForceDialog  extends JDialog {
         }
     }
 
+    private void changeDeployment() {
+        EditDeploymentDialog edd = new EditDeploymentDialog(frame, true, player);
+        edd.setVisible(true);
+        btnDeployment.setText(Utilities.getDeploymentString(player));
+    }
+
     private void loadUnits(ActionEvent evt) {
         Optional<File> units = FileDialogs.openUnits(frame);
         if (units.isPresent() && units.get() != null) {
@@ -598,6 +619,7 @@ public class CustomizeBotForceDialog  extends JDialog {
     private void done(ActionEvent evt) {
         botForce.setName(txtName.getText());
         botForce.setTeam(choiceTeam.getSelectedIndex()+1);
+        Utilities.updatePlayerSettings(botForce, player);
         botForce.setCamouflage(camo);
         botForce.setBehaviorSettings(behavior);
         botForce.setBotForceRandomizer(randomizer);
