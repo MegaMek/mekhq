@@ -63,7 +63,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             playerHome = startPos[Compute.randomInt(4)];
-            setStart(playerHome);
+            setStartingPos(playerHome);
 
             enemyStart = Board.START_CENTER;
             setEnemyHome(playerHome + 4);
@@ -72,10 +72,10 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 setEnemyHome(getEnemyHome() - 8);
             }
 
-            otherStart = getStart() + 4;
+            otherStart = getStartingPos() + 4;
             otherHome = playerHome;
         } else {
-            setStart(Board.START_CENTER);
+            setStartingPos(Board.START_CENTER);
             enemyStart = startPos[Compute.randomInt(4)];
 
             setEnemyHome(enemyStart);
@@ -93,7 +93,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         }
 
         if (!allyEntities.isEmpty()) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
+            addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);

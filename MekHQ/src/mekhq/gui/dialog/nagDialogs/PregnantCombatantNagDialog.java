@@ -18,34 +18,39 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.unit.Unit;
+import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 
-public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
-    private boolean checkHanger() {
-        for (Unit u : getCampaign().getHangar().getUnits()) {
-            if((u.isUnmaintained()) && (!u.isSalvage())) {
-                    return true;
+public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
+    private static boolean isPregnantCombatant (Campaign campaign) {
+        if (campaign.hasActiveContract()) {
+            for (Person p : campaign.getActivePersonnel()) {
+                if (p.isPregnant()) {
+                    if (p.hasCombatRole()) {
+                        if(p.getUnit() != null) {
+                            return true;
+                        }
+                    }
+                }
             }
         }
         return false;
     }
-
     //region Constructors
-    public UnmaintainedUnitsNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "UnmaintainedUnitsNagDialog", "UnmaintainedUnitsNagDialog.title",
-                "UnmaintainedUnitsNagDialog.text", campaign, MHQConstants.NAG_UNMAINTAINED_UNITS);
+    public PregnantCombatantNagDialog(final JFrame frame, final Campaign campaign) {
+        super(frame, "PregnantCombatantNagDialog", "PregnantCombatantNagDialog.title",
+                "PregnantCombatantNagDialog.text", campaign, MHQConstants.NAG_PREGNANT_COMBATANT);
     }
     //endregion Constructors
 
     @Override
     protected boolean checkNag() {
         return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && checkHanger();
+                && isPregnantCombatant(getCampaign());
     }
 }

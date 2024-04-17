@@ -349,7 +349,12 @@ public class CampaignGUI extends JPanel {
         JMenuItem menuNew = new JMenuItem(resourceMap.getString("menuNew.text"));
         menuNew.setMnemonic(KeyEvent.VK_N);
         menuNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
-        menuNew.addActionListener(evt -> new DataLoadingDialog(frame, app, null).setVisible(true));
+        menuNew.addActionListener(evt -> {
+            int decision = new NewCampaignConfirmationDialog().YesNoOption();
+            if (decision == JOptionPane.YES_OPTION) {
+                new DataLoadingDialog(frame, app, null).setVisible(true);
+            }
+        });
         menuFile.add(menuNew);
 
         //region menuImport
@@ -2378,6 +2383,11 @@ public class CampaignGUI extends JPanel {
         }
 
         if (new UnmaintainedUnitsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new PregnantCombatantNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
         }

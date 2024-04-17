@@ -62,7 +62,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             playerHome = startPos[Compute.randomInt(4)];
-            setStart(playerHome);
+            setStartingPos(playerHome);
 
             enemyStart = Board.START_CENTER;
             setEnemyHome(playerHome + 4);
@@ -71,7 +71,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
                 setEnemyHome(getEnemyHome() - 8);
             }
         } else {
-            setStart(Board.START_CENTER);
+            setStartingPos(Board.START_CENTER);
             enemyStart = startPos[Compute.randomInt(4)];
             setEnemyHome(enemyStart);
             playerHome = getEnemyHome() + 4;
@@ -82,7 +82,7 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
         }
 
         if (!allyEntities.isEmpty()) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
+            addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign),
@@ -119,11 +119,11 @@ public class ReconRaidBuiltInScenario extends AtBScenario {
                     String.format("%s:", defaultResourceBundle.getString("battleDetails.reconRaid.name")));
             raidObjective.addDetail(String.format(
                     defaultResourceBundle.getString("battleDetails.reconRaid.instructions.oppositeEdge"),
-                    OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStart()))));
+                    OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos()))));
             raidObjective.addDetail(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.stayStill"));
             raidObjective.addDetail(
                     String.format(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.returnEdge"),
-                            OffBoardDirection.translateBoardStart(getStart())));
+                            OffBoardDirection.translateBoardStart(getStartingPos())));
             raidObjective.addDetail(defaultResourceBundle.getString("battleDetails.reconRaid.instructions.reward"));
 
             ObjectiveEffect victoryEffect = new ObjectiveEffect();

@@ -81,7 +81,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
 
-        setStart(Board.START_S);
+        setStartingPos(Board.START_S);
         setDeploymentDelay(12);
 
         final AtBContract contract = getContract(campaign);

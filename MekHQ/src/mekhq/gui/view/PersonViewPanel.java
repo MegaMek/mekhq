@@ -49,6 +49,7 @@ import java.awt.*;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -208,9 +209,17 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         if (!person.getPersonnelLog().isEmpty()) {
+            JPanel pnlLogHeader = new JPanel();
+            pnlLogHeader.setName("pnlLogHeader");
+            pnlLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLogHeader.title")));
+
             JPanel pnlLog = fillLog();
+            pnlLog.setVisible(false);
             pnlLog.setName("pnlLog");
             pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title")));
+
+            pnlLogHeader.addMouseListener(getSwitchListener(pnlLogHeader, pnlLog));
+            pnlLog.addMouseListener(getSwitchListener(pnlLog, pnlLogHeader));
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -219,17 +228,28 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlLogHeader, gridBagConstraints);
             add(pnlLog, gridBagConstraints);
             gridy++;
         }
 
         if (!person.getScenarioLog().isEmpty()) {
+            JPanel pnlScenariosLogHeader = new JPanel();
+            pnlScenariosLogHeader.setName("scenarioLogHeader");
+            pnlScenariosLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("scenarioLogHeader.title")));
+
             JPanel pnlScenariosLog = fillScenarioLog();
 
             pnlScenariosLog.setName("scenarioLog");
             pnlScenariosLog.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("scenarioLog.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            pnlScenariosLog.setVisible(false);
+
+            pnlScenariosLogHeader.addMouseListener(getSwitchListener(pnlScenariosLogHeader, pnlScenariosLog));
+            pnlScenariosLog.addMouseListener(getSwitchListener(pnlScenariosLog, pnlScenariosLogHeader));
+
+
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
@@ -237,17 +257,27 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlScenariosLogHeader, gridBagConstraints);
             add(pnlScenariosLog, gridBagConstraints);
             gridy++;
         }
 
         if (!campaign.getKillsFor(person.getId()).isEmpty()) {
+            JPanel pnlKillsHeader = new JPanel();
+            pnlKillsHeader.setName("killsHeader");
+            pnlKillsHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlKillsHeader.title")));
+
             JPanel pnlKills = fillKillRecord();
 
             pnlKills.setName("txtKills");
             pnlKills.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlKills.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+            pnlKills.setVisible(false);
+
+            pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
+            pnlKills.addMouseListener(getSwitchListener(pnlKills, pnlKillsHeader));
+
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = gridy;
@@ -255,6 +285,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(5, 5, 5, 5);
             gridBagConstraints.fill = GridBagConstraints.BOTH;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlKillsHeader, gridBagConstraints);
             add(pnlKills, gridBagConstraints);
             gridy++;
         }
@@ -268,6 +299,18 @@ public class PersonViewPanel extends JScrollablePanel {
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         add(Box.createGlue(), gridBagConstraints);
+    }
+
+    private MouseListener getSwitchListener(JPanel current, JPanel switchTo) {
+        return new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (current.isVisible()) {
+                    current.setVisible(false);
+                    switchTo.setVisible(true);
+                }
+            }
+        };
     }
 
     /**
@@ -1306,7 +1349,7 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if (campaign.getCampaignOptions().isUseToughness()) {
+        if ((campaign.getCampaignOptions().isUseToughness()) && (person.getToughness() > 0)) {
             lblTough1.setName("lblTough1");
             lblTough1.setText(resourceMap.getString("lblTough1.text"));
             gridBagConstraints = new GridBagConstraints();
