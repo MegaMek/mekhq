@@ -99,8 +99,8 @@ public class OfficerDuelBuiltInScenario extends AtBScenario {
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(startPos[Compute.randomInt(4)]);
-        int enemyStart = getStart() + 4;
+        setStartingPos(startPos[Compute.randomInt(4)]);
+        int enemyStart = getStartingPos() + 4;
 
         if (enemyStart > 8) {
             enemyStart -= 8;

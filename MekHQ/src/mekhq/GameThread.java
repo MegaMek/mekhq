@@ -176,7 +176,15 @@ class GameThread extends Thread implements CloseClientListener {
                 client.sendPlanetaryConditions(scenario.createPlanetaryConditions());
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
-                client.getLocalPlayer().setStartingPos(scenario.getStart());
+                // set player deployment
+                client.getLocalPlayer().setStartingPos(scenario.getStartingPos());
+                client.getLocalPlayer().setStartOffset(scenario.getStartOffset());
+                client.getLocalPlayer().setStartWidth(scenario.getStartWidth());
+                client.getLocalPlayer().setStartingAnyNWx(scenario.getStartingAnyNWx());
+                client.getLocalPlayer().setStartingAnyNWy(scenario.getStartingAnyNWy());
+                client.getLocalPlayer().setStartingAnySEx(scenario.getStartingAnySEx());
+                client.getLocalPlayer().setStartingAnySEy(scenario.getStartingAnySEy());
+
                 client.getLocalPlayer().setTeam(1);
 
                 var entities = new ArrayList<Entity>();

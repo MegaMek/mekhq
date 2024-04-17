@@ -485,7 +485,8 @@ public class ResolveScenarioTracker {
                                     + " when trying to assign kills");
                             continue;
                         }
-                        status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getLocalDate()));
+                        status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getLocalDate(),
+                                getMissionId(), getScenarioId()));
                     }
                 }
             }
@@ -1354,6 +1355,14 @@ public class ResolveScenarioTracker {
 
     public Mission getMission() {
         return campaign.getMission(scenario.getMissionId());
+    }
+
+    public int getMissionId() {
+        return campaign.getMission(scenario.getMissionId()).getId();
+    }
+
+    public int getScenarioId() {
+        return scenario.getId();
     }
 
     public Hashtable<String, String> getKillCredits() {

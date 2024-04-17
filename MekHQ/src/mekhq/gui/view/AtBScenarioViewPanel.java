@@ -338,7 +338,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             gridBagConstraints.gridwidth = 1;
             panStats.add(lblPlayerStart, gridBagConstraints);
 
-            lblPlayerStartPos.setText(IStartingPositions.START_LOCATION_NAMES[scenario.getStart()]);
+            lblPlayerStartPos.setText(IStartingPositions.START_LOCATION_NAMES[scenario.getStartingPos()]);
             gridBagConstraints.gridx = 2;
             gridBagConstraints.gridy = y++;
             panStats.add(lblPlayerStartPos, gridBagConstraints);
