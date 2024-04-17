@@ -44,30 +44,27 @@ public class StoryChoicePanel extends AbstractMHQPanel {
     @Override
     protected void initialize() {
         setLayout(new GridLayout(0,1));
-        txtChoice = new JTextPane();
-        txtChoice.setEditable(false);
-        txtChoice.setContentType("text/html");
-        txtChoice.setText("");
-        add(txtChoice);
+        lblChoice = new JLabel();
+        //txtChoice.setEditable(false);
+        //txtChoice.setContentType("text/html");
+        lblChoice.setText("");
+        add(lblChoice);
     }
 
     protected void updateChoice(String choice, boolean isSelected, Campaign c, Color fg, Color bg) {
         // this gets a little complicated because we have to dynamically set the height of the panel based on
         // how long the text is, but that text may or not be bolded. So we calculate the height as if it was
         // bolded and then switch for unselected cases.
-        txtChoice.setText(MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens("**" + choice + "**", c)));
-        txtChoice.setBackground(bg);
-        txtChoice.setForeground(fg);
-        // to set the height dynamically, we set the size with the width of the JTextPane we want and an arbitrary
-        // height. This will set the preferred height correctly, which we can grab and use to set the height of the
-        // overall panel. To make sure it fits I have found that I need to set it below 400 to adjust for some insets
-        // and the scrollbar.
-        txtChoice.setSize(375,5);
-        int height = txtChoice.getPreferredSize().height;
+        // the div business sets a fixed width on the label and forces it to wrap.
+        lblChoice.setText("<html><div style=\"width:280px;\">" + MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens("**" + choice + "**", c)) + "</div></html>");
+        setBackground(bg);
+        lblChoice.setForeground(fg);
+        int height = lblChoice.getPreferredSize().height;
         if(!isSelected) {
-            txtChoice.setText(MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens(choice, c)));
+            lblChoice.setText("<html><div style=\"width:280px;\">" + MarkdownRenderer.getRenderedHtml(StoryArc.replaceTokens(choice, c)) + "</div></html>");
         }
-        setMinimumSize(new Dimension(400, height));
-        setPreferredSize(new Dimension(400, height));
+        setBorder(BorderFactory.createEmptyBorder(5,5,5,0));
+        setMinimumSize(new Dimension(400, height+10));
+        setPreferredSize(new Dimension(400, height+10));
     }
 }

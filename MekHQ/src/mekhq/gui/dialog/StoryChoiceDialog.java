@@ -105,7 +105,7 @@ public class StoryChoiceDialog extends StoryDialog implements KeyListener {
         choiceList.addKeyListener(this);
         gbc.gridy = 1;
         gbc.weighty = 1.0;
-        choicePanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+        choicePanel.setBorder(BorderFactory.createEmptyBorder(10,0,0,0));
         choicePanel.add(choiceList);
         rightPanel.add(choicePanel, gbc);
 
