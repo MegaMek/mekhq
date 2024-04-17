@@ -21,6 +21,7 @@ public class TheatreOfWarAwards {
     /**
      * This function loops through Theatre of War Awards, checking whether the person is eligible to receive each type of award
      * @param campaign the campaign to be processed
+     * @param mission the mission just completed
      * @param awards the awards to be processed (should only include awards where item == TheatreOfWar)
      * @param person the person to check award eligibility for
      */

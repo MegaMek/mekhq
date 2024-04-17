@@ -10,7 +10,7 @@
 		<stackable>true</stackable>
 		<precedence>1.01.1</precedence>
 		<qty>1</qty>
-		<item>Misc</item>
+		<item>Ignore</item>
 		<size>Individual</size>
 		<range>Scenario</range>
 	</award>

@@ -11,11 +11,12 @@ import java.util.ResourceBundle;
 
 public class MiscAwards {
     /**
-     * This function loops through Kill Awards, checking whether the person is eligible to receive each type of award.
+     * This function loops through Misc Awards, checking whether the person is eligible to receive each type of award.
      * All Misc awards need to be coded as individual functions
      * @param campaign the campaign to be processed
      * @param awards the awards to be processed (should only include awards where item == Kill)
      * @param person the person to check award eligibility for
+     * @param missionWasSuccessful true if the completed mission was successful
      */
     public MiscAwards(Campaign campaign, List<Award> awards, Person person, Boolean missionWasSuccessful) {
         for (Award award : awards) {

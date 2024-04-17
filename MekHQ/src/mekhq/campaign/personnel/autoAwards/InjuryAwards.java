@@ -8,7 +8,7 @@ import java.util.List;
 
 public class InjuryAwards {
     /**
-     * This function loops through Kill Awards, checking whether the person is eligible to receive each type of award
+     * This function loops through Injury Awards, checking whether the person is eligible to receive each type of award
      * @param campaign the campaign to be processed
      * @param awards the awards to be processed (should only include awards where item == Kill)
      * @param person the person to check award eligibility for

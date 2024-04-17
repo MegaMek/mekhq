@@ -5,8 +5,8 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.AwardsFactory;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.apache.logging.log4j.LogManager;
 
@@ -105,7 +105,7 @@ public class AutoAwardsController {
             // even if someone doesn't have a Combat Role, we still check combat-related Awards as we've no way to check
             // whether Person previously held a Combat Role earlier in the Mission
             if (!killAwards.isEmpty()) {
-                new KillAwards(campaign, killAwards, person);
+                new KillAwards(campaign, mission, killAwards, person);
             }
 
             if (!miscAwards.isEmpty()) {

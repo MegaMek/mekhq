@@ -12,7 +12,7 @@ import java.util.ResourceBundle;
 
 public class RankAwards {
     /**
-     * This function loops through Kill Awards, checking whether the person is eligible to receive each type of award.
+     * This function loops through Rank Awards, checking whether the person is eligible to receive each type of award.
      * All Misc awards need to be hardcoded
      * @param campaign the campaign to be processed
      * @param awards the awards to be processed (should only include awards where item == Kill)
