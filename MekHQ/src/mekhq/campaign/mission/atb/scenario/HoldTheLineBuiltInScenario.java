@@ -56,7 +56,7 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             playerHome = startPos[Compute.randomInt(4)];
-            setStart(playerHome);
+            setStartingPos(playerHome);
 
             enemyStart = Board.START_CENTER;
             setEnemyHome(playerHome + 4);
@@ -65,7 +65,7 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
                 setEnemyHome(getEnemyHome() - 8);
             }
         } else {
-            setStart(Board.START_CENTER);
+            setStartingPos(Board.START_CENTER);
             enemyStart = startPos[Compute.randomInt(4)];
             setEnemyHome(enemyStart);
             playerHome = getEnemyHome() + 4;
@@ -76,7 +76,7 @@ public class HoldTheLineBuiltInScenario extends AtBScenario {
         }
 
         if (!allyEntities.isEmpty()) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
+            addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_ASSAULT,

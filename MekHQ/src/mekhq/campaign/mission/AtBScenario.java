@@ -792,8 +792,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int playerHome;
 
         playerHome = startPos[Compute.randomInt(4)];
-        setStart(playerHome);
-        enemyStart = getStart() + 4;
+        setStartingPos(playerHome);
+        enemyStart = getStartingPos() + 4;
 
         if (enemyStart > 8) {
             enemyStart -= 8;
@@ -802,7 +802,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         enemyHome = enemyStart;
 
         if (!allyEntities.isEmpty()) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
+            addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);

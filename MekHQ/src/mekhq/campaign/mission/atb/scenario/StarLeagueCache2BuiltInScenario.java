@@ -54,7 +54,7 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(Board.START_N);
+        setStartingPos(Board.START_N);
         int enemyStart = Board.START_S;
 
         for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {

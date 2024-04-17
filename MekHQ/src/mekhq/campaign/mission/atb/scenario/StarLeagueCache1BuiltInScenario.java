@@ -85,7 +85,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(Board.START_CENTER);
+        setStartingPos(Board.START_CENTER);
         int enemyStart = Board.START_N;
 
         int roll = Compute.d6();
@@ -131,7 +131,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         loot.setName(defaultResourceBundle.getString("battleDetails.starLeagueCache.Mek"));
         loot.addUnit(en);
         getLoot().add(loot);
-        addBotForce(new BotForce(TECH_FORCE_ID, 1, getStart(), otherForce), campaign);
+        addBotForce(new BotForce(TECH_FORCE_ID, 1, getStartingPos(), otherForce), campaign);
     }
 
     @Override

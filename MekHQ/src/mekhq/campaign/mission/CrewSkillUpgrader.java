@@ -23,6 +23,7 @@ import megamek.common.*;
 import megamek.common.options.OptionsConstants;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 
@@ -47,7 +48,7 @@ public class CrewSkillUpgrader {
      */
     public CrewSkillUpgrader(int upgradeIntensity) {
         this.upgradeIntensity = upgradeIntensity;
-        
+
         specialAbilitiesByUnitType = new HashMap<>();
 
         for (SpecialAbility spa : SpecialAbility.getWeightedSpecialAbilities()) {
@@ -90,7 +91,7 @@ public class CrewSkillUpgrader {
         double skillAvg = (entity.getCrew().getGunnery() + entity.getCrew().getPiloting()) / 2.0;
         double xpCap = 0;
         int spaCap = 0;
-        
+
         // elite
         if (skillAvg < 3) {
             xpCap = maxAbilityXPCost;
@@ -165,14 +166,24 @@ public class CrewSkillUpgrader {
                         spaValue = pickRandomWeapon(entity, true);
                         break;
                     default:
-                        if ((entity.getCrew() == null) ||
-                                (entity.getCrew().getOptions() == null) ||
-                                (entity.getCrew().getOptions(spa.getName()) == null)) {
+                        // If there's no crew, stop looking for SPAs
+                        if (entity.getCrew() == null) {
                             return 0;
+                            // If we can't access the option, try a different one
+                        } else if ((entity.getCrew().getOptions() == null) ||
+                                (entity.getCrew().getOptions(spa.getName()) == null) ||
+                                (!entity.getCrew().getOptions(spa.getName()).hasMoreElements())) {
+                            continue;
                         }
 
-                        entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
-                        return spa.getCost();
+                        // If the option has a name but isn't defined, try another one
+                        try {
+                            entity.getCrew().getOptions().getOption(spa.getName()).setValue(true);
+                            return spa.getCost();
+                        } catch (NullPointerException e) {
+                            LogManager.getLogger().warn("Attempted to assign SPA '" + spa.getName() + "' but SPA not found.");
+                            continue;
+                        }
                 }
 
                 // Assign the SPA, unless it was unable to pick a random weapon/specialization for whatever reason
