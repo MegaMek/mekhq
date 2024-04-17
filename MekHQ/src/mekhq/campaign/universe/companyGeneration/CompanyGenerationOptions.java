@@ -153,9 +153,9 @@ public class CompanyGenerationOptions {
         // Personnel
         final Map<PersonnelRole, Integer> supportPersonnel = new HashMap<>();
         if (method.isWindchild()) {
-            supportPersonnel.put(PersonnelRole.MECH_TECH, 5);
-            supportPersonnel.put(PersonnelRole.MECHANIC, 1);
-            supportPersonnel.put(PersonnelRole.AERO_TECH, 1);
+            supportPersonnel.put(PersonnelRole.MECH_TECH, 7);
+            supportPersonnel.put(PersonnelRole.MECHANIC, 0);
+            supportPersonnel.put(PersonnelRole.AERO_TECH, 0);
             supportPersonnel.put(PersonnelRole.DOCTOR, 1);
             supportPersonnel.put(PersonnelRole.ADMINISTRATOR_COMMAND, 1);
             supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 1);

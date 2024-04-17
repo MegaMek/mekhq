@@ -93,7 +93,7 @@ public class CivilianRiotBuiltInScenario extends AtBScenario {
                                        ArrayList<Entity> enemyEntities) {
         // north, south, east, west
         int boardEdge = (Compute.randomInt(4) + 1) * 2;
-        setStart(boardEdge);
+        setStartingPos(boardEdge);
 
         // TODO: only units with machine guns, flamers, or sm lasers
         for (int i = 0; i < 4; i++) {

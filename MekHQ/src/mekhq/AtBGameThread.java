@@ -21,10 +21,12 @@ package mekhq;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.*;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.campaign.force.Force;
+import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -36,6 +38,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.Comparator;
+
 
 /**
  * Enhanced version of GameThread which imports settings and non-player units into the MM game
@@ -164,7 +168,15 @@ public class AtBGameThread extends GameThread {
                 client.sendPlanetaryConditions(planetaryConditions);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
-                client.getLocalPlayer().setStartingPos(scenario.getStart());
+                // set player deployment
+                client.getLocalPlayer().setStartingPos(scenario.getStartingPos());
+                client.getLocalPlayer().setStartOffset(scenario.getStartOffset());
+                client.getLocalPlayer().setStartWidth(scenario.getStartWidth());
+                client.getLocalPlayer().setStartingAnyNWx(scenario.getStartingAnyNWx());
+                client.getLocalPlayer().setStartingAnyNWy(scenario.getStartingAnyNWy());
+                client.getLocalPlayer().setStartingAnySEx(scenario.getStartingAnySEx());
+                client.getLocalPlayer().setStartingAnySEy(scenario.getStartingAnySEy());
+
                 client.getLocalPlayer().setTeam(1);
 
                 // minefields
@@ -435,8 +447,17 @@ public class AtBGameThread extends GameThread {
                 LogManager.getLogger().error("Could not configure bot " + botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
-                botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
+                //set deployment
+                botClient.getLocalPlayer().setStartingPos(botForce.getStartingPos());
+                botClient.getLocalPlayer().setStartOffset(botForce.getStartOffset());
+                botClient.getLocalPlayer().setStartWidth(botForce.getStartWidth());
+                botClient.getLocalPlayer().setStartingAnyNWx(botForce.getStartingAnyNWx());
+                botClient.getLocalPlayer().setStartingAnyNWy(botForce.getStartingAnyNWy());
+                botClient.getLocalPlayer().setStartingAnySEx(botForce.getStartingAnySEx());
+                botClient.getLocalPlayer().setStartingAnySEy(botForce.getStartingAnySEy());
+
+                // set camo
                 botClient.getLocalPlayer().setCamouflage(botForce.getCamouflage().clone());
                 botClient.getLocalPlayer().setColour(botForce.getColour());
 
@@ -448,6 +469,59 @@ public class AtBGameThread extends GameThread {
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
+    }
+
+    @Override
+    protected List<Entity> setupBotEntities(BotClient botClient, BotForce botForce, Scenario scenario) {
+        String forceName = botClient.getLocalPlayer().getName() + "|0||%s Lance|%s||";
+        var entities = new ArrayList<Entity>();
+        int i = 0;
+        int forceIdLance = 1;
+        String lastType = "";
+        final RandomCallsignGenerator RCG = RandomCallsignGenerator.getInstance();
+        String lanceName = RCG.generate();
+        botForce.generateRandomForces(units, campaign);
+        List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
+        AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
+        int lanceSize;
+
+        if (botForce.getTeam() == 2) {
+            lanceSize = Lance.getStdLanceSize(contract.getEnemy());
+        } else {
+            lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
+        }
+
+        Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
+        comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
+        comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
+        entitiesSorted.sort(comp);
+
+        for (Entity entity : entitiesSorted) {
+            if (null == entity) {
+                continue;
+            }
+
+            if ((i != 0)
+                    && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
+                forceIdLance++;
+                lanceName = RCG.generate();
+                i = forceIdLance * lanceSize;
+            }
+
+            lastType = entity.getEntityMajorTypeName(entity.getEntityType());
+            entity.setOwner(botClient.getLocalPlayer());
+            String fName = String.format(forceName, lanceName, forceIdLance);
+            entity.setForceString(fName);
+            entities.add(entity);
+            i++;
+
+            if (i % lanceSize == 0) {
+                forceIdLance++;
+                lanceName = RCG.generate();
+            }
+        }
+
+        return entities;
     }
 
     /**

@@ -68,13 +68,13 @@ public class ChaseBuiltInScenario extends AtBScenario {
         int destinationEdge = startNorth ? Board.START_S : Board.START_N;
         int startEdge = startNorth ? Board.START_N : Board.START_S;
 
-        setStart(startEdge);
+        setStartingPos(startEdge);
         setEnemyHome(destinationEdge);
 
         BotForce allyEntitiesForce = null;
 
         if (!allyEntities.isEmpty()) {
-            allyEntitiesForce = getAllyBotForce(getContract(campaign), getStart(), destinationEdge, allyEntities);
+            allyEntitiesForce = getAllyBotForce(getContract(campaign), getStartingPos(), destinationEdge, allyEntities);
             addBotForce(allyEntitiesForce, campaign);
         }
 
@@ -141,7 +141,7 @@ public class ChaseBuiltInScenario extends AtBScenario {
 
         ScenarioObjective destroyHostiles = isAttacker()
                 ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 1, 50,
-                        OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStart())))
+                        OffBoardDirection.translateBoardStart(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos())))
                 : CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 1, 50,
                         OffBoardDirection.translateBoardStart(getEnemyHome()));
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,

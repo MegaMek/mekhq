@@ -184,7 +184,7 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
         contentPane.add(dateField, BorderLayout.SOUTH);
         dateField.setColumns(10);
 
-        setResizable(false);
+        //setResizable(false);
         ready = false;
         pack();
 

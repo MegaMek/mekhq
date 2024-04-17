@@ -196,6 +196,7 @@ task stageFiles(type: Copy) {
     include "${data}/stratconbiomedefinitions/"
     include "${data}/stratconcontractdefinitions/"
     include "${data}/stratconfacilities/"
+    include "${data}/terrainconditionsodds/"
     include "${docs}/**"
     include "${mmconf}/**"
     include "${project.ext.plugins}/"
