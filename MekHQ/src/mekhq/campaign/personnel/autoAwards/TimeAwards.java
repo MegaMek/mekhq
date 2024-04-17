@@ -42,10 +42,16 @@ public class TimeAwards {
             }
 
             if (award.canBeAwarded(person)) {
-                yearsOfService = Integer.parseInt(Pattern.compile("\\s+")
-                        .splitAsStream(person.getTimeInService(campaign))
-                        .findFirst()
-                        .orElseThrow());
+                try {
+                    yearsOfService = Integer.parseInt(Pattern.compile("\\s+")
+                            .splitAsStream(person.getTimeInService(campaign))
+                            .findFirst()
+                            .orElseThrow());
+                } catch (Exception e) {
+                    LogManager.getLogger().error("Unable to parse yearsOfService for {} while processing Award {} from the [{}] set",
+                            person.getFullName(), award.getName(), award.getSet());
+                    continue;
+                }
 
                 if (isCumulative) {
                     requiredYearsOfService *= person.getAwardController().getNumberOfAwards(award) + 1;

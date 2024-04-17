@@ -116,9 +116,14 @@ public class TheatreOfWarAwards {
     private boolean isDuringWartime (List<String> wartime, int contractStartYear, int currentYear) {
         int contractLength = currentYear - contractStartYear;
 
-        return IntStream.rangeClosed(0, contractLength).map(year -> contractStartYear + year)
-                .anyMatch(checkYear -> (checkYear >= Integer.parseInt(wartime.get(0)))
-                        && (checkYear <= Integer.parseInt(wartime.get(1))));
+        try {
+            return IntStream.rangeClosed(0, contractLength).map(year -> contractStartYear + year)
+                    .anyMatch(checkYear -> (checkYear >= Integer.parseInt(wartime.get(0)))
+                            && (checkYear <= Integer.parseInt(wartime.get(1))));
+        } catch (Exception e) {
+            LogManager.getLogger().error("Failed to parse isDuringWartime. Returning false.");
+            return false;
+        }
     }
 
     /**

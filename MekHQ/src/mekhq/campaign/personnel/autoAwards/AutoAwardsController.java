@@ -34,7 +34,8 @@ public class AutoAwardsController {
 
     /**
      * The primary controller for the automatic processing of Awards
-     * @param campaign the campaign to be processed
+     * @param c the campaign to be processed
+     * @param m the mission just completed
      * @param missionWasSuccessful @Nullable true if Mission was a complete Success, otherwise false, should also be false if not run at the end of a Mission
      */
     public AutoAwardsController(Campaign c, Mission m, Boolean missionWasSuccessful) {

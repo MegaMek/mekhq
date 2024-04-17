@@ -246,7 +246,6 @@ public class KillAwards {
      * @param mission the mission just completed
      * @param forceId the Id for the force we want to parse
      * @param filterOtherMissionKills true if we should only count kills from the mission just completed
-     * @param rollingKillCount the kill count in the previous iteration, should be 0 if called romotely
      */
     private int getAllForceKills(Campaign campaign, Mission mission, int forceId, boolean filterOtherMissionKills) {
         int killCount = 0;
