@@ -23,10 +23,7 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.client.ui.swing.lobby.LobbyUtility;
-import megamek.common.Board;
-import megamek.common.Entity;
-import megamek.common.IStartingPositions;
-import megamek.common.MapSettings;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.*;
 import mekhq.MekHQ;
@@ -52,7 +49,7 @@ import java.util.*;
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Scenario {
+public class Scenario implements IPlayerSettings {
     //region Variable Declarations
     public static final int S_DEFAULT_ID = -1;
 
@@ -239,58 +236,72 @@ public class Scenario {
         return terrainType;
     }
 
+    @Override
     public int getStartingPos() {
         return startingPos;
     }
 
+    @Override
     public void setStartingPos(int start) {
         this.startingPos = start;
     }
 
+    @Override
     public int getStartOffset() {
         return startOffset;
     }
 
+    @Override
     public void setStartOffset(int startOffset) {
         this.startOffset = startOffset;
     }
 
+    @Override
     public int getStartWidth() {
         return startWidth;
     }
 
+    @Override
     public void setStartWidth(int startWidth) {
         this.startWidth = startWidth;
     }
 
+    @Override
     public int getStartingAnyNWx() {
         return startingAnyNWx;
     }
 
+    @Override
     public void setStartingAnyNWx(int startingAnyNWx) {
         this.startingAnyNWx = startingAnyNWx;
     }
 
+    @Override
     public int getStartingAnyNWy() {
         return startingAnyNWy;
     }
 
+    @Override
     public void setStartingAnyNWy(int startingAnyNWy) {
         this.startingAnyNWy = startingAnyNWy;
     }
 
+    @Override
     public int getStartingAnySEx() {
         return startingAnySEx;
     }
 
+    @Override
     public void setStartingAnySEx(int startingAnySEx) {
         this.startingAnySEx = startingAnySEx;
     }
 
+    @Override
     public int getStartingAnySEy() {
         return startingAnySEy;
     }
 
+    @Override
     public void setStartingAnySEy(int startingAnySEy) {
         this.startingAnySEy = startingAnySEy;
     }
