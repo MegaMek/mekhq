@@ -151,7 +151,10 @@ public class CustomizeScenarioDialog extends JDialog {
 
         planetaryConditions = scenario.createPlanetaryConditions();
 
-        botForces = scenario.getBotForces().stream().collect(Collectors.toList());
+        botForces = new ArrayList<>();
+        for(BotForce bf : scenario.getBotForces()) {
+            botForces.add(bf.clone());
+        }
         forcesModel = new BotForceTableModel(botForces, campaign);
 
         loots = new ArrayList<>();

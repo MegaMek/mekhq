@@ -125,7 +125,8 @@ public class BotForceRandomizer {
     }
     //endregion Constructors
 
-    public BotForceRandomizer getCopy() {
+    @Override
+    public BotForceRandomizer clone() {
         BotForceRandomizer copy = new BotForceRandomizer();
         copy.setFactionCode(this.getFactionCode());
         copy.skill = this.skill;

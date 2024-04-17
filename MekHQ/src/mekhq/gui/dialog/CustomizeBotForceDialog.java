@@ -109,7 +109,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         }
         useRandomUnits = botForce.getBotForceRandomizer() != null;
         if(useRandomUnits) {
-            randomizer = botForce.getBotForceRandomizer().getCopy();
+            randomizer = botForce.getBotForceRandomizer().clone();
         } else {
             randomizer = new BotForceRandomizer();
         }

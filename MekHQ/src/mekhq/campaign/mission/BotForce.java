@@ -40,6 +40,7 @@ import org.w3c.dom.NodeList;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BotForce implements IPlayerSettings {
     private transient final UnitNameTracker nameTracker = new UnitNameTracker();
@@ -106,7 +107,8 @@ public class BotForce implements IPlayerSettings {
         behaviorSettings.setDestinationEdge(CardinalEdge.NONE);
     }
 
-    public BotForce getCopy() {
+    @Override
+    public BotForce clone() {
         final BotForce copy = new BotForce();
         copy.setName(this.getName());
         copy.setTeam(this.getTeam());
@@ -118,9 +120,26 @@ public class BotForce implements IPlayerSettings {
         copy.setStartingAnySEx(this.getStartingAnySEx());
         copy.setStartingAnySEy(this.getStartingAnySEy());
         copy.setDeployRound(this.getDeployRound());
-        copy.setCamouflage(this.getCamouflage());
+        copy.setCamouflage(this.getCamouflage().clone());
         copy.setColour(this.getColour());
-        //copy.setBehaviorSettings(getBehaviorSettings().clone());
+        copy.setTemplateName(this.getTemplateName());
+        if(this.getBotForceRandomizer() != null) {
+            copy.setBotForceRandomizer(this.getBotForceRandomizer().clone());
+        }
+        // UUID is immutable so this should work
+        copy.traitors = traitors.stream().collect(Collectors.toList());
+        copy.setBehaviorSettings(new BehaviorSettings());
+        copy.getBehaviorSettings().setAutoFlee(this.getBehaviorSettings().shouldAutoFlee());
+        copy.getBehaviorSettings().setForcedWithdrawal(this.getBehaviorSettings().isForcedWithdrawal());
+        copy.getBehaviorSettings().setDestinationEdge(this.getBehaviorSettings().getDestinationEdge());
+        copy.getBehaviorSettings().setRetreatEdge(this.getBehaviorSettings().getRetreatEdge());
+        copy.getBehaviorSettings().setBraveryIndex(this.getBehaviorSettings().getBraveryIndex());
+        copy.getBehaviorSettings().setFallShameIndex(this.getBehaviorSettings().getFallShameIndex());
+        copy.getBehaviorSettings().setHyperAggressionIndex(this.getBehaviorSettings().getHyperAggressionIndex());
+        copy.getBehaviorSettings().setSelfPreservationIndex(this.getBehaviorSettings().getSelfPreservationIndex());
+        copy.getBehaviorSettings().setHerdMentalityIndex(this.getBehaviorSettings().getHerdMentalityIndex());
+        // this bit of trickery seems to work to make a proper copy of the entity list
+        copy.fixedEntityList = this.getFixedEntityListDirect().stream().collect(Collectors.toList());
 
         return copy;
     }
