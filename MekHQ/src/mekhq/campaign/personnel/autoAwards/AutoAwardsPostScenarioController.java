@@ -22,14 +22,13 @@ public class AutoAwardsPostScenarioController {
     final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
             MekHQ.getMHQOptions().getLocale());
 
-
     /**
-     * This creates a list of Kill Awards where item == scenario. It then loops through these Awards checking eligibility
+     * This function processes Kill(Scenario) and Injury Awards following the conclusion of a Scenario
      *
-     * @param campaign    the campaign to be processed
-     * @param scenarioId  the Id number for the scenario just completed
-     * @param person      the person to check award eligibility for
-     * @param injuryCount
+     * @param c the campaign to be processed
+     * @param scenarioId Id number for the Scenario just concluded
+     * @param p the person to check award eligibility for
+     * @param injuryCount the number of Hits sustained in the Scenario just concluded
      */
     public AutoAwardsPostScenarioController(Campaign c, int scenarioId, Person p, int injuryCount) {
         LogManager.getLogger().info("autoAwards (Mission Conclusion) has started");
@@ -97,6 +96,11 @@ public class AutoAwardsPostScenarioController {
         }
     }
 
+    /**
+     * This function processes Injury Awards and spits out eligibility into the Daily Report
+     *
+     * @param injuryCount the number of Hits sustained in the Scenario just concluded
+     */
     private void processInjuryAwards(int injuryCount) {
         int injuriesNeeded;
 
@@ -117,6 +121,11 @@ public class AutoAwardsPostScenarioController {
         }
     }
 
+    /**
+     * This function processes Kill(Scenario) Awards and spits out eligibility into the Daily Report
+     *
+     * @param kills a list of eligible kills
+     */
     private void processKillAwards(List<Kill> kills) {
         int killsNeeded;
 
