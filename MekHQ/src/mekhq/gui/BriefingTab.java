@@ -398,12 +398,9 @@ public final class BriefingTab extends CampaignGuiTab {
             ((AtBContract) mission).checkForFollowup(getCampaign());
         }
 
-        // for the purposes of Mission Accomplished awards, do not count partial Successes
-        if (Objects.equals(String.valueOf(cmd.getStatus()), "Success")) {
-            new AutoAwardsController(getCampaign(), mission, true);
-        } else {
-            new AutoAwardsController(getCampaign(), mission, false);
-        }
+        // for the purposes of Mission Accomplished awards, do not count partial Successes as Success
+        new AutoAwardsController(getCampaign(), mission,
+                Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
 
         final List<Mission> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));

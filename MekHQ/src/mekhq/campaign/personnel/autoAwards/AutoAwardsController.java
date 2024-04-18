@@ -35,11 +35,11 @@ public class AutoAwardsController {
     /**
      * The primary controller for the automatic processing of Awards
      * @param c the campaign to be processed
-     * @param m the mission just completed
+     * @param m the mission just completed (null if not triggered at the conclusion of a Mission)
      * @param missionWasSuccessful @Nullable true if Mission was a complete Success, otherwise false, should also be false if not run at the end of a Mission
      */
     public AutoAwardsController(Campaign c, Mission m, Boolean missionWasSuccessful) {
-        LogManager.getLogger().info("autoAwards has started");
+        LogManager.getLogger().info("autoAwards (Mission Conclusion) has started");
 
         campaign = c;
         mission = m;

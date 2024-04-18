@@ -199,7 +199,6 @@ public class KillAwards {
             }
 
             if (killCount >= killsNeeded) {
-                LogManager.getLogger().info("Eligible for {}", award.getName());
                 // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString()
                 campaign.addReport(person.getHyperlinkedName() + ' ' +
                         MessageFormat.format(resource.getString("EligibleForAwardReport.format"),
