@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AutoAwardsController {
+public class AutoAwardsPostMissionController {
     private Campaign campaign;
     private Mission mission;
 
@@ -38,7 +38,7 @@ public class AutoAwardsController {
      * @param m the mission just completed (null if not triggered at the conclusion of a Mission)
      * @param missionWasSuccessful @Nullable true if Mission was a complete Success, otherwise false, should also be false if not run at the end of a Mission
      */
-    public AutoAwardsController(Campaign c, Mission m, Boolean missionWasSuccessful) {
+    public AutoAwardsPostMissionController(Campaign c, Mission m, Boolean missionWasSuccessful) {
         LogManager.getLogger().info("autoAwards (Mission Conclusion) has started");
 
         campaign = c;
@@ -165,13 +165,11 @@ public class AutoAwardsController {
                             case "factionhunter":
                                 factionHunterAwards.add(award);
                                 break;
-                            // TODO track InjuryAwards at the end of a scenario
                             // InjuryAwards are issued immediately after a scenario
                             // We include them here, for tracking purposes
                             case "injury":
                                 injuryAwards.add(award);
                                 break;
-                            // TODO kill awards
                             case "kill":
                                 killAwards.add(award);
                                 break;

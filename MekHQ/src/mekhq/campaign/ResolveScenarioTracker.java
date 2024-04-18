@@ -37,7 +37,7 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.autoAwards.ScenarioKillAwards;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsPostScenarioController;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.TestUnit;
@@ -1436,7 +1436,13 @@ public class ResolveScenarioTracker {
             // TODO add Posthumous Awards to Campaign Options
             boolean fakeCampaignOptionPosthumousAwardsIsEnabled = false;
             if (!person.getStatus().isDead() || fakeCampaignOptionPosthumousAwardsIsEnabled) {
-                new ScenarioKillAwards(campaign, scenario.getId(), person);
+                int injuryCount = 0;
+
+                if (status.getHits() > person.getHits()) {
+                    injuryCount = status.getHits() - person.getHits();
+                }
+
+                new AutoAwardsPostScenarioController(campaign, scenario.getId(), person, injuryCount);
             }
         }
 
