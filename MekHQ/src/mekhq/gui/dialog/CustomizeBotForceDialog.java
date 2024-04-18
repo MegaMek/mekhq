@@ -99,7 +99,7 @@ public class CustomizeBotForceDialog  extends JDialog {
             botForce = bf;
         }
         campaign = c;
-        player = Utilities.createPlayer(bf);
+        player = Utilities.createPlayer(botForce);
         camo = botForce.getCamouflage();
         behavior = new BehaviorSettings();
         try {
