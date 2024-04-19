@@ -1304,21 +1304,36 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 StringBuilder awardMenuItem = new StringBuilder();
                 awardMenuItem.append(String.format("%s", award.getName()));
 
-                if ((award.getXPReward() != 0) || (award.getEdgeReward() != 0)) {
-                    awardMenuItem.append(" (");
+                if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isBoth()) {
+                    if ((award.getXPReward() != 0) || (award.getEdgeReward() != 0)) {
+                        awardMenuItem.append(" (");
 
-                    if (award.getXPReward() != 0) {
-                        awardMenuItem.append(award.getXPReward()).append(" XP");
-                        if (award.getEdgeReward() != 0) {
-                            awardMenuItem.append(" & ");
+                        if (award.getXPReward() != 0) {
+                            awardMenuItem.append(award.getXPReward()).append(" XP");
+                            if (award.getEdgeReward() != 0) {
+                                awardMenuItem.append(" & ");
+                            }
                         }
+
+                        if (award.getEdgeReward() != 0) {
+                            awardMenuItem.append(award.getEdgeReward()).append(" Edge");
+                        }
+
+                        awardMenuItem.append(")");
                     }
+                } else if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isXP()) {
+                    if (award.getXPReward() != 0) {
+                        awardMenuItem.append(" (");
+
+                        awardMenuItem.append(award.getXPReward()).append(" XP)");
+                    }
+                } else if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isEdge()) {
 
                     if (award.getEdgeReward() != 0) {
-                        awardMenuItem.append(award.getEdgeReward()).append(" Edge");
-                    }
+                        awardMenuItem.append(" (");
 
-                    awardMenuItem.append(")");
+                        awardMenuItem.append(award.getEdgeReward()).append(" Edge)");
+                    }
                 }
 
                 menuItem = new JMenuItem(awardMenuItem.toString());

@@ -156,7 +156,7 @@ public class AutoAwardsPostScenarioController {
      * If the relevant Campaign Option is enabled, this function will find the best Award Person is eligible for.
      * It will then post eligibility to the Daily Report pane
      * Otherwise, it will just post eligibility to the Daily Report pane for all eligible Awards
-     * @param award the award to be announced
+     * @param eligibleAwards the awards Person is eligible to receive
      */
     private void processBestAward (List<Award> eligibleAwards) {
         Award bestAward = new Award();
