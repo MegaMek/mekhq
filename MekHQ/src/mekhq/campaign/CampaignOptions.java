@@ -2262,7 +2262,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @param enable whether to issue only the best award or not
+     * @param issueBestAwardOnly whether to issue only the best award or not
      */
     public void setIssueBestAwardOnly(final boolean issueBestAwardOnly) {
         this.issueBestAwardOnly = issueBestAwardOnly;
@@ -2333,7 +2333,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @param enableFactionHunterAwards true to enable tracking of award eligibility for awards of this type
+     * @param enableInjuryAwards true to enable tracking of award eligibility for awards of this type
      */
     public void setEnableInjuryAwards(final boolean enableInjuryAwards) {
         this.enableInjuryAwards = enableInjuryAwards;
