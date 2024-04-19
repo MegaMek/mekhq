@@ -399,8 +399,10 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // for the purposes of Mission Accomplished awards, do not count partial Successes as Success
-        new AutoAwardsPostMissionController(getCampaign(), mission,
-                Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
+        if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+            new AutoAwardsPostMissionController(getCampaign(), mission,
+                    Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
+        }
 
         final List<Mission> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));

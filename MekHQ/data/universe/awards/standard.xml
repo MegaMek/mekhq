@@ -129,7 +129,7 @@
 		<qty>1</qty>
 		<item>Injury</item>
 		<size>Individual</size>
-		<range>Event</range>
+		<range>Scenario</range>
 	</award>
 	<award>
 		<name>House Meritorious Service</name>

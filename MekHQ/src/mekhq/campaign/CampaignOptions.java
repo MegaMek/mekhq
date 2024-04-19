@@ -317,6 +317,22 @@ public class CampaignOptions {
     private double[] exponentialRandomDeathFemaleValues;
     private Map<TenYearAgeRange, Double> ageRangeRandomDeathMaleValues;
     private Map<TenYearAgeRange, Double> ageRangeRandomDeathFemaleValues;
+
+    // Awards
+    private boolean issuePosthumousAwards;
+    private boolean issueBestAwardOnly;
+    private AwardBonus awardBonusStyle;
+    private boolean enableAutoAwards;
+    private boolean enableContractAwards;
+    private boolean enableFactionHunterAwards;
+    private boolean enableInjuryAwards;
+    private boolean enableKillAwards;
+    private boolean enableRankAwards;
+    private boolean enableScenarioAwards;
+    private boolean enableSkillAwards;
+    private boolean enableTheatreOfWarAwards;
+    private boolean enableTimeAwards;
+    private boolean enableMiscAwards;
     //endregion Personnel Tab
 
     //region Finance tab
@@ -801,6 +817,22 @@ public class CampaignOptions {
         getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.SIXTY_FIVE_SEVENTY_FOUR, 1421.0);
         getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.SEVENTY_FIVE_EIGHTY_FOUR, 3788.0);
         getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.EIGHTY_FIVE_OR_OLDER, 12870.0);
+
+        // Awards
+        setIssuePosthumousAwards(false);
+        setIssueBestAwardOnly(true);
+        setAwardBonusStyle(AwardBonus.BOTH);
+        setEnableAutoAwards(true);
+        setEnableContractAwards(true);
+        setEnableFactionHunterAwards(true);
+        setEnableInjuryAwards(true);
+        setEnableKillAwards(true);
+        setEnableRankAwards(true);
+        setEnableScenarioAwards(true);
+        setEnableSkillAwards(true);
+        setEnableTheatreOfWarAwards(true);
+        setEnableTimeAwards(true);
+        setEnableMiscAwards(true);
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -2205,6 +2237,206 @@ public class CampaignOptions {
         this.ageRangeRandomDeathFemaleValues = ageRangeRandomDeathFemaleValues;
     }
     //endregion Death
+
+    //region Awards
+    /**
+     * @return whether to issue awards to dead personnel
+     */
+    public boolean isIssuePosthumousAwards() {
+        return issuePosthumousAwards;
+    }
+
+    /**
+     * @param issuePosthumousAwards whether to issue awards to dead personnel or not
+     */
+    public void setIssuePosthumousAwards(final boolean issuePosthumousAwards) {
+        this.issuePosthumousAwards = issuePosthumousAwards;
+    }
+
+    /**
+     * @return whether to issue only the best award, if personnel are eligible for multiple awards of
+     * the same type
+     */
+    public boolean isIssueBestAwardOnly() {
+        return issueBestAwardOnly;
+    }
+
+    /**
+     * @param enable whether to issue only the best award or not
+     */
+    public void setIssueBestAwardOnly(final boolean issueBestAwardOnly) {
+        this.issueBestAwardOnly = issueBestAwardOnly;
+    }
+
+
+    /**
+     * @return what style of Award bonuses are enabled (if any)
+     */
+    public AwardBonus getAwardBonusStyle() {
+        return awardBonusStyle;
+    }
+
+    /**
+     * @param awardBonusStyle type of Award bonuses to enable
+     */
+    public void setAwardBonusStyle(final AwardBonus awardBonusStyle) {
+        this.awardBonusStyle = awardBonusStyle;
+    }
+
+    /**
+     * @return whether to enable autoAwards
+     */
+    public boolean isEnableAutoAwards() {
+        return enableAutoAwards;
+    }
+
+    /**
+     * @param enableAutoAwards whether to enable autoAwards or not
+     */
+    public void setEnableAutoAwards(final boolean enableAutoAwards) {
+        this.enableAutoAwards = enableAutoAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableContractAwards() {
+        return enableContractAwards;
+    }
+
+    /**
+     * @param enableContractAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableContractAwards(final boolean enableContractAwards) {
+        this.enableContractAwards = enableContractAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableFactionHunterAwards() {
+        return enableFactionHunterAwards;
+    }
+
+    /**
+     * @param enableFactionHunterAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableFactionHunterAwards(final boolean enableFactionHunterAwards) {
+        this.enableFactionHunterAwards = enableFactionHunterAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableInjuryAwards() {
+        return enableInjuryAwards;
+    }
+
+    /**
+     * @param enableFactionHunterAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableInjuryAwards(final boolean enableInjuryAwards) {
+        this.enableInjuryAwards = enableInjuryAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableKillAwards() {
+        return enableKillAwards;
+    }
+
+    /**
+     * @param enableKillAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableKillAwards(final boolean enableKillAwards) {
+        this.enableKillAwards = enableKillAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableRankAwards() {
+        return enableRankAwards;
+    }
+
+    /**
+     * @param enableRankAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableRankAwards(final boolean enableRankAwards) {
+        this.enableRankAwards = enableRankAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableScenarioAwards() {
+        return enableScenarioAwards;
+    }
+
+    /**
+     * @param enableScenarioAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableScenarioAwards(final boolean enableScenarioAwards) {
+        this.enableScenarioAwards = enableScenarioAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableSkillAwards() {
+        return enableSkillAwards;
+    }
+
+    /**
+     * @param enableSkillAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableSkillAwards(final boolean enableSkillAwards) {
+        this.enableSkillAwards = enableSkillAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableTheatreOfWarAwards() {
+        return enableTheatreOfWarAwards;
+    }
+
+    /**
+     * @param enableTheatreOfWarAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableTheatreOfWarAwards(final boolean enableTheatreOfWarAwards) {
+        this.enableTheatreOfWarAwards = enableTheatreOfWarAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableTimeAwards() {
+        return enableTimeAwards;
+    }
+
+    /**
+     * @param enableTimeAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableTimeAwards(final boolean enableTimeAwards) {
+        this.enableTimeAwards = enableTimeAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableMiscAwards() {
+        return enableMiscAwards;
+    }
+
+    /**
+     * @param enableMiscAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableMiscAwards(final boolean enableMiscAwards) {
+        this.enableMiscAwards = enableMiscAwards;
+    }
+    //endregion Awards
     //endregion Personnel Tab
 
     //region Finances Tab
@@ -3745,6 +3977,21 @@ public class CampaignOptions {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathFemaleValues");
         //endregion Death
+
+        //region Awards
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issuePosthumousAwards", isIssuePosthumousAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issueBestAwardOnly", isIssueBestAwardOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", isEnableAutoAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableContractAwards", isEnableContractAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFactionHunterAwards", isEnableFactionHunterAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableKillAwards", isEnableKillAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRankAwards", isEnableRankAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableScenarioAwards", isEnableScenarioAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableSkillAwards", isEnableSkillAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTheatreOfWarAwards", isEnableTheatreOfWarAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTimeAwards", isEnableTimeAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableMiscAwards", isEnableMiscAwards());
+        //endregion Awards
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -4457,6 +4704,35 @@ public class CampaignOptions {
                         }
                     }
                 //endregion Death
+
+                //region Awards
+                } else if (wn2.getNodeName().equalsIgnoreCase("issuePosthumousAwards")) {
+                    retVal.setIssuePosthumousAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("issueBestAwardOnly")) {
+                    retVal.setIssueBestAwardOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableAutoAwards")) {
+                    retVal.setEnableAutoAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableContractAwards")) {
+                    retVal.setEnableContractAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableFactionHunterAwards")) {
+                    retVal.setEnableFactionHunterAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableInjuryAwards")) {
+                    retVal.setEnableInjuryAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableKillAwards")) {
+                    retVal.setEnableKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableRankAwards")) {
+                    retVal.setEnableRankAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableScenarioAwards")) {
+                    retVal.setEnableScenarioAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableSkillAwards")) {
+                    retVal.setEnableSkillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableTheatreOfWarAwards")) {
+                    retVal.setEnableTheatreOfWarAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableTimeAwards")) {
+                    retVal.setEnableTimeAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableMiscAwards")) {
+                    retVal.setEnableMiscAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Awards
                 //endregion Personnel Tab
 
                 //region Finances Tab

@@ -312,6 +312,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JLabel lblPercentageRandomProcreationRelationshiplessChance;
     private JSpinner spnPercentageRandomProcreationRelationshiplessChance;
 
+    // Awards
+    private JCheckBox chkIssuePosthumousAwards;
+    private JCheckBox chkIssueBestAwardOnly;
+    private MMComboBox<AwardBonus> comboAwardBonusStyle;
+    private JCheckBox chkEnableAutoAwards;
+    private JCheckBox chkEnableContractAwards;
+    private JCheckBox chkEnableFactionHunterAwards;
+    private JCheckBox chkEnableInjuryAwards;
+    private JCheckBox chkEnableKillAwards;
+    private JCheckBox chkEnableRankAwards;
+    private JCheckBox chkEnableScenarioAwards;
+    private JCheckBox chkEnableSkillAwards;
+    private JCheckBox chkEnableTheatreOfWarAwards;
+    private JCheckBox chkEnableTimeAwards;
+    private JCheckBox chkEnableMiscAwards;
+
     // Death
     private JCheckBox chkKeepMarriedNameUponSpouseDeath;
     private MMComboBox<RandomDeathMethod> comboRandomDeathMethod;
@@ -3276,6 +3292,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseTimeInRank.setSelected(true);
         chkUseTimeInRank.doClick();
 
+        // Hook Awards panel
+        final JPanel awardsPanel = createAwardsPanel();
+
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("expandedPersonnelInformationPanel.title")));
@@ -3299,6 +3318,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkTrackTotalEarnings)
                         .addComponent(chkTrackTotalXPEarnings)
                         .addComponent(chkShowOriginFaction)
+                        .addComponent(awardsPanel)
         );
 
         layout.setHorizontalGroup(
@@ -3314,6 +3334,177 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkTrackTotalEarnings)
                         .addComponent(chkTrackTotalXPEarnings)
                         .addComponent(chkShowOriginFaction)
+                        .addComponent(awardsPanel)
+        );
+
+        return panel;
+    }
+
+    private JPanel createAwardsPanel() {
+        // Create Panel Components
+        final JPanel autoAwardsPanel = createAutoAwardsPanel();
+
+        chkIssuePosthumousAwards = new JCheckBox(resources.getString("chkIssuePosthumousAwards.text"));
+        chkIssuePosthumousAwards.setToolTipText(resources.getString("chkIssuePosthumousAwards.toolTipText"));
+        chkIssuePosthumousAwards.setName("chkIssuePosthumousAwards");
+
+        chkIssueBestAwardOnly = new JCheckBox(resources.getString("chkIssueBestAwardOnly.text"));
+        chkIssueBestAwardOnly.setToolTipText(resources.getString("chkIssueBestAwardOnly.toolTipText"));
+        chkIssueBestAwardOnly.setName("chkIssueBestAwardOnly");
+
+        final JLabel lblAwardBonusStyle = new JLabel(resources.getString("lblAwardBonusStyle.text"));
+        lblAwardBonusStyle.setToolTipText(resources.getString("lblAwardBonusStyle.toolTipText"));
+        lblAwardBonusStyle.setName("lblAwardBonusStyle");
+
+        comboAwardBonusStyle = new MMComboBox<>("comboAwardBonusStyle", AwardBonus.values());
+        comboAwardBonusStyle.setToolTipText(resources.getString("lblAwardBonusStyle.toolTipText"));
+        comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AwardBonus) {
+                    list.setToolTipText(((AwardBonus) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
+        chkEnableAutoAwards = new JCheckBox(resources.getString("chkEnableAutoAwards.text"));
+        chkEnableAutoAwards.setToolTipText(resources.getString("chkEnableAutoAwards.toolTipText"));
+        chkEnableAutoAwards.setName("chkEnableAutoAwards");
+        chkEnableAutoAwards.addActionListener(e -> chkIssuePosthumousAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkIssueBestAwardOnly.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> autoAwardsPanel.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkEnableContractAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkEnableFactionHunterAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkEnableInjuryAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkEnableKillAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkEnableRankAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkEnableScenarioAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkEnableSkillAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkEnableTheatreOfWarAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkEnableTimeAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(e -> chkEnableMiscAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("awardsPanel.title")));
+        panel.setName("awardsPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblAwardBonusStyle)
+                                .addComponent(comboAwardBonusStyle))
+                        .addComponent(chkEnableAutoAwards)
+                        .addComponent(chkIssuePosthumousAwards)
+                        .addComponent(chkIssueBestAwardOnly)
+                        .addComponent(autoAwardsPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblAwardBonusStyle)
+                                .addComponent(comboAwardBonusStyle))
+                        .addComponent(chkEnableAutoAwards)
+                        .addComponent(chkIssuePosthumousAwards)
+                        .addComponent(chkIssueBestAwardOnly)
+                        .addComponent(autoAwardsPanel)
+        );
+
+        return panel;
+    }
+
+    private JPanel createAutoAwardsPanel() {
+        // Create Panel Components
+        chkEnableContractAwards = new JCheckBox(resources.getString("chkEnableContractAwards.text"));
+        chkEnableContractAwards.setToolTipText(resources.getString("chkEnableContractAwards.toolTipText"));
+        chkEnableContractAwards.setName("chkEnableContractAwards");
+
+        chkEnableFactionHunterAwards = new JCheckBox(resources.getString("chkEnableFactionHunterAwards.text"));
+        chkEnableFactionHunterAwards.setToolTipText(resources.getString("chkEnableFactionHunterAwards.toolTipText"));
+        chkEnableFactionHunterAwards.setName("chkEnableFactionHunterAwards");
+
+        chkEnableInjuryAwards = new JCheckBox(resources.getString("chkEnableInjuryAwards.text"));
+        chkEnableInjuryAwards.setToolTipText(resources.getString("chkEnableInjuryAwards.toolTipText"));
+        chkEnableInjuryAwards.setName("chkEnableInjuryAwards");
+
+        chkEnableKillAwards = new JCheckBox(resources.getString("chkEnableKillAwards.text"));
+        chkEnableKillAwards.setToolTipText(resources.getString("chkEnableKillAwards.toolTipText"));
+        chkEnableKillAwards.setName("chkEnableKillAwards");
+
+        chkEnableRankAwards = new JCheckBox(resources.getString("chkEnableRankAwards.text"));
+        chkEnableRankAwards.setToolTipText(resources.getString("chkEnableRankAwards.toolTipText"));
+        chkEnableRankAwards.setName("chkEnableRankAwards");
+
+        chkEnableScenarioAwards = new JCheckBox(resources.getString("chkEnableScenarioAwards.text"));
+        chkEnableScenarioAwards.setToolTipText(resources.getString("chkEnableScenarioAwards.toolTipText"));
+        chkEnableScenarioAwards.setName("chkEnableScenarioAwards");
+
+        chkEnableSkillAwards = new JCheckBox(resources.getString("chkEnableSkillAwards.text"));
+        chkEnableSkillAwards.setToolTipText(resources.getString("chkEnableSkillAwards.toolTipText"));
+        chkEnableSkillAwards.setName("chkEnableSkillAwards");
+
+        chkEnableTheatreOfWarAwards = new JCheckBox(resources.getString("chkEnableTheatreOfWarAwards.text"));
+        chkEnableTheatreOfWarAwards.setToolTipText(resources.getString("chkEnableTheatreOfWarAwards.toolTipText"));
+        chkEnableTheatreOfWarAwards.setName("chkEnableTheatreOfWarAwards");
+
+        chkEnableTimeAwards = new JCheckBox(resources.getString("chkEnableTimeAwards.text"));
+        chkEnableTimeAwards.setToolTipText(resources.getString("chkEnableTimeAwards.toolTipText"));
+        chkEnableTimeAwards.setName("chkEnableTimeAwards");
+
+        chkEnableMiscAwards = new JCheckBox(resources.getString("chkEnableMiscAwards.text"));
+        chkEnableMiscAwards.setToolTipText(resources.getString("chkEnableMiscAwards.toolTipText"));
+        chkEnableMiscAwards.setName("chkEnableMiscAwards");
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("autoAwardsPanel.title")));
+        panel.setName("autoAwardsPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createParallelGroup(Alignment.BASELINE)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(chkEnableContractAwards)
+                                .addComponent(chkEnableFactionHunterAwards)
+                                .addComponent(chkEnableInjuryAwards)
+                                .addComponent(chkEnableKillAwards)
+                                .addComponent(chkEnableRankAwards))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(chkEnableScenarioAwards)
+                                .addComponent(chkEnableSkillAwards)
+                                .addComponent(chkEnableTheatreOfWarAwards)
+                                .addComponent(chkEnableTimeAwards)
+                                .addComponent(chkEnableMiscAwards))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup()
+                                .addComponent(chkEnableContractAwards)
+                                .addComponent(chkEnableFactionHunterAwards)
+                                .addComponent(chkEnableInjuryAwards)
+                                .addComponent(chkEnableKillAwards)
+                                .addComponent(chkEnableRankAwards))
+                        .addGroup(layout.createParallelGroup()
+                                .addComponent(chkEnableScenarioAwards)
+                                .addComponent(chkEnableSkillAwards)
+                                .addComponent(chkEnableTheatreOfWarAwards)
+                                .addComponent(chkEnableTimeAwards)
+                                .addComponent(chkEnableMiscAwards))
         );
 
         return panel;
@@ -4803,13 +4994,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panel.setLayout(layout);
 
         layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomProcreationRelationshipChance)
-                                .addComponent(spnPercentageRandomProcreationRelationshipChance, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPercentageRandomProcreationRelationshiplessChance)
-                                .addComponent(spnPercentageRandomProcreationRelationshiplessChance, Alignment.LEADING))
+            layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPercentageRandomProcreationRelationshipChance)
+                    .addComponent(spnPercentageRandomProcreationRelationshipChance, Alignment.LEADING))
+                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                    .addComponent(lblPercentageRandomProcreationRelationshiplessChance)
+                    .addComponent(spnPercentageRandomProcreationRelationshiplessChance, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -6209,6 +6400,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             spnAgeRangeRandomDeathMaleValues.get(ageRange).setValue(options.getAgeRangeRandomDeathMaleValues().get(ageRange));
             spnAgeRangeRandomDeathFemaleValues.get(ageRange).setValue(options.getAgeRangeRandomDeathFemaleValues().get(ageRange));
         }
+
+        // Awards
+        chkIssuePosthumousAwards.setSelected(options.isIssuePosthumousAwards());
+        chkIssueBestAwardOnly.setSelected(options.isIssueBestAwardOnly());
+        comboAwardBonusStyle.setSelectedItem(options.getAwardBonusStyle());
+        chkEnableAutoAwards.setSelected(options.isEnableAutoAwards());
+        chkEnableContractAwards.setSelected(options.isEnableContractAwards());
+        chkEnableFactionHunterAwards.setSelected(options.isEnableFactionHunterAwards());
+        chkEnableInjuryAwards.setSelected(options.isEnableInjuryAwards());
+        chkEnableKillAwards.setSelected(options.isEnableKillAwards());
+        chkEnableRankAwards.setSelected(options.isEnableRankAwards());
+        chkEnableScenarioAwards.setSelected(options.isEnableScenarioAwards());
+        chkEnableSkillAwards.setSelected(options.isEnableSkillAwards());
+        chkEnableTheatreOfWarAwards.setSelected(options.isEnableTheatreOfWarAwards());
+        chkEnableTimeAwards.setSelected(options.isEnableTimeAwards());
+        chkEnableMiscAwards.setSelected(options.isEnableMiscAwards());
         //endregion Personnel Tab
 
         //region Finances Tab
@@ -6736,6 +6943,23 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseRandomPrisonerProcreation(chkUseRandomPrisonerProcreation.isSelected());
             options.setPercentageRandomProcreationRelationshipChance((Double) spnPercentageRandomProcreationRelationshipChance.getValue() / 100.0);
             options.setPercentageRandomProcreationRelationshiplessChance((Double) spnPercentageRandomProcreationRelationshiplessChance.getValue() / 100.0);
+
+            // Awards
+            options.setIssuePosthumousAwards(chkIssuePosthumousAwards.isSelected());
+            options.setIssueBestAwardOnly(chkIssueBestAwardOnly.isSelected());
+            options.setAwardBonusStyle(comboAwardBonusStyle.getSelectedItem());
+            options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());
+            options.setEnableAutoAwards(chkEnableAutoAwards.isSelected());
+            options.setEnableContractAwards(chkEnableContractAwards.isSelected());
+            options.setEnableFactionHunterAwards(chkEnableFactionHunterAwards.isSelected());
+            options.setEnableInjuryAwards(chkEnableInjuryAwards.isSelected());
+            options.setEnableKillAwards(chkEnableKillAwards.isSelected());
+            options.setEnableRankAwards(chkEnableRankAwards.isSelected());
+            options.setEnableScenarioAwards(chkEnableScenarioAwards.isSelected());
+            options.setEnableSkillAwards(chkEnableSkillAwards.isSelected());
+            options.setEnableTheatreOfWarAwards(chkEnableTheatreOfWarAwards.isSelected());
+            options.setEnableTimeAwards(chkEnableTimeAwards.isSelected());
+            options.setEnableMiscAwards(chkEnableMiscAwards.isSelected());
 
             // Death
             options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());

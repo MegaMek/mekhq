@@ -294,7 +294,13 @@ public class KillAwards {
      * @param filterOtherMissionKills true if we should only count kills from the mission just completed
      */
     private int getIndividualKills(Campaign campaign, Mission mission, Person person, boolean filterOtherMissionKills) {
-        List<Kill> allKills = campaign.getKillsFor(person.getId());
+        List<Kill> allKills;
+
+        try {
+            allKills = campaign.getKillsFor(person.getId());
+        } catch (Exception e) {
+            return 0;
+        }
 
         if (filterOtherMissionKills) {
             allKills.removeIf(kill -> kill.getMissionId() != mission.getId());

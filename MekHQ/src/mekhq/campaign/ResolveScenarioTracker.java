@@ -1433,16 +1433,16 @@ public class ResolveScenarioTracker {
                 getCampaign().removePerson(person, false);
             }
 
-            // TODO add Posthumous Awards to Campaign Options
-            boolean fakeCampaignOptionPosthumousAwardsIsEnabled = false;
-            if (!person.getStatus().isDead() || fakeCampaignOptionPosthumousAwardsIsEnabled) {
-                int injuryCount = 0;
+            if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+                if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
+                    int injuryCount = 0;
 
-                if (status.getHits() > person.getHits()) {
-                    injuryCount = status.getHits() - person.getHits();
+                    if (status.getHits() > person.getHits()) {
+                        injuryCount = status.getHits() - person.getHits();
+                    }
+
+                    new AutoAwardsPostScenarioController(campaign, scenario.getId(), person, injuryCount);
                 }
-
-                new AutoAwardsPostScenarioController(campaign, scenario.getId(), person, injuryCount);
             }
         }
 

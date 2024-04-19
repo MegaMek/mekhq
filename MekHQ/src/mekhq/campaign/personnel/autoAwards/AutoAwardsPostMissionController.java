@@ -57,32 +57,30 @@ public class AutoAwardsPostMissionController {
                 // This is the main workhorse function
                 ProcessAwards(personnel, missionWasSuccessful);
             }
-
-            // TODO add Posthumous Awards to Campaign Options
-            boolean fakeCampaignOptionPosthumousAwardsIsEnabled = false;
-
-            if (fakeCampaignOptionPosthumousAwardsIsEnabled) {
-                personnel = campaign.getPersonnel();
-                ArrayList<Person> deceasedPersonnel = new ArrayList<>();
-
-                if (!personnel.isEmpty()) {
-                    // even dead Dependents and Prisoners aren't eligible for Awards
-                    removeDependentsAndPrisoners(personnel);
-                }
-
-                if(!personnel.isEmpty()) {
-                    deceasedPersonnel = personnel.stream().filter(person
-                            -> person.getStatus().isDead()).collect(Collectors.toCollection(ArrayList::new));
-                }
-
-                if (!deceasedPersonnel.isEmpty()) {
-                    ProcessAwards(deceasedPersonnel, missionWasSuccessful);
-                } else {
-                    LogManager.getLogger().info("AutoAwards found no deceased personnel, skipping this step");
-                }
-            }
         } else {
-            LogManager.getLogger().info("AutoAwards found no active personnel, skipping the award ceremony");
+            LogManager.getLogger().info("AutoAwards found no active personnel");
+        }
+
+        // if posthumous Awards are enabled, we process them here
+        if (campaign.getCampaignOptions().isIssuePosthumousAwards()) {
+            personnel = campaign.getPersonnel();
+            ArrayList<Person> deceasedPersonnel = new ArrayList<>();
+
+            if (!personnel.isEmpty()) {
+                // even dead Dependents and Prisoners aren't eligible for Awards
+                removeDependentsAndPrisoners(personnel);
+            }
+
+            if(!personnel.isEmpty()) {
+                deceasedPersonnel = personnel.stream().filter(person
+                        -> person.getStatus().isDead()).collect(Collectors.toCollection(ArrayList::new));
+            }
+
+            if (!deceasedPersonnel.isEmpty()) {
+                ProcessAwards(deceasedPersonnel, missionWasSuccessful);
+            } else {
+                LogManager.getLogger().info("AutoAwards found no deceased personnel, skipping this step");
+            }
         }
 
         LogManager.getLogger().info("autoAwards has finished");
@@ -160,37 +158,77 @@ public class AutoAwardsPostMissionController {
                                 ignoredAwards.add(award);
                                 break;
                             case "contract":
-                                contractAwards.add(award);
+                                if (campaign.getCampaignOptions().isEnableContractAwards()) {
+                                    contractAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
                                 break;
                             case "factionhunter":
-                                factionHunterAwards.add(award);
+                                if (campaign.getCampaignOptions().isEnableFactionHunterAwards()) {
+                                    factionHunterAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
                                 break;
                             // InjuryAwards are issued immediately after a scenario
                             // We include them here, for tracking purposes
                             case "injury":
-                                injuryAwards.add(award);
+                                if (campaign.getCampaignOptions().isEnableInjuryAwards()) {
+                                    injuryAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
                                 break;
                             case "kill":
-                                killAwards.add(award);
+                                if (campaign.getCampaignOptions().isEnableKillAwards()) {
+                                    killAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
                                 break;
                             // TODO hardcode more misc awards
                             case "misc":
-                                miscAwards.add(award);
+                                if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                                    miscAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
                                 break;
                             case "rank":
-                                rankAwards.add(award);
+                                if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                                    rankAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
                                 break;
                             case "scenario":
-                                scenarioAwards.add(award);
+                                if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                                    scenarioAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
                                 break;
                             case "skill":
-                                skillAwards.add(award);
+                                if (campaign.getCampaignOptions().isEnableSkillAwards()) {
+                                    skillAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
                                 break;
                             case "theatreofwar":
-                                theatreOfWarAwards.add(award);
+                                if (campaign.getCampaignOptions().isEnableTheatreOfWarAwards()) {
+                                    theatreOfWarAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
                                 break;
                             case "time":
-                                timeAwards.add(award);
+                                if (campaign.getCampaignOptions().isEnableTimeAwards()) {
+                                    timeAwards.add(award);
+                                } else {
+                                    ignoredAwards.add(award);
+                                }
                                 break;
                             // trainingAwards are not currently supported.
                             // We include them here for tracking purposes

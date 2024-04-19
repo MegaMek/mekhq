@@ -80,10 +80,14 @@ public class AutoAwardsPostScenarioController {
 
                     // next we separate out Kill(Scenario) and Injury Awards
                     for (Award award : awards) {
-                        if (award.getItem().equalsIgnoreCase("kill")
-                                && award.getRange().equalsIgnoreCase("scenario")) {
+                        if ((campaign.getCampaignOptions().isEnableKillAwards())
+                                && (award.getItem().equalsIgnoreCase("kill"))
+                                && (award.getRange().equalsIgnoreCase("scenario"))) {
+
                             killAwards.add(award);
-                        } else if (award.getItem().equalsIgnoreCase("injury")) {
+                        } else if ((campaign.getCampaignOptions().isEnableInjuryAwards())
+                                && (award.getItem().equalsIgnoreCase("injury"))) {
+
                             injuryAwards.add(award);
                         }
                     }
