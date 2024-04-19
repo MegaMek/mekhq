@@ -2515,7 +2515,7 @@ That's it. I hope you enjoy the campaign!
                 A very honorable decision, {commanderRank} to fight the opponent with equal forces when you could have
                 overwhelmed them with numbers. It could have also been a tactical error to give up your advantage,
                 except for the fact that you outclassed your opponent in unit and pilot quality. Just don't make that
-                tactical error when it matters. Speaking of which, we are off to Twycross well we will face a far more
+                tactical error when it matters. Speaking of which, we are off to Twycross where we will face a far more
                 fearsome foe than an old man with a taste for ancient legends. Prepare for liftoff.
             </narrative>
             <personalityId>7147f4c4-176f-4f9a-8081-a36956b49414</personalityId>
@@ -3886,7 +3886,7 @@ That's it. I hope you enjoy the campaign!
             <narrative>
                 We have defeated the Jade Falcons in combat.
 
-                *Cheers from the crowd.**
+                *Cheers from the crowd.*
 
                 Yet, Khan Vandervahn Chistu claimed, after murdering Ulric Kerensky on Wotan, that *our* Trial of
                 Refusal was, instead, *their* Trial of Absorption.
@@ -8441,8 +8441,7 @@ quickly rise out of nowhere and create blinding sand storms in an otherwise open
 
 ### Hegira/Retreat Conditions
 
-Jade Falcon units will operate under forced withdrawal but will not ask for *hegira*, although they
-will grant it. The wolf forces must withdraw and will not be able to claim battlefield salvage.
+Jade Falcon units will operate under forced withdrawal but will not ask for nor grant *hegira*. The wolf forces must withdraw and will not be able to claim battlefield salvage.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
