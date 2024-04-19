@@ -138,7 +138,7 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "takeUnit", takeUnit);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "addHits", addHits);
         if (null != deathStatusHits) {
-            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "status", deathStatusHits.name());
+            MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "deathStatusHits", deathStatusHits.name());
         }
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "healHits", healHits);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "rank", rank);
