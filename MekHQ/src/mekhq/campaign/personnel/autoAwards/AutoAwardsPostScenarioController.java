@@ -19,9 +19,6 @@ public class AutoAwardsPostScenarioController {
     ArrayList<Award> killAwards = new ArrayList<>();
     ArrayList<Award> injuryAwards = new ArrayList<>();
 
-    final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
-            MekHQ.getMHQOptions().getLocale());
-
     /**
      * This function processes Kill(Scenario) and Injury Awards following the conclusion of a Scenario
      *
@@ -108,6 +105,8 @@ public class AutoAwardsPostScenarioController {
     private void processInjuryAwards(int injuryCount) {
         int injuriesNeeded;
 
+        List<Award> eligibleAwards = new ArrayList<>();
+
         for (Award award : injuryAwards) {
             try {
                 injuriesNeeded = award.getQty();
@@ -118,11 +117,12 @@ public class AutoAwardsPostScenarioController {
             }
 
             if (injuryCount >= injuriesNeeded) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + MessageFormat
-                        .format(resource.getString("EligibleForAwardReport.format"),
-                                award.getName(), award.getSet()));
+                eligibleAwards.add(award);
             }
         }
+
+        // this finds the best Award (if applicable) and announces Award eligibility
+        processBestAward(eligibleAwards);
     }
 
     /**
@@ -132,6 +132,8 @@ public class AutoAwardsPostScenarioController {
      */
     private void processKillAwards(List<Kill> kills) {
         int killsNeeded;
+
+        List<Award> eligibleAwards = new ArrayList<>();
 
         for (Award award : killAwards) {
             try {
@@ -143,11 +145,52 @@ public class AutoAwardsPostScenarioController {
             }
 
             if (kills.size() >= killsNeeded) {
-                // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString()
-                campaign.addReport(person.getHyperlinkedName() + ' ' + MessageFormat
-                        .format(resource.getString("EligibleForAwardReport.format"),
-                                award.getName(), award.getSet()));
+                eligibleAwards.add(award);
             }
         }
+
+        processBestAward(eligibleAwards);
+    }
+
+    /**
+     * If the relevant Campaign Option is enabled, this function will find the best Award Person is eligible for.
+     * It will then post eligibility to the Daily Report pane
+     * Otherwise, it will just post eligibility to the Daily Report pane for all eligible Awards
+     * @param award the award to be announced
+     */
+    private void processBestAward (List<Award> eligibleAwards) {
+        Award bestAward = new Award();
+
+        if (!eligibleAwards.isEmpty()) {
+            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+                int rollingQty = 0;
+
+                for (Award award : eligibleAwards) {
+                    if (award.getQty() > rollingQty) {
+                        rollingQty = award.getQty();
+                        bestAward = award;
+                    }
+                }
+
+                announceEligibility(bestAward);
+            } else {
+                for (Award award : eligibleAwards) {
+                    announceEligibility(award);
+                }
+            }
+        }
+    }
+
+    /**
+     * This function announced Award eligibility to the Daily Report pane
+     * @param award the award to be announced
+     */
+    private void announceEligibility (Award award){
+        final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
+                MekHQ.getMHQOptions().getLocale());
+
+        // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString()
+        campaign.addReport(person.getHyperlinkedName() + ' ' + MessageFormat.format(resource.getString(
+                "EligibleForAwardReport.format"), award.getName(), award.getSet()));
     }
 }
