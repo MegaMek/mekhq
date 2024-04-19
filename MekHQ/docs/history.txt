@@ -41,6 +41,12 @@ MEKHQ VERSION HISTORY:
 + PR #3915: Added Dialog to Confirm New Campaign (redux) 
 + PR #3908: Adjusted Default Tech Counts 
 + PR #3967: Adjusted Zoom Speed on Interstellar Map Panel 
++ Fix #3348: Added Ability to Collapse/Expand Logs, Missions and Kills in Personnel Unit Screen
++ PR #3970: Reduced Personnel Table Right-Click Menu Clutter 
++ Fix #3981: Removed Unnecessary Error Log
++ PR #3988: Added Scenario & Mission Tracking to Kills, Added Ability to Assign Kills to Scenario and/or Mission 
++ Fix #3989: Fixed Ship Search Overvaluing Ultra-Green Personnel
++ PR #3996: Add new player deployment variables to Scenario 
 + PR #3973: Move new lance creation to AtBGameThread
 + Fix #3978: Fix a bug with saving
 + PR #3983: Load bot entities in the chat lounge
