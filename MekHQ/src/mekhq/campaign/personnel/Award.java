@@ -161,6 +161,10 @@ public class Award implements Comparable<Award> {
         return range;
     }
 
+    public Boolean isStackable() {
+        return stackable;
+    }
+
     /**
      * Gets the file name of an award given i times.
      * @param i times given the award

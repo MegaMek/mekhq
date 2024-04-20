@@ -52,7 +52,7 @@ public class ScenarioAwards {
                 int rollingQty = 0;
 
                 for (Award award : eligibleAwards) {
-                    if (logSize > rollingQty) {
+                    if (award.getQty() > rollingQty) {
                         rollingQty = award.getQty();
                         bestAward = award;
                     }

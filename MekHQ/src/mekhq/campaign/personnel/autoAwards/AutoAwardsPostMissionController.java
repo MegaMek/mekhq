@@ -129,7 +129,7 @@ public class AutoAwardsPostMissionController {
             }
 
             if (!timeAwards.isEmpty()) {
-                new TimeAwards(campaign, timeAwards, person);
+                new TimeAwards(campaign, person, timeAwards);
             }
         }
     }
