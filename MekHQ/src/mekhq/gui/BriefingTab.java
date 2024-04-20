@@ -35,7 +35,7 @@ import mekhq.campaign.mission.atb.AtBScenarioFactory;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import mekhq.campaign.personnel.autoAwards.AutoAwardsPostMissionController;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
@@ -400,7 +400,9 @@ public final class BriefingTab extends CampaignGuiTab {
 
         // for the purposes of Mission Accomplished awards, do not count partial Successes as Success
         if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
-            new AutoAwardsPostMissionController(getCampaign(), mission,
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+
+            autoAwardsController.PostMissionController(getCampaign(), mission,
                     Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
         }
 

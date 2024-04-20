@@ -37,7 +37,7 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.autoAwards.AutoAwardsPostScenarioController;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.TestUnit;
@@ -1441,7 +1441,10 @@ public class ResolveScenarioTracker {
                         injuryCount = status.getHits() - person.getHits();
                     }
 
-                    new AutoAwardsPostScenarioController(campaign, scenario.getId(), person, injuryCount);
+                    AutoAwardsController autoAwardsController = new AutoAwardsController();
+
+                    autoAwardsController.PostScenarioController(campaign, scenario.getId(),
+                            person, injuryCount);
                 }
             }
         }
