@@ -3374,19 +3374,41 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableAutoAwards = new JCheckBox(resources.getString("chkEnableAutoAwards.text"));
         chkEnableAutoAwards.setToolTipText(resources.getString("chkEnableAutoAwards.toolTipText"));
         chkEnableAutoAwards.setName("chkEnableAutoAwards");
-        chkEnableAutoAwards.addActionListener(e -> chkIssuePosthumousAwards.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkIssueBestAwardOnly.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> autoAwardsPanel.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkEnableContractAwards.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkEnableFactionHunterAwards.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkEnableInjuryAwards.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkEnableKillAwards.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkEnableRankAwards.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkEnableScenarioAwards.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkEnableSkillAwards.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkEnableTheatreOfWarAwards.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkEnableTimeAwards.setEnabled(chkEnableAutoAwards.isSelected()));
-        chkEnableAutoAwards.addActionListener(e -> chkEnableMiscAwards.setEnabled(chkEnableAutoAwards.isSelected()));
+        chkEnableAutoAwards.addActionListener(evt -> {
+            final boolean isEnabled = chkEnableAutoAwards.isSelected();
+
+            chkIssuePosthumousAwards.setEnabled(isEnabled);
+            chkIssueBestAwardOnly.setEnabled(isEnabled);
+            autoAwardsPanel.setEnabled(isEnabled);
+            chkEnableContractAwards.setEnabled(isEnabled);
+            chkEnableFactionHunterAwards.setEnabled(isEnabled);
+            chkEnableInjuryAwards.setEnabled(isEnabled);
+            chkEnableKillAwards.setEnabled(isEnabled);
+            chkEnableRankAwards.setEnabled(isEnabled);
+            chkEnableScenarioAwards.setEnabled(isEnabled);
+            chkEnableSkillAwards.setEnabled(isEnabled);
+            chkEnableTheatreOfWarAwards.setEnabled(isEnabled);
+            chkEnableTimeAwards.setEnabled(isEnabled);
+            chkEnableMiscAwards.setEnabled(isEnabled);
+        });
+
+        // this prevents a really annoying bug where disabled options don't stay disabled when
+        // reloading Campaign Options
+        if(!campaign.getCampaignOptions().isEnableAutoAwards()) {
+            chkIssuePosthumousAwards.setEnabled(false);
+            chkIssueBestAwardOnly.setEnabled(false);
+            autoAwardsPanel.setEnabled(false);
+            chkEnableContractAwards.setEnabled(false);
+            chkEnableFactionHunterAwards.setEnabled(false);
+            chkEnableInjuryAwards.setEnabled(false);
+            chkEnableKillAwards.setEnabled(false);
+            chkEnableRankAwards.setEnabled(false);
+            chkEnableScenarioAwards.setEnabled(false);
+            chkEnableSkillAwards.setEnabled(false);
+            chkEnableTheatreOfWarAwards.setEnabled(false);
+            chkEnableTimeAwards.setEnabled(false);
+            chkEnableMiscAwards.setEnabled(false);
+        }
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -6402,10 +6424,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
 
         // Awards
-        chkIssuePosthumousAwards.setSelected(options.isIssuePosthumousAwards());
-        chkIssueBestAwardOnly.setSelected(options.isIssueBestAwardOnly());
         comboAwardBonusStyle.setSelectedItem(options.getAwardBonusStyle());
         chkEnableAutoAwards.setSelected(options.isEnableAutoAwards());
+        chkIssuePosthumousAwards.setSelected(options.isIssuePosthumousAwards());
+        chkIssueBestAwardOnly.setSelected(options.isIssueBestAwardOnly());
         chkEnableContractAwards.setSelected(options.isEnableContractAwards());
         chkEnableFactionHunterAwards.setSelected(options.isEnableFactionHunterAwards());
         chkEnableInjuryAwards.setSelected(options.isEnableInjuryAwards());

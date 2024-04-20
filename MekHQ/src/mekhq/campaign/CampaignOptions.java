@@ -2284,7 +2284,7 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether to enable autoAwards
+     * @return whether autoAwards is enabled
      */
     public boolean isEnableAutoAwards() {
         return enableAutoAwards;

@@ -18,9 +18,9 @@ public class TimeAwards {
 
     /**
      * This function loops through Time Awards, checking whether the person is eligible to receive each type of award
-     * @param campaign the campaign to be processed
+     * @param c the campaign to be processed
      * @param awards the awards to be processed (should only include awards where item == Time)
-     * @param person the person to check award eligibility for
+     * @param p the person to check award eligibility for
      */
     public TimeAwards(Campaign c, Person p, List<Award> awards) {
         campaign = c;
