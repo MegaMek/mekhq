@@ -1443,8 +1443,7 @@ public class ResolveScenarioTracker {
 
                     AutoAwardsController autoAwardsController = new AutoAwardsController();
 
-                    autoAwardsController.PostScenarioController(campaign, scenario.getId(),
-                            person, injuryCount);
+                    autoAwardsController.PostScenarioController(campaign, scenario.getId(), person, injuryCount);
                 }
             }
         }

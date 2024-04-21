@@ -398,10 +398,10 @@ public final class BriefingTab extends CampaignGuiTab {
             ((AtBContract) mission).checkForFollowup(getCampaign());
         }
 
-        // for the purposes of Mission Accomplished awards, do not count partial Successes as Success
         if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
 
+            // for the purposes of Mission Accomplished awards, we do not count partial Successes as Success
             autoAwardsController.PostMissionController(getCampaign(), mission,
                     Objects.equals(String.valueOf(cmd.getStatus()), "Success"));
         }

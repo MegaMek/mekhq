@@ -9,11 +9,10 @@ import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.gui.dialog.AutoAwardsDialog;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AutoAwardsController {
@@ -37,7 +36,7 @@ public class AutoAwardsController {
      * The primary controller for the automatic processing of Awards
      * @param c the campaign to be processed
      * @param m the mission just completed
-     * @param missionWasSuccessful @Nullable true if Mission was a complete Success, otherwise false
+     * @param missionWasSuccessful true if Mission was a complete Success, otherwise false
      */
     public void PostMissionController(Campaign c, Mission m, Boolean missionWasSuccessful) {
         LogManager.getLogger().info("autoAwards (Mission Conclusion) has started");
@@ -244,20 +243,20 @@ public class AutoAwardsController {
                                         // if autoAwards doesn't know what to do with an Award, it ignores it
                                         ignoredAwards.add(award);
                                 }
-
-                                // These logs help users double-check that the number of awards found matches their records
-                                LogManager.getLogger().info("autoAwards found {} Kill Awards (excluding Scenario Kill Awards)",
-                                        killAwards.size());
-                                LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
-                                LogManager.getLogger().info("autoAwards found {} Contract Awards", contractAwards.size());
-                                LogManager.getLogger().info("autoAwards found {} Rank Awards", rankAwards.size());
-                                LogManager.getLogger().info("autoAwards found {} Scenario Awards", scenarioAwards.size());
-                                LogManager.getLogger().info("autoAwards found {} Skill Awards", skillAwards.size());
-                                LogManager.getLogger().info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());
-                                LogManager.getLogger().info("autoAwards found {} Time Awards", timeAwards.size());
-                                LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
-                                LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
                             }
+                            // These logs help users double-check that the number of awards found matches their records
+                            LogManager.getLogger().info("autoAwards found {} Kill Awards (excluding Scenario Kill Awards)",
+                                    killAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Contract Awards", contractAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Rank Awards", rankAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Scenario Awards", scenarioAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Skill Awards", skillAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Time Awards", timeAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
+                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+
                             break;
                         // post-scenario
                         case 2:
@@ -304,43 +303,91 @@ public class AutoAwardsController {
      * @param missionWasSuccessful whether the Mission ended in a Success
      */
     private void ProcessAwards(Collection<Person> personnel, Boolean missionWasSuccessful) {
-        for (Person person : personnel) {
-            if ((!contractAwards.isEmpty()) && (mission instanceof Contract)) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+
+        // Ideally, we'd not be doing multiple passes of Person or Award, but we don't have that luxury. By processing
+        // Award Eligibility in the manner below, we can stagger processing of Award Types, which reduces the likelihood
+        // that autoAwards will lock up mhq. Really, this isn't an ideal solution, but it's the best I could muster at
+        // time of writing.
+        if ((!contractAwards.isEmpty()) && (mission instanceof Contract)) {
+            for (Person person: personnel) {
                 new ContractAwards(campaign, mission, contractAwards, person);
             }
+        }
 
-            if ((!factionHunterAwards.isEmpty()) && (campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
+        if ((!factionHunterAwards.isEmpty()) && (campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
+            for (Person person: personnel) {
                 new FactionHunterAwards(campaign, mission, factionHunterAwards, person);
             }
+        }
 
-            // even if someone doesn't have a Combat Role, we still check combat-related Awards as we've no way to check
-            // whether Person previously held a Combat Role earlier in the Mission
-            if (!killAwards.isEmpty()) {
-                new KillAwards(campaign, mission, killAwards, person);
+        // even if someone doesn't have a Combat Role, we still check combat-related Awards as we've no way to check
+        // whether Person previously held a Combat Role earlier in the Mission
+        if (!killAwards.isEmpty()) {
+            Map<Integer, List<Object>> data;
+            // this gives us an incremental int that we can use as a key for awardData
+            int awardDataKey = 0;
+
+            for (Person person: personnel) {
+                try {
+                    data = KillAwards.KillAwardProcessor(campaign, mission, killAwards, person);
+                } catch (Exception e) {
+                    data = null;
+                    LogManager.getLogger().info("{} is not eligible for any Kill Awards.", person.getFullName());
+                }
+
+                if (data != null) {
+                    for (Integer dataKey : data.keySet()) {
+                        awardData.put(awardDataKey, data.get(dataKey));
+
+                        awardDataKey++;
+                    }
+                }
             }
 
-            if (!miscAwards.isEmpty()) {
+            // if awardData is empty, we just skip the Dialog for this type of Award. This ensures we don't
+            // end up with a bunch of empty Dialogs.
+            if (!awardData.isEmpty()) {
+                AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, awardData);
+                autoAwardsDialog.setVisible(true);
+            } else {
+                LogManager.getLogger().info("Zero personnel were found eligible for Kill Awards");
+            }
+        }
+
+        if (!miscAwards.isEmpty()) {
+            for (Person person: personnel) {
                 new MiscAwards(campaign, miscAwards, person, missionWasSuccessful);
             }
+        }
 
-            if (!rankAwards.isEmpty()) {
+        if (!rankAwards.isEmpty()) {
+            for (Person person: personnel) {
                 new RankAwards(campaign, rankAwards, person);
             }
+        }
 
-            if (!scenarioAwards.isEmpty()) {
+        if (!scenarioAwards.isEmpty()) {
+            for (Person person: personnel) {
                 new ScenarioAwards(campaign, scenarioAwards, person);
             }
+        }
 
-            if (!skillAwards.isEmpty()) {
+        if (!skillAwards.isEmpty()) {
+            for (Person person: personnel) {
                 new SkillAwards(campaign, skillAwards, person);
             }
+        }
 
-            // theatre of war awards are based on employer, only Contracts have employers
-            if ((!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
+        // theatre of war awards are based on employer, only Contracts have employers
+        if ((!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
+            for (Person person: personnel) {
                 new TheatreOfWarAwards(campaign, mission, theatreOfWarAwards, person);
             }
+        }
 
-            if (!timeAwards.isEmpty()) {
+        if (!timeAwards.isEmpty()) {
+            for (Person person: personnel) {
                 new TimeAwards(campaign, person, timeAwards);
             }
         }

@@ -458,6 +458,22 @@ public final class MHQOptions extends SuiteOptions {
     public void setStratConHexCoordForeground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, value.getRGB());
     }
+
+    public Color getAutoAwardsForeground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.AUTO_AWARDS_FOREGROUND, Color.BLACK.getRGB()));
+    }
+
+    public void setAutoAwardsForeground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.AUTO_AWARDS_FOREGROUND, value.getRGB());
+    }
+
+    public Color getAutoAwardsBackground() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.AUTO_AWARDS_BACKGROUND, Color.LIGHT_GRAY.getRGB()));
+    }
+
+    public void setAutoAwardsBackground(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.AUTO_AWARDS_BACKGROUND, value.getRGB());
+    }
     //endregion Colours
 
     //region Fonts
