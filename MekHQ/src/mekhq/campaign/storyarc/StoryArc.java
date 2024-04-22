@@ -155,6 +155,10 @@ public class StoryArc {
         return startingPointId;
     }
 
+    public List<StoryPoint> getStoryPoints() {
+        return new ArrayList<StoryPoint>(storyPoints.values());
+    }
+
     public void setInitCampaignPath(String s) {
         this.initCampaignPath =s;
     }

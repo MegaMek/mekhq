@@ -1,16 +1,24 @@
 package mekhq.gui;
 
+import megamek.client.ui.models.XTableColumnModel;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.gui.model.StoryPointTableModel;
+import mekhq.gui.model.UnitTableModel;
+import mekhq.gui.sorter.PersonTitleSorter;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class StoryArcEditorGUI extends JPanel {
@@ -23,6 +31,12 @@ public class StoryArcEditorGUI extends JPanel {
 
     /* Menu Bar */
     private JMenuBar menuBar;
+
+    /* Story Point Table */
+    private JTable storyPointTable;
+    private StoryPointTableModel storyPointTableModel;
+
+
     private StoryArc storyArc;
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.StoryArcEditorGUI",
             MekHQ.getMHQOptions().getLocale());
@@ -61,8 +75,16 @@ public class StoryArcEditorGUI extends JPanel {
 
         setLayout(new BorderLayout());
 
-        JLabel test = new JLabel("Just a Test!");
-        add(test, BorderLayout.CENTER);
+        storyPointTableModel = new StoryPointTableModel();
+        storyPointTable = new JTable(storyPointTableModel);
+        storyPointTable.setRowHeight(60);
+        storyPointTable.getColumnModel().getColumn(0).setCellRenderer(storyPointTableModel.getRenderer());
+        //storyPointTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
+        storyPointTable.setOpaque(false);
+        JScrollPane scrollStoryPoints = new JScrollPane(storyPointTable);
+        refreshStoryPoints();
+
+        add(scrollStoryPoints, BorderLayout.CENTER);
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -132,6 +154,16 @@ public class StoryArcEditorGUI extends JPanel {
             method.invoke(null, window, true);
         } catch (Throwable t) {
             LogManager.getLogger().error("Full screen mode is not supported", t);
+        }
+    }
+
+    public void refreshStoryPoints() {
+        final int selected = storyPointTable.getSelectedRow();
+        final List<StoryPoint> storyPoints = storyArc.getStoryPoints();
+        //storyPoints.sort(new PersonTitleSorter().reversed());
+        storyPointTableModel.setData(storyPoints);
+        if ((selected > -1) && (selected < storyPoints.size())) {
+            storyPointTable.setRowSelectionInterval(selected, selected);
         }
     }
 }
