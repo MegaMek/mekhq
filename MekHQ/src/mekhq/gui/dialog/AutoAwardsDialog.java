@@ -34,8 +34,7 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.*;
 import java.util.List;
 import java.util.*;
 
@@ -45,7 +44,9 @@ public class AutoAwardsDialog extends JDialog {
 
     private static final String PAN_AUTO_AWARDS = "PanAutoAwards";
 
+    final private Map<Integer, Map<Integer, List<Object>>> allData;
     final private Map<Integer, List<Object>> data;
+    final private int currentPageCount;
 
     private JComboBox<PersonnelFilter> cboPersonnelFilter;
     private AutoAwardsTable personnelTable;
@@ -55,15 +56,17 @@ public class AutoAwardsDialog extends JDialog {
     private JButton btnSkipAll;
     private JButton btnDone;
 
-    private boolean isSkipAll = true;
-
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
             MekHQ.getMHQOptions().getLocale());
 
-    public AutoAwardsDialog(Campaign c, Map<Integer, List<Object>> awardData) {
+    public AutoAwardsDialog(Campaign c, Map<Integer, Map<Integer, List<Object>>> allAwardData, int ceremonyCount) {
         campaign = c;
         gui = campaign.getApp().getCampaigngui();
-        data = awardData;
+        allData = allAwardData;
+        LogManager.getLogger().info("attempting to extract a single page");
+        data = allAwardData.get(ceremonyCount);
+        LogManager.getLogger().info("attempt successful");
+        currentPageCount = ceremonyCount;
 
         setSize(new Dimension(800, 600));
         initComponents();
@@ -106,7 +109,10 @@ public class AutoAwardsDialog extends JDialog {
 
         AutoAwardsTableModel model = new AutoAwardsTableModel(campaign);
         // This is where we insert the external data
+        LogManager.getLogger().info("Trying to pass data to AutoAwardsTableModel.java");
+        LogManager.getLogger().info("Data being passed: {}", data);
         model.setData(data);
+        LogManager.getLogger().info("Attempt successful");
         personnelTable = new AutoAwardsTable(model);
         personnelSorter = new TableRowSorter<>(model);
         personnelSorter.setComparator(AutoAwardsTableModel.COL_PERSON, new PersonRankStringSorter(campaign));
@@ -117,8 +123,13 @@ public class AutoAwardsDialog extends JDialog {
 
         cboPersonnelFilter.addActionListener(evt -> filterPersonnel(personnelSorter, cboPersonnelFilter));
 
-        personnelTable.getColumnModel().
-                getColumn(personnelTable.convertColumnIndexToModel(AutoAwardsTableModel.COL_AWARD));
+        TableColumn awardColumn = personnelTable.getColumnModel()
+                .getColumn(personnelTable.convertColumnIndexToModel(AutoAwardsTableModel.COL_AWARD));
+
+        DefaultCellEditor cellEditor = (DefaultCellEditor) awardColumn.getCellEditor();
+
+        JCheckBox cbxAward = (JCheckBox) cellEditor.getComponent();
+        cbxAward.addMouseListener(checkboxListener);
 
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(personnelTable);
@@ -141,6 +152,17 @@ public class AutoAwardsDialog extends JDialog {
 
         add(btnPanel, BorderLayout.PAGE_END);
     }
+
+    final private MouseListener checkboxListener = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            Checkbox checkbox = (Checkbox) e.getSource();
+            boolean currentState = checkbox.getState();
+            checkbox.setState(!currentState);
+        }
+    };
+
+
     final private ActionListener buttonListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent event) {
@@ -148,24 +170,36 @@ public class AutoAwardsDialog extends JDialog {
                 Person person;
                 Award award;
 
-                LogManager.getLogger().info("RowCount = {}", personnelTable.getRowCount());
                 for (int rowIndex = 0; rowIndex < personnelTable.getRowCount(); rowIndex++) {
                     if ((boolean) personnelTable.getValueAt(rowIndex, 3)) {
                         person = campaign.getPerson((UUID) data.get(rowIndex).get(0));
                         award = (Award) data.get(rowIndex).get(1);
 
-                        person.getAwardController().addAndLogAward(campaign, award.getSet(),
-                                award.getName(), campaign.getLocalDate());
+                        // in theory, we should have already filtered out ineligible personnel by this stage
+                        // but a little insurance never hurt
+                        if (award.canBeAwarded(person)) {
+                            person.getAwardController().addAndLogAward(campaign, award.getSet(),
+                                    award.getName(), campaign.getLocalDate());
+                        }
                     }
                 }
+                // this disables the current page
+                setVisible(false);
 
-                isSkipAll = false;
-                setVisible(false);
+                // if necessary, this initiates the next page
+                if ((currentPageCount + 1) < allData.size()) {
+                    AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allData, (currentPageCount + 1));
+                    autoAwardsDialog.setVisible(true);
+                }
             } else if (event.getSource().equals(btnSkip)) {
-                isSkipAll = false;
                 setVisible(false);
+
+                if ((currentPageCount + 1) < allData.size()) {
+                    AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allData, (currentPageCount + 1));
+                    autoAwardsDialog.setVisible(true);
+                }
             } else if (event.getSource().equals(btnSkipAll)) {
-                isSkipAll = true;
+                // we just need to disable the dialog if we're skipping all remaining pages
                 setVisible(false);
             }
         }
@@ -185,10 +219,6 @@ public class AutoAwardsDialog extends JDialog {
                 return filter.getFilteredInformation(person, campaign.getLocalDate());
             }
         });
-    }
-
-    public boolean wasSkipAll() {
-        return isSkipAll;
     }
 }
 

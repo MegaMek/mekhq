@@ -15,10 +15,10 @@ public class KillAwards {
      * This function loops through Kill Awards, checking whether the person is eligible to receive each type of award
      * @param campaign the campaign to be processed
      * @param mission the mission just completed
-     * @param awards the awards to be processed (should only include awards where item == Kill)
      * @param person the person to check award eligibility for
+     * @param awards the awards to be processed (should only include awards where item == Kill)
      */
-    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, List<Award> awards, Person person) {
+    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, Person person, List<Award> awards) {
         int formationDepth;
         String killDepth;
 
@@ -58,7 +58,6 @@ public class KillAwards {
         }
 
         for (Award award : awards) {
-            LogManager.getLogger().info("Award: {}", award.getName());
             if (award.canBeAwarded(person)) {
                 // this allows us to convert non-IS formations into IS equivalents
                 formationDepth = getFormation(award);
@@ -284,33 +283,9 @@ public class KillAwards {
             } else {
                 eligibleAwards.addAll(groupAwards);
             }
-
-            // with everything processed and filtered, we can finally return Award eligibility
-
-            List<Object> personAwardList = new ArrayList<>();
-            personAwardList.add(person.getId());
-            // we want these values populated so they can be redefined by the below loop and later,
-            // the Award Ceremony
-            personAwardList.add(0);
-            personAwardList.add(true);
-
-            int awardDataKey = 0;
-
-            Map<Integer, List<Object>> awardData = new HashMap<>();
-
-            for (Award award : eligibleAwards) {
-                personAwardList.set(1, award);
-
-                awardData.put(awardDataKey, personAwardList);
-
-                awardDataKey++;
-            }
-
-            return awardData;
         }
 
-        // Person is not eligible for any Awards
-        return null;
+        return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 
         /**

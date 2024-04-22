@@ -1,30 +1,24 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import org.apache.logging.log4j.LogManager;
 
-import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 public class SkillAwards {
     /**
      * This function loops through Skill Awards, checking whether the person is eligible to receive each type of award
-     *
-     * @param campaign the campaign to be processed
-     * @param awards   the awards to be processed (should only include awards where item == Skill)
      * @param person   the person to check award eligibility for
+     * @param awards   the awards to be processed (should only include awards where item == Skill)
      */
-    public SkillAwards(Campaign campaign, List<Award> awards, Person person) {
-        final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
-                MekHQ.getMHQOptions().getLocale());
-
+    public static Map<Integer, List<Object>> SkillAwardsProcessor(Person person, List<Award> awards) {
         int requiredSkillLevel;
+        List<Award> eligibleAwards = new ArrayList<>();
 
         for (Award award : awards) {
             try {
@@ -55,14 +49,14 @@ public class SkillAwards {
                     }
 
                     if (hasRequiredSkillLevel) {
-                        // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString()
-                        campaign.addReport(person.getHyperlinkedName() + ' ' +
-                                MessageFormat.format(resource.getString("EligibleForAwardReport.format"),
-                                        award.getName(), award.getSet()));
+                        eligibleAwards.add(award);
                     }
                 }
             }
         }
+        LogManager.getLogger().info("Awards eligibility for {}: {}", person.getFullName(), awards);
+
+        return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 
     /**
@@ -72,7 +66,7 @@ public class SkillAwards {
      * @param person the person whose skill levels we want
      * @param skill the skill we're checking
      */
-    private int processSkills(Award award, Person person, String skill) {
+    private static int processSkills(Award award, Person person, String skill) {
         List<String> relevantSkills;
 
         switch (skill.toLowerCase()) {
@@ -249,7 +243,7 @@ public class SkillAwards {
      * @param relevantSkills the list of Skills to check
      * @param person the person whose Skill Levels are being checked
      */
-    private int getSkillLevel(List<String> relevantSkills, Person person) {
+    private static int getSkillLevel(List<String> relevantSkills, Person person) {
         int[] skillLevels = new int[relevantSkills.size()];
 
         for (int i = 0; i < relevantSkills.size(); i++) {

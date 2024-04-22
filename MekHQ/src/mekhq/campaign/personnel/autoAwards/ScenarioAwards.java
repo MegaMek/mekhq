@@ -1,34 +1,27 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 public class ScenarioAwards {
-    final Campaign campaign;
-    final Person person;
-
     /**
      * This function loops through Scenario Awards, checking whether the person is eligible to receive each type of award
-     * @param c the campaign to be processed
+     * @param campaign the campaign to be processed
+     * @param person the person to check award eligibility for
      * @param awards the awards to be processed (should only include awards where item == Scenario)
-     * @param p the person to check award eligibility for
      */
-    public ScenarioAwards(Campaign c, List<Award> awards, Person p) {
-        campaign = c;
-        person = p;
-
+    public static Map<Integer, List<Object>> ScenarioAwardsProcessor(Campaign campaign, Person person, List<Award> awards) {
         int logSize = person.getScenarioLog().size();
         int requiredScenarioCount;
 
         List<Award> eligibleAwards = new ArrayList<>();
+        List<Award> eligibleAwardsBestable = new ArrayList<>();
         Award bestAward = new Award();
 
         for (Award award : awards) {
@@ -42,41 +35,28 @@ public class ScenarioAwards {
                 }
 
                 if (logSize >= requiredScenarioCount) {
-                    eligibleAwards.add(award);
+                    eligibleAwardsBestable.add(award);
                 }
             }
         }
 
-        if (!eligibleAwards.isEmpty()) {
+        if (!eligibleAwardsBestable.isEmpty()) {
             if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
                 int rollingQty = 0;
 
-                for (Award award : eligibleAwards) {
+                for (Award award : eligibleAwardsBestable) {
                     if (award.getQty() > rollingQty) {
                         rollingQty = award.getQty();
                         bestAward = award;
                     }
                 }
 
-                announceEligibility(bestAward);
+                eligibleAwards.add(bestAward);
             } else {
-                for (Award award : eligibleAwards) {
-                    announceEligibility(award);
-                }
+                eligibleAwards.addAll(eligibleAwardsBestable);
             }
         }
-    }
 
-    /**
-     * This function announced Award eligibility to the Daily Report pane
-     * @param award the award to be announced
-     */
-    private void announceEligibility (Award award){
-        final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
-                MekHQ.getMHQOptions().getLocale());
-
-        // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString()
-        campaign.addReport(person.getHyperlinkedName() + ' ' + MessageFormat.format(resource.getString(
-                "EligibleForAwardReport.format"), award.getName(), award.getSet()));
+        return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 }

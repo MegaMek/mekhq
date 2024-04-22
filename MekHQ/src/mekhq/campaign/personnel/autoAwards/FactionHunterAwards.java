@@ -1,15 +1,14 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 
-import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 import static mekhq.campaign.personnel.autoAwards.TheatreOfWarAwards.processFaction;
 
@@ -18,14 +17,12 @@ public class FactionHunterAwards {
      * This function loops through Faction Hunter Awards, checking whether the person is eligible to receive each type of award
      * @param campaign the campaign to be processed
      * @param mission the mission just completed
-     * @param awards the awards to be processed (should only include awards where item == TheatreOfWar)
      * @param person the person to check award eligibility for
+     * @param awards the awards to be processed (should only include awards where item == TheatreOfWar)
      */
-    public FactionHunterAwards(Campaign campaign, Mission mission, List<Award> awards, Person person) {
-        final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
-                MekHQ.getMHQOptions().getLocale());
-
+    public static Map<Integer, List<Object>> FactionHunterAwardsProcessor(Campaign campaign, Mission mission, Person person, List<Award> awards) {
         boolean isEligible;
+        List<Award> eligibleAwards = new ArrayList<>();
 
         String missionFaction = ((AtBContract) mission).getEnemy().getFullName(campaign.getGameYear());
 
@@ -37,12 +34,11 @@ public class FactionHunterAwards {
                 isEligible = targetFactions.stream().anyMatch(targetFaction -> processFaction(missionFaction, targetFaction));
 
                 if (isEligible) {
-                    // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString()
-                    campaign.addReport(person.getHyperlinkedName() + ' ' +
-                            MessageFormat.format(resource.getString("EligibleForAwardReport.format"),
-                                    award.getName(), award.getSet()));
+                    eligibleAwards.add(award);
                 }
             }
         }
+
+        return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 }

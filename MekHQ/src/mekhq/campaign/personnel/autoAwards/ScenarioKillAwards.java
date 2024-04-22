@@ -1,36 +1,30 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 public class ScenarioKillAwards {
-    final Campaign campaign;
-    final Person person;
-
     /**
      * This function processes Injury Awards and spits out eligibility into the Daily Report
      *
-     * @param c the campaign to be processed
-     * @param p the Person to check award eligibility for
-     * @param awards awards the awards to be processed (should only include awards where item == injury && range == scenario)
+     * @param campaign the campaign to be processed
+     * @param person the Person to check award eligibility for
      * @param kills a list of p's relevant kills
+     * @param awards awards the awards to be processed (should only include awards where item == injury && range == scenario)
      */
-    public ScenarioKillAwards(Campaign c, Person p, List<Award> awards, List<Kill> kills) {
-        campaign = c;
-        person = p;
-
+    public static Map<Integer, List<Object>> ScenarioKillAwardsProcessor(Campaign campaign, Person person, List<Award> awards, List<Kill> kills) {
         int killsNeeded;
 
         List<Award> eligibleAwards = new ArrayList<>();
+        List<Award> eligibleAwardsBestable = new ArrayList<>();
+        Award bestAward = new Award();
 
         for (Award award : awards) {
             try {
@@ -42,43 +36,44 @@ public class ScenarioKillAwards {
             }
 
             if (kills.size() >= killsNeeded) {
-                eligibleAwards.add(award);
+                eligibleAwardsBestable.add(award);
             }
         }
 
-        Award bestAward = new Award();
-
-        if (!eligibleAwards.isEmpty()) {
+        if (!eligibleAwardsBestable.isEmpty()) {
             if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
                 int rollingQty = 0;
 
-                for (Award award : eligibleAwards) {
+                for (Award award : eligibleAwardsBestable) {
                     if (award.getQty() > rollingQty) {
                         rollingQty = award.getQty();
                         bestAward = award;
                     }
                 }
 
-                announceEligibility(bestAward);
+                eligibleAwards.add(bestAward);
             } else {
-                for (Award award : eligibleAwards) {
-                    announceEligibility(award);
-                }
+                eligibleAwards.addAll(eligibleAwardsBestable);
             }
         }
-    }
 
+        if (!eligibleAwardsBestable.isEmpty()) {
+            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
+                int rollingQty = 0;
 
-    /**
-     * This function announced Award eligibility to the Daily Report pane
-     * @param award the award to be announced
-     */
-    private void announceEligibility (Award award){
-        final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
-                MekHQ.getMHQOptions().getLocale());
+                for (Award award : eligibleAwardsBestable) {
+                    if (award.getQty() > rollingQty) {
+                        rollingQty = award.getQty();
+                        bestAward = award;
+                    }
+                }
 
-        // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString()
-        campaign.addReport(person.getHyperlinkedName() + ' ' + MessageFormat.format(resource.getString(
-                "EligibleForAwardReport.format"), award.getName(), award.getSet()));
+                eligibleAwards.add(bestAward);
+            } else {
+                eligibleAwards.addAll(eligibleAwardsBestable);
+            }
+        }
+
+        return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 }

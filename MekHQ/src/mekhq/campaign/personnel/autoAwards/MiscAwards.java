@@ -1,48 +1,52 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 
-import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 public class MiscAwards {
+
     /**
      * This function loops through Misc Awards, checking whether the person is eligible to receive each type of award.
      * All Misc awards need to be coded as individual functions
-     * @param campaign the campaign to be processed
-     * @param awards the awards to be processed (should only include awards where item == Kill)
      * @param person the person to check award eligibility for
+     * @param awards the awards to be processed (should only include awards where item == Kill)
      * @param missionWasSuccessful true if the completed mission was successful
      */
-    public MiscAwards(Campaign campaign, List<Award> awards, Person person, Boolean missionWasSuccessful) {
+    public static Map<Integer, List<Object>> MiscAwardsProcessor(Person person, List<Award> awards, Boolean missionWasSuccessful) {
+        List<Award> eligibleAwards = new ArrayList<>();
+
         for (Award award : awards) {
-            switch (award.getRange().toLowerCase()) {
-                case "mission accomplished":
+            switch (award.getRange().replaceAll("\\s","").toLowerCase()) {
+                case "missionaccomplished":
                     if (missionWasSuccessful) {
-                        MissionAccomplishedAward(campaign, award, person);
+                        try {
+                            eligibleAwards.add(MissionAccomplishedAward(award, person));
+                        } catch (Exception e) {
+                            continue;
+                        }
                     }
+                    break;
                 default:
             }
         }
+
+        return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 
     /**
      * This function checks whether the Mission Accomplished award can be awarded to Person
-     * @param campaign the current campaign
      * @param award the award to be processed
      * @param person the person to check award eligibility for
      */
-    private void MissionAccomplishedAward(Campaign campaign, Award award, Person person) {
-        final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
-                MekHQ.getMHQOptions().getLocale());
-
+    private static Award MissionAccomplishedAward(Award award, Person person) {
         if (award.canBeAwarded(person)) {
-            campaign.addReport(MessageFormat.format(resource.getString("EligibleForAwardReportAll.format"),
-                    award.getName(), award.getSet()));
+            return award;
+        } else {
+            return null;
         }
     }
 }

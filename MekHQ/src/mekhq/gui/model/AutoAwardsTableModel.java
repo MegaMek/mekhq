@@ -106,6 +106,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
         } else {
             person = campaign.getPerson((UUID) data.get(rowIndex).get(0));
             award = (Award) data.get(rowIndex).get(1);
+
         }
 
         switch (columnIndex) {

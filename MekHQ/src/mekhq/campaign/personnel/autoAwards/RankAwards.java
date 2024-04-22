@@ -1,30 +1,26 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
-import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 public class RankAwards {
     /**
      * This function loops through Rank Awards, checking whether the person is eligible to receive each type of award.
      * All Misc awards need to be hardcoded
-     * @param campaign the campaign to be processed
-     * @param awards the awards to be processed (should only include awards where item == Kill)
      * @param person the person to check award eligibility for
+     * @param awards the awards to be processed (should only include awards where item == Kill)
      */
-    public RankAwards(Campaign campaign, List<Award> awards, Person person) {
-        final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
-                MekHQ.getMHQOptions().getLocale());
-
+    public static Map<Integer, List<Object>> RankAwardsProcessor(Person person, List<Award> awards) {
         int requiredRankNumeric;
         boolean isInclusive;
         boolean isEligible;
+
+        List<Award> eligibleAwards = new ArrayList<>();
 
         for (Award award : awards) {
             isEligible = false;
@@ -41,8 +37,7 @@ public class RankAwards {
             } else if (award.getRange().equalsIgnoreCase("exclusive")) {
                 isInclusive = false;
             } else {
-                LogManager.getLogger().warn("Award {} from the {} set has the invalid range {}",
-                        award.getName(), award.getSet(), award.getRange());
+                LogManager.getLogger().warn("Award {} from the {} set has the invalid range {}", award.getName(), award.getSet(), award.getRange());
                 continue;
             }
 
@@ -67,11 +62,10 @@ public class RankAwards {
             }
 
             if (isEligible) {
-                // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString()
-                campaign.addReport(person.getHyperlinkedName() + ' ' +
-                        MessageFormat.format(resource.getString("EligibleForAwardReport.format"),
-                                award.getName(), award.getSet()));
+                eligibleAwards.add(award);
             }
         }
+
+        return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 }

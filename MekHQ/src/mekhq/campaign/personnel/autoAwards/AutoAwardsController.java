@@ -13,7 +13,6 @@ import mekhq.gui.dialog.AutoAwardsDialog;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AutoAwardsController {
     private Campaign campaign;
@@ -34,8 +33,9 @@ public class AutoAwardsController {
 
     /**
      * The primary controller for the automatic processing of Awards
-     * @param c the campaign to be processed
-     * @param m the mission just completed
+     *
+     * @param c                    the campaign to be processed
+     * @param m                    the mission just completed
      * @param missionWasSuccessful true if Mission was a complete Success, otherwise false
      */
     public void PostMissionController(Campaign c, Mission m, Boolean missionWasSuccessful) {
@@ -48,42 +48,26 @@ public class AutoAwardsController {
 
         Collection<Person> personnel = campaign.getActivePersonnel();
 
-        if (!personnel.isEmpty()) {
-            // Prisoners and Dependents are not eligible for Awards
-            removeDependentsAndPrisoners(personnel);
+        // if posthumous Awards are enabled, we add the relevant dead people
+        if (campaign.getCampaignOptions().isIssuePosthumousAwards()) {
+            Collection<Person> deadPeople = campaign.getPersonnel();
 
-            // we have to do multiple isEmpty() checks as any point in the removal process could result in null personnel
-            if(!personnel.isEmpty()) {
-                // This is the main workhorse function
-                ProcessAwards(personnel, missionWasSuccessful);
-            }
-        } else {
-            LogManager.getLogger().info("AutoAwards found no active personnel");
+            deadPeople.removeIf(person -> person.getStatus().isDead());
+
+            personnel.addAll(deadPeople);
         }
 
-        // if posthumous Awards are enabled, we process them here
+        // Prisoners and Dependents are not eligible for Awards
+        if (!personnel.isEmpty()) {
+            removeDependentsAndPrisoners(personnel);
+        }
 
-        if (campaign.getCampaignOptions().isIssuePosthumousAwards()) {
-            LogManager.getLogger().info("AutoAwards is beginning to process Posthumous Awards");
-
-            personnel = campaign.getPersonnel();
-            ArrayList<Person> deceasedPersonnel = new ArrayList<>();
-
-            if (!personnel.isEmpty()) {
-                // even dead Dependents and Prisoners aren't eligible for Awards
-                removeDependentsAndPrisoners(personnel);
-            }
-
-            if(!personnel.isEmpty()) {
-                deceasedPersonnel = personnel.stream().filter(person
-                        -> person.getStatus().isDead()).collect(Collectors.toCollection(ArrayList::new));
-            }
-
-            if (!deceasedPersonnel.isEmpty()) {
-                ProcessAwards(deceasedPersonnel, missionWasSuccessful);
-            } else {
-                LogManager.getLogger().info("AutoAwards found no deceased personnel, skipping this step");
-            }
+        // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
+        if (!personnel.isEmpty()) {
+            // This is the main workhorse function
+            ProcessAwards(personnel, missionWasSuccessful);
+        } else {
+            LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
 
         LogManager.getLogger().info("autoAwards (Mission Conclusion) has finished");
@@ -92,9 +76,9 @@ public class AutoAwardsController {
     /**
      * This function processes Kill(Scenario) and Injury Awards following the conclusion of a Scenario
      *
-     * @param c the campaign to be processed
-     * @param scenarioId id number for the Scenario just concluded
-     * @param person the person to check award eligibility for
+     * @param c           the campaign to be processed
+     * @param scenarioId  id number for the Scenario just concluded
+     * @param person      the person to check award eligibility for
      * @param injuryCount the number of Hits sustained in the Scenario just concluded
      */
     public void PostScenarioController(Campaign c, int scenarioId, Person person, int injuryCount) {
@@ -102,24 +86,44 @@ public class AutoAwardsController {
 
         campaign = c;
 
+        // we convert person into a Collection, as it allows us to utilize InjuryAwardsManager
+        // outside of this function
+        Collection<Person> personnel = new ArrayList<>();
+        personnel.add(person);
+
         buildAwardLists(2);
+
+        Map<Integer, Map<Integer, List<Object>>> allAwardData = new HashMap<>();
+        Map<Integer, List<Object>> processedData;
+        int allAwardDataKey = 0;
 
         // beginning the processing of Injury Awards
         if ((injuryCount > 0) && (!injuryAwards.isEmpty())) {
-            new InjuryAwards(campaign, person, injuryAwards, injuryCount);
-        } else if (injuryAwards.isEmpty()) {
-            LogManager.getLogger().info("autoAwards failed to find any Injury Awards");
+            processedData = InjuryAwardsManager(personnel, injuryCount);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
+            }
         }
 
-        // beginning the processing of Kill(Scenario) Awards
+        // beginning the processing & filtering of Kill(Scenario) Awards
         List<Kill> kills = campaign.getKillsFor(person.getId());
-
         kills.removeIf(kill -> kill.getScenarioId() != scenarioId);
 
         if ((!kills.isEmpty()) && (!killAwards.isEmpty())) {
-            new ScenarioKillAwards(campaign, person, killAwards, kills);
-        } else if (killAwards.isEmpty()) {
-            LogManager.getLogger().info("autoAwards failed to find any Kill(Scenario) Awards");
+            processedData = ScenarioKillAwardsManager(personnel, kills);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+            }
+        }
+
+        if (!allAwardData.isEmpty()) {
+            AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
+            autoAwardsDialog.setVisible(true);
+        } else {
+            LogManager.getLogger().info("Zero personnel were found eligible for Awards");
         }
 
         LogManager.getLogger().info("autoAwards (Scenario Conclusion) has finished");
@@ -127,11 +131,12 @@ public class AutoAwardsController {
 
     /**
      * Filters out anyone with the Prisoner status, or Dependent role
+     *
      * @param personnel personnel to process
      */
-    private void removeDependentsAndPrisoners (Collection<Person> personnel) {
+    private void removeDependentsAndPrisoners(Collection<Person> personnel) {
         if (!personnel.isEmpty()) {
-            personnel.removeIf(person -> (person.hasRole(PersonnelRole.DEPENDENT)) || (person.getPrisonerStatus().isPrisoner()));
+            personnel.removeIf(person -> (person.hasRole(PersonnelRole.DEPENDENT)) || (person.getPrisonerStatus().isCurrentPrisoner()));
         }
     }
 
@@ -186,8 +191,7 @@ public class AutoAwardsController {
                                         break;
                                     case "kill":
                                         // Scenario Kill Awards are handled by the post-scenario controller
-                                        if ((campaign.getCampaignOptions().isEnableKillAwards())
-                                                && (!award.getRange().equalsIgnoreCase("scenario"))) {
+                                        if ((campaign.getCampaignOptions().isEnableKillAwards()) && (!award.getRange().equalsIgnoreCase("scenario"))) {
                                             killAwards.add(award);
                                         } else {
                                             ignoredAwards.add(award);
@@ -248,8 +252,7 @@ public class AutoAwardsController {
                                 }
                             }
                             // These logs help users double-check that the number of awards found matches their records
-                            LogManager.getLogger().info("autoAwards found {} Kill Awards (excluding Scenario Kill Awards)",
-                                    killAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Kill Awards (excluding Scenario Kill Awards)", killAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Contract Awards", contractAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Rank Awards", rankAwards.size());
@@ -266,8 +269,7 @@ public class AutoAwardsController {
                             for (Award award : awards) {
                                 switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
                                     case "kill":
-                                        if ((campaign.getCampaignOptions().isEnableKillAwards())
-                                                && (award.getRange().equalsIgnoreCase("scenario"))) {
+                                        if ((campaign.getCampaignOptions().isEnableKillAwards()) && (award.getRange().equalsIgnoreCase("scenario"))) {
 
                                             killAwards.add(award);
                                         }
@@ -283,8 +285,7 @@ public class AutoAwardsController {
                                 }
                             }
 
-                            LogManager.getLogger().info("autoAwards found {} Scenario Kill Awards (excluding Mission & Lifetime Kill Awards)",
-                                    killAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Scenario Kill Awards (excluding Mission & Lifetime Kill Awards)", killAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Injury Awards", injuryAwards.size());
 
                             break;
@@ -302,103 +303,503 @@ public class AutoAwardsController {
 
     /**
      * Loops through provided personnel, checking whether each is eligible for an award
+     *
      * @param personnel all personnel that should be checked for award eligibility
      * @param missionWasSuccessful whether the Mission ended in a Success
      */
     private void ProcessAwards(Collection<Person> personnel, Boolean missionWasSuccessful) {
-        Map<Integer, List<Object>> awardData = new HashMap<>();
-        Map<Integer, List<Object>> data;
+        Map<Integer, Map<Integer, List<Object>>> allAwardData = new HashMap<>();
+        Map<Integer, List<Object>> processedData;
+        int allAwardDataKey = 0;
 
-        // this gives us an incremental int that we can use as a key for awardData
-        int awardDataKey = 0;
-
-        boolean skipAll = false;
-
-        // Ideally, we'd not be doing multiple passes of Person or Award, but we don't have that luxury. By processing
-        // Award Eligibility in the manner below, we can stagger processing of Award Types, which reduces the likelihood
-        // that autoAwards will lock up mhq. Really, this isn't an ideal solution, but it's the best I could muster at
-        // time of writing.
         if ((!contractAwards.isEmpty()) && (mission instanceof Contract)) {
-            for (Person person: personnel) {
-                new ContractAwards(campaign, mission, contractAwards, person);
+            processedData = ContractAwardsManager(personnel);
+
+            // if processedData == null, nobody was eligible for this type of award, so they should be skipped
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
             }
         }
 
-        if ((!skipAll) && (!factionHunterAwards.isEmpty())
-                && (campaign.getCampaignOptions().isUseAtB())
-                && (mission instanceof AtBContract)) {
-            for (Person person: personnel) {
-                new FactionHunterAwards(campaign, mission, factionHunterAwards, person);
+        if ((!factionHunterAwards.isEmpty()) && (campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
+            processedData = FactionHunterAwardsManager(personnel);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
             }
         }
 
         // even if someone doesn't have a Combat Role, we still check combat-related Awards as we've no way to check
         // whether Person previously held a Combat Role earlier in the Mission
-        if ((!skipAll) && (!killAwards.isEmpty())) {
-            for (Person person: personnel) {
-                try {
-                    data = KillAwards.KillAwardProcessor(campaign, mission, killAwards, person);
-                } catch (Exception e) {
-                    data = null;
-                    LogManager.getLogger().info("{} is not eligible for any Kill Awards.", person.getFullName());
+        if (!killAwards.isEmpty()) {
+            processedData = KillAwardsManager(personnel);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
+            }
+        }
+
+        if (!miscAwards.isEmpty()) {
+            processedData = MiscAwardsManager(personnel, missionWasSuccessful);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
+            }
+        }
+
+        if (!rankAwards.isEmpty()) {
+            processedData = RankAwardsManager(personnel);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
+            }
+        }
+
+        if (!scenarioAwards.isEmpty()) {
+            processedData = ScenarioAwardsManager(personnel);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
+            }
+        }
+
+        if (!skillAwards.isEmpty()) {
+            processedData = SkillAwardsManager(personnel);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
+            }
+        }
+
+        if ((!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
+            processedData = TheatreOfWarAwardsManager(personnel);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
+            }
+        }
+
+        if (!timeAwards.isEmpty()) {
+            processedData = TimeAwardsManager(personnel);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+            }
+        }
+
+        if (!allAwardData.isEmpty()) {
+            AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
+            autoAwardsDialog.setVisible(true);
+        } else {
+            LogManager.getLogger().info("Zero personnel were found eligible for Awards");
+        }
+    }
+
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
+     * @param personnel the personnel to be processed
+     */
+    private Map<Integer, List<Object>> ContractAwardsManager(Collection<Person> personnel) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+            try {
+                // this gives us a map of unique identifier (int), containing a list of Person, and Award
+                data = ContractAwards.ContractAwardsProcessor(campaign, mission, person, contractAwards);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Contract Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                // as the unique identifiers get doubled-up as we loop through personnel, we extract the data from
+                // data and insert it into awardData (now under a new, truly unique, int identifier).
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
                 }
+            }
+        }
 
-                if (data != null) {
-                    for (Integer dataKey : data.keySet()) {
-                        awardData.put(awardDataKey, data.get(dataKey));
+        // this gives us a map of unique identifier (int), containing a list of Person, and Award
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            return null;
+        }
+    }
 
-                        awardDataKey++;
-                    }
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * @param personnel the personnel to be processed
+     */
+    private Map<Integer, List<Object>> FactionHunterAwardsManager(Collection<Person> personnel) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+
+            try {
+                data = FactionHunterAwards.FactionHunterAwardsProcessor(campaign, mission, person, factionHunterAwards);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Faction Hunter Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
                 }
             }
+        }
 
-            // if awardData is empty, we just skip the Dialog for this type of Award. This ensures we don't
-            // end up with a bunch of empty Dialogs.
-            if (!awardData.isEmpty()) {
-                AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, awardData);
-                autoAwardsDialog.setVisible(true);
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            return null;
+        }
+    }
 
-                skipAll = autoAwardsDialog.wasSkipAll();
-            } else {
-                LogManager.getLogger().info("Zero personnel were found eligible for Kill Awards");
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * @param personnel the personnel to be processed
+     */
+    private Map<Integer, List<Object>> InjuryAwardsManager(Collection<Person> personnel, int injuryCount) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+
+            try {
+                data = InjuryAwards.InjuryAwardsProcessor(campaign, person, injuryAwards, injuryCount);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Injury Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
+                }
             }
         }
 
-        if ((!skipAll) && (!miscAwards.isEmpty())) {
-            for (Person person: personnel) {
-                new MiscAwards(campaign, miscAwards, person, missionWasSuccessful);
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * @param personnel the personnel to be processed
+     */
+    private Map<Integer, List<Object>> KillAwardsManager(Collection<Person> personnel) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+            try {
+                data = KillAwards.KillAwardProcessor(campaign, mission, person, killAwards);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Kill Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
+                }
             }
         }
 
-        if ((!skipAll) && (!rankAwards.isEmpty())) {
-            for (Person person: personnel) {
-                new RankAwards(campaign, rankAwards, person);
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * @param personnel the personnel to be processed
+     */
+    private Map<Integer, List<Object>> ScenarioKillAwardsManager(Collection<Person> personnel, List<Kill> kills) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+            try {
+                data = ScenarioKillAwards.ScenarioKillAwardsProcessor(campaign, person, killAwards, kills);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Scenario Kill Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
+                }
             }
         }
 
-        if ((!skipAll) && (!scenarioAwards.isEmpty())) {
-            for (Person person: personnel) {
-                new ScenarioAwards(campaign, scenarioAwards, person);
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * @param personnel the personnel to be processed
+     * @param missionWasSuccessful whether the mission just completed was successful
+     */
+    private Map<Integer, List<Object>> MiscAwardsManager(Collection<Person> personnel, boolean missionWasSuccessful) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+            try {
+                data = MiscAwards.MiscAwardsProcessor(person, miscAwards, missionWasSuccessful);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Misc Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
+                }
             }
         }
 
-        if ((!skipAll) && (!skillAwards.isEmpty())) {
-            for (Person person: personnel) {
-                new SkillAwards(campaign, skillAwards, person);
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * @param personnel the personnel to be processed
+     */
+    private Map<Integer, List<Object>> RankAwardsManager(Collection<Person> personnel) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+            try {
+                data = RankAwards.RankAwardsProcessor(person, rankAwards);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Rank Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
+                }
             }
         }
 
-        // theatre of war awards are based on employer, only Contracts have employers
-        if ((!skipAll) && (!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
-            for (Person person: personnel) {
-                new TheatreOfWarAwards(campaign, mission, theatreOfWarAwards, person);
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * @param personnel the personnel to be processed
+     */
+    private Map<Integer, List<Object>> ScenarioAwardsManager(Collection<Person> personnel) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+            try {
+                data = ScenarioAwards.ScenarioAwardsProcessor(campaign, person, scenarioAwards);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Scenario Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
+                }
             }
         }
 
-        if ((!skipAll) && (!timeAwards.isEmpty())) {
-            for (Person person: personnel) {
-                new TimeAwards(campaign, person, timeAwards);
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * @param personnel the personnel to be processed
+     */
+    private Map<Integer, List<Object>> SkillAwardsManager(Collection<Person> personnel) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+            try {
+                data = SkillAwards.SkillAwardsProcessor(person, skillAwards);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Skill Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
+                }
             }
         }
+
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * @param personnel the personnel to be processed
+     */
+    private Map<Integer, List<Object>> TheatreOfWarAwardsManager(Collection<Person> personnel) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+            try {
+                data = TheatreOfWarAwards.TheatreOfWarAwardsProcessor(campaign, mission, person, theatreOfWarAwards);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Theatre of War Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
+                }
+            }
+        }
+
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * @param personnel the personnel to be processed
+     */
+    private Map<Integer, List<Object>> TimeAwardsManager(Collection<Person> personnel) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (Person person : personnel) {
+            Map<Integer, List<Object>> data;
+            try {
+                data = TimeAwards.TimeAwardsProcessor(campaign, person, timeAwards);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Time Awards.", person.getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
+                }
+            }
+        }
+
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
+            LogManager.getLogger().info("Returning: null");
+            return null;
+        }
+    }
+
+    /**
+     * This is called from within a Award Type module and prepares data for use by displayAwardCeremony()
+     * @param person the person being processed
+     * @param eligibleAwards the Awards they are eligible for
+     */
+    public static Map<Integer, List<Object>> prepareAwardData(Person person, List<Award> eligibleAwards) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+
+        int awardDataKey = 0;
+
+        for (Award award : eligibleAwards) {
+            List<Object> personAwardList = new ArrayList<>();
+
+            // this gives us a list containing [Person, Award, true]
+            personAwardList.add(person.getId());
+            personAwardList.add(1, award);
+            personAwardList.add(true);
+
+            // we store that list under a unique key
+            awardData.put(awardDataKey, personAwardList);
+
+            // Increment the key for the next iteration
+            awardDataKey++;
+        }
+
+        return awardData;
     }
 }

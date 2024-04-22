@@ -1,6 +1,5 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
@@ -11,10 +10,9 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.apache.logging.log4j.LogManager;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 public class TheatreOfWarAwards {
@@ -22,14 +20,12 @@ public class TheatreOfWarAwards {
      * This function loops through Theatre of War Awards, checking whether the person is eligible to receive each type of award
      * @param campaign the campaign to be processed
      * @param mission the mission just completed
-     * @param awards the awards to be processed (should only include awards where item == TheatreOfWar)
      * @param person the person to check award eligibility for
+     * @param awards the awards to be processed (should only include awards where item == TheatreOfWar)
      */
-    public TheatreOfWarAwards(Campaign campaign, Mission mission, List<Award> awards, Person person) {
-        final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
-                MekHQ.getMHQOptions().getLocale());
-
+    public static Map<Integer, List<Object>> TheatreOfWarAwardsProcessor(Campaign campaign, Mission mission, Person person, List<Award> awards) {
         boolean isEligible;
+        List<Award> eligibleAwards = new ArrayList<>();
 
         String employer = ((Contract) mission).getEmployer();
 
@@ -98,13 +94,12 @@ public class TheatreOfWarAwards {
                 }
 
                 if (isEligible) {
-                    // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString()
-                    campaign.addReport(person.getHyperlinkedName() + ' ' +
-                            MessageFormat.format(resource.getString("EligibleForAwardReport.format"),
-                                    award.getName(), award.getSet()));
+                    eligibleAwards.add(award);
                 }
             }
         }
+
+        return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 
     /**
@@ -113,7 +108,7 @@ public class TheatreOfWarAwards {
      * @param contractStartYear the contract's start yet
      * @param currentYear the current campaign year
      */
-    private boolean isDuringWartime (List<String> wartime, int contractStartYear, int currentYear) {
+    private static boolean isDuringWartime(List<String> wartime, int contractStartYear, int currentYear) {
         int contractLength = currentYear - contractStartYear;
 
         try {
@@ -131,7 +126,7 @@ public class TheatreOfWarAwards {
      * @param missionFaction a single faction (either employer or enemy)
      * @param factions a list of factions (either a list of attackers, or of defenders)
      */
-    private boolean hasLoyalty(String missionFaction, List<String> factions) {
+    private static boolean hasLoyalty(String missionFaction, List<String> factions) {
         return factions.stream().anyMatch(faction -> processFaction(missionFaction, faction));
     }
 
