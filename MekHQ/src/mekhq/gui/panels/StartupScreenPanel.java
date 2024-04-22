@@ -142,7 +142,11 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         MegamekButton btnStoryArcEditor = new MegamekButton(resources.getString("btnStoryArcEditor.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnStoryArcEditor.addActionListener(evt -> {
-            // do something
+            // FIXME: for starters we will only load existing arcs, but later need an option to start a new arc
+            StoryArcStub storyArcStub = selectStoryArc();
+            if ((null != storyArcStub) && (null != storyArcStub.getInitCampaignFile())) {
+                startStoryArcEditor(storyArcStub);
+            }
         });
 
         MegamekButton btnQuit = new MegamekButton(resources.getString("Quit.text"),
@@ -234,6 +238,10 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
     private void startCampaign(final @Nullable File file, @Nullable StoryArcStub storyArcStub) {
         new DataLoadingDialog(getFrame(), app, file, storyArcStub).setVisible(true);
+    }
+
+    private void startStoryArcEditor(@Nullable StoryArcStub storyArcStub) {
+        new DataLoadingDialog(getFrame(), app, storyArcStub.getInitCampaignFile(), storyArcStub, true).setVisible(true);
     }
 
     private @Nullable File selectCampaignFile() {
