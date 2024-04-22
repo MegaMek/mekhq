@@ -171,8 +171,9 @@ public class CrewSkillUpgrader {
                             return 0;
                             // If we can't access the option, try a different one
                         } else if ((entity.getCrew().getOptions() == null) ||
-                                (entity.getCrew().getOptions(spa.getName()) == null) ||
-                                (!entity.getCrew().getOptions(spa.getName()).hasMoreElements())) {
+                                (entity.getCrew().getOptions(spa.getName()) == null)) {
+                            // Make sure to remove choices we can't use
+                            choices.remove(spaIndex);
                             continue;
                         }
 
@@ -182,6 +183,8 @@ public class CrewSkillUpgrader {
                             return spa.getCost();
                         } catch (NullPointerException e) {
                             LogManager.getLogger().warn("Attempted to assign SPA '" + spa.getName() + "' but SPA not found.");
+                            // Make sure to remove choices we can't use
+                            choices.remove(spaIndex);
                             continue;
                         }
                 }
