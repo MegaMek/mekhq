@@ -724,16 +724,10 @@ public class Force {
 
         Force parent = force.getParentForce();
 
-        if (parent != null) {
+        while (parent != null) {
             depth++;
-
-            while (parent != null) {
-                parent = force.getParentForce();
-
-                if (parent != null) {
-                    depth++;
-                }
-            }
+            force = parent;
+            parent = force.getParentForce();
         }
 
         return depth;
@@ -745,26 +739,24 @@ public class Force {
      * @param depth the current recursive depth. Can be left null, if called remotely
      */
     public static int getMaximumDepth(Force force, @Nullable Integer depth) {
-        Vector<Force> subforces = force.getSubForces();
-
         if (depth == null) {
             depth = 0;
         }
 
-        int maximumDepth;
-        int nextDepth;
+        int maximumDepth = depth;
 
-        if (subforces.isEmpty()) {
-            return depth;
-        } else {
-            maximumDepth = depth;
-            for (Force subforce: subforces) {
-                nextDepth = getMaximumDepth(subforce, depth + 1);
+        Vector<Force> subForces = force.getSubForces();
+
+        if (!subForces.isEmpty()) {
+            for (Force subforce : subForces) {
+                int nextDepth = getMaximumDepth(subforce, depth + 1);
+
                 if (nextDepth > maximumDepth) {
                     maximumDepth = nextDepth;
                 }
             }
         }
+
         return maximumDepth;
     }
 }

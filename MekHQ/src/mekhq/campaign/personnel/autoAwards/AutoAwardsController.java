@@ -62,7 +62,10 @@ public class AutoAwardsController {
         }
 
         // if posthumous Awards are enabled, we process them here
+
         if (campaign.getCampaignOptions().isIssuePosthumousAwards()) {
+            LogManager.getLogger().info("AutoAwards is beginning to process Posthumous Awards");
+
             personnel = campaign.getPersonnel();
             ArrayList<Person> deceasedPersonnel = new ArrayList<>();
 

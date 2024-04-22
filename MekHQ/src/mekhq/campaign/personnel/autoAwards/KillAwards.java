@@ -41,32 +41,36 @@ public class KillAwards {
         Award bestAward = new Award();
         List<Award>  eligibleAwards = new ArrayList<>();
 
-        // mhq uses a forceId of -1 to signify that the unit is not assigned to a force
-        int forceId = -1;
-        // a maximumDepth of 0 just means the only entry in the TOE is the origin force
-        int maximumDepth = 0;
+        int maximumDepth;
+        int forceId;
+        int forceDepth;
+
+        try {
+            maximumDepth = Force.getMaximumDepth(campaign.getForce(0), null);
+            forceId = person.getUnit().getForceId();
+            forceDepth = Force.getDepth(campaign.getForce(forceId));
+        } catch (Exception e) {
+            LogManager.getLogger().info("AutoAwards failed to fill essential values for {}, using defaults",
+                    person.getFullName()   );
+            forceId = -1;
+            maximumDepth = 0;
+            forceDepth = 0;
+        }
 
         for (Award award : awards) {
+            LogManager.getLogger().info("Award: {}", award.getName());
             if (award.canBeAwarded(person)) {
                 // this allows us to convert non-IS formations into IS equivalents
                 formationDepth = getFormation(award);
 
+                // we skip, if an invalid formationDepth has been provided
                 if (formationDepth == -1) {
                     continue;
                 }
-                if (formationDepth != 0) {
-                    try {
-                        forceId = person.getUnit().getForceId();
-                        maximumDepth = Force.getMaximumDepth(campaign.getForce(forceId), null);
-                    } catch (Exception e) {
-                        // if person is not assigned to a unit, there is no need to count their kills
-                        continue;
-                    }
 
-                    if (forceId == -1) {
-                        // likewise, if the unit isn't assigned to a force, we ignore their kills
-                        continue;
-                    }
+                // we also skip if the unit isn't assigned to a Force and this isn't an Individual Kill Award
+                if ((formationDepth != 0) && (forceId == -1)) {
+                    continue;
                 }
 
                 List<String> validOptions = Arrays.asList("scenario", "mission", "lifetime");
@@ -101,12 +105,13 @@ public class KillAwards {
                         break;
                     // lance
                     case 1:
+                        LogManager.getLogger().info("Lance-based Award");
                         // if the maximum depth is <= than the depth we're searching, we can just cheat
                         // and get all kills
                         if (maximumDepth <= 1) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
                             // otherwise, check to make sure force is of the type we're looking for
-                        } else if (Force.getDepth(campaign.getForce(forceId)) == maximumDepth) {
+                        } else if (forceDepth == maximumDepth) {
                             // if it is, get all the kills for the force and any child forces
                             killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
                         }
@@ -118,7 +123,7 @@ public class KillAwards {
 
                         if (maximumDepth <= 2) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (Force.getDepth(campaign.getForce(forceId)) == maximumDepth - 1) {
+                        } else if (forceDepth == maximumDepth - 1) {
                             killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
                         }
 
@@ -129,7 +134,7 @@ public class KillAwards {
 
                         if (maximumDepth <= 3) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (Force.getDepth(campaign.getForce(forceId)) == maximumDepth - 2) {
+                        } else if (forceDepth == maximumDepth - 2) {
                             killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
                         }
 
@@ -140,7 +145,7 @@ public class KillAwards {
 
                         if (maximumDepth <= 4) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (Force.getDepth(campaign.getForce(forceId)) == maximumDepth - 3) {
+                        } else if (forceDepth == maximumDepth - 3) {
                             killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
                         }
 
@@ -151,7 +156,7 @@ public class KillAwards {
 
                         if (maximumDepth <= 5) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (Force.getDepth(campaign.getForce(forceId)) == maximumDepth - 4) {
+                        } else if (forceDepth == maximumDepth - 4) {
                             killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
                         }
 
@@ -162,7 +167,7 @@ public class KillAwards {
 
                         if (maximumDepth <= 6) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (Force.getDepth(campaign.getForce(forceId)) == maximumDepth - 5) {
+                        } else if (forceDepth == maximumDepth - 5) {
                             killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
                         }
 
@@ -173,7 +178,7 @@ public class KillAwards {
 
                         if (maximumDepth <= 7) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (Force.getDepth(campaign.getForce(forceId)) == maximumDepth - 6) {
+                        } else if (forceDepth == maximumDepth - 6) {
                             killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
                         }
 
@@ -184,7 +189,7 @@ public class KillAwards {
 
                         if (maximumDepth <= 8) {
                             killCount = getAllForceKills(campaign, mission, 0, killDepth.equals("mission"));
-                        } else if (Force.getDepth(campaign.getForce(forceId)) == maximumDepth - 7) {
+                        } else if (forceDepth == maximumDepth - 7) {
                             killCount = getAllForceKills(campaign, mission, forceId, killDepth.equals("mission"));
                         }
 
