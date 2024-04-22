@@ -1099,6 +1099,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         refreshXpSpent();
     }
 
+    @Override
+    public void optionSwitched(DialogOptionComponent comp, IOption option, int i) {
+        refreshXpSpent();
+    }
+
     private void changeSkillValue(String type) {
         refreshXpSpent();
         if (!skillChks.get(type).isSelected()) {
