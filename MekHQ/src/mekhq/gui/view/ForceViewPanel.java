@@ -167,11 +167,13 @@ public class ForceViewPanel extends JScrollablePanel {
         String lanceTech = "";
         String assigned = "";
         String type = null;
-        ArrayList<Person> people = new ArrayList<>();
+        
+        Person commanderPerson = campaign.getPerson(force.getForceCommanderID());
+        commander = commanderPerson != null ? commanderPerson.getFullTitle() : "";
+        
         for (UUID uid : force.getAllUnits(false)) {
             Unit u = campaign.getUnit(uid);
             if (null != u) {
-                Person p = u.getCommander();
                 bv += u.getEntity().calculateBattleValue(true, !u.hasPilot());
                 cost = cost.plus(u.getEntity().getCost(true));
                 ton += u.getEntity().getWeight();
@@ -181,16 +183,7 @@ public class ForceViewPanel extends JScrollablePanel {
                 } else if (!utype.equals(type)) {
                     type = resourceMap.getString("mixed");
                 }
-                if (null != p) {
-                    people.add(p);
-                }
             }
-        }
-
-        // sort person vector by rank
-        people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if (!people.isEmpty()) {
-            commander = people.get(0).getFullTitle();
         }
 
         if (force.getTechID() != null) {

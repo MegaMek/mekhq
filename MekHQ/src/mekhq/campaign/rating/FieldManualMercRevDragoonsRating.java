@@ -893,6 +893,7 @@ public class FieldManualMercRevDragoonsRating extends AbstractUnitRating {
             case UnitType.PROTOMEK:
             case UnitType.CONV_FIGHTER:
             case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
             case UnitType.TANK:
             case UnitType.VTOL:
             case UnitType.BATTLE_ARMOR:

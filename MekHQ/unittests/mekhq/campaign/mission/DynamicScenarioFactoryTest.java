@@ -19,6 +19,7 @@
 package mekhq.campaign.mission;
 
 import megamek.common.Board;
+import megamek.common.Compute;
 import megamek.common.UnitType;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -35,10 +36,10 @@ public class DynamicScenarioFactoryTest {
     public void testGetOppositeEdge() {
         int startingEdge = Board.START_EDGE;
         assertEquals(Board.START_CENTER, AtBDynamicScenarioFactory.getOppositeEdge(startingEdge));
-        
+
         startingEdge = Board.START_CENTER;
         assertEquals(Board.START_EDGE, AtBDynamicScenarioFactory.getOppositeEdge(startingEdge));
-        
+
         startingEdge = Board.START_ANY;
         assertEquals(Board.START_ANY, AtBDynamicScenarioFactory.getOppositeEdge(startingEdge));
 
@@ -58,35 +59,57 @@ public class DynamicScenarioFactoryTest {
         assertEquals(Board.START_SE, AtBDynamicScenarioFactory.getOppositeEdge(startingEdge));
     }
 
-    @Disabled // This Test relies on randomness, and thus doesn't work properly.
+    private void testAeroLanceSizeInner(int unitTypeCode, int numFightersPerFlight, boolean isPlanetOwner){
+        int weightCountRoll = (Compute.randomInt(3) + 1) * numFightersPerFlight;
+        int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
+        int expected;
+        switch(unitTypeCode){
+            case UnitType.AEROSPACEFIGHTER:
+                expected = numFightersPerFlight;
+                break;
+            case UnitType.CONV_FIGHTER:
+                expected = weightCountRoll;
+                break;
+            default:
+                expected = (useASFRoll >= 4) ? numFightersPerFlight : weightCountRoll;
+        }
+
+        assertEquals(expected,AtBDynamicScenarioFactory.getAeroLanceSize(unitTypeCode, numFightersPerFlight, weightCountRoll, useASFRoll));
+    }
+
     @Test
     public void testAeroLanceSize() {
-        assertEquals(2, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AERO, true, "FC"));
-        assertEquals(3, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AERO, true, "CC"));
+        assertEquals(2, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AEROSPACEFIGHTER, true, "FC"));
+        assertEquals(3, AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.AEROSPACEFIGHTER, true, "CC"));
         assertEquals(2,
                 AtBDynamicScenarioFactory.getAeroLanceSize(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX, false, "FC"));
         assertEquals(3,
                 AtBDynamicScenarioFactory.getAeroLanceSize(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX, false, "CC"));
 
-        // the number of conv fighters is randomly generated, but should be between 2 and 6, inclusively
-        // we run it a bunch of times, all but guaranteeing that we hit the extremes
-        for (int x = 0; x < 40; x++) {
-            int numConvFighters = AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.CONV_FIGHTER, true, "FC");
-            assertTrue((numConvFighters >= 2) && (numConvFighters <= 6),
-                    String.format("Conv Fighter count: %d for FC faction not between 2 and 6 inclusive", numConvFighters));
+        // Roll some "random" values and check inner function return values
+        int unitTypeCode = UnitType.AEROSPACEFIGHTER;
+        int numFightersPerFlight = 2;
+        boolean isPlanetOwner = false;
+        testAeroLanceSizeInner(unitTypeCode,numFightersPerFlight, isPlanetOwner);
+        isPlanetOwner = true;
+        testAeroLanceSizeInner(unitTypeCode,numFightersPerFlight, isPlanetOwner);
+        numFightersPerFlight = 3;
+        isPlanetOwner = false;
+        testAeroLanceSizeInner(unitTypeCode,numFightersPerFlight, isPlanetOwner);
+        isPlanetOwner = true;
+        testAeroLanceSizeInner(unitTypeCode,numFightersPerFlight, isPlanetOwner);
 
-            // for Capellans, between 3 and 9
-            numConvFighters = AtBDynamicScenarioFactory.getAeroLanceSize(UnitType.CONV_FIGHTER, true, "CC");
-            assertTrue((numConvFighters >= 3) && (numConvFighters <= 9),
-                    String.format("Conv Fighter count: %d for CC faction not between 3 and 9 inclusive", numConvFighters));
-
-            numConvFighters = AtBDynamicScenarioFactory.getAeroLanceSize(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX, true, "FC");
-            assertTrue((numConvFighters >= 2) && (numConvFighters <= 6),
-                    String.format("Conv Fighter count: %d for FC faction not between 2 and 6 inclusive", numConvFighters));
-
-            numConvFighters = AtBDynamicScenarioFactory.getAeroLanceSize(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX, true, "CC");
-            assertTrue((numConvFighters >= 3) && (numConvFighters <= 9),
-                    String.format("Conv Fighter count: %d for CC faction not between 3 and 9 inclusive", numConvFighters));
-        }
+        unitTypeCode = UnitType.CONV_FIGHTER;
+        numFightersPerFlight = 2;
+        isPlanetOwner = false;
+        testAeroLanceSizeInner(unitTypeCode,numFightersPerFlight, isPlanetOwner);
+        testAeroLanceSizeInner(unitTypeCode,numFightersPerFlight, isPlanetOwner);
+        isPlanetOwner = true;
+        testAeroLanceSizeInner(unitTypeCode,numFightersPerFlight, isPlanetOwner);
+        numFightersPerFlight = 3;
+        isPlanetOwner = false;
+        testAeroLanceSizeInner(unitTypeCode,numFightersPerFlight, isPlanetOwner);
+        isPlanetOwner = true;
+        testAeroLanceSizeInner(unitTypeCode,numFightersPerFlight, isPlanetOwner);
     }
 }

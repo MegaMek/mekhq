@@ -228,6 +228,15 @@ public class SkillType {
         }
     }
 
+    /** get the cost to acquire this skill at the given level from scratch **/
+    public int getTotalCost(int lvl) {
+        int totalCost = 0;
+        for (int i = 0; i<=lvl; i++) {
+            totalCost = totalCost + costs[i];
+        }
+        return totalCost;
+    }
+
     /** @return the maximum level of that skill (the last one not set to cost = -1, or 10) */
     public int getMaxLevel() {
         for (int lvl = 0; lvl < costs.length; ++ lvl) {

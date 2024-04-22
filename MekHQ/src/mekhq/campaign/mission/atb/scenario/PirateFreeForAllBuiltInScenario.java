@@ -76,7 +76,7 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(Board.START_CENTER);
+        setStartingPos(Board.START_CENTER);
 
         final AtBContract contract = getContract(campaign);
 
@@ -113,10 +113,10 @@ public class PirateFreeForAllBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
-        ScenarioObjective destroyPirates = CommonObjectiveFactory.getDestroyEnemies(PIRATE_FORCE_ID, 50);
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 50);
+        ScenarioObjective destroyPirates = CommonObjectiveFactory.getDestroyEnemies(PIRATE_FORCE_ID, 1, 50);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                50, false);
+                1, 50, false);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(destroyPirates);

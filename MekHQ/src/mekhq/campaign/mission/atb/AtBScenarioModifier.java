@@ -427,7 +427,7 @@ public class AtBScenarioModifier implements Cloneable {
         copy.linkedModifiers = linkedModifiers == null ? new HashMap<>() : new HashMap<>(linkedModifiers);
         copy.objectives = objectives == null ? new ArrayList<>() : new ArrayList<>(objectives);
         copy.bvBudgetAdditiveMultiplier = bvBudgetAdditiveMultiplier;
-        copy .reinforcementDelayReduction = reinforcementDelayReduction;
+        copy.reinforcementDelayReduction = reinforcementDelayReduction;
         return copy;
     }
 

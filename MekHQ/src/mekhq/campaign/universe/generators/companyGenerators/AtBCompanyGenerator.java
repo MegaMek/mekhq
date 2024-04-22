@@ -74,7 +74,7 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
                                                         final Faction faction) {
         if (parameters.isStarLeague() && !faction.isComStarOrWoB()) {
             if (faction.isClan()) {
-                // Clanners generate from Front Line tables instead of Star League
+                // Clan Pilots generate from Front Line tables instead of Star League
                 parameters.setQuality(IUnitRating.DRAGOON_B);
                 return generateMechSummary(campaign, parameters, faction.getShortName(), campaign.getGameYear());
             } else {
@@ -83,7 +83,7 @@ public class AtBCompanyGenerator extends AbstractCompanyGenerator {
                 return generateMechSummary(campaign, parameters, factionCode, getOptions().getStarLeagueYear());
             }
         } else {
-            // Clanners Generate from 2nd Line Tables
+            // Clan Pilots Generate from 2nd Line Tables
             if (faction.isClan()) {
                 parameters.setQuality(IUnitRating.DRAGOON_C);
             }

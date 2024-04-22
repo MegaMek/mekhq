@@ -153,11 +153,11 @@ public class CampaignOpsReputationTest {
     // Fighters
     private Skill mockAeroGunnery;
     private Skill mockAeroPilot;
-    private Aero mockCorsair1;
+    private AeroSpaceFighter mockCorsair1;
     private Unit mockCorsairUnit1;
     private Person mockCorsair1Pilot;
     private Person mockCorsair1Tech;
-    private Aero mockCorsair2;
+    private AeroSpaceFighter mockCorsair2;
     private Unit mockCorsairUnit2;
     private Person mockCorsair2Pilot;
     private Person mockCorsair2Tech;
@@ -1378,12 +1378,12 @@ public class CampaignOpsReputationTest {
     }
 
     private int mockCorsair1() {
-        mockCorsair1 = mock(Aero.class);
+        mockCorsair1 = mock(AeroSpaceFighter.class);
         mockCorsairUnit1 = mock(Unit.class);
         mockCorsair1Pilot = mock(Person.class);
         mockCorsair1Tech = mock(Person.class);
 
-        when(mockCorsair1.getEntityType()).thenReturn(Entity.ETYPE_AERO);
+        when(mockCorsair1.getEntityType()).thenReturn(Entity.ETYPE_AEROSPACEFIGHTER);
         when(mockCorsair1.getUnitType()).thenCallRealMethod();
         when(mockCorsairUnit1.getEntity()).thenReturn(mockCorsair1);
         when(mockCorsair1Pilot.isAdministrator()).thenReturn(false);
@@ -1414,12 +1414,12 @@ public class CampaignOpsReputationTest {
     }
 
     private int mockCorsair2() {
-        mockCorsair2 = mock(Aero.class);
+        mockCorsair2 = mock(AeroSpaceFighter.class);
         mockCorsairUnit2 = mock(Unit.class);
         mockCorsair2Pilot = mock(Person.class);
         mockCorsair2Tech = mock(Person.class);
 
-        when(mockCorsair2.getEntityType()).thenReturn(Entity.ETYPE_AERO);
+        when(mockCorsair2.getEntityType()).thenReturn(Entity.ETYPE_AEROSPACEFIGHTER);
         when(mockCorsair2.getUnitType()).thenCallRealMethod();
         when(mockCorsairUnit2.getEntity()).thenReturn(mockCorsair2);
         when(mockCorsair2Pilot.isAdministrator()).thenReturn(false);

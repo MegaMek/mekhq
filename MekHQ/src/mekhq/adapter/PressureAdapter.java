@@ -19,28 +19,28 @@
 package mekhq.adapter;
 
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
-import megamek.common.PlanetaryConditions;
+import megamek.common.planetaryconditions.Atmosphere;
 
 public class PressureAdapter extends XmlAdapter<String, Integer> {
 
     @Override
     public Integer unmarshal(String v) throws Exception {
         switch (v) {
-            case "Vacuum": return PlanetaryConditions.ATMO_VACUUM;
-            case "Trace": return PlanetaryConditions.ATMO_TRACE;
+            case "Vacuum": return Atmosphere.VACUUM.ordinal();
+            case "Trace": return Atmosphere.TRACE.ordinal();
             case "Thin":
-            case "Low": return PlanetaryConditions.ATMO_THIN;
+            case "Low": return Atmosphere.THIN.ordinal();
             case "Standard":
-            case "Normal": return PlanetaryConditions.ATMO_STANDARD;
-            case "High": return PlanetaryConditions.ATMO_HIGH;
-            case "Very High": return PlanetaryConditions.ATMO_VHIGH;
+            case "Normal": return Atmosphere.STANDARD.ordinal();
+            case "High": return Atmosphere.HIGH.ordinal();
+            case "Very High": return Atmosphere.VERY_HIGH.ordinal();
             default: return null;
         }
     }
 
     @Override
     public String marshal(Integer v) throws Exception {
-        return PlanetaryConditions.getAtmosphereDisplayableName(v);
+        return Atmosphere.getAtmosphere(v).toString();
     }
 
 }

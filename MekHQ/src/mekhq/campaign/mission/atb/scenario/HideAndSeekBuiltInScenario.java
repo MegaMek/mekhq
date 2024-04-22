@@ -28,8 +28,12 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.CommonObjectiveFactory;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.mission.atb.AtBScenarioEnabled;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @AtBScenarioEnabled
 public class HideAndSeekBuiltInScenario extends AtBScenario {
@@ -50,10 +54,15 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
     @Override
     public void setTerrain() {
+        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
         do {
-            setTerrainType(terrainChart[Compute.d6(2) - 2]);
-        } while ((getTerrainType() == TER_WETLANDS || getTerrainType() == TER_COASTAL
-                || getTerrainType() == TER_FLATLANDS));
+            setTerrainType(keys.get(Compute.randomInt(keys.size())));
+        } while (getTerrainType().equals("ColdSea")
+                || getTerrainType().equals("FrozenSea")
+                || getTerrainType().equals("HotSea")
+                || getTerrainType().equals("Plains")
+                || getTerrainType().equals("Savannah"));
     }
 
     @Override
@@ -74,7 +83,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             playerHome = startPos[Compute.randomInt(4)];
-            setStart(playerHome);
+            setStartingPos(playerHome);
 
             enemyStart = Board.START_CENTER;
             setEnemyHome(playerHome + 4);
@@ -83,7 +92,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
                 setEnemyHome(getEnemyHome() - 8);
             }
         } else {
-            setStart(Board.START_CENTER);
+            setStartingPos(Board.START_CENTER);
             enemyStart = startPos[Compute.randomInt(4)];
             setEnemyHome(enemyStart);
             playerHome = getEnemyHome() + 4;
@@ -94,7 +103,7 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
         }
 
         if (!allyEntities.isEmpty()) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
+            addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
         if (isAttacker()) {
@@ -114,10 +123,10 @@ public class HideAndSeekBuiltInScenario extends AtBScenario {
 
         // Attacker must destroy 50% and keep 66% alive
         // Defender must destroy 33% and keep 50% alive
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract,
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1,
                 isAttacker() ? 50 : 33);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(
-                campaign, contract, this, isAttacker() ? 66 : 50, false);
+                campaign, contract, this, 1, isAttacker() ? 66 : 50, false);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
                 this);
 

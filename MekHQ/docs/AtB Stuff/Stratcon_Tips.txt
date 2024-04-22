@@ -1,7 +1,7 @@
 #1: Leadership lets you bring extra auxiliary units for free (where an "auxiliary unit" is any unit of a different type than the majority of the lance and of lower BV than the lowest-BV unit in the lance)
 So: give your lance leaders leadership points, and keep some lower-BV units (tanks, aerospace fighters, whatever) around so you can bring extra stuff to a fight
 
-#2: Keep some lances on the "fight" role or keep some support/victory points. That way, if a fight seems unfair, you can bring an extra lance in Or two.
+#2: Keep some lances on the "fight" role or keep some Support/Campaign Victory Points. That way, if a fight seems unfair, you can bring an extra lance in Or two.
 
 #3: On Independent and Liaison command rights, you're expected to complete the strategic objectives. On Liaison+ command, you're expected to maintain positive campaign VP.
 
@@ -11,4 +11,4 @@ So: give your lance leaders leadership points, and keep some lower-BV units (tan
 
 #6: Pay attention to scenario objectives - some scenarios you'll have an easier time with if you don't try to destroy everything. For example, the "pursuit" or "breakthrough" scenarios are best done at night with fast, jump-capable units (or hell, VTOLs). For facilities you're trying to take out, you can just destroy the turrets and bug out if you can't take the garrison.
 
-Coming soon (TM): You can convert victory points to support points and support points to "bonus parts" if you're having trouble getting that replacement mobile hyper pulse generator or other ridiculously rare/extinct part.
+Coming soon (TM): You can convert Campaign Victory Points to support points and support points to "bonus parts" if you're having trouble getting that replacement mobile hyper pulse generator or other ridiculously rare/extinct part.

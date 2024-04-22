@@ -71,6 +71,7 @@ public class Force {
     private Vector<Force> subForces;
     private Vector<UUID> units;
     private int scenarioId;
+    private UUID forceCommanderID;
 
     protected UUID techId;
 
@@ -310,6 +311,8 @@ public class Force {
                 }
             }
         }
+        
+        updateCommander(campaign);
     }
 
     /**
@@ -338,30 +341,9 @@ public class Force {
                     }
                 }
             }
+            
+            updateCommander(campaign);
         }
-    }
-
-    public boolean removeUnitFromAllForces(UUID id) {
-        int idx = 0;
-        boolean found = false;
-        for (UUID uid : getUnits()) {
-            if (uid.equals(id)) {
-                found = true;
-                break;
-            }
-            idx++;
-        }
-        if (found) {
-            units.remove(idx);
-        } else {
-            for (Force sub : getSubForces()) {
-                found = sub.removeUnitFromAllForces(id);
-                if (found) {
-                    break;
-                }
-            }
-        }
-        return found;
     }
 
     public void clearScenarioIds(Campaign c) {
@@ -402,7 +384,64 @@ public class Force {
     public void setId(int i) {
         this.id = i;
     }
-
+    
+    public UUID getForceCommanderID() {
+        return forceCommanderID;
+    }
+    
+    public void setForceCommanderID(UUID commanderID) {
+        forceCommanderID = commanderID;
+    }
+    
+    public List<UUID> getEligibleCommanders(Campaign c) {
+        List<UUID> people = new ArrayList<>();
+        Person highestRankPerson = c.getPerson(getForceCommanderID());
+        
+        // safety check: if the person is no longer assigned to a unit or the force, 
+        // then they're not really the highest ranked person in the force.
+        if ((highestRankPerson != null) && 
+                ((highestRankPerson.getUnit() == null) ||
+                (!getUnits().contains(highestRankPerson.getUnit().getId())))) {
+            highestRankPerson = null;
+        }
+        
+        for (UUID uid : getUnits()) {
+            Unit u = c.getUnit(uid);
+            if (null != u) {
+                Person p = u.getCommander();
+                if (null != p) {
+                    // if we found someone with a higher rank, clear everything out and start again with the new highest rank person
+                    if (p.outRanks(highestRankPerson)) {
+                        people.clear();
+                        people.add(p.getId());
+                        highestRankPerson = p;
+                    // if we are looking at someone with a lower rank, ignore them and move on
+                    } else if ((highestRankPerson != null) && highestRankPerson.outRanks(p)) {
+                        continue;
+                    // someone with an equivalent rank can be commander
+                    } else {
+                        people.add(p.getId());
+                    }
+                }
+            }
+        }
+        
+        return people;
+    }
+    
+    /**
+     * Automatically update the force's commander
+     */
+    public void updateCommander(Campaign c) {
+        List<UUID> eligibleCommanders = getEligibleCommanders(c);
+        
+        // logic: if we found someone eligible who is a higher rank, the first one of those becomes the new commander
+        // otherwise, the existing commander remains the commander
+        if (!eligibleCommanders.contains(getForceCommanderID()) && (eligibleCommanders.size() > 0)) {
+            forceCommanderID = eligibleCommanders.get(0);
+        }
+    }
+    
     public void removeSubForce(int id) {
         int idx = 0;
         boolean found = false;
@@ -470,6 +509,7 @@ public class Force {
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "combatForce", combatForce);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "techId", techId);
+        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "forceCommanderID", forceCommanderID);
         if (!units.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "units");
             for (UUID uid : units) {
@@ -528,6 +568,8 @@ public class Force {
                     retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("techId")) {
                     retVal.techId = UUID.fromString(wn2.getTextContent());
+                }  else if (wn2.getNodeName().equalsIgnoreCase("forceCommanderID")) {
+                    retVal.forceCommanderID = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("units")) {
                     processUnitNodes(retVal, wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("subforces")) {
@@ -563,6 +605,8 @@ public class Force {
         } else if (version.isLowerThan("0.49.7")) {
             retVal.setForceIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getForceIcon()));
         }
+        
+        retVal.updateCommander(c);
 
         return retVal;
     }

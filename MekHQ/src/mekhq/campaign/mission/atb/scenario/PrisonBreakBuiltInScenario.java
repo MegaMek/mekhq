@@ -87,7 +87,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(Board.START_CENTER);
+        setStartingPos(Board.START_CENTER);
         int enemyStart = startPos[Compute.randomInt(4)];
 
         for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
@@ -109,7 +109,7 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
 
-        addBotForce(new BotForce(PRISONER_FORCE_ID, 1, getStart(), otherForce), campaign);
+        addBotForce(new BotForce(PRISONER_FORCE_ID, 1, getStartingPos(), otherForce), campaign);
     }
 
     @Override
@@ -117,10 +117,10 @@ public class PrisonBreakBuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
 
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1, true);
+                1, 1, true);
         ScenarioObjective keepPrisonersAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(PRISONER_FORCE_ID,
-                1, true);
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(GUARD_FORCE_ID, 100);
+                1, 1, true);
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(GUARD_FORCE_ID, 1, 100);
         destroyHostiles.getSuccessEffects().clear();
         destroyHostiles.addDetail(getResourceBundle().getString("commonObjectives.battlefieldControl"));
         destroyHostiles.setTimeLimit(8);

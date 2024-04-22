@@ -485,7 +485,8 @@ public class ResolveScenarioTracker {
                                     + " when trying to assign kills");
                             continue;
                         }
-                        status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getLocalDate()));
+                        status.addKill(new Kill(p.getId(), killed, u.getEntity().getShortNameRaw(), campaign.getLocalDate(),
+                                getMissionId(), getScenarioId()));
                     }
                 }
             }
@@ -1308,7 +1309,7 @@ public class ResolveScenarioTracker {
         return actualSalvage;
     }
 
-    public List<TestUnit> getRansomedSalvage() {
+    public List<TestUnit> getSoldSalvage() {
         return ransomedSalvage;
     }
 
@@ -1323,10 +1324,10 @@ public class ResolveScenarioTracker {
         }
     }
 
-    public void ransomUnit(int i) {
+    public void sellUnit(int i) {
         if (i < getPotentialSalvage().size()) {
             TestUnit ransomUnit = getPotentialSalvage().get(i);
-            getRansomedSalvage().add(ransomUnit);
+            getSoldSalvage().add(ransomUnit);
         }
     }
 
@@ -1354,6 +1355,14 @@ public class ResolveScenarioTracker {
 
     public Mission getMission() {
         return campaign.getMission(scenario.getMissionId());
+    }
+
+    public int getMissionId() {
+        return campaign.getMission(scenario.getMissionId()).getId();
+    }
+
+    public int getScenarioId() {
+        return scenario.getId();
     }
 
     public Hashtable<String, String> getKillCredits() {
@@ -1567,16 +1576,16 @@ public class ResolveScenarioTracker {
         }
 
         // And any ransomed salvaged units
-        if (!getRansomedSalvage().isEmpty()) {
-            for (Unit ransomedUnit : getRansomedSalvage()) {
+        if (!getSoldSalvage().isEmpty()) {
+            for (Unit ransomedUnit : getSoldSalvage()) {
                 unitRansoms = unitRansoms.plus(ransomedUnit.getSellValue());
             }
 
             if (unitRansoms.isGreaterThan(Money.zero())) {
                 getCampaign().getFinances().credit(TransactionType.SALVAGE, getCampaign().getLocalDate(),
-                        unitRansoms, "Unit ransoms for " + getScenario().getName());
+                        unitRansoms, "Unit sales for " + getScenario().getName());
                 getCampaign().addReport(unitRansoms.toAmountAndSymbolString()
-                        + " has been credited to your account from unit ransoms following "
+                        + " has been credited to your account from unit salvage sold following "
                         + getScenario().getName() + ".");
                 if (isContract) {
                     ((Contract) mission).addSalvageByUnit(unitRansoms);
@@ -1913,7 +1922,7 @@ public class ResolveScenarioTracker {
         public UnitStatus(Unit unit) {
             this.unit = unit;
             this.name = unit.getName();
-            chassis = unit.getEntity().getChassis();
+            chassis = unit.getEntity().getFullChassis();
             model = unit.getEntity().getModel();
             //assume its a total loss until we find something that says otherwise
             totalLoss = true;

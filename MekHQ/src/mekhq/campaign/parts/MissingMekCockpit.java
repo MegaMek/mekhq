@@ -65,11 +65,31 @@ public class MissingMekCockpit extends MissingPart {
     public double getTonnage() {
         switch (type) {
             case Mech.COCKPIT_SMALL:
-                return 2;
+                return 2.0;
             case Mech.COCKPIT_TORSO_MOUNTED:
-                return 4;
+            case Mech.COCKPIT_DUAL:
+            case Mech.COCKPIT_SUPERHEAVY:
+            case Mech.COCKPIT_SUPERHEAVY_INDUSTRIAL:
+            case Mech.COCKPIT_TRIPOD:
+            case Mech.COCKPIT_TRIPOD_INDUSTRIAL:
+            case Mech.COCKPIT_INTERFACE:
+            case Mech.COCKPIT_QUADVEE:
+                return 4.0;
+            case Mech.COCKPIT_PRIMITIVE:
+            case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
+            case Mech.COCKPIT_SUPERHEAVY_TRIPOD:
+            case Mech.COCKPIT_SUPERHEAVY_TRIPOD_INDUSTRIAL:
+            case Mech.COCKPIT_SMALL_COMMAND_CONSOLE:
+                return 5.0;
+            case Mech.COCKPIT_COMMAND_CONSOLE:
+                return 6.0;
+            case Mech.COCKPIT_SUPERHEAVY_COMMAND_CONSOLE:
+                return 7.0;
+            case Mech.COCKPIT_STANDARD:
+            case Mech.COCKPIT_INDUSTRIAL:
+            case Mech.COCKPIT_VRRP:
             default:
-                return 3;
+                return 3.0;
         }
     }
 

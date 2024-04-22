@@ -333,7 +333,7 @@ public class RATManager extends AbstractUnitGenerator {
     public boolean isSupportedUnitType(final int unitType) {
         return (unitType == UnitType.MEK)
                 || (unitType == UnitType.TANK)
-                || (unitType == UnitType.AERO)
+                || (unitType == UnitType.AEROSPACEFIGHTER)
                 || (unitType == UnitType.DROPSHIP)
                 || (unitType == UnitType.INFANTRY)
                 || (unitType == UnitType.BATTLE_ARMOR)
@@ -490,7 +490,7 @@ public class RATManager extends AbstractUnitGenerator {
                                     retVal.unitTypes.add(UnitType.CONV_FIGHTER);
                                     break;
                                 case "Aero":
-                                    retVal.unitTypes.add(UnitType.AERO);
+                                    retVal.unitTypes.add(UnitType.AEROSPACEFIGHTER);
                                     break;
                                 case "Small Craft":
                                     retVal.unitTypes.add(UnitType.SMALL_CRAFT);

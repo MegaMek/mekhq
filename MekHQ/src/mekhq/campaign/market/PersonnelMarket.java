@@ -45,12 +45,14 @@ public class PersonnelMarket {
     private List<Person> personnel = new ArrayList<>();
     private PersonnelMarketMethod method;
 
+
     public static final int TYPE_RANDOM = 0;
     public static final int TYPE_DYLANS = 1;
     public static final int TYPE_FMMR = 2;
     public static final int TYPE_STRAT_OPS = 3;
     public static final int TYPE_ATB = 4;
-    public static final int TYPE_NUM = 5;
+    public static final int TYPE_NONE = 5;
+    public static final int TYPE_NUM = 6;
 
     /* Used by AtB to track Units assigned to recruits; the key
      * is the person UUID. */
@@ -60,7 +62,7 @@ public class PersonnelMarket {
     private PersonnelRole paidRecruitRole = PersonnelRole.MECHWARRIOR;
 
     public PersonnelMarket() {
-        method = new PersonnelMarketRandom();
+        method = new PersonnelMarketDisabled();
         MekHQ.registerHandler(this);
     }
 
@@ -77,7 +79,7 @@ public class PersonnelMarket {
     public void setType(String key) {
         method = PersonnelMarketServiceManager.getInstance().getService(key);
         if (null == method) {
-            method = new PersonnelMarketRandom();
+            method = new PersonnelMarketDisabled();
         }
     }
 
@@ -301,9 +303,15 @@ public class PersonnelMarket {
                 return "Strat Ops";
             case TYPE_ATB:
                 return "Against the Bot";
+            case TYPE_NONE:
+                return "Disabled";
             default:
                 return "ERROR: Default case reached in PersonnelMarket.getTypeName()";
         }
+    }
+
+    public boolean isNone() {
+        return null == method || method instanceof PersonnelMarketDisabled;
     }
 
     public static long getUnitMainForceType(Campaign c) {
@@ -312,8 +320,8 @@ public class PersonnelMarket {
             return Entity.ETYPE_MECH;
         } else if ((mostTypes & Entity.ETYPE_TANK) != 0) {
             return Entity.ETYPE_TANK;
-        } else if ((mostTypes & Entity.ETYPE_AERO) != 0) {
-            return Entity.ETYPE_AERO;
+        } else if ((mostTypes & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
+            return Entity.ETYPE_AEROSPACEFIGHTER;
         } else if ((mostTypes & Entity.ETYPE_BATTLEARMOR) != 0) {
             return Entity.ETYPE_BATTLEARMOR;
         } else if ((mostTypes & Entity.ETYPE_INFANTRY) != 0) {
@@ -337,7 +345,7 @@ public class PersonnelMarket {
         int ds = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
         int sc = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int cf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int asf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
         int vee = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true) + hangarStats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
         int inf = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
         int ba = hangarStats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
@@ -381,7 +389,7 @@ public class PersonnelMarket {
             retval = retval | Entity.ETYPE_CONV_FIGHTER;
         }
         if (most == asf) {
-            retval = retval | Entity.ETYPE_AERO;
+            retval = retval | Entity.ETYPE_AEROSPACEFIGHTER;
         }
         if (most == vee) {
             retval = retval | Entity.ETYPE_TANK;

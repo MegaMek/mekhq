@@ -18,16 +18,17 @@
  */
 package mekhq;
 
+import megamek.client.AbstractClient;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
+import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ui.swing.ClientGUI;
 import megamek.common.*;
+import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.campaign.force.Force;
-import mekhq.campaign.mission.AtBDynamicScenario;
-import mekhq.campaign.mission.AtBScenario;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.force.Lance;
+import mekhq.campaign.mission.*;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
@@ -38,6 +39,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.Comparator;
+
 
 /**
  * Enhanced version of GameThread which imports settings and non-player units into the MM game
@@ -74,7 +77,7 @@ public class AtBGameThread extends GameThread {
         client.addCloseClientListener(this);
 
         if (swingGui != null) {
-            for (Client client2 : swingGui.getLocalBots().values()) {
+            for (AbstractClient client2 : swingGui.getLocalBots().values()) {
                 client2.die();
             }
             swingGui.getLocalBots().clear();
@@ -121,13 +124,15 @@ public class AtBGameThread extends GameThread {
                 mapSettings.getBoardsSelectedVector().clear();
 
                 // if the scenario is taking place in space, do space settings instead
-                if (scenario.getTerrainType() == Scenario.TER_SPACE) {
+                if (scenario.getBoardType() == Scenario.T_SPACE) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
-                    mapSettings.getBoardsSelectedVector().add(scenario.getMap().replace(".board", "")); // TODO : remove inline file type
+                    String board = scenario.getMap().replace(".board", ""); // TODO : remove inline file type
+                    board = board.replace("\\", "/");
+                    mapSettings.getBoardsSelectedVector().add(board);
 
-                    if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+                    if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
                 } else {
@@ -138,7 +143,7 @@ public class AtBGameThread extends GameThread {
                         LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);  // TODO : Remove inline file path
                     }
 
-                    if (scenario.getTerrainType() == Scenario.TER_LOW_ATMO) {
+                    if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
 
@@ -154,15 +159,25 @@ public class AtBGameThread extends GameThread {
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions();
                 planetaryConditions.setLight(scenario.getLight());
                 planetaryConditions.setWeather(scenario.getWeather());
-                planetaryConditions.setWindStrength(scenario.getWind());
+                planetaryConditions.setWind(scenario.getWind());
                 planetaryConditions.setFog(scenario.getFog());
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
                 planetaryConditions.setGravity(scenario.getGravity());
-                planetaryConditions.setTemperature(scenario.getTemperature());
+                planetaryConditions.setEMI(scenario.getEMI());
+                planetaryConditions.setBlowingSand(scenario.getBlowingSand());
+                planetaryConditions.setTemperature(scenario.getModifiedTemperature());
                 client.sendPlanetaryConditions(planetaryConditions);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
-                client.getLocalPlayer().setStartingPos(scenario.getStart());
+                // set player deployment
+                client.getLocalPlayer().setStartingPos(scenario.getStartingPos());
+                client.getLocalPlayer().setStartOffset(scenario.getStartOffset());
+                client.getLocalPlayer().setStartWidth(scenario.getStartWidth());
+                client.getLocalPlayer().setStartingAnyNWx(scenario.getStartingAnyNWx());
+                client.getLocalPlayer().setStartingAnyNWy(scenario.getStartingAnyNWy());
+                client.getLocalPlayer().setStartingAnySEx(scenario.getStartingAnySEx());
+                client.getLocalPlayer().setStartingAnySEy(scenario.getStartingAnySEy());
+
                 client.getLocalPlayer().setTeam(1);
 
                 // minefields
@@ -324,7 +339,7 @@ public class AtBGameThread extends GameThread {
 
                     // chill out while bot is created and connects to megamek
                     Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
-                    configureBot(botClient, bf);
+                    configureBot(botClient, bf, scenario);
 
                     // we need to wait until the game has actually started to do transport loading
                     // This will load the bot's infantry into APCs
@@ -401,6 +416,7 @@ public class AtBGameThread extends GameThread {
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         } finally {
+            swingGui.setDisconnectQuietly(true);
             client.die();
             client = null;
             swingGui = null;
@@ -415,7 +431,7 @@ public class AtBGameThread extends GameThread {
      * @param botClient
      * @param botForce
      */
-    private void configureBot(BotClient botClient, BotForce botForce) {
+    private void configureBot(BotClient botClient, BotForce botForce, Scenario scenario) {
         try {
             // Wait for the server to add the bot client, but allow a timeout rather than blocking
             int retryCount = 0;
@@ -432,28 +448,81 @@ public class AtBGameThread extends GameThread {
                 LogManager.getLogger().error("Could not configure bot " + botClient.getName());
             } else {
                 botClient.getLocalPlayer().setTeam(botForce.getTeam());
-                botClient.getLocalPlayer().setStartingPos(botForce.getStart());
 
+                //set deployment
+                botClient.getLocalPlayer().setStartingPos(botForce.getStartingPos());
+                botClient.getLocalPlayer().setStartOffset(botForce.getStartOffset());
+                botClient.getLocalPlayer().setStartWidth(botForce.getStartWidth());
+                botClient.getLocalPlayer().setStartingAnyNWx(botForce.getStartingAnyNWx());
+                botClient.getLocalPlayer().setStartingAnyNWy(botForce.getStartingAnyNWy());
+                botClient.getLocalPlayer().setStartingAnySEx(botForce.getStartingAnySEx());
+                botClient.getLocalPlayer().setStartingAnySEy(botForce.getStartingAnySEy());
+
+                // set camo
                 botClient.getLocalPlayer().setCamouflage(botForce.getCamouflage().clone());
                 botClient.getLocalPlayer().setColour(botForce.getColour());
 
                 botClient.sendPlayerInfo();
 
-                String forceName = botClient.getLocalPlayer().getName() + "|1";
-                var entities = new ArrayList<Entity>();
-                for (Entity entity : botForce.getFullEntityList(campaign)) {
-                    if (null == entity) {
-                        continue;
-                    }
-                    entity.setOwner(botClient.getLocalPlayer());
-                    entity.setForceString(forceName);
-                    entities.add(entity);
-                }
+                List<Entity> entities = setupBotEntities(botClient, botForce, scenario);
                 botClient.sendAddEntity(entities);
             }
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }
+    }
+
+    @Override
+    protected List<Entity> setupBotEntities(BotClient botClient, BotForce botForce, Scenario scenario) {
+        String forceName = botClient.getLocalPlayer().getName() + "|0||%s Lance|%s||";
+        var entities = new ArrayList<Entity>();
+        int i = 0;
+        int forceIdLance = 1;
+        String lastType = "";
+        final RandomCallsignGenerator RCG = RandomCallsignGenerator.getInstance();
+        String lanceName = RCG.generate();
+        botForce.generateRandomForces(units, campaign);
+        List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
+        AtBContract contract = (AtBContract) campaign.getMission(scenario.getMissionId());
+        int lanceSize;
+
+        if (botForce.getTeam() == 2) {
+            lanceSize = Lance.getStdLanceSize(contract.getEnemy());
+        } else {
+            lanceSize = Lance.getStdLanceSize(contract.getEmployerFaction());
+        }
+
+        Comparator<Entity> comp = Comparator.comparing(((Entity e) -> e.getEntityMajorTypeName(e.getEntityType())));
+        comp = comp.thenComparing(((Entity e) -> e.getRunMP()), Comparator.reverseOrder());
+        comp = comp.thenComparing(((Entity e) -> e.getRole().toString()));
+        entitiesSorted.sort(comp);
+
+        for (Entity entity : entitiesSorted) {
+            if (null == entity) {
+                continue;
+            }
+
+            if ((i != 0)
+                    && !lastType.equals(entity.getEntityMajorTypeName(entity.getEntityType()))) {
+                forceIdLance++;
+                lanceName = RCG.generate();
+                i = forceIdLance * lanceSize;
+            }
+
+            lastType = entity.getEntityMajorTypeName(entity.getEntityType());
+            entity.setOwner(botClient.getLocalPlayer());
+            String fName = String.format(forceName, lanceName, forceIdLance);
+            entity.setForceString(fName);
+            entities.add(entity);
+            i++;
+
+            if (i % lanceSize == 0) {
+                forceIdLance++;
+                lanceName = RCG.generate();
+            }
+        }
+
+        return entities;
     }
 
     /**

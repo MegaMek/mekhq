@@ -499,7 +499,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                         return getChkShowMechs().isSelected();
                     case UnitType.TANK:
                         return getChkShowVehicles().isSelected();
-                    case UnitType.AERO:
+                    case UnitType.AEROSPACEFIGHTER:
                         return getChkShowAerospace().isSelected();
                     case UnitType.CONV_FIGHTER:
                         return getChkShowConvAero().isSelected();

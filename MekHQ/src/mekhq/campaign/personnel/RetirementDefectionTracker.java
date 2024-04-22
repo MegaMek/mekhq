@@ -172,7 +172,7 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            TargetRoll target = new TargetRoll(5, "Target");
+            TargetRoll target = new TargetRoll(3, "Target");
             target.addModifier(p.getExperienceLevel(campaign, false) - campaign.getUnitRatingMod(),
                     "Experience");
             /* Retirement rolls are made before the contract status is set */
@@ -403,14 +403,14 @@ public class RetirementDefectionTracker {
                 person.getPrimaryRole()).isMechWarrior();
         switch (person.getExperienceLevel(campaign, false)) {
             case SkillType.EXP_ELITE:
-                return Money.of(isMechWarriorProfession ? 300000 : 150000);
+                return Money.of(isMechWarriorProfession ? 9600 : 5920);
             case SkillType.EXP_VETERAN:
-                return Money.of(isMechWarriorProfession ? 150000 : 50000);
+                return Money.of(isMechWarriorProfession ? 4800 : 2960);
             case SkillType.EXP_REGULAR:
-                return Money.of(isMechWarriorProfession ? 50000 : 20000);
+                return Money.of(isMechWarriorProfession ? 3000 : 1850);
             case SkillType.EXP_GREEN:
             default:
-                return Money.of(isMechWarriorProfession ? 20000 : 10000);
+                return Money.of(isMechWarriorProfession ? 1800 : 1110);
         }
     }
 
@@ -483,7 +483,7 @@ public class RetirementDefectionTracker {
                 } else {
                     payoutAmount = getBonusCost(campaign, person);
                     if (person.getRank().isOfficer()) {
-                        payoutAmount = payoutAmount.multipliedBy(2);
+                        payoutAmount = payoutAmount.multipliedBy(1.2);
                     }
                 }
 

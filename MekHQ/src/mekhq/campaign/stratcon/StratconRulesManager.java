@@ -65,7 +65,7 @@ public class StratconRulesManager {
         ChainedScenario,
 
         /**
-         * We pay a support point or convert a victory point to a support point
+         * We pay a support point or convert a Campaign Victory Point to a support point
          */
         SupportPoint,
 
@@ -186,30 +186,25 @@ public class StratconRulesManager {
     public static void setScenarioParametersFromBiome(StratconTrackState track, StratconScenario scenario) {
         StratconCoords coords = scenario.getCoords();
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
 
         // for non-surface scenarios, we will skip the temperature update
-        if (backingScenario.getTerrainType() != Scenario.TER_LOW_ATMO &&
-                backingScenario.getTerrainType() != Scenario.TER_SPACE) {
+        if (backingScenario.getBoardType() != Scenario.T_SPACE &&
+                backingScenario.getBoardType() != Scenario.T_ATMOSPHERE) {
             backingScenario.setTemperature(track.getTemperature());
-        }
-        
-        // for now, if we're using a fixed map or in a facility, don't replace the scenario
-        // TODO: facility spaces will always have a relevant biome
-        if (backingScenario.isUsingFixedMap()) {
-            return; // for now
         }
 
         StratconFacility facility = track.getFacility(scenario.getCoords());
         String terrainType;
-        
+
         // facilities have their own terrain lists
         if (facility != null) {
             int kelvinTemp = track.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
             StratconBiome facilityBiome;
-            
+
             // if facility doesn't have a biome temp map or no entry for the current temperature, use the default one
             if (facility.getBiomes().isEmpty() || (facility.getBiomeTempMap().floorEntry(kelvinTemp) == null)) {
-                facilityBiome = StratconBiomeManifest.getInstance().getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
+                facilityBiome = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
                         .floorEntry(kelvinTemp).getValue();
             } else {
                 facilityBiome = facility.getBiomeTempMap().floorEntry(kelvinTemp).getValue();
@@ -218,8 +213,8 @@ public class StratconRulesManager {
         } else {
             terrainType = track.getTerrainTile(coords);
         }
-        
-        var mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+
+        var mapTypes = biomeManifest.getBiomeMapTypes();
 
         // don't have a map list for the given terrain, leave it alone
         if(!mapTypes.containsKey(terrainType)) {
@@ -227,9 +222,17 @@ public class StratconRulesManager {
         }
 
         // if we are in space, do not update the map; note that it's ok to do so in low atmo
-        if (backingScenario.getTerrainType() != Scenario.TER_SPACE) {
+        if (backingScenario.getBoardType() != Scenario.T_SPACE) {
             var mapTypeList = mapTypes.get(terrainType).mapTypes;
-            backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+            backingScenario.setHasTrack(true);
+            backingScenario.setTerrainType(terrainType);
+            // for now, if we're using a fixed map or in a facility, don't replace the scenario
+            // TODO: facility spaces will always have a relevant biome
+            if (!backingScenario.isUsingFixedMap()) {
+                backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+            }
+            backingScenario.setLightConditions();
+            backingScenario.setWeather();
         }
     }
 
@@ -694,7 +697,7 @@ public class StratconRulesManager {
                 case UnitType.VTOL:
                     retVal.get(MapLocation.AllGroundTerrain).add(forceID);
                     break;
-                case UnitType.AERO:
+                case UnitType.AEROSPACEFIGHTER:
                     retVal.get(MapLocation.Space).add(forceID);
                     // intentional fallthrough here, ASFs can go to atmospheric maps too
                 case UnitType.CONV_FIGHTER:
@@ -977,7 +980,7 @@ public class StratconRulesManager {
     private static boolean unitTypeIsAirborne(ScenarioForceTemplate template) {
         int unitType = template.getAllowedUnitType();
 
-        return ((unitType == UnitType.AERO) ||
+        return ((unitType == UnitType.AEROSPACEFIGHTER) ||
                 (unitType == UnitType.CONV_FIGHTER) ||
                 (unitType == UnitType.DROPSHIP) ||
                 (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) &&
@@ -999,10 +1002,10 @@ public class StratconRulesManager {
                     || (primaryUnitType == UnitType.BATTLE_ARMOR)
                     || (primaryUnitType == UnitType.PROTOMEK)
                     || (primaryUnitType == UnitType.VTOL)
-                    || (primaryUnitType == UnitType.AERO) && reinforcements
+                    || (primaryUnitType == UnitType.AEROSPACEFIGHTER) && reinforcements
                     || (primaryUnitType == UnitType.CONV_FIGHTER) && reinforcements;
         } else if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-            return (primaryUnitType == UnitType.AERO) || (primaryUnitType == UnitType.CONV_FIGHTER);
+            return (primaryUnitType == UnitType.AEROSPACEFIGHTER) || (primaryUnitType == UnitType.CONV_FIGHTER);
         } else {
             return primaryUnitType == unitType;
         }
@@ -1431,9 +1434,14 @@ public class StratconRulesManager {
                     StratconFacility facility = track.getFacility(scenario.getCoords());
 
                     boolean victory = rst.getScenario().getStatus().isOverallVictory();
+                    boolean draw = rst.getScenario().getStatus().isDraw();
 
                     if (scenario.isRequiredScenario()) {
-                        campaignState.updateVictoryPoints(victory ? 1 : -1);
+                        if (draw) {
+                            // do nothing
+                        } else {
+                            campaignState.updateVictoryPoints(victory ? 1 : -1);
+                        }
                     }
 
                     // this must be done before removing the scenario from the track

@@ -86,6 +86,7 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -232,6 +233,7 @@ public class Campaign implements ITechManager {
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
+    private StoryArc storyArc;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
@@ -880,6 +882,7 @@ public class Campaign implements ITechManager {
      * Add a mission to the campaign
      *
      * @param m The mission to be added
+     * @return the id of the mission
      */
     public void addMission(Mission m) {
         int id = lastMissionId + 1;
@@ -1032,6 +1035,10 @@ public class Campaign implements ITechManager {
 
     public Scenario getScenario(int id) {
         return scenarios.get(id);
+    }
+
+    public Collection<Scenario> getScenarios() {
+        return scenarios.values();
     }
 
     public void setLocation(CurrentLocation l) {
@@ -1424,7 +1431,7 @@ public class Campaign implements ITechManager {
      * @param ignoreDice If true, skips the random roll and assigns a Bloodname automatically
      */
     public void checkBloodnameAdd(Person person, boolean ignoreDice) {
-        // if a non-clanner or a clanner without a phenotype is here, we can just return
+        // if person is non-clan or does not have a phenotype
         if (!person.isClanPersonnel() || person.getPhenotype().isNone()) {
             return;
         }
@@ -3523,6 +3530,24 @@ public class Campaign implements ITechManager {
         return null;
     }
 
+    /**
+     * return the probable commander. If we find a flagged commander, return that. Otherwise, return person
+     * with most senior rank. Ties go to the first in the queue.
+     * @return Person object of the commander
+     */
+    public Person getSeniorCommander() {
+        Person commander = null;
+        for (Person p : getActivePersonnel()) {
+            if (p.isCommander()) {
+                return p;
+            }
+            if (null == commander || p.getRankNumeric() > commander.getRankNumeric()) {
+                commander = p;
+            }
+        }
+        return commander;
+    }
+
     public void removeUnit(UUID id) {
         Unit unit = getHangar().getUnit(id);
         if (unit == null) {
@@ -3572,6 +3597,11 @@ public class Campaign implements ITechManager {
     public void removePerson(final @Nullable Person person, final boolean log) {
         if (person == null) {
             return;
+        }
+
+        Force force = getForceFor(person);
+        if (force != null) {
+            force.updateCommander(this);
         }
 
         person.getGenealogy().clearGenealogyLinks();
@@ -4080,6 +4110,31 @@ public class Campaign implements ITechManager {
         campaignOptions = options;
     }
 
+    public StoryArc getStoryArc() {
+        return storyArc;
+    }
+
+    public void useStoryArc(StoryArc arc, boolean initiate) {
+        arc.setCampaign(this);
+        arc.initializeDataDirectories();
+        this.storyArc = arc;
+        if (initiate) {
+            storyArc.begin();
+        }
+    }
+
+    public void unloadStoryArc() {
+        MekHQ.unregisterHandler(storyArc);
+        storyArc = null;
+    }
+
+    public List<String> getCurrentObjectives() {
+        if (null != getStoryArc()) {
+            return getStoryArc().getCurrentObjectives();
+        }
+        return new ArrayList<String>();
+    }
+
     public void writeToXML(final PrintWriter pw) {
         int indent = 0;
 
@@ -4186,6 +4241,11 @@ public class Campaign implements ITechManager {
         parts.writeToXML(pw, indent, "parts"); // Parts
 
         getGameOptions().writeToXML(pw, indent);
+
+        //current story arc
+        if (null != storyArc) {
+            storyArc.writeToXml(pw, indent);
+        }
 
         // Markets
         getPersonnelMarket().writeToXML(pw, indent, this);
@@ -4519,7 +4579,7 @@ public class Campaign implements ITechManager {
         int nMech = stats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
         int nLVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true);
         int nHVee = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK);
-        int nAero = stats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
+        int nAero = stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER);
         int nSC = stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
         int nCF = stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
         int nBA = stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
@@ -4540,7 +4600,7 @@ public class Campaign implements ITechManager {
         int noDS = Math.max(nDropship - stats.getOccupiedBays(Entity.ETYPE_DROPSHIP), 0);
         int noSC = Math.max(nSC - stats.getOccupiedBays(Entity.ETYPE_SMALL_CRAFT), 0);
         int noCF = Math.max(nCF - stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(nAero - stats.getOccupiedBays(Entity.ETYPE_AERO), 0);
+        int noASF = Math.max(nAero - stats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
         int nolv = Math.max(nLVee - stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = Math.max(nHVee - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int noinf = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
@@ -4805,6 +4865,12 @@ public class Campaign implements ITechManager {
         if (null != u) {
             u.resetPilotAndEntity();
         }
+
+        Force force = getForceFor(p);
+        if (force != null) {
+            force.updateCommander(this);
+        }
+
         MekHQ.triggerEvent(new PersonChangedEvent(p));
     }
 
@@ -5319,7 +5385,7 @@ public class Campaign implements ITechManager {
 
     public int getAvailableAstechs(final int minutes, final boolean alreadyOvertime) {
         if (minutes == 0) {
-            LogManager.getLogger().error("Tried to getAvailableAstechs with 0 minutes. Returning 0 Astechs.");
+            // If 0 Astechs are assigned to the task, return 0 minutes used
             return 0;
         }
 
@@ -5341,7 +5407,6 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-
         return Math.min(Math.min(availableHelp, MHQConstants.ASTECH_TEAM_SIZE), getNumberAstechs());
     }
 
@@ -5561,7 +5626,7 @@ public class Campaign implements ITechManager {
         }
         IUnitRating rating = getUnitRating();
         return getCampaignOptions().getUnitRatingMethod().isFMMR() ? rating.getUnitRatingAsInteger()
-                : rating.getModifier();
+                : MathUtility.clamp(rating.getModifier(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
     }
 
     /**
@@ -5675,8 +5740,12 @@ public class Campaign implements ITechManager {
         entity.setDoomed(false);
         entity.setHidden(false);
         entity.clearNarcAndiNarcPods();
+        entity.setShutDown(false);
+        entity.setSearchlightState(false);
 
-        if (!entity.getSensors().isEmpty()) {
+        if (entity.hasBAP()) {
+            entity.setNextSensor(entity.getSensors().lastElement());
+        } else if (!entity.getSensors().isEmpty()) {
             entity.setNextSensor(entity.getSensors().firstElement());
         }
 
@@ -6749,6 +6818,19 @@ public class Campaign implements ITechManager {
                     "It has been a year since the last retirement/defection roll, and it is time to do another.",
                     "Retirement/Defection roll required", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        }
+        return false;
+    }
+
+    public boolean checkScenariosDue() {
+        for(Mission m : getActiveMissions(true)) {
+            for(Scenario s : m.getCurrentScenarios()) {
+                if((s.getDate() != null)
+                        && !(s instanceof AtBScenario)
+                        && !getLocalDate().isBefore(s.getDate())) {
+                    return true;
+                }
+            }
         }
         return false;
     }

@@ -30,6 +30,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
@@ -52,6 +53,8 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
+import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.campaign.universe.Faction.Tag;
@@ -116,22 +119,22 @@ public class AtBDynamicScenarioFactory {
 
         boolean planetsideScenario = template.isPlanetSurface();
 
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
+            setPlanetaryConditions(scenario, contract, campaign);
+        }
+
+        setTerrain(scenario);
+
         // set lighting conditions if the user wants to play with them and is on a ground map
         // theoretically some lighting conditions apply to space maps as well, but requires additional work to implement properly
         if (campaign.getCampaignOptions().isUseLightConditions() && planetsideScenario) {
             setLightConditions(scenario);
         }
 
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions() && planetsideScenario) {
-            setPlanetaryConditions(scenario, contract, campaign);
-        }
-
         // set weather conditions if the user wants to play with them and is on a ground map
         if (campaign.getCampaignOptions().isUseWeatherConditions() && planetsideScenario) {
             setWeather(scenario);
         }
-
-        setTerrain(scenario);
 
         // apply a default "reinforcements" force template if a scenario-specific one does not already exist
         if (!template.getScenarioForces().containsKey(ScenarioForceTemplate.REINFORCEMENT_TEMPLATE_ID)) {
@@ -143,7 +146,7 @@ public class AtBDynamicScenarioFactory {
             if (template.mapParameters.getMapLocation() == MapLocation.LowAtmosphere) {
                 defaultReinforcements.setAllowedUnitType(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX);
             } else if (template.mapParameters.getMapLocation() == MapLocation.Space) {
-                defaultReinforcements.setAllowedUnitType(UnitType.AERO);
+                defaultReinforcements.setAllowedUnitType(UnitType.AEROSPACEFIGHTER);
             }
 
 
@@ -359,7 +362,7 @@ public class AtBDynamicScenarioFactory {
         boolean isPlanetOwner = isPlanetOwner(contract, currentDate, factionCode);
         boolean usingAerospace = forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                 forceTemplate.getAllowedUnitType() == UnitType.CONV_FIGHTER ||
-                forceTemplate.getAllowedUnitType() == UnitType.AERO;
+                forceTemplate.getAllowedUnitType() == UnitType.AEROSPACEFIGHTER;
 
         // here we determine the "lance size". Aircraft almost always come in pairs, mechs and tanks, not so much.
         int lanceSize = usingAerospace ? getAeroLanceSize(forceTemplate.getAllowedUnitType(), isPlanetOwner, factionCode) :
@@ -401,9 +404,9 @@ public class AtBDynamicScenarioFactory {
             int actualUnitType = forceTemplate.getAllowedUnitType();
             if (isPlanetOwner && actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX &&
                     scenario.getTemplate().mapParameters.getMapLocation() != MapLocation.Space) {
-                actualUnitType = Compute.d6() > 3 ? UnitType.AERO : UnitType.CONV_FIGHTER;
+                actualUnitType = Compute.d6() > 3 ? UnitType.AEROSPACEFIGHTER : UnitType.CONV_FIGHTER;
             } else if (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-                actualUnitType = UnitType.AERO;
+                actualUnitType = UnitType.AEROSPACEFIGHTER;
             }
 
             // some special cases that don't fit into the regular RAT generation mechanism
@@ -465,7 +468,7 @@ public class AtBDynamicScenarioFactory {
             }
 
             setStartingAltitude(generatedLance, forceTemplate.getStartingAltitude());
-            correctNonAeroFlyerBehavior(generatedLance, scenario.getTerrainType());
+            correctNonAeroFlyerBehavior(generatedLance, scenario.getBoardType());
 
             // if force contributes to map size, increment the generated "lance" count
             if (forceTemplate.getContributesToMapSize()) {
@@ -708,22 +711,7 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario for which to set lighting conditions.
      */
     private static void setLightConditions(AtBDynamicScenario scenario) {
-        int roll = Compute.randomInt(10) + 1;
-        int light;
-
-        if (roll < 6) {
-            light = PlanetaryConditions.L_DAY;
-        } else if (roll < 8) {
-            light = PlanetaryConditions.L_DUSK;
-        } else if (roll == 8) {
-            light = PlanetaryConditions.L_FULL_MOON;
-        } else if (roll == 9) {
-            light = PlanetaryConditions.L_MOONLESS;
-        } else {
-            light = PlanetaryConditions.L_PITCH_BLACK;
-        }
-
-        scenario.setLight(light);
+        scenario.setLightConditions();
     }
 
     /**
@@ -732,78 +720,7 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario for which to set weather conditions.
      */
     private static void setWeather(AtBDynamicScenario scenario) {
-        int weather = PlanetaryConditions.WE_NONE;
-        int wind = PlanetaryConditions.WI_NONE;
-        int fog = PlanetaryConditions.FOG_NONE;
-
-        // weather is irrelevant in these situations.
-        if (scenario.getTerrainType() == AtBScenario.TER_SPACE ||
-                scenario.getTerrainType() == AtBScenario.TER_LOW_ATMO) {
-            return;
-        }
-
-        int roll = Compute.randomInt(10) + 1;
-        int r2 = Compute.d6();
-        if (roll < 6) {
-            return;
-        } else if (roll == 6) {
-            if (r2 < 4) {
-                weather = PlanetaryConditions.WE_LIGHT_RAIN;
-            } else if (r2 < 6) {
-                weather = PlanetaryConditions.WE_MOD_RAIN;
-            } else {
-                weather = PlanetaryConditions.WE_HEAVY_RAIN;
-            }
-        } else if (roll == 7) {
-            if (r2 < 4) {
-                weather = PlanetaryConditions.WE_LIGHT_SNOW;
-            } else if (r2 < 6) {
-                weather = PlanetaryConditions.WE_MOD_SNOW;
-            } else {
-                weather = PlanetaryConditions.WE_HEAVY_SNOW;
-            }
-        } else if (roll == 8) {
-            if (r2 < 4) {
-                wind = PlanetaryConditions.WI_LIGHT_GALE;
-            } else if (r2 < 6) {
-                wind = PlanetaryConditions.WI_MOD_GALE;
-            } else {
-                wind = PlanetaryConditions.WI_STRONG_GALE;
-            }
-        } else if (roll == 9) {
-            if (r2 == 1) {
-                wind = PlanetaryConditions.WI_STORM;
-            } else if (r2 == 2) {
-                weather = PlanetaryConditions.WE_DOWNPOUR;
-            } else if (r2 == 3) {
-                weather = PlanetaryConditions.WE_SLEET;
-            } else if (r2 == 4) {
-                weather = PlanetaryConditions.WE_ICE_STORM;
-            } else if (r2 == 5) {
-                // tornadoes are classified as wind rather than weather.
-                wind = PlanetaryConditions.WI_TORNADO_F13;
-            } else if (r2 == 6) {
-                wind = PlanetaryConditions.WI_TORNADO_F4;
-            }
-        } else {
-            if (r2 < 5) {
-                fog = PlanetaryConditions.FOG_LIGHT;
-            } else {
-                fog = PlanetaryConditions.FOG_HEAVY;
-            }
-        }
-
-        if (!WeatherRestriction.IsWeatherRestricted(weather, scenario.getAtmosphere(), scenario.getTemperature())) {
-            scenario.setWeather(weather);
-        }
-
-        if (!WeatherRestriction.IsWindRestricted(wind, scenario.getAtmosphere(), scenario.getTemperature())) {
-            scenario.setWind(wind);
-        }
-
-        if (!WeatherRestriction.IsFogRestricted(fog, scenario.getAtmosphere(), scenario.getTemperature())) {
-            scenario.setFog(fog);
-        }
+        scenario.setWeather();
     }
 
     /**
@@ -812,26 +729,40 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario to work on.
      */
     public static void setTerrain(AtBDynamicScenario scenario) {
-        int terrainIndex;
-
         // if we are allowing all terrain types, then pick one from the list
         // otherwise, pick one from the allowed ones
         if (scenario.getTemplate().mapParameters.getMapLocation() == ScenarioMapParameters.MapLocation.AllGroundTerrain) {
-            terrainIndex = Compute.randomInt(AtBScenario.terrainTypes.length);
-            scenario.setTerrainType(terrainIndex);
+            scenario.setBoardType(AtBScenario.T_GROUND);
+            StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
+            int kelvinTemp = scenario.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+            List<String> allowedTerrain = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_BIOME)
+                    .floorEntry(kelvinTemp).getValue().allowedTerrainTypes;
+
+            int terrainIndex = Compute.randomInt(allowedTerrain.size());
+            scenario.setTerrainType(allowedTerrain.get(terrainIndex));
             scenario.setMapFile();
         } else if (scenario.getTemplate().mapParameters.getMapLocation() == ScenarioMapParameters.MapLocation.Space) {
-            scenario.setTerrainType(AtBScenario.TER_SPACE);
+            scenario.setBoardType(AtBScenario.T_SPACE);
+            scenario.setTerrainType("Space");
         } else if (scenario.getTemplate().mapParameters.getMapLocation() == ScenarioMapParameters.MapLocation.LowAtmosphere) {
+            scenario.setBoardType(AtBScenario.T_ATMOSPHERE);
             // low atmosphere actually makes use of the terrain, so we generate some here as well
-            terrainIndex = Compute.randomInt(AtBScenario.terrainTypes.length);
-            scenario.setTerrainType(terrainIndex);
+            scenario.setTerrain();
             scenario.setMapFile();
-
-            // but then we set the terrain to low atmosphere
-            scenario.setTerrainType(AtBScenario.TER_LOW_ATMO);
         } else {
-            terrainIndex = Compute.randomInt(scenario.getTemplate().mapParameters.allowedTerrainTypes.size());
+            StratconBiomeManifest biomeManifest = StratconBiomeManifest.getInstance();
+            int kelvinTemp = scenario.getTemperature() + StratconContractInitializer.ZERO_CELSIUS_IN_KELVIN;
+            List<String> allowedFacility = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_FACILITY_BIOME)
+                    .floorEntry(kelvinTemp).getValue().allowedTerrainTypes;
+            List<String> allowedTerrain = biomeManifest.getTempMap(StratconBiomeManifest.TERRAN_BIOME)
+                    .floorEntry(kelvinTemp).getValue().allowedTerrainTypes;
+            List<String> allowedTemplate = scenario.getTemplate().mapParameters.allowedTerrainTypes;
+            // try to filter on temp
+            allowedTerrain.addAll(allowedFacility);
+            allowedTemplate.retainAll(allowedTerrain);
+            allowedTemplate = allowedTemplate.size() > 0 ? allowedTemplate : scenario.getTemplate().mapParameters.allowedTerrainTypes;
+
+            int terrainIndex = Compute.randomInt(allowedTemplate.size());
             scenario.setTerrainType(scenario.getTemplate().mapParameters.allowedTerrainTypes.get(terrainIndex));
             scenario.setMapFile();
         }
@@ -846,7 +777,7 @@ public class AtBDynamicScenarioFactory {
      * @param campaign The current campaign
      */
     private static void setPlanetaryConditions(AtBDynamicScenario scenario, AtBContract mission, Campaign campaign) {
-        if (scenario.getTerrainType() == AtBScenario.TER_SPACE) {
+        if (scenario.getBoardType() == AtBScenario.T_SPACE) {
             return;
         }
 
@@ -854,7 +785,7 @@ public class AtBDynamicScenarioFactory {
             PlanetarySystem pSystem = Systems.getInstance().getSystemById(mission.getSystemId());
             Planet p = pSystem.getPrimaryPlanet();
             if (null != p) {
-                int atmosphere = ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere());
+                Atmosphere atmosphere = Atmosphere.getAtmosphere(ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), scenario.getAtmosphere().ordinal()));
                 float gravity = ObjectUtility.nonNull(p.getGravity(), scenario.getGravity()).floatValue();
                 int temperature = ObjectUtility.nonNull(p.getTemperature(campaign.getLocalDate()), scenario.getTemperature());
 
@@ -1431,7 +1362,7 @@ public class AtBDynamicScenarioFactory {
                 case UnitType.BATTLE_ARMOR:
                     phenotype = Phenotype.ELEMENTAL;
                     break;
-                case UnitType.AERO:
+                case UnitType.AEROSPACEFIGHTER:
                 case UnitType.CONV_FIGHTER:
                     phenotype = Phenotype.AEROSPACE;
                     break;
@@ -1461,7 +1392,7 @@ public class AtBDynamicScenarioFactory {
         extraData.put(0, innerMap);
 
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
-                skills[0], skills[1], gender, extraData));
+                skills[0], skills[1], gender, faction.isClan(), extraData));
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
 
@@ -1918,7 +1849,7 @@ public class AtBDynamicScenarioFactory {
 
         for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
             BotForce botForce = scenario.getBotForce(botIndex);
-            botForce.setStart(scenario.getBotForceTemplates().get(botForce).getActualDeploymentZone());
+            botForce.setStartingPos(scenario.getBotForceTemplates().get(botForce).getActualDeploymentZone());
         }
     }
 
@@ -1993,7 +1924,7 @@ public class AtBDynamicScenarioFactory {
             // compute a random cardinal edge between 0 and 3 to avoid None
             actualDestinationEdge = Compute.randomInt(CardinalEdge.values().length - 1);
         } else if (forceTemplate.getDestinationZone() == ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT) {
-            actualDestinationEdge = getOppositeEdge(force.getStart());
+            actualDestinationEdge = getOppositeEdge(force.getStartingPos());
         } else {
             force.getBehaviorSettings().setDestinationEdge(CardinalEdge.getCardinalEdge(actualDestinationEdge));
             return;
@@ -2384,23 +2315,35 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Worker function to determine the "lance size" of a group of aircraft.
-     * Either 2 for ASF
+     * Either 2 for ASF, 3 for CC ASF,
+     * @param unitTypeCode
      * @param isPlanetOwner
+     * @param factionCode
      * @return
      */
     public static int getAeroLanceSize(int unitTypeCode, boolean isPlanetOwner, String factionCode) {
         // capellans use units of three aircraft at a time, others use two
         // TODO: except maybe clans?
         int numFightersPerFlight = factionCode.equals("CC") ? 3 : 2;
+        int weightCountRoll = (Compute.randomInt(3) + 1) * numFightersPerFlight;
+        int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
+        return getAeroLanceSize(unitTypeCode, numFightersPerFlight, weightCountRoll, useASFRoll);
+    }
 
-        if (unitTypeCode == UnitType.AERO) {
+    /**
+     * Unwrapped inner logic of above function to be deterministic, for testing purposes.
+     * @param unitTypeCode
+     * @param numFightersPerFlight
+     * @param weightCountRoll
+     * @param useASFRoll
+     * @return
+     */
+    public static int getAeroLanceSize(int unitTypeCode, int numFightersPerFlight, int weightCountRoll, int useASFRoll) {
+        if (unitTypeCode == UnitType.AEROSPACEFIGHTER) {
             return numFightersPerFlight;
         } else if (unitTypeCode == UnitType.CONV_FIGHTER) {
-            return (Compute.randomInt(3) + 1) * numFightersPerFlight;
+            return weightCountRoll;
         } else {
-            int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
-            int weightCountRoll = (Compute.randomInt(3) + 1) * numFightersPerFlight; // # of conventional fighters, just in case
-
             // if we are the planet owner, we may use ASF or conventional fighters
             boolean useASF = useASFRoll >= 4;
             // if we are using ASF, we "always" use 2 at a time, otherwise, use the # of conventional fighters
@@ -2445,10 +2388,10 @@ public class AtBDynamicScenarioFactory {
      * This method contains various hacks intended to put "special units"
      * such as LAMs, VTOLs and WIGEs into a reasonable state that the bot can use
      */
-    private static void correctNonAeroFlyerBehavior(List<Entity> entityList, int terrainType) {
+    private static void correctNonAeroFlyerBehavior(List<Entity> entityList, int boardType) {
         for (Entity entity : entityList) {
-            boolean inSpace = terrainType == AtBScenario.TER_SPACE;
-            boolean inAtmo = terrainType == AtBScenario.TER_LOW_ATMO;
+            boolean inSpace = boardType == AtBScenario.T_SPACE;
+            boolean inAtmo = boardType == AtBScenario.T_ATMOSPHERE;
 
             // hack for land-air mechs
             if (entity instanceof LandAirMech) {

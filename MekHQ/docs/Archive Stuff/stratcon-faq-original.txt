@@ -16,7 +16,7 @@ Pending scenarios against hostile forces are concentric red squares.
 
 
 That's great, how do I win?
-Under Integrated and House command, you need to keep your VP count positive. Every time you win a scenario which you didn't initiate, that's +1 VP. Every time you lose a scenario you didn't initiate, that's -1 VP. 
+Under Integrated and House command, you need to keep your VP count positive. Every time you win a scenario which you didn't initiate, that's +1 VP. Every time you lose a scenario you didn't initiate, that's -1 VP.
 
 Under Liaison command, you need to keep your VP count positive AND you're responsible for completing the given number of strategic objectives. On defensive contracts, this may include keeping allied facilities intact and under allied control. On offensive contracts, it's usually capturing/destroying facilities or winning specific scenarios. VPs are only affected by scenarios in which a liaison participates.
 
@@ -32,7 +32,7 @@ If your primary lance is in a 'defend' role, you can deploy up to 2 * (x + 1) yo
 
 Finally, you can bring in additional lances, with rules as follows:
 - If the lance is already on the same track as the scenario, you can just deploy it as is.
-- If you have a support point or a victory point to spare, you can deploy the lance as is.
+- If you have a support point or a Campaign Victory Point to spare, you can deploy the lance as is.
 - If the lance is in a 'fight' role, you can deploy it. However, on a 8 or less on a 2d6, it will add an extra negative modifier to the scenario.
 - Otherwise, you can attempt to deploy a lance anyway. On a 2d6 roll, 2-5 means deployment failure, 6-8 adds extra negative modifier, 9 or more succeeds.
 
@@ -51,7 +51,7 @@ The primary opposing forces are usually generated via the "scaled BV" method. Th
 
 Your unit rating determines the BV floor. This is a percentage from 50-100, inclusive.
 Your difficulty determines the BV ceiling. This a percentage between 80-120, inclusive.
-Multiply the above percentages by the BV of your primary forces. The resulting BVs are the BV floor and BV ceiling, respectively. Note that, on non-Integrated command, the primary force is a randomly-picked lance from your TO&E, and you then get to choose which lance is actually assigned to the fight. 
+Multiply the above percentages by the BV of your primary forces. The resulting BVs are the BV floor and BV ceiling, respectively. Note that, on non-Integrated command, the primary force is a randomly-picked lance from your TO&E, and you then get to choose which lance is actually assigned to the fight.
 
 1. The scaled opfor receives one lance off the appropriate RAT. If the BV is under the floor, repeat.
 2. If the BV is between the floor and ceiling, we roll a 1d100 and compare it to the ratio of current opposition BV / ceiling. If the roll is lower than the ratio, then we stop. Otherwise, go back to 1 and add another lance.
@@ -64,7 +64,7 @@ Might be a hostile facility or three on the track. Better do some recon and take
 
 
 How do I capture a hostile facility?
-You'll need to complete the 'capture' objective in an attack scenario on it, without completing the 'destroy' objective. Meaning, you'll need to leave (by default, 75% of) the facility turrets intact (though disabling them via crew kills, equipment destruction or ammo depletion is fine), while routing any mobile enemy ground units (usually, crippling 75% of all non-aerospace units will do the trick). 
+You'll need to complete the 'capture' objective in an attack scenario on it, without completing the 'destroy' objective. Meaning, you'll need to leave (by default, 75% of) the facility turrets intact (though disabling them via crew kills, equipment destruction or ammo depletion is fine), while routing any mobile enemy ground units (usually, crippling 75% of all non-aerospace units will do the trick).
 
 
 How do I manually deploy units to a track?
@@ -80,7 +80,7 @@ Use the Scenario Template Editor to put together a scenario template. I recommen
 
 
 Do I use BV or unit count to determine whether I've completed an objective?
-You can use either, that's entirely up to you. Maybe even both! 
+You can use either, that's entirely up to you. Maybe even both!
 
 
 How do I determine if I control the battlefield after a battle?

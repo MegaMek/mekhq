@@ -62,22 +62,31 @@ public class MekCockpit extends Part {
     public double getTonnage() {
         switch (type) {
             case Mech.COCKPIT_SMALL:
-                return 2;
+                return 2.0;
             case Mech.COCKPIT_TORSO_MOUNTED:
+            case Mech.COCKPIT_DUAL:
             case Mech.COCKPIT_SUPERHEAVY:
+            case Mech.COCKPIT_SUPERHEAVY_INDUSTRIAL:
             case Mech.COCKPIT_TRIPOD:
+            case Mech.COCKPIT_TRIPOD_INDUSTRIAL:
             case Mech.COCKPIT_INTERFACE:
             case Mech.COCKPIT_QUADVEE:
-            case Mech.COCKPIT_DUAL:
-                return 4;
-            case Mech.COCKPIT_SUPERHEAVY_TRIPOD:
+                return 4.0;
             case Mech.COCKPIT_PRIMITIVE:
             case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
-                return 5;
+            case Mech.COCKPIT_SUPERHEAVY_TRIPOD:
+            case Mech.COCKPIT_SUPERHEAVY_TRIPOD_INDUSTRIAL:
+            case Mech.COCKPIT_SMALL_COMMAND_CONSOLE:
+                return 5.0;
             case Mech.COCKPIT_COMMAND_CONSOLE:
-                return 6;
+                return 6.0;
+            case Mech.COCKPIT_SUPERHEAVY_COMMAND_CONSOLE:
+                return 7.0;
+            case Mech.COCKPIT_STANDARD:
+            case Mech.COCKPIT_INDUSTRIAL:
+            case Mech.COCKPIT_VRRP:
             default:
-                return 3;
+                return 3.0;
         }
     }
 
@@ -91,9 +100,8 @@ public class MekCockpit extends Part {
                 return Money.of(175000);
             case Mech.COCKPIT_TORSO_MOUNTED:
                 return Money.of(750000);
-            case Mech.COCKPIT_STANDARD:
-                return Money.of(200000);
             case Mech.COCKPIT_INDUSTRIAL:
+            case Mech.COCKPIT_PRIMITIVE_INDUSTRIAL:
                 return Money.of(100000);
             case Mech.COCKPIT_DUAL:
                 return Money.of(40000);
@@ -101,6 +109,19 @@ public class MekCockpit extends Part {
                 return Money.of(1250000);
             case Mech.COCKPIT_QUADVEE:
                 return Money.of(375000);
+            case Mech.COCKPIT_SUPERHEAVY:
+            case Mech.COCKPIT_TRIPOD_INDUSTRIAL:
+                return Money.of(300000);
+            case Mech.COCKPIT_TRIPOD:
+            case Mech.COCKPIT_SUPERHEAVY_TRIPOD_INDUSTRIAL:
+                return Money.of(400000);
+            case Mech.COCKPIT_SUPERHEAVY_COMMAND_CONSOLE:
+                return Money.of(800000);
+            case Mech.COCKPIT_SUPERHEAVY_TRIPOD:
+                return Money.of(500000);
+            case Mech.COCKPIT_SMALL_COMMAND_CONSOLE:
+                return Money.of(675000);
+            case Mech.COCKPIT_STANDARD:
             default:
                 return Money.of(200000);
         }

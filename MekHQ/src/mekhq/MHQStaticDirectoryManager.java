@@ -32,12 +32,18 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     //region Variable Declarations
     private static AbstractDirectory forceIconDirectory;
     private static AbstractDirectory awardIconDirectory;
+    private static AbstractDirectory storySplashDirectory;
+    private static AbstractDirectory userStorySplashDirectory;
+    private static AbstractDirectory userStoryPortraitDirectory;
 
     // Re-parsing Prevention Variables: They are True at startup and when the specified directory
     // should be re-parsed, and are used to avoid re-parsing the directory repeatedly when there's
     // an error.
     private static boolean parseForceIconDirectory = true;
     private static boolean parseAwardIconDirectory = true;
+    private static boolean parseStorySplashDirectory = true;
+    private static boolean parseUserStorySplashDirectory = true;
+    private static boolean parseUserStoryPortraitDirectory = true;
     //endregion Variable Declarations
 
     //region Constructors
@@ -54,6 +60,7 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
         MMStaticDirectoryManager.initialize();
         initializeForceIcons();
         initializeAwardIcons();
+        initializeStorySplash();
     }
 
     /**
@@ -93,6 +100,67 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
             }
         }
     }
+
+    /**
+     * Parses MekHQ's storyarcs icon folder when first called or when it was refreshed.
+     *
+     * @see #refreshStorySplash()
+     */
+    private static void initializeStorySplash() {
+        // Read in and parse MekHQ's force icon folder only when first called or when refreshed
+        if (parseStorySplashDirectory) {
+            // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
+            parseStorySplashDirectory = false;
+            try {
+                File f = new File("data/images/storysplash");
+                if (f.exists()) {
+                    storySplashDirectory = new DirectoryItems(f, new ImageFileFactory());
+                }
+            } catch (Exception e) {
+                LogManager.getLogger().error("Could not parse the storyarc icon directory!", e);
+            }
+        }
+    }
+
+    /**
+     * Parses the user's Story Arc portraits directory when first called or when it was refreshed
+     *
+     */
+    public static void initializeUserStoryPortraits(String path) {
+        // Read in and parse MekHQ's force icon folder only when first called or when refreshed
+        if (parseUserStoryPortraitDirectory) {
+            // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
+            parseUserStoryPortraitDirectory = false;
+            try {
+                File f = new File(path);
+                if (f.exists()) {
+                    userStoryPortraitDirectory = new DirectoryItems(f, new ImageFileFactory());
+                }
+            } catch (Exception e) {
+                LogManager.getLogger().error("Could not parse the storyarc portrait directory!", e);
+            }
+        }
+    }
+
+    /**
+     * Parses the user's Story Arc storyarcs directory when first called or when it was refreshed
+     *
+     */
+    public static void initializeUserStorySplash(String path) {
+        // Read in and parse MekHQ's force icon folder only when first called or when refreshed
+        if (parseUserStorySplashDirectory) {
+            // Set parseForceIconDirectory to false to avoid parsing repeatedly when something fails
+            parseUserStorySplashDirectory = false;
+            try {
+                File f = new File(path);
+                if (f.exists()) {
+                    userStorySplashDirectory = new DirectoryItems(f, new ImageFileFactory());
+                }
+            } catch (Exception e) {
+                LogManager.getLogger().error("Could not parse the storyarc splash image directory!", e);
+            }
+        }
+    }
     //endregion Initialization
 
     //region Getters
@@ -116,6 +184,39 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     public static @Nullable AbstractDirectory getAwardIcons() {
         initializeAwardIcons();
         return awardIconDirectory;
+    }
+
+    /**
+     * Returns an AbstractDirectory object containing all story icon filenames found in MekHQ's
+     * storyarc icon folder.
+     * @return an AbstractDirectory object with the story icon folders and filenames.
+     * May be null if the directory cannot be parsed.
+     */
+    public static @Nullable AbstractDirectory getStorySplash() {
+        initializeStorySplash();
+        return storySplashDirectory;
+    }
+
+    /**
+     * Returns an AbstractDirectory object containing all story portrait filenames found in the user's
+     * storyarc portraits folder.
+     * @return an AbstractDirectory object with the story portrait folders and filenames.
+     * May be null if the directory cannot be parsed.
+     */
+    public static @Nullable AbstractDirectory getUserStoryPortraits() {
+        //we do not initialize here because initialization requires a specific path
+        return userStoryPortraitDirectory;
+    }
+
+    /**
+     * Returns an AbstractDirectory object containing all story arc image filenames found in the user's
+     * storyarc folder.
+     * @return an AbstractDirectory object with the story portrait folders and filenames.
+     * May be null if the directory cannot be parsed.
+     */
+    public static @Nullable AbstractDirectory getUserStorySplash() {
+        //we do not initialize here because initialization requires a specific path
+        return userStorySplashDirectory;
     }
     //endregion Getters
 
@@ -142,6 +243,18 @@ public class MHQStaticDirectoryManager extends MMStaticDirectoryManager {
     public static AbstractDirectory refreshAwardIcons() {
         parseAwardIconDirectory = true;
         return getAwardIcons();
+    }
+
+    /**
+     * Re-reads MekHQ's story icon folder and returns the updated AbstractDirectory object. This
+     * will update the AbstractDirectory object with changes to the story icons (like added image
+     * files and folders) while MekHQ is running.
+     *
+     * @see #getStorySplash()
+     */
+    public static AbstractDirectory refreshStorySplash() {
+        parseStorySplashDirectory = true;
+        return getStorySplash();
     }
     //endregion Refreshers
 }

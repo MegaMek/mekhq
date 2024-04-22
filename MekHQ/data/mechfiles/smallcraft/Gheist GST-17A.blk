@@ -1,0 +1,151 @@
+#Saved from version 0.49.16-SNAPSHOT on 2023-12-18
+<BlockVersion>
+1
+</BlockVersion>
+
+<UnitType>
+SmallCraft
+</UnitType>
+
+<Name>
+Gheist
+</Name>
+
+<Model>
+GST-17A
+</Model>
+
+<year>
+3025
+</year>
+
+<originalBuildYear>
+3025
+</originalBuildYear>
+
+<type>
+IS Level 3
+</type>
+
+<quirks>
+internal_bomb
+</quirks>
+
+<motion_type>
+Aerodyne
+</motion_type>
+
+<transporters>
+cargobay:30.0:1:1::-1:0
+steeragequarters:20.0:0:-1::-1:0
+cargobay:6.0:1:3::-1:0
+</transporters>
+
+<SafeThrust>
+5
+</SafeThrust>
+
+<heatsinks>
+1
+</heatsinks>
+
+<sink_type>
+0
+</sink_type>
+
+<fuel>
+600
+</fuel>
+
+<engine_type>
+1
+</engine_type>
+
+<armor_type>
+41
+</armor_type>
+
+<armor_tech>
+1
+</armor_tech>
+
+<internal_type>
+-1
+</internal_type>
+
+<armor>
+212
+180
+180
+148
+</armor>
+
+<Nose Equipment>
+</Nose Equipment>
+
+<Left Side Equipment>
+Medium Laser
+Medium Laser
+</Left Side Equipment>
+
+<Right Side Equipment>
+Medium Laser
+Medium Laser
+</Right Side Equipment>
+
+<Aft Equipment>
+Large Laser
+</Aft Equipment>
+
+<Hull Equipment>
+ISReconCamera
+</Hull Equipment>
+
+<structural_integrity>
+20
+</structural_integrity>
+
+<tonnage>
+200.0
+</tonnage>
+
+<designtype>
+1
+</designtype>
+
+<crew>
+4
+</crew>
+
+<officers>
+1
+</officers>
+
+<gunners>
+1
+</gunners>
+
+<passengers>
+0
+</passengers>
+
+<marines>
+0
+</marines>
+
+<battlearmor>
+0
+</battlearmor>
+
+<otherpassenger>
+0
+</otherpassenger>
+
+<life_boat>
+0
+</life_boat>
+
+<escape_pod>
+0
+</escape_pod>
+

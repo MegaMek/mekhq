@@ -37,6 +37,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.ExtraData;
 import mekhq.campaign.event.PersonChangedEvent;
+import mekhq.campaign.event.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.io.CampaignXmlParser;
@@ -497,7 +498,7 @@ public class Person {
 
     /**
      * Return a full last name which may be a bloodname or a surname with or without a post-nominal.
-     * A bloodname will overrule a surname but we do not disallow surnames for clanners, if the
+     * A bloodname will overrule a surname but we do not disallow surnames for clan personnel, if the
      * player wants to input them
      * @return a String of the person's last name
      */
@@ -629,7 +630,7 @@ public class Person {
     public void migrateName(final String text) {
         // How this works:
         // Takes the input name, and splits it into individual parts.
-        // Then, it depends on whether the person is a Clanner or not.
+        // Then, it depends on whether the person is Clan or not.
         // For Clan names:
         // Takes the input name, and assumes that person does not have a surname
         // Bloodnames are assumed to have been assigned by MekHQ
@@ -989,7 +990,7 @@ public class Person {
             removeAllTechJobs(campaign);
         }
 
-        MekHQ.triggerEvent(new PersonChangedEvent(this));
+        MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }
 
     /**

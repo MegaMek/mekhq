@@ -26,9 +26,11 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.EntityWeightClass;
-import megamek.common.enums.SkillLevel;
+import megamek.common.enums.*;
+import megamek.common.planetaryconditions.*;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.OptionsConstants;
+import megamek.common.planetaryconditions.Atmosphere;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -42,6 +44,7 @@ import mekhq.campaign.mission.atb.IAtBScenario;
 import mekhq.campaign.mission.enums.AtBLanceRole;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.*;
 import mekhq.utilities.MHQXMLUtility;
@@ -54,6 +57,7 @@ import java.io.PrintWriter;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Neoancient
@@ -176,6 +180,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     protected final transient ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
             MekHQ.getMHQOptions().getLocale());
+
+    private static TerrainConditionsOddsManifest TCO;
+    private static StratconBiomeManifest SB;
     //endregion Variable Declarations
 
     public AtBScenario () {
@@ -193,6 +200,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         deploymentDelay = 0;
         lanceCount = 0;
         rerollsRemaining = 0;
+        TCO = TerrainConditionsOddsManifest.getInstance();
+        SB = StratconBiomeManifest.getInstance();
     }
 
     public void initialize(Campaign c, Lance lance, boolean attacker, LocalDate date) {
@@ -219,11 +228,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             }
         }
 
-        light = PlanetaryConditions.L_DAY;
-        weather = PlanetaryConditions.WE_NONE;
-        wind = PlanetaryConditions.WI_NONE;
-        fog = PlanetaryConditions.FOG_NONE;
-        atmosphere = PlanetaryConditions.ATMO_STANDARD;
+        light = Light.DAY;
+        weather = Weather.CLEAR;
+        wind = Wind.CALM;
+        fog = Fog.FOG_NONE;
+        atmosphere = Atmosphere.STANDARD;
         gravity = (float) 1.0;
         deploymentDelay = 0;
         setDate(date);
@@ -297,80 +306,59 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setTerrain() {
-        setTerrainType(terrainChart[Compute.d6(2) - 2]);
+        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
+        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
+        setTerrainType(keys.get(Compute.randomInt(keys.size())));
     }
 
     public void setLightConditions() {
-        setLight(PlanetaryConditions.L_DAY);
-
-        int roll = Compute.randomInt(10) + 1;
-        if (roll < 6) {
-            setLight(PlanetaryConditions.L_DAY);
-        } else if (roll < 8) {
-            setLight(PlanetaryConditions.L_DUSK);
-        } else if (roll == 8) {
-            setLight(PlanetaryConditions.L_FULL_MOON);
-        } else if (roll == 9) {
-            setLight(PlanetaryConditions.L_MOONLESS);
-        } else {
-            setLight(PlanetaryConditions.L_PITCH_BLACK);
-        }
+        setLight(TCO.rollLightCondition(getTerrainType()));
     }
 
     public void setWeather() {
-        setWeather(PlanetaryConditions.WE_NONE);
-        setWind(PlanetaryConditions.WI_NONE);
-        setFog(PlanetaryConditions.FOG_NONE);
-
-        int roll = Compute.randomInt(10) + 1;
-        int r2 = Compute.d6();
-        if (roll == 6) {
-            if (r2 < 4) {
-                setWeather(PlanetaryConditions.WE_LIGHT_RAIN);
-            } else if (r2 < 6) {
-                setWeather(PlanetaryConditions.WE_MOD_RAIN);
-            } else {
-                setWeather(PlanetaryConditions.WE_HEAVY_RAIN);
-            }
-        } else if (roll == 7) {
-            if (r2 < 4) {
-                setWeather(PlanetaryConditions.WE_LIGHT_SNOW);
-            } else if (r2 < 6) {
-                setWeather(PlanetaryConditions.WE_MOD_SNOW);
-            } else {
-                setWeather(PlanetaryConditions.WE_HEAVY_SNOW);
-            }
-        } else if (roll == 8) {
-            if (r2 < 4) {
-                setWind(PlanetaryConditions.WI_LIGHT_GALE);
-            } else if (r2 < 6) {
-                setWind(PlanetaryConditions.WI_MOD_GALE);
-            } else {
-                setWind(PlanetaryConditions.WI_STRONG_GALE);
-            }
-        } else if (roll == 9) {
-            if (r2 == 1) {
-                setWind(PlanetaryConditions.WI_STORM);
-            } else if (r2 == 2) {
-                setWeather(PlanetaryConditions.WE_DOWNPOUR);
-            } else if (r2 == 3) {
-                setWeather(PlanetaryConditions.WE_SLEET);
-            } else if (r2 == 4) {
-                setWeather(PlanetaryConditions.WE_ICE_STORM);
-            } else if (r2 == 5) {
-                // tornadoes are classified as wind rather than weather.
-                setWind(PlanetaryConditions.WI_TORNADO_F13);
-            } else if (r2 == 6) {
-                setWind(PlanetaryConditions.WI_TORNADO_F4);
-            }
-        } else if (roll > 9) {
-            if (r2 < 5) {
-                setFog(PlanetaryConditions.FOG_LIGHT);
-            } else {
-                setFog(PlanetaryConditions.FOG_HEAVY);
-            }
+        // weather is irrelevant in these situations.
+        if (getBoardType() == AtBScenario.T_SPACE ||
+                getBoardType() == AtBScenario.T_ATMOSPHERE) {
+            return;
         }
-        // roll < 6 can be ignored, as it would just return nothing
+
+        Wind wind = TCO.rollWindCondition(getTerrainType());
+
+        if (WeatherRestriction.IsWindRestricted(wind.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
+            wind = Wind.CALM;
+        }
+
+        Weather weather = TCO.rollWeatherCondition(getTerrainType());
+
+        if (WeatherRestriction.IsWeatherRestricted(weather.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
+            weather = Weather.CLEAR;
+        }
+
+        Fog fog = TCO.rollFogCondition(getTerrainType());
+
+        if (WeatherRestriction.IsFogRestricted(fog.ordinal(), getAtmosphere().ordinal(), getTemperature())) {
+            fog = Fog.FOG_NONE;
+        }
+
+        BlowingSand blowingSand = TCO.rollBlowingSandCondition(getTerrainType());
+
+        if (getAtmosphere().isLighterThan(Atmosphere.TRACE)) {
+            blowingSand = BlowingSand.BLOWING_SAND_NONE;
+        }
+
+        EMI emi = TCO.rollEMICondition(getTerrainType());
+
+        int temp = getTemperature();
+        temp = PlanetaryConditions.setTempFromWeather(weather, temp);
+        wind = PlanetaryConditions.setWindFromWeather(weather, wind);
+        wind = PlanetaryConditions.setWindFromBlowingSand(blowingSand, wind);
+
+        setModifiedTemperature(temp);
+        setWind(wind);
+        setWeather(weather);
+        setFog(fog);
+        setBlowingSand(blowingSand);
+        setEMI(emi);
     }
 
     public void setPlanetaryConditions(Mission mission, Campaign campaign) {
@@ -379,7 +367,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             //assume primary planet for now
             Planet p = psystem.getPrimaryPlanet();
             if (null != p) {
-                setAtmosphere(ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere()));
+                setAtmosphere(Atmosphere.getAtmosphere(ObjectUtility.nonNull(p.getPressure(campaign.getLocalDate()), getAtmosphere().ordinal())));
                 setGravity(ObjectUtility.nonNull(p.getGravity(), getGravity()).floatValue());
             }
         }
@@ -431,36 +419,19 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return (5 * getLanceCount()) + getMapSizeY();
     }
 
-    public void setMapFile() {
-        final String[][] maps = {
-            {"Sandy-hills", "Hills-craters", "Hills",
-                "Wooded-hills", "Cliffs", "Town-hills"}, //hills
-            {"Sandy-valley", "Rocky-valley", "Light-craters",
-                "Heavy-craters", "Rubble-mountain", "Cliffs"}, //badlands
-            {"Muddy-swamp", "Lake-marsh", "Lake-high",
-                "Wooded-lake", "Swamp", "Wooded-swamp"}, //wetlands
-            {"Town-mining", "Town-wooded", "Town-generic",
-                "Town-farming", "Town-ruin", "Town-mountain"}, //light urban
-            {"Savannah", "Dust-bowl", "Sandy-hills",
-                "Town-ruin", "Town-generic", "Some-trees"}, //flatlands
-            {"Some-trees", "Wooded-lake", "Woods-medium",
-                "Wooded-hills", "Woods-deep", "Wooded-valley"}, //wooded
-            {"Fortress-city", "Fortress-city", "Town-concrete",
-                "Town-concrete", "City-high", "City-dense"}, //heavy urban
-            {"River-huge", "Woods-river", "Sandy-river",
-                "Rubble-river", "Seaport", "River-wetlands"}, //coastal
-            {"Mountain-lake", "Cliffs-lake", "Rubble-mountain",
-                "Cliffs", "Mountain-medium", "Mountain-high"} //mountains
-        };
-
-        int actualTerrainType = getTerrainType();
-
-        // we want to make sure the terrain type we pick is in bounds,
-        if ((getTerrainType() < 0) || (getTerrainType() >= maps.length)) {
-            actualTerrainType = Compute.randomInt(maps.length);
+    public void setMapFile(String terrainType) {
+        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
+        StratconBiomeManifest.MapTypeList value = mapTypes.get(terrainType);
+        if (value != null) {
+            List<String> mapTypeList = value.mapTypes;
+            setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+        } else {
+            setMap("Savannah");
         }
+    }
 
-        setMap(maps[actualTerrainType][Compute.d6() - 1]);
+    public void setMapFile() {
+        setMapFile(getTerrainType());
     }
 
     public boolean canRerollTerrain() {
@@ -821,8 +792,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int playerHome;
 
         playerHome = startPos[Compute.randomInt(4)];
-        setStart(playerHome);
-        enemyStart = getStart() + 4;
+        setStartingPos(playerHome);
+        enemyStart = getStartingPos() + 4;
 
         if (enemyStart > 8) {
             enemyStart -= 8;
@@ -831,7 +802,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         enemyHome = enemyStart;
 
         if (!allyEntities.isEmpty()) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
+            addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
@@ -1167,7 +1138,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int unitsPerPoint;
         switch (unitType) {
             case UnitType.TANK:
-            case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
                 unitsPerPoint = 2;
                 break;
             case UnitType.PROTOMEK:
@@ -1347,7 +1318,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 int weightClass = randomAeroWeights[Compute.d6() - 1];
 
                 aero = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(),
-                        UnitType.AERO, weightClass, campaign);
+                        UnitType.AEROSPACEFIGHTER, weightClass, campaign);
                 if (aero != null) {
                     aircraft.add(aero);
                 }
@@ -1363,8 +1334,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 en.setDeployRound(deployRound);
             });
 
-            boolean isAeroMap = getTerrainType() == TER_LOW_ATMO ||
-                    getTerrainType() == TER_SPACE;
+            boolean isAeroMap = getBoardType() == T_SPACE || getBoardType() == T_ATMOSPHERE;
 
             AtBDynamicScenarioFactory.populateAeroBombs(aircraft, campaign, !isAeroMap);
 
@@ -1400,8 +1370,9 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         boolean spawnBattleArmor = !opForOwnsPlanet &&
                 Compute.d6() >= MHQConstants.MAXIMUM_D6_VALUE - campaign.getCampaignOptions().getOpForLocalUnitChance() / 2;
 
-        boolean isTurretAppropriateTerrain = (getTerrainType() == TER_HEAVYURBAN) || (getTerrainType() == TER_LIGHTURBAN);
-        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || (getTerrainType() == TER_WOODED);
+        boolean isTurretAppropriateTerrain = (getTerrainType().toUpperCase().contains("URBAN")
+        || getTerrainType().toUpperCase().contains("FACILITY"));
+        boolean isInfantryAppropriateTerrain = isTurretAppropriateTerrain || (getTerrainType().toUpperCase().contains("FOREST"));
 
         ArrayList<Entity> scrubs = new ArrayList<>();
         // don't bother spawning turrets if there won't be anything to put them on

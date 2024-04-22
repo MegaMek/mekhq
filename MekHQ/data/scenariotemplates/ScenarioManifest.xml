@@ -100,5 +100,65 @@
 		<key>24</key>
 		<value>Space - Blockade Run.xml</value>
 	</entry>
+	<entry>
+		<key>25</key>
+		<value>Allied Facility - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>26</key>
+		<value>Assassinate - Assault.xml</value>
+	</entry>
+	<entry>
+		<key>27</key>
+		<value>Battle - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>28</key>
+		<value>Breakthrough - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>29</key>
+		<value>Capture - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>30</key>
+		<value>Convoy Attack - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>31</key>
+		<value>Convoy Escort - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>32</key>
+		<value>Defend Grounded Dropship - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>33</key>
+		<value>Destroy Grounded Dropship - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>34</key>
+		<value>Diversion - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>35</key>
+		<value>Engage - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>36</key>
+		<value>Harass - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>37</key>
+		<value>Hostile Facility - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>38</key>
+		<value>Irregular Forces - Heavy.xml</value>
+	</entry>
+	<entry>
+		<key>39</key>
+		<value>Recon - Heavy.xml</value>
+	</entry>
 	</scenarioFileNames>
 </scenarioManifest>

@@ -26,6 +26,7 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
@@ -1255,5 +1256,33 @@ public class Utilities {
 
         // Shouldn't happen
         return -1;
+    }
+
+    /**
+     * Testable function to get the original unit based on information from a new unit
+     * @param newE new Entity we want to read information from
+     * @return MechSummary that most closely represents the original of the new Entity
+     * @throws EntityLoadingException
+     */
+    public static MechSummary retrieveOriginalUnit(Entity newE) throws EntityLoadingException {
+        MechSummaryCache cacheInstance = MechSummaryCache.getInstance();
+        cacheInstance.loadMechData();
+
+        // I need to change the new entity to the one from the mtf file now, so that equipment numbers will match
+        MechSummary summary = cacheInstance.getMech(newE.getFullChassis() + " " + newE.getModel());
+
+        if (null == summary) {
+            // Attempt to deal with new naming convention directly
+            summary = cacheInstance.getMech(
+                    newE.getChassis() + " (" + newE.getClanChassisName() + ") " + newE.getModel());
+        }
+
+        // If we got this far with no summary loaded, give up
+        if (null == summary) {
+            throw new EntityLoadingException(String.format("Could not load %s %s from the mech cache",
+                    newE.getChassis(), newE.getModel()));
+        }
+
+        return summary;
     }
 }

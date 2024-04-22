@@ -185,6 +185,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             case UnitType.DROPSHIP:
             case UnitType.CONV_FIGHTER:
             case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
             case UnitType.VTOL:
             case UnitType.TANK:
                 gunnery = crew.getGunnery();
@@ -252,7 +253,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
                 //noinspection UnnecessaryContinue
                 continue;
             } else if ((u.getEntity().getEntityType() &
-                        Entity.ETYPE_AERO) == Entity.ETYPE_AERO) {
+                        Entity.ETYPE_AEROSPACEFIGHTER) == Entity.ETYPE_AEROSPACEFIGHTER) {
                 totalAero++;
             } else if ((u.getEntity().getEntityType() &
                         Entity.ETYPE_DROPSHIP) == Entity.ETYPE_DROPSHIP) {

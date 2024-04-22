@@ -56,13 +56,13 @@ public class AmbushBuiltInScenario extends AtBScenario {
     @Override
     public void setMapFile() {
         setMap("Savannah");
-        setTerrainType(TER_FLATLANDS);
+        setTerrainType("Savannah");
     }
 
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(Board.START_CENTER);
+        setStartingPos(Board.START_CENTER);
         int enemyStart = Board.START_CENTER;
 
         for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
@@ -92,9 +92,9 @@ public class AmbushBuiltInScenario extends AtBScenario {
     @Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 66);
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 66);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                100, false);
+                1, 100, false);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);

@@ -63,7 +63,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             playerHome = startPos[Compute.randomInt(4)];
-            setStart(playerHome);
+            setStartingPos(playerHome);
 
             enemyStart = Board.START_CENTER;
             setEnemyHome(playerHome + 4);
@@ -72,10 +72,10 @@ public class ExtractionBuiltInScenario extends AtBScenario {
                 setEnemyHome(getEnemyHome() - 8);
             }
 
-            otherStart = getStart() + 4;
+            otherStart = getStartingPos() + 4;
             otherHome = playerHome;
         } else {
-            setStart(Board.START_CENTER);
+            setStartingPos(Board.START_CENTER);
             enemyStart = startPos[Compute.randomInt(4)];
 
             setEnemyHome(enemyStart);
@@ -93,7 +93,7 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         }
 
         if (!allyEntities.isEmpty()) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
+            addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
@@ -136,8 +136,8 @@ public class ExtractionBuiltInScenario extends AtBScenario {
         ScenarioObjective civilianObjective;
 
         if (isAttacker()) {
-            civilianObjective = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 50, false);
-            keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 66, false);
+            civilianObjective = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID, 1, 50, false);
+            keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 1, 66, false);
 
             civilianObjective.setTimeLimit(12);
             civilianObjective.setTimeLimitAtMost(false);
@@ -156,11 +156,11 @@ public class ExtractionBuiltInScenario extends AtBScenario {
             civilianObjective.addDetail(String
                     .format(defaultResourceBundle.getString("commonObjectives.bonusRolls.text"), bonusEffect.howMuch));
         } else {
-            civilianObjective = CommonObjectiveFactory.getDestroyEnemies(CIVILIAN_FORCE_ID, 100);
+            civilianObjective = CommonObjectiveFactory.getDestroyEnemies(CIVILIAN_FORCE_ID, 1, 100);
             civilianObjective.setTimeLimit(10);
             civilianObjective.setTimeLimitAtMost(true);
             civilianObjective.setTimeLimitType(TimeLimitType.Fixed);
-            destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 33);
+            destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 33);
             destroyHostiles.setTimeLimit(10);
             destroyHostiles.setTimeLimitAtMost(true);
             destroyHostiles.setTimeLimitType(TimeLimitType.Fixed);
