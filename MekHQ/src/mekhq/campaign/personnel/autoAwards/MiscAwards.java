@@ -31,7 +31,7 @@ public class MiscAwards {
     }
 
     /**
-     * This function checks whether the Mission Accomplished award can be award to Person
+     * This function checks whether the Mission Accomplished award can be awarded to Person
      * @param campaign the current campaign
      * @param award the award to be processed
      * @param person the person to check award eligibility for

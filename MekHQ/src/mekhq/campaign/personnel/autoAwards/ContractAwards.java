@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class ContractAwards {
-    Campaign campaign;
-    Person person;
+    final Campaign campaign;
+    final Person person;
 
     /**
      * This function loops through Contract Awards, checking whether the person is eligible to receive each type of award

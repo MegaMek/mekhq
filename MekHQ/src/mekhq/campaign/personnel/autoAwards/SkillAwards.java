@@ -76,7 +76,7 @@ public class SkillAwards {
         List<String> relevantSkills;
 
         switch (skill.toLowerCase()) {
-            // These first couple of cases are for those instances where the users wants to check against multiple skills, but only needs one passing grade
+            // These first couple of cases are for those instances where the users want to check against multiple skills, but only needs one passing grade
             case "piloting":
                 relevantSkills = Arrays.asList(SkillType.S_PILOT_MECH, SkillType.S_PILOT_AERO, SkillType.S_PILOT_GVEE, SkillType.S_PILOT_VTOL, SkillType.S_PILOT_NVEE, SkillType.S_PILOT_JET, SkillType.S_PILOT_SPACE);
                 break;

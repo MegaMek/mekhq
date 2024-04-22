@@ -1,6 +1,5 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.force.Force;
@@ -9,16 +8,15 @@ import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
-import java.text.MessageFormat;
 import java.util.*;
 
 public class KillAwards {
     /**
      * This function loops through Kill Awards, checking whether the person is eligible to receive each type of award
-     * @param c the campaign to be processed
-     * @param m the mission just completed
+     * @param campaign the campaign to be processed
+     * @param mission the mission just completed
      * @param awards the awards to be processed (should only include awards where item == Kill)
-     * @param p the person to check award eligibility for
+     * @param person the person to check award eligibility for
      */
     public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, List<Award> awards, Person person) {
         int formationDepth;
@@ -286,8 +284,10 @@ public class KillAwards {
 
             List<Object> personAwardList = new ArrayList<>();
             personAwardList.add(person.getId());
-            // this allows us to redefine the value via the below loop
+            // we want these values populated so they can be redefined by the below loop and later,
+            // the Award Ceremony
             personAwardList.add(0);
+            personAwardList.add(true);
 
             int awardDataKey = 0;
 
@@ -309,7 +309,7 @@ public class KillAwards {
     }
 
         /**
-         * This function uses switches to translate non-IS formations into their IS equivalent. It also
+         * This function uses switches to translate non-IS formations into the IS equivalent. It also
          * validates award size, returning 'invalid' if a malformed size is provided.
          * @param award the award providing the formation
          */
@@ -340,22 +340,24 @@ public class KillAwards {
         }
 
         /**
-         * This function gathers kills from all the force and all subforces
-         * @param forceId the Id for the force we want to parse
+         * This function gathers kills from all the force and all sub-forces
+         * @param campaign the campaign being processed
+         * @param mission the mission just completed
+         * @param forceId the id for the force we want to parse
          * @param filterOtherMissionKills true if we should only count kills from the mission just completed
          */
         private static int getAllForceKills(Campaign campaign, Mission mission, int forceId, boolean filterOtherMissionKills){
             int killCount = 0;
 
             // this grabs the kills for any loose units that exist outside of lances
-            Vector<Force> subforces = campaign.getForce(forceId).getSubForces();
+            Vector<Force> subForces = campaign.getForce(forceId).getSubForces();
 
             killCount += getForceKills(campaign, mission, forceId, filterOtherMissionKills);
 
-            if (!subforces.isEmpty()) {
-                for (Force subforce : subforces) {
-                    killCount += getAllForceKills(campaign, mission, subforce.getId(), filterOtherMissionKills);
-                }
+            if (!subForces.isEmpty()) {
+                killCount += subForces.stream().mapToInt(subforce
+                        -> getAllForceKills(campaign, mission, subforce
+                        .getId(), filterOtherMissionKills)).sum();
             }
 
             return killCount;
@@ -363,7 +365,9 @@ public class KillAwards {
 
         /**
          * This function gathers kills from the entire force
-         * @param forceId the Id for the force we want to parse
+         * @param campaign the campaign being processed
+         * @param mission the mission just completed
+         * @param forceId the id for the force we want to parse
          * @param filterOtherMissionKills true if we should only count kills from the mission just completed
          */
         private static int getForceKills(Campaign campaign, Mission mission, int forceId, boolean filterOtherMissionKills){
@@ -382,6 +386,8 @@ public class KillAwards {
 
         /**
          * This function gathers kills from individual personnel
+         * @param campaign the campaign being processed
+         * @param mission the mission just completed
          * @param commander the unit commander whose kills are being counted
          * @param filterOtherMissionKills true if we should only count kills from the mission just completed
          */
@@ -399,18 +405,5 @@ public class KillAwards {
             }
 
             return allKills.size();
-        }
-
-        /**
-         * This function announced Award eligibility to the Daily Report pane
-         * @param award the award to be announced
-         */
-        private void announceEligibility (Campaign campaign, Person person, Award award){
-            final ResourceBundle resource = ResourceBundle.getBundle("mekhq.resources.AutoAwards",
-                    MekHQ.getMHQOptions().getLocale());
-
-            // we have to include ' ' as hyperlinked names lose their hyperlink if used within resource.getString()
-            campaign.addReport(person.getHyperlinkedName() + ' ' + MessageFormat.format(resource.getString(
-                    "EligibleForAwardReport.format"), award.getName(), award.getSet()));
         }
     }

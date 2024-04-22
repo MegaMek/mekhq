@@ -21,11 +21,13 @@ package mekhq.gui.dialog;
 import megamek.client.ui.models.XTableColumnModel;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.AutoAwardsTableModel;
 import mekhq.gui.sorter.PersonRankStringSorter;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.RowSorter.SortKey;
@@ -38,18 +40,12 @@ import java.util.List;
 import java.util.*;
 
 public class AutoAwardsDialog extends JDialog {
-    Campaign campaign;
-    CampaignGUI gui;
+    final Campaign campaign;
+    final CampaignGUI gui;
 
     private static final String PAN_AUTO_AWARDS = "PanAutoAwards";
 
-    private CampaignGUI hqView;
-
-    private Map<Integer, List<Object>> data;
-
-    private JPanel panMain;
-    private JTextArea txtInstructions;
-    private CardLayout cardLayout;
+    final private Map<Integer, List<Object>> data;
 
     private JComboBox<PersonnelFilter> cboPersonnelFilter;
     private AutoAwardsTable personnelTable;
@@ -67,16 +63,10 @@ public class AutoAwardsDialog extends JDialog {
     public AutoAwardsDialog(Campaign c, Map<Integer, List<Object>> awardData) {
         campaign = c;
         gui = campaign.getApp().getCampaigngui();
-        hqView = gui;
         data = awardData;
 
         setSize(new Dimension(800, 600));
         initComponents();
-        // TODO do I need this?
-        // we might not need this
-        btnDone.setEnabled(true);
-        btnSkip.setEnabled(true);
-        btnSkipAll.setEnabled(true);
         setLocationRelativeTo(gui.getFrame());
     }
 
@@ -84,11 +74,11 @@ public class AutoAwardsDialog extends JDialog {
         setTitle(resourceMap.getString("AutoAwardsDialog.title"));
 
         setLayout(new BorderLayout());
-        cardLayout = new CardLayout();
-        panMain = new JPanel(cardLayout);
+        CardLayout cardLayout = new CardLayout();
+        JPanel panMain = new JPanel(cardLayout);
         add(panMain, BorderLayout.CENTER);
 
-        txtInstructions = new JTextArea();
+        JTextArea txtInstructions = new JTextArea();
         add(txtInstructions, BorderLayout.PAGE_START);
         txtInstructions.setEditable(false);
         txtInstructions.setWrapStyleWord(true);
@@ -101,6 +91,8 @@ public class AutoAwardsDialog extends JDialog {
         JPanel autoAwardsPanel = new JPanel(new BorderLayout());
 
         cboPersonnelFilter = new JComboBox<>();
+        cboPersonnelFilter.setMaximumSize(new Dimension(200, 20));
+
         for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
             cboPersonnelFilter.addItem(filter);
         }
@@ -112,31 +104,21 @@ public class AutoAwardsDialog extends JDialog {
         upperPanel.add(Box.createRigidArea(new Dimension(5,0)));
         autoAwardsPanel.add(upperPanel, BorderLayout.PAGE_START);
 
-        AutoAwardsTableModel model = new AutoAwardsTableModel(hqView.getCampaign());
+        AutoAwardsTableModel model = new AutoAwardsTableModel(campaign);
+        // This is where we insert the external data
+        model.setData(data);
         personnelTable = new AutoAwardsTable(model);
-
         personnelSorter = new TableRowSorter<>(model);
-        personnelSorter.setComparator(AutoAwardsTableModel.COL_PERSON, new PersonRankStringSorter(hqView.getCampaign()));
+        personnelSorter.setComparator(AutoAwardsTableModel.COL_PERSON, new PersonRankStringSorter(campaign));
+        personnelTable.setRowSorter(personnelSorter);
         ArrayList<SortKey> sortKeys = new ArrayList<>();
         sortKeys.add(new SortKey(AutoAwardsTableModel.COL_PERSON, SortOrder.DESCENDING));
         personnelSorter.setSortKeys(sortKeys);
 
         cboPersonnelFilter.addActionListener(evt -> filterPersonnel(personnelSorter, cboPersonnelFilter));
 
-        personnelTable.getSelectionModel().addListSelectionListener(ev -> {
-            if (personnelTable.getSelectedRow() < 0) {
-                return;
-            }
-            // TODO do I need this?
-            int rowIndex = personnelTable.convertRowIndexToModel(personnelTable.getSelectedRow());
-            UUID id = ((AutoAwardsTableModel)(personnelTable.getModel())).getPerson(rowIndex).getId();
-        });
-
-        personnelTable.getColumnModel().getColumn(personnelTable.convertColumnIndexToModel(AutoAwardsTableModel.COL_AWARD)).
-                setCellEditor(new DefaultCellEditor(new JCheckBox()));
-
-        // This is where we insert the external data
-        model.setData(data);
+        personnelTable.getColumnModel().
+                getColumn(personnelTable.convertColumnIndexToModel(AutoAwardsTableModel.COL_AWARD));
 
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setViewportView(personnelTable);
@@ -153,26 +135,30 @@ public class AutoAwardsDialog extends JDialog {
         btnSkipAll = new JButton(resourceMap.getString("btnSkipAll.text"));
         btnSkipAll.addActionListener(buttonListener);
 
-        // TODO do I need setVisible here?
         btnPanel.add(btnDone);
-        btnDone.setVisible(true);
         btnPanel.add(btnSkip);
-        btnSkip.setVisible(true);
         btnPanel.add(btnSkipAll);
-        btnSkipAll.setVisible(true);
 
         add(btnPanel, BorderLayout.PAGE_END);
     }
-
-    private ActionListener buttonListener = new ActionListener() {
+    final private ActionListener buttonListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent event) {
             if (event.getSource().equals(btnDone)) {
-                // TODO this is where we will commit Award issuing
-//                for (UUID pid : ((RetirementTableModel) retireeTable.getModel()).getAltPayout().keySet()) {
-//                    rdTracker.getPayout(pid).setPayoutAmount(((RetirementTableModel) retireeTable.getModel())
-//                            .getAltPayout().get(pid));
-//                }
+                Person person;
+                Award award;
+
+                LogManager.getLogger().info("RowCount = {}", personnelTable.getRowCount());
+                for (int rowIndex = 0; rowIndex < personnelTable.getRowCount(); rowIndex++) {
+                    if ((boolean) personnelTable.getValueAt(rowIndex, 3)) {
+                        person = campaign.getPerson((UUID) data.get(rowIndex).get(0));
+                        award = (Award) data.get(rowIndex).get(1);
+
+                        person.getAwardController().addAndLogAward(campaign, award.getSet(),
+                                award.getName(), campaign.getLocalDate());
+                    }
+                }
+
                 isSkipAll = false;
                 setVisible(false);
             } else if (event.getSource().equals(btnSkip)) {
@@ -186,17 +172,17 @@ public class AutoAwardsDialog extends JDialog {
     };
 
     private void filterPersonnel(TableRowSorter<AutoAwardsTableModel> sorter, JComboBox<PersonnelFilter> comboBox) {
-        PersonnelFilter nGroup = (comboBox.getSelectedItem() != null)
-                ? (PersonnelFilter) comboBox.getSelectedItem()
-                : PersonnelFilter.ACTIVE;
+        PersonnelFilter filter = (comboBox.getSelectedItem() == null)
+                // this needs to be ALL, as we may have dead personnel in the table
+                ? PersonnelFilter.ALL
+                : (PersonnelFilter) comboBox.getSelectedItem();
 
         sorter.setRowFilter(new RowFilter<>() {
-
             @Override
             public boolean include(Entry<? extends AutoAwardsTableModel, ? extends Integer> entry) {
                 Person person = entry.getModel().getPerson(entry.getIdentifier());
 
-                return nGroup.getFilteredInformation(person, hqView.getCampaign().getLocalDate());
+                return filter.getFilteredInformation(person, campaign.getLocalDate());
             }
         });
     }

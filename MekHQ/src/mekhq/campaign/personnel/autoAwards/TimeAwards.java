@@ -13,8 +13,8 @@ import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 public class TimeAwards {
-    Campaign campaign;
-    Person person;
+    final Campaign campaign;
+    final Person person;
 
     /**
      * This function loops through Time Awards, checking whether the person is eligible to receive each type of award

@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class ScenarioAwards {
-    Campaign campaign;
-    Person person;
+    final Campaign campaign;
+    final Person person;
 
     /**
      * This function loops through Scenario Awards, checking whether the person is eligible to receive each type of award

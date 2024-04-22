@@ -19,18 +19,18 @@ public class AutoAwardsController {
     private Campaign campaign;
     private Mission mission;
 
-    private List<Award> contractAwards = new ArrayList<>();
-    private List<Award> factionHunterAwards = new ArrayList<>();
-    private List<Award> injuryAwards = new ArrayList<>();
-    private List<Award> killAwards = new ArrayList<>();
-    private List<Award> miscAwards = new ArrayList<>();
-    private List<Award> rankAwards = new ArrayList<>();
-    private List<Award> scenarioAwards = new ArrayList<>();
-    private List<Award> skillAwards = new ArrayList<>();
-    private List<Award> theatreOfWarAwards = new ArrayList<>();
-    private List<Award> timeAwards = new ArrayList<>();
-    private List<Award> trainingAwards = new ArrayList<>();
-    private List<Award> ignoredAwards = new ArrayList<>();
+    final private List<Award> contractAwards = new ArrayList<>();
+    final private List<Award> factionHunterAwards = new ArrayList<>();
+    final private List<Award> injuryAwards = new ArrayList<>();
+    final private List<Award> killAwards = new ArrayList<>();
+    final private List<Award> miscAwards = new ArrayList<>();
+    final private List<Award> rankAwards = new ArrayList<>();
+    final private List<Award> scenarioAwards = new ArrayList<>();
+    final private List<Award> skillAwards = new ArrayList<>();
+    final private List<Award> theatreOfWarAwards = new ArrayList<>();
+    final private List<Award> timeAwards = new ArrayList<>();
+    final private List<Award> trainingAwards = new ArrayList<>();
+    final private List<Award> ignoredAwards = new ArrayList<>();
 
     /**
      * The primary controller for the automatic processing of Awards
@@ -90,7 +90,7 @@ public class AutoAwardsController {
      * This function processes Kill(Scenario) and Injury Awards following the conclusion of a Scenario
      *
      * @param c the campaign to be processed
-     * @param scenarioId Id number for the Scenario just concluded
+     * @param scenarioId id number for the Scenario just concluded
      * @param person the person to check award eligibility for
      * @param injuryCount the number of Hits sustained in the Scenario just concluded
      */
@@ -304,6 +304,12 @@ public class AutoAwardsController {
      */
     private void ProcessAwards(Collection<Person> personnel, Boolean missionWasSuccessful) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
+        Map<Integer, List<Object>> data;
+
+        // this gives us an incremental int that we can use as a key for awardData
+        int awardDataKey = 0;
+
+        boolean skipAll = false;
 
         // Ideally, we'd not be doing multiple passes of Person or Award, but we don't have that luxury. By processing
         // Award Eligibility in the manner below, we can stagger processing of Award Types, which reduces the likelihood
@@ -315,7 +321,9 @@ public class AutoAwardsController {
             }
         }
 
-        if ((!factionHunterAwards.isEmpty()) && (campaign.getCampaignOptions().isUseAtB()) && (mission instanceof AtBContract)) {
+        if ((!skipAll) && (!factionHunterAwards.isEmpty())
+                && (campaign.getCampaignOptions().isUseAtB())
+                && (mission instanceof AtBContract)) {
             for (Person person: personnel) {
                 new FactionHunterAwards(campaign, mission, factionHunterAwards, person);
             }
@@ -323,11 +331,7 @@ public class AutoAwardsController {
 
         // even if someone doesn't have a Combat Role, we still check combat-related Awards as we've no way to check
         // whether Person previously held a Combat Role earlier in the Mission
-        if (!killAwards.isEmpty()) {
-            Map<Integer, List<Object>> data;
-            // this gives us an incremental int that we can use as a key for awardData
-            int awardDataKey = 0;
-
+        if ((!skipAll) && (!killAwards.isEmpty())) {
             for (Person person: personnel) {
                 try {
                     data = KillAwards.KillAwardProcessor(campaign, mission, killAwards, person);
@@ -350,43 +354,45 @@ public class AutoAwardsController {
             if (!awardData.isEmpty()) {
                 AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, awardData);
                 autoAwardsDialog.setVisible(true);
+
+                skipAll = autoAwardsDialog.wasSkipAll();
             } else {
                 LogManager.getLogger().info("Zero personnel were found eligible for Kill Awards");
             }
         }
 
-        if (!miscAwards.isEmpty()) {
+        if ((!skipAll) && (!miscAwards.isEmpty())) {
             for (Person person: personnel) {
                 new MiscAwards(campaign, miscAwards, person, missionWasSuccessful);
             }
         }
 
-        if (!rankAwards.isEmpty()) {
+        if ((!skipAll) && (!rankAwards.isEmpty())) {
             for (Person person: personnel) {
                 new RankAwards(campaign, rankAwards, person);
             }
         }
 
-        if (!scenarioAwards.isEmpty()) {
+        if ((!skipAll) && (!scenarioAwards.isEmpty())) {
             for (Person person: personnel) {
                 new ScenarioAwards(campaign, scenarioAwards, person);
             }
         }
 
-        if (!skillAwards.isEmpty()) {
+        if ((!skipAll) && (!skillAwards.isEmpty())) {
             for (Person person: personnel) {
                 new SkillAwards(campaign, skillAwards, person);
             }
         }
 
         // theatre of war awards are based on employer, only Contracts have employers
-        if ((!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
+        if ((!skipAll) && (!theatreOfWarAwards.isEmpty()) && (mission instanceof Contract)) {
             for (Person person: personnel) {
                 new TheatreOfWarAwards(campaign, mission, theatreOfWarAwards, person);
             }
         }
 
-        if (!timeAwards.isEmpty()) {
+        if ((!skipAll) && (!timeAwards.isEmpty())) {
             for (Person person: personnel) {
                 new TimeAwards(campaign, person, timeAwards);
             }

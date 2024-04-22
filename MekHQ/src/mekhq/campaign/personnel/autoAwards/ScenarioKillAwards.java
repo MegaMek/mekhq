@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 public class ScenarioKillAwards {
-    Campaign campaign;
-    Person person;
+    final Campaign campaign;
+    final Person person;
 
     /**
      * This function processes Injury Awards and spits out eligibility into the Daily Report

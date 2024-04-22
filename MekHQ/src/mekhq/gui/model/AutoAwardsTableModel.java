@@ -1,6 +1,5 @@
 package mekhq.gui.model;
 
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
@@ -31,12 +30,10 @@ public class AutoAwardsTableModel extends AbstractTableModel {
 
     private final Campaign campaign;
     private Map<Integer,List<Object>> data;
-    private Map<Integer, Boolean> issueAward;
 
     public AutoAwardsTableModel(Campaign c) {
         this.campaign = c;
         data = new HashMap<>();
-        issueAward = new HashMap<>();
     }
 
     public void setData(Map<Integer,List<Object>> map) {
@@ -119,7 +116,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
             case COL_SET:
                 return award.getSet();
             case COL_AWARD:
-                return issueAward.getOrDefault(rowIndex, true);
+                return data.get(rowIndex).get(2);
             case COL_DESCRIPTION:
                 return award.getDescription();
             default:
@@ -130,7 +127,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     @Override
     public void setValueAt(Object value, int rowIndex, int column) {
         if (column == COL_AWARD) {
-            issueAward.put(rowIndex, (Boolean) value);
+            data.get(rowIndex).set(2, value);
         }
 
         fireTableDataChanged();
@@ -146,10 +143,6 @@ public class AutoAwardsTableModel extends AbstractTableModel {
 
     public String getAwardSet(int rowIndex) {
         return ((Award) data.get(rowIndex).get(1)).getSet();
-    }
-
-    public Boolean getIssueAward(int rowIndex) {
-        return issueAward.get(rowIndex);
     }
 
     public String getAwardDescription(int rowIndex) {
@@ -172,10 +165,6 @@ public class AutoAwardsTableModel extends AbstractTableModel {
                     hasFocus, rowIndex, columnIndex);
             int actualColumn = table.convertColumnIndexToModel(columnIndex);
             setHorizontalAlignment(getAlignment(actualColumn));
-            if (!isSelected) {
-                setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
-                setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
-            }
             return this;
         }
     }
@@ -210,10 +199,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
             }
 
             MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, rowIndex);
-            if (!isSelected) {
-                setForeground(MekHQ.getMHQOptions().getAutoAwardsForeground());
-                setBackground(MekHQ.getMHQOptions().getAutoAwardsBackground());
-            }
+
             return this;
         }
     }
