@@ -3,8 +3,10 @@ package mekhq.gui.panels;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.model.StoryOutcomeModel;
 
 import javax.swing.*;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +16,15 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
     private StoryPoint storyPoint;
 
     // What do we need to track
-    // name
-    // previous story points
+    // name (done)
+    // previous story points (done)
     // personality
     // splash image
     // StoryOutcomes and StoryTriggers
     private JTextField txtName;
+
+    private JTable storyOutcomeTable;
+    private StoryOutcomeModel storyOutcomeModel;
 
     public StoryPointEditorPanel(JFrame frame, String name, StoryPoint sp) {
         super(frame, name);
@@ -64,5 +69,33 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(new JLabel(sb.toString()), gbc);
+
+        JPanel pnlOutcomes = new JPanel(new BorderLayout());
+        pnlOutcomes.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Story Outcomes and Triggers"),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+
+        storyOutcomeModel = new StoryOutcomeModel(storyPoint.getStoryOutcomes());
+        storyOutcomeTable = new JTable(storyOutcomeModel);
+        TableColumn column;
+        for (int i = 0; i < StoryOutcomeModel.N_COL; i++) {
+            column = storyOutcomeTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(storyOutcomeModel.getColumnWidth(i));
+            column.setCellRenderer(storyOutcomeModel.getRenderer());
+        }
+        storyOutcomeTable.setIntercellSpacing(new Dimension(0, 0));
+        storyOutcomeTable.setShowGrid(false);
+        storyOutcomeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        pnlOutcomes.add(new JScrollPane(storyOutcomeTable), BorderLayout.CENTER);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.BOTH;
+        add(pnlOutcomes, gbc);
     }
 }
