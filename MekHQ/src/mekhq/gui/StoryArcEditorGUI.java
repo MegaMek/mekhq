@@ -6,9 +6,12 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.model.StoryPointTableModel;
 import mekhq.gui.model.UnitTableModel;
+import mekhq.gui.panels.StoryPointEditorPanel;
 import mekhq.gui.sorter.PersonTitleSorter;
+import mekhq.gui.view.UnitViewPanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -35,6 +38,7 @@ public class StoryArcEditorGUI extends JPanel {
     /* Story Point Table */
     private JTable storyPointTable;
     private StoryPointTableModel storyPointTableModel;
+    private JScrollPane scrollStoryPointEditor;
 
 
     private StoryArc storyArc;
@@ -82,9 +86,16 @@ public class StoryArcEditorGUI extends JPanel {
         //storyPointTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
         storyPointTable.setOpaque(false);
         JScrollPane scrollStoryPoints = new JScrollPane(storyPointTable);
+        storyPointTable.getSelectionModel().addListSelectionListener(ev -> refreshStoryPointEditor());
         refreshStoryPoints();
 
-        add(scrollStoryPoints, BorderLayout.CENTER);
+        add(scrollStoryPoints, BorderLayout.WEST);
+
+        scrollStoryPointEditor = new JScrollPane();
+        scrollStoryPointEditor.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollStoryPointEditor.setViewportView(null);
+
+        add(scrollStoryPointEditor, BorderLayout.CENTER);
 
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 
@@ -165,5 +176,16 @@ public class StoryArcEditorGUI extends JPanel {
         if ((selected > -1) && (selected < storyPoints.size())) {
             storyPointTable.setRowSelectionInterval(selected, selected);
         }
+    }
+
+    public void refreshStoryPointEditor() {
+        int row = storyPointTable.getSelectedRow();
+        if (row < 0) {
+            scrollStoryPointEditor.setViewportView(null);
+            return;
+        }
+        StoryPoint selectedStoryPoint = storyPointTableModel.getStoryPointAt(storyPointTable.convertRowIndexToModel(row));
+        scrollStoryPointEditor.setViewportView(new StoryPointEditorPanel(frame, "story point editor", selectedStoryPoint));
+        SwingUtilities.invokeLater(() -> scrollStoryPointEditor.getVerticalScrollBar().setValue(0));
     }
 }
