@@ -138,6 +138,13 @@ public class StartupScreenPanel extends AbstractMHQPanel {
                 startCampaign(storyArcStub.getInitCampaignFile(), storyArcStub);
             }
         });
+
+        MegamekButton btnStoryArcEditor = new MegamekButton(resources.getString("btnStoryArcEditor.text"),
+                UIComponents.MainMenuButton.getComp(), true);
+        btnStoryArcEditor.addActionListener(evt -> {
+            // do something
+        });
+
         MegamekButton btnQuit = new MegamekButton(resources.getString("Quit.text"),
                 UIComponents.MainMenuButton.getComp(), true);
         btnQuit.addActionListener(evt -> System.exit(0));
@@ -164,6 +171,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         btnLoadLastCampaign.setPreferredSize(minButtonDim);
         btnLoadStoryArc.setMinimumSize(minButtonDim);
         btnLoadStoryArc.setPreferredSize(minButtonDim);
+        btnStoryArcEditor.setMinimumSize(minButtonDim);
+        btnStoryArcEditor.setPreferredSize(minButtonDim);
         btnQuit.setMinimumSize(minButtonDim);
         btnQuit.setPreferredSize(minButtonDim);
 
@@ -196,6 +205,8 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         add(btnLoadLastCampaign, c);
         c.gridy++;
         add(btnLoadStoryArc, c);
+        c.gridy++;
+        add(btnStoryArcEditor, c);
         c.gridy++;
         add(btnQuit, c);
 
