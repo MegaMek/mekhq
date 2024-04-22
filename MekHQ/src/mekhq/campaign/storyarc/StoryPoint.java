@@ -134,11 +134,19 @@ public abstract class StoryPoint {
         return name;
     }
 
+    public UUID getNextStoryPointId() {
+        return nextStoryPointId;
+    }
+
     public Image getImage() {
         if(storySplash.isDefault()) {
             return null;
         }
         return storySplash.getImage();
+    }
+
+    public List<StoryOutcome> getStoryOutcomes() {
+        return new ArrayList<StoryOutcome>(storyOutcomes.values());
     }
 
     /**
@@ -232,6 +240,26 @@ public abstract class StoryPoint {
 
     public Campaign getCampaign() {
         return getStoryArc().getCampaign();
+    }
+
+    public List<StoryPoint> getLinkingStoryPoints() {
+        List previous = new ArrayList<StoryPoint>();
+        UUID nextId;
+        for (StoryPoint otherStoryPoint : storyArc.getStoryPoints()) {
+            nextId = otherStoryPoint.getNextStoryPointId();
+            if ((nextId != null) && (nextId.equals(getId()))) {
+                previous.add(otherStoryPoint);
+                continue;
+            }
+            for( StoryOutcome outcome : otherStoryPoint.getStoryOutcomes()) {
+                nextId = outcome.getNextStoryPointId();
+                if ((nextId != null) && (nextId.equals(getId()))) {
+                    previous.add(otherStoryPoint);
+                    continue;
+                }
+            }
+        }
+        return previous;
     }
 
     //region I/O
