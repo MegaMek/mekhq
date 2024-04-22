@@ -112,7 +112,7 @@ public abstract class StoryPoint {
         }
     }
 
-    protected StoryArc getStoryArc() {
+    public StoryArc getStoryArc() {
         return storyArc;
     }
 

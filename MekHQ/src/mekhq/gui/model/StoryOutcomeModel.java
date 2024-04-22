@@ -3,6 +3,7 @@ package mekhq.gui.model;
 import megamek.common.Entity;
 import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryOutcome;
 
 import javax.swing.*;
@@ -15,6 +16,7 @@ public class StoryOutcomeModel extends DataTableModel {
 
     protected String[] columnNames;
     protected List<StoryOutcome> data;
+    StoryArc storyArc;
 
     public final static int COL_RESULT   = 0;
     public final static int COL_NEXT     = 1;
@@ -22,8 +24,9 @@ public class StoryOutcomeModel extends DataTableModel {
     public final static int N_COL        = 3;
     //endregion Variable Declarations
 
-    public StoryOutcomeModel(List<StoryOutcome> outcomes) {
+    public StoryOutcomeModel(List<StoryOutcome> outcomes, StoryArc arc) {
         data = outcomes;
+        storyArc = arc;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class StoryOutcomeModel extends DataTableModel {
             case COL_RESULT:
                 return outcome.getResult();
             case COL_NEXT:
-                return outcome.getNextStoryPointId() == null ? "" : outcome.getNextStoryPointId();
+                return outcome.getNextStoryPointId() == null ? "" : storyArc.getStoryPoint(outcome.getNextStoryPointId()).getName();
             case COL_TRIGGERS:
                 return outcome.getStoryTriggers().size();
             default:
