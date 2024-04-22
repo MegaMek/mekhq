@@ -10151,6 +10151,10 @@ mech in a garrison cluster, she nonetheless proved herself in battle upon Morges
 nomination for this trial.
 
 Aziza pilots an ancient second line *Warhammer IIC* that still presents a formidable threat.
+
+### Hegira/Retreat Conditions
+
+Aziza will yield the contest if her mech is crippled and your mech is not. You may surrender at any point. You cannot salvage her mech.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
@@ -10279,6 +10283,10 @@ Aziza pilots an ancient second line *Warhammer IIC* that still presents a formid
 Your opponent in this round is a brash, young mechwarrior named Damien. What he lacks for in
 experience, he makes up for in enthusiasm. He likes speed and will be bringing a jump-capable
 *Shadow Cat*. Make sure you don't let him run (or jump) circles around you.
+
+### Hegira/Retreat Conditions
+
+Damien will yield the contest if his mech is crippled and your mech is not. You may surrender at any point. You cannot salvage his mech.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
@@ -10404,6 +10412,10 @@ You have made it to the semi-finals. Your opponent in this round is Star Command
 experienced mechwarrior. He will be piloting a *Summoner C*. I am sure you realize this means a
 heavy ultra auto-cannon in the left arm. If you let him in too close, he can end this trial very
 quickly.
+
+### Hegira/Retreat Conditions
+
+Jameel will yield the contest if his mech is crippled and your mech is not. You may surrender at any point. You cannot salvage his mech.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
@@ -10535,6 +10547,10 @@ This is it - the finals. Win today and the bloodname is yours. That will not be 
 opponent is Star Captain Olympia. She is an experienced mechwarrior and considered something of a
 tactical genius. She will be piloting an *Executioner* in its A configuration, which means lots of
 lasers.
+
+### Hegira/Retreat Conditions
+
+Having reached the finals, Olympia will not surrender until her mech is destroyed. You may surrender at any point. You cannot salvage her mech.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
@@ -10669,6 +10685,10 @@ yourself and saKhan Vandervahn Chistu. Among the spectators will be many who wer
 Wolf and would like nothing better than to return.
 
 It is time to suit up and finish this.
+
+### Hegira/Retreat Conditions
+
+There is no surrender or hegira available in this battle. You must fight until one combatant's mech is destroyed. You cannot salvage Chistu's mech.
                 </desc>
                 <start>6</start>
                 <usingFixedMap>true</usingFixedMap>
