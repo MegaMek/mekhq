@@ -63,7 +63,7 @@ public class StoryOutcomeModel extends DataTableModel {
             case COL_RESULT:
                 return outcome.getResult();
             case COL_NEXT:
-                return outcome.getNextStoryPointId();
+                return outcome.getNextStoryPointId() == null ? "" : outcome.getNextStoryPointId();
             case COL_TRIGGERS:
                 return outcome.getStoryTriggers().size();
             default:

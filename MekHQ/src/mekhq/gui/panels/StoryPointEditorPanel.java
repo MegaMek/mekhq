@@ -1,5 +1,6 @@
 package mekhq.gui.panels;
 
+import mekhq.campaign.storyarc.StoryOutcome;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -76,6 +77,16 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 
         storyOutcomeModel = new StoryOutcomeModel(storyPoint.getStoryOutcomes());
+        // check for a default outcome or trigger
+        if (storyPoint.getNextStoryPointId() != null || storyPoint.getStoryTriggers().size() > 0) {
+            StoryOutcome defaultOutcome = new StoryOutcome();
+            defaultOutcome.setResult("<DEFAULT>");
+            if (storyPoint.getNextStoryPointId() != null) {
+                defaultOutcome.setNextStoryPointId(storyPoint.getNextStoryPointId());
+            }
+            defaultOutcome.setStoryTriggers(storyPoint.getStoryTriggers());
+            storyOutcomeModel.addOutcome(defaultOutcome);
+        }
         storyOutcomeTable = new JTable(storyOutcomeModel);
         TableColumn column;
         for (int i = 0; i < StoryOutcomeModel.N_COL; i++) {

@@ -149,6 +149,10 @@ public abstract class StoryPoint {
         return new ArrayList<StoryOutcome>(storyOutcomes.values());
     }
 
+    public List<StoryTrigger> getStoryTriggers() {
+        return storyTriggers;
+    }
+
     /**
      * Do whatever needs to be done to start this story point. Specific story point types may need to override this
      */
