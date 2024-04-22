@@ -40,12 +40,19 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
+
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
+        gbc.gridwidth = 2;
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
+        add(new JLabel("<html><h2>" + storyPoint.getClass().getSimpleName() + "</h2></html>"), gbc);
+
+        gbc.gridy++;
+        gbc.gridwidth = 1;
         add(new JLabel("<html><b>Story Point Name:</b></html>"), gbc);
 
         txtName = new JTextField(storyPoint.getName());

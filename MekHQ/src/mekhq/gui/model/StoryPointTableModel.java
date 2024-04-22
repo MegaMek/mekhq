@@ -24,8 +24,9 @@ public class StoryPointTableModel extends DataTableModel {
 
     private String getStoryPointDesc(StoryPoint storyPoint) {
         StringBuilder toReturn = new StringBuilder(128);
-        toReturn.append("<html><font size='2'><b>").append(storyPoint.getName()).append("</b><br/>");
-        toReturn.append("</font></html>");
+        toReturn.append("<html><b>").append(storyPoint.getName()).append("</b><br/>");
+        toReturn.append(storyPoint.getClass().getSimpleName());
+        toReturn.append("</html>");
         return toReturn.toString();
     }
 

@@ -83,7 +83,6 @@ public class StoryArcEditorGUI extends JPanel {
         storyPointTable = new JTable(storyPointTableModel);
         storyPointTable.setRowHeight(60);
         storyPointTable.getColumnModel().getColumn(0).setCellRenderer(storyPointTableModel.getRenderer());
-        //storyPointTable.getSelectionModel().addListSelectionListener(ev -> docTableValueChanged());
         storyPointTable.setOpaque(false);
         JScrollPane scrollStoryPoints = new JScrollPane(storyPointTable);
         storyPointTable.getSelectionModel().addListSelectionListener(ev -> refreshStoryPointEditor());
