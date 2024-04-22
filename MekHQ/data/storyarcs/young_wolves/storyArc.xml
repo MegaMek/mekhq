@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <storyArc version="0.49.19-SNAPSHOT">
     <title>Young Wolves</title>
-    <details>BETA TEST v0.3</details>
+    <details>Clan Invasion Era; Mechs Only</details>
     <description>
 # Young Wolves
 
@@ -38,7 +38,7 @@ Battletech history, but some deviations have been made for narrative purposes.
 
     </description>
     <storyLoadingType>START_NEW</storyLoadingType>
-    <startingPointId>a643f85c-5573-4f15-8eb2-2b55e1cbda05</startingPointId>
+    <startingPointId>e9c2df78-df50-417e-aaf0-ed3e26dbeca3</startingPointId>
     <customStringVariables>
         <customStringVariable>
             <key>firstImpressions</key>
@@ -87,41 +87,6 @@ Battletech history, but some deviations have been made for narrative purposes.
     </customStringVariables>
     <storyPoints>
         <!-- Initial story events -->
-        <storyPoint name="welcome_beta" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
-            <id>a643f85c-5573-4f15-8eb2-2b55e1cbda05</id>
-            <title>Welcome to the Beta Test</title>
-            <narrative>
-## Young Wolves Story Arc Beta Test
-
-**Version**: 0.3
-
-Welcome, mechwarriors! The new Story Arcs feature being developed for MekHQ offers the ability to create
-a branching narrative structure to lead a player through a set of missions and scenarios, allowing users
-to experience a new way to play games in MegaMek.
-
-To test the Story Arcs architecture, we are developing an example story arc. We need your help to test it out. Please
-play through the story arc and identify issues, bugs, grammatical errors, etc. Feel free to play through
-multiple times and make different choices. You should also make frequent saves and trying going back and
-making different choices to explore all the possible outcomes.
-
-We are interested in two kinds of feedback:
-
-* If you find a specific bug or error, please report this as an issue
-at https://github.com/AaronGullickson/mekhq/issues. Please note that you are not providing issues
-for the main MekHQ repository on GitHub. Please ensure that your issue is not addressed by existing
-issues. Please include the version number of the Story Arcs beta in your release. Detailed information
-including how to reproduce the bug will help us in resolving it.
-* If you have overall feedback on the story arc itself that goes beyond a simple bug such as a comment on
-the narrative, difficulty of the scenarios, etc. we would also appreciate your feedback. You can either
-provide that feedback on the pinned forum topic of the
-MegaMek subforum on the CGL Battletech forums, or on the Story Arcs channel of the MegaMek Discord.
-            </narrative>
-            <storySplash>
-                <category></category>
-                <filename>splash-mechbay.png</filename>
-            </storySplash>
-            <nextStoryPointId>e9c2df78-df50-417e-aaf0-ed3e26dbeca3</nextStoryPointId>
-        </storyPoint>
         <storyPoint name="welcome" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>e9c2df78-df50-417e-aaf0-ed3e26dbeca3</id>
             <title>Young Wolves Story Arc</title>
