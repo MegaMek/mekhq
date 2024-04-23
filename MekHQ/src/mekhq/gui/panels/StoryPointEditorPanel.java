@@ -1,9 +1,11 @@
 package mekhq.gui.panels;
 
+import mekhq.StoryPointHyperLinkListener;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryOutcome;
 import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.gui.StoryArcEditorGUI;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.model.StoryOutcomeModel;
@@ -16,6 +18,7 @@ import java.util.List;
 
 public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
 
+    private StoryArcEditorGUI editorGUI;
     private StoryPoint storyPoint;
 
     // What do we need to track
@@ -29,9 +32,10 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
     private JTable storyOutcomeTable;
     private StoryOutcomeModel storyOutcomeModel;
 
-    public StoryPointEditorPanel(JFrame frame, String name, StoryPoint sp) {
+    public StoryPointEditorPanel(JFrame frame, String name, StoryPoint sp, StoryArcEditorGUI gui) {
         super(frame, name);
         storyPoint = sp;
+        this.editorGUI = gui;
         initialize();
     }
 
@@ -72,24 +76,29 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         String SEPARATOR = "";
         for (int i = 0; i < linkedStoryPoints.size(); i++) {
             sb.append(SEPARATOR);
-            sb.append(linkedStoryPoints.get(i).getName());
+            sb.append(linkedStoryPoints.get(i).getHyperlinkedName());
             SEPARATOR = ", ";
         }
         gbc.gridx++;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(new JLabel(sb.toString()), gbc);
+        JTextPane txtLinking = new JTextPane();
+        txtLinking.setContentType("text/html");
+        txtLinking.setEditable(false);
+        txtLinking.setText(sb.toString());
+        txtLinking.addHyperlinkListener(editorGUI.getStoryPointHLL());
+        add(txtLinking, gbc);
 
         JPanel pnlOutcomes = new JPanel(new BorderLayout());
         pnlOutcomes.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Story Outcomes and Triggers"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 
-        storyOutcomeModel = new StoryOutcomeModel(storyPoint.getStoryOutcomes(), storyPoint.getStoryArc());
+        storyOutcomeModel = new StoryOutcomeModel(storyPoint.getStoryOutcomes(), storyPoint.getStoryArc(), editorGUI);
         // check for a default outcome or trigger
         if (storyPoint.getNextStoryPointId() != null || storyPoint.getStoryTriggers().size() > 0) {
             StoryOutcome defaultOutcome = new StoryOutcome();
-            defaultOutcome.setResult("<DEFAULT>");
+            defaultOutcome.setResult("<i>DEFAULT</i>");
             if (storyPoint.getNextStoryPointId() != null) {
                 defaultOutcome.setNextStoryPointId(storyPoint.getNextStoryPointId());
             }

@@ -2,6 +2,7 @@ package mekhq.gui;
 
 import megamek.client.ui.models.XTableColumnModel;
 import mekhq.MekHQ;
+import mekhq.StoryPointHyperLinkListener;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.storyarc.StoryArc;
@@ -23,6 +24,7 @@ import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.UUID;
 
 public class StoryArcEditorGUI extends JPanel {
 
@@ -31,6 +33,7 @@ public class StoryArcEditorGUI extends JPanel {
     public static final int MAX_START_HEIGHT = 900;
     private JFrame frame;
     private MekHQ app;
+    private StoryPointHyperLinkListener storyPointHLL;
 
     /* Menu Bar */
     private JMenuBar menuBar;
@@ -50,6 +53,7 @@ public class StoryArcEditorGUI extends JPanel {
     public StoryArcEditorGUI(MekHQ app, StoryArc arc) {
         this.app = app;
         this.storyArc = arc;
+        storyPointHLL = new StoryPointHyperLinkListener(storyArc, this);
         initComponents();
     }
     //endregion Constructors
@@ -61,6 +65,10 @@ public class StoryArcEditorGUI extends JPanel {
 
     protected MekHQ getApplication() {
         return app;
+    }
+
+    public StoryPointHyperLinkListener getStoryPointHLL() {
+        return storyPointHLL;
     }
 
     protected Campaign getCampaign() {
@@ -177,6 +185,20 @@ public class StoryArcEditorGUI extends JPanel {
         }
     }
 
+    public void focusOnStoryPoint(UUID id) {
+        int row = -1;
+        for (int i = 0; i < storyPointTable.getRowCount(); i++) {
+            if (storyPointTableModel.getStoryPointAt(i).getId().equals(id)) {
+                row = i;
+                break;
+            }
+        }
+        if (row != -1) {
+            storyPointTable.setRowSelectionInterval(row, row);
+            storyPointTable.scrollRectToVisible(storyPointTable.getCellRect(row, 0, true));
+        }
+    }
+
     public void refreshStoryPointEditor() {
         int row = storyPointTable.getSelectedRow();
         if (row < 0) {
@@ -184,7 +206,7 @@ public class StoryArcEditorGUI extends JPanel {
             return;
         }
         StoryPoint selectedStoryPoint = storyPointTableModel.getStoryPointAt(storyPointTable.convertRowIndexToModel(row));
-        scrollStoryPointEditor.setViewportView(new StoryPointEditorPanel(frame, "story point editor", selectedStoryPoint));
+        scrollStoryPointEditor.setViewportView(new StoryPointEditorPanel(frame, "story point editor", selectedStoryPoint, this));
         SwingUtilities.invokeLater(() -> scrollStoryPointEditor.getVerticalScrollBar().setValue(0));
     }
 }

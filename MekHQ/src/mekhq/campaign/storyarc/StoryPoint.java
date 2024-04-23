@@ -120,7 +120,7 @@ public abstract class StoryPoint {
         this.id = id;
     }
 
-    protected UUID getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -264,6 +264,10 @@ public abstract class StoryPoint {
             }
         }
         return previous;
+    }
+
+    public String getHyperlinkedName() {
+        return String.format("<a href='STORYPOINT:%s'>%s</a>", getId(), getName());
     }
 
     //region I/O

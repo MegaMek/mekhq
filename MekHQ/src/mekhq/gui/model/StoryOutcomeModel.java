@@ -5,9 +5,12 @@ import mekhq.campaign.mission.Loot;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryOutcome;
+import mekhq.gui.BasicInfo;
+import mekhq.gui.StoryArcEditorGUI;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,7 +19,9 @@ public class StoryOutcomeModel extends DataTableModel {
 
     protected String[] columnNames;
     protected List<StoryOutcome> data;
-    StoryArc storyArc;
+    private StoryArc storyArc;
+    private StoryArcEditorGUI editorGUI;
+
 
     public final static int COL_RESULT   = 0;
     public final static int COL_NEXT     = 1;
@@ -24,9 +29,10 @@ public class StoryOutcomeModel extends DataTableModel {
     public final static int N_COL        = 3;
     //endregion Variable Declarations
 
-    public StoryOutcomeModel(List<StoryOutcome> outcomes, StoryArc arc) {
+    public StoryOutcomeModel(List<StoryOutcome> outcomes, StoryArc arc, StoryArcEditorGUI gui) {
         data = outcomes;
         storyArc = arc;
+        editorGUI = gui;
     }
 
     @Override
@@ -66,7 +72,7 @@ public class StoryOutcomeModel extends DataTableModel {
             case COL_RESULT:
                 return outcome.getResult();
             case COL_NEXT:
-                return outcome.getNextStoryPointId() == null ? "" : storyArc.getStoryPoint(outcome.getNextStoryPointId()).getName();
+                return outcome.getNextStoryPointId() == null ? "" : storyArc.getStoryPoint(outcome.getNextStoryPointId()).getHyperlinkedName();
             case COL_TRIGGERS:
                 return outcome.getStoryTriggers().size();
             default:
@@ -119,17 +125,16 @@ public class StoryOutcomeModel extends DataTableModel {
         return new StoryOutcomeModel.Renderer();
     }
 
-    public class Renderer extends DefaultTableCellRenderer {
+    public class Renderer extends JTextPane implements TableCellRenderer {
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
                                                        int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            setOpaque(true);
-            int actualCol = table.convertColumnIndexToModel(column);
-            int actualRow = table.convertRowIndexToModel(row);
-            setHorizontalAlignment(getAlignment(actualCol));
-            setToolTipText(getTooltip(actualRow, actualCol));
+            setContentType("text/html");
+            setEditable(false);
+            setText(getValueAt(row, column).toString());
+            setToolTipText(getTooltip(row, column));
+            addHyperlinkListener(editorGUI.getStoryPointHLL());
 
             return this;
         }
