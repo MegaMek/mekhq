@@ -5,6 +5,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryOutcome;
 import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.gui.StoryArcEditorGUI;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.JScrollablePanel;
@@ -15,6 +16,7 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
 
@@ -28,6 +30,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
     // splash image
     // StoryOutcomes and StoryTriggers
     private JTextField txtName;
+    private JPanel pnlOutcomes;
 
     private JTable storyOutcomeTable;
     private StoryOutcomeModel storyOutcomeModel;
@@ -89,35 +92,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         txtLinking.addHyperlinkListener(editorGUI.getStoryPointHLL());
         add(txtLinking, gbc);
 
-        JPanel pnlOutcomes = new JPanel(new BorderLayout());
-        pnlOutcomes.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Story Outcomes and Triggers"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-
-        storyOutcomeModel = new StoryOutcomeModel(storyPoint.getStoryOutcomes(), storyPoint.getStoryArc(), editorGUI);
-        // check for a default outcome or trigger
-        if (storyPoint.getNextStoryPointId() != null || storyPoint.getStoryTriggers().size() > 0) {
-            StoryOutcome defaultOutcome = new StoryOutcome();
-            defaultOutcome.setResult("<i>DEFAULT</i>");
-            if (storyPoint.getNextStoryPointId() != null) {
-                defaultOutcome.setNextStoryPointId(storyPoint.getNextStoryPointId());
-            }
-            defaultOutcome.setStoryTriggers(storyPoint.getStoryTriggers());
-            storyOutcomeModel.addOutcome(defaultOutcome);
-        }
-        storyOutcomeTable = new JTable(storyOutcomeModel);
-        TableColumn column;
-        for (int i = 0; i < StoryOutcomeModel.N_COL; i++) {
-            column = storyOutcomeTable.getColumnModel().getColumn(i);
-            column.setPreferredWidth(storyOutcomeModel.getColumnWidth(i));
-            column.setCellRenderer(storyOutcomeModel.getRenderer());
-        }
-        storyOutcomeTable.setIntercellSpacing(new Dimension(0, 0));
-        storyOutcomeTable.setShowGrid(false);
-        storyOutcomeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        pnlOutcomes.add(new JScrollPane(storyOutcomeTable), BorderLayout.CENTER);
-
+        refreshOutcomesPanel();
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 1.0;
@@ -126,5 +101,85 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         add(pnlOutcomes, gbc);
+    }
+
+    private void refreshOutcomesPanel() {
+        pnlOutcomes = new JPanel(new GridBagLayout());
+        pnlOutcomes.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Story Outcomes and Triggers"),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+
+        // I would prefer to do this with a JTable, but I can't properly use a HyperLinkListener in a JTable
+        // so we need to create something else
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        pnlOutcomes.add(new JLabel("<html><b>Result</b></html>"), gbc);
+        gbc.gridx++;
+        pnlOutcomes.add(new JLabel("<html><b>Next Story Point</b></html>"), gbc);
+        gbc.gridx++;
+        pnlOutcomes.add(new JLabel("<html><b>Story Triggers</b></html>"), gbc);
+
+        for(StoryOutcome outcome : storyPoint.getStoryOutcomes()) {
+            gbc.gridx = 0;
+            gbc.weightx = 1.0;
+            gbc.gridy++;
+            pnlOutcomes.add(new JLabel(outcome.getResult()), gbc);
+            gbc.gridx++;
+            String next = outcome.getNextStoryPointId() == null ? "" :
+                    storyPoint.getStoryArc().getStoryPoint(outcome.getNextStoryPointId()).getHyperlinkedName();
+            JTextPane txtNext = new JTextPane();
+            txtNext.setContentType("text/html");
+            txtNext.setEditable(false);
+            txtNext.setText(next);
+            txtNext.addHyperlinkListener(editorGUI.getStoryPointHLL());
+            pnlOutcomes.add(txtNext, gbc);
+            gbc.gridx++;
+            pnlOutcomes.add(new JLabel(getStoryTriggerDescription(outcome.getStoryTriggers())), gbc);
+            gbc.gridx++;
+            gbc.weightx = 0.0;
+            pnlOutcomes.add(new JButton("Edit Outcome"), gbc);
+            gbc.gridx++;
+            pnlOutcomes.add(new JButton("Delete Outcome"), gbc);
+        }
+
+        // check for a default outcome or trigger
+        if (storyPoint.getNextStoryPointId() != null || storyPoint.getStoryTriggers().size() > 0) {
+            gbc.gridx = 0;
+            gbc.gridy++;
+            gbc.weightx = 1.0;
+            pnlOutcomes.add(new JLabel("<html><i>DEFAULT</i></html>"), gbc);
+            gbc.gridx++;
+            String next = storyPoint.getNextStoryPointId() == null ? "" :
+                    storyPoint.getStoryArc().getStoryPoint(storyPoint.getNextStoryPointId()).getHyperlinkedName();
+            JTextPane txtNext = new JTextPane();
+            txtNext.setContentType("text/html");
+            txtNext.setEditable(false);
+            txtNext.setText(next);
+            txtNext.addHyperlinkListener(editorGUI.getStoryPointHLL());
+            pnlOutcomes.add(txtNext, gbc);
+            gbc.gridx++;
+            pnlOutcomes.add(new JLabel(getStoryTriggerDescription(storyPoint.getStoryTriggers())), gbc);
+            gbc.gridx++;
+            gbc.weightx = 0.0;
+            pnlOutcomes.add(new JButton("Edit Outcome"), gbc);
+            gbc.gridx++;
+            pnlOutcomes.add(new JButton("Delete Outcome"), gbc);
+        }
+    }
+
+    private String getStoryTriggerDescription(List<StoryTrigger> triggers) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html>");
+        for(StoryTrigger trigger : triggers) {
+            sb.append(trigger.getClass().getSimpleName());
+            sb.append("<br>");
+        }
+        sb.append("</html>");
+        return sb.toString();
     }
 }
