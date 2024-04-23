@@ -4,14 +4,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ContractAwards {
     /**
@@ -22,7 +18,7 @@ public class ContractAwards {
      * @param awards the awards to be processed (should only include awards where item == Kill)
      */
     public static Map<Integer, List<Object>> ContractAwardsProcessor(Campaign campaign, Mission mission,
-                                                                     Person person, List<Award> awards) {
+                                                                     UUID person, List<Award> awards) {
         List<Award> eligibleAwards = new ArrayList<>();
         List<Award> eligibleAwardsBestable = new ArrayList<>();
         Award bestAward = new Award();
@@ -37,7 +33,7 @@ public class ContractAwards {
                 "diversionary raid", "objective raid", "recon raid", "extraction raid");
 
         for (Award award : awards) {
-            if (award.canBeAwarded(person)) {
+            if (award.canBeAwarded(campaign.getPerson(person))) {
                 if (award.getRange().equalsIgnoreCase("months")) {
                     try {
                         int requiredDuration = award.getQty();

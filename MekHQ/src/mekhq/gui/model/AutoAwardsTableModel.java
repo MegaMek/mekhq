@@ -36,8 +36,15 @@ public class AutoAwardsTableModel extends AbstractTableModel {
         data = new HashMap<>();
     }
 
-    public void setData(Map<Integer,List<Object>> map) {
+    public void setData( Map<Integer, List<Object>> map) {
+        if (map.isEmpty()) {
+            LogManager.getLogger().error("AutoAwardsDialog failed to pass 'data' into AutoAwardsTableModel");
+        } else {
+            LogManager.getLogger().info("'AutoAwardsDialog passed 'data' into AutoAwardsTableModel: {}", map);
+        }
+
         data = map;
+        LogManager.getLogger().info("Translated data: {}", data);
     }
 
     @Override
@@ -89,25 +96,29 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     public Class<?> getColumnClass(int col) {
         Class<?> retVal = Object.class;
         try {
-            retVal = getValueAt(0, col).getClass();
+            Object value = getValueAt(0, col);
+            if (value != null) {
+                retVal = value.getClass();
+            }
         } catch (NullPointerException e) {
-            LogManager.getLogger().error("", e);
+            LogManager.getLogger().error("autoAwards 'getColumnClass()' failed to parse {}",
+                    getValueAt(0, col));
         }
         return retVal;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Person person;
-        Award award;
-
-        if (data.isEmpty()) {
+        if (data.isEmpty() || !data.containsKey(rowIndex)) {
+            LogManager.getLogger().error("'data' is empty or does not contain key for index: {}", rowIndex);
             return "";
-        } else {
-            person = campaign.getPerson((UUID) data.get(rowIndex).get(0));
-            award = (Award) data.get(rowIndex).get(1);
-
         }
+
+        List<Object> rowData = data.get(rowIndex);
+
+        UUID personUUID = (UUID) rowData.get(0);
+        Person person = campaign.getPerson(personUUID);
+        Award award = (Award) rowData.get(1);
 
         switch (columnIndex) {
             case COL_PERSON:
@@ -117,7 +128,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
             case COL_SET:
                 return award.getSet();
             case COL_AWARD:
-                return data.get(rowIndex).get(2);
+                return rowData.get(2);
             case COL_DESCRIPTION:
                 return award.getDescription();
             default:

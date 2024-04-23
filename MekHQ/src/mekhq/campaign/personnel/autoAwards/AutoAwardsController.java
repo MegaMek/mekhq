@@ -13,6 +13,7 @@ import mekhq.gui.dialog.AutoAwardsDialog;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AutoAwardsController {
     private Campaign campaign;
@@ -46,15 +47,23 @@ public class AutoAwardsController {
 
         buildAwardLists(1);
 
-        Collection<Person> personnel = campaign.getActivePersonnel();
+        Collection<UUID> personnel = campaign.getActivePersonnel()
+                .stream()
+                .map(Person::getId)
+                .collect(Collectors.toList());
 
         // if posthumous Awards are enabled, we add the relevant dead people
         if (campaign.getCampaignOptions().isIssuePosthumousAwards()) {
-            Collection<Person> deadPeople = campaign.getPersonnel();
+            Collection<UUID> deadPeople = campaign.getPersonnel()
+                    .stream().filter(person -> person.getStatus().isDead())
+                    .map(Person::getId)
+                    .collect(Collectors.toList());
 
-            deadPeople.removeIf(person -> person.getStatus().isDead());
+            LogManager.getLogger().info("deadPeople {}", deadPeople);
 
-            personnel.addAll(deadPeople);
+            if (!deadPeople.isEmpty()) {
+                personnel.addAll(deadPeople);
+            }
         }
 
         // Prisoners and Dependents are not eligible for Awards
@@ -81,14 +90,14 @@ public class AutoAwardsController {
      * @param person      the person to check award eligibility for
      * @param injuryCount the number of Hits sustained in the Scenario just concluded
      */
-    public void PostScenarioController(Campaign c, int scenarioId, Person person, int injuryCount) {
+    public void PostScenarioController(Campaign c, int scenarioId, UUID person, int injuryCount) {
         LogManager.getLogger().info("autoAwards (Scenario Conclusion) has started");
 
         campaign = c;
 
         // we convert person into a Collection, as it allows us to utilize InjuryAwardsManager
         // outside of this function
-        Collection<Person> personnel = new ArrayList<>();
+        Collection<UUID> personnel = new ArrayList<>();
         personnel.add(person);
 
         buildAwardLists(2);
@@ -108,7 +117,7 @@ public class AutoAwardsController {
         }
 
         // beginning the processing & filtering of Kill(Scenario) Awards
-        List<Kill> kills = campaign.getKillsFor(person.getId());
+        List<Kill> kills = campaign.getKillsFor(campaign.getPerson(person).getId());
         kills.removeIf(kill -> kill.getScenarioId() != scenarioId);
 
         if ((!kills.isEmpty()) && (!killAwards.isEmpty())) {
@@ -134,9 +143,10 @@ public class AutoAwardsController {
      *
      * @param personnel personnel to process
      */
-    private void removeDependentsAndPrisoners(Collection<Person> personnel) {
+    private void removeDependentsAndPrisoners(Collection<UUID> personnel) {
         if (!personnel.isEmpty()) {
-            personnel.removeIf(person -> (person.hasRole(PersonnelRole.DEPENDENT)) || (person.getPrisonerStatus().isCurrentPrisoner()));
+            personnel.removeIf(person -> (campaign.getPerson(person).hasRole(PersonnelRole.DEPENDENT))
+                    || (campaign.getPerson(person).getPrisonerStatus().isCurrentPrisoner()));
         }
     }
 
@@ -307,7 +317,7 @@ public class AutoAwardsController {
      * @param personnel all personnel that should be checked for award eligibility
      * @param missionWasSuccessful whether the Mission ended in a Success
      */
-    private void ProcessAwards(Collection<Person> personnel, Boolean missionWasSuccessful) {
+    private void ProcessAwards(Collection<UUID> personnel, Boolean missionWasSuccessful) {
         Map<Integer, Map<Integer, List<Object>>> allAwardData = new HashMap<>();
         Map<Integer, List<Object>> processedData;
         int allAwardDataKey = 0;
@@ -408,18 +418,19 @@ public class AutoAwardsController {
      *
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> ContractAwardsManager(Collection<Person> personnel) {
+    private Map<Integer, List<Object>> ContractAwardsManager(Collection<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
                 // this gives us a map of unique identifier (int), containing a list of Person, and Award
                 data = ContractAwards.ContractAwardsProcessor(campaign, mission, person, contractAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Contract Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Contract Awards.",
+                        campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -445,18 +456,19 @@ public class AutoAwardsController {
      * This is the manager for this type of award, processing eligibility and preparing awardData
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> FactionHunterAwardsManager(Collection<Person> personnel) {
+    private Map<Integer, List<Object>> FactionHunterAwardsManager(Collection<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
 
             try {
                 data = FactionHunterAwards.FactionHunterAwardsProcessor(campaign, mission, person, factionHunterAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Faction Hunter Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Faction Hunter Awards.",
+                        campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -479,18 +491,18 @@ public class AutoAwardsController {
      * This is the manager for this type of award, processing eligibility and preparing awardData
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> InjuryAwardsManager(Collection<Person> personnel, int injuryCount) {
+    private Map<Integer, List<Object>> InjuryAwardsManager(Collection<UUID> personnel, int injuryCount) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
 
             try {
                 data = InjuryAwards.InjuryAwardsProcessor(campaign, person, injuryAwards, injuryCount);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Injury Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Injury Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -513,17 +525,18 @@ public class AutoAwardsController {
      * This is the manager for this type of award, processing eligibility and preparing awardData
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> KillAwardsManager(Collection<Person> personnel) {
+    private Map<Integer, List<Object>> KillAwardsManager(Collection<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
                 data = KillAwards.KillAwardProcessor(campaign, mission, person, killAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Kill Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Kill Awards.",
+                        campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -546,17 +559,18 @@ public class AutoAwardsController {
      * This is the manager for this type of award, processing eligibility and preparing awardData
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> ScenarioKillAwardsManager(Collection<Person> personnel, List<Kill> kills) {
+    private Map<Integer, List<Object>> ScenarioKillAwardsManager(Collection<UUID> personnel, List<Kill> kills) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
                 data = ScenarioKillAwards.ScenarioKillAwardsProcessor(campaign, person, killAwards, kills);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Scenario Kill Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Scenario Kill Awards.",
+                        campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -580,17 +594,17 @@ public class AutoAwardsController {
      * @param personnel the personnel to be processed
      * @param missionWasSuccessful whether the mission just completed was successful
      */
-    private Map<Integer, List<Object>> MiscAwardsManager(Collection<Person> personnel, boolean missionWasSuccessful) {
+    private Map<Integer, List<Object>> MiscAwardsManager(Collection<UUID> personnel, boolean missionWasSuccessful) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
-                data = MiscAwards.MiscAwardsProcessor(person, miscAwards, missionWasSuccessful);
+                data = MiscAwards.MiscAwardsProcessor(campaign, person, miscAwards, missionWasSuccessful);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Misc Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -613,17 +627,17 @@ public class AutoAwardsController {
      * This is the manager for this type of award, processing eligibility and preparing awardData
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> RankAwardsManager(Collection<Person> personnel) {
+    private Map<Integer, List<Object>> RankAwardsManager(Collection<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
-                data = RankAwards.RankAwardsProcessor(person, rankAwards);
+                data = RankAwards.RankAwardsProcessor(campaign, person, rankAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Rank Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Rank Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -646,17 +660,17 @@ public class AutoAwardsController {
      * This is the manager for this type of award, processing eligibility and preparing awardData
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> ScenarioAwardsManager(Collection<Person> personnel) {
+    private Map<Integer, List<Object>> ScenarioAwardsManager(Collection<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
                 data = ScenarioAwards.ScenarioAwardsProcessor(campaign, person, scenarioAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Scenario Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Scenario Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -679,17 +693,17 @@ public class AutoAwardsController {
      * This is the manager for this type of award, processing eligibility and preparing awardData
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> SkillAwardsManager(Collection<Person> personnel) {
+    private Map<Integer, List<Object>> SkillAwardsManager(Collection<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
-                data = SkillAwards.SkillAwardsProcessor(person, skillAwards);
+                data = SkillAwards.SkillAwardsProcessor(campaign, person, skillAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Skill Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Skill Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -712,17 +726,17 @@ public class AutoAwardsController {
      * This is the manager for this type of award, processing eligibility and preparing awardData
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> TheatreOfWarAwardsManager(Collection<Person> personnel) {
+    private Map<Integer, List<Object>> TheatreOfWarAwardsManager(Collection<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
                 data = TheatreOfWarAwards.TheatreOfWarAwardsProcessor(campaign, mission, person, theatreOfWarAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Theatre of War Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Theatre of War Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -745,17 +759,17 @@ public class AutoAwardsController {
      * This is the manager for this type of award, processing eligibility and preparing awardData
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> TimeAwardsManager(Collection<Person> personnel) {
+    private Map<Integer, List<Object>> TimeAwardsManager(Collection<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (Person person : personnel) {
+        for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
                 data = TimeAwards.TimeAwardsProcessor(campaign, person, timeAwards);
             } catch (Exception e) {
                 data = null;
-                LogManager.getLogger().info("{} is not eligible for any Time Awards.", person.getFullName());
+                LogManager.getLogger().info("{} is not eligible for any Time Awards.", campaign.getPerson(person).getFullName());
             }
 
             if (data != null) {
@@ -780,7 +794,7 @@ public class AutoAwardsController {
      * @param person the person being processed
      * @param eligibleAwards the Awards they are eligible for
      */
-    public static Map<Integer, List<Object>> prepareAwardData(Person person, List<Award> eligibleAwards) {
+    public static Map<Integer, List<Object>> prepareAwardData(UUID person, List<Award> eligibleAwards) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
 
         int awardDataKey = 0;
@@ -789,7 +803,7 @@ public class AutoAwardsController {
             List<Object> personAwardList = new ArrayList<>();
 
             // this gives us a list containing [Person, Award, true]
-            personAwardList.add(person.getId());
+            personAwardList.add(person);
             personAwardList.add(1, award);
             personAwardList.add(true);
 

@@ -2,12 +2,12 @@ package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class InjuryAwards {
     /**
@@ -18,7 +18,7 @@ public class InjuryAwards {
      * @param awards awards the awards to be processed (should only include awards where item == Injury)
      * @param injuryCount the number of Hits sustained in the Scenario just concluded
      */
-    public static Map<Integer, List<Object>> InjuryAwardsProcessor(Campaign campaign, Person person, List<Award> awards, int injuryCount) {
+    public static Map<Integer, List<Object>> InjuryAwardsProcessor(Campaign campaign, UUID person, List<Award> awards, int injuryCount) {
         int injuriesNeeded;
 
         List<Award> eligibleAwards = new ArrayList<>();

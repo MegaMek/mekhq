@@ -4,11 +4,11 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Person;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static mekhq.campaign.personnel.autoAwards.TheatreOfWarAwards.processFaction;
 
@@ -20,7 +20,7 @@ public class FactionHunterAwards {
      * @param person the person to check award eligibility for
      * @param awards the awards to be processed (should only include awards where item == TheatreOfWar)
      */
-    public static Map<Integer, List<Object>> FactionHunterAwardsProcessor(Campaign campaign, Mission mission, Person person, List<Award> awards) {
+    public static Map<Integer, List<Object>> FactionHunterAwardsProcessor(Campaign campaign, Mission mission, UUID person, List<Award> awards) {
         boolean isEligible;
         List<Award> eligibleAwards = new ArrayList<>();
 

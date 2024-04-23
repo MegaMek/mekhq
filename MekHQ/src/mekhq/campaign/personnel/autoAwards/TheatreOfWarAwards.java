@@ -5,7 +5,6 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.apache.logging.log4j.LogManager;
@@ -13,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class TheatreOfWarAwards {
@@ -23,7 +23,7 @@ public class TheatreOfWarAwards {
      * @param person the person to check award eligibility for
      * @param awards the awards to be processed (should only include awards where item == TheatreOfWar)
      */
-    public static Map<Integer, List<Object>> TheatreOfWarAwardsProcessor(Campaign campaign, Mission mission, Person person, List<Award> awards) {
+    public static Map<Integer, List<Object>> TheatreOfWarAwardsProcessor(Campaign campaign, Mission mission, UUID person, List<Award> awards) {
         boolean isEligible;
         List<Award> eligibleAwards = new ArrayList<>();
 
@@ -70,7 +70,7 @@ public class TheatreOfWarAwards {
                 continue;
             }
 
-            if (award.canBeAwarded(person)) {
+            if (award.canBeAwarded(campaign.getPerson(person))) {
                 if (isDuringWartime(wartime, contractStartYear, currentYear)) {
                     isEligible = true;
                 } else {

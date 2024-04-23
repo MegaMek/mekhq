@@ -1,22 +1,21 @@
 package mekhq.campaign.personnel.autoAwards;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import org.apache.logging.log4j.LogManager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SkillAwards {
     /**
      * This function loops through Skill Awards, checking whether the person is eligible to receive each type of award
+     * @param campaign the current campaign
      * @param person   the person to check award eligibility for
      * @param awards   the awards to be processed (should only include awards where item == Skill)
      */
-    public static Map<Integer, List<Object>> SkillAwardsProcessor(Person person, List<Award> awards) {
+    public static Map<Integer, List<Object>> SkillAwardsProcessor(Campaign campaign, UUID person, List<Award> awards) {
         int requiredSkillLevel;
         List<Award> eligibleAwards = new ArrayList<>();
 
@@ -29,7 +28,7 @@ public class SkillAwards {
                 continue;
             }
 
-            if (award.canBeAwarded(person)) {
+            if (award.canBeAwarded(campaign.getPerson(person))) {
                 // this allows the user to specify multiple skills to be checked against, where all skill levels need to be met
                 // if the user puts two ',' next to each other (creating an empty skill) the system will just treat it as an invalid
                 // skill and break the current loop iteration
@@ -41,7 +40,7 @@ public class SkillAwards {
 
                 if (!skills.isEmpty()) {
                     for (String skill : skills) {
-                        if (processSkills(award, person, skill) < requiredSkillLevel) {
+                        if (processSkills(campaign, award, person, skill) < requiredSkillLevel) {
                             hasRequiredSkillLevel = false;
                             // this break ensures that all required skills must be met/exceeded for Award eligibility
                             break;
@@ -54,19 +53,18 @@ public class SkillAwards {
                 }
             }
         }
-        LogManager.getLogger().info("Awards eligibility for {}: {}", person.getFullName(), awards);
 
         return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 
     /**
      * This function uses switches to feed the relevant skill/s into getSkillLevel()
-     *
+     * @param campaign the current campaign
      * @param award the award being processed, this is for error logging
      * @param person the person whose skill levels we want
      * @param skill the skill we're checking
      */
-    private static int processSkills(Award award, Person person, String skill) {
+    private static int processSkills(Campaign campaign, Award award, UUID person, String skill) {
         List<String> relevantSkills;
 
         switch (skill.toLowerCase()) {
@@ -233,17 +231,19 @@ public class SkillAwards {
                 return -1;
         }
 
-        return getSkillLevel(relevantSkills, person);
+        return getSkillLevel(campaign, relevantSkills, person);
     }
 
     /**
      * This function loops through all relevant skills, calculating the max skill level. If all skills are untrained
      * the function will default to -1.
-     *
+     * @param campaign the current campaign
      * @param relevantSkills the list of Skills to check
-     * @param person the person whose Skill Levels are being checked
+     * @param personId the person whose Skill Levels are being checked
      */
-    private static int getSkillLevel(List<String> relevantSkills, Person person) {
+    private static int getSkillLevel(Campaign campaign, List<String> relevantSkills, UUID personId) {
+        Person person = campaign.getPerson(personId);
+
         int[] skillLevels = new int[relevantSkills.size()];
 
         for (int i = 0; i < relevantSkills.size(); i++) {

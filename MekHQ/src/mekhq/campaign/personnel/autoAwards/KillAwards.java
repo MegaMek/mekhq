@@ -5,7 +5,6 @@ import mekhq.campaign.Kill;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
@@ -18,7 +17,7 @@ public class KillAwards {
      * @param person the person to check award eligibility for
      * @param awards the awards to be processed (should only include awards where item == Kill)
      */
-    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, Person person, List<Award> awards) {
+    public static Map<Integer, List<Object>> KillAwardProcessor(Campaign campaign, Mission mission, UUID person, List<Award> awards) {
         int formationDepth;
         String killDepth;
 
@@ -47,18 +46,18 @@ public class KillAwards {
 
         try {
             maximumDepth = Force.getMaximumDepth(campaign.getForce(0), null);
-            forceId = person.getUnit().getForceId();
+            forceId = campaign.getPerson(person).getUnit().getForceId();
             forceDepth = Force.getDepth(campaign.getForce(forceId));
         } catch (Exception e) {
             LogManager.getLogger().info("AutoAwards failed to fill essential values for {}, using defaults",
-                    person.getFullName()   );
+                    campaign.getPerson(person).getFullName()   );
             forceId = -1;
             maximumDepth = 0;
             forceDepth = 0;
         }
 
         for (Award award : awards) {
-            if (award.canBeAwarded(person)) {
+            if (award.canBeAwarded(campaign.getPerson(person))) {
                 // this allows us to convert non-IS formations into IS equivalents
                 formationDepth = getFormation(award);
 
@@ -356,7 +355,8 @@ public class KillAwards {
             Vector<UUID> units = campaign.getForce(forceId).getUnits();
 
             if (!units.isEmpty()) {
-                killCount = units.stream().mapToInt(unit -> getIndividualKills(campaign, mission, campaign.getUnit(unit).getCommander(), filterOtherMissionKills)).sum();
+                killCount = units.stream().mapToInt(unit -> getIndividualKills(campaign, mission,
+                        campaign.getUnit(unit).getCommander().getId(), filterOtherMissionKills)).sum();
 
                 return killCount;
             } else {
@@ -371,11 +371,11 @@ public class KillAwards {
          * @param commander the unit commander whose kills are being counted
          * @param filterOtherMissionKills true if we should only count kills from the mission just completed
          */
-        private static int getIndividualKills(Campaign campaign, Mission mission, Person commander, boolean filterOtherMissionKills){
+        private static int getIndividualKills(Campaign campaign, Mission mission, UUID commander, boolean filterOtherMissionKills){
             List<Kill> allKills;
 
             try {
-                allKills = campaign.getKillsFor(commander.getId());
+                allKills = campaign.getKillsFor(campaign.getPerson(commander).getId());
             } catch (Exception e) {
                 return 0;
             }

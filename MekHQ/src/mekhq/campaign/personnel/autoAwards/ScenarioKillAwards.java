@@ -3,12 +3,12 @@ package mekhq.campaign.personnel.autoAwards;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class ScenarioKillAwards {
     /**
@@ -19,7 +19,7 @@ public class ScenarioKillAwards {
      * @param kills a list of p's relevant kills
      * @param awards awards the awards to be processed (should only include awards where item == injury && range == scenario)
      */
-    public static Map<Integer, List<Object>> ScenarioKillAwardsProcessor(Campaign campaign, Person person, List<Award> awards, List<Kill> kills) {
+    public static Map<Integer, List<Object>> ScenarioKillAwardsProcessor(Campaign campaign, UUID person, List<Award> awards, List<Kill> kills) {
         int killsNeeded;
 
         List<Award> eligibleAwards = new ArrayList<>();

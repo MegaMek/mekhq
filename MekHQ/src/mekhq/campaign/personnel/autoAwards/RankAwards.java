@@ -1,5 +1,6 @@
 package mekhq.campaign.personnel.autoAwards;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
@@ -7,15 +8,17 @@ import org.apache.logging.log4j.LogManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class RankAwards {
     /**
      * This function loops through Rank Awards, checking whether the person is eligible to receive each type of award.
      * All Misc awards need to be hardcoded
-     * @param person the person to check award eligibility for
+     * @param campaign the current campaign
+     * @param personId the person to check award eligibility for
      * @param awards the awards to be processed (should only include awards where item == Kill)
      */
-    public static Map<Integer, List<Object>> RankAwardsProcessor(Person person, List<Award> awards) {
+    public static Map<Integer, List<Object>> RankAwardsProcessor(Campaign campaign, UUID personId, List<Award> awards) {
         int requiredRankNumeric;
         boolean isInclusive;
         boolean isEligible;
@@ -40,6 +43,8 @@ public class RankAwards {
                 LogManager.getLogger().warn("Award {} from the {} set has the invalid range {}", award.getName(), award.getSet(), award.getRange());
                 continue;
             }
+
+            Person person = campaign.getPerson(personId);
 
             if (award.canBeAwarded(person)) {
                 if (isInclusive) {
@@ -66,6 +71,6 @@ public class RankAwards {
             }
         }
 
-        return AutoAwardsController.prepareAwardData(person, eligibleAwards);
+        return AutoAwardsController.prepareAwardData(personId, eligibleAwards);
     }
 }

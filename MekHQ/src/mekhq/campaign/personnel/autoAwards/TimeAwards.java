@@ -2,12 +2,12 @@ package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
-import mekhq.campaign.personnel.Person;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public class TimeAwards {
@@ -17,7 +17,7 @@ public class TimeAwards {
      * @param person the person to check award eligibility for
      * @param awards the awards to be processed (should only include awards where item == Time)
      */
-    public static Map<Integer, List<Object>> TimeAwardsProcessor(Campaign campaign, Person person, List<Award> awards) {
+    public static Map<Integer, List<Object>> TimeAwardsProcessor(Campaign campaign, UUID person, List<Award> awards) {
         int requiredYearsOfService;
         boolean isCumulative;
         int yearsOfService;
@@ -43,21 +43,21 @@ public class TimeAwards {
                 continue;
             }
 
-            if (award.canBeAwarded(person)) {
+            if (award.canBeAwarded(campaign.getPerson(person))) {
                 try {
                     yearsOfService = Integer.parseInt(Pattern.compile("\\s+")
-                            .splitAsStream(person.getTimeInService(campaign))
+                            .splitAsStream(campaign.getPerson(person).getTimeInService(campaign))
                             .findFirst()
                             .orElseThrow());
                 } catch (Exception e) {
                     LogManager.getLogger().error("Unable to parse yearsOfService for {} while processing Award {} from the [{}] set." +
                                     " This can be ignored if {} has 0 years Time in Service.",
-                            person.getFullName(), award.getName(), award.getSet(), person.getFullName());
+                            campaign.getPerson(person).getFullName(), award.getName(), award.getSet(), campaign.getPerson(person).getFullName());
                     continue;
                 }
 
                 if (isCumulative) {
-                    requiredYearsOfService *= person.getAwardController().getNumberOfAwards(award) + 1;
+                    requiredYearsOfService *= campaign.getPerson(person).getAwardController().getNumberOfAwards(award) + 1;
                 }
 
                 if (yearsOfService >= requiredYearsOfService) {
