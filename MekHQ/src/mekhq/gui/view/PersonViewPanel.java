@@ -32,9 +32,9 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.MedicalViewDialog;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.ImageHelpers;
@@ -320,8 +320,13 @@ public class PersonViewPanel extends JScrollablePanel {
         Box boxRibbons = Box.createVerticalBox();
         boxRibbons.add(Box.createRigidArea(new Dimension(100, 0)));
 
-        List<Award> awards = person.getAwardController().getAwards().stream().filter(a -> a.getNumberOfRibbonFiles() > 0)
-                .sorted().collect(Collectors.toList());
+        List<Award> awards = person.getAwardController()
+                .getAwards()
+                .stream()
+                .filter(a -> a.getNumberOfRibbonFiles() > 0)
+                .sorted()
+                .collect(Collectors.toList());
+
         Collections.reverse(awards);
 
         int i = 0;
@@ -337,13 +342,32 @@ public class PersonViewPanel extends JScrollablePanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
-                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String ribbonFileName = award.getRibbonFileName(numberOfAwards);
+                int awardCount = person.getAwardController().getNumberOfAwards(award);
+                int awardTierSize = campaign.getCampaignOptions().getAwardTierSize();
+                int awardImagesCount = award.getNumberOfRibbonFiles();
+                String ribbonFileName = "";
+
+                if (awardImagesCount == 1) {
+                    // if there is only one ribbon image, we just use that
+                    ribbonFileName = award.getRibbonFileName(1);
+                } else {
+                    int tiers = (int) Math.floor(awardCount / (double) awardTierSize);
+
+                    if ((tiers + 1) > awardImagesCount) {
+                        // if tiers exceed awardImageCount we just use the last image
+                        ribbonFileName = award.getRibbonFileName(awardImagesCount);
+                    } else {
+                        ribbonFileName = award.getRibbonFileName(tiers);
+                    }
+                }
+
                 ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                        .getItem(award.getSet() + "/ribbons/", ribbonFileName);
+                        .getItem(award.getSet() + "/medals/", ribbonFileName);
+
                 if (ribbon == null) {
                     continue;
                 }
+
                 ribbon = ribbon.getScaledInstance(25, 8, Image.SCALE_DEFAULT);
                 ribbonLabel.setIcon(new ImageIcon(ribbon));
                 ribbonLabel.setToolTipText(award.getTooltip());
@@ -375,21 +399,43 @@ public class PersonViewPanel extends JScrollablePanel {
     private JPanel drawMedals() {
         JPanel pnlMedals = new JPanel();
 
-        List<Award> awards = person.getAwardController().getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0)
-                .sorted().collect(Collectors.toList());
+        List<Award> awards = person.getAwardController()
+                .getAwards()
+                .stream()
+                .filter(award -> award.getNumberOfMedalFiles() > 0)
+                .collect(Collectors.toList());
 
         for (Award award : awards) {
             JLabel medalLabel = new JLabel();
 
             Image medal;
             try {
-                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String medalFileName = award.getMedalFileName(numberOfAwards);
+                int awardCount = person.getAwardController().getNumberOfAwards(award);
+                int awardTierSize = campaign.getCampaignOptions().getAwardTierSize();
+                int awardImagesCount = award.getNumberOfMedalFiles();
+                String medalFileName = "";
+
+                if (awardImagesCount == 1) {
+                    // if there is only one award image, we just use that
+                    medalFileName = award.getMedalFileName(1);
+                } else {
+                    int tiers = (int) Math.floor(awardCount / (double) awardTierSize);
+
+                    if ((tiers + 1) > awardImagesCount) {
+                        // if tiers exceed awardImageCount we just use the last image
+                        medalFileName = award.getMedalFileName(awardImagesCount);
+                    } else {
+                        medalFileName = award.getMedalFileName(tiers);
+                    }
+                }
+
                 medal = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/medals/", medalFileName);
+
                 if (medal == null) {
                     continue;
                 }
+
                 medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip());
@@ -407,26 +453,49 @@ public class PersonViewPanel extends JScrollablePanel {
      */
     private JPanel drawMiscAwards() {
         JPanel pnlMiscAwards = new JPanel();
-        ArrayList<Award> awards = person.getAwardController().getAwards().stream().filter(a -> a.getNumberOfMiscFiles() > 0)
+        ArrayList<Award> awards = person.getAwardController()
+                .getAwards()
+                .stream()
+                .filter(a -> a.getNumberOfMiscFiles() > 0)
                 .collect(Collectors.toCollection(ArrayList::new));
+
+        Collections.reverse(awards);
 
         for (Award award : awards) {
             JLabel miscLabel = new JLabel();
 
             Image miscAward;
             try {
-                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String miscFileName = award.getMiscFileName(numberOfAwards);
-                Image miscAwardBufferedImage = (Image) MHQStaticDirectoryManager.getAwardIcons()
-                        .getItem(award.getSet() + "/misc/", miscFileName);
-                if (miscAwardBufferedImage == null) {
+                int awardCount = person.getAwardController().getNumberOfAwards(award);
+                int awardTierSize = campaign.getCampaignOptions().getAwardTierSize();
+                int awardImagesCount = award.getNumberOfMiscFiles();
+                String miscAwardFileName = "";
+
+                if (awardImagesCount == 1) {
+                    // if there is only one award image, we just use that
+                    miscAwardFileName = award.getMiscFileName(1);
+                } else {
+                    int tiers = (int) Math.floor(awardCount / (double) awardTierSize);
+
+                    if ((tiers + 1) > awardImagesCount) {
+                        // if tiers exceed awardImageCount we just use the last image
+                        miscAwardFileName = award.getMiscFileName(awardImagesCount);
+                    } else {
+                        miscAwardFileName = award.getMiscFileName(tiers);
+                    }
+                }
+
+                miscAward = (Image) MHQStaticDirectoryManager.getAwardIcons()
+                        .getItem(award.getSet() + "/medals/", miscAwardFileName);
+
+                if (miscAward == null) {
                     continue;
                 }
-                miscAward = ImageHelpers.getScaledForBoundaries(miscAwardBufferedImage, new Dimension(100, 100),
-                        Image.SCALE_DEFAULT);
+
+                miscAward = ImageHelpers.getScaledForBoundaries(miscAward, new Dimension(30, 60), Image.SCALE_DEFAULT);
                 miscLabel.setIcon(new ImageIcon(miscAward));
                 miscLabel.setToolTipText(award.getTooltip());
-                pnlMiscAwards.add(miscLabel);
+                miscLabel.add(miscLabel);
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);
             }

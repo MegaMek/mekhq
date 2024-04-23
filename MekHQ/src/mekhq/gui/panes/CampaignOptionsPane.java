@@ -320,6 +320,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkIssuePosthumousAwards;
     private JCheckBox chkIssueBestAwardOnly;
     private JCheckBox chkIgnoreStandardSet;
+    private JSpinner spnAwardTierSize;
     private JCheckBox chkEnableContractAwards;
     private JCheckBox chkEnableFactionHunterAwards;
     private JCheckBox chkEnableInjuryAwards;
@@ -3348,6 +3349,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Create Panel Components
         final JPanel autoAwardsPanel = createAutoAwardsPanel();
 
+        final JLabel lblAwardTierSize = new JLabel(resources.getString("lblAwardTierSize.text"));
+        lblAwardTierSize.setToolTipText(resources.getString("lblAwardTierSize.toolTipText"));
+        lblAwardTierSize.setName("lblAwardTierSize");
+        spnAwardTierSize.add(new JSpinner(new SpinnerNumberModel(5, 1, 100, 1)));
+
         chkIssuePosthumousAwards = new JCheckBox(resources.getString("chkIssuePosthumousAwards.text"));
         chkIssuePosthumousAwards.setToolTipText(resources.getString("chkIssuePosthumousAwards.toolTipText"));
         chkIssuePosthumousAwards.setName("chkIssuePosthumousAwards");
@@ -3388,6 +3394,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkIssuePosthumousAwards.setEnabled(isEnabled);
             chkIssueBestAwardOnly.setEnabled(isEnabled);
             chkIgnoreStandardSet.setEnabled(isEnabled);
+            lblAwardTierSize.setEnabled(isEnabled);
+            spnAwardTierSize.setEnabled(isEnabled);
             autoAwardsPanel.setEnabled(isEnabled);
             chkEnableContractAwards.setEnabled(isEnabled);
             chkEnableFactionHunterAwards.setEnabled(isEnabled);
@@ -3408,6 +3416,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkIssuePosthumousAwards.setEnabled(false);
             chkIssueBestAwardOnly.setEnabled(false);
             chkIgnoreStandardSet.setEnabled(false);
+            lblAwardTierSize.setEnabled(false);
+            spnAwardTierSize.setEnabled(false);
             autoAwardsPanel.setEnabled(false);
             chkEnableContractAwards.setEnabled(false);
             chkEnableFactionHunterAwards.setEnabled(false);
@@ -3441,6 +3451,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkIssuePosthumousAwards)
                         .addComponent(chkIssueBestAwardOnly)
                         .addComponent(chkIgnoreStandardSet)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblAwardTierSize)
+                                .addComponent(spnAwardTierSize))
                         .addComponent(autoAwardsPanel)
         );
 
@@ -3453,6 +3466,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkIssuePosthumousAwards)
                         .addComponent(chkIssueBestAwardOnly)
                         .addComponent(chkIgnoreStandardSet)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblAwardTierSize)
+                                .addComponent(spnAwardTierSize))
                         .addComponent(autoAwardsPanel)
         );
 
@@ -6451,6 +6467,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkIssuePosthumousAwards.setSelected(options.isIssuePosthumousAwards());
         chkIssueBestAwardOnly.setSelected(options.isIssueBestAwardOnly());
         chkIgnoreStandardSet.setSelected(options.isIgnoreStandardSet());
+        spnAwardTierSize.setValue(options.getAwardTierSize());
         chkEnableContractAwards.setSelected(options.isEnableContractAwards());
         chkEnableFactionHunterAwards.setSelected(options.isEnableFactionHunterAwards());
         chkEnableInjuryAwards.setSelected(options.isEnableInjuryAwards());
@@ -6996,6 +7013,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setIssuePosthumousAwards(chkIssuePosthumousAwards.isSelected());
             options.setIssueBestAwardOnly(chkIssueBestAwardOnly.isSelected());
             options.setIgnoreStandardSet(chkIgnoreStandardSet.isSelected());
+            options.setAwardTierSize((int) spnAwardTierSize.getValue());
             options.setEnableContractAwards(chkEnableContractAwards.isSelected());
             options.setEnableFactionHunterAwards(chkEnableFactionHunterAwards.isSelected());
             options.setEnableInjuryAwards(chkEnableInjuryAwards.isSelected());
