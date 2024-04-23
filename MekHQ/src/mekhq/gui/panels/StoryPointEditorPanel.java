@@ -54,13 +54,13 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         gbc.weightx = 0.0;
         gbc.gridwidth = 2;
         gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.NONE;
         add(new JLabel("<html><h2>" + storyPoint.getClass().getSimpleName() + "</h2></html>"), gbc);
 
         gbc.gridy++;
         gbc.gridwidth = 1;
-        add(new JLabel("<html><b>Story Point Name:</b></html>"), gbc);
+        add(new JLabel("<html><b><nobr>Story Point Name:</nobr></b></html>"), gbc);
 
         txtName = new JTextField(storyPoint.getName());
         gbc.gridx++;
@@ -72,7 +72,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         gbc.gridy++;
         gbc.weightx = 0.0;
         gbc.fill = GridBagConstraints.NONE;
-        add(new JLabel("<html><b>Linking Story Points:</b></html>"), gbc);
+        add(new JLabel("<html><b><nobr>Linking Story Points:</nobr></b></html>"), gbc);
 
         StringBuilder sb = new StringBuilder();
         List<StoryPoint> linkedStoryPoints = storyPoint.getLinkingStoryPoints();
@@ -118,11 +118,11 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.gridx = 0;
         gbc.gridy = 0;
-        pnlOutcomes.add(new JLabel("<html><b>Result</b></html>"), gbc);
+        pnlOutcomes.add(new JLabel("<html><b><nobr>Result</nobr></b></html>"), gbc);
         gbc.gridx++;
-        pnlOutcomes.add(new JLabel("<html><b>Next Story Point</b></html>"), gbc);
+        pnlOutcomes.add(new JLabel("<html><b><nobr>Next Story Point</nobr></b></html>"), gbc);
         gbc.gridx++;
-        pnlOutcomes.add(new JLabel("<html><b>Story Triggers</b></html>"), gbc);
+        pnlOutcomes.add(new JLabel("<html><b><nobr>Story Triggers</nobr></b></html>"), gbc);
 
         for(StoryOutcome outcome : storyPoint.getStoryOutcomes()) {
             gbc.gridx = 0;
