@@ -76,13 +76,24 @@ public class AutoAwardsDialog extends JDialog {
     private void initComponents() {
         setTitle(resourceMap.getString("AutoAwardsDialog.title"));
 
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setSize(screenSize);
+
         setLayout(new BorderLayout());
         CardLayout cardLayout = new CardLayout();
         JPanel panMain = new JPanel(cardLayout);
         add(panMain, BorderLayout.CENTER);
 
+        // we work with a combination image & instructions panel, as that allows us to sit the image
+        // right below the title, but above the instructions
+        JPanel imageAndInstructionsPanel = new JPanel(new BorderLayout());
+
+        Image image = new ImageIcon("data/images/awards/awardceremony.png")
+                .getImage().getScaledInstance(screenSize.width, (screenSize.width / 7), Image.SCALE_FAST);
+        JLabel lblImage = new JLabel(new ImageIcon(image));
+        imageAndInstructionsPanel.add(lblImage, BorderLayout.CENTER);
+
         JTextArea txtInstructions = new JTextArea();
-        add(txtInstructions, BorderLayout.PAGE_START);
         txtInstructions.setEditable(false);
         txtInstructions.setWrapStyleWord(true);
         txtInstructions.setLineWrap(true);
@@ -90,6 +101,9 @@ public class AutoAwardsDialog extends JDialog {
         txtInstructions.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder(resourceMap.getString("txtInstructions.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
+
+        imageAndInstructionsPanel.add(txtInstructions, BorderLayout.SOUTH);
+        add(imageAndInstructionsPanel, BorderLayout.PAGE_START);
 
         JPanel autoAwardsPanel = new JPanel(new BorderLayout());
 
@@ -239,7 +253,7 @@ class AutoAwardsTable extends JTable {
             }
         }
 
-        setRowHeight(80);
+        setRowHeight(50);
         setIntercellSpacing(new Dimension(0, 0));
         setShowGrid(false);
 

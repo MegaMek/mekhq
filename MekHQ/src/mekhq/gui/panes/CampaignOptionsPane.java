@@ -62,7 +62,9 @@ import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.SpecialAbilityPanel;
-import mekhq.gui.baseComponents.*;
+import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
+import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.SelectUnusedAbilityDialog;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
@@ -313,10 +315,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnPercentageRandomProcreationRelationshiplessChance;
 
     // Awards
-    private JCheckBox chkIssuePosthumousAwards;
-    private JCheckBox chkIssueBestAwardOnly;
     private MMComboBox<AwardBonus> comboAwardBonusStyle;
     private JCheckBox chkEnableAutoAwards;
+    private JCheckBox chkIssuePosthumousAwards;
+    private JCheckBox chkIssueBestAwardOnly;
+    private JCheckBox chkIgnoreStandardSet;
     private JCheckBox chkEnableContractAwards;
     private JCheckBox chkEnableFactionHunterAwards;
     private JCheckBox chkEnableInjuryAwards;
@@ -3353,6 +3356,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkIssueBestAwardOnly.setToolTipText(resources.getString("chkIssueBestAwardOnly.toolTipText"));
         chkIssueBestAwardOnly.setName("chkIssueBestAwardOnly");
 
+        chkIgnoreStandardSet = new JCheckBox(resources.getString("chkIgnoreStandardSet.text"));
+        chkIgnoreStandardSet.setToolTipText(resources.getString("chkIgnoreStandardSet.toolTipText"));
+        chkIgnoreStandardSet.setName("chkIgnoreStandardSet");
+
         final JLabel lblAwardBonusStyle = new JLabel(resources.getString("lblAwardBonusStyle.text"));
         lblAwardBonusStyle.setToolTipText(resources.getString("lblAwardBonusStyle.toolTipText"));
         lblAwardBonusStyle.setName("lblAwardBonusStyle");
@@ -3380,6 +3387,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             chkIssuePosthumousAwards.setEnabled(isEnabled);
             chkIssueBestAwardOnly.setEnabled(isEnabled);
+            chkIgnoreStandardSet.setEnabled(isEnabled);
             autoAwardsPanel.setEnabled(isEnabled);
             chkEnableContractAwards.setEnabled(isEnabled);
             chkEnableFactionHunterAwards.setEnabled(isEnabled);
@@ -3399,6 +3407,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         if(!campaign.getCampaignOptions().isEnableAutoAwards()) {
             chkIssuePosthumousAwards.setEnabled(false);
             chkIssueBestAwardOnly.setEnabled(false);
+            chkIgnoreStandardSet.setEnabled(false);
             autoAwardsPanel.setEnabled(false);
             chkEnableContractAwards.setEnabled(false);
             chkEnableFactionHunterAwards.setEnabled(false);
@@ -3431,6 +3440,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkEnableAutoAwards)
                         .addComponent(chkIssuePosthumousAwards)
                         .addComponent(chkIssueBestAwardOnly)
+                        .addComponent(chkIgnoreStandardSet)
                         .addComponent(autoAwardsPanel)
         );
 
@@ -3442,6 +3452,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkEnableAutoAwards)
                         .addComponent(chkIssuePosthumousAwards)
                         .addComponent(chkIssueBestAwardOnly)
+                        .addComponent(chkIgnoreStandardSet)
                         .addComponent(autoAwardsPanel)
         );
 
@@ -6439,6 +6450,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableAutoAwards.setSelected(options.isEnableAutoAwards());
         chkIssuePosthumousAwards.setSelected(options.isIssuePosthumousAwards());
         chkIssueBestAwardOnly.setSelected(options.isIssueBestAwardOnly());
+        chkIgnoreStandardSet.setSelected(options.isIgnoreStandardSet());
         chkEnableContractAwards.setSelected(options.isEnableContractAwards());
         chkEnableFactionHunterAwards.setSelected(options.isEnableFactionHunterAwards());
         chkEnableInjuryAwards.setSelected(options.isEnableInjuryAwards());
@@ -6979,11 +6991,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setPercentageRandomProcreationRelationshiplessChance((Double) spnPercentageRandomProcreationRelationshiplessChance.getValue() / 100.0);
 
             // Awards
+            options.setEnableAutoAwards(chkEnableAutoAwards.isSelected());
+            options.setAwardBonusStyle(comboAwardBonusStyle.getSelectedItem());
             options.setIssuePosthumousAwards(chkIssuePosthumousAwards.isSelected());
             options.setIssueBestAwardOnly(chkIssueBestAwardOnly.isSelected());
-            options.setAwardBonusStyle(comboAwardBonusStyle.getSelectedItem());
-            options.setPrisonerCaptureStyle(comboPrisonerCaptureStyle.getSelectedItem());
-            options.setEnableAutoAwards(chkEnableAutoAwards.isSelected());
+            options.setIgnoreStandardSet(chkIgnoreStandardSet.isSelected());
             options.setEnableContractAwards(chkEnableContractAwards.isSelected());
             options.setEnableFactionHunterAwards(chkEnableFactionHunterAwards.isSelected());
             options.setEnableInjuryAwards(chkEnableInjuryAwards.isSelected());

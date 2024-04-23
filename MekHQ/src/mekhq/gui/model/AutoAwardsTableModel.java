@@ -65,12 +65,12 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     public int getColumnWidth(int column) {
         switch (column) {
             case COL_PERSON:
-                return 250;
             case COL_NAME:
-            case COL_DESCRIPTION:
-                return 150;
+                return 75;
             case COL_SET:
                 return 40;
+            case COL_DESCRIPTION:
+                return 400;
             case COL_AWARD:
             default:
                 return 30;
@@ -162,7 +162,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
     }
 
     public TableCellRenderer getRenderer(int col) {
-        if (col < COL_DESCRIPTION) {
+        if (col == COL_PERSON) {
             return new VisualRenderer();
         } else {
             return new TextRenderer();
@@ -176,7 +176,9 @@ public class AutoAwardsTableModel extends AbstractTableModel {
             super.getTableCellRendererComponent(table, value, isSelected,
                     hasFocus, rowIndex, columnIndex);
             int actualColumn = table.convertColumnIndexToModel(columnIndex);
+
             setHorizontalAlignment(getAlignment(actualColumn));
+
             return this;
         }
     }
@@ -191,7 +193,6 @@ public class AutoAwardsTableModel extends AbstractTableModel {
                                                        boolean hasFocus, int rowIndex, int columnIndex) {
             int actualColumn = table.convertColumnIndexToModel(columnIndex);
             int actualRow = table.convertRowIndexToModel(rowIndex);
-            setText(getValueAt(actualRow, actualColumn).toString());
 
             switch (actualColumn) {
                 case COL_PERSON:

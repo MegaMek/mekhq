@@ -319,10 +319,11 @@ public class CampaignOptions {
     private Map<TenYearAgeRange, Double> ageRangeRandomDeathFemaleValues;
 
     // Awards
-    private boolean issuePosthumousAwards;
-    private boolean issueBestAwardOnly;
     private AwardBonus awardBonusStyle;
     private boolean enableAutoAwards;
+    private boolean issuePosthumousAwards;
+    private boolean issueBestAwardOnly;
+    private boolean ignoreStandardSet;
     private boolean enableContractAwards;
     private boolean enableFactionHunterAwards;
     private boolean enableInjuryAwards;
@@ -820,10 +821,11 @@ public class CampaignOptions {
         getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.EIGHTY_FIVE_OR_OLDER, 12870.0);
 
         // Awards
-        setIssuePosthumousAwards(false);
-        setIssueBestAwardOnly(true);
         setAwardBonusStyle(AwardBonus.BOTH);
         setEnableAutoAwards(true);
+        setIssuePosthumousAwards(false);
+        setIssueBestAwardOnly(true);
+        setIgnoreStandardSet(false);
         setEnableContractAwards(true);
         setEnableFactionHunterAwards(true);
         setEnableInjuryAwards(true);
@@ -2268,6 +2270,21 @@ public class CampaignOptions {
      */
     public void setIssueBestAwardOnly(final boolean issueBestAwardOnly) {
         this.issueBestAwardOnly = issueBestAwardOnly;
+    }
+
+    /**
+     * @return whether to issue only the best award, if personnel are eligible for multiple awards of
+     * the same type
+     */
+    public boolean isIgnoreStandardSet() {
+        return ignoreStandardSet;
+    }
+
+    /**
+     * @param ignoreStandardSet whether to issue only the best award or not
+     */
+    public void setIgnoreStandardSet(final boolean ignoreStandardSet) {
+        this.ignoreStandardSet = ignoreStandardSet;
     }
 
 
@@ -3995,9 +4012,11 @@ public class CampaignOptions {
         //endregion Death
 
         //region Awards
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardBonusStyle", getAwardBonusStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", isEnableAutoAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issuePosthumousAwards", isIssuePosthumousAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issueBestAwardOnly", isIssueBestAwardOnly());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", isEnableAutoAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreStandardSet", isIgnoreStandardSet());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableContractAwards", isEnableContractAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFactionHunterAwards", isEnableFactionHunterAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableIndividualKillAwards", isEnableIndividualKillAwards());
@@ -4723,12 +4742,16 @@ public class CampaignOptions {
                 //endregion Death
 
                 //region Awards
+                } else if (wn2.getNodeName().equalsIgnoreCase("awardBonusStyle")) {
+                    retVal.setAwardBonusStyle(AwardBonus.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableAutoAwards")) {
+                    retVal.setEnableAutoAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("issuePosthumousAwards")) {
                     retVal.setIssuePosthumousAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("issueBestAwardOnly")) {
                     retVal.setIssueBestAwardOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableAutoAwards")) {
-                    retVal.setEnableAutoAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("ignoreStandardSet")) {
+                    retVal.setIgnoreStandardSet(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableContractAwards")) {
                     retVal.setEnableContractAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableFactionHunterAwards")) {
