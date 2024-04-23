@@ -326,7 +326,8 @@ public class CampaignOptions {
     private boolean enableContractAwards;
     private boolean enableFactionHunterAwards;
     private boolean enableInjuryAwards;
-    private boolean enableKillAwards;
+    private boolean enableIndividualKillAwards;
+    private boolean enableFormationKillAwards;
     private boolean enableRankAwards;
     private boolean enableScenarioAwards;
     private boolean enableSkillAwards;
@@ -826,7 +827,8 @@ public class CampaignOptions {
         setEnableContractAwards(true);
         setEnableFactionHunterAwards(true);
         setEnableInjuryAwards(true);
-        setEnableKillAwards(true);
+        setEnableIndividualKillAwards(true);
+        setEnableFormationKillAwards(true);
         setEnableRankAwards(true);
         setEnableScenarioAwards(true);
         setEnableSkillAwards(true);
@@ -2342,15 +2344,29 @@ public class CampaignOptions {
     /**
      * @return whether to track award eligibility for this award type
      */
-    public boolean isEnableKillAwards() {
-        return enableKillAwards;
+    public boolean isEnableIndividualKillAwards() {
+        return enableIndividualKillAwards;
     }
 
     /**
-     * @param enableKillAwards true to enable tracking of award eligibility for awards of this type
+     * @param enableIndividualKillAwards true to enable tracking of award eligibility for awards of this type
      */
-    public void setEnableKillAwards(final boolean enableKillAwards) {
-        this.enableKillAwards = enableKillAwards;
+    public void setEnableIndividualKillAwards(final boolean enableIndividualKillAwards) {
+        this.enableIndividualKillAwards = enableIndividualKillAwards;
+    }
+
+    /**
+     * @return whether to track award eligibility for this award type
+     */
+    public boolean isEnableFormationKillAwards() {
+        return enableFormationKillAwards;
+    }
+
+    /**
+     * @param enableFormationKillAwards true to enable tracking of award eligibility for awards of this type
+     */
+    public void setEnableFormationKillAwards(final boolean enableFormationKillAwards) {
+        this.enableFormationKillAwards = enableFormationKillAwards;
     }
 
     /**
@@ -3984,7 +4000,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", isEnableAutoAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableContractAwards", isEnableContractAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFactionHunterAwards", isEnableFactionHunterAwards());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableKillAwards", isEnableKillAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableIndividualKillAwards", isEnableIndividualKillAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFormationKillAwards", isEnableFormationKillAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRankAwards", isEnableRankAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableScenarioAwards", isEnableScenarioAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableSkillAwards", isEnableSkillAwards());
@@ -4718,8 +4735,10 @@ public class CampaignOptions {
                     retVal.setEnableFactionHunterAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableInjuryAwards")) {
                     retVal.setEnableInjuryAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableKillAwards")) {
-                    retVal.setEnableKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableIndividualKillAwards")) {
+                    retVal.setEnableIndividualKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableFormationKillAwards")) {
+                    retVal.setEnableIndividualKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableRankAwards")) {
                     retVal.setEnableRankAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableScenarioAwards")) {

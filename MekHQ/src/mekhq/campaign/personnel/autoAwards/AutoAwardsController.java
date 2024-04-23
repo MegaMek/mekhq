@@ -201,8 +201,13 @@ public class AutoAwardsController {
                                         break;
                                     case "kill":
                                         // Scenario Kill Awards are handled by the post-scenario controller
-                                        if ((campaign.getCampaignOptions().isEnableKillAwards()) && (!award.getRange().equalsIgnoreCase("scenario"))) {
-                                            killAwards.add(award);
+                                        if (!award.getRange().equalsIgnoreCase("scenario")) {
+                                            if ((campaign.getCampaignOptions().isEnableIndividualKillAwards())
+                                                    || (campaign.getCampaignOptions().isEnableFormationKillAwards())) {
+                                                killAwards.add(award);
+                                            } else {
+                                                ignoredAwards.add(award);
+                                            }
                                         } else {
                                             ignoredAwards.add(award);
                                         }
@@ -279,7 +284,7 @@ public class AutoAwardsController {
                             for (Award award : awards) {
                                 switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
                                     case "kill":
-                                        if ((campaign.getCampaignOptions().isEnableKillAwards()) && (award.getRange().equalsIgnoreCase("scenario"))) {
+                                        if ((campaign.getCampaignOptions().isEnableIndividualKillAwards()) && (award.getRange().equalsIgnoreCase("scenario"))) {
 
                                             killAwards.add(award);
                                         }

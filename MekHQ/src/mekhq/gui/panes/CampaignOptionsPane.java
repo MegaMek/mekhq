@@ -320,7 +320,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEnableContractAwards;
     private JCheckBox chkEnableFactionHunterAwards;
     private JCheckBox chkEnableInjuryAwards;
-    private JCheckBox chkEnableKillAwards;
+    private JCheckBox chkEnableIndividualKillAwards;
+    private JCheckBox chkEnableFormationKillAwards;
     private JCheckBox chkEnableRankAwards;
     private JCheckBox chkEnableScenarioAwards;
     private JCheckBox chkEnableSkillAwards;
@@ -3383,7 +3384,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkEnableContractAwards.setEnabled(isEnabled);
             chkEnableFactionHunterAwards.setEnabled(isEnabled);
             chkEnableInjuryAwards.setEnabled(isEnabled);
-            chkEnableKillAwards.setEnabled(isEnabled);
+            chkEnableIndividualKillAwards.setEnabled(isEnabled);
+            chkEnableFormationKillAwards.setEnabled(isEnabled);
             chkEnableRankAwards.setEnabled(isEnabled);
             chkEnableScenarioAwards.setEnabled(isEnabled);
             chkEnableSkillAwards.setEnabled(isEnabled);
@@ -3401,7 +3403,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkEnableContractAwards.setEnabled(false);
             chkEnableFactionHunterAwards.setEnabled(false);
             chkEnableInjuryAwards.setEnabled(false);
-            chkEnableKillAwards.setEnabled(false);
+            chkEnableIndividualKillAwards.setEnabled(false);
+            chkEnableFormationKillAwards.setEnabled(false);
             chkEnableRankAwards.setEnabled(false);
             chkEnableScenarioAwards.setEnabled(false);
             chkEnableSkillAwards.setEnabled(false);
@@ -3459,9 +3462,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableInjuryAwards.setToolTipText(resources.getString("chkEnableInjuryAwards.toolTipText"));
         chkEnableInjuryAwards.setName("chkEnableInjuryAwards");
 
-        chkEnableKillAwards = new JCheckBox(resources.getString("chkEnableKillAwards.text"));
-        chkEnableKillAwards.setToolTipText(resources.getString("chkEnableKillAwards.toolTipText"));
-        chkEnableKillAwards.setName("chkEnableKillAwards");
+        chkEnableIndividualKillAwards = new JCheckBox(resources.getString("chkEnableIndividualKillAwards.text"));
+        chkEnableIndividualKillAwards.setToolTipText(resources.getString("chkEnableIndividualKillAwards.toolTipText"));
+        chkEnableIndividualKillAwards.setName("chkEnableIndividualKillAwards");
+
+        chkEnableFormationKillAwards = new JCheckBox(resources.getString("chkEnableFormationKillAwards.text"));
+        chkEnableFormationKillAwards.setToolTipText(resources.getString("chkEnableFormationKillAwards.toolTipText"));
+        chkEnableFormationKillAwards.setName("chkEnableFormationKillAwards");
 
         chkEnableRankAwards = new JCheckBox(resources.getString("chkEnableRankAwards.text"));
         chkEnableRankAwards.setToolTipText(resources.getString("chkEnableRankAwards.toolTipText"));
@@ -3503,11 +3510,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(chkEnableContractAwards)
                                 .addComponent(chkEnableFactionHunterAwards)
                                 .addComponent(chkEnableInjuryAwards)
-                                .addComponent(chkEnableKillAwards)
-                                .addComponent(chkEnableRankAwards))
+                                .addComponent(chkEnableIndividualKillAwards))
                         .addGroup(layout.createSequentialGroup()
+                                .addComponent(chkEnableRankAwards)
                                 .addComponent(chkEnableScenarioAwards)
                                 .addComponent(chkEnableSkillAwards)
+                                .addComponent(chkEnableFormationKillAwards))
+                        .addGroup(layout.createSequentialGroup()
                                 .addComponent(chkEnableTheatreOfWarAwards)
                                 .addComponent(chkEnableTimeAwards)
                                 .addComponent(chkEnableMiscAwards))
@@ -3519,11 +3528,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(chkEnableContractAwards)
                                 .addComponent(chkEnableFactionHunterAwards)
                                 .addComponent(chkEnableInjuryAwards)
-                                .addComponent(chkEnableKillAwards)
-                                .addComponent(chkEnableRankAwards))
+                                .addComponent(chkEnableIndividualKillAwards))
                         .addGroup(layout.createParallelGroup()
+                                .addComponent(chkEnableFormationKillAwards)
+                                .addComponent(chkEnableRankAwards)
                                 .addComponent(chkEnableScenarioAwards)
-                                .addComponent(chkEnableSkillAwards)
+                                .addComponent(chkEnableSkillAwards))
+                        .addGroup(layout.createParallelGroup()
                                 .addComponent(chkEnableTheatreOfWarAwards)
                                 .addComponent(chkEnableTimeAwards)
                                 .addComponent(chkEnableMiscAwards))
@@ -6431,7 +6442,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableContractAwards.setSelected(options.isEnableContractAwards());
         chkEnableFactionHunterAwards.setSelected(options.isEnableFactionHunterAwards());
         chkEnableInjuryAwards.setSelected(options.isEnableInjuryAwards());
-        chkEnableKillAwards.setSelected(options.isEnableKillAwards());
+        chkEnableIndividualKillAwards.setSelected(options.isEnableIndividualKillAwards());
+        chkEnableFormationKillAwards.setSelected(options.isEnableFormationKillAwards());
         chkEnableRankAwards.setSelected(options.isEnableRankAwards());
         chkEnableScenarioAwards.setSelected(options.isEnableScenarioAwards());
         chkEnableSkillAwards.setSelected(options.isEnableSkillAwards());
@@ -6975,7 +6987,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setEnableContractAwards(chkEnableContractAwards.isSelected());
             options.setEnableFactionHunterAwards(chkEnableFactionHunterAwards.isSelected());
             options.setEnableInjuryAwards(chkEnableInjuryAwards.isSelected());
-            options.setEnableKillAwards(chkEnableKillAwards.isSelected());
+            options.setEnableIndividualKillAwards(chkEnableIndividualKillAwards.isSelected());
+            options.setEnableFormationKillAwards(chkEnableFormationKillAwards.isSelected());
             options.setEnableRankAwards(chkEnableRankAwards.isSelected());
             options.setEnableScenarioAwards(chkEnableScenarioAwards.isSelected());
             options.setEnableSkillAwards(chkEnableSkillAwards.isSelected());

@@ -59,7 +59,7 @@ public class KillAwards {
         for (Award award : awards) {
             if (award.canBeAwarded(campaign.getPerson(person))) {
                 // this allows us to convert non-IS formations into IS equivalents
-                formationDepth = getFormation(award);
+                formationDepth = getFormation(campaign, award);
 
                 // we skip, if an invalid formationDepth has been provided
                 if (formationDepth == -1) {
@@ -231,7 +231,7 @@ public class KillAwards {
                 // Awards they should be eligible for, if they are eligible for a 'better' Award from another Award Group
                 // By removing each Award, as they're filtered, we can ensure all Awards have been removed
                 for (Award award : groupAwards) {
-                    switch (getFormation(award)) {
+                    switch (getFormation(campaign, award)) {
                         case 1:
                             groupAwards1.add(award);
                             break;
@@ -257,7 +257,7 @@ public class KillAwards {
                             groupAwards8.add(award);
                             break;
                         default:
-                            throw new IllegalStateException("Unexpected value in getFormation: " + getFormation(award));
+                            throw new IllegalStateException("Unexpected value in getFormation: " + getFormation(campaign, award));
                     }
                 }
 
@@ -292,29 +292,58 @@ public class KillAwards {
          * validates award size, returning 'invalid' if a malformed size is provided.
          * @param award the award providing the formation
          */
-        private static int getFormation(Award award){
+        private static int getFormation(Campaign campaign, Award award){
+            int formationDepth;
+
             switch (award.getSize().toLowerCase()) {
                 case "individual":
-                    return 0;
+                    formationDepth = 0;
+                    break;
                 case "lance":
-                    return 1;
+                    formationDepth = 1;
+                    break;
                 case "company":
-                    return 2;
+                    formationDepth = 2;
+                    break;
                 case "battalion":
-                    return 3;
+                    formationDepth = 3;
+                    break;
                 case "regiment":
-                    return 4;
+                    formationDepth = 4;
+                    break;
                 case "brigade":
-                    return 5;
+                    formationDepth = 5;
+                    break;
                 case "division":
-                    return 6;
+                    formationDepth = 6;
+                    break;
                 case "corps":
-                    return 7;
+                    formationDepth = 7;
+                    break;
                 case "army":
-                    return 8;
+                    formationDepth = 8;
+                    break;
                 default:
                     LogManager.getLogger().warn("Award {} from the {} set has invalid size value {}", award.getName(), award.getSet(), award.getSize());
+                    formationDepth = -1;
+            }
+
+            switch (formationDepth) {
+                case -1:
                     return -1;
+                case 0:
+                    if (campaign.getCampaignOptions().isEnableIndividualKillAwards()) {
+                        return formationDepth;
+                    } else {
+                        return -1;
+                    }
+                // default will catch anything over 0
+                default:
+                    if (campaign.getCampaignOptions().isEnableFormationKillAwards()) {
+                        return formationDepth;
+                    } else {
+                        return -1;
+                    }
             }
         }
 
