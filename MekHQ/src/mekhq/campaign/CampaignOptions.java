@@ -2290,15 +2290,14 @@ public class CampaignOptions {
     }
 
     /**
-     * @return whether to issue only the best award, if personnel are eligible for multiple awards of
-     * the same type
+     * @return how many times an award must be issued to use the next tier image
      */
     public int getAwardTierSize() {
         return awardTierSize;
     }
 
     /**
-     * @param awardTierSize whether to issue only the best award or not
+     * @param awardTierSize set how many times an award must be issued to use the next tier image
      */
     public void setAwardTierSize(final int awardTierSize) {
         this.awardTierSize = awardTierSize;
@@ -4037,6 +4036,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardTierSize", getAwardTierSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableContractAwards", isEnableContractAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFactionHunterAwards", isEnableFactionHunterAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableInjuryAwards", isEnableInjuryAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableIndividualKillAwards", isEnableIndividualKillAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFormationKillAwards", isEnableFormationKillAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRankAwards", isEnableRankAwards());
@@ -4771,7 +4771,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("ignoreStandardSet")) {
                     retVal.setIgnoreStandardSet(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("awardTierSize")) {
-                    retVal.setAwardTierSize(retVal.getAwardTierSize());
+                    retVal.setAwardTierSize(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableContractAwards")) {
                     retVal.setEnableContractAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableFactionHunterAwards")) {
@@ -4781,7 +4781,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableIndividualKillAwards")) {
                     retVal.setEnableIndividualKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableFormationKillAwards")) {
-                    retVal.setEnableIndividualKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    retVal.setEnableFormationKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableRankAwards")) {
                     retVal.setEnableRankAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableScenarioAwards")) {

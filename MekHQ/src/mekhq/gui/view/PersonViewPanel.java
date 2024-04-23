@@ -443,6 +443,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 } else {
                     medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(60, 30), Image.SCALE_DEFAULT);
                 }
+
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);

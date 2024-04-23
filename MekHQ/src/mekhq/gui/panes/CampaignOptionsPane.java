@@ -3352,7 +3352,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final JLabel lblAwardTierSize = new JLabel(resources.getString("lblAwardTierSize.text"));
         lblAwardTierSize.setToolTipText(resources.getString("lblAwardTierSize.toolTipText"));
         lblAwardTierSize.setName("lblAwardTierSize");
-        spnAwardTierSize.add(new JSpinner(new SpinnerNumberModel(5, 1, 100, 1)));
+        spnAwardTierSize = new JSpinner(new SpinnerNumberModel(5, 1, 100, 1));
+        spnAwardTierSize.setMaximumSize(new Dimension(60, 25));
 
         chkIssuePosthumousAwards = new JCheckBox(resources.getString("chkIssuePosthumousAwards.text"));
         chkIssuePosthumousAwards.setToolTipText(resources.getString("chkIssuePosthumousAwards.toolTipText"));
@@ -3372,6 +3373,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         comboAwardBonusStyle = new MMComboBox<>("comboAwardBonusStyle", AwardBonus.values());
         comboAwardBonusStyle.setToolTipText(resources.getString("lblAwardBonusStyle.toolTipText"));
+        comboAwardBonusStyle.setMaximumSize(new Dimension(80, 25));
         comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(final JList<?> list, final Object value,
