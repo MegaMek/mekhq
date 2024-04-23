@@ -49,6 +49,8 @@ public class AutoAwardsDialog extends JDialog {
     final private int currentPageCount;
 
     private JComboBox<PersonnelFilter> cboPersonnelFilter;
+    private JButton btnSelectAll;
+    private JButton btnDeselectAll;
     private AutoAwardsTable personnelTable;
     private TableRowSorter<AutoAwardsTableModel> personnelSorter;
 
@@ -116,9 +118,21 @@ public class AutoAwardsDialog extends JDialog {
 
         JPanel upperPanel = new JPanel();
         upperPanel.setLayout(new BoxLayout(upperPanel, BoxLayout.X_AXIS));
+
         upperPanel.add(cboPersonnelFilter);
         upperPanel.add(Box.createHorizontalGlue());
         upperPanel.add(Box.createRigidArea(new Dimension(5,0)));
+
+        btnDeselectAll = new JButton(resourceMap.getString("btnDeselectAll.text"));
+        btnDeselectAll.addMouseListener(toggleAllListener);
+        btnDeselectAll.setVisible(true);
+        upperPanel.add(btnDeselectAll);
+
+        btnSelectAll = new JButton(resourceMap.getString("btnSelectAll.text"));
+        btnSelectAll.addMouseListener(toggleAllListener);
+        btnSelectAll.setVisible(false);
+        upperPanel.add(btnSelectAll);
+
         autoAwardsPanel.add(upperPanel, BorderLayout.PAGE_START);
 
         AutoAwardsTableModel model = new AutoAwardsTableModel(campaign);
@@ -176,6 +190,33 @@ public class AutoAwardsDialog extends JDialog {
         }
     };
 
+    final private MouseListener toggleAllListener = new MouseAdapter() {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            Object source = e.getSource();
+
+            if (source instanceof JButton) {
+                JButton button = (JButton) source;
+                AutoAwardsTableModel model = (AutoAwardsTableModel) personnelTable.getModel();
+
+                if (button.equals(btnSelectAll)) {
+                    btnSelectAll.setVisible(false);
+                    btnDeselectAll.setVisible(true);
+
+                    for (int rowIndex = 0; rowIndex < model.getRowCount(); rowIndex++) {
+                        model.setValueAt(true, rowIndex, AutoAwardsTableModel.COL_AWARD);
+                    }
+                } else if (button.equals(btnDeselectAll)) {
+                    btnSelectAll.setVisible(true);
+                    btnDeselectAll.setVisible(false);
+
+                    for (int rowIndex = 0; rowIndex < model.getRowCount(); rowIndex++) {
+                        model.setValueAt(false, rowIndex, AutoAwardsTableModel.COL_AWARD);
+                    }
+                }
+            }
+        }
+    };
 
     final private ActionListener buttonListener = new ActionListener() {
         @Override
