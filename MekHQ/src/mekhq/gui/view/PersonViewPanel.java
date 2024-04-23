@@ -436,7 +436,13 @@ public class PersonViewPanel extends JScrollablePanel {
                     continue;
                 }
 
-                medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
+                if ((medal.getWidth(null)) == (medal.getHeight(null))) {
+                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(45, 45), Image.SCALE_DEFAULT);
+                } else if ((medal.getWidth(null)) < (medal.getHeight(null))) {
+                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
+                } else {
+                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(60, 30), Image.SCALE_DEFAULT);
+                }
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);
@@ -492,7 +498,14 @@ public class PersonViewPanel extends JScrollablePanel {
                     continue;
                 }
 
-                miscAward = ImageHelpers.getScaledForBoundaries(miscAward, new Dimension(30, 60), Image.SCALE_DEFAULT);
+                if ((miscAward.getWidth(null)) == (miscAward.getHeight(null))) {
+                    miscAward = ImageHelpers.getScaledForBoundaries(miscAward, new Dimension(45, 45), Image.SCALE_DEFAULT);
+                } else if ((miscAward.getWidth(null)) < (miscAward.getHeight(null))) {
+                    miscAward = ImageHelpers.getScaledForBoundaries(miscAward, new Dimension(30, 60), Image.SCALE_DEFAULT);
+                } else {
+                    miscAward = ImageHelpers.getScaledForBoundaries(miscAward, new Dimension(60, 30), Image.SCALE_DEFAULT);
+                }
+
                 miscLabel.setIcon(new ImageIcon(miscAward));
                 miscLabel.setToolTipText(award.getTooltip());
                 miscLabel.add(miscLabel);
