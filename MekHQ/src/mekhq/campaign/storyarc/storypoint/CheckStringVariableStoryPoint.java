@@ -30,6 +30,8 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This StoryPoint checks the value of a stored string variable from the
@@ -55,6 +57,16 @@ public class CheckStringVariableStoryPoint extends StoryPoint {
     @Override
     protected String getResult() {
         return getStoryArc().getCustomStringVariable(key);
+    }
+
+    @Override
+    public List<String> getAllPossibleResults() {
+        // we cannot know how many possibilities there are apriori, so we just use CUSTOM, which will allow
+        // the user to specify outcome matching result
+        List<String> results = new ArrayList<>();
+        results.add("CUSTOM");
+        results.add("DEFAULT");
+        return results;
     }
 
     @Override

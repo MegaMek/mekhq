@@ -35,6 +35,8 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -139,6 +141,16 @@ public class ScenarioStoryPoint extends StoryPoint {
 
         //if we are still here, return nothing because we probably want defaults
         return "";
+    }
+
+    @Override
+    public List<String> getAllPossibleResults() {
+        ArrayList<String> results = new ArrayList<>();
+        for(ScenarioStatus nextStatus : ScenarioStatus.values()) {
+            results.add(nextStatus.name());
+        }
+        results.add("DEFAULT");
+        return results;
     }
 
     @Override

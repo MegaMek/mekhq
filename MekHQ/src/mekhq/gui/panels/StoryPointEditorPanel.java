@@ -111,7 +111,6 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
 
         // I would prefer to do this with a JTable, but I can't properly use a HyperLinkListener in a JTable
         // so we need to create something else
-
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 1.0;
@@ -124,6 +123,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         gbc.gridx++;
         pnlOutcomes.add(new JLabel("<html><b><nobr>Story Triggers</nobr></b></html>"), gbc);
 
+        List<String> currentOutcomes = new ArrayList<>();
         for(StoryOutcome outcome : storyPoint.getStoryOutcomes()) {
             gbc.gridx = 0;
             gbc.weightx = 1.0;
@@ -145,6 +145,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             pnlOutcomes.add(new JButton("Edit Outcome"), gbc);
             gbc.gridx++;
             pnlOutcomes.add(new JButton("Delete Outcome"), gbc);
+            currentOutcomes.add(outcome.getResult());
         }
 
         // check for a default outcome or trigger
@@ -169,6 +170,25 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             pnlOutcomes.add(new JButton("Edit Outcome"), gbc);
             gbc.gridx++;
             pnlOutcomes.add(new JButton("Delete Outcome"), gbc);
+            currentOutcomes.add("DEFAULT");
+        }
+
+        //check for other possible outcomes
+        JComboBox comboOutcomes = new JComboBox();
+        List<String> possibleResults = storyPoint.getAllPossibleResults();
+        possibleResults.removeAll(currentOutcomes);
+        if(!possibleResults.isEmpty()) {
+            for (String result : possibleResults) {
+                comboOutcomes.addItem(result);
+            }
+
+            gbc.gridx = 0;
+            gbc.gridy++;
+            pnlOutcomes.add(new JButton("Add Outcome"), gbc);
+            gbc.gridx = 1;
+            gbc.gridwidth = 4;
+            gbc.fill = GridBagConstraints.NONE;
+            pnlOutcomes.add(comboOutcomes, gbc);
         }
     }
 

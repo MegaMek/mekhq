@@ -129,6 +129,15 @@ public class MissionStoryPoint extends StoryPoint {
     }
 
     @Override
+    public List<String> getAllPossibleResults() {
+        ArrayList<String> results = new ArrayList<>();
+        results.add(MissionStatus.FAILED.name());
+        results.add(MissionStatus.SUCCESS.name());
+        results.add("DEFAULT");
+        return results;
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "percentWin", percentWin);

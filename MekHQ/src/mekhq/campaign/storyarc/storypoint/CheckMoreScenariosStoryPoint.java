@@ -29,6 +29,8 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -59,6 +61,15 @@ public class CheckMoreScenariosStoryPoint extends StoryPoint {
             }
         }
         return "true";
+    }
+
+    @Override
+    public List<String> getAllPossibleResults() {
+        ArrayList<String> results = new ArrayList<>();
+        results.add("true");
+        results.add("false");
+        results.add("DEFAULT");
+        return results;
     }
 
     @Override

@@ -246,6 +246,12 @@ public abstract class StoryPoint {
         return getStoryArc().getCampaign();
     }
 
+    public List<String> getAllPossibleResults() {
+        ArrayList<String> results = new ArrayList<>();
+        results.add("DEFAULT");
+        return results;
+    }
+
     public List<StoryPoint> getLinkingStoryPoints() {
         List previous = new ArrayList<StoryPoint>();
         UUID nextId;

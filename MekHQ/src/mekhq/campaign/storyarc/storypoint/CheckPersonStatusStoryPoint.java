@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -31,6 +32,8 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -60,6 +63,16 @@ public class CheckPersonStatusStoryPoint extends StoryPoint {
         } else {
             return p.getStatus().name();
         }
+    }
+
+    @Override
+    public List<String> getAllPossibleResults() {
+        ArrayList<String> results = new ArrayList<>();
+        for(PersonnelStatus status : PersonnelStatus.getImplementedStatuses()) {
+            results.add(status.name());
+        }
+        results.add("DEFAULT");
+        return results;
     }
 
     @Override
