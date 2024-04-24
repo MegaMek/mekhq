@@ -67,7 +67,7 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
             sb.append(storyPoint.getHyperlinkedName());
         }
         if(missionStatus != null) {
-            sb.append("(");
+            sb.append(" (");
             sb.append(missionStatus.name());
             sb.append(")");
         }
