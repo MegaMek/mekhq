@@ -32,6 +32,26 @@ public class AutoAwardsController {
     final private List<Award> trainingAwards = new ArrayList<>();
     final private List<Award> ignoredAwards = new ArrayList<>();
 
+    public void ManualController(Campaign c) {
+        LogManager.getLogger().info("autoAwards (Manual) has started");
+
+        campaign = c;
+
+        buildAwardLists(0);
+
+        Collection<UUID> personnel = getPersonnel();
+
+        // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
+        if (!personnel.isEmpty()) {
+            // This is the main workhorse function
+            ProcessAwards(personnel, false);
+        } else {
+            LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
+        }
+
+        LogManager.getLogger().info("autoAwards (Manual) has finished");
+    }
+
     /**
      * The primary controller for the automatic processing of Awards
      *
@@ -47,29 +67,7 @@ public class AutoAwardsController {
 
         buildAwardLists(1);
 
-        Collection<UUID> personnel = campaign.getActivePersonnel()
-                .stream()
-                .map(Person::getId)
-                .collect(Collectors.toList());
-
-        // if posthumous Awards are enabled, we add the relevant dead people
-        if (campaign.getCampaignOptions().isIssuePosthumousAwards()) {
-            Collection<UUID> deadPeople = campaign.getPersonnel()
-                    .stream().filter(person -> person.getStatus().isDead())
-                    .map(Person::getId)
-                    .collect(Collectors.toList());
-
-            LogManager.getLogger().info("deadPeople {}", deadPeople);
-
-            if (!deadPeople.isEmpty()) {
-                personnel.addAll(deadPeople);
-            }
-        }
-
-        // Prisoners and Dependents are not eligible for Awards
-        if (!personnel.isEmpty()) {
-            removeDependentsAndPrisoners(personnel);
-        }
+        Collection<UUID> personnel = getPersonnel();
 
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
@@ -139,6 +137,36 @@ public class AutoAwardsController {
     }
 
     /**
+     * Builds a list of personnel autoAwards should process
+     */
+    private Collection<UUID> getPersonnel() {
+        Collection<UUID> personnel = campaign.getActivePersonnel()
+                .stream()
+                .map(Person::getId)
+                .collect(Collectors.toList());
+
+        // if posthumous Awards are enabled, we add the relevant dead people
+        if (campaign.getCampaignOptions().isIssuePosthumousAwards()) {
+            Collection<UUID> deadPeople = campaign.getPersonnel()
+                    .stream().filter(person -> person.getStatus().isDead())
+                    .map(Person::getId)
+                    .collect(Collectors.toList());
+
+            LogManager.getLogger().info("deadPeople {}", deadPeople);
+
+            if (!deadPeople.isEmpty()) {
+                personnel.addAll(deadPeople);
+            }
+        }
+
+        // Prisoners and Dependents are not eligible for Awards
+        if (!personnel.isEmpty()) {
+            removeDependentsAndPrisoners(personnel);
+        }
+        return personnel;
+    }
+
+    /**
      * Filters out anyone with the Prisoner status, or Dependent role
      *
      * @param personnel personnel to process
@@ -175,8 +203,86 @@ public class AutoAwardsController {
 
                     // next we begin to filter the awards into discrete lists
                     switch (awardListCase) {
-                        // manual
+                        // Manual
                         case 0:
+                            for (Award award : awards) {
+                                switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                                    case "ignore":
+                                    case "contract":
+                                    case "factionhunter":
+                                    case "injury":
+                                    case "theatreofwar":
+                                        ignoredAwards.add(award);
+                                        break;
+                                    case "kill":
+                                        if ((!award.getRange().equalsIgnoreCase("scenario"))
+                                                && (!award.getRange().equalsIgnoreCase("mission"))) {
+                                            if (campaign.getCampaignOptions().isEnableFormationKillAwards()) {
+                                                killAwards.add(award);
+                                            } else {
+                                                ignoredAwards.add(award);
+                                            }
+                                        } else {
+                                            ignoredAwards.add(award);
+                                        }
+                                        break;
+                                    // TODO hardcode more misc awards
+                                    case "misc":
+                                        if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                                            miscAwards.add(award);
+                                        } else {
+                                            ignoredAwards.add(award);
+                                        }
+                                        break;
+                                    case "rank":
+                                        if (campaign.getCampaignOptions().isEnableRankAwards()) {
+                                            rankAwards.add(award);
+                                        } else {
+                                            ignoredAwards.add(award);
+                                        }
+                                        break;
+                                    case "scenario":
+                                        if (campaign.getCampaignOptions().isEnableScenarioAwards()) {
+                                            scenarioAwards.add(award);
+                                        } else {
+                                            ignoredAwards.add(award);
+                                        }
+                                        break;
+                                    case "skill":
+                                        if (campaign.getCampaignOptions().isEnableSkillAwards()) {
+                                            skillAwards.add(award);
+                                        } else {
+                                            ignoredAwards.add(award);
+                                        }
+                                        break;
+                                    case "time":
+                                        if (campaign.getCampaignOptions().isEnableTimeAwards()) {
+                                            timeAwards.add(award);
+                                        } else {
+                                            ignoredAwards.add(award);
+                                        }
+                                        break;
+                                    // trainingAwards are not currently supported.
+                                    // We include them here for tracking purposes
+                                    // TODO add training functionality
+                                    case "training":
+                                        trainingAwards.add(award);
+                                        break;
+                                    default:
+                                        // if autoAwards doesn't know what to do with an Award, it ignores it
+                                        ignoredAwards.add(award);
+                                }
+                            }
+                            // These logs help users double-check that the number of awards found matches their records
+                            LogManager.getLogger().info("autoAwards found {} Kill Awards (excluding Mission & Scenario Kill Awards)", killAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Rank Awards", rankAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Scenario Awards", scenarioAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Skill Awards", skillAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Time Awards", timeAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
+                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+
                             break;
                         // post-mission
                         case 1:
