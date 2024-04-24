@@ -17,10 +17,7 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
     StoryPoint storyPoint;
     String result;
     boolean isNewOutcome;
-    boolean isCustom;
-
     private JSuggestField suggestNext;
-    private JTextField txtResult;
 
     public CustomizeStoryOutcomeDialog(JFrame parent, boolean modal, String result, StoryPoint sp, boolean isNew) {
         super(parent, modal);
@@ -70,9 +67,7 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        txtResult = new JTextField(result);
-        txtResult.setEditable(result.equals(StoryPoint.CUSTOM_OUTCOME));
-        panMain.add(txtResult, gbc);
+        panMain.add(new JLabel(result), gbc);
 
         Vector<String> otherPoints = new Vector<String>();
         for (StoryPoint sp : storyPoint.getStoryArc().getStoryPoints()) {
@@ -91,7 +86,6 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
     }
 
     private void done(ActionEvent evt) {
-        result = txtResult.getText();
         //set no next story point as default and then look for it
         outcome.setNextStoryPointId(null);
         // need to find by name which might not be unique

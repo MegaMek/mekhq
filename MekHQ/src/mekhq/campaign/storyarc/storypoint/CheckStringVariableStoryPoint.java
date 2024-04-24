@@ -22,6 +22,8 @@ package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
 import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.storyarc.storytrigger.ChangeStringVariableStoryTrigger;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -62,10 +64,27 @@ public class CheckStringVariableStoryPoint extends StoryPoint {
 
     @Override
     public List<String> getAllPossibleResults() {
-        // we cannot know how many possibilities there are apriori, so we just use CUSTOM, which will allow
-        // the user to specify outcome matching result
+        // this one is complicated, but we can find all the triggers where this has been changed and collect
+        // all possibilities
         List<String> results = new ArrayList<>();
-        results.add(CUSTOM_OUTCOME);
+        for(StoryPoint sp : getStoryArc().getStoryPoints()) {
+            for(StoryTrigger trigger : sp.getStoryTriggers()) {
+                if(trigger instanceof ChangeStringVariableStoryTrigger) {
+                    if(!((ChangeStringVariableStoryTrigger)trigger).getKey().equals(key)) {
+                        continue;
+                    }
+                    String value = ((ChangeStringVariableStoryTrigger)trigger).getValue();
+                    if(!results.contains(value)) {
+                        results.add(value);
+                    }
+                }
+            }
+        }
+        // finally, check the current value of this variable and add it if not already there
+        String value = getStoryArc().getCustomStringVariable(key);
+        if(!results.contains(value)) {
+            results.add(value);
+        }
         results.add(DEFAULT_OUTCOME);
         return results;
     }

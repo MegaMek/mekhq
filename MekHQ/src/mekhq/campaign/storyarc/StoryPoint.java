@@ -63,7 +63,7 @@ import java.util.Map.Entry;
 public abstract class StoryPoint {
 
     public final static String DEFAULT_OUTCOME = "DEFAULT";
-    public final static String CUSTOM_OUTCOME = "CUSTOM";
+
     /** The story arc that this story point is a part of **/
     private StoryArc storyArc;
 

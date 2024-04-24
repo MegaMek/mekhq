@@ -44,6 +44,14 @@ public class ChangeStringVariableStoryTrigger extends StoryTrigger {
         getStoryArc().addCustomStringVariable(key, value);
     }
 
+    public String getKey() {
+        return key;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
     @Override
     public String getDescription() {
         return "Change value of " + key + " to " + value;
