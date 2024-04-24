@@ -276,6 +276,15 @@ public abstract class StoryPoint {
         return String.format("<a href='STORYPOINT:%s'>%s</a>", getId(), getName());
     }
 
+    public void removeStoryOutcome(String result) {
+        storyOutcomes.remove(result);
+    }
+
+    public void removeDefaultOutcome() {
+        nextStoryPointId = null;
+        storyTriggers = new ArrayList<>();
+    }
+
     //region I/O
     public abstract void writeToXml(PrintWriter pw1, int indent);
 

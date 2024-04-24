@@ -20,6 +20,7 @@ import java.util.UUID;
 
 public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
 
+    final static String defaultOutcome = "DEFAULT";
     private StoryArcEditorGUI editorGUI;
     private StoryPoint storyPoint;
 
@@ -92,7 +93,10 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         txtLinking.addHyperlinkListener(editorGUI.getStoryPointHLL());
         add(txtLinking, gbc);
 
-        refreshOutcomesPanel();
+        pnlOutcomes = new JPanel(new GridBagLayout());
+        pnlOutcomes.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Story Outcomes and Triggers"),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 1.0;
@@ -101,14 +105,12 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         add(pnlOutcomes, gbc);
+        refreshOutcomesPanel();
     }
 
     private void refreshOutcomesPanel() {
-        pnlOutcomes = new JPanel(new GridBagLayout());
-        pnlOutcomes.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Story Outcomes and Triggers"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
 
+        pnlOutcomes.removeAll();
         // I would prefer to do this with a JTable, but I can't properly use a HyperLinkListener in a JTable
         // so we need to create something else
         GridBagConstraints gbc = new GridBagConstraints();
@@ -144,7 +146,9 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             gbc.weightx = 0.0;
             pnlOutcomes.add(new JButton("Edit Outcome"), gbc);
             gbc.gridx++;
-            pnlOutcomes.add(new JButton("Delete Outcome"), gbc);
+            JButton btnRemove = new JButton("Delete Outcome");
+            btnRemove.addActionListener(evt -> removeOutcome(outcome.getResult()));
+            pnlOutcomes.add(btnRemove, gbc);
             currentOutcomes.add(outcome.getResult());
         }
 
@@ -153,7 +157,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             gbc.gridx = 0;
             gbc.gridy++;
             gbc.weightx = 1.0;
-            pnlOutcomes.add(new JLabel("<html><i>DEFAULT</i></html>"), gbc);
+            pnlOutcomes.add(new JLabel("<html><i>" + defaultOutcome + "</i></html>"), gbc);
             gbc.gridx++;
             String next = storyPoint.getNextStoryPointId() == null ? "" :
                     storyPoint.getStoryArc().getStoryPoint(storyPoint.getNextStoryPointId()).getHyperlinkedName();
@@ -169,8 +173,10 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             gbc.weightx = 0.0;
             pnlOutcomes.add(new JButton("Edit Outcome"), gbc);
             gbc.gridx++;
-            pnlOutcomes.add(new JButton("Delete Outcome"), gbc);
-            currentOutcomes.add("DEFAULT");
+            JButton btnRemove = new JButton("Delete Outcome");
+            btnRemove.addActionListener(evt -> removeOutcome(defaultOutcome));
+            pnlOutcomes.add(btnRemove, gbc);
+            currentOutcomes.add(defaultOutcome);
         }
 
         //check for other possible outcomes
@@ -201,5 +207,15 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         }
         sb.append("</html>");
         return sb.toString();
+    }
+
+    public void removeOutcome(String result) {
+        if(result.equals(defaultOutcome)) {
+            storyPoint.removeDefaultOutcome();
+        } else {
+            storyPoint.removeStoryOutcome(result);
+        }
+        refreshOutcomesPanel();
+        pnlOutcomes.revalidate();
     }
 }
