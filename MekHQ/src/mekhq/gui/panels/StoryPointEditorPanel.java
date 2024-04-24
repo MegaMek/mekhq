@@ -10,7 +10,10 @@ import mekhq.gui.dialog.CustomizeStoryOutcomeDialog;
 import mekhq.gui.model.StoryOutcomeModel;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +23,8 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
     private StoryPoint storyPoint;
 
     private JTextField txtName;
+    private JButton btnSaveName;
+    private JButton btnCancelName;
     private JPanel pnlOutcomes;
 
     private JTable storyOutcomeTable;
@@ -38,11 +43,10 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
 
         GridBagConstraints gbc = new GridBagConstraints();
 
-
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 4;
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.NONE;
@@ -53,10 +57,37 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         add(new JLabel("<html><b><nobr>Story Point Name:</nobr></b></html>"), gbc);
 
         txtName = new JTextField(storyPoint.getName());
+        txtName.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                checkName();
+            }
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                checkName();
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                checkName();
+            }
+        });
         gbc.gridx++;
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         add(txtName, gbc);
+
+        gbc.gridx++;
+        gbc.weightx = 0.0;
+        gbc.fill = GridBagConstraints.NONE;
+        btnSaveName = new JButton("Save");
+        btnSaveName.addActionListener(this::saveName);
+        btnSaveName.setEnabled(false);
+        add(btnSaveName, gbc);
+        gbc.gridx++;
+        btnCancelName = new JButton("Cancel");
+        btnCancelName.addActionListener(this::cancelName);
+        btnCancelName.setEnabled(false);
+        add(btnCancelName, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -74,6 +105,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         }
         gbc.gridx++;
         gbc.weightx = 1.0;
+        gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         JTextPane txtLinking = new JTextPane();
         txtLinking.setContentType("text/html");
@@ -90,7 +122,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         gbc.gridy++;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = 4;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         add(pnlOutcomes, gbc);
@@ -232,6 +264,29 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         }
         refreshOutcomesPanel();
         pnlOutcomes.revalidate();
+    }
+
+    public void checkName() {
+        btnSaveName.setEnabled(!txtName.getText().equals(storyPoint.getName()));
+        btnCancelName.setEnabled(!txtName.getText().equals(storyPoint.getName()));
+    }
+
+    public void saveName(ActionEvent evt) {
+        if(storyPoint.getStoryArc().isDuplicateName(txtName.getText())) {
+            JOptionPane.showMessageDialog(getFrame(), "This name is already being used", "Dialog",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        storyPoint.setName(txtName.getText());
+        btnSaveName.setEnabled(false);
+        btnCancelName.setEnabled(false);
+        editorGUI.refreshStoryPoints();
+    }
+
+    public void cancelName(ActionEvent evt) {
+        txtName.setText(storyPoint.getName());
+        btnSaveName.setEnabled(false);
+        btnCancelName.setEnabled(false);
     }
 
     public void editOutcome(String result) {

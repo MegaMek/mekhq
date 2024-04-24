@@ -137,6 +137,10 @@ public abstract class StoryPoint {
         return name;
     }
 
+    public void setName(String s) {
+        name = s;
+    }
+
     public UUID getNextStoryPointId() {
         return nextStoryPointId;
     }

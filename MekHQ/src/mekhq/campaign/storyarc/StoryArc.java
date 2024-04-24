@@ -250,6 +250,15 @@ public class StoryArc {
         return getTitle();
     }
 
+    public boolean isDuplicateName(String name) {
+        for(StoryPoint sp : getStoryPoints()) {
+            if(sp.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     //region EventHandlers
     @Subscribe
     public void handleScenarioResolved(ScenarioResolvedEvent ev) {
