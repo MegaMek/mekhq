@@ -82,7 +82,7 @@ public class AtBDynamicScenarioFactory {
             BombType.B_LG, BombType.B_ARROW, BombType.B_HOMING, BombType.B_TAG };
     private static final int[] validBotAABombs = { BombType.B_RL, BombType.B_LAA, BombType.B_AAA };
 
-    private static final int[] minimumBVPercentage = { 50, 55, 60, 70, 75, 80 };
+    private static final int[] minimumBVPercentage = { 50, 65, 70, 80, 90, 100 };
     // target number for 2d6 roll of infantry being upgraded to battle armor, indexed by dragoons rating
     private static final int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
 
@@ -506,13 +506,13 @@ public class AtBDynamicScenarioFactory {
         }
 
         // chop out random units until we drop down to our unit count budget
-        while (forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
+        while ((forceUnitBudget > 0) && (generatedEntities.size() > forceUnitBudget)) {
             generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
         }
 
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
             // remove random units until forceBV is below 110% of forceBVBudget
-            while (((double) forceBV / forceBVBudget) > 1.1) {
+            while ((generatedEntities.size() > 1) && (((double) forceBV / forceBVBudget)) > 1.1) {
                 generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
 
                 // update forceBV
