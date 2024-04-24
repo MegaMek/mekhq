@@ -125,7 +125,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             txtResult.setText(outcome.getResult());
             pnlOutcomes.add(txtResult, gbc);
             gbc.gridx++;
-            String next = outcome.getNextStoryPointId() == null ? "" :
+            String next = outcome.getNextStoryPointId() == null ? "-" :
                     storyPoint.getStoryArc().getStoryPoint(outcome.getNextStoryPointId()).getHyperlinkedName();
             JTextPane txtNext = new JTextPane();
             txtNext.setContentType("text/html");
@@ -163,7 +163,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             txtResult.setText("<i>" + StoryPoint.DEFAULT_OUTCOME + "</i>");
             pnlOutcomes.add(txtResult, gbc);
             gbc.gridx++;
-            String next = storyPoint.getNextStoryPointId() == null ? "" :
+            String next = storyPoint.getNextStoryPointId() == null ? "-" :
                     storyPoint.getStoryArc().getStoryPoint(storyPoint.getNextStoryPointId()).getHyperlinkedName();
             JTextPane txtNext = new JTextPane();
             txtNext.setContentType("text/html");
@@ -213,6 +213,9 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
     }
 
     private String getStoryTriggerDescription(List<StoryTrigger> triggers) {
+        if(triggers.isEmpty()) {
+            return "-";
+        }
         StringBuilder sb = new StringBuilder();
         for(StoryTrigger trigger : triggers) {
             sb.append(trigger.getDescription());
