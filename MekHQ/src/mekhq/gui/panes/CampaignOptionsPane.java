@@ -321,6 +321,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkIssuePosthumousAwards;
     private JCheckBox chkIssueBestAwardOnly;
     private JCheckBox chkIgnoreStandardSet;
+    private JSpinner spnAwardTierSize;
     private JCheckBox chkEnableContractAwards;
     private JCheckBox chkEnableFactionHunterAwards;
     private JCheckBox chkEnableInjuryAwards;
@@ -3396,6 +3397,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkIssuePosthumousAwards.setEnabled(isEnabled);
             chkIssueBestAwardOnly.setEnabled(isEnabled);
             chkIgnoreStandardSet.setEnabled(isEnabled);
+            lblAwardTierSize.setEnabled(isEnabled);
+            spnAwardTierSize.setEnabled(isEnabled);
             autoAwardsPanel.setEnabled(isEnabled);
             chkEnableContractAwards.setEnabled(isEnabled);
             chkEnableFactionHunterAwards.setEnabled(isEnabled);
@@ -3416,6 +3419,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkIssuePosthumousAwards.setEnabled(false);
             chkIssueBestAwardOnly.setEnabled(false);
             chkIgnoreStandardSet.setEnabled(false);
+            lblAwardTierSize.setEnabled(false);
+            spnAwardTierSize.setEnabled(false);
             autoAwardsPanel.setEnabled(false);
             chkEnableContractAwards.setEnabled(false);
             chkEnableFactionHunterAwards.setEnabled(false);
@@ -3452,6 +3457,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkIssuePosthumousAwards)
                         .addComponent(chkIssueBestAwardOnly)
                         .addComponent(chkIgnoreStandardSet)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblAwardTierSize)
+                                .addComponent(spnAwardTierSize))
                         .addComponent(autoAwardsPanel)
         );
 
@@ -3467,6 +3475,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkIssuePosthumousAwards)
                         .addComponent(chkIssueBestAwardOnly)
                         .addComponent(chkIgnoreStandardSet)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblAwardTierSize)
+                                .addComponent(spnAwardTierSize))
                         .addComponent(autoAwardsPanel)
         );
 
