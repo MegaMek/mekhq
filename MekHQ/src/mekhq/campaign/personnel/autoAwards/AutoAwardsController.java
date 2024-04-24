@@ -32,10 +32,16 @@ public class AutoAwardsController {
     final private List<Award> trainingAwards = new ArrayList<>();
     final private List<Award> ignoredAwards = new ArrayList<>();
 
+    /**
+     * The controller for the manual-automatic processing of Awards
+     *
+     * @param c                    the campaign to be processed
+     */
     public void ManualController(Campaign c) {
         LogManager.getLogger().info("autoAwards (Manual) has started");
 
         campaign = c;
+        mission = null;
 
         buildAwardLists(0);
 
@@ -207,6 +213,8 @@ public class AutoAwardsController {
                         case 0:
                             for (Award award : awards) {
                                 switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                                    case "divider":
+                                        break;
                                     case "ignore":
                                     case "contract":
                                     case "factionhunter":
@@ -290,6 +298,8 @@ public class AutoAwardsController {
                                 switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
                                     case "ignore":
                                         ignoredAwards.add(award);
+                                        break;
+                                    case "divider":
                                         break;
                                     case "contract":
                                         if (campaign.getCampaignOptions().isEnableContractAwards()) {
@@ -393,6 +403,8 @@ public class AutoAwardsController {
                         case 2:
                             for (Award award : awards) {
                                 switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                                    case "divider":
+                                        break;
                                     case "kill":
                                         if ((campaign.getCampaignOptions().isEnableIndividualKillAwards()) && (award.getRange().equalsIgnoreCase("scenario"))) {
 
@@ -716,7 +728,7 @@ public class AutoAwardsController {
         for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
-                data = MiscAwards.MiscAwardsProcessor(campaign, person, miscAwards, missionWasSuccessful);
+                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful);
             } catch (Exception e) {
                 data = null;
                 LogManager.getLogger().info("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());
