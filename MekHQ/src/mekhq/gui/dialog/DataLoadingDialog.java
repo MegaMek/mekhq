@@ -38,6 +38,8 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.storyarc.StoryArc;
+import mekhq.campaign.storyarc.StoryArcStub;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.campaign.universe.Systems;
@@ -62,14 +64,22 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
     private final Task task;
     private JLabel splash;
     private JProgressBar progressBar;
+    private StoryArcStub storyArcStub;
+
     //endregion Variable Declarations
 
     //region Constructors
     public DataLoadingDialog(final JFrame frame, final MekHQ application,
                              final @Nullable File campaignFile) {
+            this(frame, application, campaignFile, null);
+    }
+
+    public DataLoadingDialog(final JFrame frame, final MekHQ application,
+                             final @Nullable File campaignFile, StoryArcStub stub) {
         super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
         this.application = application;
         this.campaignFile = campaignFile;
+        this.storyArcStub = stub;
         this.task = new Task(this);
         getTask().addPropertyChangeListener(this);
         initialize();
@@ -346,7 +356,6 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
                 //endregion Progress 7
             }
-
             campaign.setApp(getApplication());
             return campaign;
         }
@@ -389,6 +398,12 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 getApplication().getCampaignController().setHost(campaign.getId());
                 getApplication().showNewView();
                 getFrame().dispose();
+                if (null != storyArcStub) {
+                    StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
+                    if (null != storyArc) {
+                        campaign.useStoryArc(storyArc, true);
+                    }
+                }
             } else {
                 cancel(true);
                 getFrame().setVisible(true);
