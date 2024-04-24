@@ -103,7 +103,6 @@ public class KillAwards {
                         break;
                     // lance
                     case 1:
-                        LogManager.getLogger().info("Lance-based Award");
                         // if the maximum depth is <= than the depth we're searching, we can just cheat
                         // and get all kills
                         if (maximumDepth <= 1) {

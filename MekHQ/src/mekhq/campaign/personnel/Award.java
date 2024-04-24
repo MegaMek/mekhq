@@ -83,13 +83,13 @@ public class Award implements Comparable<Award> {
 
     }
 
-    public Award(String name, String set,  String description, String medals, String ribbons,
+    public Award(String name, String set,  String description, List<String> medals, List<String> ribbons,
                  List<String> miscs, int xp, int edge, boolean stackable, int qty, String item, String size, String range, int id) {
         this.name = name;
         this.set = set;
         this.description = description;
-        this.medals = List.of(medals.replaceAll("\\s","").split(","));
-        this.ribbons = List.of(ribbons.replaceAll("\\s","").split(","));
+        this.medals = medals;
+        this.ribbons = ribbons;
         this.miscs = miscs;
         this.xp = xp;
         this.edge = edge;
@@ -228,10 +228,8 @@ public class Award implements Comparable<Award> {
      * @return award with new date
      */
     public Award createCopy() {
-        return new Award(this.name, this.set, this.description,
-                this.medals.toString().replace("[", "").replace("]", ""),
-                this.ribbons.toString().replace("[", "").replace("]", ""),
-                this.miscs, this.xp, this.edge, this.stackable, this.qty, this.item, this.size, this.range, this.id);
+        return new Award(this.name, this.set, this.description, this.medals, this.ribbons, this.miscs,
+                this.xp, this.edge, this.stackable, this.qty, this.item, this.size, this.range, this.id);
     }
 
     /**
