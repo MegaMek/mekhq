@@ -82,7 +82,7 @@ public class AtBDynamicScenarioFactory {
             BombType.B_LG, BombType.B_ARROW, BombType.B_HOMING, BombType.B_TAG };
     private static final int[] validBotAABombs = { BombType.B_RL, BombType.B_LAA, BombType.B_AAA };
 
-    private static final int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
+    private static final int[] minimumBVPercentage = { 50, 55, 60, 70, 75, 80 };
     // target number for 2d6 roll of infantry being upgraded to battle armor, indexed by dragoons rating
     private static final int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
 
