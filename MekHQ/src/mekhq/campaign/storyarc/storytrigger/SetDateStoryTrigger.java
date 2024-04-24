@@ -19,6 +19,7 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
+import mekhq.gui.StoryPointHyperLinkListener;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -79,11 +80,9 @@ public class SetDateStoryTrigger extends StoryTrigger {
         StringBuilder sb = new StringBuilder();
         sb.append("Set date");
         if(storyPoint != null) {
-            sb.append(" in <a href='STORYPOINT:");
-            sb.append(storyPoint.getId().toString());
-            sb.append("'>");
-            sb.append(storyPoint.getName());
-            sb.append("</a> by ");
+            sb.append("in ");
+            sb.append(storyPoint.getHyperlinkedName());
+            sb.append(" by ");
             sb.append(futureDays);
             sb.append(" days");
         }

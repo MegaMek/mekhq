@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc;
 
 import megamek.Version;
+import mekhq.gui.StoryPointHyperLinkListener;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
@@ -273,7 +274,7 @@ public abstract class StoryPoint {
     }
 
     public String getHyperlinkedName() {
-        return String.format("<a href='STORYPOINT:%s'>%s</a>", getId(), getName());
+        return String.format("<a href='%s:%s'>%s</a>", StoryPointHyperLinkListener.STORYPOINT, getId(), getName());
     }
 
     public void removeStoryOutcome(String result) {

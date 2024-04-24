@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
+import mekhq.gui.StoryPointHyperLinkListener;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.enums.MissionStatus;
@@ -63,11 +64,7 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
         if(storyPoint == null) {
             sb.append("mission (MISSING)");
         } else {
-            sb.append("<a href='STORYPOINT:");
-            sb.append(storyPoint.getId().toString());
-            sb.append("'>");
-            sb.append(storyPoint.getName());
-            sb.append("</a> ");
+            sb.append(storyPoint.getHyperlinkedName());
         }
         if(missionStatus != null) {
             sb.append("(");
