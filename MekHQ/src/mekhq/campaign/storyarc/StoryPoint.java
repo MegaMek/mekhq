@@ -139,6 +139,10 @@ public abstract class StoryPoint {
         return nextStoryPointId;
     }
 
+    public void setNextStoryPointId(UUID nextStoryPointId) {
+        this.nextStoryPointId = nextStoryPointId;
+    }
+
     public Image getImage() {
         if(storySplash.isDefault()) {
             return null;
@@ -277,6 +281,10 @@ public abstract class StoryPoint {
         return String.format("<a href='%s:%s'>%s</a>", StoryPointHyperLinkListener.STORYPOINT, getId(), getName());
     }
 
+    public StoryOutcome getStoryOutcome(String result) {
+        return storyOutcomes.get(result);
+    }
+
     public void removeStoryOutcome(String result) {
         storyOutcomes.remove(result);
     }
@@ -380,5 +388,4 @@ public abstract class StoryPoint {
 
         return retVal;
     }
-
 }

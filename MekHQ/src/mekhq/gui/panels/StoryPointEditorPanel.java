@@ -1,10 +1,12 @@
 package mekhq.gui.panels;
 
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryOutcome;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.gui.StoryArcEditorGUI;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
+import mekhq.gui.dialog.CustomizeStoryOutcomeDialog;
 import mekhq.gui.model.StoryOutcomeModel;
 
 import javax.swing.*;
@@ -14,7 +16,6 @@ import java.util.List;
 
 public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
 
-    final static String defaultOutcome = "DEFAULT";
     private StoryArcEditorGUI editorGUI;
     private StoryPoint storyPoint;
 
@@ -141,7 +142,9 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             pnlOutcomes.add(txtTriggers, gbc);
             gbc.gridx++;
             gbc.weightx = 0.0;
-            pnlOutcomes.add(new JButton("Edit Outcome"), gbc);
+            JButton btnEdit = new JButton("Edit Outcome");
+            btnEdit.addActionListener(evt -> editOutcome(outcome.getResult()));
+            pnlOutcomes.add(btnEdit, gbc);
             gbc.gridx++;
             JButton btnRemove = new JButton("Delete Outcome");
             btnRemove.addActionListener(evt -> removeOutcome(outcome.getResult()));
@@ -157,7 +160,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             JTextPane txtResult = new JTextPane();
             txtResult.setContentType("text/html");
             txtResult.setEditable(false);
-            txtResult.setText("<i>" + defaultOutcome + "</i>");
+            txtResult.setText("<i>" + StoryArc.defaultOutcome + "</i>");
             pnlOutcomes.add(txtResult, gbc);
             gbc.gridx++;
             String next = storyPoint.getNextStoryPointId() == null ? "" :
@@ -177,12 +180,14 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             pnlOutcomes.add(txtTriggers, gbc);
             gbc.gridx++;
             gbc.weightx = 0.0;
-            pnlOutcomes.add(new JButton("Edit Outcome"), gbc);
+            JButton btnEdit = new JButton("Edit Outcome");
+            btnEdit.addActionListener(evt -> editOutcome(StoryArc.defaultOutcome));
+            pnlOutcomes.add(btnEdit, gbc);
             gbc.gridx++;
             JButton btnRemove = new JButton("Delete Outcome");
-            btnRemove.addActionListener(evt -> removeOutcome(defaultOutcome));
+            btnRemove.addActionListener(evt -> removeOutcome(StoryArc.defaultOutcome));
             pnlOutcomes.add(btnRemove, gbc);
-            currentOutcomes.add(defaultOutcome);
+            currentOutcomes.add(StoryArc.defaultOutcome);
         }
 
         //check for other possible outcomes
@@ -214,11 +219,18 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
     }
 
     public void removeOutcome(String result) {
-        if(result.equals(defaultOutcome)) {
+        if(result.equals(StoryArc.defaultOutcome)) {
             storyPoint.removeDefaultOutcome();
         } else {
             storyPoint.removeStoryOutcome(result);
         }
+        SwingUtilities.invokeLater(() -> refreshOutcomesPanel());
+        SwingUtilities.invokeLater(() ->pnlOutcomes.revalidate());
+    }
+
+    public void editOutcome(String result) {
+        CustomizeStoryOutcomeDialog csod = new CustomizeStoryOutcomeDialog(getFrame(), true, result, storyPoint);
+        csod.setVisible(true);
         refreshOutcomesPanel();
         pnlOutcomes.revalidate();
     }
