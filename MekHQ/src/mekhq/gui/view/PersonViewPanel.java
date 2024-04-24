@@ -338,7 +338,12 @@ public class PersonViewPanel extends JScrollablePanel {
             }
             try {
                 int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String ribbonFileName = award.getRibbonFileName(numberOfAwards);
+                // Due to how mhq handles awards, this is going to give us one long string that contains all the filenames
+                String rawFileNames = award.getRibbonFileName(numberOfAwards);
+
+                // This processes that String and gives the file name we actually want
+                String ribbonFileName = getAwardImageFileName(rawFileNames, numberOfAwards);
+
                 ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/ribbons/", ribbonFileName);
                 if (ribbon == null) {
@@ -375,8 +380,11 @@ public class PersonViewPanel extends JScrollablePanel {
     private JPanel drawMedals() {
         JPanel pnlMedals = new JPanel();
 
-        List<Award> awards = person.getAwardController().getAwards().stream().filter(a -> a.getNumberOfMedalFiles() > 0)
-                .sorted().collect(Collectors.toList());
+        List<Award> awards = person.getAwardController()
+                .getAwards()
+                .stream().filter(a -> a.getNumberOfMedalFiles() > 0)
+                .sorted()
+                .collect(Collectors.toList());
 
         for (Award award : awards) {
             JLabel medalLabel = new JLabel();
@@ -384,7 +392,10 @@ public class PersonViewPanel extends JScrollablePanel {
             Image medal;
             try {
                 int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String medalFileName = award.getMedalFileName(numberOfAwards);
+                String rawFileNames = award.getMedalFileName(numberOfAwards);
+
+                String medalFileName = getAwardImageFileName(rawFileNames, numberOfAwards);
+
                 medal = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/medals/", medalFileName);
                 if (medal == null) {
@@ -416,6 +427,21 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlMedals;
     }
 
+    private String getAwardImageFileName(String fileNames, int numberOfAwards) {
+        List<String> allFileNames = Arrays.asList(fileNames
+                .replaceAll(", ", ",")
+                .split(","));
+
+        String fileName;
+
+        if (allFileNames.size() == 1) {
+            fileName = fileNames;
+        } else {
+            fileName = allFileNames.get(numberOfAwards / campaign.getCampaignOptions().getAwardTierSize());
+        }
+        return fileName;
+    }
+
     /**
      * Draws the misc awards below the medals.
      */
@@ -430,7 +456,10 @@ public class PersonViewPanel extends JScrollablePanel {
             Image miscAward;
             try {
                 int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String miscFileName = award.getMiscFileName(numberOfAwards);
+                String rawFileNames = award.getMiscFileName(numberOfAwards);
+
+                String miscFileName = getAwardImageFileName(rawFileNames, numberOfAwards);
+
                 Image miscAwardBufferedImage = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/misc/", miscFileName);
                 if (miscAwardBufferedImage == null) {
