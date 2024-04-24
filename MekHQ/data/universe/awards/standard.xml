@@ -62,10 +62,7 @@
         <ribbon>4-04-5-DrillInstructor.png</ribbon>
         <xp>2</xp>
         <edge>1</edge>
-        <qty>1</qty>
         <item>Ignore</item>
-        <size>Individual</size>
-        <range>Career</range>
     </award>
     <award>
         <name>Humanitarian Service</name>
@@ -73,10 +70,7 @@
         <medal>HumanitarianServiceM.png</medal>
         <ribbon>3-05-5-HumanitarianService.png</ribbon>
         <edge>2</edge>
-        <qty>1</qty>
         <item>Ignore</item>
-        <size>Individual</size>
-        <range>Event</range>
     </award>
     <award>
         <name>Medal of Honor</name>
@@ -99,10 +93,7 @@
         <xp>1</xp>
         <edge>1</edge>
         <stackable>true</stackable>
-        <qty>1</qty>
         <item>Ignore</item>
-        <size>Individual</size>
-        <range>Event</range>
     </award>
     <award>
         <name>Support Person Of The Year</name>
@@ -110,10 +101,7 @@
         <ribbon>3-02-8-SupportPersonOfTheYear.png</ribbon>
         <xp>5</xp>
         <edge>1</edge>
-        <qty>1</qty>
         <item>Ignore</item>
-        <size>Individual</size>
-        <range>Career</range>
     </award>
     <award>
         <name>+ + + PERSONNEL AWARDS + + +</name>

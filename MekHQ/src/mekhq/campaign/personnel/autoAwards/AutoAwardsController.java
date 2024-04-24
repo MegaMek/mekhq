@@ -195,13 +195,14 @@ public class AutoAwardsController {
 
         if (campaign.getCampaignOptions().isIgnoreStandardSet()) {
             allSetNames.removeIf(setName -> setName.equalsIgnoreCase("standard"));
+            LogManager.getLogger().info("Ignoring the Standard Set");
         }
 
         // we start by building a master list of all awards
         if (!allSetNames.isEmpty()) {
             LogManager.getLogger().info("Getting all Award Sets");
 
-            for (String setName : AwardsFactory.getInstance().getAllSetNames()) {
+            for (String setName : allSetNames) {
                 if (!allSetNames.isEmpty()) {
                     LogManager.getLogger().info("Getting all awards from set: {}", setName);
 
