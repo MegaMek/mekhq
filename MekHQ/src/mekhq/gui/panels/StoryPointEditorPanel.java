@@ -1,22 +1,16 @@
 package mekhq.gui.panels;
 
-import mekhq.StoryPointHyperLinkListener;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryOutcome;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.gui.StoryArcEditorGUI;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
-import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.model.StoryOutcomeModel;
 
 import javax.swing.*;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
 

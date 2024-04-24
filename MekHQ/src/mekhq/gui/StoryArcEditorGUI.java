@@ -1,22 +1,14 @@
 package mekhq.gui;
 
-import megamek.client.ui.models.XTableColumnModel;
 import mekhq.MekHQ;
-import mekhq.StoryPointHyperLinkListener;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryPoint;
-import mekhq.campaign.unit.Unit;
 import mekhq.gui.model.StoryPointTableModel;
-import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.panels.StoryPointEditorPanel;
-import mekhq.gui.sorter.PersonTitleSorter;
-import mekhq.gui.view.UnitViewPanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;

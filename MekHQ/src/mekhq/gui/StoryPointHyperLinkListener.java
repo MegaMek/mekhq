@@ -1,4 +1,4 @@
-package mekhq;
+package mekhq.gui;
 
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.gui.StoryArcEditorGUI;
