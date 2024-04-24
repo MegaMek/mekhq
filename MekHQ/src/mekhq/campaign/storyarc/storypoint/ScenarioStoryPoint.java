@@ -148,6 +148,9 @@ public class ScenarioStoryPoint extends StoryPoint {
     public List<String> getAllPossibleResults() {
         ArrayList<String> results = new ArrayList<>();
         for(ScenarioStatus nextStatus : ScenarioStatus.values()) {
+            if(nextStatus.isCurrent()) {
+                continue;
+            }
             results.add(nextStatus.name());
         }
         results.add(DEFAULT_OUTCOME);
