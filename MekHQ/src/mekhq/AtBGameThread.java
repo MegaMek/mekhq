@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import megamek.client.AbstractClient;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
@@ -76,7 +77,7 @@ public class AtBGameThread extends GameThread {
         client.addCloseClientListener(this);
 
         if (swingGui != null) {
-            for (Client client2 : swingGui.getLocalBots().values()) {
+            for (AbstractClient client2 : swingGui.getLocalBots().values()) {
                 client2.die();
             }
             swingGui.getLocalBots().clear();

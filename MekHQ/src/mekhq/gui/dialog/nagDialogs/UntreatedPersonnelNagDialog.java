@@ -30,7 +30,9 @@ public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
     private static boolean isUntreatedInjury (Campaign campaign) {
         for (Person p : campaign.getActivePersonnel()) {
             if((p.needsFixing()) && (p.getDoctorId() == null)) {
-                return true;
+                if (!p.getPrisonerStatus().isPrisoner()) {
+                    return true;
+                }
             }
         }
         return false;

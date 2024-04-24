@@ -67,6 +67,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblTransportCapacity;
     private JLabel lblCargoSummary;
 
+    // objectives panel
+    private JPanel panObjectives;
+    java.awt.List listObjectives;
+
     // daily report
     private DailyReportLogPanel panLog;
 
@@ -118,6 +122,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         initLogPanel();
         initReportsPanel();
         initProcurementPanel();
+        initObjectivesPanel();
         panIcon = new JPanel(new BorderLayout());
         lblIcon = new JLabel();
         lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
@@ -137,12 +142,12 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridheight = 1;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panCommand.add(panProcurement, gridBagConstraints);
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
@@ -150,6 +155,14 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 0.0;
         panCommand.add(panReports, gridBagConstraints);
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.fill = GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 0.0;
+        panCommand.add(panObjectives, gridBagConstraints);
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
@@ -288,6 +301,20 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panInfo.add(lblCargoSummary, gridBagConstraints);
 
         panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panInfo.title")));
+    }
+
+    /**
+     * Initialize the panel for showing any objectives that might exist. Objectives might come from
+     * different play modes.
+     */
+    private void initObjectivesPanel() {
+        panObjectives = new JPanel(new BorderLayout());
+        panObjectives.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panObjectives.title")));
+        listObjectives = new java.awt.List();
+        for (String objective : getCampaign().getCurrentObjectives()) {
+            listObjectives.add(objective);
+        }
+        panObjectives.add(listObjectives, BorderLayout.CENTER);
     }
 
     /**
@@ -470,6 +497,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         refreshBasicInfo();
         refreshProcurementList();
         refreshLog();
+        refreshObjectives();
     }
 
     /**
@@ -486,6 +514,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport());
         lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());
         lblTransportCapacity.setText(getCampaign().getCampaignSummary().getTransportCapacity());
+    }
+
+    private void refreshObjectives() {
+        listObjectives.removeAll();
+        for (String objective : getCampaign().getCurrentObjectives()) {
+            listObjectives.add(objective);
+        }
     }
 
     /**
@@ -540,6 +575,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     private ActionScheduler procurementListScheduler = new ActionScheduler(this::refreshProcurementList);
     private ActionScheduler basicInfoScheduler = new ActionScheduler(this::refreshBasicInfo);
+    private ActionScheduler objectivesScheduler = new ActionScheduler(this::refreshObjectives);
 
     @Subscribe
     public void handle(UnitRefitEvent ev) {
@@ -566,12 +602,24 @@ public final class CommandCenterTab extends CampaignGuiTab {
     public void handleNewDay(NewDayEvent evt) {
         procurementListScheduler.schedule();
         basicInfoScheduler.schedule();
+        objectivesScheduler.schedule();
         initLog();
     }
 
     @Subscribe
     public void handle(MissionEvent evt) {
         basicInfoScheduler.schedule();
+        objectivesScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(ScenarioEvent evt) {
+        objectivesScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(TransitCompleteEvent evt) {
+        objectivesScheduler.schedule();
     }
 
     @Subscribe

@@ -339,6 +339,10 @@ public class CampaignGUI extends JPanel {
                 }
             }
             MekHQ.unregisterHandler(this);
+            // check for a loaded story arc and unregister that handler as well
+            if (null != getCampaign().getStoryArc()) {
+                MekHQ.unregisterHandler(getCampaign().getStoryArc());
+            }
         });
         menuFile.add(menuLoad);
 
@@ -600,6 +604,15 @@ public class CampaignGUI extends JPanel {
             refreshAllTabs();
         });
         menuRefresh.add(miRefreshAwards);
+
+        JMenuItem miRefreshStoryIcons = new JMenuItem(resourceMap.getString("miRefreshStoryIcons.text"));
+        miRefreshStoryIcons.setName("miRefreshAwards");
+        miRefreshStoryIcons.setMnemonic(KeyEvent.VK_A);
+        miRefreshStoryIcons.addActionListener(evt -> {
+            MHQStaticDirectoryManager.refreshStorySplash();
+            refreshAllTabs();
+        });
+        menuRefresh.add(miRefreshStoryIcons);
 
         JMenuItem miRefreshRanks = new JMenuItem(resourceMap.getString("miRefreshRanks.text"));
         miRefreshRanks.setName("miRefreshRanks");
