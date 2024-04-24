@@ -1,13 +1,11 @@
 package mekhq.gui.panels;
 
-import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryOutcome;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.gui.StoryArcEditorGUI;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.dialog.CustomizeStoryOutcomeDialog;
-import mekhq.gui.model.StoryOutcomeModel;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -28,7 +26,6 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
     private JPanel pnlOutcomes;
 
     private JTable storyOutcomeTable;
-    private StoryOutcomeModel storyOutcomeModel;
 
     public StoryPointEditorPanel(JFrame frame, String name, StoryPoint sp, StoryArcEditorGUI gui) {
         super(frame, name);
