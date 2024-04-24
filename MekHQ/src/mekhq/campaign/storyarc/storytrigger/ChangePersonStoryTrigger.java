@@ -129,6 +129,11 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        return "Change person";
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personId", personId);

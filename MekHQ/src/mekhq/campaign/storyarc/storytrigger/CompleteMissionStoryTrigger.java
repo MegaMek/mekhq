@@ -56,6 +56,28 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        StoryPoint storyPoint = getStoryArc().getStoryPoint(missionStoryPointId);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Complete ");
+        if(storyPoint == null) {
+            sb.append("mission (MISSING)");
+        } else {
+            sb.append("<a href='STORYPOINT:");
+            sb.append(storyPoint.getId().toString());
+            sb.append("'>");
+            sb.append(storyPoint.getName());
+            sb.append("</a> ");
+        }
+        if(missionStatus != null) {
+            sb.append("(");
+            sb.append(missionStatus.name());
+            sb.append(")");
+        }
+        return sb.toString();
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "missionStoryPointId", missionStoryPointId);

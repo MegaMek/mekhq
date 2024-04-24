@@ -46,6 +46,11 @@ public class SwitchTabStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        return "Switch to " + tab.toString() + " tab";
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "tab", tab.name());

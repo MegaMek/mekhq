@@ -24,12 +24,6 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
     private StoryArcEditorGUI editorGUI;
     private StoryPoint storyPoint;
 
-    // What do we need to track
-    // name (done)
-    // previous story points (done)
-    // personality
-    // splash image
-    // StoryOutcomes and StoryTriggers
     private JTextField txtName;
     private JPanel pnlOutcomes;
 
@@ -130,7 +124,11 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             gbc.gridx = 0;
             gbc.weightx = 1.0;
             gbc.gridy++;
-            pnlOutcomes.add(new JLabel(outcome.getResult()), gbc);
+            JTextPane txtResult = new JTextPane();
+            txtResult.setContentType("text/html");
+            txtResult.setEditable(false);
+            txtResult.setText(outcome.getResult());
+            pnlOutcomes.add(txtResult, gbc);
             gbc.gridx++;
             String next = outcome.getNextStoryPointId() == null ? "" :
                     storyPoint.getStoryArc().getStoryPoint(outcome.getNextStoryPointId()).getHyperlinkedName();
@@ -141,7 +139,12 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             txtNext.addHyperlinkListener(editorGUI.getStoryPointHLL());
             pnlOutcomes.add(txtNext, gbc);
             gbc.gridx++;
-            pnlOutcomes.add(new JLabel(getStoryTriggerDescription(outcome.getStoryTriggers())), gbc);
+            JTextPane txtTriggers = new JTextPane();
+            txtTriggers.setContentType("text/html");
+            txtTriggers.setEditable(false);
+            txtTriggers.setText(getStoryTriggerDescription(outcome.getStoryTriggers()));
+            txtTriggers.addHyperlinkListener(editorGUI.getStoryPointHLL());
+            pnlOutcomes.add(txtTriggers, gbc);
             gbc.gridx++;
             gbc.weightx = 0.0;
             pnlOutcomes.add(new JButton("Edit Outcome"), gbc);
@@ -157,7 +160,11 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             gbc.gridx = 0;
             gbc.gridy++;
             gbc.weightx = 1.0;
-            pnlOutcomes.add(new JLabel("<html><i>" + defaultOutcome + "</i></html>"), gbc);
+            JTextPane txtResult = new JTextPane();
+            txtResult.setContentType("text/html");
+            txtResult.setEditable(false);
+            txtResult.setText("<i>" + defaultOutcome + "</i>");
+            pnlOutcomes.add(txtResult, gbc);
             gbc.gridx++;
             String next = storyPoint.getNextStoryPointId() == null ? "" :
                     storyPoint.getStoryArc().getStoryPoint(storyPoint.getNextStoryPointId()).getHyperlinkedName();
@@ -168,7 +175,12 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             txtNext.addHyperlinkListener(editorGUI.getStoryPointHLL());
             pnlOutcomes.add(txtNext, gbc);
             gbc.gridx++;
-            pnlOutcomes.add(new JLabel(getStoryTriggerDescription(storyPoint.getStoryTriggers())), gbc);
+            JTextPane txtTriggers = new JTextPane();
+            txtTriggers.setContentType("text/html");
+            txtTriggers.setEditable(false);
+            txtTriggers.setText(getStoryTriggerDescription(storyPoint.getStoryTriggers()));
+            txtTriggers.addHyperlinkListener(editorGUI.getStoryPointHLL());
+            pnlOutcomes.add(txtTriggers, gbc);
             gbc.gridx++;
             gbc.weightx = 0.0;
             pnlOutcomes.add(new JButton("Edit Outcome"), gbc);
@@ -200,12 +212,10 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
 
     private String getStoryTriggerDescription(List<StoryTrigger> triggers) {
         StringBuilder sb = new StringBuilder();
-        sb.append("<html>");
         for(StoryTrigger trigger : triggers) {
-            sb.append(trigger.getClass().getSimpleName());
+            sb.append(trigger.getDescription());
             sb.append("<br>");
         }
-        sb.append("</html>");
         return sb.toString();
     }
 

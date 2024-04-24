@@ -48,6 +48,11 @@ public class AddPersonStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        return "Add person (" + person.getFullName() + ")";
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         if (null != person) {

@@ -60,6 +60,11 @@ public class RemoveUnitStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        return "Remove unit(s)";
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         if(!unitIds.isEmpty()) {

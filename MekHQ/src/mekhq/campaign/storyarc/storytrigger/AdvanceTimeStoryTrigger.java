@@ -48,6 +48,11 @@ public class AdvanceTimeStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        return "Advance time (" + days + " days)";
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "days", days);

@@ -74,6 +74,23 @@ public class SetDateStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        StoryPoint storyPoint = getStoryArc().getStoryPoint(storyPointId);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Set date");
+        if(storyPoint != null) {
+            sb.append(" in <a href='STORYPOINT:");
+            sb.append(storyPoint.getId().toString());
+            sb.append("'>");
+            sb.append(storyPoint.getName());
+            sb.append("</a> by ");
+            sb.append(futureDays);
+            sb.append(" days");
+        }
+        return sb.toString();
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "storyPointId", storyPointId.toString());

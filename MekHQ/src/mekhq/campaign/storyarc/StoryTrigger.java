@@ -61,6 +61,8 @@ public abstract class StoryTrigger {
      */
     protected abstract void execute();
 
+    public abstract String getDescription();
+
     //region I/O
     public abstract void writeToXml(PrintWriter pw1, int indent);
 

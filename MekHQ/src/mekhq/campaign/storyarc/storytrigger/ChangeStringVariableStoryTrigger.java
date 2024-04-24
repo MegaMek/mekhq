@@ -45,6 +45,11 @@ public class ChangeStringVariableStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        return "Change value of " + key + " to " + value;
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "key", key);

@@ -42,6 +42,11 @@ public class GameOverStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        return "Game Over";
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         writeToXmlEnd(pw1, --indent);

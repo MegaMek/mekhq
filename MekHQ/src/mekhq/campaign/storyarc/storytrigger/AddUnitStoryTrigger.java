@@ -62,6 +62,11 @@ public class AddUnitStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        return "Add unit(s)";
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "entityName", entityName);

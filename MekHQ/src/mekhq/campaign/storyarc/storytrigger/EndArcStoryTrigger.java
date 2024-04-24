@@ -40,6 +40,11 @@ public class EndArcStoryTrigger extends StoryTrigger {
     }
 
     @Override
+    public String getDescription() {
+        return "Complete story arc";
+    }
+
+    @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);
         writeToXmlEnd(pw1, --indent);
