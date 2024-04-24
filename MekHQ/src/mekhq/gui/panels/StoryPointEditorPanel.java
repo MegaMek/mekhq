@@ -191,23 +191,24 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
         }
 
         //check for other possible outcomes
-        JComboBox comboOutcomes = new JComboBox();
         List<String> possibleResults = storyPoint.getAllPossibleResults();
         possibleResults.removeAll(currentOutcomes);
         if(!possibleResults.isEmpty()) {
+            JPanel pnlAddOutcomes = new JPanel(new FlowLayout());
+            JComboBox comboOutcomes = new JComboBox();
             for (String result : possibleResults) {
                 comboOutcomes.addItem(result);
             }
+            JButton btnAdd = new JButton("Add Outcome");
+            btnAdd.addActionListener(evt -> addOutcome((String) comboOutcomes.getSelectedItem()));
+            pnlAddOutcomes.add(btnAdd);
+            pnlAddOutcomes.add(comboOutcomes);
 
             gbc.gridx = 0;
             gbc.gridy++;
-            JButton btnAdd = new JButton("Add Outcome");
-            btnAdd.addActionListener(evt -> addOutcome((String) comboOutcomes.getSelectedItem()));
-            pnlOutcomes.add(btnAdd, gbc);
-            gbc.gridx = 1;
-            gbc.gridwidth = 4;
+            gbc.gridwidth = 5;
             gbc.fill = GridBagConstraints.NONE;
-            pnlOutcomes.add(comboOutcomes, gbc);
+            pnlOutcomes.add(pnlAddOutcomes, gbc);
         }
     }
 
