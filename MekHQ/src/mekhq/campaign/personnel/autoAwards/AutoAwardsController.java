@@ -234,7 +234,6 @@ public class AutoAwardsController {
                                             ignoredAwards.add(award);
                                         }
                                         break;
-                                    // TODO hardcode more misc awards
                                     case "misc":
                                         if (campaign.getCampaignOptions().isEnableMiscAwards()) {
                                             miscAwards.add(award);
@@ -272,7 +271,6 @@ public class AutoAwardsController {
                                         break;
                                     // trainingAwards are not currently supported.
                                     // We include them here for tracking purposes
-                                    // TODO add training functionality
                                     case "training":
                                         trainingAwards.add(award);
                                         break;
@@ -332,7 +330,6 @@ public class AutoAwardsController {
                                             ignoredAwards.add(award);
                                         }
                                         break;
-                                    // TODO hardcode more misc awards
                                     case "misc":
                                         if (campaign.getCampaignOptions().isEnableMiscAwards()) {
                                             miscAwards.add(award);
@@ -377,7 +374,6 @@ public class AutoAwardsController {
                                         break;
                                     // trainingAwards are not currently supported.
                                     // We include them here for tracking purposes
-                                    // TODO add training functionality
                                     case "training":
                                         trainingAwards.add(award);
                                         break;
