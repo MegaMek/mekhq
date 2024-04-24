@@ -27,14 +27,18 @@ public class FactionHunterAwards {
         String missionFaction = ((AtBContract) mission).getEnemy().getFullName(campaign.getGameYear());
 
         for (Award award : awards) {
-            List<String> targetFactions = List.of(award.getRange().split(","));
+            if (award.canBeAwarded(campaign.getPerson(person))) {
+                List<String> targetFactions = List.of(award.getRange().split(","));
 
-            if (!targetFactions.isEmpty()) {
-                // returns true if missionFaction matches the requirements of the listed targetFactions
-                isEligible = targetFactions.stream().anyMatch(targetFaction -> processFaction(missionFaction, targetFaction));
+                if (!targetFactions.isEmpty()) {
+                    // returns true if missionFaction matches the requirements of the listed targetFactions
+                    isEligible = targetFactions
+                            .stream()
+                            .anyMatch(targetFaction -> processFaction(missionFaction, targetFaction));
 
-                if (isEligible) {
-                    eligibleAwards.add(award);
+                    if (isEligible) {
+                        eligibleAwards.add(award);
+                    }
                 }
             }
         }

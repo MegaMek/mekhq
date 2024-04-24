@@ -390,7 +390,21 @@ public class PersonViewPanel extends JScrollablePanel {
                 if (medal == null) {
                     continue;
                 }
-                medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60), Image.SCALE_DEFAULT);
+
+                int width = medal.getWidth(null);
+                int height = medal.getHeight(null);
+
+                if (width == height) {
+                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(45, 45),
+                            Image.SCALE_DEFAULT);
+                } else if (width < height) {
+                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(30, 60),
+                            Image.SCALE_DEFAULT);
+                } else {
+                    medal = ImageHelpers.getScaledForBoundaries(medal, new Dimension(60, 30),
+                            Image.SCALE_DEFAULT);
+                }
+
                 medalLabel.setIcon(new ImageIcon(medal));
                 medalLabel.setToolTipText(award.getTooltip());
                 pnlMedals.add(medalLabel);

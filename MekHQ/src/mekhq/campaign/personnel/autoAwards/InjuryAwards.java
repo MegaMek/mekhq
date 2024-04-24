@@ -26,16 +26,18 @@ public class InjuryAwards {
         Award bestAward = new Award();
 
         for (Award award : awards) {
-            try {
-                injuriesNeeded = award.getQty();
-            } catch (Exception e) {
-                LogManager.getLogger().warn("Injury Award {} from the {} set has invalid range qty {}",
-                        award.getName(), award.getSet(), award.getQty());
-                continue;
-            }
+            if (award.canBeAwarded(campaign.getPerson(person))) {
+                try {
+                    injuriesNeeded = award.getQty();
+                } catch (Exception e) {
+                    LogManager.getLogger().warn("Injury Award {} from the {} set has invalid range qty {}",
+                            award.getName(), award.getSet(), award.getQty());
+                    continue;
+                }
 
-            if (injuryCount >= injuriesNeeded) {
-                eligibleAwardsBestable.add(award);
+                if (injuryCount >= injuriesNeeded) {
+                    eligibleAwardsBestable.add(award);
+                }
             }
         }
 

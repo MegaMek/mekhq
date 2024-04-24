@@ -222,13 +222,10 @@ public class AutoAwardsDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent event) {
             if (event.getSource().equals(btnDone)) {
-                Person person;
-                Award award;
-
                 for (int rowIndex = 0; rowIndex < personnelTable.getRowCount(); rowIndex++) {
                     if ((boolean) personnelTable.getValueAt(rowIndex, 3)) {
-                        person = campaign.getPerson((UUID) data.get(rowIndex).get(0));
-                        award = (Award) data.get(rowIndex).get(1);
+                        Person person = campaign.getPerson((UUID) data.get(rowIndex).get(0));
+                        Award award = (Award) data.get(rowIndex).get(1);
 
                         // in theory, we should have already filtered out ineligible personnel by this stage
                         // but a little insurance never hurt

@@ -27,16 +27,18 @@ public class ScenarioKillAwards {
         Award bestAward = new Award();
 
         for (Award award : awards) {
-            try {
-                killsNeeded = award.getQty();
-            } catch (Exception e) {
-                LogManager.getLogger().warn("Kill(Scenario) Award {} from the {} set has invalid range qty {}",
-                        award.getName(), award.getSet(), award.getQty());
-                continue;
-            }
+            if (award.canBeAwarded(campaign.getPerson(person))) {
+                try {
+                    killsNeeded = award.getQty();
+                } catch (Exception e) {
+                    LogManager.getLogger().warn("Kill(Scenario) Award {} from the {} set has invalid range qty {}",
+                            award.getName(), award.getSet(), award.getQty());
+                    continue;
+                }
 
-            if (kills.size() >= killsNeeded) {
-                eligibleAwardsBestable.add(award);
+                if (kills.size() >= killsNeeded) {
+                    eligibleAwardsBestable.add(award);
+                }
             }
         }
 

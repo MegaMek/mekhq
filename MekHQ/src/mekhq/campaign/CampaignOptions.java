@@ -324,6 +324,7 @@ public class CampaignOptions {
     private boolean issuePosthumousAwards;
     private boolean issueBestAwardOnly;
     private boolean ignoreStandardSet;
+    private int awardTierSize;
     private boolean enableContractAwards;
     private boolean enableFactionHunterAwards;
     private boolean enableInjuryAwards;
@@ -826,6 +827,7 @@ public class CampaignOptions {
         setIssuePosthumousAwards(false);
         setIssueBestAwardOnly(true);
         setIgnoreStandardSet(false);
+        setAwardTierSize(5);
         setEnableContractAwards(true);
         setEnableFactionHunterAwards(true);
         setEnableInjuryAwards(true);
@@ -2285,6 +2287,20 @@ public class CampaignOptions {
      */
     public void setIgnoreStandardSet(final boolean ignoreStandardSet) {
         this.ignoreStandardSet = ignoreStandardSet;
+    }
+
+    /**
+     * @return how many times an award must be issued to use the next tier image
+     */
+    public int getAwardTierSize() {
+        return awardTierSize;
+    }
+
+    /**
+     * @param awardTierSize set how many times an award must be issued to use the next tier image
+     */
+    public void setAwardTierSize(final int awardTierSize) {
+        this.awardTierSize = awardTierSize;
     }
 
 
@@ -4017,8 +4033,10 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issuePosthumousAwards", isIssuePosthumousAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issueBestAwardOnly", isIssueBestAwardOnly());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreStandardSet", isIgnoreStandardSet());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardTierSize", getAwardTierSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableContractAwards", isEnableContractAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFactionHunterAwards", isEnableFactionHunterAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableInjuryAwards", isEnableInjuryAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableIndividualKillAwards", isEnableIndividualKillAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFormationKillAwards", isEnableFormationKillAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRankAwards", isEnableRankAwards());
@@ -4752,6 +4770,8 @@ public class CampaignOptions {
                     retVal.setIssueBestAwardOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("ignoreStandardSet")) {
                     retVal.setIgnoreStandardSet(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("awardTierSize")) {
+                    retVal.setAwardTierSize(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableContractAwards")) {
                     retVal.setEnableContractAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableFactionHunterAwards")) {
@@ -4761,7 +4781,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableIndividualKillAwards")) {
                     retVal.setEnableIndividualKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableFormationKillAwards")) {
-                    retVal.setEnableIndividualKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    retVal.setEnableFormationKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableRankAwards")) {
                     retVal.setEnableRankAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableScenarioAwards")) {

@@ -40,7 +40,7 @@ public class AutoAwardsTableModel extends AbstractTableModel {
         if (map.isEmpty()) {
             LogManager.getLogger().error("AutoAwardsDialog failed to pass 'data' into AutoAwardsTableModel");
         } else {
-            LogManager.getLogger().info("'AutoAwardsDialog passed 'data' into AutoAwardsTableModel: {}", map);
+            LogManager.getLogger().info("AutoAwardsDialog passed 'data' into AutoAwardsTableModel: {}", map);
         }
 
         data = map;
