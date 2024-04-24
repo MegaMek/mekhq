@@ -74,7 +74,7 @@ public class StoryArcEditorGUI extends JPanel {
 
     //region Initialization
     private void initComponents() {
-        frame = new JFrame("MekHQ");
+        frame = new JFrame("Story Arc Editor");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         setLayout(new BorderLayout());
