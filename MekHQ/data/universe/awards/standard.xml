@@ -53,8 +53,6 @@
         <xp>1</xp>
         <qty>1</qty>
         <item>Ignore</item>
-        <size>Individual</size>
-        <range>Career</range>
     </award>
     <award>
         <name>Drill Instructor</name>
@@ -82,8 +80,6 @@
         <stackable>true</stackable>
         <qty>1</qty>
         <item>Ignore</item>
-        <size>Individual</size>
-        <range>Scenario</range>
     </award>
     <award>
         <name>Prisoner of War</name>
