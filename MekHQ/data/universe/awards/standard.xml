@@ -10,7 +10,6 @@
         <description>Graduate of basic training.</description>
         <ribbon>4-08-1-BasicTraining.png</ribbon>
         <xp>1</xp>
-        <precedence>4.08.1</precedence>
         <qty>1</qty>
         <item>Training</item>
         <size>Individual</size>
@@ -21,7 +20,6 @@
         <description>Graduate of NCO academy.</description>
         <ribbon>4-07-1-NCOGraduate.png</ribbon>
         <xp>2</xp>
-        <precedence>4.07.1</precedence>
         <qty>1</qty>
         <item>Training</item>
         <size>Individual</size>
@@ -32,7 +30,6 @@
         <description>Graduate of warrant officer training.</description>
         <ribbon>4-06-2-WarrantGraduate.png</ribbon>
         <xp>3</xp>
-        <precedence>4.06.2</precedence>
         <qty>21</qty>
         <item>Training</item>
         <size>Individual</size>
@@ -44,7 +41,6 @@
         <ribbon>4-06-1-OfficerGraduate.png</ribbon>
         <xp>4</xp>
         <edge>1</edge>
-        <precedence>4.06.1</precedence>
         <qty>31</qty>
         <item>Training</item>
         <size>Individual</size>
@@ -55,7 +51,6 @@
         <description>Served as honor guard.</description>
         <ribbon>4-05-1-CeremonialDuty.png</ribbon>
         <xp>1</xp>
-        <precedence>4.05.1</precedence>
         <qty>1</qty>
         <item>Ignore</item>
         <size>Individual</size>
@@ -67,7 +62,6 @@
         <ribbon>4-04-5-DrillInstructor.png</ribbon>
         <xp>2</xp>
         <edge>1</edge>
-        <precedence>4.04.5</precedence>
         <qty>1</qty>
         <item>Ignore</item>
         <size>Individual</size>
@@ -79,7 +73,6 @@
         <medal>HumanitarianServiceM.png</medal>
         <ribbon>3-05-5-HumanitarianService.png</ribbon>
         <edge>2</edge>
-        <precedence>3.05.5</precedence>
         <qty>1</qty>
         <item>Ignore</item>
         <size>Individual</size>
@@ -93,7 +86,6 @@
         <xp>10</xp>
         <edge>3</edge>
         <stackable>true</stackable>
-        <precedence>1.01.1</precedence>
         <qty>1</qty>
         <item>Ignore</item>
         <size>Individual</size>
@@ -107,7 +99,6 @@
         <xp>1</xp>
         <edge>1</edge>
         <stackable>true</stackable>
-        <precedence>3.01.1</precedence>
         <qty>1</qty>
         <item>Ignore</item>
         <size>Individual</size>
@@ -119,7 +110,6 @@
         <ribbon>3-02-8-SupportPersonOfTheYear.png</ribbon>
         <xp>5</xp>
         <edge>1</edge>
-        <precedence>3.02.8</precedence>
         <qty>1</qty>
         <item>Ignore</item>
         <size>Individual</size>
@@ -135,7 +125,6 @@
         <description>Gunnery Skill of 3 or 2.</description>
         <ribbon>5-02-8-Marksmanship.png</ribbon>
         <xp>1</xp>
-        <precedence>5.02.8</precedence>
         <qty>5</qty>
         <item>Skill</item>
         <size>Individual</size>
@@ -147,7 +136,6 @@
         <medal>ExpertMarksmanshipMedalM.png</medal>
         <ribbon>5-02-4-ExpertMarksmanship.png</ribbon>
         <xp>2</xp>
-        <precedence>5.02.4</precedence>
         <qty>7</qty>
         <item>Skill</item>
         <size>Individual</size>
@@ -159,7 +147,6 @@
         <ribbon>4-03-1-Longevity.png</ribbon>
         <xp>2</xp>
         <stackable>true</stackable>
-        <precedence>4.03.1</precedence>
         <qty>4</qty>
         <item>Time</item>
         <size>Individual</size>
@@ -172,7 +159,6 @@
         <xp>3</xp>
         <edge>1</edge>
         <stackable>true</stackable>
-        <precedence>3.02.4</precedence>
         <qty>6</qty>
         <item>Time</item>
         <size>Individual</size>
@@ -188,7 +174,6 @@
         <description>Involved in combat.</description>
         <ribbon>1-13-1-CombatAction.png</ribbon>
         <edge>1</edge>
-        <precedence>1.13.1</precedence>
         <qty>1</qty>
         <item>Scenario</item>
         <size>Individual</size>
@@ -201,7 +186,6 @@
         <ribbon>1-09-1-PurpleHeart.png</ribbon>
         <xp>1</xp>
         <stackable>true</stackable>
-        <precedence>1.09.1</precedence>
         <qty>1</qty>
         <item>Injury</item>
         <size>Individual</size>
@@ -214,7 +198,6 @@
         <ribbon>1-08-1-BronzeStar.png</ribbon>
         <xp>3</xp>
         <stackable>true</stackable>
-        <precedence>1.08.1</precedence>
         <qty>4</qty>
         <item>Kill</item>
         <size>Individual</size>
@@ -227,7 +210,6 @@
         <ribbon>1-04-1-SilverStar.png</ribbon>
         <xp>5</xp>
         <stackable>true</stackable>
-        <precedence>1.04.1</precedence>
         <qty>8</qty>
         <item>Kill</item>
         <size>Individual</size>
@@ -240,7 +222,6 @@
         <ribbon>1-02-2-CombatCross.png</ribbon>
         <xp>7</xp>
         <stackable>true</stackable>
-        <precedence>1.02.1</precedence>
         <qty>12</qty>
         <item>Kill</item>
         <size>Individual</size>
@@ -257,7 +238,6 @@
         <medal>ExpeditionaryM.png</medal>
         <ribbon>3-04-2-Expeditionary.png</ribbon>
         <xp>1</xp>
-        <precedence>3.04.2</precedence>
         <qty>1</qty>
         <item>Misc</item>
         <size>Individual</size>
@@ -269,7 +249,6 @@
         <medal>HouseDefenseM.png</medal>
         <ribbon>3-05-1-HouseDefense.png</ribbon>
         <xp>1</xp>
-        <precedence>3.05.1</precedence>
         <qty>1</qty>
         <item>Misc</item>
         <size>Individual</size>
@@ -281,7 +260,6 @@
         <medal>PeripheryExpeditionaryM.png</medal>
         <ribbon>3-07-4-PeripheryExpeditionary.png</ribbon>
         <xp>1</xp>
-        <precedence>3.07.4</precedence>
         <qty>1</qty>
         <item>Misc</item>
         <size>Individual</size>
@@ -292,7 +270,6 @@
         <description>Served over 3 consecutive months in a foreign theatre.</description>
         <ribbon>4-01-2-GalacticServiceDeployment.png</ribbon>
         <xp>1</xp>
-        <precedence>4.01.2</precedence>
         <qty>3</qty>
         <item>Contract</item>
         <size>Individual</size>
@@ -303,7 +280,6 @@
         <description>Served a total of 12 months in foreign theatres.</description>
         <ribbon>4-02-2-GalacticService.png</ribbon>
         <xp>1</xp>
-        <precedence>4.02.2</precedence>
         <qty>12</qty>
         <item>Contract</item>
         <size>Individual</size>
@@ -315,7 +291,6 @@
         <ribbon>4-02-8-CovertOps.png</ribbon>
         <xp>2</xp>
         <edge>1</edge>
-        <precedence>4.02.8</precedence>
         <qty>1</qty>
         <item>Contract</item>
         <size>Individual</size>
@@ -327,7 +302,6 @@
         <medal>GalacticWarOnPiratingM.png</medal>
         <ribbon>3-05-2-GalacticWarOnPirating.png</ribbon>
         <xp>1</xp>
-        <precedence>3.05.2</precedence>
         <qty>1</qty>
         <item>Contract</item>
         <size>Individual</size>
@@ -339,7 +313,6 @@
         <ribbon>4-04-6-MilitaryTrainingInstructor.png</ribbon>
         <xp>1</xp>
         <edge>1</edge>
-        <precedence>4.04.6</precedence>
         <qty>1</qty>
         <item>Contract</item>
         <size>Individual</size>
@@ -351,7 +324,6 @@
         <ribbon>4-05-2-SecurityGuard.png</ribbon>
         <xp>1</xp>
         <edge>1</edge>
-        <precedence>4.05.2</precedence>
         <qty>1</qty>
         <item>Contract</item>
         <size>Individual</size>
@@ -363,7 +335,6 @@
         <ribbon>1-12-3-CombatAchievement.png</ribbon>
         <xp>1</xp>
         <stackable>true</stackable>
-        <precedence>1.12.3</precedence>
         <qty>6</qty>
         <item>Kill</item>
         <size>Individual</size>
@@ -376,7 +347,6 @@
         <ribbon>1-11-3-CombatCommendation.png</ribbon>
         <xp>2</xp>
         <stackable>true</stackable>
-        <precedence>1.11.3</precedence>
         <qty>9</qty>
         <item>Kill</item>
         <size>Individual</size>
@@ -389,7 +359,6 @@
         <ribbon>1-03-4-DistinguishedService.png</ribbon>
         <xp>3</xp>
         <stackable>true</stackable>
-        <precedence>1.03.4</precedence>
         <qty>12</qty>
         <item>Kill</item>
         <size>Individual</size>
@@ -401,7 +370,6 @@
         <ribbon>2-02-2-MeritoriousUnitCommendation.png</ribbon>
         <xp>2</xp>
         <stackable>true</stackable>
-        <precedence>2.02.2</precedence>
         <qty>24</qty>
         <item>Kill</item>
         <size>Lance</size>
@@ -414,7 +382,6 @@
         <ribbon>1-10-2-MeritoriousService.png</ribbon>
         <xp>3</xp>
         <stackable>true</stackable>
-        <precedence>1.10.2</precedence>
         <qty>36</qty>
         <item>Kill</item>
         <size>Lance</size>
@@ -427,7 +394,6 @@
         <ribbon>1-10-1-HouseMeritoriousService.png</ribbon>
         <xp>4</xp>
         <stackable>true</stackable>
-        <precedence>1.10.1</precedence>
         <qty>48</qty>
         <item>Kill</item>
         <size>Lance</size>
@@ -439,7 +405,6 @@
         <ribbon>2-01-7-CombatUnitCommendation.png</ribbon>
         <xp>3</xp>
         <stackable>true</stackable>
-        <precedence>2.01.7</precedence>
         <qty>72</qty>
         <item>Kill</item>
         <size>Company</size>
@@ -452,7 +417,6 @@
         <ribbon>1-07-2-ArmedForces.png</ribbon>
         <xp>4</xp>
         <stackable>true</stackable>
-        <precedence>1.07.2</precedence>
         <qty>108</qty>
         <item>Kill</item>
         <size>Company</size>
@@ -465,7 +429,6 @@
         <ribbon>1-05-2-LegionOfMerit.png</ribbon>
         <xp>5</xp>
         <stackable>true</stackable>
-        <precedence>1.05.2</precedence>
         <qty>144</qty>
         <item>Kill</item>
         <size>Company</size>
@@ -477,7 +440,6 @@
         <ribbon>2-01-2-HouseUnitCitation.png</ribbon>
         <xp>4</xp>
         <stackable>true</stackable>
-        <precedence>2.01.2</precedence>
         <qty>216</qty>
         <item>Kill</item>
         <size>Battalion</size>
@@ -490,7 +452,6 @@
         <ribbon>1-05-1-HouseSuperiorService.png</ribbon>
         <xp>5</xp>
         <stackable>true</stackable>
-        <precedence>1.05.1</precedence>
         <qty>324</qty>
         <item>Kill</item>
         <size>Battalion</size>
@@ -503,7 +464,6 @@
         <ribbon>1-03-1-HouseDistinguishedService.png</ribbon>
         <xp>6</xp>
         <stackable>true</stackable>
-        <precedence>1.03.1</precedence>
         <qty>432</qty>
         <item>Kill</item>
         <size>Battalion</size>
@@ -520,7 +480,6 @@
         <medal>ThirdSuccessionWarM.png</medal>
         <ribbon>3-08-01-ThirdSuccessionWar.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.01</precedence>
         <qty>1</qty>
         <item>Theatre of War</item>
         <size>2866, 3025</size>
@@ -532,7 +491,6 @@
         <medal>FourthSuccessionWarM.png</medal>
         <ribbon>3-08-02-FourthSuccessionWar.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.02</precedence>
         <qty>1</qty>
         <item>Theatre of War</item>
         <size>3028, 3030</size>
@@ -544,7 +502,6 @@
         <medal>AndurienWarsM.png</medal>
         <ribbon>3-08-03-AndurienWars.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.03</precedence>
         <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3030, 3040</size>
@@ -556,7 +513,6 @@
         <medal>RoninWarsM.png</medal>
         <ribbon>3-08-04-RoninWars.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.04</precedence>
         <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3034, 3034</size>
@@ -568,7 +524,6 @@
         <medal>WarOf3039M.png</medal>
         <ribbon>3-08-05-WarOf3039.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.05</precedence>
         <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3039, 3040</size>
@@ -580,7 +535,6 @@
         <medal>ClanInvasionM.png</medal>
         <ribbon>3-08-06-ClanInvasion.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.06</precedence>
         <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3049, 3052</size>
@@ -592,7 +546,6 @@
         <medal>WarOf3057M.png</medal>
         <ribbon>3-08-07-WarOf3057.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.07</precedence>
         <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3057, 3057</size>
@@ -604,7 +557,6 @@
         <medal>TaskForceSerpentM.png</medal>
         <ribbon>3-08-08-TaskForceSerpent.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.08</precedence>
         <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3059, 3059</size>
@@ -616,7 +568,6 @@
         <medal>CapellanStIvesWarM.png</medal>
         <ribbon>3-08-09-CapellanStIvesWar.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.09</precedence>
         <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3061, 3063</size>
@@ -628,7 +579,6 @@
         <medal>FedComCivilWarM.png</medal>
         <ribbon>3-08-10-FedComCivilWar.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.10</precedence>
         <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3062, 3067</size>
@@ -640,7 +590,6 @@
         <medal>WoBJihadM.png</medal>
         <ribbon>3-08-11-WoBJihad.png</ribbon>
         <xp>1</xp>
-        <precedence>3.08.11</precedence>
         <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3067, 3081</size>
