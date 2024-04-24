@@ -122,23 +122,21 @@
     </award>
     <award>
         <name>Marksmanship</name>
-        <description>Gunnery Skill of 3 or 2.</description>
+        <description>Gunnery Skill of 5+.</description>
         <ribbon>5-02-8-Marksmanship.png</ribbon>
         <xp>1</xp>
         <qty>5</qty>
         <item>Skill</item>
-        <size>Individual</size>
         <range>Accuracy</range>
     </award>
     <award>
         <name>Expert Marksmanship</name>
-        <description>Gunnery Skill of 1 or 0.</description>
+        <description>Gunnery Skill of 7+.</description>
         <medal>ExpertMarksmanshipMedalM.png</medal>
         <ribbon>5-02-4-ExpertMarksmanship.png</ribbon>
         <xp>2</xp>
         <qty>7</qty>
         <item>Skill</item>
-        <size>Individual</size>
         <range>Accuracy</range>
     </award>
     <award>
@@ -149,8 +147,6 @@
         <stackable>true</stackable>
         <qty>4</qty>
         <item>Time</item>
-        <size>Individual</size>
-        <range>True</range>
     </award>
     <award>
         <name>Good Conduct</name>
@@ -161,8 +157,6 @@
         <stackable>true</stackable>
         <qty>6</qty>
         <item>Time</item>
-        <size>Individual</size>
-        <range>True</range>
     </award>
     <award>
         <name>+ + + SCENARIO AWARDS + + +</name>
@@ -176,8 +170,6 @@
         <edge>1</edge>
         <qty>1</qty>
         <item>Scenario</item>
-        <size>Individual</size>
-        <range>Career</range>
     </award>
     <award>
         <name>Purple Heart</name>
@@ -188,8 +180,6 @@
         <stackable>true</stackable>
         <qty>1</qty>
         <item>Injury</item>
-        <size>Individual</size>
-        <range>Scenario</range>
     </award>
     <award>
         <name>Bronze Star</name>
@@ -238,9 +228,7 @@
         <medal>ExpeditionaryM.png</medal>
         <ribbon>3-04-2-Expeditionary.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Misc</item>
-        <size>Individual</size>
         <range>House World No War</range>
     </award>
     <award>
@@ -249,9 +237,7 @@
         <medal>HouseDefenseM.png</medal>
         <ribbon>3-05-1-HouseDefense.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Misc</item>
-        <size>Individual</size>
         <range>House World Yes War</range>
     </award>
     <award>
@@ -260,9 +246,7 @@
         <medal>PeripheryExpeditionaryM.png</medal>
         <ribbon>3-07-4-PeripheryExpeditionary.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Misc</item>
-        <size>Individual</size>
         <range>Periphery</range>
     </award>
     <award>
@@ -272,7 +256,6 @@
         <xp>1</xp>
         <qty>3</qty>
         <item>Contract</item>
-        <size>Individual</size>
         <range>Months</range>
     </award>
     <award>
@@ -282,7 +265,6 @@
         <xp>1</xp>
         <qty>12</qty>
         <item>Contract</item>
-        <size>Individual</size>
         <range>Months</range>
     </award>
     <award>
@@ -291,9 +273,7 @@
         <ribbon>4-02-8-CovertOps.png</ribbon>
         <xp>2</xp>
         <edge>1</edge>
-        <qty>1</qty>
         <item>Contract</item>
-        <size>Individual</size>
         <range>Raid</range>
     </award>
     <award>
@@ -302,10 +282,8 @@
         <medal>GalacticWarOnPiratingM.png</medal>
         <ribbon>3-05-2-GalacticWarOnPirating.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
-        <item>Contract</item>
-        <size>Individual</size>
-        <range>Pirate Hunting</range>
+        <item>Faction Hunter</item>
+        <range>Pirate</range>
     </award>
     <award>
         <name>Military Training Instructor</name>
@@ -313,9 +291,7 @@
         <ribbon>4-04-6-MilitaryTrainingInstructor.png</ribbon>
         <xp>1</xp>
         <edge>1</edge>
-        <qty>1</qty>
         <item>Contract</item>
-        <size>Individual</size>
         <range>Cadre Duty</range>
     </award>
     <award>
@@ -324,9 +300,7 @@
         <ribbon>4-05-2-SecurityGuard.png</ribbon>
         <xp>1</xp>
         <edge>1</edge>
-        <qty>1</qty>
         <item>Contract</item>
-        <size>Individual</size>
         <range>Security Duty</range>
     </award>
     <award>
@@ -480,7 +454,6 @@
         <medal>ThirdSuccessionWarM.png</medal>
         <ribbon>3-08-01-ThirdSuccessionWar.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre of War</item>
         <size>2866, 3025</size>
         <range>Inner Sphere</range>
@@ -491,7 +464,6 @@
         <medal>FourthSuccessionWarM.png</medal>
         <ribbon>3-08-02-FourthSuccessionWar.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre of War</item>
         <size>3028, 3030</size>
         <range>Lyran Commonwealth(1),Federated Suns(1),Draconis Combine(2),Free Worlds League(2),Capellan Confederation(2)</range>
@@ -502,7 +474,6 @@
         <medal>AndurienWarsM.png</medal>
         <ribbon>3-08-03-AndurienWars.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3030, 3040</size>
         <range>Duchy of Andurien(1),Magistracy of Canopus(1),Capellan Confederation(2),Free Worlds League(2)</range>
@@ -513,7 +484,6 @@
         <medal>RoninWarsM.png</medal>
         <ribbon>3-08-04-RoninWars.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3034, 3034</size>
         <range>Free Rasalhague Republic(1),Draconis Combine(1),Ronin(2)</range>
@@ -524,7 +494,6 @@
         <medal>WarOf3039M.png</medal>
         <ribbon>3-08-05-WarOf3039.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3039, 3040</size>
         <range>Federated Suns(1),Lyran Commonwealth(1),Draconis Combine(2)</range>
@@ -535,7 +504,6 @@
         <medal>ClanInvasionM.png</medal>
         <ribbon>3-08-06-ClanInvasion.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3049, 3052</size>
         <range>Inner Sphere(1),Clans(2)</range>
@@ -546,7 +514,6 @@
         <medal>WarOf3057M.png</medal>
         <ribbon>3-08-07-WarOf3057.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3057, 3057</size>
         <range>Free Worlds League(1),Capellan Confederation(1),Federated Commonwealth(2)</range>
@@ -557,7 +524,6 @@
         <medal>TaskForceSerpentM.png</medal>
         <ribbon>3-08-08-TaskForceSerpent.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3059, 3059</size>
         <range>Inner Sphere(1),Clan Nova Cat(1),Clan Smoke Jaguar(2)</range>
@@ -568,7 +534,6 @@
         <medal>CapellanStIvesWarM.png</medal>
         <ribbon>3-08-09-CapellanStIvesWar.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3061, 3063</size>
         <range>Capellan Confederation(1),St. Ives Compact(2)</range>
@@ -579,7 +544,6 @@
         <medal>FedComCivilWarM.png</medal>
         <ribbon>3-08-10-FedComCivilWar.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3062, 3067</size>
         <range>Federated Suns(1),Lyran Alliance(2)</range>
@@ -590,7 +554,6 @@
         <medal>WoBJihadM.png</medal>
         <ribbon>3-08-11-WoBJihad.png</ribbon>
         <xp>1</xp>
-        <qty>1</qty>
         <item>Theatre Of War</item>
         <size>3067, 3081</size>
         <range>Major Powers</range>

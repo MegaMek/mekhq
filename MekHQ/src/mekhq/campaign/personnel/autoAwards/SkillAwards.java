@@ -81,6 +81,10 @@ public class SkillAwards {
                 relevantSkills = Arrays.asList(SkillType.S_LEADER, SkillType.S_TACTICS, SkillType.S_STRATEGY);
                 break;
 
+            case "admin":
+                relevantSkills = Arrays.asList(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE);
+                break;
+
             case "techwithmedical":
                 relevantSkills = Arrays.asList(SkillType.S_TECH_MECH, SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC, SkillType.S_TECH_VESSEL, SkillType.S_TECH_BA, SkillType.S_ASTECH, SkillType.S_DOCTOR, SkillType.S_MEDTECH);
                 break;
