@@ -370,8 +370,14 @@ public class AtBDynamicScenarioFactory {
 
         // determine generation parameters
         int forceBV = 0;
+
+        double forceMultiplier = getDifficultyMultiplier(campaign);
+        forceTemplate.setForceMultiplier(forceMultiplier);
+
         int forceBVBudget = (int) (effectiveBV * forceTemplate.getForceMultiplier());
+
         int forceUnitBudget = 0;
+
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
             forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
         } else if ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) ||
@@ -502,6 +508,19 @@ public class AtBDynamicScenarioFactory {
         // chop out random units until we drop down to our unit count budget
         while (forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
             generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
+        }
+
+        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
+            // remove random units until forceBV is below 110% of forceBVBudget
+            while (((double) forceBV / forceBVBudget) > 1.1) {
+                generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
+
+                // update forceBV
+                for (Entity entity : generatedEntities) {
+                    forceBV += entity.calculateBattleValue();
+                    ;
+                }
+            }
         }
 
         // "flavor" feature - fill up APCs with infantry
