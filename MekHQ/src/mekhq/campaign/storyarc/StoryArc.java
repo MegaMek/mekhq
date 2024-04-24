@@ -65,7 +65,6 @@ import java.util.regex.Pattern;
  */
 public class StoryArc {
 
-    public final static String defaultOutcome = "DEFAULT";
     private String title;
     private String details;
     private String description;

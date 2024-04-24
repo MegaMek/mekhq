@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -71,7 +72,7 @@ public class ChoiceStoryPoint extends StoryPoint {
     @Override
     public List<String> getAllPossibleResults() {
         List<String> results = new ArrayList<String>(choices.keySet());
-        results.add("DEFAULT");
+        results.add(DEFAULT_OUTCOME);
         return results;
     }
 

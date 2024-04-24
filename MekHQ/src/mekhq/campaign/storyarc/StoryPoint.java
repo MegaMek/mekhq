@@ -62,6 +62,8 @@ import java.util.Map.Entry;
  */
 public abstract class StoryPoint {
 
+    public final static String DEFAULT_OUTCOME = "DEFAULT";
+    public final static String CUSTOM_OUTCOME = "CUSTOM";
     /** The story arc that this story point is a part of **/
     private StoryArc storyArc;
 
@@ -253,7 +255,7 @@ public abstract class StoryPoint {
 
     public List<String> getAllPossibleResults() {
         ArrayList<String> results = new ArrayList<>();
-        results.add("DEFAULT");
+        results.add(DEFAULT_OUTCOME);
         return results;
     }
 
@@ -283,6 +285,10 @@ public abstract class StoryPoint {
 
     public StoryOutcome getStoryOutcome(String result) {
         return storyOutcomes.get(result);
+    }
+
+    public void addStoryOutcome(String result, StoryOutcome outcome) {
+        storyOutcomes.put(result, outcome);
     }
 
     public void removeStoryOutcome(String result) {

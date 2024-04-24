@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -64,8 +65,8 @@ public class CheckStringVariableStoryPoint extends StoryPoint {
         // we cannot know how many possibilities there are apriori, so we just use CUSTOM, which will allow
         // the user to specify outcome matching result
         List<String> results = new ArrayList<>();
-        results.add("CUSTOM");
-        results.add("DEFAULT");
+        results.add(CUSTOM_OUTCOME);
+        results.add(DEFAULT_OUTCOME);
         return results;
     }
 

@@ -20,6 +20,7 @@ package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
 import megamek.common.Compute;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -70,7 +71,7 @@ public class RollDiceStoryPoint extends StoryPoint {
         for(int i = min; i <= max; i++) {
             results.add(Integer.toString(i));
         }
-        results.add("DEFAULT");
+        results.add(DEFAULT_OUTCOME);
         return results;
     }
     @Override

@@ -22,6 +22,7 @@ package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -71,7 +72,7 @@ public class CheckPersonStatusStoryPoint extends StoryPoint {
         for(PersonnelStatus status : PersonnelStatus.getImplementedStatuses()) {
             results.add(status.name());
         }
-        results.add("DEFAULT");
+        results.add(DEFAULT_OUTCOME);
         return results;
     }
 

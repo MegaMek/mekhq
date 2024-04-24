@@ -160,7 +160,7 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             JTextPane txtResult = new JTextPane();
             txtResult.setContentType("text/html");
             txtResult.setEditable(false);
-            txtResult.setText("<i>" + StoryArc.defaultOutcome + "</i>");
+            txtResult.setText("<i>" + StoryPoint.DEFAULT_OUTCOME + "</i>");
             pnlOutcomes.add(txtResult, gbc);
             gbc.gridx++;
             String next = storyPoint.getNextStoryPointId() == null ? "" :
@@ -181,13 +181,13 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
             gbc.gridx++;
             gbc.weightx = 0.0;
             JButton btnEdit = new JButton("Edit Outcome");
-            btnEdit.addActionListener(evt -> editOutcome(StoryArc.defaultOutcome));
+            btnEdit.addActionListener(evt -> editOutcome(StoryPoint.DEFAULT_OUTCOME));
             pnlOutcomes.add(btnEdit, gbc);
             gbc.gridx++;
             JButton btnRemove = new JButton("Delete Outcome");
-            btnRemove.addActionListener(evt -> removeOutcome(StoryArc.defaultOutcome));
+            btnRemove.addActionListener(evt -> removeOutcome(StoryPoint.DEFAULT_OUTCOME));
             pnlOutcomes.add(btnRemove, gbc);
-            currentOutcomes.add(StoryArc.defaultOutcome);
+            currentOutcomes.add(StoryPoint.DEFAULT_OUTCOME);
         }
 
         //check for other possible outcomes
@@ -201,7 +201,9 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
 
             gbc.gridx = 0;
             gbc.gridy++;
-            pnlOutcomes.add(new JButton("Add Outcome"), gbc);
+            JButton btnAdd = new JButton("Add Outcome");
+            btnAdd.addActionListener(evt -> addOutcome((String) comboOutcomes.getSelectedItem()));
+            pnlOutcomes.add(btnAdd, gbc);
             gbc.gridx = 1;
             gbc.gridwidth = 4;
             gbc.fill = GridBagConstraints.NONE;
@@ -219,17 +221,24 @@ public class StoryPointEditorPanel extends AbstractMHQScrollablePanel {
     }
 
     public void removeOutcome(String result) {
-        if(result.equals(StoryArc.defaultOutcome)) {
+        if(result.equals(StoryPoint.DEFAULT_OUTCOME)) {
             storyPoint.removeDefaultOutcome();
         } else {
             storyPoint.removeStoryOutcome(result);
         }
-        SwingUtilities.invokeLater(() -> refreshOutcomesPanel());
-        SwingUtilities.invokeLater(() ->pnlOutcomes.revalidate());
+        refreshOutcomesPanel();
+        pnlOutcomes.revalidate();
     }
 
     public void editOutcome(String result) {
-        CustomizeStoryOutcomeDialog csod = new CustomizeStoryOutcomeDialog(getFrame(), true, result, storyPoint);
+        CustomizeStoryOutcomeDialog csod = new CustomizeStoryOutcomeDialog(getFrame(), true, result, storyPoint, false);
+        csod.setVisible(true);
+        refreshOutcomesPanel();
+        pnlOutcomes.revalidate();
+    }
+
+    public void addOutcome(String result) {
+        CustomizeStoryOutcomeDialog csod = new CustomizeStoryOutcomeDialog(getFrame(), true, result, storyPoint, true);
         csod.setVisible(true);
         refreshOutcomesPanel();
         pnlOutcomes.revalidate();

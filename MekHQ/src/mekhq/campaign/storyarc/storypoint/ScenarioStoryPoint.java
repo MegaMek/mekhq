@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
@@ -149,7 +150,7 @@ public class ScenarioStoryPoint extends StoryPoint {
         for(ScenarioStatus nextStatus : ScenarioStatus.values()) {
             results.add(nextStatus.name());
         }
-        results.add("DEFAULT");
+        results.add(DEFAULT_OUTCOME);
         return results;
     }
 
