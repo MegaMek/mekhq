@@ -3,6 +3,8 @@ package mekhq.gui.dialog;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryOutcome;
 import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.gui.model.StoryTriggerListModel;
 import mekhq.gui.utilities.JSuggestField;
 
 import javax.swing.*;
@@ -18,6 +20,7 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
     String result;
     boolean isNewOutcome;
     private JSuggestField suggestNext;
+    private JList<StoryTrigger> listTriggers;
 
     public CustomizeStoryOutcomeDialog(JFrame parent, boolean modal, String result, StoryPoint sp, boolean isNew) {
         super(parent, modal);
@@ -57,6 +60,7 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
+        gbc.weightx = 0.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panMain.add(new JLabel("<html><b><nobr>Result:</nobr></b></html>"), gbc);
@@ -83,6 +87,33 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
         }
         gbc.gridy++;
         panMain.add(suggestNext, gbc);
+
+        JPanel panTriggers = new JPanel(new BorderLayout());
+        panTriggers.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Story Triggers"),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+        JPanel panTriggerButtons = new JPanel(new GridLayout(0, 2));
+        JComboBox comboNewTrigger = new JComboBox();
+        panTriggerButtons.add(comboNewTrigger);
+        panTriggerButtons.add(new JButton("Add Trigger"));
+        panTriggerButtons.add(new JButton("Edit Trigger"));
+        panTriggerButtons.add(new JButton("Delete Trigger"));
+        panTriggers.add(panTriggerButtons, BorderLayout.PAGE_START);
+
+        StoryTriggerListModel model = new StoryTriggerListModel();
+        model.setData(outcome.getStoryTriggers());
+        listTriggers = new JList<>(model);
+        listTriggers.setCellRenderer(model.getRenderer());
+        panTriggers.add(listTriggers, BorderLayout.CENTER);
+
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panMain.add(panTriggers, gbc);
     }
 
     private void done(ActionEvent evt) {
