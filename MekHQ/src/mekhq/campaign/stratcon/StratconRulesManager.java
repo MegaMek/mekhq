@@ -779,7 +779,7 @@ public class StratconRulesManager {
             scenario.setRequiredScenario(true);
         }
 
-        AtBDynamicScenarioFactory.setScenarioModifiers(scenario.getBackingScenario());
+        AtBDynamicScenarioFactory.setScenarioModifiers(campaign, scenario.getBackingScenario());
         scenario.setCurrentState(ScenarioState.UNRESOLVED);
         setScenarioDates(track, campaign, scenario);
 

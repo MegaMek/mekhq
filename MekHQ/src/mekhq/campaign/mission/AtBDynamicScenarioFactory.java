@@ -256,7 +256,7 @@ public class AtBDynamicScenarioFactory {
                     generatedLanceCount += generateFixedForce(scenario, contract, campaign, forceTemplate);
                 } else {
                     generatedLanceCount += generateForce(scenario, contract, campaign,
-                        effectiveBV, effectiveUnitCount, weightClass, forceTemplate);
+                        effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
                 }
             }
         }
@@ -314,10 +314,12 @@ public class AtBDynamicScenarioFactory {
      * @param effectiveUnitCount The effective unit count, up to this point, of player and allied units
      * @param weightClass        The maximum weight class of the units to generate (ignored )
      * @param forceTemplate      The force template to use to generate the force
+     * @param isScenarioModifier true if the source of generateForce() was a scenario modifier
      * @return How many "lances" or other individual units were generated.
      */
     public static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
-                                    int effectiveBV, int effectiveUnitCount, int weightClass, ScenarioForceTemplate forceTemplate) {
+                                    int effectiveBV, int effectiveUnitCount, int weightClass,
+                                    ScenarioForceTemplate forceTemplate, boolean isScenarioModifier) {
         // don't generate forces flagged as player-supplied
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
             return 0;
@@ -375,6 +377,10 @@ public class AtBDynamicScenarioFactory {
         forceTemplate.setForceMultiplier(forceMultiplier);
 
         int forceBVBudget = (int) (effectiveBV * forceTemplate.getForceMultiplier());
+
+        if (isScenarioModifier) {
+            forceBVBudget = forceBVBudget * campaign.getCampaignOptions().getScenarioModBV();
+        }
 
         int forceUnitBudget = 0;
 
@@ -905,26 +911,31 @@ public class AtBDynamicScenarioFactory {
      *
      * @param scenario
      */
-    public static void setScenarioModifiers(AtBDynamicScenario scenario) {
-        // this is hardcoded for now, but the eventual plan is to let the user configure how many modifiers
-        // they want applied
-        int numModsRoll = Compute.d6(2);
+    public static void setScenarioModifiers(Campaign campaign, AtBDynamicScenario scenario) {
         int numMods = 0;
-        if (numModsRoll >= 11) {
-            numMods = 3;
-        } else if (numModsRoll >= 9) {
-            numMods = 2;
-        } else if (numModsRoll >= 7) {
-            numMods = 1;
-        }
+        boolean addMods = true;
+        int modMax = campaign.getCampaignOptions().getScenarioModMax();
+        int modChance = campaign.getCampaignOptions().getScenarioModChance() - 1;
 
-        for (int x = 0; x < numMods; x++) {
-            AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation());
+        if (modMax != 0) {
+            while (addMods) {
+                if (Compute.randomInt(100) >= modChance) {
+                    numMods++;
 
-            scenario.addScenarioModifier(scenarioMod);
+                    if (numMods >= modMax) {
+                        addMods = false;
+                    }
+                }
+            }
 
-            if (scenarioMod.getBlockFurtherEvents()) {
-                break;
+            for (int x = 0; x < numMods; x++) {
+                AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation());
+
+                scenario.addScenarioModifier(scenarioMod);
+
+                if (scenarioMod.getBlockFurtherEvents()) {
+                    break;
+                }
             }
         }
     }
