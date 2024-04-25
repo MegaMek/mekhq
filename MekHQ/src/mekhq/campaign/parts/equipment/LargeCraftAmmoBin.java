@@ -22,6 +22,7 @@ import megamek.common.AmmoType;
 import megamek.common.CriticalSlot;
 import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoMounted;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -307,7 +308,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
 
     @Override
     public void updateConditionFromPart() {
-        Mounted mounted = getMounted();
+        AmmoMounted mounted = (AmmoMounted) getMounted();
         if (mounted != null) {
             mounted.setHit(false);
             mounted.setDestroyed(false);

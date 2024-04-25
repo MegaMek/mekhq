@@ -30,6 +30,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.BombMounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
@@ -5750,15 +5751,12 @@ public class Campaign implements ITechManager {
 
         if (entity instanceof IBomber) {
             IBomber bomber = (IBomber) entity;
-            List<Mounted> mountedBombs = bomber.getBombs();
+            List<BombMounted> mountedBombs = bomber.getBombs();
             if (!mountedBombs.isEmpty()) {
                 // These should return an int[] filled with 0's
                 int[] intBombChoices = bomber.getIntBombChoices();
                 int[] extBombChoices = bomber.getExtBombChoices();
-                for (Mounted m : mountedBombs) {
-                    if (!(m.getType() instanceof BombType)) {
-                        continue;
-                    }
+                for (BombMounted m : mountedBombs) {
                     if (m.getBaseShotsLeft() == 1) {
                         if (m.isInternalBomb()) {
                             intBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
