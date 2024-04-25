@@ -318,7 +318,7 @@ public class AtBContract extends Contract {
         // Player Dragoon/MRBC rating: F +2, D +1, B -1, A -2
         mod -= dragoonRating - IUnitRating.DRAGOON_C;
 
-        // For every 5 player victories in last month: -1
+        // For every 2 player victories in last month: -1
         mod -= victories / 5;
 
         // For every 2 player defeats in last month: +1
