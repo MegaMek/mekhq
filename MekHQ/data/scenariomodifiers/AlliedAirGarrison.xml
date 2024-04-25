@@ -8,7 +8,7 @@
 		<allowedUnitType>-3</allowedUnitType>
 		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>true</contributesToBV>
+		<contributesToBV>false</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>

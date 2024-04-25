@@ -12,19 +12,18 @@
 		<allowedUnitType>-2</allowedUnitType>
 		<arrivalTurn>0</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>true</contributesToBV>
+		<contributesToBV>false</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>true</contributesToUnitCount>
+		<contributesToUnitCount>false</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones/>
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>1</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
-		<fixedUnitCount>4</fixedUnitCount>
 		<forceName>Allied Light Brigade Horse Cavalry</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>MercThe600.mul</fixedMul>	
+			<fixedMul>MercThe600.mul</fixedMul>
 		<generationOrder>1</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>

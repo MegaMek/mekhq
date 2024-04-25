@@ -378,7 +378,7 @@ public class AtBDynamicScenarioFactory {
 
         int forceBVBudget = (int) (effectiveBV * forceTemplate.getForceMultiplier());
 
-        if (isScenarioModifier) {
+        if ((isScenarioModifier) && (!forceTemplate.getOverrideBvCap())) {
             forceBVBudget = forceBVBudget * campaign.getCampaignOptions().getScenarioModBV();
         }
 

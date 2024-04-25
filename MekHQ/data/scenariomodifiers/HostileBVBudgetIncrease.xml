@@ -3,5 +3,5 @@
 	<benefitsPlayer>false</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<eventRecipient>Opposing</eventRecipient>
-	<bvBudgetAdditiveMultiplier>-1</bvBudgetAdditiveMultiplier>
+	<testAdjustment>1</testAdjustment>
 </AtBScenarioModifier>
