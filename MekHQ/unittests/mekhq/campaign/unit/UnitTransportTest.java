@@ -18,12 +18,12 @@
  */
 package mekhq.campaign.unit;
 
-import megamek.common.Aero;
-import megamek.common.Entity;
-import megamek.common.Mech;
+import megamek.common.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
+import java.util.Vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -32,6 +32,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 public class UnitTransportTest {
+
+    @BeforeAll
+    static void before() {
+        EquipmentType.initializeTypes();
+    }
+
     @Test
     public void basicTransportedUnits() {
         Unit transport = new Unit();
@@ -135,6 +141,32 @@ public class UnitTransportTest {
         assertTrue(transport.hasTransportedUnits());
         assertTrue(transport.isCarryingSmallerAero());
         assertFalse(transport.isCarryingGround());
+    }
+
+    @Test
+    public void testUnitTypeForAerosMatchesAeroBayType() {
+        // Create a fake entity to back the real transport Unit
+        Dropship mockVengeance = mock(Dropship.class);
+        Unit transport = new Unit();
+        ASFBay mockASFBay = mock(ASFBay.class);
+        when(mockASFBay.getCapacity()).thenReturn(100.0);
+        transport.setEntity(mockVengeance);
+
+        // Initialize bays
+        Vector<Bay> bays = new Vector<>();
+        bays.add(mockASFBay);
+        when(mockVengeance.getTransportBays()).thenReturn(bays);
+        transport.initializeBaySpace();
+
+        // Add an aero unit
+        Entity aero = new AeroSpaceFighter();
+        Unit mockAeroUnit = mock(Unit.class);
+        when(mockAeroUnit.getId()).thenReturn(UUID.randomUUID());
+        when(mockAeroUnit.getEntity()).thenReturn(aero);
+
+        // Verify the AeroSpaceFighter is recognized as a valid ASFBay occupant
+        double remainingCap = transport.getCorrectBayCapacity(aero.getUnitType(), 50);
+        assertEquals(100.0, remainingCap);
     }
 
     @Test

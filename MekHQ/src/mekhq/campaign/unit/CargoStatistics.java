@@ -89,16 +89,6 @@ public class CargoStatistics {
 
         double cargoTonnage = 0;
         double mothballedTonnage = 0;
-        int mechs = stats.getNumberOfUnitsByType(Entity.ETYPE_MECH);
-        int ds = stats.getNumberOfUnitsByType(Entity.ETYPE_DROPSHIP);
-        int sc = stats.getNumberOfUnitsByType(Entity.ETYPE_SMALL_CRAFT);
-        int cf = stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER);
-        int asf = stats.getNumberOfUnitsByType(Entity.ETYPE_AERO);
-        int inf = stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY);
-        int ba = stats.getNumberOfUnitsByType(Entity.ETYPE_BATTLEARMOR);
-        int lv = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, true);
-        int hv = stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false);
-        int protos = stats.getNumberOfUnitsByType(Entity.ETYPE_PROTOMECH);
 
         cargoTonnage += getCampaign().getWarehouse().streamSpareParts().filter(p -> inTransit || p.isPresent())
                             .mapToDouble(p -> p.getQuantity() * p.getTonnage())

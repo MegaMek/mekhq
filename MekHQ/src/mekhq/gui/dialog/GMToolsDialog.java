@@ -89,7 +89,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private MMComboBox<String> comboEthnicCode;
     private MMComboBox<Gender> comboGender;
     private MMComboBox<FactionDisplay> comboNameGeneratorFaction;
-    private JCheckBox chkClanner;
+    private JCheckBox chkClanPersonnel;
     private JSpinner spnNameNumber;
     private JLabel lblCurrentName;
     private JTextArea txtNamesGenerated;
@@ -283,12 +283,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
         this.comboNameGeneratorFaction = comboNameGeneratorFaction;
     }
 
-    public JCheckBox getChkClanner() {
-        return chkClanner;
+    public JCheckBox getChkClanPersonnel() {
+        return chkClanPersonnel;
     }
 
-    public void setChkClanner(final JCheckBox chkClanner) {
-        this.chkClanner = chkClanner;
+    public void setChkClanPersonnel(final JCheckBox chkClanPersonnel) {
+        this.chkClanPersonnel = chkClanPersonnel;
     }
 
     public JSpinner getSpnNameNumber() {
@@ -666,7 +666,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         getComboUnitType().addItemListener(ev -> {
             final int unitType = getComboUnitType().getSelectedIndex();
             getComboUnitWeight().setEnabled((unitType == UnitType.MEK) || (unitType == UnitType.TANK)
-                    || (unitType == UnitType.AERO));
+                    || (unitType == UnitType.AEROSPACEFIGHTER));
         });
         gbc.gridx++;
         panel.add(getComboUnitType(), gbc);
@@ -773,10 +773,10 @@ public class GMToolsDialog extends AbstractMHQDialog {
         gbc.gridx++;
         panel.add(lblHistoricalEthnicity, gbc);
 
-        final JLabel lblClanner = new JLabel(resources.getString("lblClanner.text"));
-        lblClanner.setName("lblClanner");
+        final JLabel lblClanPersonnel = new JLabel(resources.getString("lblClanPersonnel.text"));
+        lblClanPersonnel.setName("lblClanPersonnel");
         gbc.gridx++;
-        panel.add(lblClanner, gbc);
+        panel.add(lblClanPersonnel, gbc);
 
         maxGridX = gbc.gridx;
 
@@ -807,11 +807,11 @@ public class GMToolsDialog extends AbstractMHQDialog {
         gbc.gridx++;
         panel.add(getComboEthnicCode(), gbc);
 
-        setChkClanner(new JCheckBox());
-        getChkClanner().setName("clannerPicker");
-        getChkClanner().getAccessibleContext().setAccessibleName(resources.getString("lblClanner.text"));
+        setChkClanPersonnel(new JCheckBox());
+        getChkClanPersonnel().setName("clanPersonnelPicker");
+        getChkClanPersonnel().getAccessibleContext().setAccessibleName(resources.getString("lblClanPersonnel.text"));
         gbc.gridx++;
-        panel.add(getChkClanner(), gbc);
+        panel.add(getChkClanPersonnel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -868,7 +868,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         lblGender.setLabelFor(getComboGender());
         lblOriginFaction.setLabelFor(getComboNameGeneratorFaction());
         lblHistoricalEthnicity.setLabelFor(getComboEthnicCode());
-        lblClanner.setLabelFor(getChkClanner());
+        lblClanPersonnel.setLabelFor(getChkClanPersonnel());
         lblNameGenerated.setLabelFor(getTxtNamesGenerated());
 
         return panel;
@@ -1230,7 +1230,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         // We set the clan personnel value based on whether or not the person is clan personell
-        getChkClanner().setSelected(getPerson().isClanPersonnel());
+        getChkClanPersonnel().setSelected(getPerson().isClanPersonnel());
 
         // Now we figure out the person's origin faction
         final FactionDisplay faction = new FactionDisplay(getPerson().getOriginFaction(), getPerson().getBirthday());
@@ -1272,6 +1272,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private boolean doesPersonPrimarilyDriveUnitType(final int unitType) {
         switch (unitType) {
             case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
                 return getPerson().getPrimaryRole().isAerospacePilot();
             case UnitType.BATTLE_ARMOR:
                 return getPerson().getPrimaryRole().isBattleArmour();
@@ -1391,12 +1392,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         if (ethnicCode == 0) {
             name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplit(
-                    getComboGender().getSelectedItem(), getChkClanner().isSelected(),
+                    getComboGender().getSelectedItem(), getChkClanPersonnel().isSelected(),
                     (Objects.requireNonNull(getComboNameGeneratorFaction().getSelectedItem()))
                             .getFaction().getShortName());
         } else {
             name = RandomNameGenerator.getInstance().generateGivenNameSurnameSplitWithEthnicCode(
-                    getComboGender().getSelectedItem(), getChkClanner().isSelected(), ethnicCode);
+                    getComboGender().getSelectedItem(), getChkClanPersonnel().isSelected(), ethnicCode);
         }
         return name;
     }

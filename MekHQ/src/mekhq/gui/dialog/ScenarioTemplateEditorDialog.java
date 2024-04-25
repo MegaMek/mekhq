@@ -33,6 +33,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioForceTemplate.SynchronizedDeploymentType;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
+import mekhq.campaign.stratcon.StratconBiomeManifest;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import org.apache.logging.log4j.LogManager;
@@ -46,6 +47,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Handles editing, saving and loading of scenario template definitions.
@@ -435,17 +437,17 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         gbc.gridx = 1;
         forcedPanel.add(cboSyncForceName, gbc);
-        
+
         JLabel lblFixedMul = new JLabel("Fixed MUL:");
         gbc.gridx = 0;
         gbc.gridy++;
-        forcedPanel.add(lblFixedMul, gbc);        
-        
+        forcedPanel.add(lblFixedMul, gbc);
+
         lstMuls = new JList<>();
         DefaultListModel<String> mulModel = new DefaultListModel<>();
         JScrollPane scrMulList = new JScrollPane(lstMuls);
         File mulDir = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY);
-        
+
         if (mulDir.exists() && mulDir.isDirectory()) {
             for (String mul : mulDir.list((d, s) -> {
                         return s.toLowerCase().endsWith(".mul");
@@ -453,8 +455,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 mulModel.addElement(mul);
             }
         }
-        
-        lstMuls.setModel(mulModel);    
+
+        lstMuls.setModel(mulModel);
         lstMuls.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         gbc.gridx = 1;
         forcedPanel.add(scrMulList, gbc);
@@ -810,11 +812,19 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         localGbc.gridheight = GridBagConstraints.RELATIVE;
         lstAllowedTerrainTypes = new JList<>();
         DefaultListModel<String> terrainTypeModel = new DefaultListModel<>();
-        for (String terrainType : AtBScenario.terrainTypes) {
+        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = StratconBiomeManifest.getInstance().getBiomeMapTypes();
+        List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
+        List<Integer> indexes = new ArrayList<>();
+        int i = 0;
+        for (String terrainType : keys) {
             terrainTypeModel.addElement(terrainType);
+            if (scenarioTemplate.mapParameters.getAllowedTerrainType().contains(terrainType)) {
+                indexes.add(i);
+            }
+            i++;
         }
         lstAllowedTerrainTypes.setModel(terrainTypeModel);
-        lstAllowedTerrainTypes.setSelectedIndices(scenarioTemplate.mapParameters.getAllowedTerrainTypeArray());
+        lstAllowedTerrainTypes.setSelectedIndices(indexes.stream().mapToInt(Integer::intValue).toArray());
         mapTypeChangeHandler();
         pnlMapParameters.add(lstAllowedTerrainTypes, localGbc);
 
@@ -1139,7 +1149,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         sft.setDeployOffboard(chkOffBoard.isSelected());
 
         sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
-        
+
         sft.setFixedMul(lstMuls.getSelectedValue());
 
         // if we have picked "None" for synchronization, then set explicit deployment zones.
@@ -1322,7 +1332,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         int selectedItem = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
         boolean isAero = selectedItem == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                         selectedItem == UnitType.CONV_FIGHTER ||
-                        selectedItem == UnitType.AERO;
+                        selectedItem == UnitType.AEROSPACEFIGHTER;
 
         chkAllowAeroBombs.setEnabled(isAero);
     }
@@ -1336,7 +1346,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         scenarioTemplate.detailedBriefing = txtLongBriefing.getText();
 
         scenarioTemplate.mapParameters.allowedTerrainTypes.clear();
-        for (int terrainType : lstAllowedTerrainTypes.getSelectedIndices()) {
+        for (int index : lstAllowedTerrainTypes.getSelectedIndices()) {
+            String terrainType = lstAllowedTerrainTypes.getModel().getElementAt(index);
             scenarioTemplate.mapParameters.allowedTerrainTypes.add(terrainType);
         }
         scenarioTemplate.mapParameters.setBaseHeight(Integer.parseInt(txtBaseHeight.getText()));

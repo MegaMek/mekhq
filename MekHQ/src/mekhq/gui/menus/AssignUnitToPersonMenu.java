@@ -94,18 +94,20 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         final JScrollableMenu navigatorMenu = new JScrollableMenu("navigatorMenu", resources.getString("navigatorMenu.text"));
 
         // Parsing Booleans
+        final Entity entity = units[0].getEntity();
         final boolean canTakeMoreDrivers = units[0].canTakeMoreDrivers();
         final boolean usesSoloPilot = units[0].usesSoloPilot();
-        final boolean isVTOL = units[0].getEntity() instanceof VTOL;
-        final boolean isMech = units[0].getEntity() instanceof Mech;
-        final boolean isSuperHeavyMech = isMech && units[0].getEntity().isSuperHeavy();
-        final boolean isProtoMech = units[0].getEntity() instanceof Protomech;
-        final boolean isConventionalAircraft = units[0].getEntity() instanceof ConvFighter;
-        final boolean isSmallCraftOrJumpShip = (units[0].getEntity() instanceof SmallCraft)
-                || (units[0].getEntity() instanceof Jumpship);
-        final boolean isTank = units[0].getEntity() instanceof Tank;
+        final boolean isVTOL = entity instanceof VTOL;
+        final boolean isMech = entity instanceof Mech;
+        final boolean isTripod = entity instanceof TripodMech;
+        final boolean isSuperHeavyMech = isMech && entity.isSuperHeavy();
+        final boolean isProtoMech = entity instanceof Protomech;
+        final boolean isConventionalAircraft = entity instanceof ConvFighter;
+        final boolean isSmallCraftOrJumpShip = (entity instanceof SmallCraft)
+                || (entity instanceof Jumpship);
+        final boolean isTank = entity instanceof Tank;
         final boolean canTakeMoreGunners = units[0].canTakeMoreGunners();
-        final boolean isAero = units[0].getEntity() instanceof Aero;
+        final boolean isAero = entity instanceof Aero;
         final boolean canTakeTechOfficer = units[0].canTakeTechOfficer();
         final boolean usesSoldiers = units[0].usesSoldiers();
         final boolean isConventionalInfantry = units[0].isConventionalInfantry();
@@ -198,7 +200,7 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         // Pilot Menu
         if (canTakeMoreDrivers) {
             // Pilot Menu
-            if (usesSoloPilot || isVTOL || isSmallCraftOrJumpShip || isSuperHeavyMech) {
+            if (usesSoloPilot || isVTOL || isSmallCraftOrJumpShip || isSuperHeavyMech || isTripod) {
                 if (isMech) {
                     filteredPersonnel = personnel.stream()
                             .filter(person -> person.getPrimaryRole().isMechWarriorGrouping()
@@ -390,11 +392,11 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
         }
 
         // Gunners Menu
-        if (canTakeMoreGunners && (isTank || isSmallCraftOrJumpShip || isSuperHeavyMech)) {
+        if (canTakeMoreGunners && (isTank || isSmallCraftOrJumpShip || isSuperHeavyMech || isTripod)) {
             filteredPersonnel = personnel.stream()
                     .filter(person -> (isSmallCraftOrJumpShip && person.hasRole(PersonnelRole.VESSEL_GUNNER)) ||
                             (isTank && person.hasRole(PersonnelRole.VEHICLE_GUNNER)) ||
-                            (isSuperHeavyMech && person.getPrimaryRole().isMechWarriorGrouping()
+                            ((isSuperHeavyMech || isTripod) && person.getPrimaryRole().isMechWarriorGrouping()
                                 || person.getSecondaryRole().isMechWarriorGrouping()))
                     .collect(Collectors.toList());
             if (!filteredPersonnel.isEmpty()) {
@@ -410,17 +412,17 @@ public class AssignUnitToPersonMenu extends JScrollableMenu {
                 // Add the person to the proper menu
                 for (final Person person : filteredPersonnel) {
                     final JScrollableMenu subMenu;
-                    
+
                     SkillLevel skillLevel = SkillLevel.NONE;
-                    // determine skill level based on unit and person's role 
+                    // determine skill level based on unit and person's role
                     if (isSmallCraftOrJumpShip) {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVesselGunner());
                     } else if (isTank) {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isVehicleGunner());
-                    } else if (isSuperHeavyMech) {
+                    } else if (isSuperHeavyMech || isTripod) {
                         skillLevel = person.getSkillLevel(campaign, !person.getPrimaryRole().isMechWarriorGrouping());
                     }
-                    
+
                     switch (skillLevel) {
                         case LEGENDARY:
                             subMenu = legendaryMenu;

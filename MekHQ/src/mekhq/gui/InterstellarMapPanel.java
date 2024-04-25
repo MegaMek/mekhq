@@ -374,7 +374,7 @@ public class InterstellarMapPanel extends JPanel {
         addMouseWheelListener(new MouseAdapter() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                 zoom(Math.pow(1.5, -1 * e.getWheelRotation()), e.getPoint());
+                 zoom(Math.pow(1.175, -1 * e.getWheelRotation()), e.getPoint());
              }
         });
 
@@ -691,8 +691,8 @@ public class InterstellarMapPanel extends JPanel {
                                     }
                                     if (campaign.getCampaignOptions().isUseAtB()
                                             && campaign.getAtBConfig().isHiringHall(system.getId(), campaign.getLocalDate())) {
-                                        g2.setPaint(new Color(192, 192, 192));
-                                        arc.setArcByCenter(x, y, size + 2, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
+                                        g2.setPaint(new Color(248, 150, 60));
+                                        arc.setArcByCenter(x, y, size + 4, 0, 360.0 * (1 - ((double) i) / factions.size()), Arc2D.PIE);
                                         g2.fill(arc);
                                     }
                                     g2.setPaint(faction.getColor());

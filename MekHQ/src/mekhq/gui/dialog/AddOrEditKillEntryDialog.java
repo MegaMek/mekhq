@@ -21,20 +21,21 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
+import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.Scenario;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Taharqa
@@ -47,6 +48,9 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private int operationType;
     private Kill kill;
     private LocalDate date;
+    private int missionId;
+    private int scenarioId;
+    private Campaign campaign;
 
     private JButton btnClose;
     private JButton btnOK;
@@ -54,22 +58,34 @@ public class AddOrEditKillEntryDialog extends JDialog {
     private JTextField txtKill;
     private JLabel lblKiller;
     private JTextField txtKiller;
+    private JLabel lblDate;
     private JButton btnDate;
+    private JLabel lblMissionId;
+    private MMComboBox<Mission> cboMissionId;
+    private ArrayList<Integer> missionIdList;
+    private JLabel lblScenarioId;
+    private MMComboBox<String> cboScenarioId;
+    private ArrayList<Integer> scenarioIdList;
 
-    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit, LocalDate entryDate) {
-        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate));
+    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, UUID killerPerson, String killerUnit, LocalDate entryDate, Campaign campaign) {
+        // We default missionId & scenarioId to 0 when adding new kills
+        this(parent, modal, ADD_OPERATION, new Kill(killerPerson, "?", killerUnit, entryDate, 0, 0), campaign);
     }
 
-    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Kill kill) {
-        this(parent, modal, EDIT_OPERATION, kill);
+    public AddOrEditKillEntryDialog(JFrame parent, boolean modal, Kill kill, Campaign campaign) {
+        this(parent, modal, EDIT_OPERATION, kill, campaign);
     }
 
-    private AddOrEditKillEntryDialog(JFrame parent, boolean modal, int operationType, Kill kill) {
+    private AddOrEditKillEntryDialog(JFrame parent, boolean modal, int operationType, Kill kill, Campaign c) {
         super(parent, modal);
+
+        campaign = c;
 
         this.frame = parent;
         this.kill = Objects.requireNonNull(kill);
         this.date = this.kill.getDate();
+        this.missionId = this.kill.getMissionId();
+        this.scenarioId = this.kill.getScenarioId();
         this.operationType = operationType;
         initComponents();
         setLocationRelativeTo(parent);
@@ -81,15 +97,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
     }
 
     private void initComponents() {
-         GridBagConstraints gridBagConstraints;
-
-        txtKill = new JTextField();
-        lblKill = new JLabel();
-        txtKiller = new JTextField();
-        lblKiller = new JLabel();
-        btnOK = new JButton();
-        btnClose = new JButton();
-        btnDate = new JButton();
+        GridBagConstraints gridBagConstraints;
 
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.AddOrEditKillEntryDialog",
                 MekHQ.getMHQOptions().getLocale());
@@ -102,6 +110,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         }
         getContentPane().setLayout(new GridBagLayout());
 
+        lblKill = new JLabel();
         lblKill.setText(resourceMap.getString("lblKill.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -111,6 +120,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblKill, gridBagConstraints);
 
+        txtKill = new JTextField();
         txtKill.setText(kill.getWhatKilled());
         txtKill.setMinimumSize(new Dimension(150, 28));
         gridBagConstraints = new GridBagConstraints();
@@ -123,6 +133,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtKill, gridBagConstraints);
 
+        lblKiller = new JLabel();
         lblKiller.setText(resourceMap.getString("lblKiller.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -132,6 +143,7 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(lblKiller, gridBagConstraints);
 
+        txtKiller = new JTextField();
         txtKiller.setText(kill.getKilledByWhat());
         txtKiller.setMinimumSize(new Dimension(150, 28));
         gridBagConstraints = new GridBagConstraints();
@@ -144,34 +156,118 @@ public class AddOrEditKillEntryDialog extends JDialog {
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(txtKiller, gridBagConstraints);
 
+        lblDate = new JLabel();
+        lblDate.setText(resourceMap.getString("lblDate.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(lblDate, gridBagConstraints);
+
+        btnDate = new JButton();
         btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         btnDate.setName("btnDate");
         btnDate.addActionListener(evt -> changeDate());
         gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         getContentPane().add(btnDate, gridBagConstraints);
 
+        lblMissionId = new JLabel();
+        lblMissionId.setText(resourceMap.getString("lblMissionId.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(lblMissionId, gridBagConstraints);
+
+        cboMissionId = new MMComboBox<>("cboMissionId");
+        missionIdList = createIdList(true);
+        for (int id : missionIdList) {
+            if (id == 0) {
+                cboMissionId.addItem(null);
+            } else {
+                cboMissionId.addItem(campaign.getMission(id));
+            }
+        }
+
+        // if missionId is valid, default to the option matching missionId
+        if (campaign.getMission(missionId) != null) {
+            cboMissionId.setSelectedItem(campaign.getMission(missionId));
+        }
+        cboMissionId.setMinimumSize(new Dimension(150, 28));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(cboMissionId, gridBagConstraints);
+
+        lblScenarioId = new JLabel();
+        lblScenarioId.setText(resourceMap.getString("lblScenarioId.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(lblScenarioId, gridBagConstraints);
+
+        cboScenarioId = new MMComboBox<>("cboScenarioId");
+        scenarioIdList = createIdList(false);
+        for (int id : scenarioIdList) {
+            if (id == 0) {
+                cboScenarioId.addItem(null);
+            } else {
+                cboScenarioId.addItem("(" + campaign.getScenario(id).getDate() + ") " + campaign.getScenario(id).getName());
+            }
+        }
+
+        // if scenarioId is valid, default to the option matching scenarioId
+        if (campaign.getScenario(scenarioId) != null) {
+            cboScenarioId.setSelectedItem("(" + campaign.getScenario(scenarioId).getDate() + ") "
+                    + campaign.getScenario(scenarioId).getName());
+        }
+        cboScenarioId.setMinimumSize(new Dimension(150, 28));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
+        getContentPane().add(cboScenarioId, gridBagConstraints);
+
+        btnOK = new JButton();
         btnOK.setText(resourceMap.getString("btnOK.text"));
         btnOK.setName("btnOK");
         btnOK.addActionListener(this::btnOKActionPerformed);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.EAST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         getContentPane().add(btnOK, gridBagConstraints);
 
+        btnClose = new JButton();
         btnClose.setText(resourceMap.getString("btnClose.text"));
         btnClose.setName("btnClose");
         btnClose.addActionListener(this::btnCloseActionPerformed);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 1;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
@@ -195,6 +291,20 @@ public class AddOrEditKillEntryDialog extends JDialog {
         kill.setWhatKilled(txtKill.getText());
         kill.setKilledByWhat(txtKiller.getText());
         kill.setDate(date);
+
+        // if an invalid mission or scenario was selected default to 0
+        if (cboMissionId.getSelectedIndex() == -1) {
+            kill.setMissionId(0);
+        } else {
+            kill.setMissionId(missionIdList.get(cboMissionId.getSelectedIndex()));
+        }
+
+        if (cboScenarioId.getSelectedIndex() == -1) {
+            kill.setScenarioId(0);
+        } else {
+            kill.setScenarioId(scenarioIdList.get(cboScenarioId.getSelectedIndex()));
+        }
+
         this.setVisible(false);
     }
 
@@ -209,5 +319,27 @@ public class AddOrEditKillEntryDialog extends JDialog {
             date = dc.getDate();
             btnDate.setText(MekHQ.getMHQOptions().getDisplayFormattedDate(date));
         }
+    }
+
+    private ArrayList<Integer> createIdList(boolean isMission) {
+        ArrayList<Integer> idList = new ArrayList<>();
+
+        if (isMission) {
+            // the default value should be the first value
+            idList.add(0);
+
+            for (Mission mission : campaign.getSortedMissions()) {
+                idList.add(mission.getId());
+            }
+        } else {
+            for (Scenario scenario : campaign.getScenarios()) {
+                idList.add(scenario.getId());
+            }
+            // this ensures the default value becomes the first value, when we reverse
+            idList.add(0);
+            Collections.reverse(idList);
+        }
+
+        return idList;
     }
 }

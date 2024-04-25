@@ -1,6 +1,66 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.49.18-SNAPSHOT
+0.49.20-SNAPSHOT
++ PR #4005: Code internals: DialogOptionsListener update
++ PR #2997: Story Arcs Basic Architecture
+
+0.49.19 (2024-04-19 2030 UTC)
++ Bug #3958: No selling units in scenario resolution if campaign disallows selling
++ Fix #3949: Custom ScenarioObjectives do not change ScenarioStatus in ResolveScenarioWizardDialog
++ PR #3953: Add disabled option for Personnel Market
++ PR #3956: Change ransomed unit buttons to sold unit button in scenario resolve dialog
++ PR #3942: Added Nag Dialog for Prisoners of War Outside of Contracts
++ PR #3845: Adaptations for Adding Clan Personnel Tracking to MegaMek
++ Fix #3775: Non-superheavy Tripods can now be assigned crews; pilots can now be assigned to SH and Tripods in the personnel tab
++ Fix: #3848: Unable to assign Aerospace units to a transport in the TO&E
++ Fix: #3856: Display bug in 'Basic Unit Information', doesn't show aerospace units
++ Fix: #3815: StratCon Modifier BadEvent is broken and doesnt do anything
++ PR: #3874: Fixes MegaMek #4464 - StratCon Mapgen Fix
++ PR: #3866: Fixed Typo and Removed Indents
++ Data: #3865: 499 new callsigns 
++ PR: #3878: Interstellar Map Hiring Hall Highlight
++ PR: #3869: Fix issue #3839 to prevent loading clientsettings.xml instead of most recent campaign save 
++ Fix #3730: Names of Victory Points (Stratcon) 
++ PR #3867: Adjusted Retirement TN and Payout Values 
++ Fix #3877: MekHQ units aren't defaulting to active probes for sensors
++ Fix #1812: AtB/StratCon] Base Attack (Defender) Objective Changes 
++ PR #3892: Corrected Typo in Mass Repair Dialog 
++ Fix #2990: Stratcon draw counts as loss 
++ PR #3895: Correct Starting Cash Dice Count in Company Generator 
++ PR #3900: Disconnect quietly from GameThread for MekHQ 
++ PR #3834: Update planetary conditions chance logic
++ Fix #3803: MekHQ fix for WOB.pm/.PM mismatch and missing parent faction check
++ Fix #3932: Added Nag for Wounded Personnel without Doctor
++ Fix #3890: Add Tech/Vessel Column to Tech Skills View 
++ PR #3951: Add OperationalVP variable to CommonObjectiveFactory.java (prep for later work)
++ Fix #3925: update Aerospace handling and reporting in MHQ (for #3882)
++ PR #3930: Prevent advancing day with pending vanilla scenarios
++ PR #3937: Added Nag for Wounded Personnel without Doctor
++ PR #3901: add lances to the force string when sending data to megamek for bot forces
++ PR #3922: Add missing cockpit costs and weights 
++ PR #3944: Added Nag Dialog for Pregnant Combatants 
++ Fix #3943: Unmaintained Unit Nag Dialog Suppressed for Units set to Salvage
++ PR #3933: Fixes for #3729,#3817,#3753: Clamped Unit Rating Mod for CamOps (redux) 
++ PR #3923: Hide Toughness When 0 
++ PR #3915: Added Dialog to Confirm New Campaign (redux) 
++ PR #3908: Adjusted Default Tech Counts 
++ PR #3967: Adjusted Zoom Speed on Interstellar Map Panel 
++ Fix #3348: Added Ability to Collapse/Expand Logs, Missions and Kills in Personnel Unit Screen
++ PR #3970: Reduced Personnel Table Right-Click Menu Clutter 
++ Fix #3981: Removed Unnecessary Error Log
++ PR #3988: Added Scenario & Mission Tracking to Kills, Added Ability to Assign Kills to Scenario and/or Mission 
++ Fix #3989: Fixed Ship Search Overvaluing Ultra-Green Personnel
++ PR #3996: Add new player deployment variables to Scenario 
++ PR #3973: Move new lance creation to AtBGameThread
++ Fix #3978: Fix a bug with saving
++ PR #3983: Load bot entities in the chat lounge
++ PR #3991: Add all deployment variables to BotForce 
++ Fix #3767: NPE while scouting Stratcon map due to non-applicable SPAs for enemy force
++ PR #3997: Set default MHQ theme to match MM GUIPreferences default (Flat Darcula currently)
++ Fix #4002: Infinite loop when assigning SPAs to enemies from generated Scenario locked game UI
++ PR #4003: Fixed Untreated Personnel Nag Triggering for Prisoners.
+
+0.49.18 (2024-02-17 1800 UTC)
 + PR #3805: Adaptations for the Internal Bomb Bay quirk
 + PR #3801: New StratCon Scenario Modifiers (Thanks Thom293)
 + PR #3788: Adjust campaign creation dialogs to have correct jdialod owner
@@ -12,7 +72,13 @@ MEKHQ VERSION HISTORY:
 + Fix #3740: Consistent messaging in Daily Activity Log: ComStar bill vs. C-Bill
 + PR #3821: Add max contract salvage percentage to campaign options
 + Fix #3763: Reversing quality names in unit set quality GM menu
-+ FIx #3194: Awarding non-stackable medals to multiple people 
++ Fix #3194: Awarding non-stackable medals to multiple people 
++ Issue #3781: Force commanders can be picked from among highest-ranking individuals
++ Fix #3843: Fix chassis lookup
++ Fix #3842: Can't load prefab campaigns  
++ PR #3849: StratCon Heavy Battles, by PhoenixHeart.
+
+
 
 0.49.17 (2023-12-31 1900 UTC)
 + No code added

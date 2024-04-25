@@ -74,7 +74,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                 null, IUnitRating.DRAGOON_F, 7);
         addOffers(campaign, Compute.d6() - 1, UnitMarketType.OPEN, UnitType.TANK,
                 null, IUnitRating.DRAGOON_F, 7);
-        addOffers(campaign, Compute.d6() - 2, UnitMarketType.OPEN, UnitType.AERO,
+        addOffers(campaign, Compute.d6() - 2, UnitMarketType.OPEN, UnitType.AEROSPACEFIGHTER,
                 null, IUnitRating.DRAGOON_F, 7);
         addOffers(campaign, Compute.d6() - 2, UnitMarketType.OPEN, UnitType.CONV_FIGHTER,
                 null, IUnitRating.DRAGOON_F, 7);
@@ -85,7 +85,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     employer, IUnitRating.DRAGOON_D, 7);
             addOffers(campaign, Compute.d6() - 2, UnitMarketType.EMPLOYER, UnitType.TANK,
                     employer, IUnitRating.DRAGOON_D, 7);
-            addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.AERO,
+            addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.AEROSPACEFIGHTER,
                     employer, IUnitRating.DRAGOON_D, 7);
             addOffers(campaign, Compute.d6() - 3, UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER,
                     employer, IUnitRating.DRAGOON_D, 7);
@@ -98,7 +98,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             addOffers(campaign, Compute.d6(3) - 6, UnitMarketType.MERCENARY,
                     UnitType.TANK, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
             addOffers(campaign, Compute.d6(3) - 9, UnitMarketType.MERCENARY,
-                    UnitType.AERO, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
+                    UnitType.AEROSPACEFIGHTER, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
             addOffers(campaign, Compute.d6(3) - 9, UnitMarketType.MERCENARY,
                     UnitType.CONV_FIGHTER, mercenaryFaction, IUnitRating.DRAGOON_C, 5);
         }
@@ -111,7 +111,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                         faction, IUnitRating.DRAGOON_A, 6);
                 addOffers(campaign, Compute.d6() - 2, UnitMarketType.FACTORY, UnitType.TANK,
                         faction, IUnitRating.DRAGOON_A, 6);
-                addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.AERO,
+                addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.AEROSPACEFIGHTER,
                         faction, IUnitRating.DRAGOON_A, 6);
                 addOffers(campaign, Compute.d6() - 3, UnitMarketType.FACTORY, UnitType.CONV_FIGHTER,
                         faction, IUnitRating.DRAGOON_A, 6);
@@ -123,7 +123,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     null, IUnitRating.DRAGOON_C, 6);
             addOffers(campaign, Compute.d6(2) - 4, UnitMarketType.BLACK_MARKET, UnitType.TANK,
                     null, IUnitRating.DRAGOON_C, 6);
-            addOffers(campaign, Compute.d6(2) - 6, UnitMarketType.BLACK_MARKET, UnitType.AERO,
+            addOffers(campaign, Compute.d6(2) - 6, UnitMarketType.BLACK_MARKET, UnitType.AEROSPACEFIGHTER,
                     null, IUnitRating.DRAGOON_C, 6);
             addOffers(campaign, Compute.d6(2) - 6, UnitMarketType.BLACK_MARKET, UnitType.CONV_FIGHTER,
                     null, IUnitRating.DRAGOON_C, 6);

@@ -6,8 +6,9 @@
 	<isHostileFacility>true</isHostileFacility>
     <mapParameters>
         <allowedTerrainTypes>
-            <allowedTerrainType>3</allowedTerrainType>
-            <allowedTerrainType>6</allowedTerrainType>
+            <allowedTerrainType>ColdFacility</allowedTerrainType>
+            <allowedTerrainType>HotFacility</allowedTerrainType>
+            <allowedTerrainType>TemperateFacility</allowedTerrainType>
         </allowedTerrainTypes>
         <allowRotation>false</allowRotation>
         <baseHeight>0</baseHeight>

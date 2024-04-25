@@ -69,7 +69,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
     @Override
     public void setMapFile() {
         setMap("Brian-cache");
-        setTerrainType(TER_LIGHTURBAN);
+        setTerrainType("Urban");
     }
 
     @Override
@@ -85,7 +85,7 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(Board.START_CENTER);
+        setStartingPos(Board.START_CENTER);
         int enemyStart = Board.START_N;
 
         int roll = Compute.d6();
@@ -131,17 +131,17 @@ public class StarLeagueCache1BuiltInScenario extends AtBScenario {
         loot.setName(defaultResourceBundle.getString("battleDetails.starLeagueCache.Mek"));
         loot.addUnit(en);
         getLoot().add(loot);
-        addBotForce(new BotForce(TECH_FORCE_ID, 1, getStart(), otherForce), campaign);
+        addBotForce(new BotForce(TECH_FORCE_ID, 1, getStartingPos(), otherForce), campaign);
     }
 
     @Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 100);
-        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 100);
+        ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this, 1,
                 1, true);
-        ScenarioObjective keepTechAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(TECH_FORCE_ID, 1, true);
+        ScenarioObjective keepTechAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(TECH_FORCE_ID, 1, 1, true);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);

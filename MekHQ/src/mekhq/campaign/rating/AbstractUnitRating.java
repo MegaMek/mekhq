@@ -921,7 +921,7 @@ public abstract class AbstractUnitRating implements IUnitRating {
             case UnitType.JUMPSHIP:
                 incrementJumpShipCount();
                 break;
-            case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
             case UnitType.CONV_FIGHTER:
                 incrementFighterCount();
                 break;

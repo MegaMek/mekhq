@@ -854,7 +854,7 @@ at short, medium, or long/extended range, respectively, but only with a speciali
 				<skill>Tech/Mechanic</skill>
 				<skill>Tech/Mech</skill>
 			</skillPrereq>
-			<miscPrereq>clanner:false</miscPrereq>
+			<miscPrereq>clanperson:false</miscPrereq>
 		</ability>
 		<ability>
 			<displayName>Tactical Genius (CamOps)</displayName>

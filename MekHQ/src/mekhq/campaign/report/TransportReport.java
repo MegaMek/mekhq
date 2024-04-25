@@ -45,7 +45,7 @@ public class TransportReport extends AbstractReport {
         @SuppressWarnings("unused") // FIXME: What type of bays do ConvFighters use?
         int noCF = Math
                 .max(stats.getNumberOfUnitsByType(Entity.ETYPE_CONV_FIGHTER) - stats.getOccupiedBays(Entity.ETYPE_CONV_FIGHTER), 0);
-        int noASF = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_AERO) - stats.getOccupiedBays(Entity.ETYPE_AERO), 0);
+        int noASF = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_AEROSPACEFIGHTER) - stats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), 0);
         int nolv = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_TANK, false, true) - stats.getOccupiedBays(Entity.ETYPE_TANK, true), 0);
         int nohv = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_TANK) - stats.getOccupiedBays(Entity.ETYPE_TANK), 0);
         int noinf = Math.max(stats.getNumberOfUnitsByType(Entity.ETYPE_INFANTRY) - stats.getOccupiedBays(Entity.ETYPE_INFANTRY), 0);
@@ -91,7 +91,7 @@ public class TransportReport extends AbstractReport {
 
         // Lets do ASF next.
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n", "ASF Bays (Occupied):",
-                stats.getTotalASFBays(), stats.getOccupiedBays(Entity.ETYPE_AERO), "ASF Not Transported:", noASF, asfAppend));
+                stats.getTotalASFBays(), stats.getOccupiedBays(Entity.ETYPE_AEROSPACEFIGHTER), "ASF Not Transported:", noASF, asfAppend));
 
         // Lets do Light Vehicles next.
         sb.append(String.format("%-35s      %4d (%4d)      %-35s     %4d%s\n", "Light Vehicle Bays (Occupied):",

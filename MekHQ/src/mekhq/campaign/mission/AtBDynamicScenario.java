@@ -166,7 +166,7 @@ public class AtBDynamicScenario extends AtBScenario {
      * The Board.START_X constant representing the starting zone for the player's primary force
      */
     @Override
-    public int getStart() {
+    public int getStartingPos() {
         // If we've assigned at least one force
         // and there's a player force template associated with the first force
         // then return the generated deployment zone associated with the first force
@@ -175,7 +175,7 @@ public class AtBDynamicScenario extends AtBScenario {
             return playerForceTemplates.get(getForceIDs().get(0)).getActualDeploymentZone();
         }
 
-        return super.getStart();
+        return super.getStartingPos();
     }
 
     /**
@@ -562,11 +562,6 @@ public class AtBDynamicScenario extends AtBScenario {
         }
 
         super.loadFieldsFromXmlNode(wn, version, campaign);
-    }
-
-    @Override
-    public void setTerrain() {
-        AtBDynamicScenarioFactory.setTerrain(this);
     }
 
     @Override

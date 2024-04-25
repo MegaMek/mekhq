@@ -116,6 +116,11 @@ public class QuirksDialog extends JDialog implements DialogOptionListener, Actio
     }
 
     @Override
+    public void optionSwitched(DialogOptionComponent comp, IOption option, int i) {
+
+    }
+
+    @Override
     public void actionPerformed(ActionEvent e) {
         if (okayButton.equals(e.getSource())) {
             qpanel.setQuirks();

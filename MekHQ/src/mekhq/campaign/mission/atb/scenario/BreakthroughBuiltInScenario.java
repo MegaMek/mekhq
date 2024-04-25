@@ -71,12 +71,12 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
 
         if (isAttacker()) {
             playerHome = Compute.d6() > 3 ? Board.START_S : Board.START_N;
-            setStart(playerHome);
+            setStartingPos(playerHome);
 
             enemyStart = Board.START_CENTER;
             setEnemyHome(AtBDynamicScenarioFactory.getOppositeEdge(playerHome));
         } else {
-            setStart(Board.START_CENTER);
+            setStartingPos(Board.START_CENTER);
             playerHome = Board.START_N;
             enemyStart = Compute.d6() > 3 ? Board.START_S : Board.START_N;
 
@@ -86,7 +86,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
         BotForce allyEntitiesForce = null;
 
         if (!allyEntities.isEmpty()) {
-            allyEntitiesForce = getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities);
+            allyEntitiesForce = getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities);
             addBotForce(allyEntitiesForce, campaign);
         }
 
@@ -97,7 +97,7 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
             if (isAttacker()) {
                 if (null != allyEntitiesForce) {
                     allyEntitiesForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
-                    allyEntitiesForce.setDestinationEdge(AtBDynamicScenarioFactory.getOppositeEdge(getStart()));
+                    allyEntitiesForce.setDestinationEdge(AtBDynamicScenarioFactory.getOppositeEdge(getStartingPos()));
                 }
             } else {
                 botForce.setBehaviorSettings(BehaviorSettingsFactory.getInstance().ESCAPE_BEHAVIOR.getCopy());
@@ -120,9 +120,9 @@ public class BreakthroughBuiltInScenario extends AtBScenario {
         super.setObjectives(campaign, contract);
 
         ScenarioObjective destroyHostiles = isAttacker()
-                ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 66,
-                        OffBoardDirection.getOpposite(OffBoardDirection.translateBoardStart(getStart())))
-                : CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 50,
+                ? CommonObjectiveFactory.getBreakthrough(contract, this, campaign, 1, 66,
+                        OffBoardDirection.getOpposite(OffBoardDirection.translateBoardStart(getStartingPos())))
+                : CommonObjectiveFactory.getPreventEnemyBreakthrough(contract, 1, 50,
                         OffBoardDirection.translateBoardStart(getEnemyHome()));
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
                 this);

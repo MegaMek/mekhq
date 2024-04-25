@@ -173,7 +173,7 @@ public class BotForceRandomizer {
             if ((unitType == UnitType.MEK) && (percentConventional > 0)
                     && (Compute.randomInt(100) <= percentConventional)) {
                 uType = UnitType.TANK;
-            } else if ((unitType == UnitType.AERO) && (percentConventional > 0)
+            } else if ((unitType == UnitType.AEROSPACEFIGHTER) && (percentConventional > 0)
                     && (Compute.randomInt(100) <= percentConventional)) {
                 uType = UnitType.CONV_FIGHTER;
             }
@@ -313,7 +313,7 @@ public class BotForceRandomizer {
                 case UnitType.BATTLE_ARMOR:
                     phenotype = Phenotype.ELEMENTAL;
                     break;
-                case UnitType.AERO:
+                case UnitType.AEROSPACEFIGHTER:
                 case UnitType.CONV_FIGHTER:
                     phenotype = Phenotype.AEROSPACE;
                     break;
@@ -343,7 +343,7 @@ public class BotForceRandomizer {
         extraData.put(0, innerMap);
 
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
-                skills[0], skills[1], gender, extraData));
+                skills[0], skills[1], gender, faction.isClan(), extraData));
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
         return en;
@@ -420,7 +420,7 @@ public class BotForceRandomizer {
         double multiplier;
         switch (e.getUnitType()) {
             case UnitType.MEK:
-            case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
             case UnitType.PROTOMEK:
                 multiplier = 1.0;
                 break;

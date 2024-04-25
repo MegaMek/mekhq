@@ -152,7 +152,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     .sort(campaign.getHangar().getUnitsStream().filter(Unit::isAvailable))
                     .collect(Collectors.toList());
             for (final Unit unit : units) {
-                if (unit.getEntity().getUnitType() != unitType) {
+                Entity entity = unit.getEntity();
+                if (entity.getUnitType() != unitType) {
                     // Add the current menus, first the Entity Weight Class menu to the related Unit
                     // Type menu, then the Unit Type menu to the grouping menu
                     pilotUnitTypeMenu.add(pilotEntityWeightMenu);
@@ -173,12 +174,12 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     navigatorMenu.add(navigatorUnitTypeMenu);
 
                     // Update parsing variables
-                    unitType = unit.getEntity().getUnitType();
-                    weightClass = unit.getEntity().getWeightClass();
+                    unitType = entity.getUnitType();
+                    weightClass = entity.getWeightClass();
 
                     // And create the new menus
                     final String unitTypeName = UnitType.getTypeDisplayableName(unitType);
-                    final String entityWeightClassName = EntityWeightClass.getClassName(weightClass, unit.getEntity());
+                    final String entityWeightClassName = EntityWeightClass.getClassName(weightClass, entity);
                     pilotUnitTypeMenu = new JScrollableMenu("pilotUnitTypeMenu", unitTypeName);
                     pilotEntityWeightMenu = new JScrollableMenu("pilotEntityWeightMenu", entityWeightClassName);
                     driverUnitTypeMenu = new JScrollableMenu("driverUnitTypeMenu", unitTypeName);
@@ -195,7 +196,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     soldierEntityWeightMenu = new JScrollableMenu("soldierEntityWeightMenu", entityWeightClassName);
                     navigatorUnitTypeMenu = new JScrollableMenu("navigatorUnitTypeMenu", unitTypeName);
                     navigatorEntityWeightMenu = new JScrollableMenu("navigatorEntityWeightMenu", entityWeightClassName);
-                } else if (unit.getEntity().getWeightClass() != weightClass) {
+                } else if (entity.getWeightClass() != weightClass) {
                     // Add the current Entity Weight Class menu to the Unit Type menu
                     pilotUnitTypeMenu.add(pilotEntityWeightMenu);
                     driverUnitTypeMenu.add(driverEntityWeightMenu);
@@ -207,10 +208,10 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     navigatorUnitTypeMenu.add(navigatorEntityWeightMenu);
 
                     // Update parsing variable
-                    weightClass = unit.getEntity().getWeightClass();
+                    weightClass = entity.getWeightClass();
 
                     // And create the new Entity Weight Class menus
-                    final String entityWeightClassName = EntityWeightClass.getClassName(weightClass, unit.getEntity());
+                    final String entityWeightClassName = EntityWeightClass.getClassName(weightClass, entity);
                     pilotEntityWeightMenu = new JScrollableMenu("pilotEntityWeightMenu", entityWeightClassName);
                     driverEntityWeightMenu = new JScrollableMenu("driverEntityWeightMenu", entityWeightClassName);
                     gunnerEntityWeightMenu = new JScrollableMenu("gunnerEntityWeightMenu", entityWeightClassName);
@@ -224,17 +225,17 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 // Pilot Menu
                 if (unit.canTakeMoreDrivers()) {
                     // Pilot Menu - Solo Pilot and VTOL Pilot Assignment
-                    if (singlePerson && (unit.usesSoloPilot() || (unit.getEntity() instanceof VTOL))) {
+                    if (singlePerson && (unit.usesSoloPilot() || (entity instanceof VTOL) || entity.isSuperHeavy() || entity.isTripodMek())) {
                         final boolean valid;
-                        if (unit.getEntity() instanceof Mech) {
+                        if (entity instanceof Mech) {
                             valid = areAllBattleMechPilots;
-                        } else if (unit.getEntity() instanceof Protomech) {
+                        } else if (entity instanceof Protomech) {
                             valid = areAllProtoMechPilots;
-                        } else if (unit.getEntity() instanceof ConvFighter) {
+                        } else if (entity instanceof ConvFighter) {
                             valid = areAllConventionalAerospacePilots;
-                        } else if (unit.getEntity() instanceof Aero) {
+                        } else if (entity instanceof Aero) {
                             valid = areAllAerospacePilots;
-                        } else if (unit.getEntity() instanceof VTOL) {
+                        } else if (entity instanceof VTOL) {
                             valid = areAllVTOLPilots;
                         } else {
                             valid = false;
@@ -253,7 +254,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                                     useTransfers = campaign.getCampaignOptions().isUseTransfers();
                                 }
 
-                                if (unit.getEntity() instanceof VTOL) {
+                                if (entity instanceof VTOL) {
                                     unit.addDriver(people[0], useTransfers);
                                 } else {
                                     unit.addPilotOrSoldier(people[0], useTransfers);
@@ -264,7 +265,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     }
 
                     // Pilot Menu - Small Craft and JumpShip Vessel Pilot Assignment
-                    if (((unit.getEntity() instanceof SmallCraft) || (unit.getEntity() instanceof Jumpship))
+                    if (((entity instanceof SmallCraft) || (entity instanceof Jumpship))
                             && areAllVesselPilots) {
                         final JMenuItem miVesselPilot = new JMenuItem(unit.getName());
                         miVesselPilot.setName("miVesselPilot");
@@ -289,9 +290,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                     }
 
                     // Driver Menu - Non-VTOL Tank Driver Assignments
-                    if (singlePerson && (unit.getEntity() instanceof Tank)
-                            && !(unit.getEntity() instanceof VTOL)) {
-                        if (unit.getEntity().getMovementMode().isMarine()
+                    if (singlePerson && (entity instanceof Tank)
+                            && !(entity instanceof VTOL)) {
+                        if (entity.getMovementMode().isMarine()
                                 ? areAllNavalVehicleDrivers : areAllGroundVehicleDrivers) {
                             final JMenuItem miDriver = new JMenuItem(unit.getName());
                             miDriver.setName("miDriver");
@@ -314,11 +315,13 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 // Gunnery Menu
                 if (unit.canTakeMoreGunners()) {
                     final boolean valid;
-                    if (unit.getEntity() instanceof Tank) {
+                    if (entity instanceof Tank) {
                         valid = areAllVehicleGunners;
-                    } else if ((unit.getEntity() instanceof SmallCraft)
-                            || (unit.getEntity() instanceof Jumpship)) {
+                    } else if ((entity instanceof SmallCraft)
+                            || (entity instanceof Jumpship)) {
                         valid = areAllVesselGunners;
+                    } else if (entity.isTripodMek() || entity.isSuperHeavy()) {
+                        valid = areAllBattleMechPilots;
                     } else {
                         valid = false;
                     }
@@ -352,9 +355,9 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 // TODO : also be based on crewmembers
                 if (unit.canTakeMoreVesselCrew()) {
                     final boolean valid;
-                    if (unit.getEntity() instanceof Aero) {
+                    if (entity instanceof Aero) {
                         valid = areAllVesselCrew;
-                    } else if (unit.getEntity().isSupportVehicle()) {
+                    } else if (entity.isSupportVehicle()) {
                         // TODO : Expand for Command and Control, Medical, Technician, and Salvage Assignments
                         valid = areAllVehicleCrew;
                     } else {
@@ -393,8 +396,8 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                 if (singlePerson && unit.canTakeTechOfficer()) {
                     // For a vehicle command console we will require the commander to be a driver
                     // or a gunner, but not necessarily both
-                    if (unit.getEntity() instanceof Tank) {
-                        if (people[0].canDrive(unit.getEntity()) || people[0].canGun(unit.getEntity())) {
+                    if (entity instanceof Tank) {
+                        if (people[0].canDrive(entity) || people[0].canGun(entity)) {
                             final JMenuItem miConsoleCommander = new JMenuItem(unit.getName());
                             miConsoleCommander.setName("miConsoleCommander");
                             miConsoleCommander.setForeground(unit.determineForegroundColor("Menu"));
@@ -410,7 +413,7 @@ public class AssignPersonToUnitMenu extends JScrollableMenu {
                             });
                             consoleCommanderEntityWeightMenu.add(miConsoleCommander);
                         }
-                    } else if (people[0].canDrive(unit.getEntity()) && people[0].canGun(unit.getEntity())) {
+                    } else if (people[0].canDrive(entity) && people[0].canGun(entity)) {
                         final JMenuItem miTechOfficer = new JMenuItem(unit.getName());
                         miTechOfficer.setName("miTechOfficer");
                         miTechOfficer.setForeground(unit.determineForegroundColor("Menu"));

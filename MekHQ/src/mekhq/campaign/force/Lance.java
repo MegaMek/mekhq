@@ -165,7 +165,7 @@ public class Lance {
                 if (null != entity) {
                     if ((entity.getEntityType() & Entity.ETYPE_MECH) != 0) {
                         armor += 1;
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AERO) != 0) {
+                    } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
                         other += 0.5;
                     } else if ((entity.getEntityType() & Entity.ETYPE_TANK) != 0) {
                         armor += 0.5;
@@ -250,24 +250,8 @@ public class Lance {
     }
 
     /* Code to find unit commander from ForceViewPanel */
-
     public static UUID findCommander(int forceId, Campaign c) {
-        ArrayList<Person> people = new ArrayList<>();
-        for (UUID uid : c.getForce(forceId).getAllUnits(false)) {
-            Unit u = c.getUnit(uid);
-            if (null != u) {
-                Person p = u.getCommander();
-                if (null != p) {
-                    people.add(p);
-                }
-            }
-        }
-        // sort person vector by rank
-        people.sort((p1, p2) -> ((Comparable<Integer>) p2.getRankNumeric()).compareTo(p1.getRankNumeric()));
-        if (!people.isEmpty()) {
-            return people.get(0).getId();
-        }
-        return null;
+        return c.getForce(forceId).getForceCommanderID();
     }
 
     public static LocalDate getBattleDate(LocalDate today) {
@@ -515,7 +499,7 @@ public class Lance {
                         } else {
                             weight += entity.getWeight();
                         }
-                    } else if ((entity.getEntityType() & Entity.ETYPE_AERO) != 0) {
+                    } else if ((entity.getEntityType() & Entity.ETYPE_AEROSPACEFIGHTER) != 0) {
                         if (c.getFaction().isClan()) {
                             weight += entity.getWeight() * 0.5;
                         } else {

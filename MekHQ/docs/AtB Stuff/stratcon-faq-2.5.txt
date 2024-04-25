@@ -27,14 +27,14 @@ SCENARIOS IN STRATCON MODE
     The biome of a hex on a track determines the map generator preset used to generate maps for that hex
     For the first time, map themes are used to give a distinct visual look to many of the maps
     Expect to see jungles, deserts, frozen wastelands and many others
-    Facilities can now spawn with reinforced buildings that are tough to destroy, so you might need to bring the big guns.  
+    Facilities can now spawn with reinforced buildings that are tough to destroy, so you might need to bring the big guns.
 
 
 * StratCon will generate scenarios based on the Contract. If such a scenario happens, it will be displayed in the Briefing room AND the "AtB Campaign State" tab (as a red icon).
 
 * If a scenario appears only in the Briefing tab, then it's a legacy or special scenario (e.g. cache, big battle), and you can ignore it if you wish (you would need to GM-remove it).
 
-* Stratcon has "Tracks" that are basically map pages.  When you are small, you will have one track (Track 0).  As you grow, your contract may involve multiple tracks.  You switch tracks on the right side of the Stratcon map in the track dropdown.  
+* Stratcon has "Tracks" that are basically map pages.  When you are small, you will have one track (Track 0).  As you grow, your contract may involve multiple tracks.  You switch tracks on the right side of the Stratcon map in the track dropdown.
 
 * Some scenarios and objectives may be on Track 0 and some on Track 1, etc.  You need to make sure you check and scout all of the Tracks, as necessary.
 
@@ -42,7 +42,7 @@ SCENARIOS IN STRATCON MODE
 
 * The game will still spawn Special Scenarios randomly, like Duels, Star League Cashes, Base Defense, Big Battles, etc. These don't appear on the map, and the deployment must be done through the TO&E.
 
-* StratCon scenarios can spawn Mechs, vehicles, VTOLs, conventional infantry, battle armor, conventional fighters (with bombs or missiles), AeroSpace Fighters (with even MORE bombs or missiles), Dropships (and hotdrops), on and off-board Artillery, and even wet navy units.  Be prepared.  
+* StratCon scenarios can spawn Mechs, vehicles, VTOLs, conventional infantry, battle armor, conventional fighters (with bombs or missiles), AeroSpace Fighters (with even MORE bombs or missiles), Dropships (and hotdrops), on and off-board Artillery, and even wet navy units.  Be prepared.
 
 * If you have even just a couple of Aerospace units, the game will spawn Aerospace or DropShip scenarios.
 
@@ -52,9 +52,9 @@ SCENARIOS IN STRATCON MODE
 
 * "My non-combat lance got dragged into battle!!" - The game sometimes ignores the non-combat flag (even for DropShips). Just don't use non-combat flag with StratCon, as it'll cause issues.
 
-* "The Enemy has 80 units and I have 4!!" - Stratcon normally pulls a lance/star unit from your TO&E to form as the seed unit for a new scenario.  BUT if you have units in your Main TO&E tree that are freestanding it can pull those units as seed, or it will use your whole TO&E BV as a seed.  Common offenders are Dropships and Jumpships, etc.  Make sure everything under your TO&E is in a subforce.  It might be best just to remove Dropships and Jumpships completely.  
+* "The Enemy has 80 units and I have 4!!" - Stratcon normally pulls a lance/star unit from your TO&E to form as the seed unit for a new scenario.  BUT if you have units in your Main TO&E tree that are freestanding it can pull those units as seed, or it will use your whole TO&E BV as a seed.  Common offenders are Dropships and Jumpships, etc.  Make sure everything under your TO&E is in a subforce.  It might be best just to remove Dropships and Jumpships completely.
 
-* "The Enemy has 80 units and I have 4, again!!"  If you ever feel outnumbered or outmatched, assign your force to the scenario, right click on it in the briefing tab, edit, and regnerate bot forces.  It will tailor the new force to the BV of your assigned force.  You may still be outmatched (as sometimes that is intentional and it will require reinforcements) - but it should be better.  
+* "The Enemy has 80 units and I have 4, again!!"  If you ever feel outnumbered or outmatched, assign your force to the scenario, right click on it in the briefing tab, edit, and regnerate bot forces.  It will tailor the new force to the BV of your assigned force.  You may still be outmatched (as sometimes that is intentional and it will require reinforcements) - but it should be better.
 
 * Evacuate Scenario during a Garrison contract: If you lose the facility, it will be under enemy control.  You can try to attack and recapture it.  If you dont, you will fail the contract.  If there is a bug with this, you can right click on hex and GM add it again. If it's a contract objective, you have to restore it in the same hex.
 
@@ -63,7 +63,7 @@ Under integrated or house command, or if the liaison is coming along for the rid
 Additionally, if there's an allied facility on the track, the scenario will move towards the nearest allied facility. Sometimes, you need to keep those intact as part of the contract. And if they get captured without a fight, the enemy will put them to use, making subsequent scenarios more difficult.
 Some scenarios might draw a bunch of modifiers and be very difficult.  There is no shame in skipping a scenario if it is too hard.  Just make sure you win your other ones.
 
-* Don't delete a scenario with a deployed force. Many bugs involved. The best solution is to eat the VP loss, and add the Victory Point through GM mode, if needed. Or, you can resolve it manually in MHQ, without a MUL file.
+* Don't delete a scenario with a deployed force. Many bugs involved. The best solution is to eat the Campaign VP loss, and add the Campaign Victory Point through GM mode, if needed. Or, you can resolve it manually in MHQ, without a MUL file.
 
 
 =======================================
@@ -72,15 +72,15 @@ YOUR MISSION AND GOALS IN STRATCON MODE
 
 Your Contract Score is no longer the sole metric of your success.
 
-* Under Integrated and House command, you need to keep your VP count positive. Every time you win a scenario which you didn't initiate, that's +1 VP. Every time you lose a scenario you didn't initiate, that's -1 VP. 
+* Under Integrated and House command, you need to keep your VP count positive. Every time you win a scenario which you didn't initiate, that's +1 VP. Every time you lose a scenario you didn't initiate, that's -1 VP.
 
 * Under Liaison command, you need to keep your VP count positive AND you're responsible for completing the given number of strategic objectives. On defensive contracts, this may include keeping allied facilities intact and under allied control. On offensive contracts, it's usually capturing/destroying facilities or winning specific scenarios. VPs are only affected by scenarios in which a liaison participates.
 
 * Under Independent command, you're only responsible for completing strategic objectives.
 
-* Stratcon contract VP's are only awarded for "required by employer" scenarios, and will show "deployment required by contract / -1 VP if lost/ignored; +1 VP if won" and are NOT necessarily Contract Objectives.  There is a screenshot sticky in the Stratcon channel for an example.  
+* Stratcon contract VP's are only awarded for "required by employer" scenarios, and will show "deployment required by contract / -1 VP if lost/ignored; +1 VP if won" and are NOT necessarily Contract Objectives.  There is a screenshot sticky in the Stratcon channel for an example.
 
-* The information about whether a scenario gives VP/SP is stated in red on the scenario description in the StratCon tab. "Scenario Victory Points" stated in the briefing tab are internal, meant for the game to find the effect (if any) of the battle.  So, VP discussed in a post-battle resolution screen and VP on the StratCon campaign tab are NOT the same.  The ones on the campaign tab are the only ones that count toward final contract score.
+* The information about whether a scenario gives VP/SP is stated in red on the scenario description in the StratCon tab. "Operational Victory Points" stated in the briefing tab are internal, meant for the game to find the effect (if any) of the battle.  So, VP discussed in a post-battle resolution screen and VP on the StratCon campaign tab are NOT the same.  The ones on the campaign tab are the only ones that count toward final contract score.
 
 * Orange objectives mean completed, but on-going objectives. Finished strategic objectives turn green.
 
@@ -103,8 +103,8 @@ THE STRATCON HEX GRID
 	* Comms Center - adds a random positive modifier for the side that owns it.
 	* Early Warning Center - Reduces the number of turns for allied or enemy reinforcements to arrive during battle.
 	* Oribital Defense - Hostile = Prevents Aerospace and adds an enemy Officer mech to scenarios.
-	* Base of Operations - More and better defenders.  Allied = losing this means a contract loss.  Enemy = Adds enemy commander mech to scenarios.  Enemy loss reduces contract activity.    
- 
+	* Base of Operations - More and better defenders.  Allied = losing this means a contract loss.  Enemy = Adds enemy commander mech to scenarios.  Enemy loss reduces contract activity.
+
 * Your forces currently deployed to the track are cyan icons.
 
 * Pending scenarios against hostile forces are red icons.
@@ -134,7 +134,7 @@ DEPLOYMENT IN STRATCON MODE
 * First, as of 49.0, the "Deployment Requirements" in the Briefing tab are not implemented in StratCon. However, the Lance count is important, as you will get multiple scenarios, up to that lance count. Also the assigned Roles are very important in StratCon, as you will see below.
 
 * To deploy in StratCon mode, you must right-click on the relevant Track hex with nested red squares and Manage. Then you can choose which Lance(s) to send, and what reinforcement to send. You can multi-select, and use ctrl-click to unselect. (The "old" TO&E deployment tool still works, but is mostly kept for GM use; use the Campaign tab one instead.)
- 
+
 * Note that when a Lance is deployed, you can right-click on that hex and click on a Lance's checkbox to have it remain in that hex, so that you don't have to spend resources to deploy it there later. Now you have a solid reason for having spare Lances!
 
 * Note that when a Lance is deployed, or returning from a battle, you can't repair/resupply it.  It is out in the field.  So you may not see mechs in your repair bay to repair.  Or units might appear in your TOE, but since they are still returning from battle, they cant be deployed.
@@ -142,7 +142,7 @@ DEPLOYMENT IN STRATCON MODE
 * If under Integrated command, you don't get to choose! The command will choose for you... Otherwise, a Lance is randomly auto-selected for the purpose of computing the OpFor BV, and then you can change it. The exception is when you are scouting or voluntarily creating a battle.
 
 * To send reinforcements, you have several choices:
-- You can simply spend a Support Point per Lance (or a Victory Point, in a pinch). SPs are obtained by certain scenarios or holding supply depot Objectives, and leftover Negotiation.
+- You can simply spend a Support Point per Lance (or a Campaign Victory Point, in a pinch). SPs are obtained by certain scenarios or holding supply depot Objectives, and leftover Negotiation.
 - If a Lance is already on the same hex as the scenario (likely because you've set it to remain there, see above), it can deploy for free.
 - A lance in a 'fight' role can be deployed for free. However, on an 8 or less on a 2d6, it will add an extra negative modifier to the scenario. There will be feedback in the Activity Log.
 - Fight role lances always consume VP/SP if available. Although game mechanics would imply a choice, it is not yet implemented. Forcing a roll is only possible if no VP/SP available, so you would have to remove them all via GM mode and re-add them after the roll. The bonus Parts gained cannot be removed at the moment, but if you go this route and want to keep game balance, you can always use them on low value items.
@@ -158,7 +158,7 @@ A NOTE ON OPFOR GENERATION
 The primary opposing forces are usually generated via the "scaled BV" method. This takes into account the difficulty rating and your current CamOps or FMM unit rating. The algorithm is roughly as follows:
 - Your unit rating determines the BV floor. This is a percentage from 50-100, inclusive.
 - Your difficulty determines the BV ceiling. This a percentage between 80-120, inclusive.
-Multiply the above percentages by the BV of your primary force (the lance that gets somewhat-randomly selected when the scenario is generated). The resulting BVs are the BV floor and BV ceiling, respectively. Note that, on non-Integrated command, the primary force is a randomly picked lance from your TO&E, and you then get to choose which lance is actually assigned to the fight. 
+Multiply the above percentages by the BV of your primary force (the lance that gets somewhat-randomly selected when the scenario is generated). The resulting BVs are the BV floor and BV ceiling, respectively. Note that, on non-Integrated command, the primary force is a randomly picked lance from your TO&E, and you then get to choose which lance is actually assigned to the fight.
 
 1. The scaled OpFor receives one lance off the appropriate RAT. If the BV is under the floor, repeat.
 2. If the BV is between the floor and ceiling, we roll a 1d100 and compare it to the ratio of current opposition BV / ceiling. If the roll is lower than the ratio, then we stop. Otherwise, go back to 1 and add another lance.
@@ -189,7 +189,7 @@ Some scenario resolution logic is broken. A common example is needing to keep bo
 So: give your lance leaders leadership points, and keep some lower-BV units (tanks, aerospace fighters, whatever) around so you can bring extra stuff to a fight
 NOTE:  This is bugged and your bonus unit may appear on other battles when it should not.  You can save and reload MHQ after your battle with the bonus unit, and undeploy it as necessary after that and it wont appear on new battles after that.
 
-#2: Keep some lances on the "fight" role or keep some support/victory points. That way, if a fight seems unfair, you can bring an extra lance or two in.
+#2: Keep some lances on the "fight" role or keep some Support/Campaign Victory Points. That way, if a fight seems unfair, you can bring an extra lance or two in.
 
 #3: On Independent and Liaison command rights, you're expected to complete the strategic objectives. On Liaison+ command, you're expected to maintain positive campaign VP.
 
@@ -213,7 +213,7 @@ There is no direct sure-fire way to go about disabling turrets. You have two cho
 - Some of the new facilities are built on Reinforced buildings that take a lot of damage to destroy.  Make sure you pay attention to the map type and if there are heavy buildings you should bring some big guns.
 
 * Base/objective attacks and capture*
-That one's a bit tricky. 
+That one's a bit tricky.
 - To capture the base you need to leave 75% of the turrets intact with 75% of opfor destroyed.  As explained above, your best bet is to NOT shoot at the turrets (though crew/weapon-disabled turrets count as preserved), then rout the indicated % of forces. That's very hard if you have bot allies as they love to shoot and kick buildings; a trick is to give all allied bots all non-turret enemies as strategic targets and set their aggression level lower.
 - To destroy the base, you need to destroy or disable ALL Turrets. You don't actually need to rout the ground forces.
 - To recon the base, you need to scan all turrets. You might want to tweak allied bots as above. Jump jets are a must. Note that if you get a base Recon scenario, you're not bound to stick to recon and can still go for a capture or destroy. You might consider the scenario a failure, though, I guess.
