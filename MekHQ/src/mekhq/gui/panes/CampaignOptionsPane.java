@@ -516,6 +516,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
+    private JSpinner spnScenarioModMax;
+    private JSpinner spnScenarioModChance;
+    private JSpinner spnScenarioModBV;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -3040,6 +3043,56 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.insets = new Insets(0, 5, 5, 5);
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(panSPAUpgradeIntensity, gridBagConstraints);
+
+        JPanel panScenarioMod = new JPanel();
+        JLabel lblScenarioMod = new JLabel(resources.getString("lblScenarioMod.text"));
+        panScenarioMod.add(lblScenarioMod);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
+
+        JLabel lblScenarioModMax = new JLabel(resources.getString("lblScenarioModMax.text"));
+        lblScenarioModMax.setToolTipText(resources.getString("lblScenarioModMax.toolTipText"));
+        spnScenarioModMax = new JSpinner(new SpinnerNumberModel(3, 0, 10, 1));
+        panScenarioMod.add(lblScenarioModMax);
+        panScenarioMod.add(spnScenarioModMax);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
+
+        JLabel lblScenarioModChance = new JLabel(resources.getString("lblScenarioModChance.text"));
+        lblScenarioModChance.setToolTipText(resources.getString("lblScenarioModChance.toolTipText"));
+        spnScenarioModChance = new JSpinner(new SpinnerNumberModel(25, 5, 100, 5));
+        panScenarioMod.add(lblScenarioModChance);
+        panScenarioMod.add(spnScenarioModChance);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
+
+        JLabel lblScenarioModBV = new JLabel(resources.getString("lblScenarioModBV.text"));
+        lblScenarioModBV.setToolTipText(resources.getString("lblScenarioModBV.toolTipText"));
+        spnScenarioModBV = new JSpinner(new SpinnerNumberModel(50, 5, 100, 5));
+        panScenarioMod.add(lblScenarioModBV);
+        panScenarioMod.add(spnScenarioModBV);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
 
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new Dimension(500, 410));
@@ -6431,6 +6484,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAdjustPlayerVehicles.setSelected(options.isAdjustPlayerVehicles());
         spnFixedMapChance.setValue(options.getFixedMapChance());
         spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
+        spnScenarioModMax.setValue(options.getScenarioModMax());
+        spnScenarioModChance.setValue(options.getScenarioModChance());
+        spnScenarioModBV.setValue(options.getScenarioModBV());
         chkRegionalMechVariations.setSelected(options.isRegionalMechVariations());
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
@@ -6842,6 +6898,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setOpForLocalUnitChance((Integer) spnOpForLocalForceChance.getValue());
             options.setFixedMapChance((Integer) spnFixedMapChance.getValue());
             options.setSpaUpgradeIntensity((Integer) spnSPAUpgradeIntensity.getValue());
+            options.setScenarioModMax((Integer) spnScenarioModMax.getValue());
+            options.setScenarioModChance((Integer) spnScenarioModChance.getValue());
+            options.setScenarioModBV((Integer) spnScenarioModBV.getValue());
             options.setUseDropShips(chkUseDropShips.isSelected());
 
             for (int i = 0; i < spnAtBBattleChance.length; i++) {

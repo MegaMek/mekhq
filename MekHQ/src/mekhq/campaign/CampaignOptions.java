@@ -474,6 +474,9 @@ public class CampaignOptions {
     private boolean usePlanetaryConditions;
     private int fixedMapChance;
     private int spaUpgradeIntensity;
+    private int scenarioModMax;
+    private int scenarioModChance;
+    private int scenarioModBV;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -978,6 +981,9 @@ public class CampaignOptions {
         useWeatherConditions = true;
         useLightConditions = true;
         usePlanetaryConditions = false;
+        setScenarioModMax(3);
+        setScenarioModChance(25);
+        setScenarioModBV(50);
         //endregion Against the Bot Tab
     }
     //endregion Constructors
@@ -3480,6 +3486,30 @@ public class CampaignOptions {
         this.spaUpgradeIntensity = spaUpgradeIntensity;
     }
 
+    public int getScenarioModMax() {
+        return scenarioModMax;
+    }
+
+    public void setScenarioModMax(final int scenarioModMax) {
+        this.scenarioModMax = scenarioModMax;
+    }
+
+    public int getScenarioModChance() {
+        return scenarioModChance;
+    }
+
+    public void setScenarioModChance(final int scenarioModChance) {
+        this.scenarioModChance = scenarioModChance;
+    }
+
+    public int getScenarioModBV() {
+        return scenarioModBV;
+    }
+
+    public void setScenarioModBV(final int scenarioModBV) {
+        this.scenarioModBV = scenarioModBV;
+    }
+
     //region File IO
     public void writeToXml(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaignOptions");
@@ -3861,6 +3891,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLocalUnitChance", getOpForLocalUnitChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fixedMapChance", fixedMapChance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaUpgradeIntensity", spaUpgradeIntensity);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModMax", scenarioModMax);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", scenarioModChance);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", scenarioModBV);
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonus);
@@ -4689,6 +4722,12 @@ public class CampaignOptions {
                     retVal.fixedMapChance = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("spaUpgradeIntensity")) {
                     retVal.setSpaUpgradeIntensity(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioModMax")) {
+                    retVal.setScenarioModMax(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioModChance")) {
+                    retVal.setScenarioModChance(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioModBV")) {
+                    retVal.setScenarioModBV(Integer.parseInt(wn2.getTextContent().trim()));
 
                 //region Legacy
                 // Removed in 0.49.*
