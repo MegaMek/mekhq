@@ -926,6 +926,8 @@ public class AtBDynamicScenarioFactory {
                     if (numMods >= modMax) {
                         addMods = false;
                     }
+                } else {
+                    addMods = false;
                 }
             }
 
