@@ -28,6 +28,7 @@ public enum TransactionType {
     BATTLE_LOSS_COMPENSATION("TransactionType.BATTLE_LOSS_COMPENSATION.text", "TransactionType.BATTLE_LOSS_COMPENSATION.toolTipText"),
     CONSTRUCTION("TransactionType.CONSTRUCTION.text", "TransactionType.CONSTRUCTION.toolTipText"),
     CONTRACT_PAYMENT("TransactionType.CONTRACT_PAYMENT.text", "TransactionType.CONTRACT_PAYMENT.toolTipText"),
+    EDUCATION("TransactionType.EDUCATION.text", "TransactionType.EDUCATION.toolTipText"),
     EQUIPMENT_PURCHASE("TransactionType.EQUIPMENT_PURCHASE.text", "TransactionType.EQUIPMENT_PURCHASE.toolTipText"),
     EQUIPMENT_SALE("TransactionType.EQUIPMENT_SALE.text", "TransactionType.EQUIPMENT_SALE.toolTipText"),
     FINANCIAL_TERM_END_CARRYOVER("TransactionType.FINANCIAL_TERM_END_CARRYOVER.text", "TransactionType.FINANCIAL_TERM_END_CARRYOVER.toolTipText"),
@@ -84,6 +85,10 @@ public enum TransactionType {
 
     public boolean isContractPayment() {
         return this == CONTRACT_PAYMENT;
+    }
+
+    public boolean isEducation() {
+        return this == EDUCATION;
     }
 
     public boolean isEquipmentPurchase() {
@@ -228,6 +233,8 @@ public enum TransactionType {
                     return REPAIRS;
                 case 16:
                     return RANSOM;
+                case 17:
+                    return EDUCATION;
                 default:
                     break;
             }

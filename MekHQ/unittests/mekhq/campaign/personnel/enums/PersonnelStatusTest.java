@@ -141,6 +141,17 @@ public class PersonnelStatusTest {
     }
 
     @Test
+    public void testIsStudent() {
+        for (final PersonnelStatus personnelStatus : statuses) {
+            if (personnelStatus == PersonnelStatus.STUDENT) {
+                assertTrue(personnelStatus.isStudent());
+            } else {
+                assertFalse(personnelStatus.isStudent());
+            }
+        }
+    }
+
+    @Test
     public void testIsKIA() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.KIA) {

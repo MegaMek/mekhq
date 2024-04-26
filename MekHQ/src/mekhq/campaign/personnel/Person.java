@@ -31,7 +31,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -60,6 +59,7 @@ import mekhq.campaign.work.IPartWork;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.io.migration.FactionMigrator;
 import mekhq.io.migration.PersonMigrator;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -947,6 +947,10 @@ public class Person {
                     campaign.addReport(String.format(resources.getString("returnedFromLeave.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+                } else if (getStatus().isStudent()) {
+                    campaign.addReport(String.format(resources.getString("returnedFromEducation.report"),
+                            getHyperlinkedFullTitle()));
+                    ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
                 } else if (getStatus().isAWOL()) {
                     campaign.addReport(String.format(resources.getString("returnedFromAWOL.report"),
                             getHyperlinkedFullTitle()));
@@ -968,6 +972,9 @@ public class Person {
             case PREGNANCY_COMPLICATIONS:
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 // purposeful fall through
+            case STUDENT:
+                // log entries & reports are handled by the education package (mekhq/campaign/personnel/education)
+                break;
             default:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);

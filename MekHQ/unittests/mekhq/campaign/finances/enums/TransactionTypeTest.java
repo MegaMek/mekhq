@@ -80,6 +80,17 @@ public class TransactionTypeTest {
     }
 
     @Test
+    public void testIsEducation() {
+        for (final TransactionType transactionType : types) {
+            if (transactionType == TransactionType.EDUCATION) {
+                assertTrue(transactionType.isEducation());
+            } else {
+                assertFalse(transactionType.isEducation());
+            }
+        }
+    }
+
+    @Test
     public void testIsEquipmentPurchase() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.EQUIPMENT_PURCHASE) {

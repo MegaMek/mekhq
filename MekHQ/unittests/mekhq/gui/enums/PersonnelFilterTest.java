@@ -532,6 +532,17 @@ public class PersonnelFilterTest {
     }
 
     @Test
+    public void testIsStudent() {
+        for (final PersonnelFilter personnelFilter : filters) {
+            if (personnelFilter == PersonnelFilter.STUDENT) {
+                assertTrue(personnelFilter.isStudent());
+            } else {
+                assertFalse(personnelFilter.isStudent());
+            }
+        }
+    }
+
+    @Test
     public void testIsKIA() {
         for (final PersonnelFilter personnelFilter : filters) {
             if (personnelFilter == PersonnelFilter.KIA) {

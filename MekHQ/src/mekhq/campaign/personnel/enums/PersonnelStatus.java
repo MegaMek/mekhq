@@ -38,6 +38,7 @@ public enum PersonnelStatus {
     AWOL("PersonnelStatus.AWOL.text", "PersonnelStatus.AWOL.toolTipText", "PersonnelStatus.AWOL.reportText", "PersonnelStatus.AWOL.logText"),
     RETIRED("PersonnelStatus.RETIRED.text", "PersonnelStatus.RETIRED.toolTipText", "PersonnelStatus.RETIRED.reportText", "PersonnelStatus.RETIRED.logText"),
     DESERTED("PersonnelStatus.DESERTED.text", "PersonnelStatus.DESERTED.toolTipText", "PersonnelStatus.DESERTED.reportText", "PersonnelStatus.DESERTED.logText"),
+    STUDENT("PersonnelStatus.STUDENT.text", "PersonnelStatus.STUDENT.toolTipText", "PersonnelStatus.STUDENT.reportText", "PersonnelStatus.STUDENT.logText"),
     KIA("PersonnelStatus.KIA.text", "PersonnelStatus.KIA.toolTipText", "PersonnelStatus.KIA.reportText", "PersonnelStatus.KIA.logText"),
     HOMICIDE("PersonnelStatus.HOMICIDE.text", "PersonnelStatus.HOMICIDE.toolTipText", "PersonnelStatus.HOMICIDE.reportText", "PersonnelStatus.HOMICIDE.logText"),
     WOUNDS("PersonnelStatus.WOUNDS.text", "PersonnelStatus.WOUNDS.toolTipText", "PersonnelStatus.WOUNDS.reportText", "PersonnelStatus.WOUNDS.logText"),
@@ -113,6 +114,10 @@ public enum PersonnelStatus {
         return this == DESERTED;
     }
 
+    public boolean isStudent() {
+        return this == STUDENT;
+    }
+
     public boolean isKIA() {
         return this == KIA;
     }
@@ -161,7 +166,7 @@ public enum PersonnelStatus {
      * @return true if a person is currently absent from the core force, otherwise false
      */
     public boolean isAbsent() {
-        return isMIA() || isPoW() || isOnLeave() || isAWOL();
+        return isMIA() || isPoW() || isOnLeave() || isAWOL() || isStudent();
     }
 
     /**
@@ -184,7 +189,7 @@ public enum PersonnelStatus {
     public static List<PersonnelStatus> getImplementedStatuses() {
         return Stream.of(values())
                 .filter(personnelStatus -> !personnelStatus.isPoW() && !personnelStatus.isOnLeave()
-                        && ! personnelStatus.isAWOL())
+                        && !personnelStatus.isAWOL())
                 .collect(Collectors.toList());
     }
 
@@ -210,6 +215,8 @@ public enum PersonnelStatus {
                     return KIA;
                 case 3:
                     return MIA;
+                case 4:
+                    return STUDENT;
                 default:
                     break;
             }

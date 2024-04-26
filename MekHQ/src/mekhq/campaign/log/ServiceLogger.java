@@ -86,6 +86,14 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, status.getLogText()));
     }
 
+    public static void beganEducation(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("startedEducation.text"), institution)));
+    }
+
+    public static void endedEducation(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("endedEducation.text"), institution)));
+    }
+
     public static void recoveredMia(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredMia.text")));
     }

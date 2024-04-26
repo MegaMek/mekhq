@@ -80,6 +80,7 @@ public enum PersonnelFilter {
     MIA("PersonnelFilter.MIA.text", "PersonnelFilter.MIA.toolTipText", false, false),
     RETIRED("PersonnelFilter.RETIRED.text", "PersonnelFilter.RETIRED.toolTipText", false, false),
     DESERTED("PersonnelFilter.DESERTED.text", "PersonnelFilter.DESERTED.toolTipText", false, false),
+    STUDENT("PersonnelFilter.STUDENT.text", "PersonnelFilter.STUDENT.toolTipText", false, false),
     KIA("PersonnelFilter.KIA.text", "PersonnelFilter.KIA.toolTipText", false, false),
     DEAD("PersonnelFilter.DEAD.text", "PersonnelFilter.DEAD.toolTipText", false, false);
     //endregion Expanded Personnel Tab Filters
@@ -310,6 +311,10 @@ public enum PersonnelFilter {
         return this == DESERTED;
     }
 
+    public boolean isStudent() {
+        return this == STUDENT;
+    }
+
     public boolean isKIA() {
         return this == KIA;
     }
@@ -482,6 +487,8 @@ public enum PersonnelFilter {
                 return person.getStatus().isRetired();
             case DESERTED:
                 return person.getStatus().isDeserted();
+            case STUDENT:
+                return person.getStatus().isStudent();
             case KIA:
                 return person.getStatus().isKIA();
             case DEAD:
