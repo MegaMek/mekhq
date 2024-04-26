@@ -36,6 +36,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
@@ -60,7 +61,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
-import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
@@ -1389,9 +1389,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int eduAcademyDuration = 0;
                 Money eduAcademyFee = null;
                 eduAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
+                        // this warning is a false-positive
                         .replace("0", String.valueOf(eduAcademyDuration))
                         .replace("1", String.valueOf(eduAcademyFee)));
-                eduAcademy.addActionListener(this);
+                eduAcademy.addActionListener(e -> new EducationController(gui.getCampaign(), "Local Academy"));
                 eduAcademy.setEnabled(true);
                 eduCivilian.add(eduAcademy);
 
@@ -1402,7 +1403,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 eduTechAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
                         .replace("0", String.valueOf(eduTechAcademyDuration))
                         .replace("1", String.valueOf(eduTechAcademyFee)));
-                eduTechAcademy.addActionListener(this);
+                eduTechAcademy.addActionListener(e -> new EducationController(gui.getCampaign(), "Tech Academy"));
                 eduTechAcademy.setEnabled(true);
                 eduCivilian.add(eduTechAcademy);
 
@@ -1413,7 +1414,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 eduPrestigiousAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
                         .replace("0", String.valueOf(eduPrestigiousAcademyDuration))
                         .replace("1", String.valueOf(eduPrestigiousAcademyFee)));
-                eduPrestigiousAcademy.addActionListener(this);
+                eduPrestigiousAcademy.addActionListener(e -> new EducationController(gui.getCampaign(), "Prestigious Academy"));
                 eduPrestigiousAcademy.setEnabled(true);
                 eduCivilian.add(eduPrestigiousAcademy);
                 // end eduCivilian region
@@ -1430,7 +1431,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 eduBasicTraining.setToolTipText(resources.getString("eduOAcademy.tooltip")
                         .replace("0", String.valueOf(eduBasicTrainingDuration))
                         .replace("1", String.valueOf(eduBasicTrainingFee)));
-                eduBasicTraining.addActionListener(this);
+                eduBasicTraining.addActionListener(e -> new EducationController(gui.getCampaign(), "Basic Training"));
                 eduBasicTraining.setEnabled(true);
                 eduMilitary.add(eduBasicTraining);
 
@@ -1441,7 +1442,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 eduMechwarriorAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
                         .replace("0", String.valueOf(eduMechwarriorAcademyDuration))
                         .replace("1", String.valueOf(eduMechwarriorAcademyFee)));
-                eduMechwarriorAcademy.addActionListener(this);
+                eduMechwarriorAcademy.addActionListener(e -> new EducationController(gui.getCampaign(), "MechWarrior Academy"));
                 eduMechwarriorAcademy.setEnabled(true);
                 eduMilitary.add(eduMechwarriorAcademy);
 
@@ -1452,7 +1453,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 eduNcoAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
                         .replace("0", String.valueOf(eduNcoAcademyDuration))
                         .replace("1", String.valueOf(eduNcoAcademyFee)));
-                eduNcoAcademy.addActionListener(this);
+                eduNcoAcademy.addActionListener(e -> new EducationController(gui.getCampaign(), "NCO Academy"));
                 eduNcoAcademy.setEnabled(true);
                 eduMilitary.add(eduNcoAcademy);
 
@@ -1463,7 +1464,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 eduWoAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
                         .replace("0", String.valueOf(eduWoAcademyDuration))
                         .replace("1", String.valueOf(eduWoAcademyFee)));
-                eduWoAcademy.addActionListener(this);
+                eduWoAcademy.addActionListener(e -> new EducationController(gui.getCampaign(), "Warrant Officer Academy"));
                 eduWoAcademy.setEnabled(true);
                 eduMilitary.add(eduWoAcademy);
 
@@ -1474,6 +1475,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 eduOAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
                         .replace("0", String.valueOf(eduOAcademyDuration))
                         .replace("1", String.valueOf(eduOAcademyFee)));
+                eduOAcademy.addActionListener(e -> new EducationController(gui.getCampaign(), "Officer Academy"));
                 eduOAcademy.setEnabled(true);
                 eduMilitary.add(eduOAcademy);
 
