@@ -187,6 +187,13 @@ public class Person {
     private UUID originalUnitId;
     //endregion Against the Bot
 
+    //region Education
+    private int eduDaysOfTravelToAcademy;
+    private int eduDaysOfTravelFromAcademy;
+    private Planet eduAcademyPlanet;
+    private int eduDaysOfEducation;
+    //endregion Education
+
     //region Flags
     private boolean clanPersonnel;
     private boolean commander;
@@ -323,6 +330,10 @@ public class Person {
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
         acquisitions = 0;
+        eduDaysOfTravelToAcademy = 0;
+        eduDaysOfTravelFromAcademy = 0;
+        eduAcademyPlanet = null;
+        eduDaysOfEducation = 0;
 
         //region Flags
         setClanPersonnel(originFaction.isClan());
@@ -1239,6 +1250,38 @@ public class Person {
         this.biography = biography;
     }
 
+    public int getEduDaysOfTravelToAcademy() {
+        return eduDaysOfTravelToAcademy;
+    }
+
+    public void setEduDaysOfTravelToAcademy(final int eduDaysOfTravelToAcademy) {
+        this.eduDaysOfTravelToAcademy = eduDaysOfTravelToAcademy;
+    }
+
+    public int getEduDaysOfTravelFromAcademy() {
+        return eduDaysOfTravelFromAcademy;
+    }
+
+    public void setEduDaysOfTravelFromAcademy(final int eduDaysOfTravelFromAcademy) {
+        this.eduDaysOfTravelFromAcademy = eduDaysOfTravelFromAcademy;
+    }
+
+    public int getEduDaysOfEducation() {
+        return eduDaysOfEducation;
+    }
+
+    public void setEduDaysOfEducation(final int eduDaysOfEducation) {
+        this.eduDaysOfEducation = eduDaysOfEducation;
+    }
+
+    public Planet getEduAcademyPlanet() {
+        return eduAcademyPlanet;
+    }
+
+    public void setEduAcademyPlanet(final Planet eduAcademyPlanet) {
+        this.eduAcademyPlanet = eduAcademyPlanet;
+    }
+
     //region Flags
     public boolean isClanPersonnel() {
         return clanPersonnel;
@@ -1513,6 +1556,23 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "originalUnitId", originalUnitId);
             if (acquisitions != 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitions", acquisitions);
+            }
+
+            if (eduDaysOfTravelToAcademy != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelToAcademy", eduDaysOfTravelToAcademy);
+            }
+
+            if (eduDaysOfTravelFromAcademy != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelFromAcademy", eduDaysOfTravelFromAcademy);
+            }
+
+            if (eduAcademyPlanet != null) {
+                MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "eduAcademyPlanet", "systemId",
+                        eduAcademyPlanet.getParentSystem().getId(), eduAcademyPlanet.getId());
+            }
+
+            if (eduDaysOfEducation != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfEducation", eduDaysOfEducation);
             }
 
             //region Flags
@@ -1800,6 +1860,16 @@ public class Person {
                     retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelToAcademy")) {
+                    retVal.eduDaysOfTravelToAcademy = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelFromAcademy")) {
+                    retVal.eduDaysOfTravelFromAcademy = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyPlanet")) {
+                        String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
+                        String planetId = wn2.getTextContent().trim();
+                        retVal.eduAcademyPlanet = c.getSystemById(systemId).getPlanetById(planetId);
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfEducation")) {
+                    retVal.eduDaysOfEducation = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
                         || wn2.getNodeName().equalsIgnoreCase("clan")) { // Legacy - 0.49.9 removal
                     retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
