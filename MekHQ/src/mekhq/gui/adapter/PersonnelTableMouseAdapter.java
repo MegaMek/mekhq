@@ -60,6 +60,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
@@ -1372,6 +1373,113 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
         popup.add(awardMenu);
         //endregion Awards Menu
+
+        //region Education Menu
+        if (oneSelected && person.getStatus().isActive()) {
+            // TODO this is where we check to make sure the education module is enabled
+            if (true) {
+                JMenu educationMenu = new JMenu(resources.getString("eduEducation.text"));
+
+                // begin eduCivilian region
+                JMenu eduCivilian = new JMenu(String.format(resources.getString("eduCivilian.text")));
+                eduCivilian.setEnabled(true);
+                educationMenu.add(eduCivilian);
+
+                JMenuItem eduAcademy = new JMenuItem(String.format(resources.getString("eduAcademy.text")));
+                int eduAcademyDuration = 0;
+                Money eduAcademyFee = null;
+                eduAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
+                        .replace("0", String.valueOf(eduAcademyDuration))
+                        .replace("1", String.valueOf(eduAcademyFee)));
+                eduAcademy.addActionListener(this);
+                eduAcademy.setEnabled(true);
+                eduCivilian.add(eduAcademy);
+
+                JMenuItem eduTechAcademy = new JMenuItem(String.format(resources.getString("eduTechAcademy.text")));
+                // TODO replace these placeholder values with getDuration() & getFee() calls
+                int eduTechAcademyDuration = 0;
+                Money eduTechAcademyFee = null;
+                eduTechAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
+                        .replace("0", String.valueOf(eduTechAcademyDuration))
+                        .replace("1", String.valueOf(eduTechAcademyFee)));
+                eduTechAcademy.addActionListener(this);
+                eduTechAcademy.setEnabled(true);
+                eduCivilian.add(eduTechAcademy);
+
+                JMenuItem eduPrestigiousAcademy = new JMenuItem(String.format(resources.getString("eduPrestigiousAcademy.text")));
+                // TODO replace these placeholder values with getDuration() & getFee() calls
+                int eduPrestigiousAcademyDuration = 0;
+                Money eduPrestigiousAcademyFee = null;
+                eduPrestigiousAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
+                        .replace("0", String.valueOf(eduPrestigiousAcademyDuration))
+                        .replace("1", String.valueOf(eduPrestigiousAcademyFee)));
+                eduPrestigiousAcademy.addActionListener(this);
+                eduPrestigiousAcademy.setEnabled(true);
+                eduCivilian.add(eduPrestigiousAcademy);
+                // end eduCivilian region
+
+                // begin eduMilitary region
+                JMenu eduMilitary = new JMenu(String.format(resources.getString("eduMilitary.text")));
+                eduMilitary.setEnabled(true);
+                educationMenu.add(eduMilitary);
+
+                JMenuItem eduBasicTraining = new JMenuItem(String.format(resources.getString("eduBasicTraining.text")));
+                // TODO replace these placeholder values with getDuration() & getFee() calls
+                int eduBasicTrainingDuration = 0;
+                Money eduBasicTrainingFee = null;
+                eduBasicTraining.setToolTipText(resources.getString("eduOAcademy.tooltip")
+                        .replace("0", String.valueOf(eduBasicTrainingDuration))
+                        .replace("1", String.valueOf(eduBasicTrainingFee)));
+                eduBasicTraining.addActionListener(this);
+                eduBasicTraining.setEnabled(true);
+                eduMilitary.add(eduBasicTraining);
+
+                JMenuItem eduMechwarriorAcademy = new JMenuItem(String.format(resources.getString("eduMechwarriorAcademy.text")));
+                // TODO replace these placeholder values with getDuration() & getFee() calls
+                int eduMechwarriorAcademyDuration = 0;
+                Money eduMechwarriorAcademyFee = null;
+                eduMechwarriorAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
+                        .replace("0", String.valueOf(eduMechwarriorAcademyDuration))
+                        .replace("1", String.valueOf(eduMechwarriorAcademyFee)));
+                eduMechwarriorAcademy.addActionListener(this);
+                eduMechwarriorAcademy.setEnabled(true);
+                eduMilitary.add(eduMechwarriorAcademy);
+
+                JMenuItem eduNcoAcademy = new JMenuItem(String.format(resources.getString("eduNcoAcademy.text")));
+                // TODO replace these placeholder values with getDuration() & getFee() calls
+                int eduNcoAcademyDuration = 0;
+                Money eduNcoAcademyFee = null;
+                eduNcoAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
+                        .replace("0", String.valueOf(eduNcoAcademyDuration))
+                        .replace("1", String.valueOf(eduNcoAcademyFee)));
+                eduNcoAcademy.addActionListener(this);
+                eduNcoAcademy.setEnabled(true);
+                eduMilitary.add(eduNcoAcademy);
+
+                JMenuItem eduWoAcademy = new JMenuItem(String.format(resources.getString("eduWoAcademy.text")));
+                // TODO replace these placeholder values with getDuration() & getFee() calls
+                int eduWoAcademyDuration = 0;
+                Money eduWoAcademyFee = null;
+                eduWoAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
+                        .replace("0", String.valueOf(eduWoAcademyDuration))
+                        .replace("1", String.valueOf(eduWoAcademyFee)));
+                eduWoAcademy.addActionListener(this);
+                eduWoAcademy.setEnabled(true);
+                eduMilitary.add(eduWoAcademy);
+
+                JMenuItem eduOAcademy = new JMenuItem(String.format(resources.getString("eduOAcademy.text")));
+                // TODO replace these placeholder values with getDuration() & getFee() calls
+                int eduOAcademyDuration = 0;
+                Money eduOAcademyFee = null;
+                eduOAcademy.setToolTipText(resources.getString("eduOAcademy.tooltip")
+                        .replace("0", String.valueOf(eduOAcademyDuration))
+                        .replace("1", String.valueOf(eduOAcademyFee)));
+                eduOAcademy.setEnabled(true);
+                eduMilitary.add(eduOAcademy);
+
+                popup.add(educationMenu);
+            }
+        }
 
         //region Spend XP Menu
         if (oneSelected && person.getStatus().isActive()) {
