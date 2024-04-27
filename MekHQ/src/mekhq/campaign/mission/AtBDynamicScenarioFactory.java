@@ -860,7 +860,11 @@ public class AtBDynamicScenarioFactory {
      * the given threshold, replace the scenario's generated map with a fixed map from data/boards
      */
     private static void setScenarioMap(AtBDynamicScenario scenario, int mapChance) {
-        if ((scenario.getMapSizeX() > 0) && (scenario.getMapSizeY() > 0) && (Compute.randomInt(100) <= mapChance)) {
+        if (scenario.getBoardType() != Scenario.T_SPACE
+                && scenario.getTerrainType().equals("Space")
+                && (scenario.getMapSizeX() > 0)
+                && (scenario.getMapSizeY() > 0)
+                && (Compute.randomInt(100) <= mapChance)) {
             BoardClassifier bc = BoardClassifier.getInstance();
             List<String> maps = bc.getMatchingBoards(scenario.getMapSizeX(), scenario.getMapSizeY(), 5, 5, new ArrayList<>());
 
