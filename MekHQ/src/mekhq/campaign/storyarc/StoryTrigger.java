@@ -21,12 +21,14 @@
 package mekhq.campaign.storyarc;
 
 import megamek.Version;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
@@ -62,6 +64,8 @@ public abstract class StoryTrigger {
     protected abstract void execute();
 
     public abstract String getDescription();
+
+    public abstract StoryTriggerPanel getPanel(JFrame frame);
 
     //region I/O
     public abstract void writeToXml(PrintWriter pw1, int indent);

@@ -21,6 +21,8 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
+import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -31,6 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.UUID;
@@ -131,6 +134,11 @@ public class ChangePersonStoryTrigger extends StoryTrigger {
     @Override
     public String getDescription() {
         return "Change person";
+    }
+
+    @Override
+    public StoryTriggerPanel getPanel(JFrame frame) {
+        return new FakeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override

@@ -23,8 +23,11 @@ package mekhq.campaign.storyarc.storytrigger;
 import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import org.w3c.dom.Node;
 
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
@@ -42,6 +45,11 @@ public class EndArcStoryTrigger extends StoryTrigger {
     @Override
     public String getDescription() {
         return "Complete story arc";
+    }
+
+    @Override
+    public StoryTriggerPanel getPanel(JFrame frame) {
+        return new FakeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override

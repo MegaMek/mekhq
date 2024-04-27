@@ -24,10 +24,13 @@ import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.*;
 import java.io.PrintWriter;
 import java.text.ParseException;
 
@@ -50,6 +53,11 @@ public class AddPersonStoryTrigger extends StoryTrigger {
     @Override
     public String getDescription() {
         return "Add person (" + person.getFullName() + ")";
+    }
+
+    @Override
+    public StoryTriggerPanel getPanel(JFrame frame) {
+        return new FakeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override
