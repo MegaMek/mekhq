@@ -1388,9 +1388,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         // this next block preps variables for use by the menu & tooltip
         JMenu academies;
-        JMenuItem courses;
         int campaignYear = gui.getCampaign().getLocalDate().getYear();
-        int travelTime = 0;
+        int travelTime = 2;
         String destination = gui.getCampaign().getCurrentSystem().getName(gui.getCampaign().getLocalDate());
 
         List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
@@ -1399,47 +1398,59 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         for (String setName : academySetNames) {
             JMenu setAcademyMenu = new JMenu(setName);
 
+            JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
+            setAcademyMenu.add(civilianMenu);
+            JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
+            setAcademyMenu.add(militaryMenu);
+
             List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
 
             for (Academy academy : academiesOfSet) {
                 // we check to make sure Person is within the correct age bracket
                 if ((person.getAge(gui.getCampaign().getLocalDate()) >= academy.getAgeMin())
                         && (person.getAge(gui.getCampaign().getLocalDate()) < academy.getAgeMax())) {
-                    for (String system : academy.getLocationSystems()) {
-                        int travelTimeNew = EducationController.simplifiedTravelTime(gui.getCampaign(), null, destination);
-                        if (travelTimeNew > travelTime) {
-                            travelTime = travelTimeNew;
-                            destination = system;
+                    if (!academy.isLocal()) {
+                        for (String system : academy.getLocationSystems()) {
+                            int travelTimeNew = EducationController.simplifiedTravelTime(gui.getCampaign(), null, destination);
+                            if (travelTimeNew > travelTime) {
+                                travelTime = travelTimeNew;
+                                destination = system;
+                            }
                         }
                     }
 
-                    // TODO replace '20' with a Campaign Option
-                    // is the academy within the maximum travel distance set in Campaign Options?
-                    if ((travelTime) <= (20 * 7)) {
-                        // here we check the academy has been built and is still standing
-                        if (campaignYear >= academy.getConstructionYear()) {
-                            if (campaignYear < academy.getDestructionYear()) {
-                                academies = new JMenu(academy.getName());
-                                setAcademyMenu.add(academies);
+                    if (!academy.isMilitary()) {
+                        // TODO replace '20' with a Campaign Option
+                        // is the academy within the maximum travel distance set in Campaign Options?
+                        if ((travelTime) <= (20 * 7)) {
+                            // here we check the academy has been built and is still standing
+                            if (campaignYear >= academy.getConstructionYear()) {
+                                if (campaignYear < academy.getDestructionYear()) {
+                                    academies = new JMenu(academy.getName());
+                                    civilianMenu.add(academies);
 
-                                int courseCount = academy.getQualifications().size();
-                                for (int courseIndex = 0; courseIndex < courseCount; courseIndex++) {
-                                    // we also need to make sure the course is being offered
-                                    if (campaignYear >= academy.getQualificationStartYears().get(courseIndex)) {
-                                        String course = "<html>" + academy.getQualifications().get(courseIndex) + "<br>" + academy.getCurriculums().get(courseIndex) + "</html>";
-                                        courses = new JMenuItem(course);
-                                        courses.setToolTipText(academy.getTooltip(gui.getCampaign(), person, courseIndex));
-                                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex)));
-                                        courses.addActionListener(this);
-                                        academies.add(courses);
-                                    } else {
-                                        courses = new JMenuItem(resources.getString("eduNoQualificationsOffered.text"));
-                                        academies.add(courses);
-                                    }
+                                    buildSubMenus(academy, campaignYear, person, academies);
+                                } else {
+                                    academies = new JMenu(resources.getString("eduDestroyed.text"));
+                                    civilianMenu.add(academies);
                                 }
-                            } else {
-                                academies = new JMenu(resources.getString("eduDestroyed.text"));
-                                setAcademyMenu.add(academies);
+                            }
+                        }
+                    } else {
+                        // TODO replace '20' with a Campaign Option
+                        // is the academy within the maximum travel distance set in Campaign Options?
+                        if ((travelTime) <= (20 * 7)) {
+                            // here we check the academy has been built and is still standing
+                            if (campaignYear >= academy.getConstructionYear()) {
+                                if (campaignYear < academy.getDestructionYear()) {
+                                    academies = new JMenu(academy.getName());
+                                    militaryMenu.add(academies);
+
+                                    buildSubMenus(academy, campaignYear, person, academies);
+                                } else {
+                                    academies = new JMenu(resources.getString("eduDestroyed.text"));
+                                    militaryMenu.add(academies);
+                                }
                             }
                         }
                     }
@@ -2453,6 +2464,33 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         //endregion GM Menu
 
         return Optional.of(popup);
+    }
+
+    /**
+     * Builds submenus for the academies in a given campaign year, based on a person's qualifications.
+     *
+     * @param academy        the academy to build submenus for
+     * @param campaignYear   the campaign year to consider
+     * @param person         the person for whom the submenus are being built
+     * @param academies      the main menu item where the submenus will be added
+     */
+    private void buildSubMenus(Academy academy, int campaignYear, Person person, JMenu academies) {
+        JMenuItem courses;
+        int courseCount = academy.getQualifications().size();
+        for (int courseIndex = 0; courseIndex < courseCount; courseIndex++) {
+            // we also need to make sure the course is being offered
+            if (campaignYear >= academy.getQualificationStartYears().get(courseIndex)) {
+                String course = "<html>" + academy.getQualifications().get(courseIndex) + "<br>" + academy.getCurriculums().get(courseIndex) + "</html>";
+                courses = new JMenuItem(course);
+                courses.setToolTipText(academy.getTooltip(gui.getCampaign(), person, courseIndex));
+                courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex)));
+                courses.addActionListener(this);
+                academies.add(courses);
+            } else {
+                courses = new JMenuItem(resources.getString("eduNoQualificationsOffered.text"));
+                academies.add(courses);
+            }
+        }
     }
 
     private JMenuItem newMenuItem(String text, String command) {

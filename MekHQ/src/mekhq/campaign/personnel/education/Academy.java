@@ -44,6 +44,9 @@ public class Academy {
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary;
 
+    @XmlElement(name = "isLocal")
+    private Boolean isLocal = false;
+
     @XmlElement(name = "description")
     private String description;
 
@@ -105,6 +108,7 @@ public class Academy {
      * @param set                  the set the academy belongs to
      * @param name                 the name of the academy
      * @param isMilitary           a boolean value indicating whether the academy is military or not
+     * @param isLocal a boolean value indicating whether the academy is local or not
      * @param description          a description of the academy
      * @param locationSystems      a list of location systems where the academy is located
      * @param constructionYear     the year the academy was constructed
@@ -121,13 +125,14 @@ public class Academy {
      * @param qualificationStartYears a list of start years for each curriculum offered by the academy
      * @param skillLevel           the base skill level provided for completion of a curriculum
      */
-    public Academy(String set, String name, Boolean isMilitary, String description, List<String> locationSystems,
+    public Academy(String set, String name, Boolean isMilitary, Boolean isLocal, String description, List<String> locationSystems,
                    Integer constructionYear, Integer destructionYear, Integer tuition, Integer durationDays, Integer facultySkill,
                    Integer educationLevelMin, Integer educationLevelMax, Integer ageMin, Integer ageMax, List<String> qualifications,
                    List<String> curriculums, List<Integer> qualificationStartYears, Integer skillLevel) {
         this.set = set;
         this.name = name;
         this.isMilitary = isMilitary;
+        this.isLocal = isLocal;
         this.description = description;
         this.locationSystems = locationSystems;
         this.constructionYear = constructionYear;
@@ -170,6 +175,24 @@ public class Academy {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * Checks if the academy is a military academy.
+     *
+     * @return {@code true} if the academy is a military academy, {@code false} otherwise.
+     */
+    public Boolean isMilitary() {
+        return isMilitary;
+    }
+
+    /**
+     * Checks if the academy is a local academy.
+     *
+     * @return {@code true} if the academy is a local academy, {@code false} otherwise.
+     */
+    public Boolean isLocal() {
+        return isLocal;
     }
 
     /**
@@ -376,15 +399,17 @@ public class Academy {
                 .append(durationDays / 7).append (" weeks").append("<br>");
 
         // we need to do a little extra work to get distance, to cover academies with multiple campuses
-        int distance = 0;
+        int distance = 2;
         String destination = campaign.getCurrentSystem().getName(campaign.getLocalDate());
 
-        for (String system : locationSystems) {
-            int distanceNew = EducationController.simplifiedTravelTime(campaign, null, system);
+        if (!isLocal) {
+            for (String system : locationSystems) {
+                int distanceNew = EducationController.simplifiedTravelTime(campaign, null, system);
 
-            if (distanceNew > distance) {
-                distance = distanceNew;
-                destination = system;
+                if (distanceNew > distance) {
+                    distance = distanceNew;
+                    destination = system;
+                }
             }
         }
 
