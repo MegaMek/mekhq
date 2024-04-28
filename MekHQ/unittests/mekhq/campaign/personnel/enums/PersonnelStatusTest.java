@@ -279,6 +279,7 @@ public class PersonnelStatusTest {
                 case MIA:
                 case POW:
                 case ON_LEAVE:
+                case STUDENT:
                 case AWOL:
                     assertTrue(personnelStatus.isAbsent());
                     break;
@@ -368,9 +369,10 @@ public class PersonnelStatusTest {
         assertEquals(PersonnelStatus.RETIRED, PersonnelStatus.parseFromString("1"));
         assertEquals(PersonnelStatus.KIA, PersonnelStatus.parseFromString("2"));
         assertEquals(PersonnelStatus.MIA, PersonnelStatus.parseFromString("3"));
+        assertEquals(PersonnelStatus.STUDENT, PersonnelStatus.parseFromString("4"));
 
         // Error Case
-        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("4"));
+        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("5"));
         assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("blah"));
     }
     //endregion File I/O

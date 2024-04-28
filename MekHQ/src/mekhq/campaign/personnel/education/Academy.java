@@ -26,7 +26,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.RandomFactionGenerator;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -47,8 +50,8 @@ public class Academy {
     @XmlElement(name = "description")
     private String description;
 
-    @XmlElement(name = "faction")
-    private String faction;
+    @XmlElement(name = "academyFaction")
+    private String academyFaction = null;
 
     @XmlElement(name = "factionDiscount")
     private Integer factionDiscount = 0;
@@ -118,7 +121,7 @@ public class Academy {
      * @param name                    the name of the academy
      * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
      * @param description             the description of the academy
-     * @param faction                 the faction associated with the academy
+     * @param academyFaction          the faction associated with the academy
      * @param factionDiscount         the discount offered by the academy to faction members
      * @param isFactionRestricted     indicates if the academy is restricted to faction members (true) or not (false)
      * @param isLocal                 indicates if the academy is local (true) or not (false) (overrides locationSystems)
@@ -137,7 +140,7 @@ public class Academy {
      * @param qualificationStartYears the list of years when each qualification becomes available
      * @param baseSkillLevel              the base skill level provided by the academy
      */
-    public Academy(String set, String name, Boolean isMilitary, String description, String faction,
+    public Academy(String set, String name, Boolean isMilitary, String description, String academyFaction,
                    Integer factionDiscount, Boolean isFactionRestricted, List<String> locationSystems,
                    Boolean isLocal, Integer constructionYear, Integer destructionYear, Integer tuition,
                    Integer durationDays, Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax,
@@ -147,7 +150,7 @@ public class Academy {
         this.name = name;
         this.isMilitary = isMilitary;
         this.description = description;
-        this.faction = faction;
+        this.academyFaction = academyFaction;
         this.factionDiscount = factionDiscount;
         this.isFactionRestricted = isFactionRestricted;
         this.isLocal = isLocal;
@@ -221,10 +224,11 @@ public class Academy {
         return description;
     }
 
+
     /**
-     * Returns the academy's location system or faction.
+     * Retrieves the list of location systems where the academy is present.
      *
-     * @return the academy's location system or faction as a string
+     * @return The list of location systems as a List of String.
      */
     public List<String> getLocationSystems() {
         return locationSystems;
@@ -300,8 +304,11 @@ public class Academy {
      *
      * @return The faction of the academy as a String.
      */
-    public String getFaction() {
-        return faction;
+    public List<String> getAcademyFaction(Campaign campaign) {
+        if (isLocal) {
+            return campaign.getCurrentSystem().getFactions(campaign.getLocalDate());
+        }
+        return Collections.singletonList(academyFaction);
     }
 
     /**
@@ -315,13 +322,14 @@ public class Academy {
 
 
     /**
-     * Calculates the faction discount for a given person.
+     * Calculates the adjusted faction discount for a given person in a campaign.
      *
-     * @param person the person for whom to calculate the faction discount
-     * @return the faction discount as a double value, between 0.0 and 1.0
+     * @param campaign the Campaign object representing the campaign
+     * @param person the Person object representing the person
+     * @return the faction discount as a double value, between 0.00 and 1.00
      */
-    public Double getFactionDiscountAdjusted(Person person) {
-        if (person.getOriginFaction().getShortName().equals(getFaction())) {
+    public Double getFactionDiscountAdjusted(Campaign campaign, Person person) {
+        if (getAcademyFaction(campaign).contains(person.getOriginFaction().getShortName())) {
             return (double) (factionDiscount / 100);
         } else {
             return 1.00;
@@ -335,6 +343,22 @@ public class Academy {
      */
     public Boolean isFactionRestricted() {
         return isFactionRestricted;
+    }
+
+    public Boolean acceptingApplicants(Campaign campaign, Person person) {
+        // if the academy is faction restricted, we just need to confirm whether Person's faction
+        // matches the academy faction
+        if ((isFactionRestricted)
+                && (getAcademyFaction(campaign).contains(person.getOriginFaction().getShortName()))) {
+            return true;
+        }
+
+        // otherwise, we check whether Person's faction is at war with the academy faction.
+        // if the academy is local, the faction is the systems' current owner/s
+        return getAcademyFaction(campaign).stream()
+                .anyMatch(faction -> !RandomFactionGenerator.getInstance().getFactionHints()
+                        .isAtWarWith(person.getOriginFaction(),
+                                Factions.getInstance().getFaction(faction), campaign.getLocalDate()));
     }
 
     /**
@@ -453,7 +477,7 @@ public class Academy {
 
         // with the skill content resolved, we can move onto the rest of the tooltip
         tooltip.append("<br><b>").append(resources.getString("tuition.text")).append("</b> ")
-                .append(tuition * getFactionDiscountAdjusted(person)).append (" CSB").append("<br>");
+                .append(tuition * getFactionDiscountAdjusted(campaign, person)).append (" CSB").append("<br>");
         tooltip.append("<b>").append(resources.getString("duration.text")).append("</b> ")
                 .append(durationDays / 7).append (" weeks").append("<br>");
 

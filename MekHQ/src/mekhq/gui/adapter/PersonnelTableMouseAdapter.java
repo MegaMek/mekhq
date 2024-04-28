@@ -47,9 +47,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.dialog.*;
@@ -1430,20 +1428,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 // and whether the academy has been destroyed
                                 if (campaignYear < academy.getDestructionYear()) {
                                     // and whether the academy allows applicants from Person's faction
-                                    if ((academy.isFactionRestricted())
-                                            && (person.getOriginFaction().getShortName().equals(academy.getFaction()))) {
-                                        // and whether the academy's faction is at war with Person's faction
-                                        if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
-                                                Factions.getInstance().getFaction(academy.getFaction()),
-                                                gui.getCampaign().getLocalDate())) {
-                                            academies = new JMenu(academy.getName());
-                                            civilianMenu.add(academies);
+                                    if (academy.acceptingApplicants(gui.getCampaign(), person)) {
+                                        academies = new JMenu(academy.getName());
+                                        civilianMenu.add(academies);
 
-                                            buildSubMenus(academy, campaignYear, person, academies);
-                                        } else {
-                                            academies = new JMenu(resources.getString("eduFactionRejectedWar.text"));
-                                            civilianMenu.add(academies);
-                                        }
+                                        buildSubMenus(academy, campaignYear, person, academies);
                                     } else {
                                         academies = new JMenu(resources.getString("eduFactionRejected.text"));
                                         civilianMenu.add(academies);
