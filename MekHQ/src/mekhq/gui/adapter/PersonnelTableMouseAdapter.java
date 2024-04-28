@@ -1434,7 +1434,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                                         buildSubMenus(academy, campaignYear, person, academies);
                                     } else {
-                                        academies = new JMenu(resources.getString("eduFactionRejected.text"));
+                                        academies = new JMenu(resources.getString("eduFactionRejected.text")
+                                                .replaceAll("0", person.getFirstName()));
                                         civilianMenu.add(academies);
                                     }
                                 } else {
