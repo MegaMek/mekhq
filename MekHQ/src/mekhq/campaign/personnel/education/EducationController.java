@@ -26,7 +26,7 @@ public class EducationController {
 
         // get the right Academy
         for (Academy a : academiesOfSet) {
-            if (String.valueOf(a).equals(academyName)) {
+            if (String.valueOf(a.getName()).equals(academyName)) {
                 academy = a;
             }
         }
