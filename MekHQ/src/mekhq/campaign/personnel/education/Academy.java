@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
 /**
  * This class represents an academy.
  * The following fields are serialized to XML: name, description, locationSystems, constructionYear, destructionYear,
- * tuition, durationDays, tierMin, tierMax, skills, and skillLevel.
+ * tuition, durationDays, tierMin, tierMax, skills, and baseSkillLevel.
  */
 @XmlRootElement(name = "academy")
 @XmlAccessorType(value = XmlAccessType.FIELD)
@@ -44,14 +44,23 @@ public class Academy {
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary;
 
-    @XmlElement(name = "isLocal")
-    private Boolean isLocal = false;
-
     @XmlElement(name = "description")
     private String description;
 
+    @XmlElement(name = "faction")
+    private String faction;
+
+    @XmlElement(name = "factionDiscount")
+    private Integer factionDiscount = 0;
+
+    @XmlElement(name = "isFactionRestricted")
+    private Boolean isFactionRestricted = false;
+
+    @XmlElement(name = "isLocal")
+    private Boolean isLocal = false;
+
     @XmlElement(name = "locationSystem")
-    private List<String> locationSystems;
+    private List<String> locationSystems = null;
 
     @XmlElement(name = "constructionYear")
     private Integer constructionYear;
@@ -89,8 +98,8 @@ public class Academy {
     @XmlElement(name = "qualificationStartYear")
     private List<Integer> qualificationStartYears;
 
-    @XmlElement(name = "skillLevel")
-    private Integer skillLevel;
+    @XmlElement(name = "baseSkillLevel")
+    private Integer baseSkillLevel;
 
     private String set;
 
@@ -103,37 +112,45 @@ public class Academy {
 
 
     /**
-     * Creates an instance of the Academy class.
+     * Constructs a new Academy object.
      *
-     * @param set                  the set the academy belongs to
-     * @param name                 the name of the academy
-     * @param isMilitary           a boolean value indicating whether the academy is military or not
-     * @param isLocal a boolean value indicating whether the academy is local or not
-     * @param description          a description of the academy
-     * @param locationSystems      a list of location systems where the academy is located
-     * @param constructionYear     the year the academy was constructed
-     * @param destructionYear      the year the academy was destroyed (optional, default value is 9999)
-     * @param tuition              the tuition cost of the academy
-     * @param durationDays         the duration of education in days
-     * @param facultySkill         the skill level of the academy faculty
-     * @param educationLevelMin    the minimum education level required for admission to the academy
-     * @param educationLevelMax    the maximum education level provided by the academy
-     * @param ageMin               the minimum age required for admission to the academy (optional, default value is 0)
-     * @param ageMax               the maximum age required for admission to the academy (optional, default value is 9999)
-     * @param qualifications       a list of qualifications provided by the academy
-     * @param curriculums          a list of curriculums offered by the academy (groups of skills to be improved)
-     * @param qualificationStartYears a list of start years for each curriculum offered by the academy
-     * @param skillLevel           the base skill level provided for completion of a curriculum
+     * @param set                     the set name of the academy
+     * @param name                    the name of the academy
+     * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
+     * @param description             the description of the academy
+     * @param faction                 the faction associated with the academy
+     * @param factionDiscount         the discount offered by the academy to faction members
+     * @param isFactionRestricted     indicates if the academy is restricted to faction members (true) or not (false)
+     * @param isLocal                 indicates if the academy is local (true) or not (false) (overrides locationSystems)
+     * @param locationSystems         the list of location systems where the academy is present
+     * @param constructionYear        the year when the academy was constructed
+     * @param destructionYear         the year when the academy was destroyed (null if not destroyed)
+     * @param tuition                 the tuition fee for attending the academy
+     * @param durationDays            the duration of the academy in days
+     * @param facultySkill            the skill level of the academy's faculty
+     * @param educationLevelMin       the minimum education level required to attend the academy
+     * @param educationLevelMax       the maximum education level provided by the academy
+     * @param ageMin                  the minimum age requirement to attend the academy
+     * @param ageMax                  the maximum age accepted by the academy
+     * @param qualifications          the list of qualifications provided by the academy
+     * @param curriculums             the list of curriculums offered by the academy
+     * @param qualificationStartYears the list of years when each qualification becomes available
+     * @param baseSkillLevel              the base skill level provided by the academy
      */
-    public Academy(String set, String name, Boolean isMilitary, Boolean isLocal, String description, List<String> locationSystems,
-                   Integer constructionYear, Integer destructionYear, Integer tuition, Integer durationDays, Integer facultySkill,
-                   Integer educationLevelMin, Integer educationLevelMax, Integer ageMin, Integer ageMax, List<String> qualifications,
-                   List<String> curriculums, List<Integer> qualificationStartYears, Integer skillLevel) {
+    public Academy(String set, String name, Boolean isMilitary, String description, String faction,
+                   Integer factionDiscount, Boolean isFactionRestricted, List<String> locationSystems,
+                   Boolean isLocal, Integer constructionYear, Integer destructionYear, Integer tuition,
+                   Integer durationDays, Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax,
+                   Integer ageMin, Integer ageMax, List<String> qualifications, List<String> curriculums,
+                   List<Integer> qualificationStartYears, Integer baseSkillLevel) {
         this.set = set;
         this.name = name;
         this.isMilitary = isMilitary;
-        this.isLocal = isLocal;
         this.description = description;
+        this.faction = faction;
+        this.factionDiscount = factionDiscount;
+        this.isFactionRestricted = isFactionRestricted;
+        this.isLocal = isLocal;
         this.locationSystems = locationSystems;
         this.constructionYear = constructionYear;
         this.destructionYear = destructionYear;
@@ -147,7 +164,7 @@ public class Academy {
         this.qualifications = qualifications;
         this.curriculums = curriculums;
         this.qualificationStartYears = qualificationStartYears;
-        this.skillLevel = skillLevel;
+        this.baseSkillLevel = baseSkillLevel;
     }
 
     /**
@@ -279,6 +296,48 @@ public class Academy {
     }
 
     /**
+     * Retrieves the faction of the academy.
+     *
+     * @return The faction of the academy as a String.
+     */
+    public String getFaction() {
+        return faction;
+    }
+
+    /**
+     * Retrieves the academy's faction discount value.
+     *
+     * @return The academy's discount value for the faction.
+     */
+    public Integer getFactionDiscountRaw() {
+        return factionDiscount;
+    }
+
+
+    /**
+     * Calculates the faction discount for a given person.
+     *
+     * @param person the person for whom to calculate the faction discount
+     * @return the faction discount as a double value, between 0.0 and 1.0
+     */
+    public Double getFactionDiscountAdjusted(Person person) {
+        if (person.getOriginFaction().getShortName().equals(getFaction())) {
+            return (double) (factionDiscount / 100);
+        } else {
+            return 1.00;
+        }
+    }
+
+    /**
+     * Checks if the academy is faction restricted.
+     *
+     * @return true if the academy is faction restricted, otherwise false.
+     */
+    public Boolean isFactionRestricted() {
+        return isFactionRestricted;
+    }
+
+    /**
      * Retrieves faculty skill level.
      *
      * @return The faculty skill level as an Integer.
@@ -338,8 +397,8 @@ public class Academy {
      *
      * @return the base skill level granted by this academy as an Integer
      */
-    public Integer getAcademicSkillLevel() {
-        return skillLevel;
+    public Integer getAcademicBaseSkillLevel() {
+        return baseSkillLevel;
     }
 
     /**
@@ -370,7 +429,7 @@ public class Academy {
             educationLevel += person.getEduHighestEducation() - educationLevelMin;
         }
 
-        int skillLevelAdjusted = skillLevel + educationLevel;
+        int baseSkillLevelAdjusted = baseSkillLevel + educationLevel;
 
         tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
 
@@ -382,19 +441,19 @@ public class Academy {
             String skillParsed = skillParser(skill);
 
             if (person.hasSkill(skillParsed)) {
-                if (person.getSkillLevel(skillParsed) >= skillLevelAdjusted) {
+                if (person.getSkillLevel(skillParsed) >= baseSkillLevelAdjusted) {
                     tooltip.append("nothingToLearn.text").append(")<br>");
                 } else {
-                    tooltip.append('+').append(skillLevelAdjusted - person.getSkillLevel(skillParsed)).append(")<br>");
+                    tooltip.append('+').append(baseSkillLevelAdjusted - person.getSkillLevel(skillParsed)).append(")<br>");
                 }
             } else {
-                tooltip.append('+').append(skillLevelAdjusted - person.getSkillLevel(skillParsed)).append(")<br>");
+                tooltip.append('+').append(baseSkillLevelAdjusted - person.getSkillLevel(skillParsed)).append(")<br>");
             }
         }
 
         // with the skill content resolved, we can move onto the rest of the tooltip
         tooltip.append("<br><b>").append(resources.getString("tuition.text")).append("</b> ")
-                .append(tuition).append (" CSB").append("<br>");
+                .append(tuition * getFactionDiscountAdjusted(person)).append (" CSB").append("<br>");
         tooltip.append("<b>").append(resources.getString("duration.text")).append("</b> ")
                 .append(durationDays / 7).append (" weeks").append("<br>");
 
