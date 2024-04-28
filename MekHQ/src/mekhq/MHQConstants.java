@@ -265,5 +265,13 @@ public final class MHQConstants extends SuiteConstants {
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
     //endregion StratCon
+
+    //region StoryArcs
+    public static final String STORY_ARC_DIRECTORY = "data/storyarcs/";
+    public static final String USER_STORY_ARC_DIRECTORY = "userdata/storyarcs/";
+    public static final String STORY_ARC_FILE = "storyArc.xml";
+    public static final String STORY_ARC_CAMPAIGN_FILE = "initCampaign.cpnx.gz";
+    //endregion StoryArcs
+
     //endregion File Paths
 }

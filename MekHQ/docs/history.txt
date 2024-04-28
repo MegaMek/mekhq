@@ -1,6 +1,12 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.49.19-SNAPSHOT
+0.49.20-SNAPSHOT
++ PR #4005: Code internals: DialogOptionsListener update
++ PR #2997: Story Arcs Basic Architecture
++ FIX #4017 Space and Low Atmosphere not saved to xml, when started game after load the correct board type was to megamek
++ PR #3928 add glare and solar flare odds to TerrainConditionsOddsManifest.xml file
+
+0.49.19 (2024-04-19 2030 UTC)
 + Bug #3958: No selling units in scenario resolution if campaign disallows selling
 + Fix #3949: Custom ScenarioObjectives do not change ScenarioStatus in ResolveScenarioWizardDialog
 + PR #3953: Add disabled option for Personnel Market
@@ -41,12 +47,20 @@ MEKHQ VERSION HISTORY:
 + PR #3915: Added Dialog to Confirm New Campaign (redux) 
 + PR #3908: Adjusted Default Tech Counts 
 + PR #3967: Adjusted Zoom Speed on Interstellar Map Panel 
++ Fix #3348: Added Ability to Collapse/Expand Logs, Missions and Kills in Personnel Unit Screen
++ PR #3970: Reduced Personnel Table Right-Click Menu Clutter 
++ Fix #3981: Removed Unnecessary Error Log
++ PR #3988: Added Scenario & Mission Tracking to Kills, Added Ability to Assign Kills to Scenario and/or Mission 
++ Fix #3989: Fixed Ship Search Overvaluing Ultra-Green Personnel
++ PR #3996: Add new player deployment variables to Scenario 
 + PR #3973: Move new lance creation to AtBGameThread
 + Fix #3978: Fix a bug with saving
 + PR #3983: Load bot entities in the chat lounge
 + PR #3991: Add all deployment variables to BotForce 
 + Fix #3767: NPE while scouting Stratcon map due to non-applicable SPAs for enemy force
 + PR #3997: Set default MHQ theme to match MM GUIPreferences default (Flat Darcula currently)
++ Fix #4002: Infinite loop when assigning SPAs to enemies from generated Scenario locked game UI
++ PR #4003: Fixed Untreated Personnel Nag Triggering for Prisoners.
 
 0.49.18 (2024-02-17 1800 UTC)
 + PR #3805: Adaptations for the Internal Bomb Bay quirk

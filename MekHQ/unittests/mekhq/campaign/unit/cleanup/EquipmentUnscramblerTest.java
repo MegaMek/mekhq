@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -43,10 +44,10 @@ public class EquipmentUnscramblerTest {
         AmmoType at0 = mock(AmmoType.class);
         AmmoType at1 = mock(AmmoType.class);
 
-        Mounted mount0 = createEquipment(mockEntity, 0, et0);
-        Mounted mount1 = createEquipment(mockEntity, 1, et1);
-        Mounted mount2 = createEquipment(mockEntity, 2, at0);
-        Mounted mount3 = createEquipment(mockEntity, 3, at1);
+        Mounted<?> mount0 = createEquipment(mockEntity, 0, et0);
+        Mounted<?> mount1 = createEquipment(mockEntity, 1, et1);
+        Mounted<?> mount2 = createEquipment(mockEntity, 2, at0);
+        Mounted<?> mount3 = createEquipment(mockEntity, 3, at1);
         when(mockEntity.getEquipment()).thenReturn(equipmentList(mount0, mount1, mount2, mount3));
 
         EquipmentPart ep0 = createPart(0, et0);
@@ -305,7 +306,7 @@ public class EquipmentUnscramblerTest {
         return mockPart;
     }
 
-    private ArrayList<Mounted> equipmentList(Mounted... equipment) {
+    private List<Mounted<?>> equipmentList(Mounted<?>... equipment) {
         return new ArrayList<>(Arrays.asList(equipment));
     }
 }

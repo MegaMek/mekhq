@@ -1397,4 +1397,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     public void optionClicked(DialogOptionComponent arg0, IOption arg1, boolean arg2) {
 
     }
+
+    @Override
+    public void optionSwitched(DialogOptionComponent comp, IOption option, int i) {
+
+    }
 }

@@ -24,6 +24,8 @@ import megamek.common.Compute;
 import mekhq.MekHQ;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.event.LocationChangedEvent;
+import mekhq.campaign.event.NewDayEvent;
+import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -252,6 +254,7 @@ public class CurrentLocation {
                 //we are here!
                 transitTime = 0;
                 jumpPath = null;
+                MekHQ.triggerEvent(new TransitCompleteEvent(this));
             }
         }
     }

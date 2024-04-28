@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<storyArc version="0.49.6-SNAPSHOT">
+  <title>A Test Campaign</title>
+  <details>Just for testing</details>
+  <description>This campaign is used for testing out features.</description>
+  <storyLoadingType>START_NEW</storyLoadingType>
+  <startingPointId>10700728-5c5b-11ec-bf63-0242ac130002</startingPointId>
+  <storyPoints>
+    <storyPoint name="creat_char" type="mekhq.campaign.storyarc.storypoint.CreateCharacterStoryPoint">
+      <id>9b068c99-c2ef-4a35-b59b-b923f4ddbdce</id>
+      <xpPool>25</xpPool>
+      <rank>34</rank>
+      <firstname>Harry</firstname>
+      <bloodname>Christu</bloodname>
+      <age>35</age>
+      <clan>true</clan>
+      <phenotype>MECHWARRIOR</phenotype>
+      <primaryRole>MECHWARRIOR</primaryRole>
+      <nextStoryPointId>10700728-5c5b-11ec-bf63-0242ac130002</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="date_reached" type="mekhq.campaign.storyarc.storypoint.CheckDateReachedStoryPoint">
+      <id>d01587c6-5473-4d62-ba2e-9a015368db40</id>
+      <date>3071-05-15</date>
+      <nextStoryPointId>dedcb5e7-dc7d-40d1-b45e-b97002c60334</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="travel_acamar" type="mekhq.campaign.storyarc.storypoint.TravelStoryPoint">
+      <id>6116e791-ea40-4435-8f45-e2c696f4da2b</id>
+      <destinationId>Acamar</destinationId>
+      <nextStoryPointId>10700728-5c5b-11ec-bf63-0242ac130002</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_welcome" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>10700728-5c5b-11ec-bf63-0242ac130002</id>
+      <title>A Test Story Arc</title>
+      <narrative>Welcome to the test *story arc*! Check out the **briefing tab** to see what missions and scenarios are available. Have fun!</narrative>
+      <personalityId>057e8ef4-5c59-11ec-bf63-0242ac130002</personalityId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.SetDateStoryTrigger">
+        <storyPointId>d01587c6-5473-4d62-ba2e-9a015368db40</storyPointId>
+        <futureDays>5</futureDays>
+      </storyTrigger>
+      <nextStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="narr_mission_complete" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>500511f2-5b8f-11ec-bf63-0242ac130002</id>
+      <title>First mission complete!</title>
+      <narrative>Congratulations on completing your first mission!</narrative>
+      <nextStoryPointId>3491b950-5bcd-11ec-bf63-0242ac130002</nextStoryPointId>
+      <StorySplash>
+        <category></category>
+        <filename>splash-guardduty.png</filename>
+      </StorySplash>
+    </storyPoint>
+    <storyPoint name="narr_date_reached" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
+      <id>dedcb5e7-dc7d-40d1-b45e-b97002c60334</id>
+      <title>Date reached</title>
+      <narrative>Its May 15th, 3071. Just thought you should know. Its probably a holiday somewhere.</narrative>
+      <StorySplash>
+        <category></category>
+        <filename>splash-guardduty.png</filename>
+      </StorySplash>
+    </storyPoint>
+    <storyPoint name="choice_what_next" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
+      <id>3491b950-5bcd-11ec-bf63-0242ac130002</id>
+      <title>What Next?</title>
+      <question>Which mission would you like to go on now?</question>
+      <choice id="mission2">Mission 2</choice>
+      <choice id="mission3">Mission 3</choice>
+      <personalityId>9adeb0c8-69d0-4206-b455-bcca43144df3</personalityId>
+      <storyOutcomes>
+        <storyOutcome result="mission2">
+          <nextStoryPointId>bf41db33-2683-459f-855b-0632eedb807e</nextStoryPointId>
+        </storyOutcome>
+        <storyOutcome result="mission3">
+          <nextStoryPointId>d7617c74-5bcd-11ec-bf63-0242ac130002</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+    </storyPoint>
+    <storyPoint name="mission_first" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>35b5b068-5946-11ec-bf63-0242ac130002</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>First Mission</name>
+        <type>Planetary Assault</type>
+        <systemId>Terra</systemId>
+        <desc>If everything is working correctly, you should see this mission loaded when you begin the story arc.</desc>
+      </mission>
+      <scenarioStoryPointId>5a333f88-597c-11ec-bf63-0242ac130002</scenarioStoryPointId>
+      <nextStoryPointId>500511f2-5b8f-11ec-bf63-0242ac130002</nextStoryPointId>
+    </storyPoint>
+    <storyPoint name="mission_second" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>bf41db33-2683-459f-855b-0632eedb807e</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>Second Mission</name>
+        <type>Objective Raid</type>
+        <systemId>Terra</systemId>
+        <desc>If everything is working correctly, you should see this mission once you select it from the choice dialog. There is nothing more at this point.</desc>
+      </mission>
+    </storyPoint>
+    <storyPoint name="mission_third" type="mekhq.campaign.storyarc.storypoint.MissionStoryPoint">
+      <id>d7617c74-5bcd-11ec-bf63-0242ac130002</id>
+      <mission type="mekhq.campaign.mission.Mission">
+        <name>Third Mission</name>
+        <type>Riot Duty</type>
+        <systemId>Hall</systemId>
+        <desc>If everything is working correctly, you should see this mission once once you select it from the choice dialog. There is nothing more at this point.</desc>
+      </mission>
+    </storyPoint>
+    <storyPoint name="scenario_initial" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>5a333f88-597c-11ec-bf63-0242ac130002</id>
+      <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+      <nextStoryPointId>dbb7357c-59cd-11ec-bf63-0242ac130002</nextStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <nextStoryPointId>0d96f227-6c97-4cb1-ade5-578b2386c1a5</nextStoryPointId>
+        </storyOutcome>
+      </storyOutcomes>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Initial Scenario</name>
+        <desc>If everything is working correctly, you should see this scenario as part of First mission when you begin the story arc. To see what happens next, try out the scenario and then select Victory or Defeat.</desc>
+      </scenario>
+    </storyPoint>
+    <storyPoint name="scenario_victory" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>0d96f227-6c97-4cb1-ade5-578b2386c1a5</id>
+      <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+      <nextStoryPointId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Victory Scenario</name>
+        <desc>If everything is working correctly, this scenario should be added to First mission when you are victorious in the initial scenario. Being victorious in this scenario should complete First Mission.</desc>
+      </scenario>
+    </storyPoint>
+    <storyPoint name="scenario_defeat" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>dbb7357c-59cd-11ec-bf63-0242ac130002</id>
+      <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+      <nextStoryPointId>f6d7cc16-5afb-11ec-bf63-0242ac130002</nextStoryPointId>
+      <storyOutcomes>
+        <storyOutcome result="PYRRHIC_VICTORY">
+          <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+            <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+            <missionStatus>SUCCESS</missionStatus>
+          </storyTrigger>
+        </storyOutcome>
+      </storyOutcomes>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Defeat Scenario</name>
+        <desc>If everything is working correctly, this scenario should be added to First mission when you are defeated in the initial scenario. Being victorious in this scenario should complete First mission.</desc>
+      </scenario>
+    </storyPoint>
+    <storyPoint name="scenario_last_try" type="mekhq.campaign.storyarc.storypoint.ScenarioStoryPoint">
+      <id>f6d7cc16-5afb-11ec-bf63-0242ac130002</id>
+      <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+      <storyTrigger type="mekhq.campaign.storyarc.storytrigger.CompleteMissionStoryTrigger">
+        <missionStoryPointId>35b5b068-5946-11ec-bf63-0242ac130002</missionStoryPointId>
+        <missionStatus>SUCCESS</missionStatus>
+      </storyTrigger>
+      <scenario type="mekhq.campaign.mission.Scenario">
+        <name>Last Try Scenario</name>
+        <desc>If everything is working correctly, this scenario should be added to First mission if you are defeated in your second scenario. Completing it should finish First Mission.</desc>
+      </scenario>
+    </storyPoint>
+  </storyPoints>
+  <personalities>
+    <personality name="personality_helperpants">
+      <id>057e8ef4-5c59-11ec-bf63-0242ac130002</id>
+      <title>Captain Helperpants</title>
+      <portrait>
+        <category>Female/Admin/Command</category>
+        <filename>Adm_Com_F_2.png</filename>
+      </portrait>
+    </personality>
+    <personality name="personality_somebody">
+      <id>9adeb0c8-69d0-4206-b455-bcca43144df3</id>
+      <personCampaignId>590dcabe-e9d9-43ec-8e24-0c3651f1a28c</personCampaignId>
+    </personality>
+  </personalities>
+</storyArc>

@@ -938,6 +938,7 @@ public class Scenario implements IPlayerSettings {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "boardType", boardType);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasTrack", hasTrack);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());

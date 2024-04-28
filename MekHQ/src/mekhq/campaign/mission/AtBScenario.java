@@ -421,13 +421,17 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setMapFile(String terrainType) {
-        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
-        StratconBiomeManifest.MapTypeList value = mapTypes.get(terrainType);
-        if (value != null) {
-            List<String> mapTypeList = value.mapTypes;
-            setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+        if (terrainType.equals("Space")) {
+            setMap("Space");
         } else {
-            setMap("Savannah");
+            Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
+            StratconBiomeManifest.MapTypeList value = mapTypes.get(terrainType);
+            if (value != null) {
+                List<String> mapTypeList = value.mapTypes;
+                setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+            } else {
+                setMap("Savannah");
+            }
         }
     }
 

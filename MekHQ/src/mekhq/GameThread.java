@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import megamek.client.AbstractClient;
 import megamek.client.Client;
 import megamek.client.CloseClientListener;
 import megamek.client.bot.BotClient;
@@ -89,7 +90,7 @@ class GameThread extends Thread implements CloseClientListener {
         client.addCloseClientListener(this);
 
         if (swingGui != null) {
-            for (Client client2 : swingGui.getLocalBots().values()) {
+            for (AbstractClient client2 : swingGui.getLocalBots().values()) {
                 client2.die();
             }
             swingGui.getLocalBots().clear();

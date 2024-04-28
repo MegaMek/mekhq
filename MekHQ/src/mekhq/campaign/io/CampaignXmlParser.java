@@ -25,6 +25,7 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.common.Entity;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoMounted;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Camouflage;
 import megamek.common.weapons.bayweapons.BayWeapon;
@@ -50,6 +51,7 @@ import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
@@ -245,6 +247,8 @@ public class CampaignXmlParser {
                     processSkillTypeNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("specialAbilities")) {
                     processSpecialAbilityNodes(retVal, wn, version);
+                } else if (xn.equalsIgnoreCase("storyArc")) {
+                    processStoryArcNodes(retVal, wn, version);
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     retVal.getGameOptions().fillFromXML(wn.getChildNodes());
                 } else if (xn.equalsIgnoreCase("kills")) {
@@ -891,6 +895,14 @@ public class CampaignXmlParser {
         LogManager.getLogger().info("Load Skill Type Nodes Complete!");
     }
 
+    private static void processStoryArcNodes(Campaign retVal, Node wn, Version version) {
+        LogManager.getLogger().info("Loading Story Arc Nodes from XML...");
+
+        StoryArc storyArc = StoryArc.parseFromXML(wn.getChildNodes(), retVal, version);
+        MekHQ.registerHandler(storyArc);
+        retVal.useStoryArc(storyArc, false);
+    }
+
     private static void processSpecialAbilityNodes(Campaign retVal, Node wn, Version version) {
         LogManager.getLogger().info("Loading Special Ability Nodes from XML...");
 
@@ -1236,11 +1248,11 @@ public class CampaignXmlParser {
                     && version.isLowerThan("0.43.5")
                     && ((prt instanceof AmmoBin) || (prt instanceof MissingAmmoBin))) {
                 if (prt.getUnit().getEntity().usesWeaponBays()) {
-                    Mounted ammo;
+                    AmmoMounted ammo;
                     if (prt instanceof EquipmentPart) {
-                        ammo = prt.getUnit().getEntity().getEquipment(((EquipmentPart) prt).getEquipmentNum());
+                        ammo = (AmmoMounted) prt.getUnit().getEntity().getEquipment(((EquipmentPart) prt).getEquipmentNum());
                     } else {
-                        ammo = prt.getUnit().getEntity().getEquipment(((MissingEquipmentPart) prt).getEquipmentNum());
+                        ammo = (AmmoMounted) prt.getUnit().getEntity().getEquipment(((MissingEquipmentPart) prt).getEquipmentNum());
                     }
                     if (null != ammo) {
                         if (prt instanceof AmmoBin) {

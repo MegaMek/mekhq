@@ -18,6 +18,7 @@
  */
 package mekhq;
 
+import megamek.client.AbstractClient;
 import megamek.client.Client;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
@@ -76,7 +77,7 @@ public class AtBGameThread extends GameThread {
         client.addCloseClientListener(this);
 
         if (swingGui != null) {
-            for (Client client2 : swingGui.getLocalBots().values()) {
+            for (AbstractClient client2 : swingGui.getLocalBots().values()) {
                 client2.die();
             }
             swingGui.getLocalBots().clear();
@@ -123,7 +124,8 @@ public class AtBGameThread extends GameThread {
                 mapSettings.getBoardsSelectedVector().clear();
 
                 // if the scenario is taking place in space, do space settings instead
-                if (scenario.getBoardType() == Scenario.T_SPACE) {
+                if (scenario.getBoardType() == Scenario.T_SPACE
+                        || scenario.getTerrainType().equals("Space")) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
