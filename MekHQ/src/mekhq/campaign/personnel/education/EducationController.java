@@ -17,15 +17,26 @@ import java.util.ResourceBundle;
  * Controls the education module for a person in a campaign.
  */
 public class EducationController {
-    /**
-     * Controls the education module for a person in a campaign.
-     *
-     * @param campaign the campaign to which the person belongs
-     * @param person the person whose education is being controlled
-     * @param origin the origin of the education (e.g., "Basic Training", "Local Academy", etc.)
-     * @throws IllegalStateException if the origin value is unexpected
-     */
     public static void educationController(Campaign campaign, Person person, String academySet, String academyName, int courseIndex) {
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
+                MekHQ.getMHQOptions().getLocale());
+
+        List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(academySet);
+        Academy academy = new Academy();
+
+        // get the right Academy
+        for (Academy a : academiesOfSet) {
+            if (String.valueOf(a).equals(academyName)) {
+                academy = a;
+            }
+        }
+
+        // check there is enough money in the campaign
+        if (getBalance(campaign) < academy.getTuition()) {
+            campaign.addReport(resources.getString("insufficientFunds.text").replaceAll("0", person.getHyperlinkedFullTitle()));
+            return;
+        }
+
 
     }
 

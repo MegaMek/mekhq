@@ -6,7 +6,6 @@
         <description>A supremely excellent education</description>
         <locationSystem>Galatea</locationSystem>
         <constructionYear>2986</constructionYear>
-        <destructionYear>3031</destructionYear>
         <tuition>30000</tuition>
         <durationDays>365</durationDays>
         <facultySkill>11</facultySkill>
@@ -14,13 +13,13 @@
         <educationLevelMax>5</educationLevelMax>
         <qualification>-----------Random Stuff Degree</qualification>
         <curriculum>Piloting/Naval, Gunnery/ProtoMech</curriculum>
-        <qualificationStartYear>3025</qualificationStartYear>
+        <qualificationStartYear>3030</qualificationStartYear>
         <qualification>------------MechAwesomeness Degree</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
-        <qualificationStartYear>3025</qualificationStartYear>
+        <qualificationStartYear>3030</qualificationStartYear>
         <qualification>------------Jets go weee</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
-        <qualificationStartYear>3025</qualificationStartYear>
+        <qualificationStartYear>3030</qualificationStartYear>
         <skillLevel>1</skillLevel>
     </academy>
 </academies>

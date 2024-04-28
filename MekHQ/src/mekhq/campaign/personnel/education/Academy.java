@@ -22,14 +22,12 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -56,7 +54,7 @@ public class Academy {
     private Integer constructionYear;
 
     @XmlElement(name = "destructionYear")
-    private Integer destructionYear;
+    private Integer destructionYear = 9999;
 
     @XmlElement(name = "tuition")
     private Integer tuition;
@@ -74,10 +72,10 @@ public class Academy {
     private Integer educationLevelMax;
 
     @XmlElement(name = "ageMin")
-    private Integer ageMin;
+    private Integer ageMin = 0;
 
     @XmlElement(name = "ageMax")
-    private Integer ageMax;
+    private Integer ageMax = 9999;
 
     @XmlElement(name = "qualification")
     private List<String> qualifications;
@@ -85,8 +83,8 @@ public class Academy {
     @XmlElement(name = "curriculum")
     private List<String> curriculums;
 
-    @XmlElement(name = "curriculumsStartYear")
-    private List<Integer> curriculumStartYears;
+    @XmlElement(name = "qualificationStartYear")
+    private List<Integer> qualificationStartYears;
 
     @XmlElement(name = "skillLevel")
     private Integer skillLevel;
@@ -120,31 +118,30 @@ public class Academy {
      * @param ageMax               the maximum age required for admission to the academy (optional, default value is 9999)
      * @param qualifications       a list of qualifications provided by the academy
      * @param curriculums          a list of curriculums offered by the academy (groups of skills to be improved)
-     * @param curriculumStartYears a list of start years for each curriculum offered by the academy
+     * @param qualificationStartYears a list of start years for each curriculum offered by the academy
      * @param skillLevel           the base skill level provided for completion of a curriculum
      */
     public Academy(String set, String name, Boolean isMilitary, String description, List<String> locationSystems,
-                   Integer constructionYear, @Nullable Integer destructionYear, Integer tuition, Integer durationDays,
-                   Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax, @Nullable Integer ageMin,
-                   @Nullable Integer ageMax, List<String> qualifications, List<String> curriculums,
-                   List<Integer> curriculumStartYears, Integer skillLevel) {
+                   Integer constructionYear, Integer destructionYear, Integer tuition, Integer durationDays, Integer facultySkill,
+                   Integer educationLevelMin, Integer educationLevelMax, Integer ageMin, Integer ageMax, List<String> qualifications,
+                   List<String> curriculums, List<Integer> qualificationStartYears, Integer skillLevel) {
         this.set = set;
         this.name = name;
         this.isMilitary = isMilitary;
         this.description = description;
         this.locationSystems = locationSystems;
         this.constructionYear = constructionYear;
-        this.destructionYear = Objects.requireNonNullElse(destructionYear, 9999);
+        this.destructionYear = destructionYear;
         this.tuition = tuition;
         this.durationDays = durationDays;
         this.facultySkill = facultySkill;
         this.educationLevelMin = educationLevelMin;
         this.educationLevelMax = educationLevelMax;
-        this.ageMin = Objects.requireNonNullElse(ageMin, 0);
-        this.ageMax = Objects.requireNonNullElse(ageMax, 9999);
+        this.ageMin = ageMin;
+        this.ageMax = ageMax;
         this.qualifications = qualifications;
         this.curriculums = curriculums;
-        this.curriculumStartYears = curriculumStartYears;
+        this.qualificationStartYears = qualificationStartYears;
         this.skillLevel = skillLevel;
     }
 
@@ -309,8 +306,8 @@ public class Academy {
      *
      * @return The skills improved by this academy as a String.
      */
-    public List<Integer> getCurriculumStartYears() {
-        return curriculumStartYears;
+    public List<Integer> getQualificationStartYears() {
+        return qualificationStartYears;
     }
 
     /**
