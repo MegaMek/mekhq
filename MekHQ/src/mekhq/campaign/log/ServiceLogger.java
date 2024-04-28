@@ -86,12 +86,20 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, status.getLogText()));
     }
 
-    public static void beganEducation(Person person, LocalDate date, String institution) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("startedEducation.text"), institution)));
+    public static void eduEnrolled(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduEnrolled.text"), institution)));
     }
 
-    public static void endedEducation(Person person, LocalDate date, String institution) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("endedEducation.text"), institution)));
+    public static void eduGraduated(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduated.text"), institution)));
+    }
+
+    public static void eduGraduatedPlus(Person person, LocalDate date, String graduationType, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedPlus.text"), graduationType, institution)));
+    }
+
+    public static void eduFailed(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduFailed.text"), institution)));
     }
 
     public static void recoveredMia(Person person, LocalDate date) {

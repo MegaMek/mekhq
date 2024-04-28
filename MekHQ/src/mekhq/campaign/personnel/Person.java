@@ -188,9 +188,13 @@ public class Person {
     //endregion Against the Bot
 
     //region Education
+    private int eduHighestEducation;
     private int eduDaysOfTravelToAcademy;
     private int eduDaysOfTravelFromAcademy;
-    private Planet eduAcademyPlanet;
+    private String eduAcademySystem;
+    private String eduAcademySet;
+    private String eduAcademyName;
+    private String eduAcademyType;
     private int eduDaysOfEducation;
     //endregion Education
 
@@ -330,9 +334,13 @@ public class Person {
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
         acquisitions = 0;
+        eduHighestEducation = 0;
         eduDaysOfTravelToAcademy = 0;
         eduDaysOfTravelFromAcademy = 0;
-        eduAcademyPlanet = null;
+        eduAcademySystem = null;
+        eduAcademyName = null;
+        eduAcademySet = null;
+        eduAcademyType = null;
         eduDaysOfEducation = 0;
 
         //region Flags
@@ -1257,6 +1265,14 @@ public class Person {
         this.biography = biography;
     }
 
+    public int getEduHighestEducation() {
+        return eduHighestEducation;
+    }
+
+    public void setEduHighestEducation(final int eduHighestEducation) {
+        this.eduHighestEducation = eduHighestEducation;
+    }
+
     public int getEduDaysOfTravelToAcademy() {
         return eduDaysOfTravelToAcademy;
     }
@@ -1281,13 +1297,38 @@ public class Person {
         this.eduDaysOfEducation = eduDaysOfEducation;
     }
 
-    public Planet getEduAcademyPlanet() {
-        return eduAcademyPlanet;
+    public String getEduAcademySystem() {
+        return eduAcademySystem;
     }
 
-    public void setEduAcademyPlanet(final Planet eduAcademyPlanet) {
-        this.eduAcademyPlanet = eduAcademyPlanet;
+    public void setEduAcademySystem(final String eduAcademySystem) {
+        this.eduAcademySystem = eduAcademySystem;
     }
+
+    public String getEduAcademyName() {
+        return eduAcademyName;
+    }
+
+    public void setEduAcademyName(final String eduAcademyName) {
+        this.eduAcademyName = eduAcademyName;
+    }
+
+    public void setEduAcademySet(final String eduAcademySet) {
+        this.eduAcademySet = eduAcademySet;
+    }
+
+    public String getEduAcademySet() {
+        return eduAcademySet;
+    }
+
+    public String getEduAcademyType() {
+        return eduAcademyType;
+    }
+
+    public void setEduAcademyType(final String eduAcademyType) {
+        this.eduAcademyType = eduAcademyType;
+    }
+
 
     //region Flags
     public boolean isClanPersonnel() {
@@ -1565,6 +1606,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitions", acquisitions);
             }
 
+            if (eduHighestEducation != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation);
+            }
+
             if (eduDaysOfTravelToAcademy != 0) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelToAcademy", eduDaysOfTravelToAcademy);
             }
@@ -1573,9 +1618,20 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelFromAcademy", eduDaysOfTravelFromAcademy);
             }
 
-            if (eduAcademyPlanet != null) {
-                MHQXMLUtility.writeSimpleXMLAttributedTag(pw, indent, "eduAcademyPlanet", "systemId",
-                        eduAcademyPlanet.getParentSystem().getId(), eduAcademyPlanet.getId());
+            if (eduAcademySystem != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
+            }
+
+            if (eduAcademyName != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyName", eduAcademyName);
+            }
+
+            if (eduAcademySet != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySet", eduAcademySet);
+            }
+
+            if (eduAcademyType != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyType", eduAcademyType);
             }
 
             if (eduDaysOfEducation != 0) {
@@ -1867,14 +1923,20 @@ public class Person {
                     retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduHighestEducation")) {
+                    retVal.eduHighestEducation = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelToAcademy")) {
                     retVal.eduDaysOfTravelToAcademy = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelFromAcademy")) {
                     retVal.eduDaysOfTravelFromAcademy = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyPlanet")) {
-                        String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
-                        String planetId = wn2.getTextContent().trim();
-                        retVal.eduAcademyPlanet = c.getSystemById(systemId).getPlanetById(planetId);
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
+                    retVal.eduAcademySystem = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySet")) {
+                    retVal.eduAcademySet = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyName")) {
+                    retVal.eduAcademyName = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyType")) {
+                    retVal.eduAcademyType = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfEducation")) {
                     retVal.eduDaysOfEducation = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
