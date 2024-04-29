@@ -355,6 +355,9 @@ public class ScenarioDeploymentLimit {
                 personNames.add(p.getFullName());
             }
         }
+        if(personNames.isEmpty()) {
+            return "None";
+        }
         return String.join(", ", personNames);
     }
     //endregion Required personnel methods
@@ -415,6 +418,9 @@ public class ScenarioDeploymentLimit {
             if (null != u) {
                 unitNames.add(u.getName());
             }
+        }
+        if(unitNames.isEmpty()) {
+            return "None";
         }
         return String.join(", ", unitNames);
     }

@@ -563,10 +563,10 @@ public class CustomizeScenarioDialog extends JDialog {
 
     private void refreshDeploymentLimits() {
         if(deploymentLimits != null) {
-            lblAllowedUnitsDesc.setText(deploymentLimits.getAllowedUnitTypeDesc());
-            lblQuantityLimitDesc.setText(deploymentLimits.getQuantityLimitDesc(scenario, campaign));
-            lblRequiredPersonnelDesc.setText(deploymentLimits.getRequiredPersonnelDesc(campaign));
-            lblRequiredUnitsDesc.setText(deploymentLimits.getRequiredUnitDesc(campaign));
+            lblAllowedUnitsDesc.setText("<html>" + deploymentLimits.getAllowedUnitTypeDesc() + "</html>");
+            lblQuantityLimitDesc.setText("<html>" +deploymentLimits.getQuantityLimitDesc(scenario, campaign) + "</html>");
+            lblRequiredPersonnelDesc.setText("<html>" + deploymentLimits.getRequiredPersonnelDesc(campaign) + "</html>");
+            lblRequiredUnitsDesc.setText("<html>" + deploymentLimits.getRequiredUnitDesc(campaign) + "</html>");
         } else {
             lblAllowedUnitsDesc.setText("All");
             lblQuantityLimitDesc.setText("No Limits");
