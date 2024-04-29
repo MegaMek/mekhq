@@ -143,6 +143,14 @@ public class BotForceRandomizer {
     public void setFactionCode(final String factionCode) {
         this.factionCode = factionCode;
     }
+
+    public double getError() {
+        return error;
+    }
+
+    public void setError(double d) {
+        error = d;
+    }
     //endregion Getters/Setters
 
     /**
