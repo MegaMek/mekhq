@@ -3097,6 +3097,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
+
         lifePathsPanel.add(createPersonnelRandomizationPanel(), gbc);
 
         gbc.gridx++;
@@ -3104,6 +3105,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gbc.gridx = 0;
         gbc.gridy++;
+        gbc.gridwidth = 2;
         lifePathsPanel.add(createFamilyPanel(), gbc);
 
         gbc.gridy++;
@@ -3115,10 +3117,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gbc.gridx = 0;
         gbc.gridy++;
-        lifePathsPanel.add(createProcreationPanel(), gbc);
+        lifePathsPanel.add(createDeathPanel(), gbc);
 
         gbc.gridx++;
-        lifePathsPanel.add(createDeathPanel(), gbc);
+        lifePathsPanel.add(createProcreationPanel(), gbc);
 
         final JScrollPane scrollLifePaths = new JScrollPane(lifePathsPanel);
         scrollLifePaths.setPreferredSize(new Dimension(400, 400));
