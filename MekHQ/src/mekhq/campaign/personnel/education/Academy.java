@@ -109,7 +109,6 @@ public class Academy {
     /**
      * This class provides a no-arg constructor, which is needed for unmarshalling of XML.
      */
-    // no-arg constructor needed for unmarshalling of xml
     public Academy() {
     }
 
@@ -428,9 +427,9 @@ public class Academy {
     /**
      * Returns an HTML formatted string to be used as a tooltip.
      *
-     * @param campaign    the current campaign
-     * @param person      the person we're generating the tooltip for
-     * @param courseIndex
+     * @param campaign      the current campaign
+     * @param person        the person we're generating the tooltip for
+     * @param courseIndex   the index of the course in the curriculum
      * @return the tooltip string
      */
     public String getTooltip(Campaign campaign, Person person, int courseIndex) {
@@ -513,7 +512,7 @@ public class Academy {
      * @return the corresponding skill code as a string
      * @throws IllegalStateException if the skill string is unexpected or invalid
      */
-    private static String skillParser(String skill) {
+    static String skillParser(String skill) {
         switch (skill.toLowerCase().replaceAll("\\s", "")) {
             case "piloting/mech":
                 return SkillType.S_PILOT_MECH;

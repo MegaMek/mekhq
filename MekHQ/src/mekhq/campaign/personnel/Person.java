@@ -189,13 +189,14 @@ public class Person {
 
     //region Education
     private int eduHighestEducation;
-    private int eduDaysOfTravelToAcademy;
-    private int eduDaysOfTravelFromAcademy;
-    private String eduAcademySystem;
-    private String eduAcademySet;
     private String eduAcademyName;
-    private String eduAcademyType;
+    private String eduAcademySet;
+    private String eduAcademyNameInSet;
+    private String eduAcademySystem;
+    private int eduCourseIndex;
+    private int eduDaysOfTravelToAcademy;
     private int eduDaysOfEducation;
+    private int eduDaysOfTravelFromAcademy;
     //endregion Education
 
     //region Flags
@@ -335,13 +336,14 @@ public class Person {
         originalUnitId = null;
         acquisitions = 0;
         eduHighestEducation = 0;
-        eduDaysOfTravelToAcademy = 0;
-        eduDaysOfTravelFromAcademy = 0;
-        eduAcademySystem = null;
         eduAcademyName = null;
-        eduAcademySet = null;
-        eduAcademyType = null;
+        eduAcademySystem = null;
+        eduCourseIndex = 0;
+        eduDaysOfTravelToAcademy = 0;
         eduDaysOfEducation = 0;
+        eduDaysOfTravelFromAcademy = 0;
+        eduAcademySet = null;
+        eduAcademyNameInSet = null;
 
         //region Flags
         setClanPersonnel(originFaction.isClan());
@@ -1305,6 +1307,22 @@ public class Person {
         this.eduAcademySystem = eduAcademySystem;
     }
 
+    public String getEduAcademyNameInSet() {
+        return eduAcademyNameInSet;
+    }
+
+    public void setEduAcademyNameInSet(final String eduAcademyNameInSet) {
+        this.eduAcademyNameInSet = eduAcademyNameInSet;
+    }
+
+    public Integer getEduCourseIndex() {
+        return eduCourseIndex;
+    }
+
+    public void setEduCourseIndex(final Integer eduCourseIndex) {
+        this.eduCourseIndex = eduCourseIndex;
+    }
+
     public String getEduAcademyName() {
         return eduAcademyName;
     }
@@ -1320,15 +1338,6 @@ public class Person {
     public String getEduAcademySet() {
         return eduAcademySet;
     }
-
-    public String getEduAcademyType() {
-        return eduAcademyType;
-    }
-
-    public void setEduAcademyType(final String eduAcademyType) {
-        this.eduAcademyType = eduAcademyType;
-    }
-
 
     //region Flags
     public boolean isClanPersonnel() {
@@ -1622,16 +1631,20 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
             }
 
-            if (eduAcademyName != null) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyName", eduAcademyName);
+            if (eduAcademyNameInSet != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyNameInSet", eduAcademyNameInSet);
             }
 
             if (eduAcademySet != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySet", eduAcademySet);
             }
 
-            if (eduAcademyType != null) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyType", eduAcademyType);
+            if (eduAcademyName != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyName", eduAcademyName);
+            }
+
+            if (eduCourseIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduCourseIndex", eduCourseIndex);
             }
 
             if (eduDaysOfEducation != 0) {
@@ -1931,12 +1944,14 @@ public class Person {
                     retVal.eduDaysOfTravelFromAcademy = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
                     retVal.eduAcademySystem = String.valueOf(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySet")) {
-                    retVal.eduAcademySet = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyName")) {
                     retVal.eduAcademyName = String.valueOf(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyType")) {
-                    retVal.eduAcademyType = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySet")) {
+                    retVal.eduAcademySet = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyNameInSet")) {
+                    retVal.eduAcademyNameInSet = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduCourseIndex")) {
+                    retVal.eduCourseIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfEducation")) {
                     retVal.eduDaysOfEducation = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")

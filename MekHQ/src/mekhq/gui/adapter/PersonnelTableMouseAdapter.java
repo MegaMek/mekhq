@@ -351,7 +351,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_BEGIN_EDUCATION: {
                 for (Person person : people) {
-                    EducationController.educationController(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]));
+                    EducationController.beginEducation(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]));
                 }
                 break;
             }
@@ -1432,7 +1432,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                         academies = new JMenu(academy.getName());
                                         civilianMenu.add(academies);
 
-                                        buildSubMenus(academy, campaignYear, person, academies);
+                                        buildEduSubMenus(academy, campaignYear, person, academies);
                                     } else {
                                         academies = new JMenu(resources.getString("eduFactionRejected.text")
                                                 .replaceAll("0", person.getFirstName()));
@@ -1454,7 +1454,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     academies = new JMenu(academy.getName());
                                     militaryMenu.add(academies);
 
-                                    buildSubMenus(academy, campaignYear, person, academies);
+                                    buildEduSubMenus(academy, campaignYear, person, academies);
                                 } else {
                                     academies = new JMenu(resources.getString("eduDestroyed.text"));
                                     militaryMenu.add(academies);
@@ -2482,7 +2482,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param person         the person for whom the submenus are being built
      * @param academies      the main menu item where the submenus will be added
      */
-    private void buildSubMenus(Academy academy, int campaignYear, Person person, JMenu academies) {
+    private void buildEduSubMenus(Academy academy, int campaignYear, Person person, JMenu academies) {
         JMenuItem courses;
         int courseCount = academy.getQualifications().size();
         for (int courseIndex = 0; courseIndex < courseCount; courseIndex++) {

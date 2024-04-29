@@ -43,7 +43,7 @@ import java.util.Map;
  */
 public class AcademyFactory {
     private static AcademyFactory instance = null;
-    private Map<String, Map<String, Academy>> academyMap;
+    private final Map<String, Map<String, Academy>> academyMap;
 
     /**
      * This class is responsible for generating academy blueprint by reading the data from XML sources.
