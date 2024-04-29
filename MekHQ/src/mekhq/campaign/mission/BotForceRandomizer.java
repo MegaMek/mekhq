@@ -159,10 +159,12 @@ public class BotForceRandomizer {
 
         double targetPoints = calculateMaxPoints(playerUnits);
         double currentPoints = calculateStartingPoints(botFixedEntities);
-        if ((focalWeightClass < EntityWeightClass.WEIGHT_LIGHT) ||
-                (focalWeightClass > EntityWeightClass.WEIGHT_ASSAULT)) {
-            // if no focal weight class was provided or its outside of range then use the mean of the player units
-            focalWeightClass = calculateMeanWeightClass(playerUnits);
+        // don't use actual focalWeightClass because we don't want to save changes
+        double targetWeightClass = focalWeightClass;
+        if ((targetWeightClass < EntityWeightClass.WEIGHT_LIGHT) ||
+                (targetWeightClass > EntityWeightClass.WEIGHT_ASSAULT)) {
+            // if no target weight class was provided or its outside of range then use the mean of the player units
+            targetWeightClass = calculateMeanWeightClass(playerUnits);
         }
 
         // using a gamma distribution to get actual weight class for each lance. Each gamma
