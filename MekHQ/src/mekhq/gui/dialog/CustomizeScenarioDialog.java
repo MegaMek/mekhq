@@ -175,7 +175,10 @@ public class CustomizeScenarioDialog extends JDialog {
         lootModel = new LootTableModel(loots);
 
         // FIXME: clone this so we don't change on a cancel
-        objectives = scenario.getScenarioObjectives();
+        objectives = new ArrayList<>();
+        for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
+            objectives.add(new ScenarioObjective(objective));
+        }
         objectiveModel = new ObjectiveTableModel(objectives);
 
         initComponents();
@@ -446,6 +449,7 @@ public class CustomizeScenarioDialog extends JDialog {
         scenario.readPlanetaryConditions(planetaryConditions);
         scenario.setDate(date);
         scenario.setBotForces(botForces);
+        scenario.setScenarioObjectives(objectives);
         scenario.resetLoot();
         for (Loot loot : lootModel.getAllLoot()) {
             scenario.addLoot(loot);
@@ -806,7 +810,7 @@ public class CustomizeScenarioDialog extends JDialog {
         CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame, true, new ScenarioObjective(), scenario.getBotForces());
         csod.setVisible(true);
         if (null != csod.getObjective()) {
-            objectiveModel.addObjective(csod.getObjective());
+            objectives.add(csod.getObjective());
         }
         refreshObjectiveTable();
     }
