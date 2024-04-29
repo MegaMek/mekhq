@@ -157,9 +157,8 @@ public class BotForceRandomizer {
     public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities) {
         ArrayList<Entity> entityList = new ArrayList<>();
 
-        double maxPoints = calculateMaxPoints(playerUnits);
+        double targetPoints = calculateMaxPoints(playerUnits);
         double currentPoints = calculateStartingPoints(botFixedEntities);
-        double ratioPoints = 0;
         if ((focalWeightClass < EntityWeightClass.WEIGHT_LIGHT) ||
                 (focalWeightClass > EntityWeightClass.WEIGHT_ASSAULT)) {
             // if no focal weight class was provided or its outside of range then use the mean of the player units
@@ -182,20 +181,20 @@ public class BotForceRandomizer {
         while(startOver) {
             nAttempts++;
             if((nAttempts % 20) == 0) {
-                // widen error bars by 50%
+                // widen error bars by 50%. We do this up to a maximum of four times which at 5% original error
+                // bars will max out error bars at roughly 25%.
                 loosenError = loosenError + 0.5;
+                LogManager.getLogger().info("Could not find randomized forces within specified parameters. Increasing target bounds by 50%");
             }
-            highBounds = maxPoints * (1 + error * loosenError);
-            lowBounds = maxPoints * (1 - error * loosenError);
+            highBounds = targetPoints * (1 + error * loosenError);
+            lowBounds = targetPoints * (1 - error * loosenError);
             currentPoints = calculateStartingPoints(botFixedEntities);
             entityList = new ArrayList<>();
             int uType;
             List<Entity> lanceList;
             int weightClass;
             while (currentPoints < lowBounds) {
-
                 weightClass = sampleWeightClass(gamma);
-
                 // if the unit type is mek or aero, then roll to see if I get a conventional unit instead
                 uType = unitType;
                 if ((unitType == UnitType.MEK) && (percentConventional > 0)
@@ -212,14 +211,27 @@ public class BotForceRandomizer {
                     currentPoints += calculatePoints(e);
                 }
             }
-
-            if ((currentPoints <= highBounds) || (nAttempts >= 100)) {
+            if ((currentPoints <= highBounds) || (nAttempts >= 99)) {
+                if(nAttempts >= 99) {
+                    entityList = new ArrayList<>();
+                    LogManager.getLogger().info("Could not find randomized forces after 99 attempts. No forces generated.");
+                }
                 startOver = false;
             }
         }
 
         return entityList;
     }
+
+    /**
+     * This is the primary function that generates a force of entities from the given parameters. The
+     * intent is that this function is called from GameThread when the game is started.
+     * @param playerUnits A List of Units for the player's deployed force in the relevant scenario. This
+     *                    is used to determine the total points allowed for this force.
+     * @param botFixedEntities A List of The fixed Entities that might have also been declared in BotForce already.
+     *                         This is used to calculate the starting points already used when generating the force.
+     * @return A List of Entities that will be added to the game by GameThread.
+     */
 
     /**
      * Generate a "lance" of entities based on the lanceSize variable. This is not really a lance but
