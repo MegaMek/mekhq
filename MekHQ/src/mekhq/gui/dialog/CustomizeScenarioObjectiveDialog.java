@@ -45,6 +45,8 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
     private JList<String> lstDetails;
 
+    DefaultListModel<String> forceModel = new DefaultListModel<>();
+
 
     public CustomizeScenarioObjectiveDialog(JFrame parent, boolean modal, ScenarioObjective objective, List<BotForce> botForces) {
         super(parent, modal);
@@ -53,7 +55,10 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         this.botForces = botForces;
 
         initGUI();
-        updateForceList();
+
+        for(String forceName : objective.getAssociatedForceNames()) {
+            forceModel.addElement(forceName);
+        }
 
         txtShortDescription.setText(objective.getDescription());
         cboObjectiveType.setSelectedItem(objective.getObjectiveCriterion());
@@ -303,6 +308,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         forceNames = new JList<>();
         forceNames.setVisibleRowCount(5);
         forceNames.addListSelectionListener(e -> btnRemove.setEnabled(!forceNames.getSelectedValuesList().isEmpty()));
+        forceNames.setModel(forceModel);
 
         JButton btnAdd = new JButton("Add");
         btnAdd.addActionListener(e -> this.addForce());
@@ -484,18 +490,15 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void addForce() {
-        objective.addForce(cboForceName.getSelectedItem().toString());
-
-        updateForceList();
+        forceModel.addElement(cboForceName.getSelectedItem().toString());
+        //forceNames.revalidate();
         pack();
     }
 
     private void removeForce() {
         for (String forceName : forceNames.getSelectedValuesList()) {
-            objective.removeForce(forceName);
+           forceModel.removeElement(forceName);
         }
-
-        updateForceList();
         btnRemove.setEnabled(false);
         pack();
     }
@@ -519,15 +522,6 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         }
 
         lstDetails.setModel(detailModel);
-    }
-
-    private void updateForceList() {
-        DefaultListModel<String> forceModel = new DefaultListModel<>();
-        for (String forceName : objective.getAssociatedForceNames()) {
-            forceModel.addElement(forceName);
-        }
-
-        forceNames.setModel(forceModel);
     }
 
     private void setDirectionDropdownVisibility() {
@@ -581,6 +575,11 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
             objective.setPercentage(number);
         } else {
             objective.setFixedAmount(number);
+        }
+
+        objective.clearForces();
+        for (int i = 0; i< forceModel.getSize(); i++) {
+            objective.addForce(forceModel.getElementAt(i));
         }
 
         if (cboDirection.isVisible() && cboDirection.getSelectedIndex() > 0) {
