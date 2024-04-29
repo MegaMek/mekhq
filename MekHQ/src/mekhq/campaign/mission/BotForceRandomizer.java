@@ -61,7 +61,8 @@ public class BotForceRandomizer {
 
     private enum BalancingMethod {
         BV,
-        WEIGHT_ADJ;
+        WEIGHT_ADJ,
+        GENERIC_BV;
 
         @Override
         public String toString() {
@@ -69,6 +70,8 @@ public class BotForceRandomizer {
                 return "BV";
             } else if (this == WEIGHT_ADJ) {
                 return "Adjusted Weight";
+            } else if (this == GENERIC_BV) {
+                return "Generic BV";
             }
             return super.toString();
         }
@@ -113,6 +116,11 @@ public class BotForceRandomizer {
     private int baChance;
     //endregion Variable Declarations
 
+    /**
+     * percentage error allowed in matching points
+     */
+    private double error;
+
     //region Constructors
     public BotForceRandomizer() {
         factionCode = "MERC";
@@ -123,6 +131,7 @@ public class BotForceRandomizer {
         baChance = 0;
         balancingMethod = BalancingMethod.WEIGHT_ADJ;
         lanceSize = 1;
+        error = 0.05;
     }
     //endregion Constructors
 
@@ -150,6 +159,7 @@ public class BotForceRandomizer {
 
         double maxPoints = calculateMaxPoints(playerUnits);
         double currentPoints = calculateStartingPoints(botFixedEntities);
+        double ratioPoints = 0;
         if ((focalWeightClass < EntityWeightClass.WEIGHT_LIGHT) ||
                 (focalWeightClass > EntityWeightClass.WEIGHT_ASSAULT)) {
             // if no focal weight class was provided or its outside of range then use the mean of the player units
@@ -161,27 +171,50 @@ public class BotForceRandomizer {
         // or lower. The scale parameter of 0.4 produces a reasonable variance.
         GammaDistribution gamma = new GammaDistribution(focalWeightClass / 0.4, 0.4);
 
-        int uType;
-        List<Entity> lanceList;
-        int weightClass;
-        while (currentPoints < maxPoints) {
+        // we use a double while loop here so that we start the whole thing over if we overshoot force size
+        // to ensure we don't get caught in an infinite loop, we will widen the error bars on a decent match
+        // after a certain number of times through the loop and if we hit a max value, we will just give up
+        boolean startOver = true;
+        int nAttempts = 0;
+        double loosenError = 1.0;
+        double highBounds;
+        double lowBounds;
+        while(startOver) {
+            nAttempts++;
+            if((nAttempts % 20) == 0) {
+                // widen error bars by 50%
+                loosenError = loosenError + 0.5;
+            }
+            highBounds = maxPoints * (1 + error * loosenError);
+            lowBounds = maxPoints * (1 - error * loosenError);
+            currentPoints = calculateStartingPoints(botFixedEntities);
+            entityList = new ArrayList<>();
+            int uType;
+            List<Entity> lanceList;
+            int weightClass;
+            while (currentPoints < lowBounds) {
 
-            weightClass = sampleWeightClass(gamma);
+                weightClass = sampleWeightClass(gamma);
 
-            // if the unit type is mek or aero, then roll to see if I get a conventional unit instead
-            uType = unitType;
-            if ((unitType == UnitType.MEK) && (percentConventional > 0)
-                    && (Compute.randomInt(100) <= percentConventional)) {
-                uType = UnitType.TANK;
-            } else if ((unitType == UnitType.AEROSPACEFIGHTER) && (percentConventional > 0)
-                    && (Compute.randomInt(100) <= percentConventional)) {
-                uType = UnitType.CONV_FIGHTER;
+                // if the unit type is mek or aero, then roll to see if I get a conventional unit instead
+                uType = unitType;
+                if ((unitType == UnitType.MEK) && (percentConventional > 0)
+                        && (Compute.randomInt(100) <= percentConventional)) {
+                    uType = UnitType.TANK;
+                } else if ((unitType == UnitType.AEROSPACEFIGHTER) && (percentConventional > 0)
+                        && (Compute.randomInt(100) <= percentConventional)) {
+                    uType = UnitType.CONV_FIGHTER;
+                }
+
+                lanceList = generateLance(lanceSize, uType, weightClass);
+                for (Entity e : lanceList) {
+                    entityList.add(e);
+                    currentPoints += calculatePoints(e);
+                }
             }
 
-            lanceList = generateLance(lanceSize, uType, weightClass);
-            for (Entity e : lanceList) {
-                entityList.add(e);
-                currentPoints += calculatePoints(e);
+            if ((currentPoints <= highBounds) || (nAttempts >= 100)) {
+                startOver = false;
             }
         }
 
@@ -404,6 +437,8 @@ public class BotForceRandomizer {
             return e.calculateBattleValue();
         } else if (balancingMethod == BalancingMethod.WEIGHT_ADJ) {
             return getAdjustedWeightPoints(e);
+        } else if (balancingMethod == BalancingMethod.GENERIC_BV) {
+            return e.getGenericBattleValue();
         }
         return e.getWeight();
     }
