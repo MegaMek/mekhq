@@ -140,7 +140,10 @@ public class ScenarioObjective {
     }
 
     public ScenarioObjective() {
-
+        description = "";
+        objectiveCriterion = ObjectiveCriterion.Destroy;
+        destinationEdge = OffBoardDirection.NONE;
+        percentage = 100;
     }
 
     /**

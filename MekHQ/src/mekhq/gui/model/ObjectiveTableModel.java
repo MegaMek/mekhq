@@ -46,6 +46,11 @@ public class ObjectiveTableModel extends AbstractTableModel {
         }
     }
 
+    public void addObjective(ScenarioObjective objective) {
+        data.add(objective);
+        fireTableDataChanged();
+    }
+
     @Override
     public Object getValueAt(int row, int col) {
         ScenarioObjective objective;
@@ -85,6 +90,12 @@ public class ObjectiveTableModel extends AbstractTableModel {
             default:
                 return null;
         }
+    }
+
+    //fill table with values
+    public void setData(List<ScenarioObjective> objectives) {
+        data = objectives;
+        fireTableDataChanged();
     }
 
     public ObjectiveTableModel.Renderer getRenderer() {

@@ -765,18 +765,18 @@ public class CustomizeScenarioDialog extends JDialog {
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
         btnAddObjective = new JButton(resourceMap.getString("btnAddObjective.text"));
-        //btnAddObjective.addActionListener(evt -> addObjective());
+        btnAddObjective.addActionListener(evt -> addObjective());
         btnAddObjective.setEnabled(scenario.getStatus().isCurrent());
         panBtns.add(btnAddObjective);
 
         btnEditObjective = new JButton(resourceMap.getString("btnEditObjective.text"));
         btnEditObjective.setEnabled(false);
-        //btnEditObjective.addActionListener(evt -> editObjective());
+        btnEditObjective.addActionListener(evt -> editObjective());
         panBtns.add(btnEditObjective);
 
         btnDeleteObjective = new JButton(resourceMap.getString("btnDeleteObjective.text"));
         btnDeleteObjective.setEnabled(false);
-        //btnDeleteObjective.addActionListener(evt -> deleteObjective());
+        btnDeleteObjective.addActionListener(evt -> deleteObjective());
         panBtns.add(btnDeleteObjective);
         panObjectives.add(panBtns, BorderLayout.PAGE_START);
 
@@ -800,6 +800,46 @@ public class CustomizeScenarioDialog extends JDialog {
         int row = objectiveTable.getSelectedRow();
         btnDeleteObjective.setEnabled(row != -1);
         btnEditObjective.setEnabled(row != -1);
+    }
+
+    private void addObjective() {
+        CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame, true, new ScenarioObjective(), scenario.getBotForces());
+        csod.setVisible(true);
+        if (null != csod.getObjective()) {
+            objectiveModel.addObjective(csod.getObjective());
+        }
+        refreshObjectiveTable();
+    }
+
+    private void editObjective() {
+        ScenarioObjective objective = objectiveModel.getObjectiveAt(objectiveTable.getSelectedRow());
+        if (null != objective) {
+            CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame, true, objective, scenario.getBotForces());
+            csod.setVisible(true);
+            refreshObjectiveTable();
+        }
+    }
+
+    private void deleteObjective() {
+        int row = objectiveTable.getSelectedRow();
+        if (-1 != row) {
+            objectives.remove(row);
+        }
+        refreshObjectiveTable();
+    }
+
+    private void refreshObjectiveTable() {
+        int selectedRow = objectiveTable.getSelectedRow();
+        objectiveModel.setData(objectives);
+        if (selectedRow != -1) {
+            if (objectiveTable.getRowCount() > 0) {
+                if (objectiveTable.getRowCount() == selectedRow) {
+                    objectiveTable.setRowSelectionInterval(selectedRow-1, selectedRow-1);
+                } else {
+                    objectiveTable.setRowSelectionInterval(selectedRow, selectedRow);
+                }
+            }
+        }
     }
 
     private void initLootPanel(ResourceBundle resourceMap) {
