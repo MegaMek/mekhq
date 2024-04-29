@@ -36,6 +36,7 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.model.BotForceTableModel;
 import mekhq.gui.model.LootTableModel;
+import mekhq.gui.model.ObjectiveTableModel;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import org.apache.logging.log4j.LogManager;
 
@@ -69,6 +70,11 @@ public class CustomizeScenarioDialog extends JDialog {
     private Player player;
     private List<BotForce> botForces;
 
+    // objectives
+    private List<ScenarioObjective> objectives;
+    private JTable objectiveTable;
+    private ObjectiveTableModel objectiveModel;
+
     // loot
     private ArrayList<Loot> loots;
     private JTable lootTable;
@@ -81,6 +87,7 @@ public class CustomizeScenarioDialog extends JDialog {
     // panels
     private JPanel panDeploymentLimits;
     private JPanel panLoot;
+    private JPanel panObjectives;
     private JPanel panOtherForces;
     private JPanel panPlanetaryConditions;
 
@@ -115,6 +122,10 @@ public class CustomizeScenarioDialog extends JDialog {
     private JButton btnAddLoot;
     private JButton btnEditLoot;
     private JButton btnDeleteLoot;
+
+    private JButton btnAddObjective;
+    private JButton btnEditObjective;
+    private JButton btnDeleteObjective;
     private JButton btnAddForce;
     private JButton btnEditForce;
     private JButton btnDeleteForce;
@@ -162,6 +173,11 @@ public class CustomizeScenarioDialog extends JDialog {
             loots.add((Loot) loot.clone());
         }
         lootModel = new LootTableModel(loots);
+
+        // FIXME: clone this so we don't change on a cancel
+        objectives = scenario.getScenarioObjectives();
+        objectiveModel = new ObjectiveTableModel(objectives);
+
         initComponents();
         setLocationRelativeTo(parent);
         setUserPreferences();
@@ -284,9 +300,16 @@ public class CustomizeScenarioDialog extends JDialog {
         panInfo.add(panPlanetaryConditions, gbc);
         // endregion Set up info panel
 
+        initObjectivesPanel(resourceMap);
+        //panObjectives.setPreferredSize(new Dimension(300,150));
+        //panObjectives.setMinimumSize(new Dimension(300,150));
+        panObjectives.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Scenario Objectives"),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+
         initLootPanel(resourceMap);
-        panLoot.setPreferredSize(new Dimension(300,150));
-        panLoot.setMinimumSize(new Dimension(300,150));
+        //panLoot.setPreferredSize(new Dimension(300,150));
+        //panLoot.setMinimumSize(new Dimension(300,150));
         panLoot.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Scenario Costs & Payouts"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
@@ -369,17 +392,24 @@ public class CustomizeScenarioDialog extends JDialog {
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
+        gbc.gridheight = 2;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
         panMain.add(panInfo, gbc);
         gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weighty = 0.5;
+        gbc.gridheight = 1;
+        panMain.add(panObjectives, gbc);
+        gbc.gridy = 1;
         panMain.add(panLoot, gbc);
         gbc.gridx = 2;
-        gbc.gridheight = 2;
+        gbc.gridy = 0;
+        gbc.gridheight = 3;
         gbc.weighty = 1.0;
         panMain.add(panWrite, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 1;
+        gbc.gridy = 2;
         gbc.gridwidth = 2;
         gbc.gridheight = 1;
         panMain.add(panOtherForces, gbc);
@@ -728,6 +758,48 @@ public class CustomizeScenarioDialog extends JDialog {
             planetaryConditions = pc.getConditions();
         }
         refreshPlanetaryConditions();
+    }
+
+    private void initObjectivesPanel(ResourceBundle resourceMap) {
+        panObjectives = new JPanel(new BorderLayout());
+
+        JPanel panBtns = new JPanel(new GridLayout(1,0));
+        btnAddObjective = new JButton(resourceMap.getString("btnAddObjective.text"));
+        //btnAddObjective.addActionListener(evt -> addObjective());
+        btnAddObjective.setEnabled(scenario.getStatus().isCurrent());
+        panBtns.add(btnAddObjective);
+
+        btnEditObjective = new JButton(resourceMap.getString("btnEditObjective.text"));
+        btnEditObjective.setEnabled(false);
+        //btnEditObjective.addActionListener(evt -> editObjective());
+        panBtns.add(btnEditObjective);
+
+        btnDeleteObjective = new JButton(resourceMap.getString("btnDeleteObjective.text"));
+        btnDeleteObjective.setEnabled(false);
+        //btnDeleteObjective.addActionListener(evt -> deleteObjective());
+        panBtns.add(btnDeleteObjective);
+        panObjectives.add(panBtns, BorderLayout.PAGE_START);
+
+        objectiveTable = new JTable(objectiveModel);
+        TableColumn column;
+        for (int i = 0; i < ObjectiveTableModel.N_COL; i++) {
+            column = objectiveTable.getColumnModel().getColumn(i);
+            column.setPreferredWidth(objectiveModel.getColumnWidth(i));
+            column.setCellRenderer(objectiveModel.getRenderer());
+        }
+        objectiveTable.setIntercellSpacing(new Dimension(0, 0));
+        objectiveTable.setShowGrid(false);
+        objectiveTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        objectiveTable.getSelectionModel().addListSelectionListener(this::objectiveTableValueChanged);
+
+        panObjectives.add(new JScrollPane(objectiveTable), BorderLayout.CENTER);
+
+    }
+
+    private void objectiveTableValueChanged(ListSelectionEvent evt) {
+        int row = objectiveTable.getSelectedRow();
+        btnDeleteObjective.setEnabled(row != -1);
+        btnEditObjective.setEnabled(row != -1);
     }
 
     private void initLootPanel(ResourceBundle resourceMap) {
