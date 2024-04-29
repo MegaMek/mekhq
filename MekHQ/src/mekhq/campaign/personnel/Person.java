@@ -961,6 +961,16 @@ public class Person {
                     campaign.addReport(String.format(resources.getString("returnedFromEducation.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+
+                    // clean up the save entry
+                    this.setEduAcademyName(null);
+                    this.setEduAcademySet(null);
+                    this.setEduAcademyNameInSet(null);
+                    this.setEduAcademySystem(null);
+                    this.setEduCourseIndex(0);
+                    this.setEduDaysOfTravelToAcademy(0);
+                    this.setEduDaysOfTravelFromAcademy(0);
+                    this.setEduDaysOfEducation(0);
                 } else if (getStatus().isAWOL()) {
                     campaign.addReport(String.format(resources.getString("returnedFromAWOL.report"),
                             getHyperlinkedFullTitle()));

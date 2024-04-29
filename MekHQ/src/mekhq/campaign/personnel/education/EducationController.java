@@ -9,6 +9,8 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.RandomFactionGenerator;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
@@ -331,7 +333,7 @@ public class EducationController {
                     person.setEduDaysOfEducation(daysOfTravelFrom - 1);
                 }
 
-                if ((daysOfTravelFrom - 1) == 0) {
+                if ((daysOfTravelFrom - 1) < 1) {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("returned.text"));
                     person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
                 }
@@ -369,15 +371,36 @@ public class EducationController {
      * @param daysOfEducation The number of days the person has received education.
      * @param resources      The resource bundle used for obtaining localized strings.
      */
-    private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person, int daysOfEducation,
-                                             ResourceBundle resources) {
-        int roll = Compute.d6(2);
-
-        if (roll >= academy.getFacultySkill()) {
+    private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person, int daysOfEducation, ResourceBundle resources) {
+        if (Compute.d6(2) >= academy.getFacultySkill()) {
             person.awardXP(campaign, 1);
         }
 
-        roll = Compute.randomInt(100);
+        // time to check whether the academy is still standing
+        if (campaign.getLocalDate().getYear() >= academy.getDestructionYear()) {
+            if (Compute.d6(2) >= 5) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
+                person.setEduDaysOfEducation(0);
+            } else {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestructionKilled.text"));
+                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.HOMICIDE);
+            }
+        }
+
+        List<String> factions = campaign.getSystemByName(person.getEduAcademySystem()).getFactions(campaign.getLocalDate());
+
+        for (String faction : factions) {
+            if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(), Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
+                if (Compute.d6(2) >= 5) {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWar.text"));
+                    person.setEduDaysOfEducation(person.getEduDaysOfEducation() + Compute.d6(1));
+                } else {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWarExpelled.text"));
+                    person.setEduDaysOfEducation(0);
+                }
+            }
+        }
+        int roll = Compute.randomInt(100);
 
         // we add this limiter to avoid a bad play experience when someone drops out in the final stretch
         if (roll == 0) {
