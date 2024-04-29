@@ -351,7 +351,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_BEGIN_EDUCATION: {
                 for (Person person : people) {
-                    EducationController.beginEducation(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]));
+                    EducationController.beginEducation(gui.getCampaign(), person, data[1], Integer.parseInt(data[2]));
                 }
                 break;
             }
@@ -2491,7 +2491,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String course = "<html>" + academy.getQualifications().get(courseIndex) + "<br>" + academy.getCurriculums().get(courseIndex) + "</html>";
                 courses = new JMenuItem(course);
                 courses.setToolTipText(academy.getTooltip(gui.getCampaign(), person, courseIndex));
-                courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex)));
+                courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), String.valueOf(courseIndex)));
                 courses.addActionListener(this);
                 academies.add(courses);
             } else {

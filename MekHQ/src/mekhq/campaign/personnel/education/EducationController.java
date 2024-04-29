@@ -12,10 +12,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * Controls the education module for a person in a campaign.
@@ -26,24 +23,14 @@ public class EducationController {
      *
      * @param campaign the campaign in which the education is taking place
      * @param person the person receiving the education
-     * @param academySet the set of academies to choose from
      * @param academyName the name of the academy to enroll in
      * @param courseIndex the index of the curriculum to enroll in
      */
-    public static void beginEducation(Campaign campaign, Person person, String academySet, String academyName,
-                                      int courseIndex) {
+    public static void beginEducation(Campaign campaign, Person person, String academyName, int courseIndex) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
                 MekHQ.getMHQOptions().getLocale());
 
-        List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(academySet);
-        Academy academy = null;
-
-        // get the right Academy
-        for (Academy a : academiesOfSet) {
-            if (String.valueOf(a.getName()).equals(academyName)) {
-                academy = a;
-            }
-        }
+        Academy academy = getAcademy(person);
 
         if (academy == null) {
             LogManager.getLogger().error("No academy found with name {}", academyName);
@@ -277,7 +264,7 @@ public class EducationController {
      *
      * @param campaign the campaign object containing the students
      */
-    public static void processNewDay(Campaign campaign, Academy academy) {
+    public static void processNewDay(Campaign campaign) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
                 MekHQ.getMHQOptions().getLocale());
 
@@ -301,6 +288,8 @@ public class EducationController {
 
             if (daysOfEducation > 0) {
                 person.setEduDaysOfEducation(daysOfEducation - 1);
+
+                Academy academy = getAcademy(person);
 
                 if ((daysOfEducation - 1) == 0) {
                     graduatePerson(campaign, person, academy);
@@ -350,6 +339,36 @@ public class EducationController {
         }
     }
 
+    /**
+     * Returns the academy where the given person is enrolled.
+     *
+     * @param person the person whose academy is being retrieved
+     * @return the academy where the person is enrolled,
+     *         or null if the person is not enrolled in any academy
+     */
+    private static Academy getAcademy(Person person) {
+        List<String> setNames = AcademyFactory.getInstance().getAllSetNames();
+
+        return setNames.stream()
+                .filter(setName -> setName.equalsIgnoreCase(person.getEduAcademySet()))
+                .map(setName -> AcademyFactory.getInstance()
+                        .getAllAcademiesForSet(setName))
+                .flatMap(Collection::stream)
+                .filter(academy -> String.valueOf(academy.getName())
+                        .equals(person.getEduAcademyNameInSet()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Processes the new week checks for a specific person in a campaign.
+     *
+     * @param campaign       The campaign in which the person is participating.
+     * @param academy        The academy where the person is receiving education.
+     * @param person         The person whose new week checks need to be processed.
+     * @param daysOfEducation The number of days the person has received education.
+     * @param resources      The resource bundle used for obtaining localized strings.
+     */
     private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person, int daysOfEducation,
                                              ResourceBundle resources) {
         int roll = Compute.d6(2);
@@ -377,6 +396,13 @@ public class EducationController {
         }
     }
 
+    /**
+     * Graduates a person from an academy.
+     *
+     * @param campaign the campaign the person belongs to
+     * @param person the person being graduated
+     * @param academy the academy from which the person is being graduated
+     */
     private static void graduatePerson(Campaign campaign, Person person, Academy academy) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
                 MekHQ.getMHQOptions().getLocale());
