@@ -129,7 +129,7 @@ public class BotForceRandomizer {
         forceMultiplier = 1.0;
         percentConventional = 0;
         baChance = 0;
-        balancingMethod = BalancingMethod.WEIGHT_ADJ;
+        balancingMethod = BalancingMethod.GENERIC_BV;
         lanceSize = 1;
         error = 0.05;
     }
