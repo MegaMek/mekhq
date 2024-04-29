@@ -45,7 +45,13 @@ public class Academy {
     private String name;
 
     @XmlElement(name = "isMilitary")
-    private Boolean isMilitary;
+    private Boolean isMilitary = false;
+
+    @XmlElement(name = "isPrepSchool")
+    private Boolean isPrepSchool = false;
+
+    @XmlElement(name = "isClan")
+    private Boolean isClan = false;
 
     @XmlElement(name = "description")
     private String description;
@@ -66,7 +72,7 @@ public class Academy {
     private List<String> locationSystems = null;
 
     @XmlElement(name = "constructionYear")
-    private Integer constructionYear;
+    private Integer constructionYear = 2300;
 
     @XmlElement(name = "destructionYear")
     private Integer destructionYear = 9999;
@@ -75,11 +81,18 @@ public class Academy {
     private Integer tuition;
 
     @XmlElement(name = "durationDays")
-    private Integer durationDays;
+    // this number is chosen so that PrepSchools still experience dropouts
+    private Integer durationDays = 11;
 
     @XmlElement(name = "facultySkill")
     private Integer facultySkill;
 
+    // 0 = early childhood <= 10
+    // 1 = 11-16
+    // 2 = high school
+    // 3 = college / university
+    // 4 = post-grad
+    // 5 = doctorate
     @XmlElement(name = "educationLevelMin")
     private Integer educationLevelMin;
 
@@ -119,6 +132,8 @@ public class Academy {
      * @param set                     the set name of the academy
      * @param name                    the name of the academy
      * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
+     * @param isClan                  indicates if the academy is Clan-based (true) or not (false)
+     * @param isPrepSchool            indicates if the academy is focused on children (true) or not (false)
      * @param description             the description of the academy
      * @param academyFaction          the faction associated with the academy
      * @param factionDiscount         the discount offered by the academy to faction members
@@ -139,15 +154,18 @@ public class Academy {
      * @param qualificationStartYears the list of years when each qualification becomes available
      * @param baseSkillLevel              the base skill level provided by the academy
      */
-    public Academy(String set, String name, Boolean isMilitary, String description, String academyFaction,
-                   Integer factionDiscount, Boolean isFactionRestricted, List<String> locationSystems,
-                   Boolean isLocal, Integer constructionYear, Integer destructionYear, Integer tuition,
-                   Integer durationDays, Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax,
-                   Integer ageMin, Integer ageMax, List<String> qualifications, List<String> curriculums,
-                   List<Integer> qualificationStartYears, Integer baseSkillLevel) {
+    public Academy(String set, String name, Boolean isMilitary, Boolean isClan, Boolean isPrepSchool,
+                   String description, String academyFaction, Integer factionDiscount, Boolean isFactionRestricted,
+                   List<String> locationSystems, Boolean isLocal, Integer constructionYear,
+                   Integer destructionYear, Integer tuition, Integer durationDays, Integer facultySkill,
+                   Integer educationLevelMin, Integer educationLevelMax, Integer ageMin, Integer ageMax,
+                   List<String> qualifications, List<String> curriculums, List<Integer> qualificationStartYears,
+                   Integer baseSkillLevel) {
         this.set = set;
         this.name = name;
         this.isMilitary = isMilitary;
+        this.isClan = isClan;
+        this.isPrepSchool = isPrepSchool;
         this.description = description;
         this.academyFaction = academyFaction;
         this.factionDiscount = factionDiscount;
@@ -203,6 +221,24 @@ public class Academy {
      */
     public Boolean isMilitary() {
         return isMilitary;
+    }
+
+    /**
+     * Checks if the academy is a Clan academy.
+     *
+     * @return {@code true} if the academy is a Clan academy, {@code false} otherwise.
+     */
+    public Boolean isClan() {
+        return isClan;
+    }
+
+    /**
+     * Checks if the academy is a Prep School.
+     *
+     * @return {@code true} if the academy is a Prep School, {@code false} otherwise.
+     */
+    public Boolean isPrepSchool() {
+        return isPrepSchool;
     }
 
     /**
@@ -290,7 +326,7 @@ public class Academy {
     }
 
     /**
-     * Retrieves course duration in days.
+     * Retrieves course duration (in days).
      *
      * @return The course duration in days as an Integer.
      */

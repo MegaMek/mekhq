@@ -102,6 +102,26 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduFailed.text"), institution)));
     }
 
+    public static void eduClanWarriorFailed(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanWarriorFailed.text")));
+    }
+
+    public static void eduClanWarrior(Person person, LocalDate date, String kills) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanWarrior.text"), kills)));
+    }
+
+    public static void eduClanFailed(Person person, LocalDate date, String caste) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanFailed.text"), caste)));
+    }
+
+    public static void eduClanPassed(Person person, LocalDate date, String degree, String caste) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanPassed.text"), degree, caste)));
+    }
+
+    public static void eduClanLabour(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanLabour.text")));
+    }
+
     public static void recoveredMia(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredMia.text")));
     }
