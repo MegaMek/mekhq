@@ -561,6 +561,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         addTab(resources.getString("suppliesAndAcquisitionsPanel.title"), createSuppliesAndAcquisitionsTab());
         addTab(resources.getString("techLimitsPanel.title"), createTechLimitsTab());
         addTab(resources.getString("personnelPanel.title"), createPersonnelTab());
+        addTab(resources.getString("lifePathsPanel.title"), createLifePathsPanel());
         addTab(resources.getString("financesPanel.title"), createFinancesTab(campaign.getCampaignOptions().isReverseQualityNames()));
         addTab(resources.getString("mercenaryPanel.title"), createMercenaryTab());
         addTab(resources.getString("experiencePanel.title"), createExperienceTab());
@@ -3071,18 +3072,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridx++;
         personnelPanel.add(createPrisonerPanel(), gbc);
 
-        gbc.gridx = 0;
         gbc.gridy++;
-        personnelPanel.add(createPersonnelRandomizationPanel(), gbc);
-
-        gbc.gridx++;
-        personnelPanel.add(createRetirementPanel(), gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        personnelPanel.add(createFamilyPanel(), gbc);
-
-        gbc.gridx++;
         personnelPanel.add(createDependentPanel(), gbc);
 
         gbc.gridx = 0;
@@ -3090,24 +3080,50 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridwidth = 2;
         personnelPanel.add(createSalaryPanel(), gbc);
 
-        gbc.gridy++;
-        gbc.gridwidth = 1;
-        personnelPanel.add(createMarriagePanel(), gbc);
-
-        gbc.gridx++;
-        personnelPanel.add(createDivorcePanel(), gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        personnelPanel.add(createProcreationPanel(), gbc);
-
-        gbc.gridx++;
-        personnelPanel.add(createDeathPanel(), gbc);
-
         final JScrollPane scrollPersonnel = new JScrollPane(personnelPanel);
         scrollPersonnel.setPreferredSize(new Dimension(500, 400));
 
         return scrollPersonnel;
+    }
+
+    //region Personnel Tab
+    private JScrollPane createLifePathsPanel() {
+        final AbstractMHQScrollablePanel lifePathsPanel = new DefaultMHQScrollablePanel(getFrame(),
+                "lifePathsPanel", new GridBagLayout());
+        lifePathsPanel.setTracksViewportWidth(false);
+
+        final GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        lifePathsPanel.add(createPersonnelRandomizationPanel(), gbc);
+
+        gbc.gridx++;
+        lifePathsPanel.add(createRetirementPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        lifePathsPanel.add(createFamilyPanel(), gbc);
+
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        lifePathsPanel.add(createMarriagePanel(), gbc);
+
+        gbc.gridx++;
+        lifePathsPanel.add(createDivorcePanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        lifePathsPanel.add(createProcreationPanel(), gbc);
+
+        gbc.gridx++;
+        lifePathsPanel.add(createDeathPanel(), gbc);
+
+        final JScrollPane scrollLifePaths = new JScrollPane(lifePathsPanel);
+        scrollLifePaths.setPreferredSize(new Dimension(400, 400));
+
+        return scrollLifePaths;
     }
 
     private JPanel createGeneralPersonnelPanel() {
