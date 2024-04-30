@@ -1,5 +1,6 @@
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
@@ -22,7 +23,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private JComboBox<ScenarioObjective.ObjectiveCriterion> cboObjectiveType;
     private JComboBox<String> cboDirection;
     private JTextField txtPercentage;
-    private JComboBox<String> cboCountType;
+    private MMComboBox<ScenarioObjective.ObjectiveAmountType> cboCountType;
     private JComboBox<String> cboForceName;
 
     private JLabel lblMagnitude;
@@ -226,9 +227,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         txtPercentage = new JTextField();
         txtPercentage.setColumns(4);
 
-        cboCountType = new JComboBox<>();
-        cboCountType.addItem("Percent");
-        cboCountType.addItem("Fixed Amount");
+        cboCountType = new MMComboBox("cboCountType", ScenarioObjective.ObjectiveAmountType.values());
 
 
         cboDirection = new JComboBox<>();
@@ -552,8 +551,9 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
         objective.setObjectiveCriterion((ScenarioObjective.ObjectiveCriterion) cboObjectiveType.getSelectedItem());
         objective.setDescription(txtShortDescription.getText());
-        if (this.cboCountType.getSelectedIndex() == 0) {
+        if (cboCountType.getSelectedItem().equals(ScenarioObjective.ObjectiveAmountType.Percentage)) {
             objective.setPercentage(number);
+            objective.setFixedAmount(null);
         } else {
             objective.setFixedAmount(number);
         }
