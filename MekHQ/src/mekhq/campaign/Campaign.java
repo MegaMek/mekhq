@@ -6816,8 +6816,8 @@ public class Campaign implements ITechManager {
             // FIXME : Localize
             Object[] options = { "Show Retirement Dialog", "Not Now" };
             return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
-                    "It has been a year since the last retirement/defection roll, and it is time to do another.",
-                    "Retirement/Defection roll required", JOptionPane.OK_CANCEL_OPTION,
+                    "It has been a year since the last Employee Turnover roll, and it is time to do another.",
+                    "Employee Turnover roll required", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         }
         return false;
