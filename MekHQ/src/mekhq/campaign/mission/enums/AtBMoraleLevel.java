@@ -30,6 +30,7 @@ public enum AtBMoraleLevel {
     LOW("AtBMoraleLevel.LOW.text", "AtBMoraleLevel.LOW.toolTipText"),
     NORMAL("AtBMoraleLevel.NORMAL.text", "AtBMoraleLevel.NORMAL.toolTipText"),
     HIGH("AtBMoraleLevel.HIGH.text", "AtBMoraleLevel.HIGH.toolTipText"),
+    VERY_HIGH("AtBMoraleLevel.VERY_HIGH.text", "AtBMoraleLevel.VERY_HIGH.toolTipText"),
     INVINCIBLE("AtBMoraleLevel.INVINCIBLE.text", "AtBMoraleLevel.INVINCIBLE.toolTipText");
     //endregion Enum Declarations
 
@@ -74,6 +75,10 @@ public enum AtBMoraleLevel {
         return this == HIGH;
     }
 
+    public boolean isVeryHigh() {
+        return this == VERY_HIGH;
+    }
+
     public boolean isInvincible() {
         return this == INVINCIBLE;
     }
@@ -104,6 +109,8 @@ public enum AtBMoraleLevel {
                 case 4:
                     return HIGH;
                 case 5:
+                    return VERY_HIGH;
+                case 6:
                     return INVINCIBLE;
                 default:
                     break;
