@@ -230,23 +230,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkAtBPrisonerDefection;
     private JCheckBox chkAtBPrisonerRansom;
 
-    // Personnel Randomization
-    private JCheckBox chkUseDylansRandomXP;
-    private RandomOriginOptionsPanel randomOriginOptionsPanel;
-
-    // Retirement
-    private JCheckBox chkUseRetirementDateTracking;
-    private JPanel randomRetirementPanel;
-    private MMComboBox<RandomRetirementMethod> comboRandomRetirementMethod;
-    private JCheckBox chkUseYearEndRandomRetirement;
-    private JCheckBox chkUseContractCompletionRandomRetirement;
-    private JCheckBox chkUseCustomRetirementModifiers;
-    private JCheckBox chkUseRandomFounderRetirement;
-    private JCheckBox chkTrackUnitFatigue;
-
-    // Family
-    private MMComboBox<FamilialRelationshipDisplayLevel> comboFamilyDisplayLevel;
-
     // Dependent
     private JPanel randomDependentPanel;
     private MMComboBox<RandomDependentMethod> comboRandomDependentMethod;
@@ -260,6 +243,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnSpecialistInfantrySalary;
     private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
     private JSpinner[] spnBaseSalary;
+    //endregion Personnel Tab
+
+    //region Life Paths Ta
+    // Personnel Randomization
+    private JCheckBox chkUseDylansRandomXP;
+    private RandomOriginOptionsPanel randomOriginOptionsPanel;
+
+    // Retirement
+    private JCheckBox chkUseRetirementDateTracking;
+    private JPanel randomRetirementPanel;
+    private MMComboBox<RandomRetirementMethod> comboRandomRetirementMethod;
+    private JCheckBox chkUseYearEndRandomRetirement;
+    private JCheckBox chkUseContractCompletionRandomRetirement;
+    private JCheckBox chkUseCustomRetirementModifiers;
+    private JCheckBox chkUseRandomFounderRetirement;
+    private JCheckBox chkTrackUnitFatigue;
 
     // Marriage
     private JCheckBox chkUseManualMarriages;
@@ -324,7 +323,45 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner[] spnExponentialRandomDeathFemaleValues;
     private Map<TenYearAgeRange, JSpinner> spnAgeRangeRandomDeathMaleValues;
     private Map<TenYearAgeRange, JSpinner> spnAgeRangeRandomDeathFemaleValues;
-    //endregion Personnel Tab
+
+    // Family
+    private MMComboBox<FamilialRelationshipDisplayLevel> comboFamilyDisplayLevel;
+
+    // Education
+    // TODO process these options in Campaign Options
+    private JCheckBox chkUseEducationModule;
+    private JCheckBox chkEduEnableAutoAwardsIntegration;
+    private JCheckBox chkEnableLocalAcademies;
+    private JCheckBox chkEnablePrestigiousAcademies;
+    private JCheckBox chkEnableClanEducation;
+    private JCheckBox chkEnableRandomXp;
+    private JLabel lblRandomXpRate;
+    private JSpinner spnRandomXpRate;
+    private JCheckBox chkEnableBonuses;
+    private JLabel lblAdultDropoutChance;
+    private JSpinner spnAdultDropoutChance;
+    private JLabel lblChildrenDropoutChance;
+    private JSpinner spnChildrenDropoutChance;
+    private JLabel lblWarriorCasteDropOutChance;
+    private JSpinner spnWarriorCasteDropOutChance;
+    private JCheckBox chkAllAges;
+    private JLabel lblMilitaryAcademyAccidents;
+    private JSpinner spnMilitaryAcademyAccidents;
+    private JLabel lblWarriorCasteAccidents;
+    private JSpinner spnWarriorCasteAccidents;
+    private JLabel lblOtherCasteAccidents;
+    private JSpinner spnOtherCasteAccidents;
+    private JCheckBox chkLiveFireBlooding;
+    private JLabel lblWarriorCasteFallbackCastes;
+    private JLabel lblFallbackScientist;
+    private JSpinner spnFallbackScientist;
+    private JLabel lblFallbackMerchant;
+    private JSpinner spnFallbackMerchant;
+    private JLabel lblFallbackTechnician;
+    private JSpinner spnFallbackTechnician;
+    private JLabel lblFallbackLabour;
+    private JSpinner spnFallbackLabour;
+    //endregion Life Paths Tab
 
     //region Finances Tab
     private JCheckBox payForPartsBox;
@@ -3117,10 +3154,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gbc.gridx = 0;
         gbc.gridy++;
-        lifePathsPanel.add(createDeathPanel(), gbc);
+        lifePathsPanel.add(createEducationPanel(), gbc);
 
         gbc.gridx++;
         lifePathsPanel.add(createProcreationPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        lifePathsPanel.add(createDeathPanel(), gbc);
 
         final JScrollPane scrollLifePaths = new JScrollPane(lifePathsPanel);
         scrollLifePaths.setPreferredSize(new Dimension(400, 400));
@@ -4687,6 +4728,368 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return panel;
     }
 
+    private JPanel createEducationPanel() {
+        // Global Enable
+        chkUseEducationModule = new JCheckBox(resources.getString("chkUseEducationModule.text"));
+        chkUseEducationModule.setToolTipText(resources.getString("chkUseEducationModule.toolTip"));
+        chkUseEducationModule.setName("chkUseEducationModule");
+
+        // TODO add autoAwards integration once both modules are merged
+        // Enable autoAwards Integration
+        chkEduEnableAutoAwardsIntegration = new JCheckBox(resources.getString("chkEduEnableAutoAwardsIntegration.text"));
+        chkEduEnableAutoAwardsIntegration.setToolTipText(resources.getString("chkEduEnableAutoAwardsIntegration.toolTip"));
+        chkEduEnableAutoAwardsIntegration.setName("chkEduEnableAutoAwardsIntegration");
+
+        // Academy Set Enable
+        final JPanel enableStandardSetsPanel = createStandardSetsPanel();
+
+        // XP & Skill Bonuses
+        final JPanel xpAndSkillBonusesPanel = createXpAndSkillBonusesPanel();
+
+        // Dropout Chances
+        final JPanel dropoutChancePanel = createDropoutChancePanel();
+
+        // Random Fatal Accidents & Events
+        final JPanel accidentsAndEventsPanel = createAccidentsAndEventsPanel();
+
+        // Warrior Caste Fallback Castes
+        final JPanel warriorCasteFallbackPanel = createWarriorCasteFallbackPanel();
+
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("educationPanel.title")));
+        panel.setName("educationPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseEducationModule)
+                        .addGap(10)
+                        .addComponent(chkEduEnableAutoAwardsIntegration)
+                        .addComponent(enableStandardSetsPanel)
+                        .addComponent(xpAndSkillBonusesPanel)
+                        .addComponent(dropoutChancePanel)
+                        .addComponent(accidentsAndEventsPanel)
+                        .addComponent(warriorCasteFallbackPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseEducationModule)
+                        .addGap(10)
+                        .addComponent(chkEduEnableAutoAwardsIntegration)
+                        .addComponent(enableStandardSetsPanel)
+                        .addComponent(xpAndSkillBonusesPanel)
+                        .addComponent(dropoutChancePanel)
+                        .addComponent(accidentsAndEventsPanel)
+                        .addComponent(warriorCasteFallbackPanel)
+        );
+
+        return panel;
+    }
+
+    private JPanel createStandardSetsPanel() {
+        chkEnableLocalAcademies = new JCheckBox(resources.getString("chkEnableLocalAcademies.text"));
+        chkEnableLocalAcademies.setToolTipText(resources.getString("chkEnableLocalAcademies.toolTip"));
+        chkEnableLocalAcademies.setName("chkEnableLocalAcademies");
+
+        chkEnablePrestigiousAcademies = new JCheckBox(resources.getString("chkEnablePrestigiousAcademies.text"));
+        chkEnablePrestigiousAcademies.setToolTipText(resources.getString("chkEnablePrestigiousAcademies.toolTip"));
+        chkEnablePrestigiousAcademies.setName("chkEnablePrestigiousAcademies");
+
+        chkEnableClanEducation = new JCheckBox(resources.getString("chkEnableClanEducation.text"));
+        chkEnableClanEducation.setToolTipText(resources.getString("chkEnableClanEducation.toolTip"));
+        chkEnableClanEducation.setName("chkEnableClanEducation");
+
+        // creating the layout
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("standardSets.title")));
+        panel.setName("standardSetsPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkEnableLocalAcademies)
+                        .addComponent(chkEnablePrestigiousAcademies)
+                        .addComponent(chkEnableClanEducation)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkEnableLocalAcademies)
+                        .addComponent(chkEnablePrestigiousAcademies)
+                        .addComponent(chkEnableClanEducation)
+        );
+
+        return panel;
+    }
+
+    private JPanel createXpAndSkillBonusesPanel() {
+        chkEnableBonuses = new JCheckBox(resources.getString("chkEnableBonuses.text"));
+        chkEnableBonuses.setToolTipText(resources.getString("chkEnableBonuses.toolTip"));
+        chkEnableBonuses.setName("chkEnableBonuses");
+
+        chkEnableRandomXp = new JCheckBox(resources.getString("chkEnableRandomXp.text"));
+        chkEnableRandomXp.setToolTipText(resources.getString("chkEnableRandomXp.toolTip"));
+        chkEnableRandomXp.setName("chkEnableRandomXp");
+
+        lblRandomXpRate = new JLabel(resources.getString("lblRandomXpRate.text"));
+        lblRandomXpRate.setToolTipText(resources.getString("lblRandomXpRate.toolTip"));
+        lblRandomXpRate.setName("lblRandomXpRate");
+        spnRandomXpRate = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+        spnRandomXpRate.setToolTipText(resources.getString("lblRandomXpRate.toolTip"));
+        spnRandomXpRate.setName("spnRandomXpRate");
+
+        // creating the layout
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("xpAndSkillBonuses.title")));
+        panel.setName("xpAndSkillBonusesPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkEnableBonuses)
+                        .addComponent(chkEnableRandomXp)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblRandomXpRate)
+                                .addComponent(spnRandomXpRate, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkEnableBonuses)
+                        .addComponent(chkEnableRandomXp)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblRandomXpRate)
+                                .addComponent(spnRandomXpRate))
+        );
+
+        return panel;
+    }
+
+    private JPanel createDropoutChancePanel() {
+        lblAdultDropoutChance = new JLabel(resources.getString("lblAdultDropoutChance.text"));
+        lblAdultDropoutChance.setToolTipText(resources.getString("lblAdultDropoutChance.toolTip"));
+        lblAdultDropoutChance.setName("lblAdultDropoutChance");
+        spnAdultDropoutChance = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnAdultDropoutChance.setToolTipText(resources.getString("lblAdultDropoutChance.toolTip"));
+        spnAdultDropoutChance.setName("spnAdultDropoutChance");
+
+        lblChildrenDropoutChance = new JLabel(resources.getString("lblChildrenDropoutChance.text"));
+        lblChildrenDropoutChance.setToolTipText(resources.getString("lblChildrenDropoutChance.toolTip"));
+        lblChildrenDropoutChance.setName("lblChildrenDropoutChance");
+        spnChildrenDropoutChance = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnChildrenDropoutChance.setToolTipText(resources.getString("lblChildrenDropoutChance.toolTip"));
+        spnChildrenDropoutChance.setName("spnChildrenDropoutChance");
+
+        lblWarriorCasteDropOutChance = new JLabel(resources.getString("lblWarriorCasteDropOutChance.text"));
+        lblWarriorCasteDropOutChance.setToolTipText(resources.getString("lblWarriorCasteDropOutChance.toolTip"));
+        lblWarriorCasteDropOutChance.setName("lblWarriorCasteDropOutChance");
+        spnWarriorCasteDropOutChance = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnWarriorCasteDropOutChance.setToolTipText(resources.getString("lblWarriorCasteDropOutChance.toolTip"));
+        spnWarriorCasteDropOutChance.setName("spnWarriorCasteDropOutChance");
+
+        // creating the layout
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("dropoutChance.title")));
+        panel.setName("dropoutChancePanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblAdultDropoutChance)
+                                .addComponent(spnAdultDropoutChance, Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                        .addComponent(lblChildrenDropoutChance)
+                                        .addComponent(spnChildrenDropoutChance, Alignment.LEADING)))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblWarriorCasteDropOutChance)
+                                .addComponent(spnWarriorCasteDropOutChance, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblAdultDropoutChance)
+                                .addComponent(spnAdultDropoutChance)
+                                .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblChildrenDropoutChance)
+                                        .addComponent(spnChildrenDropoutChance)))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblWarriorCasteDropOutChance)
+                                .addComponent(spnWarriorCasteDropOutChance))
+        );
+
+        return panel;
+    }
+
+
+    private JPanel createAccidentsAndEventsPanel() {
+        chkAllAges = new JCheckBox(resources.getString("chkAllAges.text"));
+        chkAllAges.setToolTipText(resources.getString("chkAllAges.toolTip"));
+        chkAllAges.setName("chkAllAges");
+
+        chkLiveFireBlooding = new JCheckBox(resources.getString("chkLiveFireBlooding.text"));
+        chkLiveFireBlooding.setToolTipText(resources.getString("chkLiveFireBlooding.toolTip"));
+        chkLiveFireBlooding.setName("chkLiveFireBlooding");
+
+        lblMilitaryAcademyAccidents = new JLabel(resources.getString("lblMilitaryAcademyAccidents.text"));
+        lblMilitaryAcademyAccidents.setToolTipText(resources.getString("lblMilitaryAcademyAccidents.toolTip"));
+        lblMilitaryAcademyAccidents.setName("lblMilitaryAcademyAccidents");
+        spnMilitaryAcademyAccidents = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnMilitaryAcademyAccidents.setToolTipText(resources.getString("lblMilitaryAcademyAccidents.toolTip"));
+        spnMilitaryAcademyAccidents.setName("spnMilitaryAcademyAccidents");
+
+        lblWarriorCasteAccidents = new JLabel(resources.getString("lblWarriorCasteAccidents.text"));
+        lblWarriorCasteAccidents.setToolTipText(resources.getString("lblWarriorCasteAccidents.toolTip"));
+        lblWarriorCasteAccidents.setName("lblWarriorCasteAccidents");
+        spnWarriorCasteAccidents = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnWarriorCasteAccidents.setToolTipText(resources.getString("lblWarriorCasteAccidents.toolTip"));
+        spnWarriorCasteAccidents.setName("spnWarriorCasteAccidents");
+
+        lblOtherCasteAccidents = new JLabel(resources.getString("lblOtherCasteAccidents.text"));
+        lblOtherCasteAccidents.setToolTipText(resources.getString("lblOtherCasteAccidents.toolTip"));
+        lblOtherCasteAccidents.setName("lblOtherCasteAccidents");
+        spnOtherCasteAccidents = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnOtherCasteAccidents.setToolTipText(resources.getString("lblOtherCasteAccidents.toolTip"));
+        spnOtherCasteAccidents.setName("spnOtherCasteAccidents");
+
+        // creating the layout
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("accidentsAndEvents.title")));
+        panel.setName("accidentsAndEventsPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(chkAllAges)
+                                .addComponent(chkLiveFireBlooding))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblMilitaryAcademyAccidents)
+                                .addComponent(spnMilitaryAcademyAccidents, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblWarriorCasteAccidents)
+                                .addComponent(spnWarriorCasteAccidents, Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                        .addComponent(lblOtherCasteAccidents)
+                                        .addComponent(spnOtherCasteAccidents, Alignment.LEADING)))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(chkAllAges)
+                                .addComponent(chkLiveFireBlooding))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMilitaryAcademyAccidents)
+                                .addComponent(spnMilitaryAcademyAccidents))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblWarriorCasteAccidents)
+                                .addComponent(spnWarriorCasteAccidents)
+                                .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblOtherCasteAccidents)
+                                        .addComponent(spnOtherCasteAccidents)))
+        );
+
+        return panel;
+    }
+
+    private JPanel createWarriorCasteFallbackPanel() {
+        lblFallbackScientist = new JLabel(resources.getString("lblFallbackScientist.text"));
+        lblFallbackScientist.setToolTipText(resources.getString("lblFallbackScientist.toolTip"));
+        lblFallbackScientist.setName("lblFallbackScientist");
+        spnFallbackScientist = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnFallbackScientist.setToolTipText(resources.getString("lblFallbackScientist.toolTip"));
+        spnFallbackScientist.setName("spnFallbackScientist");
+
+        lblFallbackMerchant = new JLabel(resources.getString("lblFallbackMerchant.text"));
+        lblFallbackMerchant.setToolTipText(resources.getString("lblFallbackMerchant.toolTip"));
+        lblFallbackMerchant.setName("lblFallbackMerchant");
+        spnFallbackMerchant = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnFallbackMerchant.setToolTipText(resources.getString("lblFallbackMerchant.toolTip"));
+        spnFallbackMerchant.setName("spnFallbackMerchant");
+
+        lblFallbackTechnician = new JLabel(resources.getString("lblFallbackTechnician.text"));
+        lblFallbackTechnician.setToolTipText(resources.getString("lblFallbackTechnician.toolTip"));
+        lblFallbackTechnician.setName("lblFallbackTechnician");
+        spnFallbackTechnician = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnFallbackTechnician.setToolTipText(resources.getString("lblFallbackTechnician.toolTip"));
+        spnFallbackTechnician.setName("spnFallbackTechnician");
+
+        lblFallbackLabour = new JLabel(resources.getString("lblFallbackLabour.text"));
+        lblFallbackLabour.setToolTipText(resources.getString("lblFallbackLabour.toolTip"));
+        lblFallbackLabour.setName("lblFallbackLabour");
+        spnFallbackLabour = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnFallbackLabour.setToolTipText(resources.getString("lblFallbackLabour.toolTip"));
+        spnFallbackLabour.setName("spnFallbackLabour");
+
+        // creating the layout
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("warriorCasteFallbackCastes.title")));
+        panel.setName("warriorCasteFallbackPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblFallbackScientist)
+                                .addComponent(spnFallbackScientist, Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                        .addComponent(lblFallbackMerchant)
+                                        .addComponent(spnFallbackMerchant, Alignment.LEADING)))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblFallbackTechnician)
+                                .addComponent(spnFallbackTechnician, Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                        .addComponent(lblFallbackLabour)
+                                        .addComponent(spnFallbackLabour, Alignment.LEADING)))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblFallbackScientist)
+                                .addComponent(spnFallbackScientist)
+                                .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblFallbackMerchant)
+                                        .addComponent(spnFallbackMerchant)))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblFallbackTechnician)
+                                .addComponent(spnFallbackTechnician)
+                                .addGroup(layout.createSequentialGroup()
+                                        .addComponent(lblFallbackLabour)
+                                        .addComponent(spnFallbackLabour)))
+        );
+
+        return panel;
+    }
+
     private JPanel createRandomProcreationPanel() {
         // Initialize Components Used in ActionListeners
         final JPanel percentageRandomProcreationPanel = new JDisableablePanel("percentageRandomProcreationPanel");
@@ -6099,22 +6502,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAtBPrisonerDefection.setSelected(options.isUseAtBPrisonerDefection());
         chkAtBPrisonerRansom.setSelected(options.isUseAtBPrisonerRansom());
 
-        // Personnel Randomization
-        chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
-        randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
-
-        // Retirement
-        chkUseRetirementDateTracking.setSelected(options.isUseRetirementDateTracking());
-        comboRandomRetirementMethod.setSelectedItem(options.getRandomRetirementMethod());
-        chkUseYearEndRandomRetirement.setSelected(options.isUseYearEndRandomRetirement());
-        chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
-        chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
-        chkUseRandomFounderRetirement.setSelected(options.isUseRandomFounderRetirement());
-        chkTrackUnitFatigue.setSelected(options.isTrackUnitFatigue());
-
-        // Family
-        comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
-
         // Dependent
         comboRandomDependentMethod.setSelectedItem(options.getRandomDependentMethod());
         chkUseRandomDependentAddition.setSelected(options.isUseRandomDependentAddition());
@@ -6132,6 +6519,24 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         for (int i = 0; i < spnBaseSalary.length; i++) {
             spnBaseSalary[i].setValue(options.getRoleBaseSalaries()[i].getAmount().doubleValue());
         }
+        //endregion Personnel Tab
+
+        //region Life Paths Tab
+        // Personnel Randomization
+        chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
+        randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
+
+        // Retirement
+        chkUseRetirementDateTracking.setSelected(options.isUseRetirementDateTracking());
+        comboRandomRetirementMethod.setSelectedItem(options.getRandomRetirementMethod());
+        chkUseYearEndRandomRetirement.setSelected(options.isUseYearEndRandomRetirement());
+        chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
+        chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
+        chkUseRandomFounderRetirement.setSelected(options.isUseRandomFounderRetirement());
+        chkTrackUnitFatigue.setSelected(options.isTrackUnitFatigue());
+
+        // Family
+        comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
 
         // Marriage
         chkUseManualMarriages.setSelected(options.isUseManualMarriages());
@@ -6227,7 +6632,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             spnAgeRangeRandomDeathMaleValues.get(ageRange).setValue(options.getAgeRangeRandomDeathMaleValues().get(ageRange));
             spnAgeRangeRandomDeathFemaleValues.get(ageRange).setValue(options.getAgeRangeRandomDeathFemaleValues().get(ageRange));
         }
-        //endregion Personnel Tab
+
+        // Education
+        // TODO add Education options
+        //endregion Life Paths Tab
 
         //region Finances Tab
         payForPartsBox.setSelected(options.isPayForParts());
@@ -6670,22 +7078,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseAtBPrisonerDefection(chkAtBPrisonerDefection.isSelected());
             options.setUseAtBPrisonerRansom(chkAtBPrisonerRansom.isSelected());
 
-            // Personnel Randomization
-            options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
-            options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
-
-            // Retirement
-            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
-            options.setRandomRetirementMethod(comboRandomRetirementMethod.getSelectedItem());
-            options.setUseYearEndRandomRetirement(chkUseYearEndRandomRetirement.isSelected());
-            options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
-            options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
-            options.setUseRandomFounderRetirement(chkUseRandomFounderRetirement.isSelected());
-            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
-
-            // Family
-            options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
-
             // Dependent
             options.setRandomDependentMethod(comboRandomDependentMethod.getSelectedItem());
             options.setUseRandomDependentAddition(chkUseRandomDependentAddition.isSelected());
@@ -6703,6 +7095,24 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             for (final PersonnelRole personnelRole : PersonnelRole.values()) {
                 options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
             }
+            //endregion Personnel Tab
+
+            //region Life Paths Tab
+            // Personnel Randomization
+            options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
+            options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
+
+            // Retirement
+            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
+            options.setRandomRetirementMethod(comboRandomRetirementMethod.getSelectedItem());
+            options.setUseYearEndRandomRetirement(chkUseYearEndRandomRetirement.isSelected());
+            options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
+            options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
+            options.setUseRandomFounderRetirement(chkUseRandomFounderRetirement.isSelected());
+            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
+
+            // Family
+            options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
 
             // Marriage
             options.setUseManualMarriages(chkUseManualMarriages.isSelected());
@@ -6773,10 +7183,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 options.getAgeRangeRandomDeathMaleValues().put(ageRange, (double) spnAgeRangeRandomDeathMaleValues.get(ageRange).getValue());
                 options.getAgeRangeRandomDeathFemaleValues().put(ageRange, (double) spnAgeRangeRandomDeathFemaleValues.get(ageRange).getValue());
             }
-            //endregion Personnel Tab
+
+            // Education
+            // TODO add education options
+            //endregion Life Paths Tab
 
             //region Finances Tab
-
             // Price Multipliers
             options.setCommonPartPriceMultiplier((Double) spnCommonPartPriceMultiplier.getValue());
             options.setInnerSphereUnitPriceMultiplier((Double) spnInnerSphereUnitPriceMultiplier.getValue());

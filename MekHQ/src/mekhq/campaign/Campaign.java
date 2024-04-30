@@ -4873,6 +4873,18 @@ public class Campaign implements ITechManager {
         return totalCost;
     }
 
+    /**
+     * Calculates simplified travel time.
+     * Travel time is calculated by dividing distance (in LY) by 30 and multiplying the result by 7.
+     *
+     * @param campaign the campaign in which the person is traveling
+     * @param destination the planetary system being traveled to
+     * @return the simplified travel time in days
+     */
+    public static int getSimplifiedTravelTime(Campaign campaign, PlanetarySystem destination) {
+        return (int) Math.floor((campaign.getCurrentSystem().getDistanceTo(destination) / 30) * 7);
+    }
+
     public void personUpdated(Person p) {
         Unit u = p.getUnit();
         if (null != u) {

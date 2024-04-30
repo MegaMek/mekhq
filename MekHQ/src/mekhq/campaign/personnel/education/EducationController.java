@@ -1,7 +1,6 @@
 package mekhq.campaign.personnel.education;
 
 import megamek.common.Compute;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -10,6 +9,7 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import org.apache.logging.log4j.LogManager;
 
@@ -119,26 +119,26 @@ public class EducationController {
         // the following two blocks of code need to be processed in this order so that generateName()
         // can make useful names
         int travelTime = 2;
-        String campus = campaign.getCurrentSystem().getName(campaign.getLocalDate());
+        PlanetarySystem campus = campaign.getCurrentSystem();
 
         if (!academy.isLocal()) {
             for (String system : academy.getLocationSystems()) {
-                int travelTimeNew = simplifiedTravelTime(campaign, null, system);
+                int travelTimeNew = Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(system));
 
                 if (travelTimeNew > travelTime) {
                     travelTime = travelTimeNew;
-                    campus = system;
+                    campus = campaign.getSystemByName(system);
                 }
             }
         }
 
         person.setEduDaysOfTravelToAcademy(travelTime);
         person.setEduAcademyNameInSet(academy.getName());
-        person.setEduAcademySystem(campus);
+        person.setEduAcademySystem(campus.getName(campaign.getLocalDate()));
 
         // if the academy is local, we need to generate a name, otherwise we use the listed name
         if (academy.isLocal()) {
-            person.setEduAcademyName(generateName(academy.isMilitary(), campus));
+            person.setEduAcademyName(generateName(academy.isMilitary(), campus.getName(campaign.getLocalDate())));
         } else {
             person.setEduAcademyName(person.getEduAcademyNameInSet());
         }
@@ -379,7 +379,7 @@ public class EducationController {
         int daysOfTravelFrom = person.getEduDaysOfTravelFromAcademy();
 
         if ((daysOfEducation == 0) && (daysOfTravelFrom == 0)) {
-            int travelTime = simplifiedTravelTime(campaign, person, null);
+            int travelTime = Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(person.getEduAcademySystem()));
 
             // We use a minimum of 2 days travel to avoid awkward grammar in the report.
             // This can be hand waved as being the time it takes for Person to get from campus and
@@ -408,7 +408,7 @@ public class EducationController {
      */
     private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfEducation, Integer daysOfTravelFrom, ResourceBundle resources) {
         if ((daysOfEducation < 1) && (daysOfTravelFrom > 0)) {
-            int travelTime = simplifiedTravelTime(campaign, person, null);
+            int travelTime = Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(person.getEduAcademySystem()));
 
             // if true, it means the unit has moved since we last ran, so we need to adjust
             if (travelTime > daysOfEducation) {
@@ -1044,27 +1044,6 @@ public class EducationController {
         } else {
             return graduationEventTable.get(0);
         }
-    }
-
-    /**
-     * Calculates the simplified travel time for a person in a campaign.
-     * The simplified travel time is calculated based on the number of jumps between the person's education academy's
-     * parent system and the current system in the campaign.
-     *
-     * @param campaign the campaign in which the person is traveling
-     * @param person the person who is traveling, can be null if location is provided
-     * @param location the location system of the academy can be null if a person is provided
-     * @return the simplified travel time in days
-     */
-    public static int simplifiedTravelTime(Campaign campaign, @Nullable Person person, @Nullable String location) {
-        if (location == null) {
-            location = person.getEduAcademySystem();
-        }
-
-        int jumps = campaign.calculateJumpPath(campaign.getSystemByName(location),
-                campaign.getCurrentSystem()).getJumps();
-
-        return jumps * 7;
     }
 
     /**

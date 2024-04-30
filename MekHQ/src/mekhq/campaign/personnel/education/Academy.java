@@ -27,6 +27,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
 import java.util.Collections;
@@ -85,7 +86,7 @@ public class Academy {
     private Integer durationDays = 11;
 
     @XmlElement(name = "facultySkill")
-    private Integer facultySkill;
+    private Integer facultySkill = 12;
 
     // 0 = early childhood <= 10
     // 1 = 11-16
@@ -518,21 +519,21 @@ public class Academy {
 
         // we need to do a little extra work to get distance, to cover academies with multiple campuses
         int distance = 2;
-        String destination = campaign.getCurrentSystem().getName(campaign.getLocalDate());
+        PlanetarySystem destination = campaign.getCurrentSystem();
 
         if (!isLocal) {
             for (String system : locationSystems) {
-                int distanceNew = EducationController.simplifiedTravelTime(campaign, null, system);
+                int distanceNew = Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(system));
 
                 if (distanceNew > distance) {
                     distance = distanceNew;
-                    destination = system;
+                    destination = campaign.getSystemByName(system);
                 }
             }
         }
 
         tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ")
-                .append(distance / 7).append (" weeks (").append(destination).append(")<br>");
+                .append(distance / 7).append (" weeks (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
         tooltip.append("<b>").append(resources.getString("facultySkill.text")).append("</b> ")
                 .append(facultySkill).append ('+').append("<br>");
         tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")

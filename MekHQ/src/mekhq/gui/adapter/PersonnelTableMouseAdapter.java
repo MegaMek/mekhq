@@ -28,6 +28,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
@@ -48,6 +49,7 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.dialog.*;
@@ -1390,7 +1392,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenu academies;
         int campaignYear = gui.getCampaign().getLocalDate().getYear();
         int travelTime = 2;
-        String destination = gui.getCampaign().getCurrentSystem().getName(gui.getCampaign().getLocalDate());
+        PlanetarySystem destination = gui.getCampaign().getCurrentSystem();
 
         List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
         Collections.sort(academySetNames);
@@ -1411,10 +1413,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         && (person.getAge(gui.getCampaign().getLocalDate()) < academy.getAgeMax())) {
                     if (!academy.isLocal()) {
                         for (String system : academy.getLocationSystems()) {
-                            int travelTimeNew = EducationController.simplifiedTravelTime(gui.getCampaign(), null, destination);
+                            int travelTimeNew = Campaign.getSimplifiedTravelTime(gui.getCampaign(), destination);
                             if (travelTimeNew > travelTime) {
                                 travelTime = travelTimeNew;
-                                destination = system;
+                                destination = gui.getCampaign().getSystemByName(system);
                             }
                         }
                     }
