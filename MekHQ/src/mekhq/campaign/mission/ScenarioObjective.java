@@ -194,6 +194,14 @@ public class ScenarioObjective {
         associatedForceNames.clear();
     }
 
+    public void clearDetails() {
+        additionalDetails.clear();
+    }
+
+    public List<String> getAdditionalDetails() {
+        return additionalDetails;
+    }
+
     public void addDetail(String detail) {
         additionalDetails.add(detail);
     }
@@ -222,12 +230,20 @@ public class ScenarioObjective {
         associatedUnitIDs.clear();
     }
 
+    public void clearSuccessEffects() {
+        successEffects.clear();
+    }
+
     public void addSuccessEffect(ObjectiveEffect successEffect) {
         successEffects.add(successEffect);
     }
 
     public List<ObjectiveEffect> getSuccessEffects() {
         return successEffects;
+    }
+
+    public void clearFailureEffects() {
+        failureEffects.clear();
     }
 
     public void addFailureEffect(ObjectiveEffect failureEffect) {

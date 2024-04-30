@@ -49,6 +49,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     DefaultListModel<ObjectiveEffect> successEffectsModel = new DefaultListModel<>();
     DefaultListModel<ObjectiveEffect> failureEffectsModel = new DefaultListModel<>();
 
+    DefaultListModel<String> detailModel = new DefaultListModel<>();
 
 
     public CustomizeScenarioObjectiveDialog(JFrame parent, boolean modal, ScenarioObjective objective, List<BotForce> botForces) {
@@ -88,7 +89,10 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         for (ObjectiveEffect currentEffect : objective.getFailureEffects()) {
             failureEffectsModel.addElement(currentEffect);
         }
-        updateDetailList();
+
+        for (String detail : objective.getDetails()) {
+            detailModel.addElement(detail);
+        }
 
         validate();
         setLocationRelativeTo(parent);
@@ -172,7 +176,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         JTextField txtDetail = new JTextField();
         txtDetail.setColumns(40);
         JLabel lblDetail = new JLabel("Details (shows up after force/unit list):");
-        lstDetails = new JList<>();
+        lstDetails = new JList<>(detailModel);
         JButton btnAddDetail = new JButton("Add");
         JButton btnRemoveDetail = new JButton("Remove");
 
@@ -264,11 +268,9 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         JLabel lblSuccessEffects = new JLabel("Effects on completion:");
         JLabel lblFailureEffects = new JLabel("Effects on failure:");
 
-        successEffects = new JList<>();
-        successEffects.setModel(successEffectsModel);
+        successEffects = new JList<>(successEffectsModel);
         successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
-        failureEffects = new JList<>();
-        failureEffects.setModel(failureEffectsModel);
+        failureEffects = new JList<>(failureEffectsModel);
         failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
 
         btnRemoveSuccess = new JButton("Remove");
@@ -314,10 +316,9 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
             cboForceName.addItem(force.getName());
         }
 
-        forceNames = new JList<>();
+        forceNames = new JList<>(forceModel);
         forceNames.setVisibleRowCount(5);
         forceNames.addListSelectionListener(e -> btnRemove.setEnabled(!forceNames.getSelectedValuesList().isEmpty()));
-        forceNames.setModel(forceModel);
 
         JButton btnAdd = new JButton("Add");
         btnAdd.addActionListener(e -> this.addForce());
@@ -495,24 +496,13 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void addDetail(JTextField field) {
-        objective.addDetail(field.getText());
-        updateDetailList();
+        detailModel.addElement(field.getText());
     }
 
     private void removeDetails() {
-        for (int index : lstDetails.getSelectedIndices()) {
-            objective.getDetails().remove(index);
+        for (String detail : lstDetails.getSelectedValuesList()) {
+            detailModel.removeElement(detail);
         }
-        updateDetailList();
-    }
-
-    private void updateDetailList() {
-        DefaultListModel<String> detailModel = new DefaultListModel<>();
-        for (String detail : objective.getDetails()) {
-            detailModel.addElement(detail);
-        }
-
-        lstDetails.setModel(detailModel);
     }
 
     private void setDirectionDropdownVisibility() {
@@ -574,12 +564,19 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         }
 
 
+        objective.clearSuccessEffects();
         for (int i = 0; i< successEffectsModel.getSize(); i++) {
             objective.addSuccessEffect(successEffectsModel.getElementAt(i));
         }
 
+        objective.clearFailureEffects();
         for (int i = 0; i< failureEffectsModel.getSize(); i++) {
-            objective.addSuccessEffect(failureEffectsModel.getElementAt(i));
+            objective.addFailureEffect(failureEffectsModel.getElementAt(i));
+        }
+
+        objective.clearDetails();
+        for (int i = 0; i< detailModel.getSize(); i++) {
+            objective.addDetail(detailModel.getElementAt(i));
         }
 
         if (cboDirection.isVisible() && cboDirection.getSelectedIndex() > 0) {
