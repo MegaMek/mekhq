@@ -62,7 +62,9 @@ import mekhq.campaign.rating.UnitRatingMethod;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RATManager;
 import mekhq.gui.SpecialAbilityPanel;
-import mekhq.gui.baseComponents.*;
+import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
+import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
+import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.dialog.SelectUnusedAbilityDialog;
 import mekhq.gui.dialog.iconDialogs.UnitIconDialog;
@@ -4728,11 +4730,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createEducationPanel() {
-        // Global Enable
-        chkUseEducationModule = new JCheckBox(resources.getString("chkUseEducationModule.text"));
-        chkUseEducationModule.setToolTipText(resources.getString("chkUseEducationModule.toolTip"));
-        chkUseEducationModule.setName("chkUseEducationModule");
-
         // TODO add autoAwards integration once both modules are merged
         // Enable autoAwards Integration
         chkEduEnableAutoAwardsIntegration = new JCheckBox(resources.getString("chkEduEnableAutoAwardsIntegration.text"));
@@ -4753,6 +4750,59 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Warrior Caste Fallback Castes
         final JPanel warriorCasteFallbackPanel = createWarriorCasteFallbackPanel();
+
+        // Global Enable
+        chkUseEducationModule = new JCheckBox(resources.getString("chkUseEducationModule.text"));
+        chkUseEducationModule.setToolTipText(resources.getString("chkUseEducationModule.toolTip"));
+        chkUseEducationModule.setName("chkUseEducationModule");
+        chkUseEducationModule.addActionListener(evt -> {
+            final boolean isEnabled = chkUseEducationModule.isSelected();
+
+            chkEduEnableAutoAwardsIntegration.setEnabled(isEnabled);
+            enableStandardSetsPanel.setEnabled(isEnabled);
+            chkEnableLocalAcademies.setEnabled(isEnabled);
+            chkEnablePrestigiousAcademies.setEnabled(isEnabled);
+            chkEnableClanEducation.setEnabled(isEnabled);
+            xpAndSkillBonusesPanel.setEnabled(isEnabled);
+            chkEnableBonuses.setEnabled(isEnabled);
+            lblRandomXpRate.setEnabled(isEnabled);
+            spnRandomXpRate.setEnabled(isEnabled);
+            chkEnableRandomXp.setEnabled(isEnabled);
+            dropoutChancePanel.setEnabled(isEnabled);
+            lblAdultDropoutChance.setEnabled(isEnabled);
+            spnAdultDropoutChance.setEnabled(isEnabled);
+            lblChildrenDropoutChance.setEnabled(isEnabled);
+            spnChildrenDropoutChance.setEnabled(isEnabled);
+            lblWarriorCasteDropOutChance.setEnabled(isEnabled);
+            spnWarriorCasteDropOutChance.setEnabled(isEnabled);
+            accidentsAndEventsPanel.setEnabled(isEnabled);
+            chkAllAges.setEnabled(isEnabled);
+            chkLiveFireBlooding.setEnabled(isEnabled);
+            lblMilitaryAcademyAccidents.setEnabled(isEnabled);
+            spnMilitaryAcademyAccidents.setEnabled(isEnabled);
+            lblWarriorCasteAccidents.setEnabled(isEnabled);
+            spnWarriorCasteAccidents.setEnabled(isEnabled);
+            lblOtherCasteAccidents.setEnabled(isEnabled);
+            spnOtherCasteAccidents.setEnabled(isEnabled);
+            warriorCasteFallbackPanel.setEnabled(isEnabled);
+            lblFallbackScientist.setEnabled(isEnabled);
+            spnFallbackScientist.setEnabled(isEnabled);
+            lblFallbackMerchant.setEnabled(isEnabled);
+            spnFallbackMerchant.setEnabled(isEnabled);
+            lblFallbackTechnician.setEnabled(isEnabled);
+            spnFallbackTechnician.setEnabled(isEnabled);
+            lblFallbackLabour.setEnabled(isEnabled);
+            spnFallbackLabour.setEnabled(isEnabled);
+        });
+
+        // this prevents a really annoying bug where disabled options don't stay disabled when
+        // reloading Campaign Options
+        chkEduEnableAutoAwardsIntegration.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        enableStandardSetsPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        xpAndSkillBonusesPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        dropoutChancePanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        accidentsAndEventsPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        warriorCasteFallbackPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -4804,6 +4854,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableClanEducation.setToolTipText(resources.getString("chkEnableClanEducation.toolTip"));
         chkEnableClanEducation.setName("chkEnableClanEducation");
 
+        // these prevent a really annoying bug where disabled options don't stay disabled when
+        // reloading Campaign Options
+        chkEnableLocalAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        chkEnablePrestigiousAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        chkEnableClanEducation.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+
         // creating the layout
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("standardSets.title")));
@@ -4836,16 +4892,33 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableBonuses.setToolTipText(resources.getString("chkEnableBonuses.toolTip"));
         chkEnableBonuses.setName("chkEnableBonuses");
 
-        chkEnableRandomXp = new JCheckBox(resources.getString("chkEnableRandomXp.text"));
-        chkEnableRandomXp.setToolTipText(resources.getString("chkEnableRandomXp.toolTip"));
-        chkEnableRandomXp.setName("chkEnableRandomXp");
-
         lblRandomXpRate = new JLabel(resources.getString("lblRandomXpRate.text"));
         lblRandomXpRate.setToolTipText(resources.getString("lblRandomXpRate.toolTip"));
         lblRandomXpRate.setName("lblRandomXpRate");
-        spnRandomXpRate = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+        spnRandomXpRate = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
         spnRandomXpRate.setToolTipText(resources.getString("lblRandomXpRate.toolTip"));
         spnRandomXpRate.setName("spnRandomXpRate");
+
+        chkEnableRandomXp = new JCheckBox(resources.getString("chkEnableRandomXp.text"));
+        chkEnableRandomXp.setToolTipText(resources.getString("chkEnableRandomXp.toolTip"));
+        chkEnableRandomXp.setName("chkEnableRandomXp");
+        chkEnableRandomXp.addActionListener(evt -> {
+            final boolean isEnabled = chkEnableRandomXp.isSelected();
+
+            lblRandomXpRate.setEnabled(isEnabled);
+        });
+
+        // These prevent a really annoying bug where disabled options don't stay disabled when
+        // reloading Campaign Options
+        if ((campaign.getCampaignOptions().isEnableRandomXp()) && (campaign.getCampaignOptions().isUseEducationModule())) {
+            lblRandomXpRate.setEnabled(true);
+            spnRandomXpRate.setEnabled(true);
+        } else {
+            lblRandomXpRate.setEnabled(false);
+            spnRandomXpRate.setEnabled(false);
+        }
+        chkEnableBonuses.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        chkEnableRandomXp.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // creating the layout
         final JPanel panel = new JPanel();
@@ -4882,23 +4955,32 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblAdultDropoutChance = new JLabel(resources.getString("lblAdultDropoutChance.text"));
         lblAdultDropoutChance.setToolTipText(resources.getString("lblAdultDropoutChance.toolTip"));
         lblAdultDropoutChance.setName("lblAdultDropoutChance");
-        spnAdultDropoutChance = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnAdultDropoutChance = new JSpinner(new SpinnerNumberModel(1000, 0, 100000, 1));
         spnAdultDropoutChance.setToolTipText(resources.getString("lblAdultDropoutChance.toolTip"));
         spnAdultDropoutChance.setName("spnAdultDropoutChance");
 
         lblChildrenDropoutChance = new JLabel(resources.getString("lblChildrenDropoutChance.text"));
         lblChildrenDropoutChance.setToolTipText(resources.getString("lblChildrenDropoutChance.toolTip"));
         lblChildrenDropoutChance.setName("lblChildrenDropoutChance");
-        spnChildrenDropoutChance = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnChildrenDropoutChance = new JSpinner(new SpinnerNumberModel(10000, 0, 100000, 1));
         spnChildrenDropoutChance.setToolTipText(resources.getString("lblChildrenDropoutChance.toolTip"));
         spnChildrenDropoutChance.setName("spnChildrenDropoutChance");
 
         lblWarriorCasteDropOutChance = new JLabel(resources.getString("lblWarriorCasteDropOutChance.text"));
         lblWarriorCasteDropOutChance.setToolTipText(resources.getString("lblWarriorCasteDropOutChance.toolTip"));
         lblWarriorCasteDropOutChance.setName("lblWarriorCasteDropOutChance");
-        spnWarriorCasteDropOutChance = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnWarriorCasteDropOutChance = new JSpinner(new SpinnerNumberModel(5000, 0, 100000, 1));
         spnWarriorCasteDropOutChance.setToolTipText(resources.getString("lblWarriorCasteDropOutChance.toolTip"));
         spnWarriorCasteDropOutChance.setName("spnWarriorCasteDropOutChance");
+
+        // These prevent a really annoying bug where disabled options don't stay disabled when
+        // reloading Campaign Options
+        lblAdultDropoutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnAdultDropoutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblChildrenDropoutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnChildrenDropoutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblWarriorCasteDropOutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnWarriorCasteDropOutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // creating the layout
         final JPanel panel = new JPanel();
@@ -4944,6 +5026,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAllAges = new JCheckBox(resources.getString("chkAllAges.text"));
         chkAllAges.setToolTipText(resources.getString("chkAllAges.toolTip"));
         chkAllAges.setName("chkAllAges");
+        chkAllAges.addActionListener(evt -> {
+            final boolean isEnabled = chkAllAges.isSelected();
+
+            chkLiveFireBlooding.setEnabled(isEnabled);
+            spnWarriorCasteAccidents.setEnabled(isEnabled);
+            spnOtherCasteAccidents.setEnabled(isEnabled);
+        });
 
         chkLiveFireBlooding = new JCheckBox(resources.getString("chkLiveFireBlooding.text"));
         chkLiveFireBlooding.setToolTipText(resources.getString("chkLiveFireBlooding.toolTip"));
@@ -4952,23 +5041,41 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblMilitaryAcademyAccidents = new JLabel(resources.getString("lblMilitaryAcademyAccidents.text"));
         lblMilitaryAcademyAccidents.setToolTipText(resources.getString("lblMilitaryAcademyAccidents.toolTip"));
         lblMilitaryAcademyAccidents.setName("lblMilitaryAcademyAccidents");
-        spnMilitaryAcademyAccidents = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnMilitaryAcademyAccidents = new JSpinner(new SpinnerNumberModel(10000, 0, 100000, 1));
         spnMilitaryAcademyAccidents.setToolTipText(resources.getString("lblMilitaryAcademyAccidents.toolTip"));
         spnMilitaryAcademyAccidents.setName("spnMilitaryAcademyAccidents");
 
         lblWarriorCasteAccidents = new JLabel(resources.getString("lblWarriorCasteAccidents.text"));
         lblWarriorCasteAccidents.setToolTipText(resources.getString("lblWarriorCasteAccidents.toolTip"));
         lblWarriorCasteAccidents.setName("lblWarriorCasteAccidents");
-        spnWarriorCasteAccidents = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnWarriorCasteAccidents = new JSpinner(new SpinnerNumberModel(5000, 0, 100000, 1));
         spnWarriorCasteAccidents.setToolTipText(resources.getString("lblWarriorCasteAccidents.toolTip"));
         spnWarriorCasteAccidents.setName("spnWarriorCasteAccidents");
 
         lblOtherCasteAccidents = new JLabel(resources.getString("lblOtherCasteAccidents.text"));
         lblOtherCasteAccidents.setToolTipText(resources.getString("lblOtherCasteAccidents.toolTip"));
         lblOtherCasteAccidents.setName("lblOtherCasteAccidents");
-        spnOtherCasteAccidents = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnOtherCasteAccidents = new JSpinner(new SpinnerNumberModel(10000, 0, 100000, 1));
         spnOtherCasteAccidents.setToolTipText(resources.getString("lblOtherCasteAccidents.toolTip"));
         spnOtherCasteAccidents.setName("spnOtherCasteAccidents");
+
+        // These prevent a really annoying bug where disabled options don't stay disabled when
+        // reloading Campaign Options
+        chkAllAges.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        chkLiveFireBlooding.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblMilitaryAcademyAccidents.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnMilitaryAcademyAccidents.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        if ((campaign.getCampaignOptions().isUseEducationModule()) && (campaign.getCampaignOptions().isAllAges())) {
+            lblWarriorCasteAccidents.setEnabled(true);
+            spnWarriorCasteAccidents.setEnabled(true);
+            lblOtherCasteAccidents.setEnabled(true);
+            spnOtherCasteAccidents.setEnabled(true);
+        } else {
+            lblWarriorCasteAccidents.setEnabled(false);
+            spnWarriorCasteAccidents.setEnabled(false);
+            lblOtherCasteAccidents.setEnabled(false);
+            spnOtherCasteAccidents.setEnabled(false);
+        }
 
         // creating the layout
         final JPanel panel = new JPanel();
@@ -5019,30 +5126,41 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblFallbackScientist = new JLabel(resources.getString("lblFallbackScientist.text"));
         lblFallbackScientist.setToolTipText(resources.getString("lblFallbackScientist.toolTip"));
         lblFallbackScientist.setName("lblFallbackScientist");
-        spnFallbackScientist = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnFallbackScientist = new JSpinner(new SpinnerNumberModel(6, 0, 100, 1));
         spnFallbackScientist.setToolTipText(resources.getString("lblFallbackScientist.toolTip"));
         spnFallbackScientist.setName("spnFallbackScientist");
 
         lblFallbackMerchant = new JLabel(resources.getString("lblFallbackMerchant.text"));
         lblFallbackMerchant.setToolTipText(resources.getString("lblFallbackMerchant.toolTip"));
         lblFallbackMerchant.setName("lblFallbackMerchant");
-        spnFallbackMerchant = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnFallbackMerchant = new JSpinner(new SpinnerNumberModel(6, 0, 100, 1));
         spnFallbackMerchant.setToolTipText(resources.getString("lblFallbackMerchant.toolTip"));
         spnFallbackMerchant.setName("spnFallbackMerchant");
 
         lblFallbackTechnician = new JLabel(resources.getString("lblFallbackTechnician.text"));
         lblFallbackTechnician.setToolTipText(resources.getString("lblFallbackTechnician.toolTip"));
         lblFallbackTechnician.setName("lblFallbackTechnician");
-        spnFallbackTechnician = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnFallbackTechnician = new JSpinner(new SpinnerNumberModel(5, 0, 100, 1));
         spnFallbackTechnician.setToolTipText(resources.getString("lblFallbackTechnician.toolTip"));
         spnFallbackTechnician.setName("spnFallbackTechnician");
 
         lblFallbackLabour = new JLabel(resources.getString("lblFallbackLabour.text"));
         lblFallbackLabour.setToolTipText(resources.getString("lblFallbackLabour.toolTip"));
         lblFallbackLabour.setName("lblFallbackLabour");
-        spnFallbackLabour = new JSpinner(new SpinnerNumberModel(50, 1, 1000, 1));
+        spnFallbackLabour = new JSpinner(new SpinnerNumberModel(3, 0, 100, 1));
         spnFallbackLabour.setToolTipText(resources.getString("lblFallbackLabour.toolTip"));
         spnFallbackLabour.setName("spnFallbackLabour");
+
+        // These prevent a really annoying bug where disabled options don't stay disabled when
+        // reloading Campaign Options
+        spnFallbackScientist.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblFallbackScientist.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnFallbackMerchant.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblFallbackMerchant.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnFallbackTechnician.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblFallbackTechnician.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnFallbackLabour.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblFallbackLabour.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // creating the layout
         final JPanel panel = new JPanel();
@@ -6613,6 +6731,28 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPercentageRandomProcreationRelationshipChance.setValue(options.getPercentageRandomProcreationRelationshipChance() * 100.0);
         spnPercentageRandomProcreationRelationshiplessChance.setValue(options.getPercentageRandomProcreationRelationshiplessChance() * 100.0);
 
+        // Education
+        chkUseEducationModule.setSelected(options.isUseEducationModule());
+        chkEduEnableAutoAwardsIntegration.setSelected(options.isEduEnableAutoAwardsIntegration());
+        chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
+        chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
+        chkEnableClanEducation.setSelected(options.isEnableClanEducation());
+        chkEnableRandomXp.setSelected(options.isEnableRandomXp());
+        spnRandomXpRate.setValue(options.getRandomXpRate());
+        chkEnableBonuses.setSelected(options.isEnableBonuses());
+        spnAdultDropoutChance.setValue(options.getAdultDropoutChance());
+        spnChildrenDropoutChance.setValue(options.getChildrenDropoutChance());
+        spnWarriorCasteDropOutChance.setValue(options.getWarriorCasteDropOutChance());
+        chkAllAges.setSelected(options.isAllAges());
+        spnMilitaryAcademyAccidents.setValue(options.getMilitaryAcademyAccidents());
+        spnWarriorCasteAccidents.setValue(options.getWarriorCasteAccidents());
+        spnOtherCasteAccidents.setValue(options.getOtherCasteAccidents());
+        chkLiveFireBlooding.setSelected(options.isLiveFireBlooding());
+        spnFallbackScientist.setValue(options.getFallbackScientist());
+        spnFallbackMerchant.setValue(options.getFallbackMerchant());
+        spnFallbackTechnician.setValue(options.getFallbackTechnician());
+        spnFallbackLabour.setValue(options.getFallbackLabour());
+
         // Death
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.isKeepMarriedNameUponSpouseDeath());
         comboRandomDeathMethod.setSelectedItem(options.getRandomDeathMethod());
@@ -7163,6 +7303,28 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseRandomPrisonerProcreation(chkUseRandomPrisonerProcreation.isSelected());
             options.setPercentageRandomProcreationRelationshipChance((Double) spnPercentageRandomProcreationRelationshipChance.getValue() / 100.0);
             options.setPercentageRandomProcreationRelationshiplessChance((Double) spnPercentageRandomProcreationRelationshiplessChance.getValue() / 100.0);
+
+            // Education
+            options.setUseEducationModule(chkUseEducationModule.isSelected());
+            options.setEduEnableAutoAwardsIntegration(chkEduEnableAutoAwardsIntegration.isSelected());
+            options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
+            options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
+            options.setEnableClanEducation(chkEnableClanEducation.isSelected());
+            options.setEnableRandomXp(chkEnableRandomXp.isSelected());
+            options.setRandomXpRate((Integer) spnRandomXpRate.getValue());
+            options.setEnableBonuses(chkEnableBonuses.isSelected());
+            options.setAdultDropoutChance((Integer) spnAdultDropoutChance.getValue());
+            options.setChildrenDropoutChance((Integer) spnChildrenDropoutChance.getValue());
+            options.setWarriorCasteDropOutChance((Integer) spnWarriorCasteDropOutChance.getValue());
+            options.setAllAges(chkAllAges.isSelected());
+            options.setMilitaryAcademyAccidents((Integer) spnMilitaryAcademyAccidents.getValue());
+            options.setWarriorCasteAccidents((Integer) spnWarriorCasteAccidents.getValue());
+            options.setOtherCasteAccidents((Integer) spnOtherCasteAccidents.getValue());
+            options.setLiveFireBlooding(chkLiveFireBlooding.isSelected());
+            options.setFallbackScientist((Integer) spnFallbackScientist.getValue());
+            options.setFallbackMerchant((Integer) spnFallbackMerchant.getValue());
+            options.setFallbackTechnician((Integer) spnFallbackTechnician.getValue());
+            options.setFallbackLabour((Integer) spnFallbackLabour.getValue());
 
             // Death
             options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());

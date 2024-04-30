@@ -229,6 +229,21 @@ public class CampaignOptions {
     private boolean useAtBPrisonerDefection;
     private boolean useAtBPrisonerRansom;
 
+    // Dependent
+    private RandomDependentMethod randomDependentMethod;
+    private boolean useRandomDependentAddition;
+    private boolean useRandomDependentRemoval;
+
+    // Salary
+    private double salaryCommissionMultiplier;
+    private double salaryEnlistedMultiplier;
+    private double salaryAntiMekMultiplier;
+    private double salarySpecialistInfantryMultiplier;
+    private Map<SkillLevel, Double> salaryXPMultipliers;
+    private Money[] roleBaseSalaries;
+    //endregion Personnel Tab
+
+    //region Life Paths Tab
     // Personnel Randomization
     private boolean useDylansRandomXP; // Unofficial
     private RandomOriginOptions randomOriginOptions;
@@ -244,19 +259,6 @@ public class CampaignOptions {
 
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
-
-    // Dependent
-    private RandomDependentMethod randomDependentMethod;
-    private boolean useRandomDependentAddition;
-    private boolean useRandomDependentRemoval;
-
-    // Salary
-    private double salaryCommissionMultiplier;
-    private double salaryEnlistedMultiplier;
-    private double salaryAntiMekMultiplier;
-    private double salarySpecialistInfantryMultiplier;
-    private Map<SkillLevel, Double> salaryXPMultipliers;
-    private Money[] roleBaseSalaries;
 
     // Marriage
     private boolean useManualMarriages;
@@ -305,6 +307,28 @@ public class CampaignOptions {
     private double percentageRandomProcreationRelationshipChance;
     private double percentageRandomProcreationRelationshiplessChance;
 
+    // Education
+    private boolean useEducationModule;
+    private boolean eduEnableAutoAwardsIntegration;
+    private boolean enableLocalAcademies;
+    private boolean enablePrestigiousAcademies;
+    private boolean enableClanEducation;
+    private boolean enableRandomXp;
+    private Integer randomXpRate;
+    private boolean enableBonuses;
+    private Integer adultDropoutChance;
+    private Integer childrenDropoutChance;
+    private Integer warriorCasteDropOutChance;
+    private boolean allAges;
+    private Integer militaryAcademyAccidents;
+    private Integer warriorCasteAccidents;
+    private Integer otherCasteAccidents;
+    private boolean liveFireBlooding;
+    private Integer fallbackScientist;
+    private Integer fallbackMerchant;
+    private Integer fallbackTechnician;
+    private Integer fallbackLabour;
+
     // Death
     private boolean keepMarriedNameUponSpouseDeath;
     private RandomDeathMethod randomDeathMethod;
@@ -317,7 +341,7 @@ public class CampaignOptions {
     private double[] exponentialRandomDeathFemaleValues;
     private Map<TenYearAgeRange, Double> ageRangeRandomDeathMaleValues;
     private Map<TenYearAgeRange, Double> ageRangeRandomDeathFemaleValues;
-    //endregion Personnel Tab
+    //endregion Life Paths Tab
 
     //region Finance tab
     private boolean payForParts;
@@ -627,22 +651,6 @@ public class CampaignOptions {
         setUseAtBPrisonerDefection(false);
         setUseAtBPrisonerRansom(false);
 
-        // Personnel Randomization
-        setUseDylansRandomXP(false);
-        setRandomOriginOptions(new RandomOriginOptions(true));
-
-        // Retirement
-        setUseRetirementDateTracking(false);
-        setRandomRetirementMethod(RandomRetirementMethod.NONE);
-        setUseYearEndRandomRetirement(true);
-        setUseContractCompletionRandomRetirement(true);
-        setUseCustomRetirementModifiers(true);
-        setUseRandomFounderRetirement(true);
-        setTrackUnitFatigue(false);
-
-        // Family
-        setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
-
         // Dependent
         setRandomDependentMethod(RandomDependentMethod.NONE);
         setUseRandomDependentAddition(true);
@@ -692,6 +700,24 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
         setRoleBaseSalary(PersonnelRole.DEPENDENT, 0);
         setRoleBaseSalary(PersonnelRole.NONE, 0);
+        //endregion Personnel Tab
+
+        //region Life Paths Tab
+        // Personnel Randomization
+        setUseDylansRandomXP(false);
+        setRandomOriginOptions(new RandomOriginOptions(true));
+
+        // Retirement
+        setUseRetirementDateTracking(false);
+        setRandomRetirementMethod(RandomRetirementMethod.NONE);
+        setUseYearEndRandomRetirement(true);
+        setUseContractCompletionRandomRetirement(true);
+        setUseCustomRetirementModifiers(true);
+        setUseRandomFounderRetirement(true);
+        setTrackUnitFatigue(false);
+
+        // Family
+        setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
 
         // Marriage
         setUseManualMarriages(true);
@@ -739,8 +765,6 @@ public class CampaignOptions {
         setPercentageRandomDivorceOppositeSexChance(0.000001);
         setPercentageRandomDivorceSameSexChance(0.000001);
 
-        // Divorce
-
         // Procreation
         setUseManualProcreation(true);
         setUseClanPersonnelProcreation(false);
@@ -758,6 +782,28 @@ public class CampaignOptions {
         setUseRandomPrisonerProcreation(true);
         setPercentageRandomProcreationRelationshipChance(0.0005);
         setPercentageRandomProcreationRelationshiplessChance(0.00005);
+
+        // Education
+        setUseEducationModule(true);
+        setEduEnableAutoAwardsIntegration(true);
+        setEnableLocalAcademies(true);
+        setEnablePrestigiousAcademies(true);
+        setEnableClanEducation(true);
+        setEnableRandomXp(true);
+        setRandomXpRate(1);
+        setEnableBonuses(true);
+        setAdultDropoutChance(1000);
+        setChildrenDropoutChance(10000);
+        setWarriorCasteDropOutChance(1000);
+        setAllAges(false);
+        setMilitaryAcademyAccidents(10000);
+        setWarriorCasteAccidents(1000);
+        setOtherCasteAccidents(10000);
+        setLiveFireBlooding(true);
+        setFallbackScientist(6);
+        setFallbackMerchant(6);
+        setFallbackTechnician(5);
+        setFallbackLabour(3);
 
         // Death
         setKeepMarriedNameUponSpouseDeath(true);
@@ -801,7 +847,7 @@ public class CampaignOptions {
         getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.SIXTY_FIVE_SEVENTY_FOUR, 1421.0);
         getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.SEVENTY_FIVE_EIGHTY_FOUR, 3788.0);
         getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.EIGHTY_FIVE_OR_OLDER, 12870.0);
-        //endregion Personnel Tab
+        //endregion Life Paths Tab
 
         //region Finances Tab
         payForParts = false;
@@ -2117,6 +2163,168 @@ public class CampaignOptions {
      */
     public void setKeepMarriedNameUponSpouseDeath(final boolean keepMarriedNameUponSpouseDeath) {
         this.keepMarriedNameUponSpouseDeath = keepMarriedNameUponSpouseDeath;
+    }
+
+    public boolean isUseEducationModule() {
+        return useEducationModule;
+    }
+
+    public void setUseEducationModule(boolean useEducationModule) {
+        this.useEducationModule = useEducationModule;
+    }
+
+
+    public boolean isEduEnableAutoAwardsIntegration() {
+        return eduEnableAutoAwardsIntegration;
+    }
+
+
+    public void setEduEnableAutoAwardsIntegration(boolean eduEnableAutoAwardsIntegration) {
+        this.eduEnableAutoAwardsIntegration = eduEnableAutoAwardsIntegration;
+    }
+
+    public boolean isEnableLocalAcademies() {
+        return enableLocalAcademies;
+    }
+
+    public void setEnableLocalAcademies(boolean enableLocalAcademies) {
+        this.enableLocalAcademies = enableLocalAcademies;
+    }
+
+    public boolean isEnablePrestigiousAcademies() {
+        return enablePrestigiousAcademies;
+    }
+
+    public void setEnablePrestigiousAcademies(boolean enablePrestigiousAcademies) {
+        this.enablePrestigiousAcademies = enablePrestigiousAcademies;
+    }
+
+    public boolean isEnableClanEducation() {
+        return enableClanEducation;
+    }
+
+    public void setEnableClanEducation(boolean enableClanEducation) {
+        this.enableClanEducation = enableClanEducation;
+    }
+
+    public boolean isEnableRandomXp() {
+        return enableRandomXp;
+    }
+
+    public void setEnableRandomXp(boolean enableRandomXp) {
+        this.enableRandomXp = enableRandomXp;
+    }
+
+    public Integer getRandomXpRate() {
+        return randomXpRate;
+    }
+
+    public void setRandomXpRate(Integer randomXpRate) {
+        this.randomXpRate = randomXpRate;
+    }
+
+    public boolean isEnableBonuses() {
+        return enableBonuses;
+    }
+
+    public void setEnableBonuses(boolean enableBonuses) {
+        this.enableBonuses = enableBonuses;
+    }
+
+    public Integer getAdultDropoutChance() {
+        return adultDropoutChance;
+    }
+
+    public void setAdultDropoutChance(Integer adultDropoutChance) {
+        this.adultDropoutChance = adultDropoutChance;
+    }
+
+    public Integer getChildrenDropoutChance() {
+        return childrenDropoutChance;
+    }
+
+    public void setChildrenDropoutChance(Integer childrenDropoutChance) {
+        this.childrenDropoutChance = childrenDropoutChance;
+    }
+
+    public Integer getWarriorCasteDropOutChance() {
+        return warriorCasteDropOutChance;
+    }
+
+    public void setWarriorCasteDropOutChance(Integer warriorCasteDropOutChance) {
+        this.warriorCasteDropOutChance = warriorCasteDropOutChance;
+    }
+
+    public boolean isAllAges() {
+        return allAges;
+    }
+
+    public void setAllAges(boolean allAges) {
+        this.allAges = allAges;
+    }
+
+    public Integer getMilitaryAcademyAccidents() {
+        return militaryAcademyAccidents;
+    }
+
+    public void setMilitaryAcademyAccidents(Integer militaryAcademyAccidents) {
+        this.militaryAcademyAccidents = militaryAcademyAccidents;
+    }
+
+    public Integer getWarriorCasteAccidents() {
+        return warriorCasteAccidents;
+    }
+
+    public void setWarriorCasteAccidents(Integer warriorCasteAccidents) {
+        this.warriorCasteAccidents = warriorCasteAccidents;
+    }
+
+    public Integer getOtherCasteAccidents() {
+        return otherCasteAccidents;
+    }
+
+    public void setOtherCasteAccidents(Integer otherCasteAccidents) {
+        this.otherCasteAccidents = otherCasteAccidents;
+    }
+
+    public boolean isLiveFireBlooding() {
+        return liveFireBlooding;
+    }
+
+    public void setLiveFireBlooding(boolean liveFireBlooding) {
+        this.liveFireBlooding = liveFireBlooding;
+    }
+
+    public Integer getFallbackScientist() {
+        return fallbackScientist;
+    }
+
+    public void setFallbackScientist(Integer fallbackScientist) {
+        this.fallbackScientist = fallbackScientist;
+    }
+
+    public Integer getFallbackMerchant() {
+        return fallbackMerchant;
+    }
+
+    public void setFallbackMerchant(Integer fallbackMerchant) {
+        this.fallbackMerchant = fallbackMerchant;
+    }
+
+    public Integer getFallbackTechnician() {
+        return fallbackTechnician;
+    }
+
+    public void setFallbackTechnician(Integer fallbackTechnician) {
+        this.fallbackTechnician = fallbackTechnician;
+    }
+
+    public Integer getFallbackLabour() {
+        return fallbackLabour;
+    }
+
+    public void setFallbackLabour(Integer fallbackLabour) {
+        this.fallbackLabour = fallbackLabour;
     }
 
     /**
@@ -3624,25 +3832,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAtBPrisonerRansom", isUseAtBPrisonerRansom());
         //endregion Prisoners
 
-        //region Personnel Randomization
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
-        getRandomOriginOptions().writeToXML(pw, indent);
-        //endregion Personnel Randomization
-
-        //region Retirement
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomRetirementMethod", getRandomRetirementMethod().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
-        //endregion Retirement
-
-        //region Family
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "familyDisplayLevel", getFamilyDisplayLevel().name());
-        //endregion Family
-
         //region Dependent
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDependentMethod", getRandomDependentMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomDependentAddition", isUseRandomDependentAddition());
@@ -3661,6 +3850,27 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salaryXPMultipliers");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
+        //endregion Personnel Tab
+
+        //region Life Paths Tab
+        //region Personnel Randomization
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDylansRandomXP", isUseDylansRandomXP());
+        getRandomOriginOptions().writeToXML(pw, indent);
+        //endregion Personnel Randomization
+
+        //region Retirement
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomRetirementMethod", getRandomRetirementMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
+        //endregion Retirement
+
+        //region Family
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "familyDisplayLevel", getFamilyDisplayLevel().name());
+        //endregion Family
 
         //region Marriage
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualMarriages", isUseManualMarriages());
@@ -3720,6 +3930,29 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "percentageRandomProcreationRelationshiplessChance", getPercentageRandomProcreationRelationshiplessChance());
         //endregion Procreation
 
+        //region Education
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEnableAutoAwardsIntegration", isEduEnableAutoAwardsIntegration());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableClanEducation", isEnableClanEducation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRandomXp", isEnableRandomXp());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomXpRate", getRandomXpRate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableBonuses", isEnableBonuses());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adultDropoutChance", getAdultDropoutChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childrenDropoutChance", getChildrenDropoutChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "warriorCasteDropOutChance", getWarriorCasteDropOutChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allAges", isAllAges());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "militaryAcademyAccidents", getMilitaryAcademyAccidents());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "warriorCasteAccidents", getWarriorCasteAccidents());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "otherCasteAccidents", getOtherCasteAccidents());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "liveFireBlooding", isLiveFireBlooding());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackScientist", getFallbackScientist());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackMerchant", getFallbackMerchant());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackTechnician", getFallbackTechnician());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackLabour", getFallbackLabour());
+        //endregion Education
+
         //region Death
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "keepMarriedNameUponSpouseDeath", isKeepMarriedNameUponSpouseDeath());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomDeathMethod", getRandomDeathMethod().name());
@@ -3745,7 +3978,7 @@ public class CampaignOptions {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ageRangeRandomDeathFemaleValues");
         //endregion Death
-        //endregion Personnel Tab
+        //endregion Life Paths Tab
 
         //region Finances Tab
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payForParts", payForParts);
@@ -4187,43 +4420,6 @@ public class CampaignOptions {
                     retVal.setUseAtBPrisonerRansom(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion Prisoners
 
-                //region Personnel Randomization
-                } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXP")) {
-                    retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomOriginOptions")) {
-                    if (!wn2.hasChildNodes()) {
-                        continue;
-                    }
-                    final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(wn2.getChildNodes(), true);
-                    if (randomOriginOptions == null) {
-                        continue;
-                    }
-                    retVal.setRandomOriginOptions(randomOriginOptions);
-                //endregion Personnel Randomization
-
-                //region Retirement
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
-                    retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomRetirementMethod")) {
-                    retVal.setRandomRetirementMethod(RandomRetirementMethod.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useYearEndRandomRetirement")) {
-                    retVal.setUseYearEndRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useContractCompletionRandomRetirement")) {
-                    retVal.setUseContractCompletionRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
-                    retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomFounderRetirement")) {
-                    retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
-                    retVal.setTrackUnitFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                //endregion Retirement
-
-                //region Family
-                } else if (wn2.getNodeName().equalsIgnoreCase("familyDisplayLevel")
-                        || wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) { // Legacy, 0.49.12 removal
-                    retVal.setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
-                //endregion Family
-
                 //region Dependent
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDependentMethod")) {
                     retVal.setRandomDependentMethod(RandomDependentMethod.valueOf(wn2.getTextContent().trim()));
@@ -4266,8 +4462,47 @@ public class CampaignOptions {
                         retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
                     }
                 //endregion Salary
+                //endregion Personnel Tab
 
-                //region Marriage
+                //region Life Paths Tab
+                    //region Personnel Randomization
+                } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXP")) {
+                    retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomOriginOptions")) {
+                    if (!wn2.hasChildNodes()) {
+                        continue;
+                    }
+                    final RandomOriginOptions randomOriginOptions = RandomOriginOptions.parseFromXML(wn2.getChildNodes(), true);
+                    if (randomOriginOptions == null) {
+                        continue;
+                    }
+                    retVal.setRandomOriginOptions(randomOriginOptions);
+                    //endregion Personnel Randomization
+
+                    //region Retirement
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
+                    retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomRetirementMethod")) {
+                    retVal.setRandomRetirementMethod(RandomRetirementMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useYearEndRandomRetirement")) {
+                    retVal.setUseYearEndRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useContractCompletionRandomRetirement")) {
+                    retVal.setUseContractCompletionRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
+                    retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomFounderRetirement")) {
+                    retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
+                    retVal.setTrackUnitFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    //endregion Retirement
+
+                    //region Family
+                } else if (wn2.getNodeName().equalsIgnoreCase("familyDisplayLevel")
+                        || wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) { // Legacy, 0.49.12 removal
+                    retVal.setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
+                    //endregion Family
+
+                    //region Marriage
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
                     retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useClanPersonnelMarriages")
@@ -4310,9 +4545,9 @@ public class CampaignOptions {
                     retVal.setPercentageRandomMarriageOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomMarriageSameSexChance")) {
                     retVal.setPercentageRandomMarriageSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
-                //endregion Marriage
+                    //endregion Marriage
 
-                //region Divorce
+                    //region Divorce
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualDivorce")) {
                     retVal.setUseManualDivorce(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useClanPersonnelDivorce")
@@ -4349,9 +4584,9 @@ public class CampaignOptions {
                     retVal.setPercentageRandomDivorceOppositeSexChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomDivorceSameSexChance")) {
                     retVal.setPercentageRandomDivorceSameSexChance(Double.parseDouble(wn2.getTextContent().trim()));
-                //endregion Divorce
+                    //endregion Divorce
 
-                //region Procreation
+                    //region Procreation
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualProcreation")) {
                     retVal.setUseManualProcreation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useClanPersonnelProcreation")
@@ -4386,9 +4621,52 @@ public class CampaignOptions {
                     retVal.setPercentageRandomProcreationRelationshipChance(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("percentageRandomProcreationRelationshiplessChance")) {
                     retVal.setPercentageRandomProcreationRelationshiplessChance(Double.parseDouble(wn2.getTextContent().trim()));
-                //endregion Procreation
+                    //endregion Procreation
 
-                //region Death
+                    //region Education
+                } else if (wn2.getNodeName().equalsIgnoreCase("useEducationModule")) {
+                    retVal.setUseEducationModule(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduEnableAutoAwardsIntegration")) {
+                    retVal.setEduEnableAutoAwardsIntegration(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableLocalAcademies")) {
+                    retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
+                    retVal.setEnablePrestigiousAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableClanEducation")) {
+                    retVal.setEnableClanEducation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableRandomXp")) {
+                    retVal.setEnableRandomXp(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("randomXpRate")) {
+                    retVal.setRandomXpRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableBonuses")) {
+                    retVal.setEnableBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("adultDropoutChance")) {
+                    retVal.setAdultDropoutChance(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("childrenDropoutChance")) {
+                    retVal.setChildrenDropoutChance(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("warriorCasteDropOutChance")) {
+                    retVal.setWarriorCasteDropOutChance(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("allAges")) {
+                    retVal.setAllAges(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("militaryAcademyAccidents")) {
+                    retVal.setMilitaryAcademyAccidents(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("warriorCasteAccidents")) {
+                    retVal.setWarriorCasteAccidents(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("otherCasteAccidents")) {
+                    retVal.setOtherCasteAccidents(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("liveFireBlooding")) {
+                    retVal.setLiveFireBlooding(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fallbackScientist")) {
+                    retVal.setFallbackScientist(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fallbackMerchant")) {
+                    retVal.setFallbackMerchant(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fallbackTechnician")) {
+                    retVal.setFallbackTechnician(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fallbackLabour")) {
+                    retVal.setFallbackLabour(Integer.parseInt(wn2.getTextContent().trim()));
+                    //endregion Education
+
+                    //region Death
                 } else if (wn2.getNodeName().equalsIgnoreCase("keepMarriedNameUponSpouseDeath")) {
                     retVal.setKeepMarriedNameUponSpouseDeath(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDeathMethod")) {
@@ -4456,8 +4734,8 @@ public class CampaignOptions {
 
                         }
                     }
-                //endregion Death
-                //endregion Personnel Tab
+                    //endregion Death
+                //endregion Life Paths Tab
 
                 //region Finances Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
