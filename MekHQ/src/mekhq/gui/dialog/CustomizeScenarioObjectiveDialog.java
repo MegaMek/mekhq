@@ -46,6 +46,9 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private JList<String> lstDetails;
 
     DefaultListModel<String> forceModel = new DefaultListModel<>();
+    DefaultListModel<ObjectiveEffect> successEffectsModel = new DefaultListModel<>();
+    DefaultListModel<ObjectiveEffect> failureEffectsModel = new DefaultListModel<>();
+
 
 
     public CustomizeScenarioObjectiveDialog(JFrame parent, boolean modal, ScenarioObjective objective, List<BotForce> botForces) {
@@ -79,8 +82,12 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
             }
         }
 
-        updateEffectList(successEffects, objective.getSuccessEffects());
-        updateEffectList(failureEffects, objective.getFailureEffects());
+        for (ObjectiveEffect currentEffect : objective.getSuccessEffects()) {
+            successEffectsModel.addElement(currentEffect);
+        }
+        for (ObjectiveEffect currentEffect : objective.getFailureEffects()) {
+            failureEffectsModel.addElement(currentEffect);
+        }
         updateDetailList();
 
         validate();
@@ -258,8 +265,10 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         JLabel lblFailureEffects = new JLabel("Effects on failure:");
 
         successEffects = new JList<>();
+        successEffects.setModel(successEffectsModel);
         successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
         failureEffects = new JList<>();
+        failureEffects.setModel(failureEffectsModel);
         failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
 
         btnRemoveSuccess = new JButton("Remove");
@@ -444,54 +453,36 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         effect.effectType = (ObjectiveEffect.ObjectiveEffectType) cboEffectType.getSelectedItem();
 
         if (cboEffectCondition.getSelectedItem() == ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess) {
-            objective.addSuccessEffect(effect);
-
-            updateEffectList(successEffects, objective.getSuccessEffects());
+            successEffectsModel.addElement(effect);
+            successEffects.repaint();
         } else {
-            objective.addFailureEffect(effect);
-
-            updateEffectList(failureEffects, objective.getFailureEffects());
+            failureEffectsModel.addElement(effect);
         }
 
         pack();
     }
 
-    /**
-     * Worker function that updates an objective effects list with the given objective effects
-     */
-    private void updateEffectList(JList<ObjectiveEffect> listToUpdate, java.util.List<ObjectiveEffect> objectiveEffects) {
-        DefaultListModel<ObjectiveEffect> effectModel = new DefaultListModel<>();
-        for (ObjectiveEffect currentEffect : objectiveEffects) {
-            effectModel.addElement(currentEffect);
-        }
-
-        listToUpdate.setModel(effectModel);
-    }
-
     private void removeEffect(ObjectiveEffect.ObjectiveEffectConditionType conditionType) {
-        JList<ObjectiveEffect> listToUpdate;
-        List<ObjectiveEffect> objectiveEffects;
+        JList<ObjectiveEffect> targetList;
+        DefaultListModel<ObjectiveEffect> modelToUpdate;
 
         if (conditionType == ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess) {
-            listToUpdate = successEffects;
-            objectiveEffects = objective.getSuccessEffects();
+            targetList = successEffects;
+            modelToUpdate = (DefaultListModel<ObjectiveEffect>) successEffects.getModel();
             btnRemoveSuccess.setEnabled(false);
         } else {
-            listToUpdate = failureEffects;
-            objectiveEffects = objective.getFailureEffects();
+            targetList = failureEffects;
+            modelToUpdate = (DefaultListModel<ObjectiveEffect>) failureEffects.getModel();
             btnRemoveFailure.setEnabled(false);
         }
 
-        for (ObjectiveEffect effectToRemove : listToUpdate.getSelectedValuesList()) {
-            objectiveEffects.remove(effectToRemove);
+        for (ObjectiveEffect effectToRemove : targetList.getSelectedValuesList()) {
+            modelToUpdate.removeElement(effectToRemove);
         }
-
-        updateEffectList(listToUpdate, objectiveEffects);
     }
 
     private void addForce() {
         forceModel.addElement(cboForceName.getSelectedItem().toString());
-        //forceNames.revalidate();
         pack();
     }
 
@@ -580,6 +571,15 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         objective.clearForces();
         for (int i = 0; i< forceModel.getSize(); i++) {
             objective.addForce(forceModel.getElementAt(i));
+        }
+
+
+        for (int i = 0; i< successEffectsModel.getSize(); i++) {
+            objective.addSuccessEffect(successEffectsModel.getElementAt(i));
+        }
+
+        for (int i = 0; i< failureEffectsModel.getSize(); i++) {
+            objective.addSuccessEffect(failureEffectsModel.getElementAt(i));
         }
 
         if (cboDirection.isVisible() && cboDirection.getSelectedIndex() > 0) {
