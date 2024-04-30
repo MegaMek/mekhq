@@ -352,7 +352,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JLabel lblOtherCasteAccidents;
     private JSpinner spnOtherCasteAccidents;
     private JCheckBox chkLiveFireBlooding;
-    private JLabel lblWarriorCasteFallbackCastes;
     private JLabel lblFallbackScientist;
     private JSpinner spnFallbackScientist;
     private JLabel lblFallbackMerchant;
