@@ -3,6 +3,8 @@ MEKHQ VERSION HISTORY:
 0.49.20-SNAPSHOT
 + PR #4005: Code internals: DialogOptionsListener update
 + PR #2997: Story Arcs Basic Architecture
++ FIX #4017 Space and Low Atmosphere not saved to xml, when started game after load the correct board type was to megamek
++ PR #3928 add glare and solar flare odds to TerrainConditionsOddsManifest.xml file
 
 0.49.19 (2024-04-19 2030 UTC)
 + Bug #3958: No selling units in scenario resolution if campaign disallows selling
