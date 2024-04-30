@@ -3,8 +3,13 @@ MEKHQ VERSION HISTORY:
 0.49.20-SNAPSHOT
 + PR #4005: Code internals: DialogOptionsListener update
 + PR #2997: Story Arcs Basic Architecture
-+ FIX #4017 Space and Low Atmosphere not saved to xml, when started game after load the correct board type was to megamek
-+ PR #3928 add glare and solar flare odds to TerrainConditionsOddsManifest.xml file
++ FIX #4017: Space and Low Atmosphere not saved to xml, when started game after load the correct board type was to megamek
++ PR #3928: add glare and solar flare odds to TerrainConditionsOddsManifest.xml file
++ PR #4033: Introduced a New Morale Level to Curb Invincible Morale Spikes in AtB & StratCon 
++ Fix #3359: Added Ability to Order Impossible TN Parts from Acquisitions Dialog. 
++ PR #3969: Added Nag Dialog for Exceeding Cargo Capacity While Destination is Set 
++ Fix #3938: Added CamOps Rank Salary Multipliers
++ PR #3924: Fatigue GUI Support and Rebalance 
 
 0.49.19 (2024-04-19 2030 UTC)
 + Bug #3958: No selling units in scenario resolution if campaign disallows selling
