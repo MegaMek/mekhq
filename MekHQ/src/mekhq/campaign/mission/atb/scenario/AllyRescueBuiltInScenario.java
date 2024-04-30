@@ -81,7 +81,7 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
 
-        setStart(Board.START_S);
+        setStartingPos(Board.START_S);
         setDeploymentDelay(12);
 
         final AtBContract contract = getContract(campaign);
@@ -122,9 +122,9 @@ public class AllyRescueBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 50);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                50, false);
+                1, 50, false);
 
         // in addition to the standard destroy 50/preserve 50, you need to keep
         // at least 3/8 of the "allied" units alive.

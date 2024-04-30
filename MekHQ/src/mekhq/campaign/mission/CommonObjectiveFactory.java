@@ -71,7 +71,7 @@ public class CommonObjectiveFactory {
     /**
      * Generates a "keep at least X% or X of [force] units" objective from the bot force with the specified name
      */
-    public static ScenarioObjective getPreserveSpecificFriendlies(String forceName, int number, boolean fixedAmount) {
+    public static ScenarioObjective getPreserveSpecificFriendlies(String forceName, int OperationalVP, int number, boolean fixedAmount) {
         ScenarioObjective keepFriendliesAlive = new ScenarioObjective();
         if (fixedAmount) {
             keepFriendliesAlive.setDescription(String.format(resourceMap.getString("commonObjectives.preserveFriendlyUnits.text"), number, ""));
@@ -85,12 +85,12 @@ public class CommonObjectiveFactory {
 
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
-        successEffect.howMuch = 1;
+        successEffect.howMuch = OperationalVP;
         keepFriendliesAlive.addSuccessEffect(successEffect);
 
         ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
         friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        friendlyFailureEffect.howMuch = 1;
+        friendlyFailureEffect.howMuch = OperationalVP;
         keepFriendliesAlive.addFailureEffect(friendlyFailureEffect);
 
         return keepFriendliesAlive;
@@ -101,7 +101,7 @@ public class CommonObjectiveFactory {
      * as well as any attached allies, alive
      */
     public static ScenarioObjective getKeepFriendliesAlive(Campaign campaign, AtBContract contract,
-                                                           AtBScenario scenario, int number,
+                                                           AtBScenario scenario, int OperationalVP, int number,
                                                            boolean fixedAmount) {
         ScenarioObjective keepFriendliesAlive = new ScenarioObjective();
         if (fixedAmount) {
@@ -119,12 +119,12 @@ public class CommonObjectiveFactory {
 
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
-        successEffect.howMuch = 1;
+        successEffect.howMuch = OperationalVP;
         keepFriendliesAlive.addSuccessEffect(successEffect);
 
         ObjectiveEffect friendlyFailureEffect = new ObjectiveEffect();
         friendlyFailureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        friendlyFailureEffect.howMuch = 1;
+        friendlyFailureEffect.howMuch = OperationalVP;
         keepFriendliesAlive.addFailureEffect(friendlyFailureEffect);
 
         return keepFriendliesAlive;
@@ -134,7 +134,7 @@ public class CommonObjectiveFactory {
      * Generates a "destroy x% of all units" from the given force name objective
      * @param forcename Explicit enemy force name
      */
-    public static ScenarioObjective getDestroyEnemies(String forcename, int percentage) {
+    public static ScenarioObjective getDestroyEnemies(String forcename, int OperationalVP, int percentage) {
         ScenarioObjective destroyHostiles = new ScenarioObjective();
         destroyHostiles.setDescription(String.format(resourceMap.getString("commonObjectives.forceWithdraw.text"), percentage));
         destroyHostiles.setObjectiveCriterion(ObjectiveCriterion.ForceWithdraw);
@@ -143,12 +143,12 @@ public class CommonObjectiveFactory {
 
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
-        successEffect.howMuch = 1;
+        successEffect.howMuch = OperationalVP;
         destroyHostiles.addSuccessEffect(successEffect);
 
         ObjectiveEffect failureEffect = new ObjectiveEffect();
         failureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        failureEffect.howMuch = 1;
+        failureEffect.howMuch = OperationalVP;
         destroyHostiles.addFailureEffect(failureEffect);
 
         return destroyHostiles;
@@ -158,14 +158,14 @@ public class CommonObjectiveFactory {
      * Generates a "destroy x% of all units" objective from the primary opposing force
      * @param contract Contract to examine for enemy force name.
      */
-    public static ScenarioObjective getDestroyEnemies(AtBContract contract, int percentage) {
-        return getDestroyEnemies(contract.getEnemyBotName(), percentage);
+    public static ScenarioObjective getDestroyEnemies(AtBContract contract, int OperationalVP, int percentage) {
+        return getDestroyEnemies(contract.getEnemyBotName(), OperationalVP, percentage);
     }
 
     /**
      * Generates a "prevent x% of all units from reaching given edge" objective from the primary opposing force
      */
-    public static ScenarioObjective getPreventEnemyBreakthrough(AtBContract contract, int percentage, OffBoardDirection direction) {
+    public static ScenarioObjective getPreventEnemyBreakthrough(AtBContract contract, int OperationalVP, int percentage, OffBoardDirection direction) {
         ScenarioObjective destroyHostiles = new ScenarioObjective();
         destroyHostiles.setDescription(
                 String.format(resourceMap.getString("commonObjectives.preventBreakthrough.text"), percentage, direction));
@@ -176,12 +176,12 @@ public class CommonObjectiveFactory {
 
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
-        successEffect.howMuch = 1;
+        successEffect.howMuch = OperationalVP;
         destroyHostiles.addSuccessEffect(successEffect);
 
         ObjectiveEffect failureEffect = new ObjectiveEffect();
         failureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        failureEffect.howMuch = 1;
+        failureEffect.howMuch = OperationalVP;
         destroyHostiles.addFailureEffect(failureEffect);
 
         return destroyHostiles;
@@ -190,7 +190,7 @@ public class CommonObjectiveFactory {
     /**
      * Generates a "reach X edge with x% of all allied + player units" objective
      */
-    public static ScenarioObjective getBreakthrough(AtBContract contract, AtBScenario scenario, Campaign campaign,
+    public static ScenarioObjective getBreakthrough(AtBContract contract, AtBScenario scenario, Campaign campaign, int OperationalVP,
                                                     int percentage, OffBoardDirection direction) {
         ScenarioObjective breakthrough = new ScenarioObjective();
         breakthrough.setDescription(
@@ -204,12 +204,12 @@ public class CommonObjectiveFactory {
 
         ObjectiveEffect successEffect = new ObjectiveEffect();
         successEffect.effectType = ObjectiveEffectType.ScenarioVictory;
-        successEffect.howMuch = 1;
+        successEffect.howMuch = OperationalVP;
         breakthrough.addSuccessEffect(successEffect);
 
         ObjectiveEffect failureEffect = new ObjectiveEffect();
         failureEffect.effectType = ObjectiveEffectType.ScenarioDefeat;
-        failureEffect.howMuch = 1;
+        failureEffect.howMuch = OperationalVP;
         breakthrough.addFailureEffect(failureEffect);
 
         return breakthrough;

@@ -27,6 +27,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
+import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.swing.gameConnectionDialogs.HostDialog;
 import megamek.common.event.*;
@@ -168,12 +169,26 @@ public class MekHQ implements GameListener {
         new StartupScreenPanel(this).getFrame().setVisible(true);
     }
 
+    /**
+     * restart back to the splash screen
+     */
+    public void restart() {
+
+        // Actually close MHQ
+        if (campaignGUI != null) {
+            campaignGUI.getFrame().dispose();
+        }
+
+        new StartupScreenPanel(this).getFrame().setVisible(true);
+    }
+
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
     private void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQ.class);
 
-            selectedTheme = new ObservableString("selectedTheme", UIManager.getLookAndFeel().getClass().getName());
+            // TODO: complete integration of Suite Preferences, including GUIPreferences
+            selectedTheme = new ObservableString("selectedTheme", GUIPreferences.UI_THEME);
             selectedTheme.addPropertyChangeListener(new MekHqPropertyChangedListener());
             preferences.manage(new StringPreference(selectedTheme));
 
@@ -473,6 +488,8 @@ public class MekHQ implements GameListener {
                     getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
                 }
             }
+            // we need to trigger ScenarioResolvedEvent before stopping the thread or currentScenario may become null
+            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
             gameThread.requestStop();
             // MegaMek dumps these in the deployment phase to free memory
             if (getCampaign().getCampaignOptions().isUseAtB()) {
@@ -485,7 +502,6 @@ public class MekHQ implements GameListener {
                 // This can't be null because of the above
                 Stream.of(tempImageDirectory.listFiles()).filter(file -> file.getName().endsWith(".png")).forEach(File::delete);
             }
-            MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
         } catch (Exception ex) {
             LogManager.getLogger().error("", ex);
         }

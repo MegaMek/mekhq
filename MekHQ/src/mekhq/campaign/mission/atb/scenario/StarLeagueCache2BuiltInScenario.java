@@ -54,7 +54,7 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(Board.START_N);
+        setStartingPos(Board.START_N);
         int enemyStart = Board.START_S;
 
         for (int weight = EntityWeightClass.WEIGHT_ULTRA_LIGHT; weight <= EntityWeightClass.WEIGHT_COLOSSAL; weight++) {
@@ -79,9 +79,9 @@ public class StarLeagueCache2BuiltInScenario extends StarLeagueCache1BuiltInScen
     public void setObjectives(Campaign campaign, AtBContract contract) {
         getScenarioObjectives().clear();
 
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 100);
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1,100);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                100, false);
+                1, 100, false);
 
         getScenarioObjectives().add(destroyHostiles);
         getScenarioObjectives().add(keepFriendliesAlive);

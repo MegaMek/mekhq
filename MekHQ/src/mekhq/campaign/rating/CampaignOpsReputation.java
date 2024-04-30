@@ -185,6 +185,7 @@ public class CampaignOpsReputation extends AbstractUnitRating {
             case UnitType.DROPSHIP:
             case UnitType.CONV_FIGHTER:
             case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
             case UnitType.VTOL:
             case UnitType.TANK:
                 gunnery = crew.getGunnery();

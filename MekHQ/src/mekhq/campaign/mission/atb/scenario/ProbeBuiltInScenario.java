@@ -64,9 +64,9 @@ public class ProbeBuiltInScenario extends AtBScenario {
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
         int playerHome = startPos[Compute.randomInt(4)];
-        setStart(playerHome);
+        setStartingPos(playerHome);
 
-        int enemyStart = getStart() + 4;
+        int enemyStart = getStartingPos() + 4;
 
         if (enemyStart > 8) {
             enemyStart -= 8;
@@ -75,7 +75,7 @@ public class ProbeBuiltInScenario extends AtBScenario {
         setEnemyHome(enemyStart);
 
         if (!allyEntities.isEmpty()) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
+            addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), EntityWeightClass.WEIGHT_MEDIUM, 0, 0,
@@ -88,9 +88,9 @@ public class ProbeBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 25);
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 25);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                75, false);
+                1, 75, false);
         ScenarioObjective keepAttachedUnitsAlive = CommonObjectiveFactory.getKeepAttachedGroundUnitsAlive(contract,
                 this);
 

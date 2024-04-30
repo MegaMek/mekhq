@@ -420,13 +420,17 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setMapFile(String terrainType) {
-        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
-        StratconBiomeManifest.MapTypeList value = mapTypes.get(terrainType);
-        if (value != null) {
-            List<String> mapTypeList = value.mapTypes;
-            setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+        if (terrainType.equals("Space")) {
+            setMap("Space");
         } else {
-            setMap("Savannah");
+            Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
+            StratconBiomeManifest.MapTypeList value = mapTypes.get(terrainType);
+            if (value != null) {
+                List<String> mapTypeList = value.mapTypes;
+                setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+            } else {
+                setMap("Savannah");
+            }
         }
     }
 
@@ -792,8 +796,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int playerHome;
 
         playerHome = startPos[Compute.randomInt(4)];
-        setStart(playerHome);
-        enemyStart = getStart() + 4;
+        setStartingPos(playerHome);
+        enemyStart = getStartingPos() + 4;
 
         if (enemyStart > 8) {
             enemyStart -= 8;
@@ -802,7 +806,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         enemyHome = enemyStart;
 
         if (!allyEntities.isEmpty()) {
-            addBotForce(getAllyBotForce(getContract(campaign), getStart(), playerHome, allyEntities), campaign);
+            addBotForce(getAllyBotForce(getContract(campaign), getStartingPos(), playerHome, allyEntities), campaign);
         }
 
         addEnemyForce(enemyEntities, getLance(campaign).getWeightClass(campaign), campaign);
@@ -1138,7 +1142,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         int unitsPerPoint;
         switch (unitType) {
             case UnitType.TANK:
-            case UnitType.AERO:
+            case UnitType.AEROSPACEFIGHTER:
                 unitsPerPoint = 2;
                 break;
             case UnitType.PROTOMEK:
@@ -1318,7 +1322,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 int weightClass = randomAeroWeights[Compute.d6() - 1];
 
                 aero = getEntity(contract.getEnemyCode(), contract.getEnemySkill(), contract.getEnemyQuality(),
-                        UnitType.AERO, weightClass, campaign);
+                        UnitType.AEROSPACEFIGHTER, weightClass, campaign);
                 if (aero != null) {
                     aircraft.add(aero);
                 }

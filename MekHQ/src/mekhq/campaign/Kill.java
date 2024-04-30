@@ -41,15 +41,19 @@ public class Kill {
     private LocalDate date;
     private String killed;
     private String killer;
+    private int missionId;
+    private int scenarioId;
 
     public Kill() {
     }
 
-    public Kill(UUID id, String kill, String killer, LocalDate d) {
+    public Kill(UUID id, String kill, String killer, LocalDate d, int missionId, int scenarioId) {
         pilotId = id;
         this.killed = kill;
         this.killer = killer;
         date = d;
+        this.missionId = missionId;
+        this.scenarioId = scenarioId;
     }
 
     public UUID getPilotId() {
@@ -72,6 +76,14 @@ public class Kill {
         return killer;
     }
 
+    public int getMissionId() {
+        return missionId;
+    }
+
+    public int getScenarioId() {
+        return scenarioId;
+    }
+
     public void setDate(LocalDate d) {
         date = d;
     }
@@ -82,6 +94,14 @@ public class Kill {
 
     public void setKilledByWhat(String s) {
         killer = s;
+    }
+
+    public void setMissionId(int id) {
+        missionId = id;
+    }
+
+    public void setScenarioId(int id) {
+        scenarioId = id;
     }
 
     public static Kill generateInstanceFromXML(Node wn, Version version) {
@@ -100,6 +120,10 @@ public class Kill {
                     retVal.killer = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("date")) {
                     retVal.date = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("missionId")) {
+                    retVal.missionId = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("scenarioId")) {
+                    retVal.scenarioId = Integer.parseInt(wn2.getTextContent());
                 }
             }
         } catch (Exception ex) {
@@ -117,11 +141,13 @@ public class Kill {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killed", killed);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "killer", killer);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "missionId", missionId);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioId", scenarioId);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "kill");
     }
 
     @Override
     public Kill clone() {
-        return new Kill(getPilotId(), getWhatKilled(), getKilledByWhat(), getDate());
+        return new Kill(getPilotId(), getWhatKilled(), getKilledByWhat(), getDate(), getMissionId(), getScenarioId());
     }
 }

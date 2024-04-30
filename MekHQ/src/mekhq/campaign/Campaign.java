@@ -30,6 +30,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.BombMounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
@@ -85,6 +86,7 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -231,6 +233,7 @@ public class Campaign implements ITechManager {
     private IUnitRating unitRating;
     private CampaignSummary campaignSummary;
     private final Quartermaster quartermaster;
+    private StoryArc storyArc;
 
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Campaign",
             MekHQ.getMHQOptions().getLocale());
@@ -879,6 +882,7 @@ public class Campaign implements ITechManager {
      * Add a mission to the campaign
      *
      * @param m The mission to be added
+     * @return the id of the mission
      */
     public void addMission(Mission m) {
         int id = lastMissionId + 1;
@@ -1031,6 +1035,10 @@ public class Campaign implements ITechManager {
 
     public Scenario getScenario(int id) {
         return scenarios.get(id);
+    }
+
+    public Collection<Scenario> getScenarios() {
+        return scenarios.values();
     }
 
     public void setLocation(CurrentLocation l) {
@@ -3150,6 +3158,7 @@ public class Campaign implements ITechManager {
             fatigueLevel -= 2;
         }
         fatigueLevel = Math.max(fatigueLevel, 0);
+        addReport("Your fatigue level is: " + fatigueLevel);
     }
 
     private void processNewDayATB() {
@@ -3520,6 +3529,24 @@ public class Campaign implements ITechManager {
             }
         }
         return null;
+    }
+
+    /**
+     * return the probable commander. If we find a flagged commander, return that. Otherwise, return person
+     * with most senior rank. Ties go to the first in the queue.
+     * @return Person object of the commander
+     */
+    public Person getSeniorCommander() {
+        Person commander = null;
+        for (Person p : getActivePersonnel()) {
+            if (p.isCommander()) {
+                return p;
+            }
+            if (null == commander || p.getRankNumeric() > commander.getRankNumeric()) {
+                commander = p;
+            }
+        }
+        return commander;
     }
 
     public void removeUnit(UUID id) {
@@ -4084,6 +4111,31 @@ public class Campaign implements ITechManager {
         campaignOptions = options;
     }
 
+    public StoryArc getStoryArc() {
+        return storyArc;
+    }
+
+    public void useStoryArc(StoryArc arc, boolean initiate) {
+        arc.setCampaign(this);
+        arc.initializeDataDirectories();
+        this.storyArc = arc;
+        if (initiate) {
+            storyArc.begin();
+        }
+    }
+
+    public void unloadStoryArc() {
+        MekHQ.unregisterHandler(storyArc);
+        storyArc = null;
+    }
+
+    public List<String> getCurrentObjectives() {
+        if (null != getStoryArc()) {
+            return getStoryArc().getCurrentObjectives();
+        }
+        return new ArrayList<String>();
+    }
+
     public void writeToXML(final PrintWriter pw) {
         int indent = 0;
 
@@ -4190,6 +4242,11 @@ public class Campaign implements ITechManager {
         parts.writeToXML(pw, indent, "parts"); // Parts
 
         getGameOptions().writeToXML(pw, indent);
+
+        //current story arc
+        if (null != storyArc) {
+            storyArc.writeToXml(pw, indent);
+        }
 
         // Markets
         getPersonnelMarket().writeToXML(pw, indent, this);
@@ -5329,7 +5386,7 @@ public class Campaign implements ITechManager {
 
     public int getAvailableAstechs(final int minutes, final boolean alreadyOvertime) {
         if (minutes == 0) {
-            LogManager.getLogger().error("Tried to getAvailableAstechs with 0 minutes. Returning 0 Astechs.");
+            // If 0 Astechs are assigned to the task, return 0 minutes used
             return 0;
         }
 
@@ -5351,7 +5408,6 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-
         return Math.min(Math.min(availableHelp, MHQConstants.ASTECH_TEAM_SIZE), getNumberAstechs());
     }
 
@@ -5571,7 +5627,7 @@ public class Campaign implements ITechManager {
         }
         IUnitRating rating = getUnitRating();
         return getCampaignOptions().getUnitRatingMethod().isFMMR() ? rating.getUnitRatingAsInteger()
-                : rating.getModifier();
+                : MathUtility.clamp(rating.getModifier(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
     }
 
     /**
@@ -5696,15 +5752,12 @@ public class Campaign implements ITechManager {
 
         if (entity instanceof IBomber) {
             IBomber bomber = (IBomber) entity;
-            List<Mounted> mountedBombs = bomber.getBombs();
+            List<BombMounted> mountedBombs = bomber.getBombs();
             if (!mountedBombs.isEmpty()) {
                 // These should return an int[] filled with 0's
                 int[] intBombChoices = bomber.getIntBombChoices();
                 int[] extBombChoices = bomber.getExtBombChoices();
-                for (Mounted m : mountedBombs) {
-                    if (!(m.getType() instanceof BombType)) {
-                        continue;
-                    }
+                for (BombMounted m : mountedBombs) {
                     if (m.getBaseShotsLeft() == 1) {
                         if (m.isInternalBomb()) {
                             intBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
@@ -6766,6 +6819,19 @@ public class Campaign implements ITechManager {
                     "It has been a year since the last Employee Turnover roll, and it is time to do another.",
                     "Employee Turnover roll required", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+        }
+        return false;
+    }
+
+    public boolean checkScenariosDue() {
+        for(Mission m : getActiveMissions(true)) {
+            for(Scenario s : m.getCurrentScenarios()) {
+                if((s.getDate() != null)
+                        && !(s instanceof AtBScenario)
+                        && !getLocalDate().isBefore(s.getDate())) {
+                    return true;
+                }
+            }
         }
         return false;
     }

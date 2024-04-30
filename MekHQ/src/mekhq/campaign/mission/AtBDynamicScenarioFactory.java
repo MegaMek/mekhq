@@ -146,7 +146,7 @@ public class AtBDynamicScenarioFactory {
             if (template.mapParameters.getMapLocation() == MapLocation.LowAtmosphere) {
                 defaultReinforcements.setAllowedUnitType(ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX);
             } else if (template.mapParameters.getMapLocation() == MapLocation.Space) {
-                defaultReinforcements.setAllowedUnitType(UnitType.AERO);
+                defaultReinforcements.setAllowedUnitType(UnitType.AEROSPACEFIGHTER);
             }
 
 
@@ -362,7 +362,7 @@ public class AtBDynamicScenarioFactory {
         boolean isPlanetOwner = isPlanetOwner(contract, currentDate, factionCode);
         boolean usingAerospace = forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                 forceTemplate.getAllowedUnitType() == UnitType.CONV_FIGHTER ||
-                forceTemplate.getAllowedUnitType() == UnitType.AERO;
+                forceTemplate.getAllowedUnitType() == UnitType.AEROSPACEFIGHTER;
 
         // here we determine the "lance size". Aircraft almost always come in pairs, mechs and tanks, not so much.
         int lanceSize = usingAerospace ? getAeroLanceSize(forceTemplate.getAllowedUnitType(), isPlanetOwner, factionCode) :
@@ -404,9 +404,9 @@ public class AtBDynamicScenarioFactory {
             int actualUnitType = forceTemplate.getAllowedUnitType();
             if (isPlanetOwner && actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX &&
                     scenario.getTemplate().mapParameters.getMapLocation() != MapLocation.Space) {
-                actualUnitType = Compute.d6() > 3 ? UnitType.AERO : UnitType.CONV_FIGHTER;
+                actualUnitType = Compute.d6() > 3 ? UnitType.AEROSPACEFIGHTER : UnitType.CONV_FIGHTER;
             } else if (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-                actualUnitType = UnitType.AERO;
+                actualUnitType = UnitType.AEROSPACEFIGHTER;
             }
 
             // some special cases that don't fit into the regular RAT generation mechanism
@@ -860,7 +860,11 @@ public class AtBDynamicScenarioFactory {
      * the given threshold, replace the scenario's generated map with a fixed map from data/boards
      */
     private static void setScenarioMap(AtBDynamicScenario scenario, int mapChance) {
-        if ((scenario.getMapSizeX() > 0) && (scenario.getMapSizeY() > 0) && (Compute.randomInt(100) <= mapChance)) {
+        if (scenario.getBoardType() != Scenario.T_SPACE
+                && scenario.getTerrainType().equals("Space")
+                && (scenario.getMapSizeX() > 0)
+                && (scenario.getMapSizeY() > 0)
+                && (Compute.randomInt(100) <= mapChance)) {
             BoardClassifier bc = BoardClassifier.getInstance();
             List<String> maps = bc.getMatchingBoards(scenario.getMapSizeX(), scenario.getMapSizeY(), 5, 5, new ArrayList<>());
 
@@ -1362,7 +1366,7 @@ public class AtBDynamicScenarioFactory {
                 case UnitType.BATTLE_ARMOR:
                     phenotype = Phenotype.ELEMENTAL;
                     break;
-                case UnitType.AERO:
+                case UnitType.AEROSPACEFIGHTER:
                 case UnitType.CONV_FIGHTER:
                     phenotype = Phenotype.AEROSPACE;
                     break;
@@ -1849,7 +1853,7 @@ public class AtBDynamicScenarioFactory {
 
         for (int botIndex = 0; botIndex < scenario.getNumBots(); botIndex++) {
             BotForce botForce = scenario.getBotForce(botIndex);
-            botForce.setStart(scenario.getBotForceTemplates().get(botForce).getActualDeploymentZone());
+            botForce.setStartingPos(scenario.getBotForceTemplates().get(botForce).getActualDeploymentZone());
         }
     }
 
@@ -1924,7 +1928,7 @@ public class AtBDynamicScenarioFactory {
             // compute a random cardinal edge between 0 and 3 to avoid None
             actualDestinationEdge = Compute.randomInt(CardinalEdge.values().length - 1);
         } else if (forceTemplate.getDestinationZone() == ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT) {
-            actualDestinationEdge = getOppositeEdge(force.getStart());
+            actualDestinationEdge = getOppositeEdge(force.getStartingPos());
         } else {
             force.getBehaviorSettings().setDestinationEdge(CardinalEdge.getCardinalEdge(actualDestinationEdge));
             return;
@@ -2315,23 +2319,35 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Worker function to determine the "lance size" of a group of aircraft.
-     * Either 2 for ASF
+     * Either 2 for ASF, 3 for CC ASF,
+     * @param unitTypeCode
      * @param isPlanetOwner
+     * @param factionCode
      * @return
      */
     public static int getAeroLanceSize(int unitTypeCode, boolean isPlanetOwner, String factionCode) {
         // capellans use units of three aircraft at a time, others use two
         // TODO: except maybe clans?
         int numFightersPerFlight = factionCode.equals("CC") ? 3 : 2;
+        int weightCountRoll = (Compute.randomInt(3) + 1) * numFightersPerFlight;
+        int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
+        return getAeroLanceSize(unitTypeCode, numFightersPerFlight, weightCountRoll, useASFRoll);
+    }
 
-        if (unitTypeCode == UnitType.AERO) {
+    /**
+     * Unwrapped inner logic of above function to be deterministic, for testing purposes.
+     * @param unitTypeCode
+     * @param numFightersPerFlight
+     * @param weightCountRoll
+     * @param useASFRoll
+     * @return
+     */
+    public static int getAeroLanceSize(int unitTypeCode, int numFightersPerFlight, int weightCountRoll, int useASFRoll) {
+        if (unitTypeCode == UnitType.AEROSPACEFIGHTER) {
             return numFightersPerFlight;
         } else if (unitTypeCode == UnitType.CONV_FIGHTER) {
-            return (Compute.randomInt(3) + 1) * numFightersPerFlight;
+            return weightCountRoll;
         } else {
-            int useASFRoll = isPlanetOwner ? Compute.d6() : 6;
-            int weightCountRoll = (Compute.randomInt(3) + 1) * numFightersPerFlight; // # of conventional fighters, just in case
-
             // if we are the planet owner, we may use ASF or conventional fighters
             boolean useASF = useASFRoll >= 4;
             // if we are using ASF, we "always" use 2 at a time, otherwise, use the # of conventional fighters

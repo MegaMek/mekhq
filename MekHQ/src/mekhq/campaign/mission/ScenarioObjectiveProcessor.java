@@ -281,9 +281,9 @@ public class ScenarioObjectiveProcessor {
         }
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
-            // some objectives aren't associated with units and their completion is set manually
-            // in that case, we continue on
-            if (!objectiveUnitCounts.containsKey(objective)) {
+
+            // if the scenario is not in our objectiveUnitCounts or objectiveOverrides, skip it
+            if (!(objectiveUnitCounts.containsKey(objective) || objectiveOverrides.containsKey(objective))) {
                 continue;
             }
 

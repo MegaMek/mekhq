@@ -70,8 +70,8 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
     @Override
     public void setExtraScenarioForces(Campaign campaign, ArrayList<Entity> allyEntities,
                                        ArrayList<Entity> enemyEntities) {
-        setStart(startPos[Compute.randomInt(4)]);
-        int enemyStart = getStart() + 4;
+        setStartingPos(startPos[Compute.randomInt(4)]);
+        int enemyStart = getStartingPos() + 4;
 
         if (enemyStart > 8) {
             enemyStart -= 8;
@@ -95,18 +95,18 @@ public class CivilianHelpBuiltInScenario extends AtBScenario {
             getSurvivalBonusIds().add(UUID.fromString(e.getExternalIdAsString()));
         }
 
-        addBotForce(new BotForce(CIVILIAN_FORCE_ID, 1, getStart(), otherForce), campaign);
+        addBotForce(new BotForce(CIVILIAN_FORCE_ID, 1, getStartingPos(), otherForce), campaign);
     }
 
     @Override
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 66);
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 66);
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                1, true);
+                1, 1, true);
         ScenarioObjective keepCiviliansAlive = CommonObjectiveFactory.getPreserveSpecificFriendlies(CIVILIAN_FORCE_ID,
-                1, true);
+                1, 1, true);
 
         // not losing the scenario also gets you a "bonus"
         ObjectiveEffect bonusEffect = new ObjectiveEffect();

@@ -88,12 +88,12 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         // the attacker starts on an edge, the defender starts in the center and
         // flees to the opposite edge of the attacker
         if (isAttacker()) {
-            setStart(attackerStart);
+            setStartingPos(attackerStart);
 
             setEnemyHome(defenderHome);
             enemyStart = defenderStart;
         } else {
-            setStart(defenderStart);
+            setStartingPos(defenderStart);
 
             setEnemyHome(attackerStart);
             enemyStart = attackerStart;
@@ -117,7 +117,7 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
         // the ally is the "second force" and will flee either in the same
         // direction as the player (in case of the player being the defender)
         // or where it came from (in case of the player being the attacker
-        addBotForce(getAllyBotForce(getContract(campaign), isAttacker() ? secondAttackerForceStart : getStart(),
+        addBotForce(getAllyBotForce(getContract(campaign), isAttacker() ? secondAttackerForceStart : getStartingPos(),
                 isAttacker() ? secondAttackerForceStart : defenderHome, allyEntities), campaign);
 
         // "base" force gets 8 civilian units and six turrets
@@ -162,14 +162,14 @@ public class BaseAttackBuiltInScenario extends AtBScenario {
     public void setObjectives(Campaign campaign, AtBContract contract) {
         super.setObjectives(campaign, contract);
 
-        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 50);
+        ScenarioObjective destroyHostiles = CommonObjectiveFactory.getDestroyEnemies(contract, 1, 50);
         destroyHostiles.addForce(String.format("%s%s", contract.getEnemyBotName(), SECOND_ENEMY_FORCE_SUFFIX));
         ScenarioObjective keepFriendliesAlive = CommonObjectiveFactory.getKeepFriendliesAlive(campaign, contract, this,
-                50, false);
+                1, 50, false);
 
         ScenarioObjective preserveBaseUnits = null;
         if (!isAttacker()) {
-            preserveBaseUnits = CommonObjectiveFactory.getPreserveSpecificFriendlies(BASE_CIVILIAN_FORCE_ID, 3, true);
+            preserveBaseUnits = CommonObjectiveFactory.getPreserveSpecificFriendlies(BASE_CIVILIAN_FORCE_ID, 1, 3, true);
             preserveBaseUnits.addForce(BASE_TURRET_FORCE_ID);
 
             ObjectiveEffect defeatEffect = new ObjectiveEffect();

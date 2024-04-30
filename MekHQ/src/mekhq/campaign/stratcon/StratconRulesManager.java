@@ -213,7 +213,7 @@ public class StratconRulesManager {
         } else {
             terrainType = track.getTerrainTile(coords);
         }
-        
+
         var mapTypes = biomeManifest.getBiomeMapTypes();
 
         // don't have a map list for the given terrain, leave it alone
@@ -697,7 +697,7 @@ public class StratconRulesManager {
                 case UnitType.VTOL:
                     retVal.get(MapLocation.AllGroundTerrain).add(forceID);
                     break;
-                case UnitType.AERO:
+                case UnitType.AEROSPACEFIGHTER:
                     retVal.get(MapLocation.Space).add(forceID);
                     // intentional fallthrough here, ASFs can go to atmospheric maps too
                 case UnitType.CONV_FIGHTER:
@@ -980,7 +980,7 @@ public class StratconRulesManager {
     private static boolean unitTypeIsAirborne(ScenarioForceTemplate template) {
         int unitType = template.getAllowedUnitType();
 
-        return ((unitType == UnitType.AERO) ||
+        return ((unitType == UnitType.AEROSPACEFIGHTER) ||
                 (unitType == UnitType.CONV_FIGHTER) ||
                 (unitType == UnitType.DROPSHIP) ||
                 (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) &&
@@ -1002,10 +1002,10 @@ public class StratconRulesManager {
                     || (primaryUnitType == UnitType.BATTLE_ARMOR)
                     || (primaryUnitType == UnitType.PROTOMEK)
                     || (primaryUnitType == UnitType.VTOL)
-                    || (primaryUnitType == UnitType.AERO) && reinforcements
+                    || (primaryUnitType == UnitType.AEROSPACEFIGHTER) && reinforcements
                     || (primaryUnitType == UnitType.CONV_FIGHTER) && reinforcements;
         } else if (unitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-            return (primaryUnitType == UnitType.AERO) || (primaryUnitType == UnitType.CONV_FIGHTER);
+            return (primaryUnitType == UnitType.AEROSPACEFIGHTER) || (primaryUnitType == UnitType.CONV_FIGHTER);
         } else {
             return primaryUnitType == unitType;
         }
@@ -1356,8 +1356,11 @@ public class StratconRulesManager {
             case HIGH:
                 moraleModifier = 5;
                 break;
-            case INVINCIBLE:
+            case VERY_HIGH:
                 moraleModifier = 10;
+                break;
+            case INVINCIBLE:
+                moraleModifier = 15;
                 break;
             default:
                 break;

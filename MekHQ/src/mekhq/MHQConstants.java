@@ -161,12 +161,16 @@ public final class MHQConstants extends SuiteConstants {
     //region Nag Tab
     public static final String NAG_NODE = "mekhq/prefs/nags";
     public static final String NAG_UNMAINTAINED_UNITS = "nagUnmaintainedUnits";
+    public static final String NAG_PREGNANT_COMBATANT = "nagPregnantCombatant";
+    public static final String NAG_PRISONERS = "nagPrisoners";
+    public static final String NAG_UNTREATED_PERSONNEL = "nagUntreatedPersonnel";
     public static final String NAG_INSUFFICIENT_ASTECHS = "nagInsufficientAstechs";
     public static final String NAG_INSUFFICIENT_ASTECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";
     public static final String NAG_SHORT_DEPLOYMENT = "nagShortDeployment";
     public static final String NAG_UNRESOLVED_STRATCON_CONTACTS = "nagUnresolvedStratConContacts";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
+    public static final String NAG_CARGO_CAPACITY = "nagCargoCapacity";
     //endregion Nag Tab
 
     //region Miscellaneous Options
@@ -262,5 +266,13 @@ public final class MHQConstants extends SuiteConstants {
     public static final String SCENARIO_MODIFIER_ALLIED_AIR_SUPPORT = "AlliedAirSupportImmediate.xml";
     public static final String SCENARIO_MODIFIER_ALLIED_ARTY_SUPPORT = "AlliedArtillerySupportImmediate.xml";
     //endregion StratCon
+
+    //region StoryArcs
+    public static final String STORY_ARC_DIRECTORY = "data/storyarcs/";
+    public static final String USER_STORY_ARC_DIRECTORY = "userdata/storyarcs/";
+    public static final String STORY_ARC_FILE = "storyArc.xml";
+    public static final String STORY_ARC_CAMPAIGN_FILE = "initCampaign.cpnx.gz";
+    //endregion StoryArcs
+
     //endregion File Paths
 }

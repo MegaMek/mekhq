@@ -123,7 +123,6 @@ public class CampaignSummary {
                     veeCount++;
                     break;
                 case UnitType.AEROSPACEFIGHTER:
-                case UnitType.AERO:
                 case UnitType.CONV_FIGHTER:
                     aeroCount++;
                     break;
@@ -250,6 +249,14 @@ public class CampaignSummary {
      */
     public String getCargoCapacityReport() {
         return (int) Math.round(cargoTons) + " tons (" + (int) Math.round(cargoCapacity) + " tons capacity)";
+    }
+
+    public int getCargoTons() {
+        return (int) Math.round(cargoTons);
+    }
+
+    public int getCargoCapacity() {
+        return (int) Math.round(cargoCapacity);
     }
 
     /**

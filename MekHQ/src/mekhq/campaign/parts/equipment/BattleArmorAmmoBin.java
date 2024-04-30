@@ -22,6 +22,7 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoMounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.PartInventory;
@@ -119,7 +120,7 @@ public class BattleArmorAmmoBin extends AmmoBin {
 
     @Override
     public void loadBin() {
-        Mounted mounted = getMounted();
+        AmmoMounted mounted = (AmmoMounted) getMounted();
         if (mounted != null) {
             // Calculate the actual shots needed
             int shotsPerTrooper = shotsNeeded / getNumTroopers();

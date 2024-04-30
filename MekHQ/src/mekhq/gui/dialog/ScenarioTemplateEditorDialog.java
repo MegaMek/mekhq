@@ -437,17 +437,17 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         gbc.gridy++;
         gbc.gridx = 1;
         forcedPanel.add(cboSyncForceName, gbc);
-        
+
         JLabel lblFixedMul = new JLabel("Fixed MUL:");
         gbc.gridx = 0;
         gbc.gridy++;
-        forcedPanel.add(lblFixedMul, gbc);        
-        
+        forcedPanel.add(lblFixedMul, gbc);
+
         lstMuls = new JList<>();
         DefaultListModel<String> mulModel = new DefaultListModel<>();
         JScrollPane scrMulList = new JScrollPane(lstMuls);
         File mulDir = new File(MHQConstants.STRATCON_MUL_FILES_DIRECTORY);
-        
+
         if (mulDir.exists() && mulDir.isDirectory()) {
             for (String mul : mulDir.list((d, s) -> {
                         return s.toLowerCase().endsWith(".mul");
@@ -455,8 +455,8 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
                 mulModel.addElement(mul);
             }
         }
-        
-        lstMuls.setModel(mulModel);    
+
+        lstMuls.setModel(mulModel);
         lstMuls.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         gbc.gridx = 1;
         forcedPanel.add(scrMulList, gbc);
@@ -1149,7 +1149,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         sft.setDeployOffboard(chkOffBoard.isSelected());
 
         sft.setSyncDeploymentType(SynchronizedDeploymentType.values()[cboSyncDeploymentType.getSelectedIndex()]);
-        
+
         sft.setFixedMul(lstMuls.getSelectedValue());
 
         // if we have picked "None" for synchronization, then set explicit deployment zones.
@@ -1332,7 +1332,7 @@ public class ScenarioTemplateEditorDialog extends JDialog implements ActionListe
         int selectedItem = cboUnitType.getSelectedIndex() - ScenarioForceTemplate.SPECIAL_UNIT_TYPES.size();
         boolean isAero = selectedItem == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX ||
                         selectedItem == UnitType.CONV_FIGHTER ||
-                        selectedItem == UnitType.AERO;
+                        selectedItem == UnitType.AEROSPACEFIGHTER;
 
         chkAllowAeroBombs.setEnabled(isAero);
     }
