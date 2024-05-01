@@ -1,6 +1,7 @@
 package mekhq.campaign.personnel.education;
 
 import megamek.common.Compute;
+import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -8,29 +9,28 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.RandomFactionGenerator;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
 import java.util.*;
 
 /**
- * Controls the education module for a person in a campaign.
+ * The EducationController class is responsible for managing the education process.
+ * It provides methods to begin the education process, calculate education level, and enroll a person into an academy.
  */
 public class EducationController {
     /**
-     * Begins the education process for a person.
+     * Begins the education process, including finance checks.
      *
-     * @param campaign the campaign in which the education is taking place
-     * @param person the person receiving the education
-     * @param academyName the name of the academy to enroll in
-     * @param courseIndex the index of the curriculum to enroll in
+     * @param campaign    The campaign object in which the education process will occur.
+     * @param person      The person who will be enrolled in the education process.
+     * @param academyName The name of the academy where the person will be enrolled.
+     * @param courseIndex The index of the course in the academy where the person will be enrolled.
+     * @param campus      The campus where the person will be enrolled. Can be null if the academy is local.
+     * @param faction     The faction of the campus.
      */
-    public static void beginEducation(Campaign campaign, Person person, String academyName, int courseIndex) {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
-                MekHQ.getMHQOptions().getLocale());
+    public static void beginEducation(Campaign campaign, Person person, String academyName, int courseIndex, @Nullable String campus, String faction) {
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
         Academy academy = getAcademy(person);
 
@@ -43,22 +43,22 @@ public class EducationController {
 
         // check there is enough money in the campaign & if so, make a debit
         if (getBalance(campaign) < tuition) {
-            campaign.addReport(resources.getString("insufficientFunds.text").replaceAll("0",
-                    person.getHyperlinkedFullTitle()));
+            campaign.addReport(resources.getString("insufficientFunds.text").replaceAll("0", person.getHyperlinkedFullTitle()));
             return;
         } else {
-            campaign.getFinances().debit(TransactionType.EDUCATION, campaign.getLocalDate(), Money.of(tuition),
-                    resources.getString("payment.text").replaceAll("0", person.getFullName()));
+            campaign.getFinances().debit(TransactionType.EDUCATION, campaign.getLocalDate(), Money.of(tuition), resources.getString("payment.text").replaceAll("0", person.getFullName()));
         }
 
-        // with the checks done, we can enroll Person
+        // with the checks done, and tuition paid, we can enroll Person
         person.setEduCourseIndex(courseIndex);
-        enrollPerson(campaign, person, academy);
 
-        campaign.addReport(resources.getString("offToSchool.text")
-                .replaceAll("0", person.getFullName())
-                .replaceAll("1", person.getEduAcademyName())
-                .replaceAll("2", String.valueOf(person.getEduDaysOfTravelToAcademy())));
+        if (academy.isLocal()) {
+            enrollPerson(campaign, person, academy, null, faction);
+        } else {
+            enrollPerson(campaign, person, academy, campus, faction);
+        }
+
+        campaign.addReport(resources.getString("offToSchool.text").replaceAll("0", person.getFullName()).replaceAll("1", person.getEduAcademyName()).replaceAll("2", String.valueOf(person.getEduDaysOfTravelToAcademy())));
     }
 
     /**
@@ -81,7 +81,7 @@ public class EducationController {
      * Calculates the education level of a person based on their highest prior education level and
      * the range of education levels offered by an academy.
      *
-     * @param person The person whose education level needs to be determined.
+     * @param person  The person whose education level needs to be determined.
      * @param academy The academy that provides the education.
      * @return The education level of the person.
      * It is calculated as the difference between the person's highest prior education level and the minimum education level offered by the
@@ -103,48 +103,47 @@ public class EducationController {
     /**
      * Enrolls a person into an academy and assigns them to a campus.
      * Sets the person's various education-related properties.
-     * If the academy is local, it generates a name for the academy.
      *
-     * @param campaign The campaign the person is from.
-     * @param person The person to be enrolled.
-     * @param academy The academy to which the person is being enrolled.
+     * @param campaign The campaign the person is being enrolled in.
+     * @param person   The person being enrolled.
+     * @param academy  The academy the person is being enrolled into.
+     * @param campus   The campus where the person will be assigned.
+     *                 This parameter can be null if the academy is local.
+     * @param faction  The faction of the academy the person is being enrolled into.
      */
-    public static void enrollPerson(Campaign campaign, Person person, Academy academy) {
+    public static void enrollPerson(Campaign campaign, Person person, Academy academy, @Nullable String campus, String faction) {
+        // if 'campus' is null and the academy isn't local, we need to abort
+        if ((campus == null) && (!academy.isLocal())) {
+            LogManager.getLogger().error("Non-Local Academy {} with null campus", academy.getName());
+            return;
+        }
+
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
 
         person.setEduAcademySet(academy.getSet());
         person.setEduAcademyNameInSet(academy.getName());
         person.setEduDaysOfEducation(academy.getDurationDays());
+        person.setEduAcademyFaction(faction);
 
-        // the following two blocks of code need to be processed in this order so that generateName()
-        // can make useful names
-        int travelTime = 2;
-        PlanetarySystem campus = campaign.getCurrentSystem();
-
-        if (!academy.isLocal()) {
-            for (String system : academy.getLocationSystems()) {
-                int travelTimeNew = Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(system));
-
-                if (travelTimeNew > travelTime) {
-                    travelTime = travelTimeNew;
-                    campus = campaign.getSystemByName(system);
-                }
-            }
+        if (academy.isLocal()) {
+            person.setEduDaysOfTravelToAcademy(2);
+            person.setEduAcademySystem(campaign.getCurrentSystem().getName(campaign.getLocalDate()));
+        } else {
+            person.setEduDaysOfTravelToAcademy(Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(campus)));
+            person.setEduAcademySystem(campaign.getSystemByName(campus).getName(campaign.getLocalDate()));
         }
 
-        person.setEduDaysOfTravelToAcademy(travelTime);
         person.setEduAcademyNameInSet(academy.getName());
-        person.setEduAcademySystem(campus.getName(campaign.getLocalDate()));
 
         // if the academy is local, we need to generate a name, otherwise we use the listed name
         if (academy.isLocal()) {
-            person.setEduAcademyName(generateName(academy.isMilitary(), campus.getName(campaign.getLocalDate())));
+            person.setEduAcademyName(generateName(academy.isMilitary(), campaign.getCurrentSystem().getName(campaign.getLocalDate())));
         } else {
-            person.setEduAcademyName(person.getEduAcademyNameInSet());
+            person.setEduAcademyName(person.getEduAcademyNameInSet() + " (" + campus + ')');
         }
 
         // we have this all the way at the bottom as a bit of insurance.
-        // if the log isn't getting entered, we know something went wrong when troubleshooting.
+        // when troubleshooting, if the log isn't getting entered, we know something went wrong when enrolling.
         ServiceLogger.eduEnrolled(person, campaign.getLocalDate(), person.getEduAcademyName());
     }
 
@@ -157,8 +156,7 @@ public class EducationController {
      * @throws IllegalStateException if there is an unexpected roll value
      */
     public static String generateName(Boolean isMilitary, String campus) {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
-                MekHQ.getMHQOptions().getLocale());
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
         String type;
         int roll = Compute.d6(1);
@@ -267,8 +265,7 @@ public class EducationController {
      * @param campaign the campaign object containing the students
      */
     public static void processNewDay(Campaign campaign) {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
-                MekHQ.getMHQOptions().getLocale());
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
         for (Person person : campaign.getStudents()) {
             Academy academy = getAcademy(person);
@@ -300,8 +297,8 @@ public class EducationController {
     /**
      * Processes a person's journey to campus.
      *
-     * @param campaign The campaign the person is part of.
-     * @param person The person for whom the journey is being processed.
+     * @param campaign  The campaign the person is part of.
+     * @param person    The person for whom the journey is being processed.
      * @param resources The resource bundle containing localized strings.
      * @return True if the person's journey to campus was processed, false otherwise.
      */
@@ -324,9 +321,9 @@ public class EducationController {
     /**
      * Processes a person's ongoing education.
      *
-     * @param campaign The campaign the person is part of.
-     * @param person The person for whom the days of education are being processed.
-     * @param academy the academy the person is attending.
+     * @param campaign  The campaign the person is part of.
+     * @param person    The person for whom the days of education are being processed.
+     * @param academy   the academy the person is attending.
      * @param resources The resource bundle containing localized strings.
      * @return The remaining days of education for the person.
      */
@@ -338,7 +335,7 @@ public class EducationController {
                 person.setEduDaysOfEducation(daysOfEducation - 1);
 
                 if ((daysOfEducation - 1) == 0) {
-                    graduatePerson(campaign, person, academy, resources);
+                    graduateAdult(campaign, person, academy, resources);
                 }
 
                 if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
@@ -349,9 +346,9 @@ public class EducationController {
         } else {
             if (person.getAge(campaign.getLocalDate()) > academy.getAgeMax()) {
                 if (academy.isClan()) {
-                    graduatePersonClan(campaign, person, academy, resources);
+                    graduateClan(campaign, person, academy, resources);
                 } else {
-                    graduatePersonChild(campaign, person, academy, resources);
+                    graduateChild(campaign, person, academy, resources);
                 }
                 person.setEduDaysOfEducation(0);
             }
@@ -368,12 +365,12 @@ public class EducationController {
     /**
      * This method begins the journey home for a person after their education.
      *
-     * @param campaign The campaign the person is part of.
-     * @param person The person for whom the journey is being processed.
-     * @param daysOfEducation  the number education days the person has remaining
-     * @param resources        the resource bundle for localization
+     * @param campaign        The campaign the person is part of.
+     * @param person          The person for whom the journey is being processed.
+     * @param daysOfEducation the number education days the person has remaining
+     * @param resources       the resource bundle for localization
      * @return the number of travel days from the academy, or null if the person has no education days and no
-     *                         previous travel days
+     * previous travel days
      */
     private static Integer beginJourneyHome(Campaign campaign, Person person, Integer daysOfEducation, ResourceBundle resources) {
         int daysOfTravelFrom = person.getEduDaysOfTravelFromAcademy();
@@ -400,11 +397,11 @@ public class EducationController {
     /**
      * Processes the journey home for a person.
      *
-     * @param campaign the campaign the person is in
-     * @param person the person whose journey home is being processed
-     * @param daysOfEducation the number education days remaining
+     * @param campaign         the campaign the person is in
+     * @param person           the person whose journey home is being processed
+     * @param daysOfEducation  the number education days remaining
      * @param daysOfTravelFrom the number of days it takes for the person to travel from the campaign location to the unit
-     * @param resources the ResourceBundle containing localized text resources
+     * @param resources        the ResourceBundle containing localized text resources
      */
     private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfEducation, Integer daysOfTravelFrom, ResourceBundle resources) {
         if ((daysOfEducation < 1) && (daysOfTravelFrom > 0)) {
@@ -429,92 +426,379 @@ public class EducationController {
      *
      * @param person the person whose academy is being retrieved
      * @return the academy where the person is enrolled,
-     *         or null if the person is not enrolled in any academy
+     * or null if the person is not enrolled in any academy
      */
     private static Academy getAcademy(Person person) {
         List<String> setNames = AcademyFactory.getInstance().getAllSetNames();
 
-        return setNames.stream()
-                .filter(setName -> setName.equalsIgnoreCase(person.getEduAcademySet()))
-                .map(setName -> AcademyFactory.getInstance()
-                        .getAllAcademiesForSet(setName))
-                .flatMap(Collection::stream)
-                .filter(academy -> String.valueOf(academy.getName())
-                        .equals(person.getEduAcademyNameInSet()))
-                .findFirst()
-                .orElse(null);
+        return setNames.stream().filter(setName -> setName.equalsIgnoreCase(person.getEduAcademySet())).map(setName -> AcademyFactory.getInstance().getAllAcademiesForSet(setName)).flatMap(Collection::stream).filter(academy -> String.valueOf(academy.getName()).equals(person.getEduAcademyNameInSet())).findFirst().orElse(null);
     }
 
     /**
      * Processes the new week checks for a specific person in a campaign.
      *
-     * @param campaign       The campaign in which the person is participating.
-     * @param academy        The academy where the person is receiving education.
-     * @param person         The person whose new week checks need to be processed.
+     * @param campaign        The campaign in which the person is participating.
+     * @param academy         The academy where the person is receiving education.
+     * @param person          The person whose new week checks need to be processed.
      * @param daysOfEducation The number of days the person has received education.
-     * @param resources      The resource bundle used for obtaining localized strings.
+     * @param resources       The resource bundle used for obtaining localized strings.
      */
     private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person, int daysOfEducation, ResourceBundle resources) {
-        if (Compute.d6(2) >= academy.getFacultySkill()) {
-            person.awardXP(campaign, 1);
-        }
-
-        // time to check whether the academy is still standing
-        if (campaign.getLocalDate().getYear() >= academy.getDestructionYear()) {
-            if (Compute.d6(2) >= 5) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
-                person.setEduDaysOfEducation(0);
-            } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestructionKilled.text"));
-                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.HOMICIDE);
+        if (campaign.getCampaignOptions().isEnableRandomXp()) {
+            if (Compute.d6(2) >= academy.getFacultySkill()) {
+                person.awardXP(campaign, campaign.getCampaignOptions().getRandomXpRate());
             }
         }
 
-        // is the academy faction at war with person faction?
-        List<String> factions = campaign.getSystemByName(person.getEduAcademySystem()).getFactions(campaign.getLocalDate());
+        if (daysOfEducation > 0) {
+            // time to check whether the academy is still standing.
+            if (checkForAcademyDestruction(campaign, academy, person, resources)) {
+                return;
+            }
 
-        for (String faction : factions) {
-            if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(), Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
-                if (Compute.d6(2) >= 5) {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWar.text"));
-                    person.setEduDaysOfEducation(person.getEduDaysOfEducation() + Compute.d6(1));
+            // is the academy still open?
+            if (checkForAcademyClosure(campaign, academy, person, resources)) {
+                return;
+            }
+
+            // is the academy faction at war with person faction, or the campaign faction?
+            if (checkForAcademyFactionConflict(campaign, academy, person, resources)) {
+                return;
+            }
+
+            // does person want to drop out?
+            if (checkForDropout(campaign, academy, person, daysOfEducation, resources)) {
+                return;
+            }
+
+            // was there a training accident?
+            if (checkForTrainingAccidents(campaign, academy, person, resources)) {
+                return;
+            }
+        }
+    }
+
+    /**
+     * Checks for training accidents for a person in a campaign.
+     *
+     * @param campaign   the campaign the person is part of
+     * @param academy    the academy the person belongs to
+     * @param person     the person to check for training accidents
+     * @param resources  the resource bundle for getting localized strings
+     * @return true if a training accident occurs, otherwise false
+     */
+    private static boolean checkForTrainingAccidents(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
+        if ((academy.isClan()) || (academy.isMilitary())) {
+            int roll;
+            int diceSize;
+
+            int warriorDiceSize = campaign.getCampaignOptions().getWarriorCasteAccidents();
+            int otherCasteDiceSize = campaign.getCampaignOptions().getOtherCasteAccidents();
+            int militaryDiceSize = campaign.getCampaignOptions().getMilitaryAcademyAccidents();
+
+            if (academy.isClan()) {
+                if (person.getEduCourseIndex() <= 6) {
+                    if (warriorDiceSize > 1) {
+                        roll = Compute.randomInt(warriorDiceSize);
+                    } else {
+                        // this is to avoid throwing an exception if dice size is 0
+                        roll = -1;
+                    }
+
+                    diceSize = warriorDiceSize;
                 } else {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWarExpelled.text"));
-                    person.setEduDaysOfEducation(0);
+                    if (otherCasteDiceSize > 1) {
+                        roll = Compute.randomInt(otherCasteDiceSize);
+                    } else {
+                        roll = -1;
+                    }
+
+                    diceSize = otherCasteDiceSize;
+                }
+            } else {
+                if (militaryDiceSize > 1) {
+                    roll = Compute.randomInt(militaryDiceSize);
+                } else {
+                    roll = -1;
+                }
+
+                diceSize = militaryDiceSize;
+            }
+
+            if (diceSize > 0) {
+                if (roll == 0) {
+                    if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
+                        if (Compute.d6(2) >= 5) {
+                            roll = Compute.d6(3);
+                            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventTrainingAccident.text")
+                                    .replaceAll("0", String.valueOf(roll)));
+                            person.setEduDaysOfEducation(person.getEduDaysOfEducation() + roll);
+                        } else {
+                            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventTrainingAccidentKilled.text"));
+                            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
+                        }
+                    } else {
+                        roll = Compute.d6(3);
+                        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventTrainingAccident.text")
+                                .replaceAll("0", String.valueOf(roll)));
+                        person.setEduDaysOfEducation(person.getEduDaysOfEducation() + roll);
+                    }
+
+                    return true;
                 }
             }
         }
+        return false;
+    }
 
-        // does person want to drop out?
+    /**
+     * Checks if a person should drop out of an education campaign based on their characteristics and chance factors.
+     *
+     * @param campaign The campaign the person is enrolled in.
+     * @param academy The academy the person is attending.
+     * @param person The person being evaluated.
+     * @param daysOfEducation The number of days the person has been in education.
+     * @param resources The resource bundle containing localization strings.
+     * @return true if the person should drop out, false otherwise.
+     */
+    private static boolean checkForDropout(Campaign campaign, Academy academy, Person person, int daysOfEducation, ResourceBundle resources) {
         int roll;
+        int diceSize;
 
-        // TODO make these a campaign option
-        int academyDiceSize = 1000;
-        int prepSchoolDiceSize = 10000;
+        int adultDiceSize = campaign.getCampaignOptions().getAdultDropoutChance();
+        int childDiceSize = campaign.getCampaignOptions().getChildrenDropoutChance();
+        int clanDiceSize = campaign.getCampaignOptions().getWarriorCasteDropOutChance();
 
-        if (academy.isPrepSchool()) {
-            roll = Compute.randomInt(prepSchoolDiceSize);
-        } else {
-            roll = Compute.randomInt(academyDiceSize);
-        }
-        // we add this limiter to avoid a bad play experience when someone drops out in the final stretch
-        if (roll == 0) {
-            if (daysOfEducation >= 10) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
-
-                ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName());
-
-                person.setEduDaysOfEducation(0);
+        if (academy.isClan()) {
+            if (clanDiceSize > 1) {
+                roll = Compute.randomInt(clanDiceSize);
             } else {
+                // this is to avoid an exception for dice sizes of 0
+                roll = -1;
+            }
+
+            diceSize = clanDiceSize;
+        } else if (person.isChild(campaign.getLocalDate())) {
+            if (childDiceSize > 1) {
+                roll = Compute.randomInt(childDiceSize);
+            } else {
+                roll = -1;
+            }
+
+            diceSize = childDiceSize;
+        } else {
+            if (adultDiceSize > 1) {
+                roll = Compute.randomInt(adultDiceSize);
+            } else {
+                roll = -1;
+            }
+
+            diceSize = adultDiceSize;
+        }
+
+        // we add this limiter to avoid a bad play experience when someone drops out in the final stretch
+        if (diceSize > 0) {
+            if (roll == 0) {
+                if (daysOfEducation >= 10) {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
+
+                    // if it's a Sibko we wash them out, instead
+                    if (academy.isClan()) {
+                        switch (person.getEduCourseIndex()) {
+                            case 0:
+                            case 1:
+                            case 2:
+                            case 3:
+                            case 4:
+                            case 5:
+                            case 6:
+                                if (processWarriorCasteWashout(campaign, person, resources)) {
+                                    return true;
+                                }
+                                break;
+                            case 7:
+                                ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedScientist.text"));
+
+                                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
+                                        .replaceAll("0", resources.getString("graduatedScientist.text")) + resources.getString("graduatedWarriorLabour.text"));
+                                person.setEduCourseIndex(10);
+
+                                break;
+                            case 8:
+                                ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedMerchant.text"));
+
+                                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
+                                        .replaceAll("0", resources.getString("graduatedMerchant.text")) + resources.getString("graduatedWarriorLabour.text"));
+                                person.setEduCourseIndex(10);
+
+                                break;
+                            case 9:
+                                ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedTechnician.text"));
+
+                                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
+                                        .replaceAll("0", resources.getString("graduatedTechnician.text")) + resources.getString("graduatedWarriorLabour.text"));
+                                person.setEduCourseIndex(10);
+
+                                break;
+                            case 10:
+                                ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedLabour.text"));
+
+                                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
+                                        .replaceAll("0", resources.getString("graduatedLabour.text")) + resources.getString("washoutLabour.text"));
+
+                                person.setEduDaysOfEducation(0);
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected Clan Sibko Course Index: " + person.getEduCourseIndex());
+                        }
+                    // if it isn't a Sibko, we just drop them out
+                    } else {
+                        ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName());
+
+                        person.setEduDaysOfEducation(0);
+                    }
+                } else {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
+                }
+            } else if ((roll < (diceSize / 20)) && (!academy.isPrepSchool())) {
+                // might as well scare the player
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
             }
-        } else if ((roll < (prepSchoolDiceSize / 20)) && (academy.isPrepSchool())) {
-            // might as well scare the player a little
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
-        } else if ((roll < (academyDiceSize / 20)) && (!academy.isPrepSchool())) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
         }
+        return false;
     }
+
+    /**
+     * Checks for a conflict between the academy faction and the person's faction (or their campaign faction)
+     *
+     * @param campaign the campaign in which the conflict is being checked
+     * @param academy the academy for which the conflict is being checked
+     * @param person the person whose faction is being tested for conflict
+     * @param resources the resource bundle for localized strings
+     * @return true if a faction conflict is found and resolved, false otherwise
+     */
+    private static boolean checkForAcademyFactionConflict(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
+        if (academy.isFactionConflict(campaign, person)) {
+            if (Compute.d6(2) >= 5) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWar.text"));
+                person.setEduDaysOfEducation(person.getEduDaysOfEducation() + Compute.d6(1));
+            } else {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWarExpelled.text"));
+                person.setEduDaysOfEducation(0);
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if an academy has been closed.
+     *
+     * @param campaign   the campaign the academy is in
+     * @param academy    the academy being checked for closure
+     * @param person     the person enrolled in the academy
+     * @param resources  the resource bundle for localization.
+     * @return true if the academy has been closed, false otherwise
+     */
+    private static boolean checkForAcademyClosure(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
+        if (campaign.getLocalDate().getYear() >= academy.getClosureYear()) {
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventClosure.text"));
+            person.setEduDaysOfEducation(0);
+
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if an academy has been destroyed.
+     *
+     * @param campaign   the campaign the academy is in
+     * @param academy    the academy being checked for destruction
+     * @param person     the person enrolled in the academy
+     * @param resources  the resource bundle containing localized text
+     * @return true if the academy has been destroyed, false otherwise
+     */
+    private static boolean checkForAcademyDestruction(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
+        if (campaign.getLocalDate().getYear() >= academy.getDestructionYear()) {
+            if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
+                if (Compute.d6(2) >= 5) {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
+                    person.setEduDaysOfEducation(0);
+                } else {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestructionKilled.text"));
+                    person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.HOMICIDE);
+                }
+            } else {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
+                person.setEduDaysOfEducation(0);
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Process the washout from the warrior caste.
+     *
+     * @param campaign   the campaign in which the washout is being processed
+     * @param person     the person who is being washed out
+     * @param resources  the resource bundle containing the necessary text resources
+     * @return true if the washout is successful, false otherwise
+     */
+    private static boolean processWarriorCasteWashout(Campaign campaign, Person person, ResourceBundle resources) {
+        ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedWarrior.text"));
+
+        int totalOptionCount = campaign.getCampaignOptions().getFallbackLabour() + campaign.getCampaignOptions().getFallbackMerchant()
+                + campaign.getCampaignOptions().getFallbackScientist() + campaign.getCampaignOptions().getFallbackTechnician();
+        int rollingOptionCount = campaign.getCampaignOptions().getFallbackLabour();
+
+
+        int roll = Compute.randomInt(totalOptionCount);
+
+        if (roll < rollingOptionCount) {
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
+                    .replaceAll("0", resources.getString("graduatedWarrior.text")) + resources.getString("graduatedWarriorScience.text"));
+            person.setEduCourseIndex(7);
+
+            return true;
+        } else {
+            rollingOptionCount += campaign.getCampaignOptions().getFallbackScientist();
+        }
+
+        if (roll < rollingOptionCount) {
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
+                    .replaceAll("0", resources.getString("graduatedWarrior.text")) + resources.getString("graduatedWarriorMerchant.text"));
+            person.setEduCourseIndex(8);
+
+            return true;
+        } else {
+            rollingOptionCount += campaign.getCampaignOptions().getFallbackMerchant();
+        }
+
+        if (roll < rollingOptionCount) {
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
+                    .replaceAll("0", resources.getString("graduatedWarrior.text")) + resources.getString("graduatedWarriorTechnician.text"));
+            person.setEduCourseIndex(9);
+
+            return true;
+        } else {
+            rollingOptionCount += campaign.getCampaignOptions().getFallbackTechnician();
+        }
+
+        if (roll < rollingOptionCount) {
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
+                    .replaceAll("0", resources.getString("graduatedWarrior.text")) + resources.getString("graduatedWarriorLabour.text"));
+            person.setEduCourseIndex(10);
+
+            return true;
+        }
+
+        return false;
+    }
+
 
     /**
      * Graduates a person from an academy.
@@ -523,7 +807,7 @@ public class EducationController {
      * @param person the person being graduated
      * @param academy the academy from which the person is being graduated
      */
-    private static void graduatePerson(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+    private static void graduateAdult(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         int graduationRoll = Compute.randomInt(100);
         int roll;
         // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
@@ -549,6 +833,20 @@ public class EducationController {
             return;
         }
 
+        // this covers the code that is identical for both child and adult students
+        commonGraduation(campaign, person, academy, resources, graduationRoll);
+    }
+
+    /**
+     * Processes the types of graduation that are identical for both adult & child students.
+     *
+     * @param campaign the campaign where the graduation is taking place
+     * @param person the person who is graduating
+     * @param academy the academy where the person is studying
+     * @param resources the resource bundle containing the strings for reporting and logging
+     * @param graduationRoll the roll number for determining the graduation type
+     */
+    private static void commonGraduation(Campaign campaign, Person person, Academy academy, ResourceBundle resources, int graduationRoll) {
         // graduated top of the class
         if (graduationRoll == 99) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text")
@@ -558,7 +856,10 @@ public class EducationController {
                     resources.getString("graduatedTopLog.text"), person.getEduAcademyName());
 
             improveSkills(person, academy, true);
-            addBonus(campaign, person, academy, 2, resources);
+
+            if (campaign.getCampaignOptions().isEnableBonuses()) {
+                addBonus(campaign, person, academy, 2, resources);
+            }
 
             person.setEduHighestEducation(getEducationLevel(person, academy));
 
@@ -574,7 +875,10 @@ public class EducationController {
                     resources.getString("graduatedHonorsLog.text"), person.getEduAcademyName());
 
             improveSkills(person, academy, true);
-            addBonus(campaign, person, academy, 1, resources);
+
+            if (campaign.getCampaignOptions().isEnableBonuses()) {
+                addBonus(campaign, person, academy, 1, resources);
+            }
 
             person.setEduHighestEducation(getEducationLevel(person, academy));
 
@@ -599,54 +903,105 @@ public class EducationController {
      * @param person the person being graduated
      * @param academy the Prep School from which the person is being graduated
      */
-    private static void graduatePersonClan(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+    private static void graduateChild(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+        int graduationRoll = Compute.randomInt(100);
+        // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
+
+        // qualification failed
+        if (graduationRoll < 30) {
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedBarely.text"));
+            ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName());
+
+            improveSkills(person, academy, false);
+
+            return;
+        }
+
+        // graduated top of the class
+        commonGraduation(campaign, person, academy, resources, graduationRoll);
+    }
+
+    /**
+     * Graduates a child from a Sibko.
+     *
+     * @param campaign the campaign the person belongs to
+     * @param person the person being graduated
+     * @param academy the Prep School from which the person is being graduated
+     */
+    private static void graduateClan(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         int graduationRoll = Compute.randomInt(100);
         // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
 
         // Warrior Caste
         // [0]MechWarrior, [1]ProtoMech, [2]AreoSpace, [3]Space, [4]BA, [5]CI, [6]Vehicle
         if (person.getEduCourseIndex() <= 6) {
-            // TODO include a Campaign Option to disable fatalities during The Blooding
-            // killed during The Blooding
-            if (graduationRoll < 30) {
+            // killed during The Blooding (only if life fire & all ages are enabled)
+            // we probably don't need to also check All Ages here, but we do so as insurance.
+            // we don't want child fatalities ever to occur (even as a bug) in a campaign that otherwise has them disabled
+            if ((graduationRoll < 30) && (campaign.getCampaignOptions().isLiveFireBlooding()) && (campaign.getCampaignOptions().isAllAges())) {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedWarriorKilled.text"));
                 ServiceLogger.eduClanWarriorFailed(person, campaign.getLocalDate());
                 person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
                 return;
             }
 
-            // survived The Blooding, but failed to place
+            // survived The Blooding, but failed to place.
+            // process washout into fallback Caste.
             if (graduationRoll < 50) {
                 ServiceLogger.eduClanWarriorFailed(person, campaign.getLocalDate());
 
-                switch (Compute.randomInt(5)) {
-                    case 0:
-                        campaign.addReport(person.getHyperlinkedName() + ' '
-                                + resources.getString("graduatedWarriorFailed.text")
-                                + resources.getString("graduatedWarriorScience.text"));
-                        person.setEduCourseIndex(7);
-                        break;
-                    case 1:
-                        campaign.addReport(person.getHyperlinkedName() + ' '
-                                + resources.getString("graduatedWarriorFailed.text")
-                                + resources.getString("graduatedWarriorMerchant.text"));
-                        person.setEduCourseIndex(8);
-                        break;
-                    case 2:
-                        campaign.addReport(person.getHyperlinkedName() + ' '
-                                + resources.getString("graduatedWarriorFailed.text")
-                                + resources.getString("graduatedWarriorTechnician.text"));
-                        person.setEduCourseIndex(9);
-                        break;
-                    case 3:
-                    case 4:
-                        campaign.addReport(person.getHyperlinkedName() + ' '
-                                + resources.getString("graduatedWarriorFailed.text")
-                                + resources.getString("graduatedWarriorLabour.text"));
-                        person.setEduCourseIndex(10);
-                        break;
-                    default:
-                        throw new IllegalStateException("Unexpected value in Failed Blooding: " + Compute.randomInt(5));
+                int totalOptionCount = campaign.getCampaignOptions().getFallbackLabour() + campaign.getCampaignOptions().getFallbackMerchant()
+                        + campaign.getCampaignOptions().getFallbackScientist() + campaign.getCampaignOptions().getFallbackTechnician();
+                int rollingOptionCount = campaign.getCampaignOptions().getFallbackLabour();
+
+                int roll = Compute.randomInt(totalOptionCount);
+                boolean proceed = true;
+
+                if (roll < rollingOptionCount) {
+                    campaign.addReport(person.getHyperlinkedName() + ' '
+                            + resources.getString("graduatedWarriorFailed.text")
+                            + resources.getString("graduatedWarriorScience.text"));
+                    person.setEduCourseIndex(7);
+
+                    proceed = false;
+                } else {
+                    rollingOptionCount += campaign.getCampaignOptions().getFallbackScientist();
+                }
+
+                if ((proceed) && (roll < rollingOptionCount)) {
+                    campaign.addReport(person.getHyperlinkedName() + ' '
+                            + resources.getString("graduatedWarriorFailed.text")
+                            + resources.getString("graduatedWarriorMerchant.text"));
+                    person.setEduCourseIndex(8);
+
+                    proceed = false;
+                } else {
+                    rollingOptionCount += campaign.getCampaignOptions().getFallbackMerchant();
+                }
+
+                if ((proceed) && (roll < rollingOptionCount)) {
+                    campaign.addReport(person.getHyperlinkedName() + ' '
+                            + resources.getString("graduatedWarriorFailed.text")
+                            + resources.getString("graduatedWarriorTechnician.text"));
+                    person.setEduCourseIndex(9);
+
+                    proceed = false;
+                } else {
+                    rollingOptionCount += campaign.getCampaignOptions().getFallbackTechnician();
+                }
+
+                if ((proceed) && (roll < rollingOptionCount)) {
+                    campaign.addReport(person.getHyperlinkedName() + ' '
+                            + resources.getString("graduatedWarriorFailed.text")
+                            + resources.getString("graduatedWarriorLabour.text"));
+                    person.setEduCourseIndex(10);
+
+                    proceed = false;
+                }
+
+                if (proceed) {
+                    LogManager.getLogger().error("Invalid caste fallback roll {}, graduation canceled", roll);
+                    return;
                 }
             }
 
@@ -668,7 +1023,10 @@ public class EducationController {
                 ServiceLogger.eduClanWarrior(person, campaign.getLocalDate(), resources.getString("graduatedWarriorTwoKillsLog.text"));
 
                 improveSkills(person, academy, true);
-                addBonus(campaign, person, academy, 1, resources);
+
+                if (campaign.getCampaignOptions().isEnableBonuses()) {
+                    addBonus(campaign, person, academy, 1, resources);
+                }
 
                 person.setEduHighestEducation(2);
 
@@ -681,7 +1039,10 @@ public class EducationController {
                 ServiceLogger.eduClanWarrior(person, campaign.getLocalDate(), resources.getString("graduatedWarriorThreeKillsLog.text"));
 
                 improveSkills(person, academy, true);
-                addBonus(campaign, person, academy, 2, resources);
+
+                if (campaign.getCampaignOptions().isEnableBonuses()) {
+                    addBonus(campaign, person, academy, 2, resources);
+                }
 
                 person.setEduHighestEducation(2);
 
@@ -727,7 +1088,10 @@ public class EducationController {
                         resources.getString("graduatedScience.text"));
 
                 improveSkills(person, academy, true);
-                addBonus(campaign, person, academy, 1, resources);
+
+                if (campaign.getCampaignOptions().isEnableBonuses()) {
+                    addBonus(campaign, person, academy, 1, resources);
+                }
 
                 person.setEduHighestEducation(2);
 
@@ -744,7 +1108,10 @@ public class EducationController {
                         resources.getString("graduatedScience.text"));
 
                 improveSkills(person, academy, true);
-                addBonus(campaign, person, academy, 1, resources);
+
+                if (campaign.getCampaignOptions().isEnableBonuses()) {
+                    addBonus(campaign, person, academy, 2, resources);
+                }
 
                 person.setEduHighestEducation(2);
 
@@ -790,7 +1157,10 @@ public class EducationController {
                         resources.getString("graduatedMerchant.text"));
 
                 improveSkills(person, academy, true);
-                addBonus(campaign, person, academy, 1, resources);
+
+                if (campaign.getCampaignOptions().isEnableBonuses()) {
+                    addBonus(campaign, person, academy, 1, resources);
+                }
 
                 person.setEduHighestEducation(2);
 
@@ -807,7 +1177,10 @@ public class EducationController {
                         resources.getString("graduatedMerchant.text"));
 
                 improveSkills(person, academy, true);
-                addBonus(campaign, person, academy, 1, resources);
+
+                if (campaign.getCampaignOptions().isEnableBonuses()) {
+                    addBonus(campaign, person, academy, 2, resources);
+                }
 
                 person.setEduHighestEducation(2);
 
@@ -853,7 +1226,10 @@ public class EducationController {
                         resources.getString("graduatedTechnician.text"));
 
                 improveSkills(person, academy, true);
-                addBonus(campaign, person, academy, 1, resources);
+
+                if (campaign.getCampaignOptions().isEnableBonuses()) {
+                    addBonus(campaign, person, academy, 1, resources);
+                }
 
                 person.setEduHighestEducation(2);
 
@@ -870,7 +1246,10 @@ public class EducationController {
                         resources.getString("graduatedTechnician.text"));
 
                 improveSkills(person, academy, true);
-                addBonus(campaign, person, academy, 1, resources);
+
+                if (campaign.getCampaignOptions().isEnableBonuses()) {
+                    addBonus(campaign, person, academy, 2, resources);
+                }
 
                 person.setEduHighestEducation(2);
 
@@ -885,71 +1264,6 @@ public class EducationController {
         improveSkills(person, academy, true);
 
         person.setEduHighestEducation(2);
-    }
-
-    /**
-     * Graduates a child from a Prep School.
-     *
-     * @param campaign the campaign the person belongs to
-     * @param person the person being graduated
-     * @param academy the Prep School from which the person is being graduated
-     */
-    private static void graduatePersonChild(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int graduationRoll = Compute.randomInt(100);
-        // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
-
-        // qualification failed
-        if (graduationRoll < 30) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedBarely.text"));
-            ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName());
-
-            improveSkills(person, academy, false);
-
-            return;
-        }
-
-        // TODO Duplicate code, let's extract it
-        // graduated top of the class
-        if (graduationRoll == 99) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text")
-                    .replace("0", graduationEventPicker()));
-
-            ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
-                    resources.getString("graduatedTopLog.text"), person.getEduAcademyName());
-
-            improveSkills(person, academy, true);
-            addBonus(campaign, person, academy, 2, resources);
-
-            person.setEduHighestEducation(getEducationLevel(person, academy));
-
-            return;
-        }
-
-        // graduated with honors
-        if (graduationRoll >= 90) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHonors.text")
-                    .replace("0", graduationEventPicker()));
-
-            ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
-                    resources.getString("graduatedHonorsLog.text"), person.getEduAcademyName());
-
-            improveSkills(person, academy, true);
-            addBonus(campaign, person, academy, 1, resources);
-
-            person.setEduHighestEducation(getEducationLevel(person, academy));
-
-            return;
-        }
-
-        // default graduation
-        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
-                .replace("0", graduationEventPicker()));
-
-        ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
-
-        improveSkills(person, academy, true);
-
-        person.setEduHighestEducation(getEducationLevel(person, academy));
     }
 
     /**

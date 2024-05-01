@@ -333,6 +333,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // TODO process these options in Campaign Options
     private JCheckBox chkUseEducationModule;
     private JCheckBox chkEduEnableAutoAwardsIntegration;
+    private JLabel lblMaximumJumpCount;
+    private JSpinner spnMaximumJumpCount;
     private JCheckBox chkEnableLocalAcademies;
     private JCheckBox chkEnablePrestigiousAcademies;
     private JCheckBox chkEnableClanEducation;
@@ -4736,6 +4738,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEduEnableAutoAwardsIntegration.setToolTipText(resources.getString("chkEduEnableAutoAwardsIntegration.toolTip"));
         chkEduEnableAutoAwardsIntegration.setName("chkEduEnableAutoAwardsIntegration");
 
+        // General Settings
+        lblMaximumJumpCount = new JLabel(resources.getString("lblMaximumJumpCount.text"));
+        lblMaximumJumpCount.setToolTipText(resources.getString("lblMaximumJumpCount.toolTip"));
+        lblMaximumJumpCount.setName("lblMaximumJumpCount");
+        spnMaximumJumpCount = new JSpinner(new SpinnerNumberModel(20, 1, 200, 1));
+        spnMaximumJumpCount.setToolTipText(resources.getString("lblMaximumJumpCount.toolTip"));
+        spnMaximumJumpCount.setName("spnMaximumJumpCount");
+
         // Academy Set Enable
         final JPanel enableStandardSetsPanel = createStandardSetsPanel();
 
@@ -4759,15 +4769,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final boolean isEnabled = chkUseEducationModule.isSelected();
 
             chkEduEnableAutoAwardsIntegration.setEnabled(isEnabled);
+            lblMaximumJumpCount.setEnabled(isEnabled);
+            spnMaximumJumpCount.setEnabled(isEnabled);
+
             enableStandardSetsPanel.setEnabled(isEnabled);
             chkEnableLocalAcademies.setEnabled(isEnabled);
             chkEnablePrestigiousAcademies.setEnabled(isEnabled);
             chkEnableClanEducation.setEnabled(isEnabled);
+
             xpAndSkillBonusesPanel.setEnabled(isEnabled);
             chkEnableBonuses.setEnabled(isEnabled);
             lblRandomXpRate.setEnabled(isEnabled);
             spnRandomXpRate.setEnabled(isEnabled);
             chkEnableRandomXp.setEnabled(isEnabled);
+
             dropoutChancePanel.setEnabled(isEnabled);
             lblAdultDropoutChance.setEnabled(isEnabled);
             spnAdultDropoutChance.setEnabled(isEnabled);
@@ -4775,6 +4790,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             spnChildrenDropoutChance.setEnabled(isEnabled);
             lblWarriorCasteDropOutChance.setEnabled(isEnabled);
             spnWarriorCasteDropOutChance.setEnabled(isEnabled);
+
             accidentsAndEventsPanel.setEnabled(isEnabled);
             chkAllAges.setEnabled(isEnabled);
             chkLiveFireBlooding.setEnabled(isEnabled);
@@ -4784,6 +4800,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             spnWarriorCasteAccidents.setEnabled(isEnabled);
             lblOtherCasteAccidents.setEnabled(isEnabled);
             spnOtherCasteAccidents.setEnabled(isEnabled);
+
             warriorCasteFallbackPanel.setEnabled(isEnabled);
             lblFallbackScientist.setEnabled(isEnabled);
             spnFallbackScientist.setEnabled(isEnabled);
@@ -4798,6 +4815,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // this prevents a really annoying bug where disabled options don't stay disabled when
         // reloading Campaign Options
         chkEduEnableAutoAwardsIntegration.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblMaximumJumpCount.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnMaximumJumpCount.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         enableStandardSetsPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         xpAndSkillBonusesPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         dropoutChancePanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
@@ -4819,6 +4838,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseEducationModule)
                         .addGap(10)
                         .addComponent(chkEduEnableAutoAwardsIntegration)
+                        .addGap(10)
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                .addComponent(lblMaximumJumpCount)
+                                .addComponent(spnMaximumJumpCount))
                         .addComponent(enableStandardSetsPanel)
                         .addComponent(xpAndSkillBonusesPanel)
                         .addComponent(dropoutChancePanel)
@@ -4831,6 +4854,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseEducationModule)
                         .addGap(10)
                         .addComponent(chkEduEnableAutoAwardsIntegration)
+                        .addGap(10)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMaximumJumpCount)
+                                .addComponent(spnMaximumJumpCount))
                         .addComponent(enableStandardSetsPanel)
                         .addComponent(xpAndSkillBonusesPanel)
                         .addComponent(dropoutChancePanel)
@@ -6736,6 +6763,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Education
         chkUseEducationModule.setSelected(options.isUseEducationModule());
         chkEduEnableAutoAwardsIntegration.setSelected(options.isEduEnableAutoAwardsIntegration());
+        spnMaximumJumpCount.setValue(options.getMaximumJumpCount());
         chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
         chkEnableClanEducation.setSelected(options.isEnableClanEducation());

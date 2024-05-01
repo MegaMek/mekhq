@@ -192,6 +192,7 @@ public class Person {
     private String eduAcademyName;
     private String eduAcademySet;
     private String eduAcademyNameInSet;
+    private String eduAcademyFaction;
     private String eduAcademySystem;
     private int eduCourseIndex;
     private int eduDaysOfTravelToAcademy;
@@ -344,6 +345,7 @@ public class Person {
         eduDaysOfTravelFromAcademy = 0;
         eduAcademySet = null;
         eduAcademyNameInSet = null;
+        eduAcademyFaction = null;
 
         //region Flags
         setClanPersonnel(originFaction.isClan());
@@ -1325,6 +1327,14 @@ public class Person {
         this.eduAcademyNameInSet = eduAcademyNameInSet;
     }
 
+    public String getEduAcademyFaction() {
+        return eduAcademyFaction;
+    }
+
+    public void setEduAcademyFaction(final String eduAcademyFaction) {
+        this.eduAcademyFaction = eduAcademyFaction;
+    }
+
     public Integer getEduCourseIndex() {
         return eduCourseIndex;
     }
@@ -1645,6 +1655,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyNameInSet", eduAcademyNameInSet);
             }
 
+            if (eduAcademyFaction != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyFaction", eduAcademyFaction);
+            }
+
             if (eduAcademySet != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySet", eduAcademySet);
             }
@@ -1960,6 +1974,8 @@ public class Person {
                     retVal.eduAcademySet = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyNameInSet")) {
                     retVal.eduAcademyNameInSet = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyFaction")) {
+                    retVal.eduAcademyFaction = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduCourseIndex")) {
                     retVal.eduCourseIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfEducation")) {

@@ -30,7 +30,6 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -57,9 +56,6 @@ public class Academy {
     @XmlElement(name = "description")
     private String description;
 
-    @XmlElement(name = "academyFaction")
-    private String academyFaction = null;
-
     @XmlElement(name = "factionDiscount")
     private Integer factionDiscount = 0;
 
@@ -77,6 +73,9 @@ public class Academy {
 
     @XmlElement(name = "destructionYear")
     private Integer destructionYear = 9999;
+
+    @XmlElement(name = "closureYear")
+    private Integer closureYear = 9999;
 
     @XmlElement(name = "tuition")
     private Integer tuition;
@@ -136,7 +135,6 @@ public class Academy {
      * @param isClan                  indicates if the academy is Clan-based (true) or not (false)
      * @param isPrepSchool            indicates if the academy is focused on children (true) or not (false)
      * @param description             the description of the academy
-     * @param academyFaction          the faction associated with the academy
      * @param factionDiscount         the discount offered by the academy to faction members
      * @param isFactionRestricted     indicates if the academy is restricted to faction members (true) or not (false)
      * @param isLocal                 indicates if the academy is local (true) or not (false) (overrides locationSystems)
@@ -156,11 +154,11 @@ public class Academy {
      * @param baseSkillLevel              the base skill level provided by the academy
      */
     public Academy(String set, String name, Boolean isMilitary, Boolean isClan, Boolean isPrepSchool,
-                   String description, String academyFaction, Integer factionDiscount, Boolean isFactionRestricted,
+                   String description, Integer factionDiscount, Boolean isFactionRestricted,
                    List<String> locationSystems, Boolean isLocal, Integer constructionYear,
-                   Integer destructionYear, Integer tuition, Integer durationDays, Integer facultySkill,
-                   Integer educationLevelMin, Integer educationLevelMax, Integer ageMin, Integer ageMax,
-                   List<String> qualifications, List<String> curriculums, List<Integer> qualificationStartYears,
+                   Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
+                   Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax, Integer ageMin,
+                   Integer ageMax, List<String> qualifications, List<String> curriculums, List<Integer> qualificationStartYears,
                    Integer baseSkillLevel) {
         this.set = set;
         this.name = name;
@@ -168,13 +166,13 @@ public class Academy {
         this.isClan = isClan;
         this.isPrepSchool = isPrepSchool;
         this.description = description;
-        this.academyFaction = academyFaction;
         this.factionDiscount = factionDiscount;
         this.isFactionRestricted = isFactionRestricted;
         this.isLocal = isLocal;
         this.locationSystems = locationSystems;
         this.constructionYear = constructionYear;
         this.destructionYear = destructionYear;
+        this.closureYear = closureYear;
         this.tuition = tuition;
         this.durationDays = durationDays;
         this.facultySkill = facultySkill;
@@ -288,6 +286,26 @@ public class Academy {
         return destructionYear;
     }
 
+
+    /**
+     * Retrieves the closure year of an academy.
+     *
+     * @return The closure year as an Integer.
+     */
+    public Integer getClosureYear() {
+        return closureYear;
+    }
+
+
+    /**
+     * Sets the closure year for the specific academy.
+     *
+     * @param closureYear the closure year to be set
+     */
+    public void setClosureYear(final Integer closureYear) {
+        this.closureYear = closureYear;
+    }
+
     /**
      * Retrieves the minimum age allowed at the academy.
      *
@@ -336,18 +354,6 @@ public class Academy {
     }
 
     /**
-     * Retrieves the faction of the academy.
-     *
-     * @return The faction of the academy as a String.
-     */
-    public List<String> getAcademyFaction(Campaign campaign) {
-        if (isLocal) {
-            return campaign.getCurrentSystem().getFactions(campaign.getLocalDate());
-        }
-        return Collections.singletonList(academyFaction);
-    }
-
-    /**
      * Retrieves the academy's faction discount value.
      *
      * @return The academy's discount value for the faction.
@@ -360,16 +366,20 @@ public class Academy {
     /**
      * Calculates the adjusted faction discount for a given person in a campaign.
      *
-     * @param campaign the Campaign object representing the campaign
-     * @param person the Person object representing the person
+     * @param campaign the campaign the person belongs to
+     * @param person the person receiving the discount
      * @return the faction discount as a double value, between 0.00 and 1.00
      */
     public Double getFactionDiscountAdjusted(Campaign campaign, Person person) {
-        if (getAcademyFaction(campaign).contains(person.getOriginFaction().getShortName())) {
+        if (locationSystems.stream()
+                .flatMap(campus -> campaign.getSystemByName(campus)
+                        .getFactions(campaign.getLocalDate())
+                        .stream())
+                .anyMatch(faction -> faction.equalsIgnoreCase(person.getOriginFaction().getShortName()))) {
             return (double) (factionDiscount / 100);
-        } else {
-            return 1.00;
         }
+
+        return 1.00;
     }
 
     /**
@@ -379,22 +389,6 @@ public class Academy {
      */
     public Boolean isFactionRestricted() {
         return isFactionRestricted;
-    }
-
-    public Boolean acceptingApplicants(Campaign campaign, Person person) {
-        // if the academy is faction restricted, we just need to confirm whether Person's faction
-        // matches the academy faction
-        if ((isFactionRestricted)
-                && (getAcademyFaction(campaign).contains(person.getOriginFaction().getShortName()))) {
-            return true;
-        }
-
-        // otherwise, we check whether Person's faction is at war with the academy faction.
-        // if the academy is local, the faction is the systems' current owner/s
-        return getAcademyFaction(campaign).stream()
-                .anyMatch(faction -> !RandomFactionGenerator.getInstance().getFactionHints()
-                        .isAtWarWith(person.getOriginFaction(),
-                                Factions.getInstance().getFaction(faction), campaign.getLocalDate()));
     }
 
     /**
@@ -459,6 +453,109 @@ public class Academy {
      */
     public Integer getAcademicBaseSkillLevel() {
         return baseSkillLevel;
+    }
+
+    /**
+     * Retrieves the filtered faction for a given local campus in a campaign.
+     *
+     * @param campaign The campaign being played.
+     * @param person The person for whom to filter the faction.
+     * @param system The system in which the local campus is located.
+     * @return The filtered faction for the local campus, or null if no faction is found.
+     */
+    public String getCampusFilteredFaction(Campaign campaign, Person person, String system) {
+        List<String> systemOwners = campaign.getSystemByName(system).getFactions(campaign.getLocalDate());
+
+        for (String faction : systemOwners) {
+            if ((isFactionRestricted) && (!faction.equals(person.getOriginFaction().getShortName()))) {
+                if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
+                        Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
+                    if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
+                            Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
+                        return faction;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Retrieves a list of campuses filtered by faction restrictions.
+     *
+     * @param campaign the campaign object containing system and faction information
+     * @param person the person object representing the player
+     * @return a list of campuses filtered by faction, or null if no campuses are available
+     */
+    public List<String> getCampusesFilteredByFaction(Campaign campaign, Person person) {
+        List<String> campuses = locationSystems;
+
+        for (String campus : campuses) {
+            List<String> systemOwners = campaign.getSystemByName(campus).getFactions(campaign.getLocalDate());
+
+            for (String faction : systemOwners) {
+                if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
+                        Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
+                    campuses.remove(campus);
+                } else if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
+                        Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
+                    campuses.remove(campus);
+                } else if ((isFactionRestricted) && (!faction.equals(person.getOriginFaction().getShortName()))) {
+                    campuses.remove(campus);
+                }
+            }
+        }
+
+        if (!campuses.isEmpty()) {
+            return campuses;
+        } else {
+            return null;
+        }
+    }
+
+
+    /**
+     * Checks if there is a conflict between the factions related to the academy and person or campaign.
+     *
+     * @param campaign The current campaign.
+     * @param person The person to check the faction conflict with.
+     * @return true if there is a faction conflict, false otherwise.
+     */
+    public Boolean isFactionConflict(Campaign campaign, Person person) {
+        String faction = person.getEduAcademyFaction();
+
+        // if academy faction at war with person's faction?
+        if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
+                Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
+            return true;
+        } else {
+            // else, is academy faction at war with campaign's faction?
+            return RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
+                    Factions.getInstance().getFaction(faction), campaign.getLocalDate());
+        }
+    }
+
+    /**
+     * Returns the nearest campus to a given campaign.
+     *
+     * @param campaign the campaign for which to find the nearest campus
+     * @param campuses a list of campuses to consider
+     * @return the nearest campus to the campaign
+     */
+    public String getNearestCampus(Campaign campaign, List<String> campuses) {
+        int distance = 0;
+        String nearestCampus = "";
+
+        for (String campus : campuses) {
+            int travelTime = Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(campus));
+
+            if (travelTime > distance) {
+                distance = travelTime;
+                nearestCampus = campus;
+            }
+        }
+
+        return nearestCampus;
     }
 
     /**

@@ -23,6 +23,7 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.common.Crew;
 import megamek.common.Mounted;
+import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -49,7 +50,6 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
-import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.dialog.*;
@@ -353,7 +353,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_BEGIN_EDUCATION: {
                 for (Person person : people) {
-                    EducationController.beginEducation(gui.getCampaign(), person, data[1], Integer.parseInt(data[2]));
+                    EducationController.beginEducation(gui.getCampaign(), person, data[1], Integer.parseInt(data[2]), data[3], data[4]);
                 }
                 break;
             }
@@ -1043,8 +1043,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if (StaticChecks.areAllEligible(true, selected)) {
             menu = new JMenu(resources.getString("changeRank.text"));
             final Profession initialProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
-            for (final RankDisplay rankDisplay : RankDisplay.getRankDisplaysForSystem(
-                    person.getRankSystem(), initialProfession)) {
+            for (final RankDisplay rankDisplay : RankDisplay.getRankDisplaysForSystem(person.getRankSystem(), initialProfession)) {
                 final Rank rank = person.getRankSystem().getRank(rankDisplay.getRankNumeric());
                 final Profession profession = initialProfession.getProfession(person.getRankSystem(), rank);
                 final int rankLevels = rank.getRankLevels().get(profession);
@@ -1052,12 +1051,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (rankLevels > 1) {
                     submenu = new JMenu(rankDisplay.toString());
                     for (int level = 0; level <= rankLevels; level++) {
-                        cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession)
-                                + Utilities.getRomanNumeralsFromArabicNumber(level, true));
-                        cbMenuItem.setSelected((person.getRankNumeric() == rankDisplay.getRankNumeric())
-                                && (person.getRankLevel() == level));
-                        cbMenuItem.setActionCommand(makeCommand(CMD_RANK,
-                                String.valueOf(rankDisplay.getRankNumeric()), String.valueOf(level)));
+                        cbMenuItem = new JCheckBoxMenuItem(rank.getName(profession) + Utilities.getRomanNumeralsFromArabicNumber(level, true));
+                        cbMenuItem.setSelected((person.getRankNumeric() == rankDisplay.getRankNumeric()) && (person.getRankLevel() == level));
+                        cbMenuItem.setActionCommand(makeCommand(CMD_RANK, String.valueOf(rankDisplay.getRankNumeric()), String.valueOf(level)));
                         cbMenuItem.addActionListener(this);
                         submenu.add(cbMenuItem);
                     }
@@ -1169,8 +1165,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
         }
 
-        if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom()
-                && StaticChecks.areAllPrisoners(selected)) {
+        if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPrisoners(selected)) {
             popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
         }
 
@@ -1222,9 +1217,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(gui.getCampaign(), selected));
 
         if (oneSelected && person.getStatus().isActive()) {
-            if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
-                    && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign(),
-                            gui.getCampaign().getLocalDate(), person, false) == null)) {
+            if (gui.getCampaign().getCampaignOptions().isUseManualMarriages() && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign(), gui.getCampaign().getLocalDate(), person, false) == null)) {
                 menu = new JMenu(resources.getString("chooseSpouse.text"));
                 JMenu maleMenu = new JMenu(resources.getString("spouseMenuMale.text"));
                 JMenu femaleMenu = new JMenu(resources.getString("spouseMenuFemale.text"));
@@ -1233,36 +1226,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 LocalDate today = gui.getCampaign().getLocalDate();
 
                 // Get all safe potential spouses sorted by age and then by surname
-                final List<Person> personnel = gui.getCampaign().getPersonnel().stream()
-                        .filter(potentialSpouse -> gui.getCampaign().getMarriage().safeSpouse(
-                                gui.getCampaign(), gui.getCampaign().getLocalDate(), person,
-                                potentialSpouse, false))
-                        .sorted(Comparator.comparing((Person p) -> p.getAge(today))
-                                .thenComparing(Person::getSurname))
-                        .collect(Collectors.toList());
+                final List<Person> personnel = gui.getCampaign().getPersonnel().stream().filter(potentialSpouse -> gui.getCampaign().getMarriage().safeSpouse(gui.getCampaign(), gui.getCampaign().getLocalDate(), person, potentialSpouse, false)).sorted(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname)).collect(Collectors.toList());
 
                 for (final Person potentialSpouse : personnel) {
                     final String status;
                     final String founder = potentialSpouse.isFounder() ? resources.getString("spouseFounder.text") : "";
                     if (potentialSpouse.getPrisonerStatus().isBondsman()) {
-                        status = String.format(resources.getString("marriageBondsmanDesc.format"),
-                                potentialSpouse.getFullName(), potentialSpouse.getAge(today),
-                                potentialSpouse.getRoleDesc(), founder);
+                        status = String.format(resources.getString("marriageBondsmanDesc.format"), potentialSpouse.getFullName(), potentialSpouse.getAge(today), potentialSpouse.getRoleDesc(), founder);
                     } else if (potentialSpouse.getPrisonerStatus().isCurrentPrisoner()) {
-                        status = String.format(resources.getString("marriagePrisonerDesc.format"),
-                                potentialSpouse.getFullName(), potentialSpouse.getAge(today),
-                                potentialSpouse.getRoleDesc(), founder);
+                        status = String.format(resources.getString("marriagePrisonerDesc.format"), potentialSpouse.getFullName(), potentialSpouse.getAge(today), potentialSpouse.getRoleDesc(), founder);
                     } else {
-                        status = String.format(resources.getString("marriagePartnerDesc.format"),
-                                potentialSpouse.getFullName(), potentialSpouse.getAge(today),
-                                potentialSpouse.getRoleDesc(), founder);
+                        status = String.format(resources.getString("marriagePartnerDesc.format"), potentialSpouse.getFullName(), potentialSpouse.getAge(today), potentialSpouse.getRoleDesc(), founder);
                     }
 
                     spouseMenu = new JMenu(status);
 
                     for (final MergingSurnameStyle style : MergingSurnameStyle.values()) {
-                        spouseMenu.add(newMenuItem(style.getDropDownText(),
-                                makeCommand(CMD_ADD_SPOUSE, potentialSpouse.getId().toString(), style.name())));
+                        spouseMenu.add(newMenuItem(style.getDropDownText(), makeCommand(CMD_ADD_SPOUSE, potentialSpouse.getId().toString(), style.name())));
                     }
 
                     if (potentialSpouse.getGender().isMale()) {
@@ -1284,8 +1264,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
 
-        if (gui.getCampaign().getCampaignOptions().isUseManualDivorce()
-                && Stream.of(selected).anyMatch(p -> gui.getCampaign().getDivorce().canDivorce(person, false) == null)) {
+        if (gui.getCampaign().getCampaignOptions().isUseManualDivorce() && Stream.of(selected).anyMatch(p -> gui.getCampaign().getDivorce().canDivorce(person, false) == null)) {
             menu = new JMenu(resources.getString("removeSpouse.text"));
 
             for (final SplittingSurnameStyle style : SplittingSurnameStyle.values()) {
@@ -1386,87 +1365,105 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         //endregion Awards Menu
 
         //region Education Menu
-        JMenu academyMenu = new JMenu(resources.getString("eduEducation.text"));
+        if (gui.getCampaign().getCampaignOptions().isUseEducationModule()) {
+            JMenu academyMenu = new JMenu(resources.getString("eduEducation.text"));
 
-        // this next block preps variables for use by the menu & tooltip
-        JMenu academies;
-        int campaignYear = gui.getCampaign().getLocalDate().getYear();
-        int travelTime = 2;
-        PlanetarySystem destination = gui.getCampaign().getCurrentSystem();
+            // we use 'campaign' a lot here, so let's store it, so we don't have to re-call it every time
+            Campaign campaign = gui.getCampaign();
 
-        List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
-        Collections.sort(academySetNames);
+            // this next block preps variables for use by the menu & tooltip
+            int campaignYear = campaign.getLocalDate().getYear();
 
-        for (String setName : academySetNames) {
-            JMenu setAcademyMenu = new JMenu(setName);
+            List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
+            Collections.sort(academySetNames);
 
-            JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
-            setAcademyMenu.add(civilianMenu);
-            JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
-            setAcademyMenu.add(militaryMenu);
+            // this filters out any academy sets that are disabled in Campaign Options
+            for (String academySet : academySetNames) {
+                if ((academySet.equals("Local Academies")) && (!campaign.getCampaignOptions().isEnableLocalAcademies())) {
+                    academySetNames.remove(academySet);
+                } else if ((academySet.equals("Prestigious Academies")) && (!campaign.getCampaignOptions().isEnablePrestigiousAcademies())) {
+                    academySetNames.remove(academySet);
+                } else if ((academySet.equals("Clan Sibkos")) && (!campaign.getCampaignOptions().isEnableClanEducation())) {
+                    academySetNames.remove(academySet);
+                }
+            }
 
-            List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
+            // We then start processing the remaining academy sets
+            int currentYear = campaign.getLocalDate().getYear();
+            int personAge = person.getAge(campaign.getLocalDate());
 
-            for (Academy academy : academiesOfSet) {
-                // we check to make sure Person is within the correct age bracket
-                if ((person.getAge(gui.getCampaign().getLocalDate()) >= academy.getAgeMin())
-                        && (person.getAge(gui.getCampaign().getLocalDate()) < academy.getAgeMax())) {
-                    if (!academy.isLocal()) {
-                        for (String system : academy.getLocationSystems()) {
-                            int travelTimeNew = Campaign.getSimplifiedTravelTime(gui.getCampaign(), destination);
-                            if (travelTimeNew > travelTime) {
-                                travelTime = travelTimeNew;
-                                destination = gui.getCampaign().getSystemByName(system);
-                            }
-                        }
-                    }
+            for (String setName : academySetNames) {
+                JMenu setAcademyMenu = new JMenu(setName);
 
-                    if (!academy.isMilitary()) {
-                        // TODO replace '20' with a Campaign Option
-                        // is the academy within the maximum travel distance set in Campaign Options?
-                        if ((travelTime) <= (20 * 7)) {
-                            // here we check the academy has been built...
-                            if (campaignYear >= academy.getConstructionYear()) {
-                                // and whether the academy has been destroyed
-                                if (campaignYear < academy.getDestructionYear()) {
-                                    // and whether the academy allows applicants from Person's faction
-                                    if (academy.acceptingApplicants(gui.getCampaign(), person)) {
-                                        academies = new JMenu(academy.getName());
-                                        civilianMenu.add(academies);
+                // we filter each academy into one of these three categories
+                JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
+                setAcademyMenu.add(civilianMenu);
+                JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
+                setAcademyMenu.add(militaryMenu);
+                JMenu clanMenu = new JMenu(resources.getString("eduClan.text"));
+                setAcademyMenu.add(clanMenu);
 
-                                        buildEduSubMenus(academy, campaignYear, person, academies);
+                // time to start filtering the academies based on a few parameters.
+                List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
+
+                for (Academy academy : academiesOfSet) {
+                    // has the academy been constructed, is still standing, & has not closed?
+                    if ((currentYear >= academy.getConstructionYear()) && (currentYear < academy.getDestructionYear()) && (currentYear < academy.getClosureYear())) {
+                        // is the applicant within the right age bracket?
+                        if ((personAge < academy.getAgeMax()) && (personAge >= academy.getAgeMin())) {
+                            // is the academy Local?
+                            if (academy.isLocal()) {
+                                // are any of the local academies accepting applicants from person's Faction or campaign's Faction?
+                                String faction = academy.getCampusFilteredFaction(campaign, person, campaign.getCurrentSystem().getName(campaign.getLocalDate()));
+
+                                if (faction != null) {
+                                    // attach it to the right category
+                                    JMenu academyOption = new JMenu(academy.getName());
+
+                                    if (academy.isClan()) {
+                                        clanMenu.add(academyOption);
+                                    } else if (academy.isMilitary()) {
+                                        militaryMenu.add(academyOption);
                                     } else {
-                                        academies = new JMenu(resources.getString("eduFactionRejected.text")
-                                                .replaceAll("0", person.getFirstName()));
-                                        civilianMenu.add(academies);
+                                        civilianMenu.add(academyOption);
                                     }
-                                } else {
-                                    academies = new JMenu(resources.getString("eduDestroyed.text"));
-                                    civilianMenu.add(academies);
-                                }
-                            }
-                        }
-                    } else {
-                        // TODO replace '20' with a Campaign Option
-                        // is the academy within the maximum travel distance set in Campaign Options?
-                        if ((travelTime) <= (20 * 7)) {
-                            // here we check the academy has been built and is still standing
-                            if (campaignYear >= academy.getConstructionYear()) {
-                                if (campaignYear < academy.getDestructionYear()) {
-                                    academies = new JMenu(academy.getName());
-                                    militaryMenu.add(academies);
 
-                                    buildEduSubMenus(academy, campaignYear, person, academies);
-                                } else {
-                                    academies = new JMenu(resources.getString("eduDestroyed.text"));
-                                    militaryMenu.add(academies);
+                                    // get the courses
+                                    buildEduSubMenus(academy, campaignYear, person, academyOption, null, faction);
+                                }
+                            } else {
+                                // what campuses accept applicants from person's Faction & campaign Faction?
+                                List<String> campuses = academy.getCampusesFilteredByFaction(campaign, person);
+
+                                if (campuses != null) {
+                                    // of these, which is the nearest?
+                                    String nearestCampus = academy.getNearestCampus(campaign, campuses);
+
+                                    // is it within the maximum jump range set in Campaign Options?
+                                    if ((Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(nearestCampus)) / 7)
+                                            <= campaign.getCampaignOptions().getMaximumJumpCount()) {
+                                        // attach it to the right category
+                                        JMenu academyOption = new JMenu(academy.getName());
+
+                                        if (academy.isClan()) {
+                                            clanMenu.add(academyOption);
+                                        } else if (academy.isMilitary()) {
+                                            militaryMenu.add(academyOption);
+                                        } else {
+                                            civilianMenu.add(academyOption);
+                                        }
+
+                                        // get the courses
+                                        String faction = academy.getCampusFilteredFaction(campaign, person, nearestCampus);
+                                        buildEduSubMenus(academy, campaignYear, person, academyOption, nearestCampus, faction);
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                    academyMenu.add(setAcademyMenu);
             }
-            academyMenu.add(setAcademyMenu);
 
             popup.add(academyMenu);
         }
@@ -2479,26 +2476,33 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     /**
      * Builds submenus for the academies in a given campaign year, based on a person's qualifications.
      *
-     * @param academy        the academy to build submenus for
-     * @param campaignYear   the campaign year to consider
-     * @param person         the person for whom the submenus are being built
-     * @param academies      the main menu item where the submenus will be added
+     * @param academies     the main menu item where the submenus will be added
+     * @param academy       the academy to build submenus for
+     * @param campaignYear  the campaign year to consider
+     * @param person        the person for whom the submenus are being built
      */
-    private void buildEduSubMenus(Academy academy, int campaignYear, Person person, JMenu academies) {
+    private void buildEduSubMenus(Academy academy, int campaignYear, Person person, JMenu academyOption, @Nullable String campus, String faction) {
         JMenuItem courses;
         int courseCount = academy.getQualifications().size();
-        for (int courseIndex = 0; courseIndex < courseCount; courseIndex++) {
-            // we also need to make sure the course is being offered
-            if (campaignYear >= academy.getQualificationStartYears().get(courseIndex)) {
-                String course = "<html>" + academy.getQualifications().get(courseIndex) + "<br>" + academy.getCurriculums().get(courseIndex) + "</html>";
-                courses = new JMenuItem(course);
-                courses.setToolTipText(academy.getTooltip(gui.getCampaign(), person, courseIndex));
-                courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), String.valueOf(courseIndex)));
-                courses.addActionListener(this);
-                academies.add(courses);
-            } else {
-                courses = new JMenuItem(resources.getString("eduNoQualificationsOffered.text"));
-                academies.add(courses);
+
+        if (courseCount > 0) {
+            for (int courseIndex = 0; courseIndex < courseCount; courseIndex++) {
+                // we also need to make sure the course is being offered
+                if (campaignYear >= academy.getQualificationStartYears().get(courseIndex)) {
+                    String course = "<html>" + academy.getQualifications().get(courseIndex) + "<br>" + academy.getCurriculums().get(courseIndex) + "</html>";
+                    courses = new JMenuItem(course);
+                    courses.setToolTipText(academy.getTooltip(gui.getCampaign(), person, courseIndex));
+                    if (academy.isLocal()) {
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), String.valueOf(courseIndex), null, faction));
+                    } else {
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), String.valueOf(courseIndex), campus, faction));
+                    }
+                    courses.addActionListener(this);
+                    academyOption.add(courses);
+                } else {
+                    courses = new JMenuItem(resources.getString("eduNoQualificationsOffered.text"));
+                    academyOption.add(courses);
+                }
             }
         }
     }

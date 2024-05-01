@@ -102,6 +102,11 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduFailed.text"), institution)));
     }
 
+    public static void eduClanWashout(Person person, LocalDate date, String originCaste) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanWashout.text"), originCaste)));
+    }
+
+
     public static void eduClanWarriorFailed(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanWarriorFailed.text")));
     }

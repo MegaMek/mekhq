@@ -310,6 +310,7 @@ public class CampaignOptions {
     // Education
     private boolean useEducationModule;
     private boolean eduEnableAutoAwardsIntegration;
+    private Integer maximumJumpCount;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
     private boolean enableClanEducation;
@@ -786,6 +787,7 @@ public class CampaignOptions {
         // Education
         setUseEducationModule(true);
         setEduEnableAutoAwardsIntegration(true);
+        setMaximumJumpCount(20);
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
         setEnableClanEducation(true);
@@ -2181,6 +2183,16 @@ public class CampaignOptions {
 
     public void setEduEnableAutoAwardsIntegration(boolean eduEnableAutoAwardsIntegration) {
         this.eduEnableAutoAwardsIntegration = eduEnableAutoAwardsIntegration;
+    }
+
+
+    public Integer getMaximumJumpCount() {
+        return maximumJumpCount;
+    }
+
+
+    public void setMaximumJumpCount(Integer maximumJumpCount) {
+        this.maximumJumpCount = maximumJumpCount;
     }
 
     public boolean isEnableLocalAcademies() {
@@ -3933,6 +3945,7 @@ public class CampaignOptions {
         //region Education
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEnableAutoAwardsIntegration", isEduEnableAutoAwardsIntegration());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCunt", getMaximumJumpCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableClanEducation", isEnableClanEducation());
@@ -4628,6 +4641,8 @@ public class CampaignOptions {
                     retVal.setUseEducationModule(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEnableAutoAwardsIntegration")) {
                     retVal.setEduEnableAutoAwardsIntegration(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("maximumJumpCount")) {
+                    retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableLocalAcademies")) {
                     retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
