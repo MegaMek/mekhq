@@ -112,7 +112,7 @@ public class Academy {
     private List<String> curriculums = List.of("Gunnery/Mech, Piloting/Mech");
 
     @XmlElement(name = "qualificationStartYear")
-    private List<Integer> qualificationStartYears = List.of(0001);
+    private List<Integer> qualificationStartYears = List.of(2001);
 
     @XmlElement(name = "baseAcademicSkillLevel")
     private Integer baseAcademicSkillLevel = 0;
