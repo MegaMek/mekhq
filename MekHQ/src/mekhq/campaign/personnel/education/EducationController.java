@@ -1277,7 +1277,7 @@ public class EducationController {
         String[] curriculum = academy.getCurriculums().get(person.getEduCourseIndex())
                 .replaceAll(", ", ",").split(",");
 
-        int education = academy.getAcademicBaseSkillLevel() + getEducationLevel(person, academy);
+        int education = academy.getBaseAcademicSkillLevel() + getEducationLevel(person, academy);
 
         if (!isGraduating) {
             education--;

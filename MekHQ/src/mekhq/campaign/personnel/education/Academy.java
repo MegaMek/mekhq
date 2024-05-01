@@ -36,13 +36,13 @@ import java.util.ResourceBundle;
 /**
  * This class represents an academy.
  * The following fields are serialized to XML: name, description, locationSystems, constructionYear, destructionYear,
- * tuition, durationDays, tierMin, tierMax, skills, and baseSkillLevel.
+ * tuition, durationDays, tierMin, tierMax, skills, and baseAcademicSkillLevel.
  */
 @XmlRootElement(name = "academy")
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class Academy {
     @XmlElement(name = "name")
-    private String name;
+    private String name = "";
 
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary = false;
@@ -54,7 +54,7 @@ public class Academy {
     private Boolean isClan = false;
 
     @XmlElement(name = "description")
-    private String description;
+    private String description = "";
 
     @XmlElement(name = "factionDiscount")
     private Integer factionDiscount = 0;
@@ -78,7 +78,7 @@ public class Academy {
     private Integer closureYear = 9999;
 
     @XmlElement(name = "tuition")
-    private Integer tuition;
+    private Integer tuition = 0;
 
     @XmlElement(name = "durationDays")
     // this number is chosen so that PrepSchools still experience dropouts
@@ -94,7 +94,7 @@ public class Academy {
     // 4 = post-grad
     // 5 = doctorate
     @XmlElement(name = "educationLevelMin")
-    private Integer educationLevelMin;
+    private Integer educationLevelMin = 0;
 
     @XmlElement(name = "educationLevelMax")
     private Integer educationLevelMax;
@@ -114,8 +114,8 @@ public class Academy {
     @XmlElement(name = "qualificationStartYear")
     private List<Integer> qualificationStartYears;
 
-    @XmlElement(name = "baseSkillLevel")
-    private Integer baseSkillLevel;
+    @XmlElement(name = "baseAcademicSkillLevel")
+    private Integer baseAcademicSkillLevel = 0;
 
     private String set;
 
@@ -151,7 +151,7 @@ public class Academy {
      * @param qualifications          the list of qualifications provided by the academy
      * @param curriculums             the list of curriculums offered by the academy
      * @param qualificationStartYears the list of years when each qualification becomes available
-     * @param baseSkillLevel              the base skill level provided by the academy
+     * @param baseAcademicSkillLevel              the base skill level provided by the academy
      */
     public Academy(String set, String name, Boolean isMilitary, Boolean isClan, Boolean isPrepSchool,
                    String description, Integer factionDiscount, Boolean isFactionRestricted,
@@ -159,7 +159,7 @@ public class Academy {
                    Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
                    Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax, Integer ageMin,
                    Integer ageMax, List<String> qualifications, List<String> curriculums, List<Integer> qualificationStartYears,
-                   Integer baseSkillLevel) {
+                   Integer baseAcademicSkillLevel) {
         this.set = set;
         this.name = name;
         this.isMilitary = isMilitary;
@@ -183,7 +183,7 @@ public class Academy {
         this.qualifications = qualifications;
         this.curriculums = curriculums;
         this.qualificationStartYears = qualificationStartYears;
-        this.baseSkillLevel = baseSkillLevel;
+        this.baseAcademicSkillLevel = baseAcademicSkillLevel;
     }
 
     /**
@@ -213,6 +213,16 @@ public class Academy {
         return name;
     }
 
+
+    /**
+     * Sets the name of the academy.
+     *
+     * @param name the new name to be set
+     */
+    public void setName(final String name) {
+        this.name = name;
+    }
+
     /**
      * Checks if the academy is a military academy.
      *
@@ -220,6 +230,15 @@ public class Academy {
      */
     public Boolean isMilitary() {
         return isMilitary;
+    }
+
+    /**
+     * Sets the value indicating whether the academy is a military academy.
+     *
+     * @param isMilitary true if the academy is military, false otherwise.
+     */
+    public void setIsMilitary(final boolean isMilitary) {
+        this.isMilitary = isMilitary;
     }
 
     /**
@@ -232,12 +251,30 @@ public class Academy {
     }
 
     /**
+     * Sets the value indicating whether the academy is a Clan Sibko.
+     *
+     * @param isClan true if the academy is a Clan Sibko, false otherwise.
+     */
+    public void setIsClan(final boolean isClan) {
+        this.isClan = isClan;
+    }
+
+    /**
      * Checks if the academy is a Prep School.
      *
      * @return {@code true} if the academy is a Prep School, {@code false} otherwise.
      */
     public Boolean isPrepSchool() {
         return isPrepSchool;
+    }
+
+    /**
+     * Sets the value indicating whether the academy is a prep school.
+     *
+     * @param isPrepSchool true if the academy is a prep school, false otherwise.
+     */
+    public void setIsPrepSchool(final boolean isPrepSchool) {
+        this.isPrepSchool = isPrepSchool;
     }
 
     /**
@@ -250,6 +287,15 @@ public class Academy {
     }
 
     /**
+     * Sets the value indicating whether the academy is local.
+     *
+     * @param isLocal true if the academy is local, false otherwise.
+     */
+    public void setIsLocal(final boolean isLocal) {
+        this.isLocal = isLocal;
+    }
+
+    /**
      * Returns the description of the academy.
      *
      * @return The description of the academy.
@@ -258,6 +304,14 @@ public class Academy {
         return description;
     }
 
+    /**
+     * Sets the description of the academy.
+     *
+     * @param description the new description for the academy
+     */
+    public void setDescription(final String description) {
+        this.description = description;
+    }
 
     /**
      * Retrieves the list of location systems where the academy is present.
@@ -266,6 +320,15 @@ public class Academy {
      */
     public List<String> getLocationSystems() {
         return locationSystems;
+    }
+
+    /**
+     * Sets the location systems for the academy.
+     *
+     * @param locationSystems the list of location systems to be set
+     */
+    public void setLocationSystems(final List<String> locationSystems) {
+        this.locationSystems = locationSystems;
     }
 
     /**
@@ -278,6 +341,15 @@ public class Academy {
     }
 
     /**
+     * Sets the construction year of the academy.
+     *
+     * @param constructionYear the construction year to be set
+     */
+    public void setConstructionYear(final Integer constructionYear) {
+        this.constructionYear = constructionYear;
+    }
+
+    /**
      * Retrieves the academy's destruction year.
      *
      * @return The academy's destruction year, represented as an Integer.
@@ -286,6 +358,14 @@ public class Academy {
         return destructionYear;
     }
 
+    /**
+     * Sets the destruction year of the academy.
+     *
+     * @param destructionYear the destruction year to be set
+     */
+    public void setDestructionYear(final Integer destructionYear) {
+        this.destructionYear = destructionYear;
+    }
 
     /**
      * Retrieves the closure year of an academy.
@@ -296,9 +376,8 @@ public class Academy {
         return closureYear;
     }
 
-
     /**
-     * Sets the closure year for the specific academy.
+     * Sets the closure year of the academy.
      *
      * @param closureYear the closure year to be set
      */
@@ -316,12 +395,30 @@ public class Academy {
     }
 
     /**
+     * Sets the minimum age.
+     *
+     * @param ageMin the minimum age to set
+     */
+    public void setAgeMin(final Integer ageMin) {
+        this.ageMin = ageMin;
+    }
+
+    /**
      * Retrieves the maximum age allowed at the academy.
      *
      * @return the maximum age allowed as an Integer.
      */
     public Integer getAgeMax() {
         return ageMax;
+    }
+
+    /**
+     * Sets the maximum age.
+     *
+     * @param ageMax the maximum age to be set
+     */
+    public void setAgeMax(final Integer ageMax) {
+        this.ageMax = ageMax;
     }
 
     /**
@@ -334,14 +431,12 @@ public class Academy {
     }
 
     /**
-     * Retrieves the adjusted value of the academy's tuition based on the specified tier minimum and education level.
+     * Sets the tuition value.
      *
-     * @param tierMin        the minimum education level tier for calculating the adjustment
-     * @param educationLevel the education level for which the tuition adjustment is calculated
-     * @return the adjusted tuition value as an Integer
+     * @param tuition the new tuition value to be set
      */
-    public Integer getTuitionAdjusted(Integer tierMin, Integer educationLevel) {
-        return getTuition() * ((educationLevel - tierMin) / 2);
+    public void setTuition(final Integer tuition) {
+        this.tuition = tuition;
     }
 
     /**
@@ -354,6 +449,15 @@ public class Academy {
     }
 
     /**
+     * Sets the course duration in days.
+     *
+     * @param durationDays the duration in days to set
+     */
+    public void setDurationDays(final Integer durationDays) {
+        this.durationDays = durationDays;
+    }
+
+    /**
      * Retrieves the academy's faction discount value.
      *
      * @return The academy's discount value for the faction.
@@ -362,6 +466,164 @@ public class Academy {
         return factionDiscount;
     }
 
+    /**
+     * Sets the faction discount raw value.
+     *
+     * @param factionDiscount the faction discount to set
+     */
+    public void setFactionDiscountRaw(final Integer factionDiscount) {
+        this.factionDiscount = factionDiscount;
+    }
+
+    /**
+     * Checks if the academy is faction restricted.
+     *
+     * @return true if the academy is faction restricted, otherwise false.
+     */
+    public Boolean isFactionRestricted() {
+        return isFactionRestricted;
+    }
+
+    /**
+     * Sets whether the academy is faction restricted.
+     *
+     * @param isFactionRestricted true if the academy is faction restricted, false otherwise
+     */
+    public void setIsFactionRestricted(final Boolean isFactionRestricted) {
+        this.isFactionRestricted = isFactionRestricted;
+    }
+
+    /**
+     * Retrieves faculty skill level.
+     *
+     * @return The faculty skill level as an Integer.
+     */
+    public Integer getFacultySkill() {
+        return facultySkill;
+    }
+
+    /**
+     * Sets the skill level of the faculty.
+     *
+     * @param facultySkill the skill level of the faculty to be set
+     */
+    public void setFacultySkill(final Integer facultySkill) {
+        this.facultySkill = facultySkill;
+    }
+
+    /**
+     * Returns the minimum academic tier value.
+     *
+     * @return The minimum academic tier value as an Integer.
+     */
+    public Integer getEducationLevelMin() {
+        return educationLevelMin;
+    }
+
+    /**
+     * Sets the minimum education level required for admission.
+     *
+     * @param educationLevelMin the minimum education level required, as an Integer
+     */
+    public void setEducationLevelMin(final Integer educationLevelMin) {
+        this.educationLevelMin = educationLevelMin;
+    }
+
+    /**
+     * Retrieves the maximum academic tier value.
+     *
+     * @return The maximum academic tier value as an Integer
+     */
+    public Integer getEducationLevelMax() {
+        return educationLevelMax;
+    }
+
+    /**
+     * Sets the maximum education level provided by the academy.
+     *
+     * @param educationLevelMax the maximum education level to be set
+     */
+    public void setEducationLevelMax(final Integer educationLevelMax) {
+        this.educationLevelMax = educationLevelMax;
+    }
+
+    /**
+     * Returns the list of qualification names.
+     *
+     * @return the list of qualification names.
+     */
+    public List<String> getQualifications() {
+        return qualifications;
+    }
+
+    /**
+     * Sets the qualifications for the academy.
+     *
+     * @param qualifications a list of strings representing the qualifications to set
+     */
+    public void setQualifications(final List<String> qualifications) {
+        this.qualifications = qualifications;
+    }
+
+    /**
+     * Retrieves the skills improved by this academy.
+     *
+     * @return The skills improved by this academy as a String.
+     */
+    public List<String> getCurriculums() {
+        return curriculums;
+    }
+
+    /**
+     * Sets the curriculums for the academy.
+     *
+     * @param curriculums The list of curriculums to be set.
+     */
+    public void setCurriculums(final List<String> curriculums) {
+        this.curriculums = curriculums;
+    }
+
+    /**
+     * Retrieves the skills improved by this academy.
+     *
+     * @return The skills improved by this academy as a String.
+     */
+    public List<Integer> getQualificationStartYears() {
+        return qualificationStartYears;
+    }
+
+    /**
+     * Sets the qualification start years.
+     *
+     * @param qualificationStartYears the list of qualification start years to be set
+     */
+    public void setQualificationStartYears(List<Integer> qualificationStartYears) {
+        this.qualificationStartYears = qualificationStartYears;
+    }
+
+    /**
+     * Retrieves the base skill level granted by this academy.
+     *
+     * @return the base skill level granted by this academy as an Integer
+     */
+    public Integer getBaseAcademicSkillLevel() {
+        return baseAcademicSkillLevel;
+    }
+
+    public void setBaseAcademicSkillLevel(final Integer baseAcademicSkillLevel) {
+        this.baseAcademicSkillLevel = baseAcademicSkillLevel;
+    }
+
+    /**
+     * Retrieves the adjusted value of the academy's tuition based on the specified tier minimum and education level.
+     *
+     * @param tierMin        the minimum education level tier for calculating the adjustment
+     * @param educationLevel the education level for which the tuition adjustment is calculated
+     * @return the adjusted tuition value as an Integer
+     */
+    public Integer getTuitionAdjusted(Integer tierMin, Integer educationLevel) {
+        return getTuition() * ((educationLevel - tierMin) / 2);
+    }
 
     /**
      * Calculates the adjusted faction discount for a given person in a campaign.
@@ -383,80 +645,7 @@ public class Academy {
     }
 
     /**
-     * Checks if the academy is faction restricted.
-     *
-     * @return true if the academy is faction restricted, otherwise false.
-     */
-    public Boolean isFactionRestricted() {
-        return isFactionRestricted;
-    }
-
-    /**
-     * Retrieves faculty skill level.
-     *
-     * @return The faculty skill level as an Integer.
-     */
-    public Integer getFacultySkill() {
-        return facultySkill;
-    }
-
-    /**
-     * Returns the minimum academic tier value.
-     *
-     * @return The minimum academic tier value as an Integer.
-     */
-    public Integer getEducationLevelMin() {
-        return educationLevelMin;
-    }
-
-    /**
-     * Retrieves the maximum academic tier value.
-     *
-     * @return The maximum academic tier value as an Integer
-     */
-    public Integer getEducationLevelMax() {
-        return educationLevelMax;
-    }
-
-
-    /**
-     * Returns the list of qualification names.
-     *
-     * @return the list of qualification names.
-     */
-    public List<String> getQualifications() {
-        return qualifications;
-    }
-
-    /**
-     * Retrieves the skills improved by this academy.
-     *
-     * @return The skills improved by this academy as a String.
-     */
-    public List<String> getCurriculums() {
-        return curriculums;
-    }
-
-    /**
-     * Retrieves the skills improved by this academy.
-     *
-     * @return The skills improved by this academy as a String.
-     */
-    public List<Integer> getQualificationStartYears() {
-        return qualificationStartYears;
-    }
-
-    /**
-     * Retrieves the base skill level granted by this academy.
-     *
-     * @return the base skill level granted by this academy as an Integer
-     */
-    public Integer getAcademicBaseSkillLevel() {
-        return baseSkillLevel;
-    }
-
-    /**
-     * Retrieves the filtered faction for a given local campus in a campaign.
+     * Retrieves the first Faction not in conflict with person's Faction or the campaign Faction.
      *
      * @param campaign The campaign being played.
      * @param person The person for whom to filter the faction.
@@ -466,18 +655,11 @@ public class Academy {
     public String getCampusFilteredFaction(Campaign campaign, Person person, String system) {
         List<String> systemOwners = campaign.getSystemByName(system).getFactions(campaign.getLocalDate());
 
-        for (String faction : systemOwners) {
-            if ((isFactionRestricted) && (!faction.equals(person.getOriginFaction().getShortName()))) {
-                if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
-                        Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
-                    if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
-                            Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
-                        return faction;
-                    }
-                }
-            }
-        }
-        return null;
+        return systemOwners.stream()
+                .filter(faction -> (isFactionRestricted) && (!faction.equals(person.getOriginFaction().getShortName())))
+                .filter(faction -> RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(), Factions.getInstance().getFaction(faction), campaign.getLocalDate()))
+                .filter(faction -> RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(), Factions.getInstance().getFaction(faction), campaign.getLocalDate()))
+                .findFirst().orElse(null);
     }
 
     /**
@@ -512,7 +694,6 @@ public class Academy {
             return null;
         }
     }
-
 
     /**
      * Checks if there is a conflict between the factions related to the academy and person or campaign.
@@ -586,7 +767,7 @@ public class Academy {
             educationLevel += person.getEduHighestEducation() - educationLevelMin;
         }
 
-        int baseSkillLevelAdjusted = baseSkillLevel + educationLevel;
+        int baseSkillLevelAdjusted = baseAcademicSkillLevel + educationLevel;
 
         tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
 
