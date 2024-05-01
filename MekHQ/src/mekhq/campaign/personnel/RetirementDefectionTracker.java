@@ -46,7 +46,7 @@ import java.util.*;
  * @author Neoancient
  *
  * Against the Bot
- * Utility class that handles retirement/defection rolls and final payments
+ * Utility class that handles Employee Turnover rolls and final payments
  * to personnel who retire/defect/get sacked and families of those killed
  * in battle.
  */
@@ -93,6 +93,31 @@ public class RetirementDefectionTracker {
         }
 
         return netWorth.dividedBy(totalShares);
+    }
+
+    /**
+     * @param age the age of the employee
+     * @return the age-based modifier
+     */
+    private static int getAgeMod(int age) {
+        int ageMod = 0;
+        if (age <= 20) {
+            ageMod = -1;
+        } else if ((age >= 50) && (age < 65)) {
+            ageMod = 1;
+        } else if ((age >= 65) && (age < 75)) {
+            ageMod = 2;
+        } else if ((age >= 75) && (age < 85)) {
+            ageMod = 3;
+        } else if ((age >= 85) && (age < 95)) {
+            ageMod = 4;
+        } else if ((age >= 95) && (age < 105)) {
+            ageMod = 5;
+        } else if (age >= 105) {
+            ageMod = 6;
+        }
+
+        return ageMod;
     }
 
     /**
@@ -161,33 +186,86 @@ public class RetirementDefectionTracker {
         }
 
         for (Person p : campaign.getActivePersonnel()) {
-            if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()
-                    || (p.isFounder() && !campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
+            if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed() || (p.isFounder() && !campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
                 continue;
             }
 
             /* Infantry units retire or defect by platoon */
-            if ((null != p.getUnit()) && p.getUnit().usesSoldiers()
-                    && !p.getUnit().isCommander(p)) {
+            if ((null != p.getUnit()) && p.getUnit().usesSoldiers() && !p.getUnit().isCommander(p)) {
                 continue;
             }
 
-            TargetRoll target = new TargetRoll(3, "Target");
-            target.addModifier(p.getExperienceLevel(campaign, false) - campaign.getUnitRatingMod(),
-                    "Experience");
+            TargetRoll target = new TargetRoll(3, "Base");
+
+            // Skill Rating modifier
+            int skillRating = p.getExperienceLevel(campaign, false);
+            String skillRatingDescription;
+
+            switch (skillRating) {
+                case -1:
+                    skillRatingDescription = "Unskilled";
+                    break;
+                case 0:
+                    skillRatingDescription = "Ultra-Green";
+                    break;
+                case 1:
+                    skillRatingDescription = "Green";
+                    break;
+                case 2:
+                    skillRatingDescription = "Regular";
+                    break;
+                case 3:
+                    skillRatingDescription = "Veteran";
+                    break;
+                case 4:
+                    skillRatingDescription = "Elite";
+                    break;
+                default:
+                    skillRatingDescription = "Error, please see log";
+                    LogManager.getLogger().error("RetirementDefectionTracker: Unable to parse skillRating. Returning " + skillRating);
+            }
+
+            target.addModifier(skillRating, skillRatingDescription);
+
+            // Unit Rating modifier
+            int unitRating = 0;
+
+            if (campaign.getUnitRatingMod() < 1) {
+                unitRating = 2;
+            } else if (campaign.getUnitRatingMod() == 1) {
+                unitRating = 1;
+            } else if (campaign.getUnitRatingMod() > 3) {
+                unitRating = -1;
+            }
+
+            target.addModifier(unitRating, "Unit Rating");
+
             /* Retirement rolls are made before the contract status is set */
             if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
                 target.addModifier(1, "Failed mission");
             }
 
+            // Fatigue Modifiers
             if (campaign.getCampaignOptions().isTrackUnitFatigue() && (campaign.getFatigueLevel() >= 10)) {
                 target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
             }
 
+            // Faction Modifiers
             if (campaign.getFaction().isPirate()) {
-                target.addModifier(1, "Pirate");
+                target.addModifier(1, "Pirate Company");
+            } else if (p.getOriginFaction().isPirate()) {
+                target.addModifier(1,"Pirate");
             }
 
+            if (p.getOriginFaction().isMercenary()) {
+                target.addModifier(1, "Mercenary");
+            }
+
+            if (p.getOriginFaction().isClan()) {
+                target.addModifier(-2, "Clan");
+            }
+
+            // Officer Modifiers
             if (p.getRank().isOfficer()) {
                 target.addModifier(-1, "Officer");
             } else {
@@ -202,10 +280,15 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            if (p.getAge(campaign.getLocalDate()) >= 50) {
-                target.addModifier(1, "Over 50");
+            // Old Age modifier
+            int age = p.getAge(campaign.getLocalDate());
+            int ageMod = getAgeMod(age);
+
+            if (ageMod > 0) {
+                target.addModifier(ageMod, "Age");
             }
 
+            // Shares Modifiers
             if (campaign.getCampaignOptions().isUseShareSystem()) {
                 /* If this retirement roll is not being made at the end
                  * of a contract (e.g. >12 months since last roll), the
@@ -220,16 +303,17 @@ public class RetirementDefectionTracker {
                         }
                     }
                 }
-                if ((c != null) && (c.getSharesPct() > 20)) {
+                if (c != null) {
                     target.addModifier(-((c.getSharesPct() - 20) / 10), "Shares");
                 }
-            } else {
-                // Bonus payments handled by dialog
             }
 
+            // Role Modifiers
             if (p.getPrimaryRole().isSoldier()) {
                 target.addModifier(-1, p.getPrimaryRole().toString());
             }
+
+            // Injury Modifiers
             int injuryMod = 0;
             for (Injury i : p.getInjuries()) {
                 if (i.isPermanent()) {
@@ -238,15 +322,16 @@ public class RetirementDefectionTracker {
             }
 
             if (injuryMod > 0) {
-                target.addModifier(injuryMod, "Permanent injuries");
+                target.addModifier(injuryMod, "Permanent Injuries");
             }
 
+            // Leadership Modifiers
             if ((combatLeadershipMod != 0) && p.getPrimaryRole().isCombat()) {
-                target.addModifier(combatLeadershipMod, "Leadership");
+                target.addModifier(combatLeadershipMod, "Leadership (Combatant)");
             }
 
             if ((supportLeadershipMod != 0) && p.getPrimaryRole().isSupport()) {
-                target.addModifier(supportLeadershipMod, "Leadership");
+                target.addModifier(supportLeadershipMod, "Leadership (Support)");
             }
 
             targets.put(p.getId(), target);
@@ -254,10 +339,10 @@ public class RetirementDefectionTracker {
         return targets;
     }
 
-    /**
-     * Makes rolls for retirement/defection based on previously calculated target rolls,
+  /**
+     * Makes rolls for Employee Turnover based on previously calculated target rolls,
      * and tracks all retirees in the unresolvedPersonnel hash in case the dialog
-     * is closed before payments are resolved, to avoid rerolling the results.
+     * is closed before payments are resolved, to avoid re-rolling the results.
      *
      * @param mission Nullable mission value
      * @param targets The hash previously generated by calculateTargetNumbers.
@@ -339,7 +424,7 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Worker function that clears out any orphan retirement/defection records
+     * Worker function that clears out any orphan Employee Turnover records
      */
     public void cleanupOrphans(Campaign campaign) {
         payouts.keySet().removeIf(personID -> campaign.getPerson(personID) == null);
@@ -396,22 +481,10 @@ public class RetirementDefectionTracker {
     /**
      * @param campaign the campaign the person is a part of
      * @param person the person to get the bonus cost for
-     * @return The amount in C-bills required to get a bonus to the retirement/defection roll
+     * @return The amount in C-bills required to get a bonus to the Employee Turnover roll
      */
     public static Money getBonusCost(final Campaign campaign, Person person) {
-        final boolean isMechWarriorProfession = Profession.getProfessionFromPersonnelRole(
-                person.getPrimaryRole()).isMechWarrior();
-        switch (person.getExperienceLevel(campaign, false)) {
-            case SkillType.EXP_ELITE:
-                return Money.of(isMechWarriorProfession ? 9600 : 5920);
-            case SkillType.EXP_VETERAN:
-                return Money.of(isMechWarriorProfession ? 4800 : 2960);
-            case SkillType.EXP_REGULAR:
-                return Money.of(isMechWarriorProfession ? 3000 : 1850);
-            case SkillType.EXP_GREEN:
-            default:
-                return Money.of(isMechWarriorProfession ? 1800 : 1110);
-        }
+        return person.getSalary(campaign).multipliedBy(24);
     }
 
     /**
@@ -440,9 +513,6 @@ public class RetirementDefectionTracker {
             }
             if (killed) {
                 switch (Compute.d6()) {
-                    case 1:
-                        /* No effects */
-                        break;
                     case 2:
                         dependents = 1;
                         break;
@@ -455,6 +525,8 @@ public class RetirementDefectionTracker {
                         break;
                     case 6:
                         heir = true;
+                        break;
+                    default:
                         break;
                 }
             }
@@ -482,9 +554,6 @@ public class RetirementDefectionTracker {
                     }
                 } else {
                     payoutAmount = getBonusCost(campaign, person);
-                    if (person.getRank().isOfficer()) {
-                        payoutAmount = payoutAmount.multipliedBy(1.2);
-                    }
                 }
 
                 if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
@@ -658,7 +727,7 @@ public class RetirementDefectionTracker {
                                     payout.setWeightClass(Integer.parseInt(wn4.getTextContent()));
                                 } else if (wn4.getNodeName().equalsIgnoreCase("dependents")) {
                                     payout.setDependents(Integer.parseInt(wn4.getTextContent()));
-                                } else if (wn4.getNodeName().equalsIgnoreCase("cbills")) {
+                                } else if (wn4.getNodeName().equalsIgnoreCase("c-bills")) {
                                     payout.setPayoutAmount(Money.fromXmlString(wn4.getTextContent().trim()));
                                 } else if (wn4.getNodeName().equalsIgnoreCase("recruit")) {
                                     payout.setRecruit(Boolean.parseBoolean(wn4.getTextContent()));
@@ -678,14 +747,11 @@ public class RetirementDefectionTracker {
                 }
             }
         } catch (Exception ex) {
-            // Errrr, apparently either the class name was invalid...
-            // Or the listed name doesn't exist.
-            // Doh!
-            LogManager.getLogger().error("", ex);
+            LogManager.getLogger().error("RetirementDefectionTracker: either the class name is invalid or the listed name doesn't exist.", ex);
         }
 
         if (retVal != null) {
-            // sometimes, a campaign may be loaded with orphan records in the retirement/defection tracker
+            // sometimes, a campaign may be loaded with orphan records in the Employee Turnover tracker
             // let's clean those up here.
             retVal.cleanupOrphans(c);
         }

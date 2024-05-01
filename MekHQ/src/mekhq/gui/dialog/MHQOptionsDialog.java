@@ -153,6 +153,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionShortDeploymentNag;
     private JCheckBox optionUnresolvedStratConContactsNag;
     private JCheckBox optionOutstandingScenariosNag;
+    private JCheckBox optionCargoCapacityNag;
     //endregion Nag Tab
 
     //region Miscellaneous
@@ -881,6 +882,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionOutstandingScenariosNag.setToolTipText(resources.getString("optionOutstandingScenariosNag.toolTipText"));
         optionOutstandingScenariosNag.setName("optionOutstandingScenariosNag");
 
+        optionCargoCapacityNag = new JCheckBox(resources.getString("optionCargoCapacityNag.text"));
+        optionCargoCapacityNag.setToolTipText(resources.getString("optionCargoCapacityNag.toolTipText"));
+        optionCargoCapacityNag.setName("optionCargoCapacityNag");
+
         // Layout the UI
         final JPanel panel = new JPanel();
         panel.setName("nagPanel");
@@ -901,6 +906,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionShortDeploymentNag)
                         .addComponent(optionUnresolvedStratConContactsNag)
                         .addComponent(optionOutstandingScenariosNag)
+                        .addComponent(optionCargoCapacityNag)
         );
 
         layout.setHorizontalGroup(
@@ -915,6 +921,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionShortDeploymentNag)
                         .addComponent(optionUnresolvedStratConContactsNag)
                         .addComponent(optionOutstandingScenariosNag)
+                        .addComponent(optionCargoCapacityNag)
         );
 
         return panel;
@@ -1170,6 +1177,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT, optionShortDeploymentNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_CARGO_CAPACITY, optionCargoCapacityNag.isSelected());
 
         PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
         PreferenceManager.getInstance().save();
@@ -1281,6 +1289,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionShortDeploymentNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT));
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
+        optionCargoCapacityNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_CARGO_CAPACITY));
 
         txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());
