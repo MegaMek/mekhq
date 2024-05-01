@@ -42,7 +42,7 @@ import java.util.ResourceBundle;
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class Academy {
     @XmlElement(name = "name")
-    private String name = "";
+    private String name = "Error: Name Missing";
 
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary = false;
@@ -54,7 +54,7 @@ public class Academy {
     private Boolean isClan = false;
 
     @XmlElement(name = "description")
-    private String description = "";
+    private String description = "Error: no description";
 
     @XmlElement(name = "factionDiscount")
     private Integer factionDiscount = 0;
@@ -66,7 +66,7 @@ public class Academy {
     private Boolean isLocal = false;
 
     @XmlElement(name = "locationSystem")
-    private List<String> locationSystems = null;
+    private List<String> locationSystems = List.of("Terra");
 
     @XmlElement(name = "constructionYear")
     private Integer constructionYear = 2300;
@@ -97,7 +97,7 @@ public class Academy {
     private Integer educationLevelMin = 0;
 
     @XmlElement(name = "educationLevelMax")
-    private Integer educationLevelMax;
+    private Integer educationLevelMax = 1;
 
     @XmlElement(name = "ageMin")
     private Integer ageMin = 0;
@@ -106,13 +106,13 @@ public class Academy {
     private Integer ageMax = 9999;
 
     @XmlElement(name = "qualification")
-    private List<String> qualifications;
+    private List<String> qualifications = List.of("Error: no qualifications");
 
     @XmlElement(name = "curriculum")
-    private List<String> curriculums;
+    private List<String> curriculums = List.of("Gunnery/Mech, Piloting/Mech");
 
     @XmlElement(name = "qualificationStartYear")
-    private List<Integer> qualificationStartYears;
+    private List<Integer> qualificationStartYears = List.of(0001);
 
     @XmlElement(name = "baseAcademicSkillLevel")
     private Integer baseAcademicSkillLevel = 0;
@@ -140,7 +140,7 @@ public class Academy {
      * @param isLocal                 indicates if the academy is local (true) or not (false) (overrides locationSystems)
      * @param locationSystems         the list of location systems where the academy is present
      * @param constructionYear        the year when the academy was constructed
-     * @param destructionYear         the year when the academy was destroyed (null if not destroyed)
+     * @param destructionYear         the year when the academy was destroyed
      * @param tuition                 the tuition fee for attending the academy
      * @param durationDays            the duration of the academy in days
      * @param facultySkill            the skill level of the academy's faculty
@@ -800,14 +800,8 @@ public class Academy {
         PlanetarySystem destination = campaign.getCurrentSystem();
 
         if (!isLocal) {
-            for (String system : locationSystems) {
-                int distanceNew = Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(system));
-
-                if (distanceNew > distance) {
-                    distance = distanceNew;
-                    destination = campaign.getSystemByName(system);
-                }
-            }
+            distance = Campaign.getSimplifiedTravelTime(campaign,
+                    campaign.getSystemByName(getNearestCampus(campaign, locationSystems)));
         }
 
         tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ")
