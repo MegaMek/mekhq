@@ -337,9 +337,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEnablePrestigiousAcademies;
     private JCheckBox chkEnableClanEducation;
     private JCheckBox chkEnableRandomXp;
+    private JCheckBox chkEnableBonuses;
     private JLabel lblRandomXpRate;
     private JSpinner spnRandomXpRate;
-    private JCheckBox chkEnableBonuses;
     private JLabel lblAdultDropoutChance;
     private JSpinner spnAdultDropoutChance;
     private JLabel lblChildrenDropoutChance;
@@ -5066,11 +5066,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblMilitaryAcademyAccidents.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnMilitaryAcademyAccidents.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         if ((campaign.getCampaignOptions().isUseEducationModule()) && (campaign.getCampaignOptions().isAllAges())) {
+            chkLiveFireBlooding.setEnabled(true);
             lblWarriorCasteAccidents.setEnabled(true);
             spnWarriorCasteAccidents.setEnabled(true);
             lblOtherCasteAccidents.setEnabled(true);
             spnOtherCasteAccidents.setEnabled(true);
         } else {
+            chkLiveFireBlooding.setEnabled(false);
             lblWarriorCasteAccidents.setEnabled(false);
             spnWarriorCasteAccidents.setEnabled(false);
             lblOtherCasteAccidents.setEnabled(false);
