@@ -1371,6 +1371,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // we use 'campaign' a lot here, so let's store it, so we don't have to re-call it every time
             Campaign campaign = gui.getCampaign();
 
+            // TODO remove this once we have the MechWarrior Histories module
+            // this tells mhq that all adults have completed high school.
+            // this helps grandfather in existing campaign personnel.
+            if ((!person.isChild(campaign.getLocalDate())) && (person.getEduHighestEducation() < 1)) {
+                person.setEduHighestEducation(1);
+            }
+
             // this next block preps variables for use by the menu & tooltip
             int campaignYear = campaign.getLocalDate().getYear();
 
@@ -1409,8 +1416,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (Academy academy : academiesOfSet) {
                     // has the academy been constructed, is still standing, & has not closed?
                     if ((currentYear >= academy.getConstructionYear()) && (currentYear < academy.getDestructionYear()) && (currentYear < academy.getClosureYear())) {
-                        // is the applicant within the right age bracket?
-                        if ((personAge < academy.getAgeMax()) && (personAge >= academy.getAgeMin())) {
+                        // is the applicant within the right age bracket and qualified?
+                        if ((personAge < academy.getAgeMax()) && (personAge >= academy.getAgeMin()) && (academy.isQualified(person))) {
                             // is the academy Local?
                             if (academy.isLocal()) {
                                 // are any of the local academies accepting applicants from person's Faction or campaign's Faction?
@@ -1429,7 +1436,18 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     }
 
                                     // get the courses
-                                    buildEduSubMenus(academy, campaignYear, person, academyOption, null, faction);
+                                    buildEduSubMenus(academy, campaignYear, person, academyOption, "local", faction);
+                                } else {
+                                    JMenuItem academyOption = new JMenuItem(resources.getString("eduFactionConflict.text")
+                                            .replaceAll("0", person.getFirstName()));
+
+                                    if (academy.isClan()) {
+                                        clanMenu.add(academyOption);
+                                    } else if (academy.isMilitary()) {
+                                        militaryMenu.add(academyOption);
+                                    } else {
+                                        civilianMenu.add(academyOption);
+                                    }
                                 }
                             } else {
                                 // what campuses accept applicants from person's Faction & campaign Faction?
@@ -2486,14 +2504,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         int courseCount = academy.getQualifications().size();
 
         if (courseCount > 0) {
-            for (int courseIndex = 0; courseIndex < courseCount; courseIndex++) {
+            for (int courseIndex = 0; courseIndex < (courseCount); courseIndex++) {
+                LogManager.getLogger().info("Important: {}", academy.getQualificationStartYears().get(courseIndex));
                 // we also need to make sure the course is being offered
                 if (campaignYear >= academy.getQualificationStartYears().get(courseIndex)) {
-                    String course = "<html>" + academy.getQualifications().get(courseIndex) + "<br>" + academy.getCurriculums().get(courseIndex) + "</html>";
+                    String course = academy.getQualifications().get(courseIndex);
                     courses = new JMenuItem(course);
                     courses.setToolTipText(academy.getTooltip(gui.getCampaign(), person, courseIndex));
                     if (academy.isLocal()) {
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), String.valueOf(courseIndex), null, faction));
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), String.valueOf(courseIndex), "local", faction));
                     } else {
                         courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), String.valueOf(courseIndex), campus, faction));
                     }

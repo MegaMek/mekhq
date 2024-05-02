@@ -39,7 +39,7 @@ public class EducationController {
             return;
         }
 
-        int tuition = academy.getTuitionAdjusted(academy.getEducationLevelMin(), getEducationLevel(person, academy));
+        int tuition = academy.getTuitionAdjusted(person);
 
         // check there is enough money in the campaign & if so, make a debit
         if (getBalance(campaign) < tuition) {
@@ -75,29 +75,6 @@ public class EducationController {
         }
 
         return Integer.parseInt(balance);
-    }
-
-    /**
-     * Calculates the education level of a person based on their highest prior education level and
-     * the range of education levels offered by an academy.
-     *
-     * @param person  The person whose education level needs to be determined.
-     * @param academy The academy that provides the education.
-     * @return The education level of the person.
-     * It is calculated as the difference between the person's highest prior education level and the minimum education level offered by the
-     * academy, unless the person's highest education level exceeds the maximum education level offered by the academy, in which case the education
-     * level is set to the difference between the maximum and minimum education levels.
-     */
-    private static int getEducationLevel(Person person, Academy academy) {
-        int educationLevel = 0;
-
-        if (person.getEduHighestEducation() >= academy.getEducationLevelMax()) {
-            educationLevel = academy.getEducationLevelMax() - academy.getEducationLevelMin();
-        } else {
-            educationLevel += person.getEduHighestEducation() - academy.getEducationLevelMin();
-        }
-
-        return educationLevel;
     }
 
     /**
@@ -431,7 +408,10 @@ public class EducationController {
     private static Academy getAcademy(Person person) {
         List<String> setNames = AcademyFactory.getInstance().getAllSetNames();
 
-        return setNames.stream().filter(setName -> setName.equalsIgnoreCase(person.getEduAcademySet())).map(setName -> AcademyFactory.getInstance().getAllAcademiesForSet(setName)).flatMap(Collection::stream).filter(academy -> String.valueOf(academy.getName()).equals(person.getEduAcademyNameInSet())).findFirst().orElse(null);
+        return setNames.stream().filter(setName -> setName.equalsIgnoreCase(person.getEduAcademySet()))
+                .map(setName -> AcademyFactory.getInstance().getAllAcademiesForSet(setName))
+                .flatMap(Collection::stream).filter(academy -> String.valueOf(academy.getName())
+                        .equals(person.getEduAcademyNameInSet())).findFirst().orElse(null);
     }
 
     /**
@@ -817,7 +797,7 @@ public class EducationController {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedFailed.text"));
             ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName());
 
-            improveSkills(person, academy, false);
+            improveSkills(campaign, person, academy, false);
 
             return;
         }
@@ -833,21 +813,6 @@ public class EducationController {
             return;
         }
 
-        // this covers the code that is identical for both child and adult students
-        commonGraduation(campaign, person, academy, resources, graduationRoll);
-    }
-
-    /**
-     * Processes the types of graduation that are identical for both adult & child students.
-     *
-     * @param campaign the campaign where the graduation is taking place
-     * @param person the person who is graduating
-     * @param academy the academy where the person is studying
-     * @param resources the resource bundle containing the strings for reporting and logging
-     * @param graduationRoll the roll number for determining the graduation type
-     */
-    private static void commonGraduation(Campaign campaign, Person person, Academy academy, ResourceBundle resources, int graduationRoll) {
-        // graduated top of the class
         if (graduationRoll == 99) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text")
                     .replace("0", graduationEventPicker()));
@@ -855,13 +820,27 @@ public class EducationController {
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
                     resources.getString("graduatedTopLog.text"), person.getEduAcademyName());
 
-            improveSkills(person, academy, true);
+            improveSkills(campaign, person, academy, true);
 
             if (campaign.getCampaignOptions().isEnableBonuses()) {
                 addBonus(campaign, person, academy, 2, resources);
             }
 
-            person.setEduHighestEducation(getEducationLevel(person, academy));
+            int educationLevel = academy.getEducationLevel(person);
+            person.setEduHighestEducation(educationLevel);
+
+            if (educationLevel == 3) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedMasters.text"));
+
+                ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName());
+
+            } else if (educationLevel == 4) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedDoctorate.text"));
+
+                ServiceLogger.eduGraduatedDoctorate(person, campaign.getLocalDate(), person.getEduAcademyName());
+
+                person.setPreNominal("Dr");
+            }
 
             return;
         }
@@ -874,13 +853,13 @@ public class EducationController {
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
                     resources.getString("graduatedHonorsLog.text"), person.getEduAcademyName());
 
-            improveSkills(person, academy, true);
+            improveSkills(campaign, person, academy, true);
 
             if (campaign.getCampaignOptions().isEnableBonuses()) {
                 addBonus(campaign, person, academy, 1, resources);
             }
 
-            person.setEduHighestEducation(getEducationLevel(person, academy));
+            person.setEduHighestEducation(academy.getEducationLevel(person));
 
             return;
         }
@@ -891,9 +870,9 @@ public class EducationController {
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
 
-        improveSkills(person, academy, true);
+        improveSkills(campaign, person, academy, true);
 
-        person.setEduHighestEducation(getEducationLevel(person, academy));
+        person.setEduHighestEducation(academy.getEducationLevel(person));
     }
 
     /**
@@ -912,13 +891,20 @@ public class EducationController {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedBarely.text"));
             ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName());
 
-            improveSkills(person, academy, false);
+            improveSkills(campaign, person, academy, false);
 
             return;
         }
 
-        // graduated top of the class
-        commonGraduation(campaign, person, academy, resources, graduationRoll);
+        // default graduation
+        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
+                .replace("0", graduationEventPicker()));
+
+        ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
+
+        improveSkills(campaign, person, academy, true);
+
+        person.setEduHighestEducation(academy.getEducationLevel(person));
     }
 
     /**
@@ -1010,7 +996,7 @@ public class EducationController {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedWarriorOneKill.text"));
                 ServiceLogger.eduClanWarrior(person, campaign.getLocalDate(), resources.getString("graduatedWarriorOneKillLog.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 person.setEduHighestEducation(2);
 
@@ -1022,7 +1008,7 @@ public class EducationController {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedWarriorTwoKills.text"));
                 ServiceLogger.eduClanWarrior(person, campaign.getLocalDate(), resources.getString("graduatedWarriorTwoKillsLog.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 if (campaign.getCampaignOptions().isEnableBonuses()) {
                     addBonus(campaign, person, academy, 1, resources);
@@ -1038,7 +1024,7 @@ public class EducationController {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedWarriorThreeKills.text"));
                 ServiceLogger.eduClanWarrior(person, campaign.getLocalDate(), resources.getString("graduatedWarriorThreeKillsLog.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 if (campaign.getCampaignOptions().isEnableBonuses()) {
                     addBonus(campaign, person, academy, 2, resources);
@@ -1071,7 +1057,7 @@ public class EducationController {
                         resources.getString("graduatedClanBarely.text"),
                         resources.getString("graduatedScience.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 person.setEduHighestEducation(2);
 
@@ -1087,7 +1073,7 @@ public class EducationController {
                         resources.getString("graduatedEasily.text"),
                         resources.getString("graduatedScience.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 if (campaign.getCampaignOptions().isEnableBonuses()) {
                     addBonus(campaign, person, academy, 1, resources);
@@ -1107,7 +1093,7 @@ public class EducationController {
                         resources.getString("graduatedEffortlessly.text"),
                         resources.getString("graduatedScience.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 if (campaign.getCampaignOptions().isEnableBonuses()) {
                     addBonus(campaign, person, academy, 2, resources);
@@ -1140,7 +1126,7 @@ public class EducationController {
                         resources.getString("graduatedClanBarely.text"),
                         resources.getString("graduatedMerchant.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 person.setEduHighestEducation(2);
 
@@ -1156,7 +1142,7 @@ public class EducationController {
                         resources.getString("graduatedEasily.text"),
                         resources.getString("graduatedMerchant.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 if (campaign.getCampaignOptions().isEnableBonuses()) {
                     addBonus(campaign, person, academy, 1, resources);
@@ -1176,7 +1162,7 @@ public class EducationController {
                         resources.getString("graduatedEffortlessly.text"),
                         resources.getString("graduatedMerchant.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 if (campaign.getCampaignOptions().isEnableBonuses()) {
                     addBonus(campaign, person, academy, 2, resources);
@@ -1209,7 +1195,7 @@ public class EducationController {
                         resources.getString("graduatedClanBarely.text"),
                         resources.getString("graduatedTechnician.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 person.setEduHighestEducation(2);
 
@@ -1225,7 +1211,7 @@ public class EducationController {
                         resources.getString("graduatedEasily.text"),
                         resources.getString("graduatedTechnician.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 if (campaign.getCampaignOptions().isEnableBonuses()) {
                     addBonus(campaign, person, academy, 1, resources);
@@ -1245,7 +1231,7 @@ public class EducationController {
                         resources.getString("graduatedEffortlessly.text"),
                         resources.getString("graduatedTechnician.text"));
 
-                improveSkills(person, academy, true);
+                improveSkills(campaign, person, academy, true);
 
                 if (campaign.getCampaignOptions().isEnableBonuses()) {
                     addBonus(campaign, person, academy, 2, resources);
@@ -1261,7 +1247,7 @@ public class EducationController {
         campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedLabour.text"));
         ServiceLogger.eduClanLabour(person, campaign.getLocalDate());
 
-        improveSkills(person, academy, true);
+        improveSkills(campaign, person, academy, true);
 
         person.setEduHighestEducation(2);
     }
@@ -1273,29 +1259,33 @@ public class EducationController {
      * @param academy The academy the person is attending.
      * @param isGraduating A boolean value indicating whether the person is graduating from the academy or not.
      */
-    private static void improveSkills(Person person, Academy academy, Boolean isGraduating) {
+    private static void improveSkills(Campaign campaign, Person person, Academy academy, Boolean isGraduating) {
         String[] curriculum = academy.getCurriculums().get(person.getEduCourseIndex())
                 .replaceAll(", ", ",").split(",");
 
-        int education = academy.getBaseAcademicSkillLevel() + getEducationLevel(person, academy);
+        int educationLevel = academy.getBaseAcademicSkillLevel() + academy.getEducationLevel(person);
 
         if (!isGraduating) {
-            education--;
+            educationLevel--;
 
-            if (education < 0) {
+            if (educationLevel < 0) {
                 return;
             }
         }
 
         for (String skill : curriculum) {
-            String skillParsed = Academy.skillParser(skill);
-            int bonus;
-
-            if ((person.hasSkill(skillParsed)) && (person.getSkillLevel(skillParsed) < education)) {
-                bonus = person.getSkill(skillParsed).getBonus();
-                person.addSkill(skillParsed, education, bonus);
+            if (skill.equalsIgnoreCase("bonus xp")) {
+                person.awardXP(campaign, Compute.d6(educationLevel));
             } else {
-                person.addSkill(skillParsed, education, 0);
+                String skillParsed = Academy.skillParser(skill);
+                int bonus;
+
+                if ((person.hasSkill(skillParsed)) && (person.getSkillLevel(skillParsed) < educationLevel)) {
+                    bonus = person.getSkill(skillParsed).getBonus();
+                    person.addSkill(skillParsed, educationLevel, bonus);
+                } else {
+                    person.addSkill(skillParsed, educationLevel, 0);
+                }
             }
         }
     }
@@ -1312,18 +1302,13 @@ public class EducationController {
         List<String> curriculum = Arrays.asList(academy.getCurriculums().get(person.getEduCourseIndex())
                 .replaceAll(", ", ",").split(","));
 
-        // we remove the chance someone rolls the same skill multiple times, so they don't lose their bonus
-        List<Integer> oldRolls = new ArrayList<>();
-
         for (int i = 0; i < bonusCount; i++) {
-            int roll = Compute.randomInt(curriculum.size());
+            int roll = Compute.randomInt(curriculum.size() - 1);
 
-            if (!oldRolls.contains(roll)) {
-                oldRolls.add(roll);
+            try {
                 String skillParsed = Academy.skillParser(curriculum.get(roll));
 
-                // if the skill already has a bonus, they don't get to improve it further.
-                // this is to discourage people from farming academia
+                // if 'person' already has a +1 bonus for the skill, we give them XP, instead
                 if (person.getSkill(skillParsed).getBonus() < 1) {
                     int skillLevel = person.getSkillLevel(skillParsed);
                     int bonus = person.getSkill(skillParsed).getBonus() + 1;
@@ -1332,10 +1317,12 @@ public class EducationController {
 
                     campaign.addReport(resources.getString("bonusAdded.text")
                             .replaceAll("0", person.getFirstName()));
+                } else {
+                    person.awardXP(campaign, Compute.d6(2));
                 }
-            } else {
-                // this ensures the loop is redone
-                bonusCount--;
+            } catch (Exception e) {
+                // if we get this, it means the 'skill' was Bonus XP
+                person.awardXP(campaign, Compute.d6(2));
             }
         }
     }

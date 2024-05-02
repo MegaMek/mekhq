@@ -78,12 +78,6 @@ class AcademyTests {
     }
 
     @Test
-    void testGetTuitionAdjusted() {
-        Integer result = academy.getTuitionAdjusted(0, 0);
-        Assertions.assertEquals(Integer.valueOf(0), result);
-    }
-
-    @Test
     public void testSkillParser_ValidSkill() {
         assertEquals(SkillType.S_PILOT_MECH, Academy.skillParser("piloting/mech"));
         assertEquals(SkillType.S_GUN_MECH, Academy.skillParser("gunnery/mech"));

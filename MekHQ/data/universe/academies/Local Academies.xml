@@ -1,0 +1,348 @@
+<?xml version="1.0"?>
+<academies>
+    <academy>
+        <name>Boarding School</name>
+        <isPrepSchool>true</isPrepSchool>
+        <description>In a home away from home, students learn the basics of life and undergo their earliest education.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>47500</tuition>
+        <durationDays>1</durationDays>
+        <educationLevelMax>0</educationLevelMax>
+        <ageMax>11</ageMax>
+        <qualification>General Education</qualification>
+        <curriculum>XP Bonus</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>High School</name>
+        <isPrepSchool>true</isPrepSchool>
+        <description>A typical academic life for teenagers across the Inner Sphere</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>3500</tuition>
+        <ageMin>11</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>General Education</qualification>
+        <curriculum>XP Bonus</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Preparatory School</name>
+        <isPrepSchool>true</isPrepSchool>
+        <description>A boarding school for the privileged teenagers of the Inner Sphere.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>22500</tuition>
+        <facultySkill>6</facultySkill>
+        <ageMin>11</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>General Education</qualification>
+        <curriculum>XP Bonus, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Military School</name>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Whether as punishment, or a matter of familial pride, an education here prepares students for a life of military discipline.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>6250</tuition>
+        <ageMin>11</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>General Education</qualification>
+        <curriculum>Small Arms, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Tech Apprenticeship</name>
+        <isPrepSchool>true</isPrepSchool>
+        <description>A few years spent training under a willing master will prepare a student for the life of a Technician.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>6250</tuition>
+        <facultySkill>8</facultySkill>
+        <ageMin>11</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>General Education</qualification>
+        <curriculum>Bonus XP, Astech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Adult High School</name>
+        <description>A option for those students who never graduated high school, or who never had the chance to attend.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>1750</tuition>
+        <durationDays>150</durationDays>
+        <qualification>General Education</qualification>
+        <curriculum>XP Bonus</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Trade Bootcamp</name>
+        <description>Shorter, more intense courses provide a basic education in the student's chosen field</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>3000</tuition>
+        <durationDays>300</durationDays>
+        <facultySkill>8</facultySkill>
+        <educationLevelMin>1</educationLevelMin>
+        <ageMin>16</ageMin>
+        <qualification>BattleMech Repair &amp; Maintenance</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Advanced Technology Maintenance &amp; Repairs</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>AeroSpace Flight Technology</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <qualification>Battle Armor Development</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Black Naval Technologies</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Applied Bureaucracy</qualification>
+        <curriculum>Administration</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Business Studies</qualification>
+        <curriculum>Negotiation, Scrounge</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Technical College</name>
+        <description>Technical Colleges are places where the technicians of the future hone their craft.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>5000</tuition>
+        <durationDays>600</durationDays>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Advanced BattleMech Technologies</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Advanced Technology &amp; Development</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced AeroSpace Technologies</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <qualification>Battle Armor Technology &amp; Development</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Black Naval Technologies</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Trade School</name>
+        <description>Here, students learn the art of administration and applied economics</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>5000</tuition>
+        <durationDays>600</durationDays>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Vocational Administrator</qualification>
+        <curriculum>Administration</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Vocational Logistician</qualification>
+        <curriculum>Negotiation, Scrounge</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Nursing School</qualification>
+        <curriculum>Medtech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>University</name>
+        <description>The upper crust of higher education, universities offer a wide range of courses and post-graduate options</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>4</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Advanced BattleMech Technologies</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Advanced Technology &amp; Development</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced AeroSpace Technologies</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <qualification>Battle Armor Technology &amp; Development</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Black Naval Technologies</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Advanced Systems &amp; Technology</qualification>
+        <curriculum>Administration</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Applied Economics</qualification>
+        <curriculum>Negotiation, Scrounge</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Medical School</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Applied Astrophysics</qualification>
+        <curriculum>Hyperspace Navigation</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Police Academy</name>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>750</tuition>
+        <durationDays>70</durationDays>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Field Officer Training</qualification>
+        <curriculum>Small Arms</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Administrative Officer Training</qualification>
+        <curriculum>Administration</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Boot Camp</name>
+        <isMilitary>true</isMilitary>
+        <description>After a couple of months' hard training students are ready to serve on the line.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>1250</tuition>
+        <durationDays>70</durationDays>
+        <facultySkill>8</facultySkill>
+        <educationLevelMin>1</educationLevelMin>
+        <ageMin>16</ageMin>
+        <qualification>Mechanized Cavalry Bootcamp</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Air Cavalry Bootcamp</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/VTOL</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Naval Bootcamp</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/VTOL</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Flight Camp</qualification>
+        <curriculum>Gunnery/Aircraft, Piloting/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Infantry Bootcamp</qualification>
+        <curriculum>Small Arms</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Military Academy</name>
+        <isMilitary>true</isMilitary>
+        <description>Military Academies offer the finest tuition for career-minded students</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>3500</tuition>
+        <durationDays>300</durationDays>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Academy</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Advanced Flight School</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <qualification>Black Naval Academy</qualification>
+        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Battle Armor Academy</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Artillery College</qualification>
+        <curriculum>Small Arms, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Cavalry School</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Air Cavalry College</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/VTOL</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Naval Academy</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Naval</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Flight School</qualification>
+        <curriculum>Gunnery/Aircraft, Piloting/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced War Fighting</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>NCO Candidate School</name>
+        <isMilitary>true</isMilitary>
+        <description>Here candidates are trained in the skills required to lead men</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>2500</tuition>
+        <durationDays>70</durationDays>
+        <educationLevelMin>1</educationLevelMin>
+        <ageMin>16</ageMin>
+        <qualification>NCO Candidacy</qualification>
+        <curriculum>Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Warrant Officer Candidate School</name>
+        <isMilitary>true</isMilitary>
+        <description>Only the most qualified personnel are fit to become Warrant Officers. This is where they gain essential training and education.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>5000</tuition>
+        <durationDays>150</durationDays>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Warrant Officer</qualification>
+        <curriculum>Leadership, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Officer Candidate School</name>
+        <isMilitary>true</isMilitary>
+        <description>Only the most qualified personnel are fit to become Officers. This is where they gain essential training and education.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>5000</tuition>
+        <durationDays>150</durationDays>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Field Officer</qualification>
+        <curriculum>Leadership, Tactics</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Command Officer</qualification>
+        <curriculum>Leadership, Strategy</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+</academies>

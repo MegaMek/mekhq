@@ -31,6 +31,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
@@ -57,7 +58,7 @@ public class Academy {
     private String description = "Error: no description";
 
     @XmlElement(name = "factionDiscount")
-    private Integer factionDiscount = 0;
+    private Integer factionDiscount = 25;
 
     @XmlElement(name = "isFactionRestricted")
     private Boolean isFactionRestricted = false;
@@ -66,7 +67,7 @@ public class Academy {
     private Boolean isLocal = false;
 
     @XmlElement(name = "locationSystem")
-    private List<String> locationSystems = List.of("Terra");
+    private List<String> locationSystems = null;
 
     @XmlElement(name = "constructionYear")
     private Integer constructionYear = 2300;
@@ -82,17 +83,17 @@ public class Academy {
 
     @XmlElement(name = "durationDays")
     // this number is chosen so that PrepSchools still experience dropouts
+    // otherwise 300/year
     private Integer durationDays = 11;
 
     @XmlElement(name = "facultySkill")
-    private Integer facultySkill = 12;
+    private Integer facultySkill = 7;
 
     // 0 = early childhood <= 10
-    // 1 = 11-16
-    // 2 = high school
-    // 3 = college / university
-    // 4 = post-grad
-    // 5 = doctorate
+    // 1 = (11-16) high school
+    // 2 = college / university
+    // 3 = post-grad
+    // 4 = doctorate
     @XmlElement(name = "educationLevelMin")
     private Integer educationLevelMin = 0;
 
@@ -106,13 +107,13 @@ public class Academy {
     private Integer ageMax = 9999;
 
     @XmlElement(name = "qualification")
-    private List<String> qualifications = List.of("Error: no qualifications");
+    private List<String> qualifications = null;
 
     @XmlElement(name = "curriculum")
-    private List<String> curriculums = List.of("Gunnery/Mech, Piloting/Mech");
+    private List<String> curriculums = null;
 
     @XmlElement(name = "qualificationStartYear")
-    private List<Integer> qualificationStartYears = List.of(2001);
+    private List<Integer> qualificationStartYears = null;
 
     @XmlElement(name = "baseAcademicSkillLevel")
     private Integer baseAcademicSkillLevel = 0;
@@ -124,7 +125,6 @@ public class Academy {
      */
     public Academy() {
     }
-
 
     /**
      * Constructs a new Academy object.
@@ -617,12 +617,12 @@ public class Academy {
     /**
      * Retrieves the adjusted value of the academy's tuition based on the specified tier minimum and education level.
      *
-     * @param tierMin        the minimum education level tier for calculating the adjustment
-     * @param educationLevel the education level for which the tuition adjustment is calculated
+     * @param person        the person for whom the tuition is being calculated
+     * @param educationLevelMin the education level for which the tuition adjustment is calculated
      * @return the adjusted tuition value as an Integer
      */
-    public Integer getTuitionAdjusted(Integer tierMin, Integer educationLevel) {
-        return getTuition() * ((educationLevel - tierMin) / 2);
+    public Integer getTuitionAdjusted(Person person) {
+        return getTuition() * (getEducationLevel(person) - educationLevelMin);
     }
 
     /**
@@ -655,11 +655,16 @@ public class Academy {
     public String getCampusFilteredFaction(Campaign campaign, Person person, String system) {
         List<String> systemOwners = campaign.getSystemByName(system).getFactions(campaign.getLocalDate());
 
-        return systemOwners.stream()
-                .filter(faction -> (isFactionRestricted) && (!faction.equals(person.getOriginFaction().getShortName())))
-                .filter(faction -> RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(), Factions.getInstance().getFaction(faction), campaign.getLocalDate()))
-                .filter(faction -> RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(), Factions.getInstance().getFaction(faction), campaign.getLocalDate()))
-                .findFirst().orElse(null);
+        for (String faction : systemOwners) {
+            if ((isFactionRestricted) && (Objects.equals(person.getOriginFaction().getShortName(), faction))) {
+                return faction;
+            } else if (!RandomFactionGenerator.getInstance().getFactionHints()
+                    .isAtWarWith(person.getOriginFaction(), Factions.getInstance().getFaction(faction),
+                            campaign.getLocalDate())) {
+                return faction;
+            }
+        }
+        return null;
     }
 
     /**
@@ -693,6 +698,35 @@ public class Academy {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Checks if a person is qualified to enroll based on their highest education level.
+     *
+     * @param person The person to check qualification for.
+     * @return True, if the person's highest education level is greater than or equal to the minimum education level required, false otherwise.
+     */
+    public boolean isQualified(Person person) {
+        return person.getEduHighestEducation() >= educationLevelMin;
+    }
+
+    /**
+     * Calculates the education level of a qualification based on the applicant's highest prior education level and
+     * the range of education levels offered by the academy.
+     *
+     * @param person  The person whose education level needs to be determined.
+     * @return The education level of the qualification.
+     */
+    int getEducationLevel(Person person) {
+        int educationLevel;
+
+        if ((person.getEduHighestEducation() + educationLevelMin) >= educationLevelMax) {
+            educationLevel = educationLevelMax;
+        } else {
+            educationLevel = person.getEduHighestEducation() + educationLevelMin;
+        }
+
+        return educationLevel;
     }
 
     /**
@@ -751,41 +785,31 @@ public class Academy {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
                 MekHQ.getMHQOptions().getLocale());
 
-        StringBuilder tooltip = new StringBuilder().append("<html>");
+        StringBuilder tooltip = new StringBuilder().append("<html><body style='width: 200px'>");
         tooltip.append("<i>").append(description).append("</i><br><br>");
-
-        // this is where we check Person is eligible for the education and prep the skill display
-        int educationLevel = 0;
-        if (person.getEduHighestEducation() < educationLevelMin) {
-            // If the person is ineligible to attend the academy, we tell them here
-            tooltip.append("<b>").append(resources.getString("ineligible.text")
-                    .replaceAll("0", String.valueOf(educationLevelMin))).append(" </b></html");
-            return tooltip.toString();
-        } else if (person.getEduHighestEducation() >= educationLevelMax) {
-            educationLevel = educationLevelMax - educationLevelMin;
-        } else {
-            educationLevel += person.getEduHighestEducation() - educationLevelMin;
-        }
-
-        int baseSkillLevelAdjusted = baseAcademicSkillLevel + educationLevel;
-
         tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
+
+        int educationLevel = getEducationLevel(person);
 
         // here we display the skills
         String[] skills = curriculums.get(courseIndex).replaceAll(", ", ",").split(",");
         for (String skill : skills) {
             tooltip.append(skill).append(" (");
 
-            String skillParsed = skillParser(skill);
-
-            if (person.hasSkill(skillParsed)) {
-                if (person.getSkillLevel(skillParsed) >= baseSkillLevelAdjusted) {
-                    tooltip.append("nothingToLearn.text").append(")<br>");
-                } else {
-                    tooltip.append('+').append(baseSkillLevelAdjusted - person.getSkillLevel(skillParsed)).append(")<br>");
-                }
+            if(skill.equalsIgnoreCase("xp bonus")) {
+                tooltip.append(getEducationLevel(person)).append(resources.getString("xpBonus.text")).append(")<br>");
             } else {
-                tooltip.append('+').append(baseSkillLevelAdjusted - person.getSkillLevel(skillParsed)).append(")<br>");
+                String skillParsed = skillParser(skill);
+
+                if (person.hasSkill(skillParsed)) {
+                    if (person.getSkillLevel(skillParsed) >= educationLevel) {
+                        tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                    } else {
+                        tooltip.append('+').append(educationLevel - person.getSkillLevel(skillParsed)).append(")<br>");
+                    }
+                } else {
+                    tooltip.append('+').append(educationLevel - person.getSkillLevel(skillParsed)).append(")<br>");
+                }
             }
         }
 
@@ -809,7 +833,7 @@ public class Academy {
         tooltip.append("<b>").append(resources.getString("facultySkill.text")).append("</b> ")
                 .append(facultySkill).append ('+').append("<br>");
         tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")
-                .append(educationLevel).append ('+').append("<br>");
+                .append(getEducationLevel(person)).append("<br>");
 
         return tooltip.append("</html>").toString();
     }

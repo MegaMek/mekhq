@@ -98,6 +98,14 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedPlus.text"), graduationType, institution)));
     }
 
+    public static void eduGraduatedMasters(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedMasters.text"), institution)));
+    }
+
+    public static void eduGraduatedDoctorate(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedDoctorate.text"), institution)));
+    }
+
     public static void eduFailed(Person person, LocalDate date, String institution) {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduFailed.text"), institution)));
     }
