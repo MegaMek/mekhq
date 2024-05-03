@@ -31,7 +31,6 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private MMComboBox<ScenarioObjective.ObjectiveAmountType> cboCountType;
     private JComboBox<String> cboForceName;
 
-    private JLabel lblMagnitude;
     private JSpinner spnScore;
     private JComboBox<ObjectiveEffect.EffectScalingType> cboScalingType;
     private JComboBox<ObjectiveEffect.ObjectiveEffectType> cboEffectType;
@@ -343,7 +342,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbcRight.fill = GridBagConstraints.NONE;
         gbcRight.weightx = 1.0;
 
-        lblMagnitude = new JLabel(resourceMap.getString("lblMagnitude.text"));
+        JLabel lblMagnitude = new JLabel(resourceMap.getString("lblMagnitude.text"));
         panObjectiveEffect.add(lblMagnitude, gbcLeft);
         spnScore = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
         panObjectiveEffect.add(spnScore, gbcRight);
@@ -480,14 +479,6 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
      * Event handler for the 'add' button for scenario effects
      */
     private void addEffect() {
-        int amount = 0;
-        try {
-            amount =
-            lblMagnitude.setForeground(UIManager.getColor("text"));
-        } catch (Exception e) {
-            lblMagnitude.setForeground(Color.red);
-            return;
-        }
 
         ObjectiveEffect effect = new ObjectiveEffect();
         effect.howMuch = (int) spnScore.getValue();;
