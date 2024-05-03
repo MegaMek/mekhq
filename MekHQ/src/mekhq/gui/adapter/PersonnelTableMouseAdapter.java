@@ -23,7 +23,6 @@ import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.common.Crew;
 import megamek.common.Mounted;
-import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -1442,9 +1441,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                         // is the academy Local?
                                         if (academy.isLocal()) {
                                             // are any of the local academies accepting applicants from person's Faction or campaign's Faction?
-                                            String faction = academy.getCampusFilteredFaction(campaign, person, campaign.getCurrentSystem().getName(campaign.getLocalDate()));
+                                            String faction = academy.getCampusFilteredFaction(campaign, person, campaign.getCurrentSystem().getId());
 
-                                            if (faction != null) {
+                                            // we add this exception so Clan players always have access to Trueborn Crèches and Sibkos.
+                                            if ((faction != null) || (academy.isClan())) {
                                                 // attach it to the right category
                                                 JMenu academyOption = new JMenu(academy.getName());
 
@@ -1457,9 +1457,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                                 }
 
                                                 // get the courses
-                                                buildEduSubMenus(academy, campaignYear, person, academyOption, "local", faction);
+                                                if (academy.isClan()) {
+                                                    // again, Clans get a free pass
+                                                    buildEduSubMenus(academy, campaignYear, person, academyOption, "local", campaign.getFaction().getShortName());
+                                                } else {
+                                                    buildEduSubMenus(academy, campaignYear, person, academyOption, "local", faction);
+                                                }
                                             } else {
-                                                JMenuItem academyOption = new JMenuItem(resources.getString("eduFactionConflict.text").replaceAll("0", person.getFirstName()));
+                                                JMenuItem academyOption = new JMenuItem(resources.getString("eduFactionConflict.text")
+                                                        .replaceAll("0", person.getFirstName()));
 
                                                 if (academy.isClan()) {
                                                     clanMenu.add(academyOption);
@@ -2539,7 +2545,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param campaignYear  the campaign year to consider
      * @param person        the person for whom the submenus are being built
      */
-    private void buildEduSubMenus(Academy academy, int campaignYear, Person person, JMenu academyOption, @Nullable String campus, String faction) {
+    private void buildEduSubMenus(Academy academy, int campaignYear, Person person, JMenu academyOption, String campus, String faction) {
         JMenuItem courses;
         int courseCount = academy.getQualifications().size();
 

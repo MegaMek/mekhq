@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<academies>
+    <academy>
+        <name>Trueborn Crèche</name>
+        <isPrepSchool>true</isPrepSchool>
+        <isClan>true</isClan>
+        <description>Alongside their sibkin, Trueborn Clansmen begin their life in the crèche.</description>
+        <factionDiscount>0</factionDiscount>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2802</constructionYear>
+        <facultySkill>4</facultySkill>
+        <educationLevelMax>0</educationLevelMax>
+        <ageMax>10</ageMax>
+        <qualification>Tier A Tuition &amp; Primary Care</qualification>
+        <curriculum>Bonus XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Freeborn Crèche</name>
+        <isPrepSchool>true</isPrepSchool>
+        <isClan>true</isClan>
+        <description>From an early age, Freeborn children are taught their place in Clan society.</description>
+        <factionDiscount>0</factionDiscount>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2802</constructionYear>
+        <facultySkill>5</facultySkill>
+        <educationLevelMax>0</educationLevelMax>
+        <ageMax>10</ageMax>
+        <qualification>Tier B Tuition &amp; Primary Care</qualification>
+        <curriculum>Bonus XP</curriculum>
+        <qualificationStartYear>2802</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+</academies>

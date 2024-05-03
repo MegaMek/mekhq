@@ -54,6 +54,9 @@ public class Academy {
     @XmlElement(name = "isClan")
     private Boolean isClan = false;
 
+    @XmlElement(name = "isTrueborn")
+    private Boolean isTrueborn = false;
+
     @XmlElement(name = "description")
     private String description = "Error: no description";
 
@@ -62,6 +65,9 @@ public class Academy {
 
     @XmlElement(name = "isFactionRestricted")
     private Boolean isFactionRestricted = false;
+
+    @XmlElement(name = "faction")
+    private String faction = "CS";
 
     @XmlElement(name = "isLocal")
     private Boolean isLocal = false;
@@ -87,7 +93,7 @@ public class Academy {
     private Integer durationDays = 11;
 
     @XmlElement(name = "facultySkill")
-    private Integer facultySkill = 7;
+    private Integer facultySkill = 6;
 
     // 0 = early childhood <= 10
     // 1 = (11-16) high school
@@ -132,11 +138,13 @@ public class Academy {
      * @param set                     the set name of the academy
      * @param name                    the name of the academy
      * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
-     * @param isClan                  indicates if the academy is Clan-based (true) or not (false)
+     * @param isClan                  indicates if the academy is a Clan Sibko or Crèche (true) or not (false)
+     * @param isTrueborn              indicates if the Sibko is intended for Trueborn (true) or not (false)
      * @param isPrepSchool            indicates if the academy is focused on children (true) or not (false)
      * @param description             the description of the academy
      * @param factionDiscount         the discount offered by the academy to faction members
      * @param isFactionRestricted     indicates if the academy is restricted to faction members (true) or not (false)
+     * @param faction                 the faction code the academy is restricted to
      * @param isLocal                 indicates if the academy is local (true) or not (false) (overrides locationSystems)
      * @param locationSystems         the list of location systems where the academy is present
      * @param constructionYear        the year when the academy was constructed
@@ -153,9 +161,9 @@ public class Academy {
      * @param qualificationStartYears the list of years when each qualification becomes available
      * @param baseAcademicSkillLevel              the base skill level provided by the academy
      */
-    public Academy(String set, String name, Boolean isMilitary, Boolean isClan, Boolean isPrepSchool,
-                   String description, Integer factionDiscount, Boolean isFactionRestricted,
-                   List<String> locationSystems, Boolean isLocal, Integer constructionYear,
+    public Academy(String set, String name, Boolean isMilitary, Boolean isClan, Boolean isTrueborn,
+                   Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
+                   String faction, List<String> locationSystems, Boolean isLocal, Integer constructionYear,
                    Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
                    Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax, Integer ageMin,
                    Integer ageMax, List<String> qualifications, List<String> curriculums, List<Integer> qualificationStartYears,
@@ -164,10 +172,12 @@ public class Academy {
         this.name = name;
         this.isMilitary = isMilitary;
         this.isClan = isClan;
+        this.isTrueborn = isTrueborn;
         this.isPrepSchool = isPrepSchool;
         this.description = description;
         this.factionDiscount = factionDiscount;
         this.isFactionRestricted = isFactionRestricted;
+        this.faction = faction;
         this.isLocal = isLocal;
         this.locationSystems = locationSystems;
         this.constructionYear = constructionYear;
@@ -242,21 +252,39 @@ public class Academy {
     }
 
     /**
-     * Checks if the academy is a Clan academy.
+     * Checks if the academy is a Clan Sibko or Crèche.
      *
-     * @return {@code true} if the academy is a Clan academy, {@code false} otherwise.
+     * @return {@code true} if the academy is a Clan Sibko or Crèche, {@code false} otherwise.
      */
     public Boolean isClan() {
         return isClan;
     }
 
     /**
-     * Sets the value indicating whether the academy is a Clan Sibko.
+     * Sets the value indicating whether the academy is a Clan Sibko or Crèche.
      *
-     * @param isClan true if the academy is a Clan Sibko, false otherwise.
+     * @param isClan true if the academy is a Clan Sibko or Crèche, false otherwise.
      */
     public void setIsClan(final boolean isClan) {
         this.isClan = isClan;
+    }
+
+    /**
+     * Checks if the academy is a Truenorn Sibko or Crèche.
+     *
+     * @return {@code true} if the academy is a Trueborn Sibko or Crèche, {@code false} otherwise.
+     */
+    public Boolean getIsTrueborn() {
+        return isTrueborn;
+    }
+
+    /**
+     * Sets the value indicating whether the academy is a Trueborn Sibko or Crèche.
+     *
+     * @param isTrueborn true if the academy is a Trueborn Sibko or Crèche, false otherwise.
+     */
+    public void setIsTrueborn(final boolean isTrueborn) {
+        this.isTrueborn = isTrueborn;
     }
 
     /**
@@ -462,7 +490,7 @@ public class Academy {
      *
      * @return The academy's discount value for the faction.
      */
-    public Integer getFactionDiscountRaw() {
+    public Integer getFactionDiscount() {
         return factionDiscount;
     }
 
@@ -471,7 +499,7 @@ public class Academy {
      *
      * @param factionDiscount the faction discount to set
      */
-    public void setFactionDiscountRaw(final Integer factionDiscount) {
+    public void setFactionDiscount(final Integer factionDiscount) {
         this.factionDiscount = factionDiscount;
     }
 
@@ -491,6 +519,24 @@ public class Academy {
      */
     public void setIsFactionRestricted(final Boolean isFactionRestricted) {
         this.isFactionRestricted = isFactionRestricted;
+    }
+
+    /**
+     * Retrieves the faction associated with an academy.
+     *
+     * @return The faction of the academy.
+     */
+    public String getFaction() {
+        return faction;
+    }
+
+    /**
+     * Sets the faction of an academy.
+     *
+     * @param faction the faction to be set
+     */
+    public void setFaction(final String faction) {
+        this.faction = faction;
     }
 
     /**
@@ -637,7 +683,7 @@ public class Academy {
      */
     public Double getFactionDiscountAdjusted(Campaign campaign, Person person) {
         if (locationSystems.stream()
-                .flatMap(campus -> campaign.getSystemByName(campus)
+                .flatMap(campus -> campaign.getSystemById(campus)
                         .getFactions(campaign.getLocalDate())
                         .stream())
                 .anyMatch(faction -> faction.equalsIgnoreCase(person.getOriginFaction().getShortName()))) {
@@ -656,7 +702,7 @@ public class Academy {
      * @return The filtered faction for the local campus, or null if no faction is found.
      */
     public String getCampusFilteredFaction(Campaign campaign, Person person, String system) {
-        List<String> systemOwners = campaign.getSystemByName(system).getFactions(campaign.getLocalDate());
+        List<String> systemOwners = campaign.getSystemById(system).getFactions(campaign.getLocalDate());
 
         for (String faction : systemOwners) {
             if ((isFactionRestricted) && (Objects.equals(person.getOriginFaction().getShortName(), faction))) {
@@ -681,16 +727,20 @@ public class Academy {
         List<String> campuses = locationSystems;
 
         for (String campus : campuses) {
-            List<String> systemOwners = campaign.getSystemByName(campus).getFactions(campaign.getLocalDate());
+            List<String> systemOwners = campaign.getSystemById(campus).getFactions(campaign.getLocalDate());
 
-            for (String faction : systemOwners) {
-                if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
+            // we check for both academy faction and system owner faction, with the logic that system
+            // owners might be able to block applications
+            for (String ownerFaction : systemOwners) {
+                if ((isFactionRestricted) && (!ownerFaction.equals(person.getOriginFaction().getShortName()))) {
+                    campuses.remove(campus);
+                } else if ((isFactionRestricted) && (!ownerFaction.equals(faction))) {
+                    campuses.remove(campus);
+                } else if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
                         Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
                     campuses.remove(campus);
-                } else if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
-                        Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
-                    campuses.remove(campus);
-                } else if ((isFactionRestricted) && (!faction.equals(person.getOriginFaction().getShortName()))) {
+                } else if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
+                        Factions.getInstance().getFaction(ownerFaction), campaign.getLocalDate())) {
                     campuses.remove(campus);
                 }
             }
@@ -765,7 +815,7 @@ public class Academy {
         String nearestCampus = "";
 
         for (String campus : campuses) {
-            int travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemByName(campus));
+            int travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById(campus));
 
             if (travelTime > distance) {
                 distance = travelTime;
@@ -792,15 +842,15 @@ public class Academy {
         tooltip.append("<i>").append(description).append("</i><br><br>");
         tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
 
-        int educationLevel = getEducationLevel(person);
+        int educationLevel = getEducationLevel(person) + baseAcademicSkillLevel;
 
         // here we display the skills
         String[] skills = curriculums.get(courseIndex).replaceAll(", ", ",").split(",");
         for (String skill : skills) {
             tooltip.append(skill).append(" (");
 
-            if(skill.equalsIgnoreCase("xp bonus")) {
-                tooltip.append(getEducationLevel(person)).append(resources.getString("xpBonus.text")).append(")<br>");
+            if (skill.equalsIgnoreCase("xp bonus") || (skill.equalsIgnoreCase("bonus xp"))) {
+                tooltip.append(educationLevel).append(resources.getString("xpBonus.text")).append(")<br>");
             } else {
                 String skillParsed = skillParser(skill);
 
@@ -819,19 +869,33 @@ public class Academy {
         // with the skill content resolved, we can move onto the rest of the tooltip
         tooltip.append("<br><b>").append(resources.getString("tuition.text")).append("</b> ")
                 .append(tuition * getFactionDiscountAdjusted(campaign, person)).append (" CSB").append("<br>");
-        tooltip.append("<b>").append(resources.getString("duration.text")).append("</b> ")
-                .append(durationDays / 7).append (" weeks").append("<br>");
+        if ((isPrepSchool) || (isClan)) {
+            tooltip.append("<b>").append(resources.getString("duration.text"))
+                    .append("</b> ").append(' ').append(resources.getString("durationAge.text")
+                            .replaceAll("0", String.valueOf(ageMax))).append("<br>");
+        } else {
+            tooltip.append("<b>").append(resources.getString("duration.text"))
+                    .append("</b> ").append(durationDays / 7)
+                    .append(' ').append(resources.getString("durationWeeks.text")).append("<br>");
+        }
 
         // we need to do a little extra work to get distance, to cover academies with multiple campuses
         int distance = 2;
         PlanetarySystem destination = campaign.getCurrentSystem();
 
-        if (!isLocal) {
-            distance = campaign.getSimplifiedTravelTime(campaign.getSystemByName(getNearestCampus(campaign, locationSystems)));
+        if (isClan) {
+            try {
+                distance = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
+            } catch (Exception e) {
+                distance = 100;
+            }
+        } else if (!isLocal) {
+            distance = campaign.getSimplifiedTravelTime(campaign.getSystemById(getNearestCampus(campaign, locationSystems)));
         }
 
         tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ")
-                .append(distance / 7).append (" weeks (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
+                .append(distance / 7).append(' ').append(resources.getString("durationWeeks.text"))
+                .append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
         tooltip.append("<b>").append(resources.getString("facultySkill.text")).append("</b> ")
                 .append(facultySkill).append ('+').append("<br>");
         tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")

@@ -35,8 +35,6 @@ public class EducationController {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
         Academy academy = getAcademy(academySet, academyNameInSet);
-        LogManager.getLogger().info(academySet);
-        LogManager.getLogger().info(academyNameInSet);
 
         if (academy == null) {
             LogManager.getLogger().error("No academy found with name {} in set {}", academyNameInSet, academySet);
@@ -90,10 +88,10 @@ public class EducationController {
 
         if (academy.isLocal()) {
             person.setEduDaysOfTravelToAcademy(2);
-            person.setEduAcademySystem(campaign.getCurrentSystem().getName(campaign.getLocalDate()));
+            person.setEduAcademySystem(campaign.getCurrentSystem().getId());
         } else {
-            person.setEduDaysOfTravelToAcademy(campaign.getSimplifiedTravelTime(campaign.getSystemByName(campus)));
-            person.setEduAcademySystem(campaign.getSystemByName(campus).getName(campaign.getLocalDate()));
+            person.setEduDaysOfTravelToAcademy(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
+            person.setEduAcademySystem(campaign.getSystemById(campus).getName(campaign.getLocalDate()));
         }
 
         person.setEduAcademyNameInSet(academy.getName());
@@ -124,7 +122,13 @@ public class EducationController {
 
         if (academy.isClan()) {
             if (academy.isLocal()) {
-                return generateSibkoCode(campaign, person, courseIndex, resources) + " (REDACTED)";
+                if (academy.isPrepSchool()) {
+                    LocalDate birthDate = person.getBirthday();
+
+                    return "Crèche " + birthDate.getYear() + birthDate.getMonth().getValue() + birthDate.getDayOfMonth() + campaign.getFaction().getShortName();
+                } else {
+                    return generateSibkoCode(campaign, person, courseIndex, resources) + " (REDACTED)";
+                }
             } else {
                 return generateSibkoCode(campaign, person, courseIndex, resources) + " (" + campus + ')';
             }
@@ -156,7 +160,7 @@ public class EducationController {
      * @throws IllegalStateException if the course index is unexpected.
      */
     private static String generateSibkoCode(Campaign campaign, Person person, Integer courseIndex, ResourceBundle resources) {
-        LocalDate birthDate = person.getRecruitment();
+        LocalDate birthDate = person.getBirthday();
         String caste;
 
         switch (courseIndex) {
@@ -215,7 +219,7 @@ public class EducationController {
     }
 
     /**
-     * This method generates a academy suffix based on a random roll.
+     * This method generates an academy suffix based on a random roll.
      *
      * @param resources The ResourceBundle containing the suffix texts.
      * @return The generated suffix.
@@ -365,11 +369,7 @@ public class EducationController {
             }
         } else {
             if (person.getAge(campaign.getLocalDate()) > academy.getAgeMax()) {
-                if (academy.isClan()) {
-                    graduateClan(campaign, person, academy, resources);
-                } else {
-                    graduateChild(campaign, person, academy, resources);
-                }
+                graduationPicker(campaign, person, academy, resources);
                 person.setEduDaysOfEducation(0);
             }
 
@@ -379,6 +379,30 @@ public class EducationController {
             return null;
         }
         return daysOfEducation;
+    }
+
+    /**
+     * Determine the appropriate graduation method based on the given parameters.
+     * If the academy is both a clan and a prep school, the graduateClanCreche method will be called.
+     * If the academy is a clan but not a prep school, the graduateClanSibko method will be called.
+     * If the academy is a prep school but not a clan, the graduateChild method will be called.
+     * If the academy is neither a clan nor a prep school, the graduateAdult method will be called.
+     *
+     * @param campaign   the current campaign
+     * @param person     the person graduating
+     * @param academy    the academy person is graduating from
+     * @param resources  the resource bundle for localization
+     */
+    private static void graduationPicker(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+        if ((academy.isClan()) && (academy.isPrepSchool())) {
+            graduateClanCreche(campaign, person, academy, resources);
+        } else if ((academy.isClan()) && (!academy.isPrepSchool())) {
+            graduateClanSibko(campaign, person, academy, resources);
+        } else if (academy.isPrepSchool()){
+            graduateChild(campaign, person, academy, resources);
+        } else {
+            graduateAdult(campaign, person, academy, resources);
+        }
     }
 
     /**
@@ -394,13 +418,7 @@ public class EducationController {
 
         person.setEduDaysOfEducation(0);
 
-        if (academy.isPrepSchool()) {
-            graduateChild(campaign, person, academy, resources);
-        } else if (academy.isClan()) {
-            graduateClan(campaign, person, academy, resources);
-        } else {
-            graduateAdult(campaign, person, academy, resources);
-        }
+        graduationPicker(campaign, person, academy, resources);
     }
 
     /**
@@ -419,7 +437,13 @@ public class EducationController {
         int travelTime;
 
         if ((daysOfEducation == 0) && (daysOfTravelFrom == 0)) {
-            if ((academy.isClan()) && (academy.isLocal())) {
+            if ((academy.isClan()) && (academy.isPrepSchool())) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("creche.text"));
+
+                // we do this to deliberately create an infinite loop, where the player is pestered
+                // daily until the student is assigned to a Sibko
+                travelTime = 0;
+            } else if ((academy.isClan()) && (academy.isLocal())) {
                 try {
                     travelTime = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
                 } catch (Exception e) {
@@ -427,7 +451,7 @@ public class EducationController {
                     travelTime = 100;
                 }
             } else {
-                travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemByName(person.getEduAcademySystem()));
+                travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem()));
             }
 
             // We use a minimum of 2 days travel to avoid awkward grammar in the report.
@@ -457,7 +481,7 @@ public class EducationController {
      */
     private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfEducation, Integer daysOfTravelFrom) {
         if ((daysOfEducation < 1) && (daysOfTravelFrom > 0)) {
-            int travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemByName(person.getEduAcademySystem()));
+            int travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem()));
 
             // if true, it means the unit has moved since we last ran, so we need to adjust
             if (travelTime > daysOfEducation) {
@@ -897,8 +921,13 @@ public class EducationController {
         }
 
         if (graduationRoll == 99) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text")
-                    .replace("0", resources.getString(graduationEventPicker())));
+            if (Compute.d6(1) > 5) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text")
+                        .replace("0", ' ' + resources.getString(graduationEventPicker())));
+            } else {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text")
+                        .replace("0", ""));
+            }
 
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
                     resources.getString("graduatedTopLog.text"), person.getEduAcademyName());
@@ -930,8 +959,13 @@ public class EducationController {
 
         // graduated with honors
         if (graduationRoll >= 90) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHonors.text")
-                    .replace("0", resources.getString(graduationEventPicker())));
+            if (Compute.d6(1) > 5) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHonors.text")
+                        .replace("0", ' ' + resources.getString(graduationEventPicker())));
+            } else {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHonors.text")
+                        .replace("0", ""));
+            }
 
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
                     resources.getString("graduatedHonorsLog.text"), person.getEduAcademyName());
@@ -948,8 +982,13 @@ public class EducationController {
         }
 
         // default graduation
-        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
-                .replace("0", resources.getString(graduationEventPicker())));
+        if (Compute.d6(1) > 5) {
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
+                    .replace("0", ' ' + resources.getString(graduationEventPicker())));
+        } else {
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
+                    .replace("0", ""));
+        }
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
 
@@ -981,9 +1020,21 @@ public class EducationController {
 
         // default graduation
         campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
-                .replace("0", resources.getString(graduationEventPicker())));
+                .replace("0", ""));
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
+
+        improveSkills(campaign, person, academy, true);
+
+        person.setEduHighestEducation(academy.getEducationLevel(person));
+    }
+
+    private static void graduateClanCreche(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+        // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
+
+        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedCreche.text"));
+
+        ServiceLogger.eduClanCreche(person, campaign.getLocalDate());
 
         improveSkills(campaign, person, academy, true);
 
@@ -997,7 +1048,7 @@ public class EducationController {
      * @param person the person being graduated
      * @param academy the Prep School from which the person is being graduated
      */
-    private static void graduateClan(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+    private static void graduateClanSibko(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         int graduationRoll = Compute.randomInt(100);
         // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
 
@@ -1350,7 +1401,7 @@ public class EducationController {
         String[] curriculum = academy.getCurriculums().get(person.getEduCourseIndex())
                 .replaceAll(", ", ",").split(",");
 
-        int educationLevel = academy.getEducationLevel(person);
+        int educationLevel = academy.getEducationLevel(person) + academy.getBaseAcademicSkillLevel();
 
         if (!isGraduating) {
             educationLevel--;
@@ -1422,14 +1473,7 @@ public class EducationController {
     private static String graduationEventPicker() {
         List<String> graduationEventTable = graduationEventTable();
 
-        if (Compute.d6() >= 5) {
-            int roll = Compute.randomInt(graduationEventTable.size());
-
-            // We add 1 to ensure we cannot roll index 0 (uneventful.text)
-            return graduationEventTable.get(roll + 1);
-        } else {
-            return graduationEventTable.get(0);
-        }
+        return graduationEventTable.get(Compute.randomInt(graduationEventTable.size()));
     }
 
     /**
@@ -1442,7 +1486,7 @@ public class EducationController {
         return Arrays.asList(
                 // this should always be the first entry
                 "uneventful.text",
-                // positive events
+                // the events
                 "addressEncouragement.text",
                 "addressFriendship.text",
                 "addressFuturism.text",
@@ -1569,7 +1613,7 @@ public class EducationController {
                 "eventTechnicalSupport.text",
                 "eventTemperatureAdjustment.text",
                 "eventTheft.text",
-                "eventTicketMixup.text",
+                "eventTicketMixUp.text",
                 "eventTicketScanningDelay.text",
                 "eventTimeCapsule.text",
                 "eventTraffic.text",
@@ -1642,6 +1686,19 @@ public class EducationController {
                 "speechUninspiring.text",
                 "surpriseArgument.text",
                 "surpriseArtist.text",
-                "surpriseAwardsCeremony.text");
+                "surpriseAwardsCeremony.text",
+                "surpriseBand.text",
+                "surpriseBandLocal.text",
+                "surpriseChoir.text",
+                "surpriseCommander.text",
+                "surpriseDanceBattle.text",
+                "surpriseMascot.text",
+                "surpriseMotivationalSpeaker.text",
+                "surprisePoet.text",
+                "surpriseScholarship.text",
+                "surpriseScholarshipAward.text",
+                "surpriseSpeaker.text",
+                "surpriseStandard.text");
+
     }
 }

@@ -1069,6 +1069,11 @@ public class Person {
         this.birthday = birthday;
     }
 
+    /**
+     * Returns the date a person was born.
+     *
+     * @return a LocalDate representing the person's date of birth
+     */
     public LocalDate getBirthday() {
         return birthday;
     }

@@ -3,17 +3,18 @@
     <academy>
         <name>Boarding School</name>
         <isPrepSchool>true</isPrepSchool>
-        <description>In a home away from home, students learn the basics of life and undergo their earliest education.</description>
+        <description>In a home away from home, privileged students learn the basics of life and undergo their earliest education.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>47500</tuition>
         <durationDays>1</durationDays>
         <educationLevelMax>0</educationLevelMax>
-        <ageMax>11</ageMax>
+        <ageMax>10</ageMax>
         <qualification>General Education</qualification>
-        <curriculum>XP Bonus</curriculum>
+        <curriculum>Bonus XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>High School</name>
@@ -22,11 +23,11 @@
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
-        <tuition>3500</tuition>
-        <ageMin>11</ageMin>
+        <tuition>3750</tuition>
+        <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
-        <curriculum>XP Bonus</curriculum>
+        <curriculum>Bonus XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
     <academy>
@@ -37,11 +38,11 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>22500</tuition>
-        <facultySkill>6</facultySkill>
-        <ageMin>11</ageMin>
+        <facultySkill>5</facultySkill>
+        <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
-        <curriculum>XP Bonus, Leadership</curriculum>
+        <curriculum>Bonus XP, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
     <academy>
@@ -53,7 +54,7 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>6250</tuition>
-        <ageMin>11</ageMin>
+        <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
         <curriculum>Small Arms, Leadership</curriculum>
@@ -67,8 +68,8 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>6250</tuition>
-        <facultySkill>8</facultySkill>
-        <ageMin>11</ageMin>
+        <facultySkill>7</facultySkill>
+        <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
         <curriculum>Bonus XP, Astech</curriculum>
@@ -81,9 +82,10 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>1750</tuition>
+        <ageMin>16</ageMin>
         <durationDays>150</durationDays>
         <qualification>General Education</qualification>
-        <curriculum>XP Bonus</curriculum>
+        <curriculum>Bonus XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
     <academy>
@@ -94,7 +96,7 @@
         <constructionYear>2300</constructionYear>
         <tuition>3000</tuition>
         <durationDays>300</durationDays>
-        <facultySkill>8</facultySkill>
+        <facultySkill>7</facultySkill>
         <educationLevelMin>1</educationLevelMin>
         <ageMin>16</ageMin>
         <qualification>BattleMech Repair &amp; Maintenance</qualification>
@@ -175,7 +177,7 @@
         <constructionYear>2300</constructionYear>
         <tuition>7500</tuition>
         <durationDays>600</durationDays>
-        <facultySkill>6</facultySkill>
+        <facultySkill>5</facultySkill>
         <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>4</educationLevelMax>
         <ageMin>16</ageMin>
@@ -233,7 +235,7 @@
         <constructionYear>2300</constructionYear>
         <tuition>1250</tuition>
         <durationDays>70</durationDays>
-        <facultySkill>8</facultySkill>
+        <facultySkill>7</facultySkill>
         <educationLevelMin>1</educationLevelMin>
         <ageMin>16</ageMin>
         <qualification>Mechanized Cavalry Bootcamp</qualification>
