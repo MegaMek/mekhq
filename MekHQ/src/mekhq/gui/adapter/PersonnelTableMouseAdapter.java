@@ -64,6 +64,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.List;
@@ -84,6 +85,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_ADD_AWARD = "ADD_AWARD";
     private static final String CMD_RMV_AWARD = "RMV_AWARD";
     private static final String CMD_BEGIN_EDUCATION = "BEGIN_EDUCATION";
+    private static final String CMD_COMPLETE_STAGE = "COMPLETE_STAGE";
 
     private static final String CMD_EDIT_SALARY = "SALARY";
     private static final String CMD_GIVE_PAYMENT = "GIVE_PAYMENT";
@@ -354,6 +356,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_BEGIN_EDUCATION: {
                 for (Person person : people) {
                     EducationController.beginEducation(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5]);
+                }
+                break;
+            }
+            case CMD_COMPLETE_STAGE: {
+                for (Person person : people) {
+                    if (person.getEduDaysOfTravelToAcademy() > 0) {
+                    } else if (person.getEduDaysOfEducation() > 0) {
+                        EducationController.completeEducation(gui.getCampaign(), person);
+                    } else {
+                        person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+                    }
                 }
                 break;
             }
@@ -1366,7 +1379,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         //region Education Menu
         if (gui.getCampaign().getCampaignOptions().isUseEducationModule()) {
-            // TODO add new GM options to allow users to complete travel, education, and return travel
             JMenu academyMenu = new JMenu(resources.getString("eduEducation.text"));
 
             // we use 'campaign' a lot here, so let's store it, so we don't have to re-call it every time
@@ -1380,92 +1392,59 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 person.setEduHighestEducation(1);
             }
 
-            // this next block preps variables for use by the menu & tooltip
-            int campaignYear = campaign.getLocalDate().getYear();
+            if (StaticChecks.areAllActive(selected)) {
+                // this next block preps variables for use by the menu & tooltip
+                int campaignYear = campaign.getLocalDate().getYear();
 
-            List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
-            Collections.sort(academySetNames);
+                List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
+                Collections.sort(academySetNames);
 
-            // this filters out any academy sets that are disabled in Campaign Options
-            for (String academySet : academySetNames) {
-                if ((academySet.equals("Local Academies")) && (!campaign.getCampaignOptions().isEnableLocalAcademies())) {
-                    academySetNames.remove(academySet);
-                } else if ((academySet.equals("Prestigious Academies")) && (!campaign.getCampaignOptions().isEnablePrestigiousAcademies())) {
-                    academySetNames.remove(academySet);
-                } else if ((academySet.equals("Clan Sibkos")) && (!campaign.getCampaignOptions().isEnableClanEducation())) {
-                    academySetNames.remove(academySet);
-                }
-            }
-
-            // We then start processing the remaining academy sets
-            int currentYear = campaign.getLocalDate().getYear();
-            int personAge = person.getAge(campaign.getLocalDate());
-
-            for (String setName : academySetNames) {
-                JMenu setAcademyMenu = new JMenu(setName);
-
-                // we filter each academy into one of these three categories
-                JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
-                setAcademyMenu.add(civilianMenu);
-                JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
-                setAcademyMenu.add(militaryMenu);
-                JMenu clanMenu = new JMenu(resources.getString("eduClan.text"));
-                if (campaignIsClan) {
-                    setAcademyMenu.add(clanMenu);
+                // this filters out any academy sets that are disabled in Campaign Options
+                for (String academySet : academySetNames) {
+                    if ((academySet.equals("Local Academies")) && (!campaign.getCampaignOptions().isEnableLocalAcademies())) {
+                        academySetNames.remove(academySet);
+                    } else if ((academySet.equals("Prestigious Academies")) && (!campaign.getCampaignOptions().isEnablePrestigiousAcademies())) {
+                        academySetNames.remove(academySet);
+                    } else if ((academySet.equals("Clan Sibkos")) && (!campaign.getCampaignOptions().isEnableClanEducation())) {
+                        academySetNames.remove(academySet);
+                    }
                 }
 
-                // time to start filtering the academies based on a few parameters.
-                List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
+                // We then start processing the remaining academy sets
+                int currentYear = campaign.getLocalDate().getYear();
+                int personAge = person.getAge(campaign.getLocalDate());
 
-                for (Academy academy : academiesOfSet) {
-                    // does the faction have access to Sibkos?
-                    if ((!academy.isClan()) || (campaignIsClan)) {
-                        // has the academy been constructed, is still standing, & has not closed?
-                        if ((currentYear >= academy.getConstructionYear()) && (currentYear < academy.getDestructionYear()) && (currentYear < academy.getClosureYear())) {
-                            // is the applicant within the right age bracket?
-                            if ((personAge < academy.getAgeMax()) && (personAge >= academy.getAgeMin())) {
-                                // is the applicant qualified?
-                                if (academy.isQualified(person)) {
-                                    // is the academy Local?
-                                    if (academy.isLocal()) {
-                                        // are any of the local academies accepting applicants from person's Faction or campaign's Faction?
-                                        String faction = academy.getCampusFilteredFaction(campaign, person, campaign.getCurrentSystem().getName(campaign.getLocalDate()));
+                for (String setName : academySetNames) {
+                    JMenu setAcademyMenu = new JMenu(setName);
 
-                                        if (faction != null) {
-                                            // attach it to the right category
-                                            JMenu academyOption = new JMenu(academy.getName());
+                    // we filter each academy into one of these three categories
+                    JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
+                    setAcademyMenu.add(civilianMenu);
+                    JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
+                    setAcademyMenu.add(militaryMenu);
+                    JMenu clanMenu = new JMenu(resources.getString("eduClan.text"));
+                    if (campaignIsClan) {
+                        setAcademyMenu.add(clanMenu);
+                    }
 
-                                            if (academy.isClan()) {
-                                                clanMenu.add(academyOption);
-                                            } else if (academy.isMilitary()) {
-                                                militaryMenu.add(academyOption);
-                                            } else {
-                                                civilianMenu.add(academyOption);
-                                            }
+                    // time to start filtering the academies based on a few parameters.
+                    List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
 
-                                            // get the courses
-                                            buildEduSubMenus(academy, campaignYear, person, academyOption, "local", faction);
-                                        } else {
-                                            JMenuItem academyOption = new JMenuItem(resources.getString("eduFactionConflict.text").replaceAll("0", person.getFirstName()));
+                    for (Academy academy : academiesOfSet) {
+                        // does the faction have access to Sibkos?
+                        if ((!academy.isClan()) || (campaignIsClan)) {
+                            // has the academy been constructed, is still standing, & has not closed?
+                            if ((currentYear >= academy.getConstructionYear()) && (currentYear < academy.getDestructionYear()) && (currentYear < academy.getClosureYear())) {
+                                // is the applicant within the right age bracket?
+                                if ((personAge < academy.getAgeMax()) && (personAge >= academy.getAgeMin())) {
+                                    // is the applicant qualified?
+                                    if (academy.isQualified(person)) {
+                                        // is the academy Local?
+                                        if (academy.isLocal()) {
+                                            // are any of the local academies accepting applicants from person's Faction or campaign's Faction?
+                                            String faction = academy.getCampusFilteredFaction(campaign, person, campaign.getCurrentSystem().getName(campaign.getLocalDate()));
 
-                                            if (academy.isClan()) {
-                                                clanMenu.add(academyOption);
-                                            } else if (academy.isMilitary()) {
-                                                militaryMenu.add(academyOption);
-                                            } else {
-                                                civilianMenu.add(academyOption);
-                                            }
-                                        }
-                                    } else {
-                                        // what campuses accept applicants from person's Faction & campaign Faction?
-                                        List<String> campuses = academy.getCampusesFilteredByFaction(campaign, person);
-
-                                        if (campuses != null) {
-                                            // of these, which is the nearest?
-                                            String nearestCampus = academy.getNearestCampus(campaign, campuses);
-
-                                            // is it within the maximum jump range set in Campaign Options?
-                                            if ((campaign.getSimplifiedTravelTime(campaign.getSystemByName(nearestCampus)) / 7) <= campaign.getCampaignOptions().getMaximumJumpCount()) {
+                                            if (faction != null) {
                                                 // attach it to the right category
                                                 JMenu academyOption = new JMenu(academy.getName());
 
@@ -1478,29 +1457,72 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                                 }
 
                                                 // get the courses
-                                                String faction = academy.getCampusFilteredFaction(campaign, person, nearestCampus);
-                                                buildEduSubMenus(academy, campaignYear, person, academyOption, nearestCampus, faction);
+                                                buildEduSubMenus(academy, campaignYear, person, academyOption, "local", faction);
+                                            } else {
+                                                JMenuItem academyOption = new JMenuItem(resources.getString("eduFactionConflict.text").replaceAll("0", person.getFirstName()));
+
+                                                if (academy.isClan()) {
+                                                    clanMenu.add(academyOption);
+                                                } else if (academy.isMilitary()) {
+                                                    militaryMenu.add(academyOption);
+                                                } else {
+                                                    civilianMenu.add(academyOption);
+                                                }
+                                            }
+                                        } else {
+                                            // what campuses accept applicants from person's Faction & campaign Faction?
+                                            List<String> campuses = academy.getCampusesFilteredByFaction(campaign, person);
+
+                                            if (campuses != null) {
+                                                // of these, which is the nearest?
+                                                String nearestCampus = academy.getNearestCampus(campaign, campuses);
+
+                                                // is it within the maximum jump range set in Campaign Options?
+                                                if ((campaign.getSimplifiedTravelTime(campaign.getSystemByName(nearestCampus)) / 7) <= campaign.getCampaignOptions().getMaximumJumpCount()) {
+                                                    // attach it to the right category
+                                                    JMenu academyOption = new JMenu(academy.getName());
+
+                                                    if (academy.isClan()) {
+                                                        clanMenu.add(academyOption);
+                                                    } else if (academy.isMilitary()) {
+                                                        militaryMenu.add(academyOption);
+                                                    } else {
+                                                        civilianMenu.add(academyOption);
+                                                    }
+
+                                                    // get the courses
+                                                    String faction = academy.getCampusFilteredFaction(campaign, person, nearestCampus);
+                                                    buildEduSubMenus(academy, campaignYear, person, academyOption, nearestCampus, faction);
+                                                }
                                             }
                                         }
-                                    }
-                                } else {
-                                    JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + " ---<i>" + resources.getString("eduUnqualified.text")
-                                            .replaceAll("0", String.valueOf(academy.getEducationLevelMin())));
-
-                                    if (academy.isClan()) {
-                                        clanMenu.add(academyOption);
-                                    } else if (academy.isMilitary()) {
-                                        militaryMenu.add(academyOption);
                                     } else {
-                                        civilianMenu.add(academyOption);
+                                        JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + " ---<i>" + resources.getString("eduUnqualified.text").replaceAll("0", String.valueOf(academy.getEducationLevelMin())));
+
+                                        if (academy.isClan()) {
+                                            clanMenu.add(academyOption);
+                                        } else if (academy.isMilitary()) {
+                                            militaryMenu.add(academyOption);
+                                        } else {
+                                            civilianMenu.add(academyOption);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
                     academyMenu.add(setAcademyMenu);
+                }
             }
+
+            if ((StaticChecks.areAllStudents(selected)) && (campaign.isGM())) {
+                JMenuItem completeStage = new JMenuItem(resources.getString("eduCompleteStage.text"));
+                completeStage.setToolTipText(resources.getString("eduCompleteStage.toolTip"));
+                completeStage.setActionCommand(makeCommand(CMD_COMPLETE_STAGE));
+                completeStage.addActionListener(this);
+                academyMenu.add(completeStage);
+            }
+
             popup.add(academyMenu);
         }
         //endregion Education Menu

@@ -42,8 +42,6 @@ public class EducationController {
         }
 
         double tuition = academy.getTuitionAdjusted(person) * academy.getFactionDiscountAdjusted(campaign, person);
-        LogManager.getLogger().info(tuition);
-        LogManager.getLogger().info(campaign.getFinances().getBalance());
 
         // check there is enough money in the campaign & if so, make a debit
         if (campaign.getFinances().getBalance().isLessThan(Money.of(tuition))) {
@@ -131,15 +129,15 @@ public class EducationController {
         } else {
             if (Compute.d6(1) <= 3) {
                 if (academy.isMilitary()) {
-                    return campus + ' ' + generateMilitaryPrefix(resources) + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + generateSuffix(resources);
+                    return campus + ' ' + generateMilitaryPrefix(resources) + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + ' ' + generateSuffix(resources);
                 } else {
-                    return campus + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + generateSuffix(resources);
+                    return campus + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + ' ' + generateSuffix(resources);
                 }
             } else {
                 if (academy.isMilitary()) {
-                    return generateMilitaryPrefix(resources) + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + campus;
+                    return generateMilitaryPrefix(resources) + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + ' ' + campus;
                 } else {
-                    return generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + campus;
+                    return generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + ' ' + campus;
                 }
             }
         }
@@ -326,6 +324,19 @@ public class EducationController {
     }
 
     /**
+     * This method completes the journey to the campaign's academy for the given person.
+     *
+     * @param campaign The current campaign.
+     * @param person   The individual traveling to the academy.
+     */
+    public static void completeJourneyTo(Campaign campaign, Person person) {
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
+
+        person.setEduDaysOfTravelToAcademy(0);
+        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("arrived.text"));
+    }
+
+    /**
      * Processes a person's ongoing education.
      *
      * @param campaign  The campaign the person is part of.
@@ -341,7 +352,7 @@ public class EducationController {
             if (daysOfEducation > 0) {
                 person.setEduDaysOfEducation(daysOfEducation - 1);
 
-                if ((daysOfEducation - 1) == 0) {
+                if ((daysOfEducation - 1) < 1) {
                     graduateAdult(campaign, person, academy, resources);
                 }
 
@@ -361,12 +372,33 @@ public class EducationController {
             }
 
             if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                // 11 is used as it still allows for drop-outs
                 processNewWeekChecks(campaign, academy, person, daysOfEducation, resources);
             }
             return null;
         }
         return daysOfEducation;
+    }
+
+    /**
+     * Completes the education process for a person.
+     *
+     * @param campaign the campaign in which the education is taking place
+     * @param person the person whose education is being completed
+     */
+    public static void completeEducation(Campaign campaign, Person person) {
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
+
+        Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+        person.setEduDaysOfEducation(0);
+
+        if (academy.isPrepSchool()) {
+            graduateChild(campaign, person, academy, resources);
+        } else if (academy.isClan()) {
+            graduateClan(campaign, person, academy, resources);
+        } else {
+            graduateAdult(campaign, person, academy, resources);
+        }
     }
 
     /**
@@ -405,7 +437,8 @@ public class EducationController {
 
             person.setEduDaysOfTravelFromAcademy(travelTime);
 
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("returningFromSchool.text"));
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("returningFromSchool.text")
+                    .replaceAll("0", String.valueOf(travelTime)));
 
             return null;
         }
@@ -433,7 +466,6 @@ public class EducationController {
             }
 
             if ((daysOfTravelFrom - 1) < 1) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("returned.text"));
                 person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
             }
         }
@@ -863,7 +895,7 @@ public class EducationController {
 
         if (graduationRoll == 99) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text")
-                    .replace("0", graduationEventPicker()));
+                    .replace("0", resources.getString(graduationEventPicker())));
 
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
                     resources.getString("graduatedTopLog.text"), person.getEduAcademyName());
@@ -896,7 +928,7 @@ public class EducationController {
         // graduated with honors
         if (graduationRoll >= 90) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHonors.text")
-                    .replace("0", graduationEventPicker()));
+                    .replace("0", resources.getString(graduationEventPicker())));
 
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
                     resources.getString("graduatedHonorsLog.text"), person.getEduAcademyName());
@@ -914,7 +946,7 @@ public class EducationController {
 
         // default graduation
         campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
-                .replace("0", graduationEventPicker()));
+                .replace("0", resources.getString(graduationEventPicker())));
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
 
@@ -946,7 +978,7 @@ public class EducationController {
 
         // default graduation
         campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
-                .replace("0", graduationEventPicker()));
+                .replace("0", resources.getString(graduationEventPicker())));
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
 
