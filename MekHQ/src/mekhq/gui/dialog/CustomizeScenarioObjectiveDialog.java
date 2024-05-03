@@ -3,11 +3,13 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.mission.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class CustomizeScenarioObjectiveDialog extends JDialog {
 
@@ -104,7 +106,11 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void initialize() {
-        setTitle("Customize Scenario Objective");
+
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CustomizeScenarioObjectiveDialog",
+                MekHQ.getMHQOptions().getLocale());
+
+        setTitle(resourceMap.getString("dialog.title"));
         getContentPane().setLayout(new BorderLayout());
         JPanel panMain = new JPanel(new GridBagLayout());
 
@@ -114,7 +120,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panMain.add(new JLabel("Description:"), gbc);
+        panMain.add(new JLabel(resourceMap.getString("lblDescription.text")), gbc);
 
         txtShortDescription = new JTextField();
         gbc.gridx++;
@@ -128,7 +134,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbc.gridwidth = 1;
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0.0;
-        panMain.add(new JLabel("Details:"), gbc);
+        panMain.add(new JLabel(resourceMap.getString("lblDetails.text")), gbc);
 
         JTextField txtDetail = new JTextField();
         txtDetail.setColumns(40);
@@ -137,7 +143,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbc.weightx = 1.0;
         panMain.add(txtDetail, gbc);
 
-        JButton btnAddDetail = new JButton("Add");
+        JButton btnAddDetail = new JButton(resourceMap.getString("btnAdd.text"));
         btnAddDetail.addActionListener(e -> this.addDetail(txtDetail));
         gbc.gridx++;
         gbc.fill = GridBagConstraints.NONE;
@@ -146,7 +152,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
 
         lstDetails = new JList<>(detailModel);
-        JButton btnRemoveDetail = new JButton("Remove");
+        JButton btnRemoveDetail = new JButton(resourceMap.getString("btnRemove.text"));
         btnRemoveDetail.addActionListener(e -> this.removeDetails());
         lstDetails.addListSelectionListener(e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList().isEmpty()));
         lstDetails.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -168,7 +174,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.anchor = GridBagConstraints.WEST;
-        panMain.add(new JLabel("Objective Type:"), gbc);
+        panMain.add(new JLabel(resourceMap.getString("lblObjectiveType.text")), gbc);
         initObjectiveTypePanel();
         gbc.gridx++;
         gbc.gridwidth = 2;
@@ -182,9 +188,9 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0.0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
-        panMain.add(new JLabel("Force Names:"), gbc);
+        panMain.add(new JLabel(resourceMap.getString("lblForceNames.text")), gbc);
 
-        initForcePanel();
+        initForcePanel(resourceMap);
         gbc.gridx++;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -197,7 +203,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0.0;
         gbc.anchor = GridBagConstraints.WEST;
-        panMain.add(new JLabel("Time Limit:"), gbc);
+        panMain.add(new JLabel(resourceMap.getString("lblTimeLimit.text")), gbc);
 
         initTimeLimitPanel();
         gbc.gridx++;
@@ -206,7 +212,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbc.weightx = 1.0;
         panMain.add(panTimeLimits, gbc);
 
-        initObjectiveEffectPanel();
+        initObjectiveEffectPanel(resourceMap);
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 3;
@@ -219,9 +225,9 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         getContentPane().add(panMain, BorderLayout.CENTER);
 
         JPanel panButtons = new JPanel(new GridLayout(0, 2));
-        JButton btnCancel = new JButton("Cancel");
+        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
         btnCancel.addActionListener(e -> this.setVisible(false));
-        JButton btnOK = new JButton("OK");
+        JButton btnOK = new JButton(resourceMap.getString("btnOK.text"));
         btnOK.addActionListener(e -> this.saveObjectiveAndClose());
         panButtons.add(btnOK);
         panButtons.add(btnCancel);
@@ -275,7 +281,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     /**
      * Handles the UI for adding/removing forces relevant to this objective
      */
-    private void initForcePanel() {
+    private void initForcePanel(ResourceBundle resourceMap) {
         panForce = new JPanel(new GridBagLayout());
 
         cboForceName = new JComboBox<>();
@@ -288,10 +294,10 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         forceNames.setVisibleRowCount(5);
         forceNames.addListSelectionListener(e -> btnRemove.setEnabled(!forceNames.getSelectedValuesList().isEmpty()));
 
-        JButton btnAdd = new JButton("Add");
+        JButton btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
         btnAdd.addActionListener(e -> this.addForce());
 
-        btnRemove = new JButton("Remove");
+        btnRemove = new JButton(resourceMap.getString("btnRemove.text"));
         btnRemove.addActionListener(e -> this.removeForce());
         btnRemove.setEnabled(false);
 
@@ -317,10 +323,10 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     /**
      * Handles the UI for adding objective effects
      */
-    private void initObjectiveEffectPanel() {
+    private void initObjectiveEffectPanel(ResourceBundle resourceMap) {
         panObjectiveEffect = new JPanel(new GridBagLayout());
         panObjectiveEffect.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Objective Effects"),
+                BorderFactory.createTitledBorder(resourceMap.getString("panObjectiveEffect.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 
         GridBagConstraints gbcLeft = new GridBagConstraints();
@@ -337,14 +343,14 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbcRight.fill = GridBagConstraints.NONE;
         gbcRight.weightx = 1.0;
 
-        lblMagnitude = new JLabel("Amount:");
+        lblMagnitude = new JLabel(resourceMap.getString("lblMagnitude.text"));
         panObjectiveEffect.add(lblMagnitude, gbcLeft);
         spnScore = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
         panObjectiveEffect.add(spnScore, gbcRight);
 
         gbcLeft.gridy++;
         gbcRight.gridy++;
-        panObjectiveEffect.add(new JLabel("Effect Scaling:"), gbcLeft);
+        panObjectiveEffect.add(new JLabel(resourceMap.getString("lblEffectScaling.text")), gbcLeft);
         cboScalingType = new JComboBox<>();
         for (ObjectiveEffect.EffectScalingType scalingType : ObjectiveEffect.EffectScalingType.values()) {
             cboScalingType.addItem(scalingType);
@@ -353,7 +359,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
         gbcLeft.gridy++;
         gbcRight.gridy++;
-        panObjectiveEffect.add(new JLabel("Effect Type:"), gbcLeft);
+        panObjectiveEffect.add(new JLabel(resourceMap.getString("lblEffectType.text")), gbcLeft);
         cboEffectType = new JComboBox<>();
         for (ObjectiveEffect.ObjectiveEffectType scalingType : ObjectiveEffect.ObjectiveEffectType.values()) {
             cboEffectType.addItem(scalingType);
@@ -362,30 +368,30 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
         gbcLeft.gridy++;
         gbcRight.gridy++;
-        panObjectiveEffect.add(new JLabel("Effect Condition:"), gbcLeft);
+        panObjectiveEffect.add(new JLabel(resourceMap.getString("lblEffectCondition.text")), gbcLeft);
         cboEffectCondition = new JComboBox<>();
         cboEffectCondition.addItem(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess);
         cboEffectCondition.addItem(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveFailure);
         panObjectiveEffect.add(cboEffectCondition, gbcRight);
 
-        JButton btnAdd = new JButton("Add");
+        JButton btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
         btnAdd.addActionListener(e -> this.addEffect());
         gbcLeft.gridy++;
         panObjectiveEffect.add(btnAdd, gbcLeft);
 
-        JLabel lblSuccessEffects = new JLabel("Effects on Success");
-        JLabel lblFailureEffects = new JLabel("Effects on Failure");
+        JLabel lblSuccessEffects = new JLabel(resourceMap.getString("lblSuccessEffects.text"));
+        JLabel lblFailureEffects = new JLabel(resourceMap.getString("lblSuccessEffects.text"));
 
         successEffects = new JList<>(successEffectsModel);
         successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
         failureEffects = new JList<>(failureEffectsModel);
         failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
 
-        btnRemoveSuccess = new JButton("Remove");
+        btnRemoveSuccess = new JButton(resourceMap.getString("btnRemove.text"));
         btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess));
         btnRemoveSuccess.setEnabled(false);
 
-        btnRemoveFailure = new JButton("Remove");
+        btnRemoveFailure = new JButton(resourceMap.getString("btnRemove.text"));
         btnRemoveFailure.addActionListener(e -> this.removeEffect(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveFailure));
         btnRemoveFailure.setEnabled(false);
 
@@ -476,7 +482,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private void addEffect() {
         int amount = 0;
         try {
-            amount = (int) spnScore.getValue();
+            amount =
             lblMagnitude.setForeground(UIManager.getColor("text"));
         } catch (Exception e) {
             lblMagnitude.setForeground(Color.red);
@@ -484,7 +490,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         }
 
         ObjectiveEffect effect = new ObjectiveEffect();
-        effect.howMuch = amount;
+        effect.howMuch = (int) spnScore.getValue();;
         effect.effectScaling = (ObjectiveEffect.EffectScalingType) cboScalingType.getSelectedItem();
         effect.effectType = (ObjectiveEffect.ObjectiveEffectType) cboEffectType.getSelectedItem();
 
