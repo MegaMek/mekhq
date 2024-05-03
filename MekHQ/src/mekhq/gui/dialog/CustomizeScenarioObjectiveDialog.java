@@ -26,12 +26,14 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private JTextField txtShortDescription;
     private JComboBox<ScenarioObjective.ObjectiveCriterion> cboObjectiveType;
     private JComboBox<String> cboDirection;
-    private JTextField txtPercentage;
+    private JSpinner spnPercentage;
+    private SpinnerNumberModel modelPercent;
+    private SpinnerNumberModel modelFixed;
     private MMComboBox<ScenarioObjective.ObjectiveAmountType> cboCountType;
     private JComboBox<String> cboForceName;
 
     private JLabel lblMagnitude;
-    private JTextField txtAmount;
+    private JSpinner spnAmount;
     private JComboBox<ObjectiveEffect.EffectScalingType> cboScalingType;
     private JComboBox<ObjectiveEffect.ObjectiveEffectType> cboEffectType;
     private JComboBox<ObjectiveEffect.ObjectiveEffectConditionType> cboEffectCondition;
@@ -43,7 +45,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
     private JComboBox<String> cboTimeLimitDirection;
     private JComboBox<ScenarioObjective.TimeLimitType> cboTimeScaling;
-    private JTextField txtTimeLimit;
+    private JSpinner spnTimeLimit;
 
     private JList<String> forceNames;
     JButton btnRemove;
@@ -72,7 +74,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         txtShortDescription.setText(objective.getDescription());
         cboObjectiveType.setSelectedItem(objective.getObjectiveCriterion());
         cboCountType.setSelectedItem(objective.getAmountType());
-        txtPercentage.setText(Integer.toString(objective.getAmount()));
+        spnPercentage.setValue(objective.getAmount());
         setDirectionDropdownVisibility();
 
         cboDirection.setSelectedIndex(objective.getDestinationEdge().ordinal());
@@ -81,10 +83,10 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         updateTimeLimitUI();
         cboTimeLimitDirection.setSelectedIndex(objective.isTimeLimitAtMost() ? 0 : 1);
         if (objective.getTimeLimitType() == ScenarioObjective.TimeLimitType.ScaledToPrimaryUnitCount) {
-            txtTimeLimit.setText(objective.getTimeLimitScaleFactor().toString());
+            spnTimeLimit.setValue(objective.getTimeLimitScaleFactor());
         } else {
             if (objective.getTimeLimit() != null) {
-                txtTimeLimit.setText(objective.getTimeLimit().toString());
+                spnTimeLimit.setValue(objective.getTimeLimit());
             }
         }
 
@@ -241,10 +243,12 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         }
         cboObjectiveType.addActionListener(e -> this.setDirectionDropdownVisibility());
 
-        txtPercentage = new JTextField();
-        txtPercentage.setColumns(4);
+        modelPercent = new SpinnerNumberModel(0, 0, 100, 5);
+        modelFixed = new SpinnerNumberModel(0, 0, null, 1);
+        spnPercentage = new JSpinner(modelPercent);
 
         cboCountType = new MMComboBox("cboCountType", ScenarioObjective.ObjectiveAmountType.values());
+        cboCountType.addActionListener(etv -> switchNumberModel());
 
 
         cboDirection = new JComboBox<>();
@@ -264,7 +268,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         localGbc.gridx++;
         panObjectiveType.add(cboDirection, localGbc);
         localGbc.gridx++;
-        panObjectiveType.add(txtPercentage, localGbc);
+        panObjectiveType.add(spnPercentage, localGbc);
         localGbc.gridx++;
         localGbc.weightx = 1.0;
         panObjectiveType.add(cboCountType, localGbc);
@@ -338,9 +342,8 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
         lblMagnitude = new JLabel("Amount:");
         panObjectiveEffect.add(lblMagnitude, gbcLeft);
-        txtAmount = new JTextField();
-        txtAmount.setColumns(5);
-        panObjectiveEffect.add(txtAmount, gbcRight);
+        spnAmount = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
+        panObjectiveEffect.add(spnAmount, gbcRight);
 
         gbcLeft.gridy++;
         gbcRight.gridy++;
@@ -440,8 +443,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         }
         cboTimeScaling.addActionListener(e -> this.updateTimeLimitUI());
 
-        txtTimeLimit = new JTextField();
-        txtTimeLimit.setColumns(5);
+        spnTimeLimit = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
 
         GridBagConstraints localGbc = new GridBagConstraints();
         localGbc.gridx = 0;
@@ -454,15 +456,21 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         panTimeLimits.add(cboTimeScaling, localGbc);
         localGbc.gridx++;
         localGbc.weightx = 1.0;
-        panTimeLimits.add(txtTimeLimit, localGbc);
+        panTimeLimits.add(spnTimeLimit, localGbc);
     }
 
-    /**
-     * Handles the "add objective effect" row
-     */
-    private void initEffectPanel() {
-
-
+    private void switchNumberModel() {
+        int value = (int) spnPercentage.getValue();
+        if(cboCountType.getSelectedItem() == ScenarioObjective.ObjectiveAmountType.Percentage) {
+            if(value > 100) {
+                value = 100;
+            }
+            modelPercent.setValue(value);
+            spnPercentage.setModel(modelPercent);
+        } else {
+            modelFixed.setValue(value);
+            spnPercentage.setModel(modelFixed);
+        }
     }
 
     /**
@@ -471,7 +479,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private void addEffect() {
         int amount = 0;
         try {
-            amount = Integer.parseInt(txtAmount.getText());
+            amount = (int) spnAmount.getValue();
             lblMagnitude.setForeground(UIManager.getColor("text"));
         } catch (Exception e) {
             lblMagnitude.setForeground(Color.red);
@@ -550,7 +558,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private void updateTimeLimitUI() {
         boolean enable = !cboTimeScaling.getSelectedItem().equals(ScenarioObjective.TimeLimitType.None);
 
-        txtTimeLimit.setEnabled(enable);
+        spnTimeLimit.setEnabled(enable);
         cboTimeLimitDirection.setEnabled(enable);
     }
 
@@ -559,29 +567,9 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void saveObjectiveAndClose() {
-        int number = 0;
-        int timeLimit = 0;
-
-        try {
-            number = Integer.parseInt(txtPercentage.getText());
-            txtPercentage.setBorder(null);
-        } catch (Exception e) {
-            txtPercentage.setBorder(new LineBorder(Color.red));
-            return;
-        }
-
-        try {
-            if (txtTimeLimit.isEnabled()) {
-                timeLimit = Integer.parseInt(txtTimeLimit.getText());
-                txtTimeLimit.setBorder(null);
-            }
-        } catch (Exception e) {
-            txtTimeLimit.setBorder(new LineBorder(Color.red));
-            return;
-        }
-
         objective.setObjectiveCriterion((ScenarioObjective.ObjectiveCriterion) cboObjectiveType.getSelectedItem());
         objective.setDescription(txtShortDescription.getText());
+        int number = (int) spnPercentage.getValue();
         if (cboCountType.getSelectedItem().equals(ScenarioObjective.ObjectiveAmountType.Percentage)) {
             objective.setPercentage(number);
             objective.setFixedAmount(null);
@@ -616,15 +604,15 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
             objective.setDestinationEdge(OffBoardDirection.NONE);
         }
 
+        int timeLimit = (int) spnTimeLimit.getValue();
         objective.setTimeLimitType((ScenarioObjective.TimeLimitType) cboTimeScaling.getSelectedItem());
-        if (txtTimeLimit.isEnabled()) {
+        if (spnTimeLimit.isEnabled()) {
             if (objective.getTimeLimitType() == ScenarioObjective.TimeLimitType.ScaledToPrimaryUnitCount) {
                 objective.setTimeLimitScaleFactor(timeLimit);
             } else {
                 objective.setTimeLimit(timeLimit);
             }
         }
-
         if (cboTimeLimitDirection.isEnabled()) {
             objective.setTimeLimitAtMost(cboTimeLimitDirection.getSelectedIndex() == 0);
         }
