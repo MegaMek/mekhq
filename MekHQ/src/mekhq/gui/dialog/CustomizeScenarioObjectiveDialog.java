@@ -17,9 +17,13 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private ScenarioObjective objective;
     private List<BotForce> botForces;
     private JFrame frame;
-    private JLabel lblShortDescription;
-    private JTextArea txtShortDescription;
-    private JLabel lblObjectiveType;
+
+    private JPanel panObjectiveType;
+    private JPanel panForce;
+    private JPanel panTimeLimits;
+    private JPanel panEffect;
+    private JPanel panObjectiveEffect;
+    private JTextField txtShortDescription;
     private JComboBox<ScenarioObjective.ObjectiveCriterion> cboObjectiveType;
     private JComboBox<String> cboDirection;
     private JTextField txtPercentage;
@@ -59,7 +63,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         this.objective = objective;
         this.botForces = botForces;
 
-        initGUI();
+        initialize();
 
         for(String forceName : objective.getAssociatedForceNames()) {
             forceModel.addElement(forceName);
@@ -100,124 +104,137 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         pack();
     }
 
-    private void initGUI() {
+    private void initialize() {
+        setTitle("Customize Scenario Objective");
+        getContentPane().setLayout(new BorderLayout());
+        JPanel panMain = new JPanel(new GridBagLayout());
+
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panMain.add(new JLabel("Description:"), gbc);
 
-        getContentPane().setLayout(new GridBagLayout());
-
-        addDescriptionUI(gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
-
-        addObjectiveTypeUI(gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
-
-        addSubjectForce(gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
-
-        addTimeLimitUI(gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
-
-        addEffectUI(gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
-
-        addObjectiveEffectUI(gbc);
+        txtShortDescription = new JTextField();
+        gbc.gridx++;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        panMain.add(txtShortDescription, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
-
-        addSaveCloseButtons(gbc);
-    }
-
-    /**
-     * Handles the save/close buttons row.
-     */
-    private void addSaveCloseButtons(GridBagConstraints gbc) {
-        JPanel saveClosePanel = new JPanel();
-        saveClosePanel.setLayout(new GridBagLayout());
-        GridBagConstraints localGbc = new GridBagConstraints();
-        localGbc.gridx = 0;
-        localGbc.gridy = 0;
-        localGbc.insets = new Insets(0, 0, 0, 5);
-
-        JButton btnCancel = new JButton("Cancel");
-        btnCancel.addActionListener(e -> this.setVisible(false));
-        JButton btnSaveAndClose = new JButton("Save and Close");
-        btnSaveAndClose.addActionListener(e -> this.saveObjectiveAndClose());
-
-        saveClosePanel.add(btnCancel);
-        saveClosePanel.add(btnSaveAndClose);
-
-        getContentPane().add(saveClosePanel, gbc);
-    }
-
-    /**
-     * Handles the "description" row.
-     */
-    private void addDescriptionUI(GridBagConstraints gbc) {
-        lblShortDescription = new JLabel("Short Description:");
-
-        JScrollPane txtScroll = new JScrollPane();
-        txtShortDescription = new JTextArea();
-        txtShortDescription.setColumns(40);
-        txtShortDescription.setRows(5);
-        txtShortDescription.setLineWrap(true);
-        txtShortDescription.setWrapStyleWord(true);
-        txtScroll.setViewportView(txtShortDescription);
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0.0;
+        panMain.add(new JLabel("Details:"), gbc);
 
         JTextField txtDetail = new JTextField();
         txtDetail.setColumns(40);
-        JLabel lblDetail = new JLabel("Details (shows up after force/unit list):");
-        lstDetails = new JList<>(detailModel);
-        JButton btnAddDetail = new JButton("Add");
-        JButton btnRemoveDetail = new JButton("Remove");
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        panMain.add(txtDetail, gbc);
 
+        JButton btnAddDetail = new JButton("Add");
+        btnAddDetail.addActionListener(e -> this.addDetail(txtDetail));
+        gbc.gridx++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0.0;
+        panMain.add(btnAddDetail, gbc);
+
+
+        lstDetails = new JList<>(detailModel);
+        JButton btnRemoveDetail = new JButton("Remove");
+        btnRemoveDetail.addActionListener(e -> this.removeDetails());
         lstDetails.addListSelectionListener(e -> btnRemoveDetail.setEnabled(!lstDetails.getSelectedValuesList().isEmpty()));
         lstDetails.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        btnRemoveDetail.addActionListener(e -> this.removeDetails());
-        btnAddDetail.addActionListener(e -> this.addDetail(txtDetail));
+        JScrollPane scrDetails = new JScrollPane(lstDetails);
+        scrDetails.setMinimumSize(new Dimension(200, 100));
+        scrDetails.setPreferredSize(new Dimension(200, 100));
+        gbc.gridx = 1;
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        panMain.add(scrDetails, gbc);
 
-        JPanel descriptionPanel = new JPanel();
-        descriptionPanel.setLayout(new GridBagLayout());
-        GridBagConstraints localGbc = new GridBagConstraints();
-        localGbc.gridx = 0;
-        localGbc.gridy = 0;
-        localGbc.insets = new Insets(5, 0, 5, 5);
+        gbc.gridx++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0.0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        panMain.add(btnRemoveDetail, gbc);
 
-        descriptionPanel.add(lblShortDescription, localGbc);
-        localGbc.gridx++;
-        descriptionPanel.add(txtScroll, localGbc);
-        localGbc.gridx = 0;
-        localGbc.gridy++;
-        descriptionPanel.add(lblDetail, localGbc);
-        localGbc.gridx++;
-        descriptionPanel.add(txtDetail, localGbc);
-        localGbc.gridx++;
-        descriptionPanel.add(btnAddDetail, localGbc);
-        localGbc.gridx++;
-        descriptionPanel.add(lstDetails, localGbc);
-        localGbc.gridx++;
-        descriptionPanel.add(btnRemoveDetail, localGbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.WEST;
+        panMain.add(new JLabel("Objective Type:"), gbc);
+        initObjectiveTypePanel();
+        gbc.gridx++;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        panMain.add(panObjectiveType, gbc);
 
-        getContentPane().add(descriptionPanel, gbc);
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0.0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        panMain.add(new JLabel("Force Names:"), gbc);
+
+        initForcePanel();
+        gbc.gridx++;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        panMain.add(panForce, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        panMain.add(new JLabel("Time Limit:"), gbc);
+
+        initTimeLimitPanel();
+        gbc.gridx++;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        panMain.add(panTimeLimits, gbc);
+
+        initObjectiveEffectPanel();
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 3;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        panMain.add(panObjectiveEffect, gbc);
+
+        getContentPane().add(panMain, BorderLayout.CENTER);
+
+        JPanel panButtons = new JPanel(new GridLayout(0, 2));
+        JButton btnCancel = new JButton("Cancel");
+        btnCancel.addActionListener(e -> this.setVisible(false));
+        JButton btnOK = new JButton("OK");
+        btnOK.addActionListener(e -> this.saveObjectiveAndClose());
+        panButtons.add(btnOK);
+        panButtons.add(btnCancel);
+        getContentPane().add(panButtons, BorderLayout.PAGE_END);
+
     }
 
     /**
      * Handles the "objective type" row
      */
-    private void addObjectiveTypeUI(GridBagConstraints gbc) {
-        JPanel objectivePanel = new JPanel();
-
-        lblObjectiveType = new JLabel("Objective Type:");
+    private void initObjectiveTypePanel() {
+        panObjectiveType = new JPanel(new GridBagLayout());
         cboObjectiveType = new JComboBox<>();
         for (ScenarioObjective.ObjectiveCriterion objectiveType : ScenarioObjective.ObjectiveCriterion.values()) {
             cboObjectiveType.addItem(objectiveType);
@@ -237,77 +254,28 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         }
         cboDirection.setVisible(false);
 
-        objectivePanel.setLayout(new GridBagLayout());
         GridBagConstraints localGbc = new GridBagConstraints();
         localGbc.gridx = 0;
         localGbc.gridy = 0;
+        localGbc.anchor = GridBagConstraints.WEST;
         localGbc.insets = new Insets(0, 0, 0, 5);
 
-
-        objectivePanel.add(lblObjectiveType, localGbc);
+        panObjectiveType.add(cboObjectiveType, localGbc);
         localGbc.gridx++;
-        objectivePanel.add(cboObjectiveType, localGbc);
+        panObjectiveType.add(cboDirection, localGbc);
         localGbc.gridx++;
-        objectivePanel.add(cboDirection, localGbc);
+        panObjectiveType.add(txtPercentage, localGbc);
         localGbc.gridx++;
-        objectivePanel.add(txtPercentage, localGbc);
-        localGbc.gridx++;
-        objectivePanel.add(cboCountType, localGbc);
+        localGbc.weightx = 1.0;
+        panObjectiveType.add(cboCountType, localGbc);
 
-        getContentPane().add(objectivePanel, gbc);
-    }
-
-    /**
-     * Handles the UI for adding objective effects
-     */
-    private void addObjectiveEffectUI(GridBagConstraints gbc) {
-        JPanel effectPanel = new JPanel();
-
-
-        JLabel lblSuccessEffects = new JLabel("Effects on completion:");
-        JLabel lblFailureEffects = new JLabel("Effects on failure:");
-
-        successEffects = new JList<>(successEffectsModel);
-        successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
-        failureEffects = new JList<>(failureEffectsModel);
-        failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
-
-        btnRemoveSuccess = new JButton("Remove");
-        btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess));
-        btnRemoveSuccess.setEnabled(false);
-
-        btnRemoveFailure = new JButton("Remove");
-        btnRemoveFailure.addActionListener(e -> this.removeEffect(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveFailure));
-        btnRemoveFailure.setEnabled(false);
-
-        GridBagConstraints localGbc = new GridBagConstraints();
-        effectPanel.setLayout(new GridBagLayout());
-        localGbc.gridx = 0;
-        localGbc.gridy = 0;
-        localGbc.insets = new Insets(0, 0, 0, 5);
-
-        effectPanel.add(lblSuccessEffects, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(successEffects, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(btnRemoveSuccess, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(lblFailureEffects, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(failureEffects, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(btnRemoveFailure, localGbc);
-
-        getContentPane().add(effectPanel, gbc);
     }
 
     /**
      * Handles the UI for adding/removing forces relevant to this objective
      */
-    private void addSubjectForce(GridBagConstraints gbc) {
-        JPanel forcePanel = new JPanel();
-
-        JLabel forcesLabel = new JLabel("Force Names:");
+    private void initForcePanel() {
+        panForce = new JPanel(new GridBagLayout());
 
         cboForceName = new JComboBox<>();
         cboForceName.addItem(MHQConstants.EGO_OBJECTIVE_NAME);
@@ -329,25 +297,138 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         GridBagConstraints localGbc = new GridBagConstraints();
         localGbc.gridx = 0;
         localGbc.gridy = 0;
+        localGbc.anchor = GridBagConstraints.NORTHWEST;
         localGbc.insets = new Insets(0, 0, 0, 5);
 
-        forcePanel.add(forcesLabel, localGbc);
+        panForce.add(cboForceName, localGbc);
         localGbc.gridx++;
-        forcePanel.add(cboForceName, localGbc);
+        panForce.add(btnAdd, localGbc);
         localGbc.gridx++;
-        forcePanel.add(btnAdd, localGbc);
-        localGbc.gridx--;
-        localGbc.gridy++;
-        forcePanel.add(forceNames, localGbc);
+        JScrollPane scrForceNames = new JScrollPane(forceNames);
+        scrForceNames.setMinimumSize(new Dimension(250, 100));
+        scrForceNames.setPreferredSize(new Dimension(250, 100));
+        panForce.add(scrForceNames, localGbc);
         localGbc.gridx++;
-        forcePanel.add(btnRemove, localGbc);
-
-
-        getContentPane().add(forcePanel, gbc);
+        localGbc.weightx = 1.0;
+        panForce.add(btnRemove, localGbc);
     }
 
-    private void addTimeLimitUI(GridBagConstraints gbc) {
-        JPanel timeLimitPanel = new JPanel();
+    /**
+     * Handles the UI for adding objective effects
+     */
+    private void initObjectiveEffectPanel() {
+        panObjectiveEffect = new JPanel(new GridBagLayout());
+        panObjectiveEffect.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Objective Effects"),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
+
+        GridBagConstraints gbcLeft = new GridBagConstraints();
+        gbcLeft.gridx = 0;
+        gbcLeft.gridy = 0;
+        gbcLeft.anchor = GridBagConstraints.WEST;
+        gbcLeft.fill = GridBagConstraints.NONE;
+        gbcLeft.weightx = 0.0;
+
+        GridBagConstraints gbcRight = new GridBagConstraints();
+        gbcRight.gridx = 1;
+        gbcRight.gridy = 0;
+        gbcRight.anchor = GridBagConstraints.WEST;
+        gbcRight.fill = GridBagConstraints.NONE;
+        gbcRight.weightx = 1.0;
+
+        lblMagnitude = new JLabel("Amount:");
+        panObjectiveEffect.add(lblMagnitude, gbcLeft);
+        txtAmount = new JTextField();
+        txtAmount.setColumns(5);
+        panObjectiveEffect.add(txtAmount, gbcRight);
+
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panObjectiveEffect.add(new JLabel("Effect Scaling:"), gbcLeft);
+        cboScalingType = new JComboBox<>();
+        for (ObjectiveEffect.EffectScalingType scalingType : ObjectiveEffect.EffectScalingType.values()) {
+            cboScalingType.addItem(scalingType);
+        }
+        panObjectiveEffect.add(cboScalingType, gbcRight);
+
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panObjectiveEffect.add(new JLabel("Effect Type:"), gbcLeft);
+        cboEffectType = new JComboBox<>();
+        for (ObjectiveEffect.ObjectiveEffectType scalingType : ObjectiveEffect.ObjectiveEffectType.values()) {
+            cboEffectType.addItem(scalingType);
+        }
+        panObjectiveEffect.add(cboEffectType, gbcRight);
+
+        gbcLeft.gridy++;
+        gbcRight.gridy++;
+        panObjectiveEffect.add(new JLabel("Effect Condition:"), gbcLeft);
+        cboEffectCondition = new JComboBox<>();
+        cboEffectCondition.addItem(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess);
+        cboEffectCondition.addItem(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveFailure);
+        panObjectiveEffect.add(cboEffectCondition, gbcRight);
+
+        JButton btnAdd = new JButton("Add");
+        btnAdd.addActionListener(e -> this.addEffect());
+        gbcLeft.gridy++;
+        panObjectiveEffect.add(btnAdd, gbcLeft);
+
+        JLabel lblSuccessEffects = new JLabel("Effects on Success");
+        JLabel lblFailureEffects = new JLabel("Effects on Failure");
+
+        successEffects = new JList<>(successEffectsModel);
+        successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));
+        failureEffects = new JList<>(failureEffectsModel);
+        failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
+
+        btnRemoveSuccess = new JButton("Remove");
+        btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess));
+        btnRemoveSuccess.setEnabled(false);
+
+        btnRemoveFailure = new JButton("Remove");
+        btnRemoveFailure.addActionListener(e -> this.removeEffect(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveFailure));
+        btnRemoveFailure.setEnabled(false);
+
+        JPanel panBottom = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5,5,0,5);
+        panBottom.add(lblSuccessEffects, gbc);
+        gbc.gridx++;
+        gbc.gridx++;
+        panBottom.add(lblFailureEffects, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        JScrollPane scrSuccessEffects = new JScrollPane(successEffects);
+        scrSuccessEffects.setMinimumSize(new Dimension(300, 100));
+        scrSuccessEffects.setPreferredSize(new Dimension(300, 100));
+        panBottom.add(scrSuccessEffects, gbc);
+        gbc.gridx++;
+        panBottom.add(btnRemoveSuccess, gbc);
+        gbc.gridx++;
+        JScrollPane scrFailureEffects = new JScrollPane(failureEffects);
+        scrFailureEffects.setMinimumSize(new Dimension(300, 100));
+        scrFailureEffects.setPreferredSize(new Dimension(300, 100));
+        panBottom.add(scrFailureEffects, gbc);
+        gbc.gridx++;
+        panBottom.add(btnRemoveFailure, gbc);
+
+        gbcLeft.gridy++;
+        gbcLeft.gridwidth = 3;
+        gbcLeft.anchor = GridBagConstraints.WEST;
+        gbcLeft.fill = GridBagConstraints.BOTH;
+        gbcLeft.weightx = 1.0;
+        gbcLeft.weighty = 1.0;
+        panObjectiveEffect.add(panBottom, gbcLeft);
+
+    }
+
+    private void initTimeLimitPanel() {
+        panTimeLimits = new JPanel(new GridBagLayout());
 
         cboTimeLimitDirection = new JComboBox<>();
         cboTimeLimitDirection.addItem("at most");
@@ -365,73 +446,23 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         GridBagConstraints localGbc = new GridBagConstraints();
         localGbc.gridx = 0;
         localGbc.gridy = 0;
+        localGbc.anchor = GridBagConstraints.NORTHWEST;
         localGbc.insets = new Insets(0, 0, 0, 5);
 
-        timeLimitPanel.add(cboTimeLimitDirection, localGbc);
+        panTimeLimits.add(cboTimeLimitDirection, localGbc);
         localGbc.gridx++;
-        timeLimitPanel.add(cboTimeScaling, localGbc);
+        panTimeLimits.add(cboTimeScaling, localGbc);
         localGbc.gridx++;
-        timeLimitPanel.add(txtTimeLimit, localGbc);
-
-
-        getContentPane().add(timeLimitPanel, gbc);
+        localGbc.weightx = 1.0;
+        panTimeLimits.add(txtTimeLimit, localGbc);
     }
 
     /**
      * Handles the "add objective effect" row
      */
-    private void addEffectUI(GridBagConstraints gbc) {
-        JPanel effectPanel = new JPanel();
+    private void initEffectPanel() {
 
-        lblMagnitude = new JLabel("Amount:");
-        txtAmount = new JTextField();
-        txtAmount.setColumns(5);
 
-        JLabel lblScaling = new JLabel("Effect Scaling:");
-        cboScalingType = new JComboBox<>();
-        for (ObjectiveEffect.EffectScalingType scalingType : ObjectiveEffect.EffectScalingType.values()) {
-            cboScalingType.addItem(scalingType);
-        }
-
-        JLabel lblEffectType = new JLabel("Effect Type:");
-        cboEffectType = new JComboBox<>();
-        for (ObjectiveEffect.ObjectiveEffectType scalingType : ObjectiveEffect.ObjectiveEffectType.values()) {
-            cboEffectType.addItem(scalingType);
-        }
-
-        JLabel lblEffectCondition = new JLabel("Effect Condition:");
-        cboEffectCondition = new JComboBox<>();
-        cboEffectCondition.addItem(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess);
-        cboEffectCondition.addItem(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveFailure);
-
-        JButton btnAdd = new JButton("Add");
-        btnAdd.addActionListener(e -> this.addEffect());
-
-        GridBagConstraints localGbc = new GridBagConstraints();
-        localGbc.gridx = 0;
-        localGbc.gridy = 0;
-        localGbc.insets = new Insets(0, 0, 0, 5);
-        effectPanel.setLayout(new GridBagLayout());
-
-        effectPanel.add(lblMagnitude, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(txtAmount, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(lblScaling, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(cboScalingType, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(lblEffectType, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(cboEffectType, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(lblEffectCondition, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(cboEffectCondition, localGbc);
-        localGbc.gridx++;
-        effectPanel.add(btnAdd, localGbc);
-
-        getContentPane().add(effectPanel, gbc);
     }
 
     /**
