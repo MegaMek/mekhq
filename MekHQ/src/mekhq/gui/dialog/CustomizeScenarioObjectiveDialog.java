@@ -3,13 +3,10 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.*;
 
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CustomizeScenarioObjectiveDialog extends JDialog {
@@ -26,14 +23,14 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private JTextField txtShortDescription;
     private JComboBox<ScenarioObjective.ObjectiveCriterion> cboObjectiveType;
     private JComboBox<String> cboDirection;
-    private JSpinner spnPercentage;
+    private JSpinner spnAmount;
     private SpinnerNumberModel modelPercent;
     private SpinnerNumberModel modelFixed;
     private MMComboBox<ScenarioObjective.ObjectiveAmountType> cboCountType;
     private JComboBox<String> cboForceName;
 
     private JLabel lblMagnitude;
-    private JSpinner spnAmount;
+    private JSpinner spnScore;
     private JComboBox<ObjectiveEffect.EffectScalingType> cboScalingType;
     private JComboBox<ObjectiveEffect.ObjectiveEffectType> cboEffectType;
     private JComboBox<ObjectiveEffect.ObjectiveEffectConditionType> cboEffectCondition;
@@ -74,7 +71,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         txtShortDescription.setText(objective.getDescription());
         cboObjectiveType.setSelectedItem(objective.getObjectiveCriterion());
         cboCountType.setSelectedItem(objective.getAmountType());
-        spnPercentage.setValue(objective.getAmount());
+        spnAmount.setValue(objective.getAmount());
         setDirectionDropdownVisibility();
 
         cboDirection.setSelectedIndex(objective.getDestinationEdge().ordinal());
@@ -245,7 +242,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
         modelPercent = new SpinnerNumberModel(0, 0, 100, 5);
         modelFixed = new SpinnerNumberModel(0, 0, null, 1);
-        spnPercentage = new JSpinner(modelPercent);
+        spnAmount = new JSpinner(modelPercent);
 
         cboCountType = new MMComboBox("cboCountType", ScenarioObjective.ObjectiveAmountType.values());
         cboCountType.addActionListener(etv -> switchNumberModel());
@@ -268,7 +265,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         localGbc.gridx++;
         panObjectiveType.add(cboDirection, localGbc);
         localGbc.gridx++;
-        panObjectiveType.add(spnPercentage, localGbc);
+        panObjectiveType.add(spnAmount, localGbc);
         localGbc.gridx++;
         localGbc.weightx = 1.0;
         panObjectiveType.add(cboCountType, localGbc);
@@ -342,8 +339,8 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
         lblMagnitude = new JLabel("Amount:");
         panObjectiveEffect.add(lblMagnitude, gbcLeft);
-        spnAmount = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
-        panObjectiveEffect.add(spnAmount, gbcRight);
+        spnScore = new JSpinner(new SpinnerNumberModel(1, 1, null, 1));
+        panObjectiveEffect.add(spnScore, gbcRight);
 
         gbcLeft.gridy++;
         gbcRight.gridy++;
@@ -460,16 +457,16 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void switchNumberModel() {
-        int value = (int) spnPercentage.getValue();
+        int value = (int) spnAmount.getValue();
         if(cboCountType.getSelectedItem() == ScenarioObjective.ObjectiveAmountType.Percentage) {
             if(value > 100) {
                 value = 100;
             }
             modelPercent.setValue(value);
-            spnPercentage.setModel(modelPercent);
+            spnAmount.setModel(modelPercent);
         } else {
             modelFixed.setValue(value);
-            spnPercentage.setModel(modelFixed);
+            spnAmount.setModel(modelFixed);
         }
     }
 
@@ -479,7 +476,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private void addEffect() {
         int amount = 0;
         try {
-            amount = (int) spnAmount.getValue();
+            amount = (int) spnScore.getValue();
             lblMagnitude.setForeground(UIManager.getColor("text"));
         } catch (Exception e) {
             lblMagnitude.setForeground(Color.red);
@@ -569,7 +566,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private void saveObjectiveAndClose() {
         objective.setObjectiveCriterion((ScenarioObjective.ObjectiveCriterion) cboObjectiveType.getSelectedItem());
         objective.setDescription(txtShortDescription.getText());
-        int number = (int) spnPercentage.getValue();
+        int number = (int) spnAmount.getValue();
         if (cboCountType.getSelectedItem().equals(ScenarioObjective.ObjectiveAmountType.Percentage)) {
             objective.setPercentage(number);
             objective.setFixedAmount(null);
