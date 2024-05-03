@@ -806,8 +806,13 @@ public class CustomizeScenarioDialog extends JDialog {
         btnEditObjective.setEnabled(row != -1);
     }
 
+    private List<String> getBotForceNames() {
+        return botForces.stream().map(BotForce::getName).collect(Collectors.toCollection(ArrayList::new));
+    }
+
     private void addObjective() {
-        CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame, true, new ScenarioObjective(), scenario.getBotForces());
+        CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame, true,
+                new ScenarioObjective(), getBotForceNames());
         csod.setVisible(true);
         if (null != csod.getObjective()) {
             objectives.add(csod.getObjective());
@@ -818,7 +823,8 @@ public class CustomizeScenarioDialog extends JDialog {
     private void editObjective() {
         ScenarioObjective objective = objectiveModel.getObjectiveAt(objectiveTable.getSelectedRow());
         if (null != objective) {
-            CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame, true, objective, scenario.getBotForces());
+            CustomizeScenarioObjectiveDialog csod = new CustomizeScenarioObjectiveDialog(frame, true, objective,
+                    getBotForceNames());
             csod.setVisible(true);
             refreshObjectiveTable();
         }
@@ -981,17 +987,26 @@ public class CustomizeScenarioDialog extends JDialog {
 
     private void editForce() {
         BotForce bf = forcesModel.getBotForceAt(forcesTable.getSelectedRow());
+        String nameOld = bf.getName();
         if (null != bf) {
             CustomizeBotForceDialog cbfd = new CustomizeBotForceDialog(frame, true, bf, campaign);
             cbfd.setVisible(true);
             refreshForcesTable();
+            if(!bf.getName().equals(nameOld)) {
+                checkForceRename(nameOld, bf.getName());
+                refreshObjectiveTable();
+            }
         }
     }
 
     private void deleteForce() {
+        BotForce bf = forcesModel.getBotForceAt(forcesTable.getSelectedRow());
+        String nameRemove = bf.getName();
         int row = forcesTable.getSelectedRow();
         if (-1 != row) {
             botForces.remove(row);
+            checkForceDelete(nameRemove);
+            refreshObjectiveTable();
         }
         refreshForcesTable();
     }
@@ -1006,6 +1021,29 @@ public class CustomizeScenarioDialog extends JDialog {
                 } else {
                     forcesTable.setRowSelectionInterval(selectedRow, selectedRow);
                 }
+            }
+        }
+    }
+
+    /**
+     * If a force was renamed, we need to change its name in any corresponding scenario objectives
+     */
+    private void checkForceRename(String nameOld, String nameNew) {
+        for(ScenarioObjective objective : objectives) {
+            if(objective.getAssociatedForceNames().contains(nameOld)) {
+                objective.removeForce(nameOld);
+                objective.addForce(nameNew);
+            }
+        }
+    }
+
+    /**
+     * If a force is deleted, check scenario objectives and remove it there as well
+     */
+    private void checkForceDelete(String nameRemove) {
+        for(ScenarioObjective objective : objectives) {
+            if (objective.getAssociatedForceNames().contains(nameRemove)) {
+                objective.removeForce(nameRemove);
             }
         }
     }

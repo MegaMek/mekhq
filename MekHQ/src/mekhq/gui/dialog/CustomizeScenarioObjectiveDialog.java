@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
 public class CustomizeScenarioObjectiveDialog extends JDialog {
 
     private ScenarioObjective objective;
-    private List<BotForce> botForces;
+    private List<String> botForceNames;
     private JFrame frame;
 
     private JPanel panObjectiveType;
@@ -57,11 +57,11 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     DefaultListModel<String> detailModel = new DefaultListModel<>();
 
 
-    public CustomizeScenarioObjectiveDialog(JFrame parent, boolean modal, ScenarioObjective objective, List<BotForce> botForces) {
+    public CustomizeScenarioObjectiveDialog(JFrame parent, boolean modal, ScenarioObjective objective, List<String> botForceNames) {
         super(parent, modal);
         this.frame = parent;
         this.objective = objective;
-        this.botForces = botForces;
+        this.botForceNames = botForceNames;
 
         initialize();
 
@@ -285,8 +285,8 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
         cboForceName = new JComboBox<>();
         cboForceName.addItem(MHQConstants.EGO_OBJECTIVE_NAME);
-        for(BotForce force : botForces) {
-            cboForceName.addItem(force.getName());
+        for(String name : botForceNames) {
+            cboForceName.addItem(name);
         }
 
         forceNames = new JList<>(forceModel);
