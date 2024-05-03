@@ -353,7 +353,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_BEGIN_EDUCATION: {
                 for (Person person : people) {
-                    EducationController.beginEducation(gui.getCampaign(), person, data[1], Integer.parseInt(data[2]), data[3], data[4]);
+                    EducationController.beginEducation(gui.getCampaign(), person, data[1], data[2], Integer.parseInt(data[3]), data[4], data[5]);
                 }
                 break;
             }
@@ -1366,6 +1366,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         //region Education Menu
         if (gui.getCampaign().getCampaignOptions().isUseEducationModule()) {
+            // TODO add new GM options to allow users to complete travel, education, and return travel
             JMenu academyMenu = new JMenu(resources.getString("eduEducation.text"));
 
             // we use 'campaign' a lot here, so let's store it, so we don't have to re-call it every time
@@ -1458,7 +1459,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                     String nearestCampus = academy.getNearestCampus(campaign, campuses);
 
                                     // is it within the maximum jump range set in Campaign Options?
-                                    if ((Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(nearestCampus)) / 7)
+                                    if ((campaign.getSimplifiedTravelTime(campaign.getSystemByName(nearestCampus)) / 7)
                                             <= campaign.getCampaignOptions().getMaximumJumpCount()) {
                                         // attach it to the right category
                                         JMenu academyOption = new JMenu(academy.getName());
@@ -2505,16 +2506,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         if (courseCount > 0) {
             for (int courseIndex = 0; courseIndex < (courseCount); courseIndex++) {
-                LogManager.getLogger().info("Important: {}", academy.getQualificationStartYears().get(courseIndex));
                 // we also need to make sure the course is being offered
                 if (campaignYear >= academy.getQualificationStartYears().get(courseIndex)) {
                     String course = academy.getQualifications().get(courseIndex);
                     courses = new JMenuItem(course);
                     courses.setToolTipText(academy.getTooltip(gui.getCampaign(), person, courseIndex));
                     if (academy.isLocal()) {
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), String.valueOf(courseIndex), "local", faction));
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), "local", faction));
                     } else {
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), String.valueOf(courseIndex), campus, faction));
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campus, faction));
                     }
                     courses.addActionListener(this);
                     academyOption.add(courses);

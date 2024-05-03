@@ -618,11 +618,14 @@ public class Academy {
      * Retrieves the adjusted value of the academy's tuition based on the specified tier minimum and education level.
      *
      * @param person        the person for whom the tuition is being calculated
-     * @param educationLevelMin the education level for which the tuition adjustment is calculated
      * @return the adjusted tuition value as an Integer
      */
     public Integer getTuitionAdjusted(Person person) {
-        return getTuition() * (getEducationLevel(person) - educationLevelMin);
+        if (getEducationLevel(person) < 1) {
+            return tuition;
+        } else {
+            return tuition * getEducationLevel(person);
+        }
     }
 
     /**
@@ -762,7 +765,7 @@ public class Academy {
         String nearestCampus = "";
 
         for (String campus : campuses) {
-            int travelTime = Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(campus));
+            int travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemByName(campus));
 
             if (travelTime > distance) {
                 distance = travelTime;
@@ -824,8 +827,7 @@ public class Academy {
         PlanetarySystem destination = campaign.getCurrentSystem();
 
         if (!isLocal) {
-            distance = Campaign.getSimplifiedTravelTime(campaign,
-                    campaign.getSystemByName(getNearestCampus(campaign, locationSystems)));
+            distance = campaign.getSimplifiedTravelTime(campaign.getSystemByName(getNearestCampus(campaign, locationSystems)));
         }
 
         tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ")

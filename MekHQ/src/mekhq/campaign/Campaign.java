@@ -4881,8 +4881,8 @@ public class Campaign implements ITechManager {
      * @param destination the planetary system being traveled to
      * @return the simplified travel time in days
      */
-    public static int getSimplifiedTravelTime(Campaign campaign, PlanetarySystem destination) {
-        return (int) Math.floor((campaign.getCurrentSystem().getDistanceTo(destination) / 30) * 7);
+    public int getSimplifiedTravelTime(PlanetarySystem destination) {
+        return (int) Math.floor((getCurrentSystem().getDistanceTo(destination) / 30) * 7);
     }
 
     public void personUpdated(Person p) {

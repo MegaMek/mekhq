@@ -9,9 +9,13 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.PlanetarySystem;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -20,29 +24,32 @@ import java.util.*;
  */
 public class EducationController {
     /**
-     * Begins the education process, including finance checks.
+     * Begins the education process for a Person in a Campaign.
      *
-     * @param campaign    The campaign object in which the education process will occur.
-     * @param person      The person who will be enrolled in the education process.
-     * @param academyName The name of the academy where the person will be enrolled.
-     * @param courseIndex The index of the course in the academy where the person will be enrolled.
-     * @param campus      The campus where the person will be enrolled. Can be null if the academy is local.
-     * @param faction     The faction of the campus.
+     * @param campaign The Campaign in which the education process is taking place.
+     * @param person The Person who is enrolling for education.
+     * @param academySet The set name of the academy.
+     * @param academyNameInSet The name of the academy within the set.
+     * @param courseIndex The index of the course in the academy.
+     * @param campus The campus location (can be null if the academy is local).
+     * @param faction The faction of the person.
      */
-    public static void beginEducation(Campaign campaign, Person person, String academyName, int courseIndex, @Nullable String campus, String faction) {
+    public static void beginEducation(Campaign campaign, Person person, String academySet, String academyNameInSet, int courseIndex, @Nullable String campus, String faction) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
-        Academy academy = getAcademy(person);
+        Academy academy = getAcademy(academySet, academyNameInSet);
 
         if (academy == null) {
-            LogManager.getLogger().error("No academy found with name {}", academyName);
+            LogManager.getLogger().error("No academy found with name {} in set {}", academyNameInSet, academySet);
             return;
         }
 
-        int tuition = academy.getTuitionAdjusted(person);
+        double tuition = academy.getTuitionAdjusted(person) * academy.getFactionDiscountAdjusted(campaign, person);
+        LogManager.getLogger().info(tuition);
+        LogManager.getLogger().info(campaign.getFinances().getBalance());
 
         // check there is enough money in the campaign & if so, make a debit
-        if (getBalance(campaign) < tuition) {
+        if (campaign.getFinances().getBalance().isLessThan(Money.of(tuition))) {
             campaign.addReport(resources.getString("insufficientFunds.text").replaceAll("0", person.getHyperlinkedFullTitle()));
             return;
         } else {
@@ -52,29 +59,9 @@ public class EducationController {
         // with the checks done, and tuition paid, we can enroll Person
         person.setEduCourseIndex(courseIndex);
 
-        if (academy.isLocal()) {
-            enrollPerson(campaign, person, academy, null, faction);
-        } else {
-            enrollPerson(campaign, person, academy, campus, faction);
-        }
+        enrollPerson(campaign, person, academy, campus, faction, courseIndex);
 
         campaign.addReport(resources.getString("offToSchool.text").replaceAll("0", person.getFullName()).replaceAll("1", person.getEduAcademyName()).replaceAll("2", String.valueOf(person.getEduDaysOfTravelToAcademy())));
-    }
-
-    /**
-     * Returns the balance of the given campaign.
-     *
-     * @param campaign the campaign for which to get the balance
-     * @return the balance of the campaign
-     */
-    private static int getBalance(Campaign campaign) {
-        String balance = String.valueOf(campaign.getFinances().getBalance()).replaceAll("CSB ", "");
-
-        if (balance.contains(".")) {
-            balance = balance.substring(0, balance.indexOf('.'));
-        }
-
-        return Integer.parseInt(balance);
     }
 
     /**
@@ -87,8 +74,10 @@ public class EducationController {
      * @param campus   The campus where the person will be assigned.
      *                 This parameter can be null if the academy is local.
      * @param faction  The faction of the academy the person is being enrolled into.
+     * @param courseIndex The index of the course being taken
+     *                 This parameter can be null if the academy is not a Clan Sibko.
      */
-    public static void enrollPerson(Campaign campaign, Person person, Academy academy, @Nullable String campus, String faction) {
+    public static void enrollPerson(Campaign campaign, Person person, Academy academy, @Nullable String campus, String faction, @Nullable Integer courseIndex) {
         // if 'campus' is null and the academy isn't local, we need to abort
         if ((campus == null) && (!academy.isLocal())) {
             LogManager.getLogger().error("Non-Local Academy {} with null campus", academy.getName());
@@ -106,15 +95,15 @@ public class EducationController {
             person.setEduDaysOfTravelToAcademy(2);
             person.setEduAcademySystem(campaign.getCurrentSystem().getName(campaign.getLocalDate()));
         } else {
-            person.setEduDaysOfTravelToAcademy(Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(campus)));
+            person.setEduDaysOfTravelToAcademy(campaign.getSimplifiedTravelTime(campaign.getSystemByName(campus)));
             person.setEduAcademySystem(campaign.getSystemByName(campus).getName(campaign.getLocalDate()));
         }
 
         person.setEduAcademyNameInSet(academy.getName());
 
-        // if the academy is local, we need to generate a name, otherwise we use the listed name
-        if (academy.isLocal()) {
-            person.setEduAcademyName(generateName(academy.isMilitary(), campaign.getCurrentSystem().getName(campaign.getLocalDate())));
+        // if the academy is Local or Clan, we need to generate a name, otherwise we use the listed name
+        if ((academy.isLocal()) || (academy.isClan())) {
+            person.setEduAcademyName(generateName(campaign, person, academy, courseIndex, campaign.getCurrentSystem().getName(campaign.getLocalDate())));
         } else {
             person.setEduAcademyName(person.getEduAcademyNameInSet() + " (" + campus + ')');
         }
@@ -125,115 +114,159 @@ public class EducationController {
     }
 
     /**
-     * Generates a name for an academy.
+     * Generates a name for a local academy.
      *
-     * @param isMilitary a boolean value indicating if the institution is military or not
-     * @param campus     the name of the campus
-     * @return the generated name for the educational institution
-     * @throws IllegalStateException if there is an unexpected roll value
+     * @param person      The person for whom the name is being generated (nullable, if not Clan Sibko).
+     * @param academy     The academy to which the person is applying.
+     * @param courseIndex The index of the course (nullable, if not Clan Sibko).
+     * @param campus      The campus of the academy.
+     * @return The generated name.
      */
-    public static String generateName(Boolean isMilitary, String campus) {
+    public static String generateName(@Nullable Campaign campaign, @Nullable Person person, Academy academy, @Nullable Integer courseIndex, String campus) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
-        String type;
-        int roll = Compute.d6(1);
-        switch (roll) {
+        if (academy.isClan()) {
+            if (academy.isLocal()) {
+                return generateSibkoCode(campaign, person, courseIndex, resources) + " (REDACTED)";
+            } else {
+                return generateSibkoCode(campaign, person, courseIndex, resources) + " (" + campus + ')';
+            }
+        } else {
+            if (Compute.d6(1) <= 3) {
+                if (academy.isMilitary()) {
+                    return campus + ' ' + generateMilitaryPrefix(resources) + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + generateSuffix(resources);
+                } else {
+                    return campus + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + generateSuffix(resources);
+                }
+            } else {
+                if (academy.isMilitary()) {
+                    return generateMilitaryPrefix(resources) + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + campus;
+                } else {
+                    return generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + campus;
+                }
+            }
+        }
+    }
+
+    /**
+     * Generates a Sibko code based on the given campaign, person, course index, and resources.
+     *
+     * @param campaign The current campaign.
+     * @param person The individual.
+     * @param courseIndex The index of the course the person is enrolled in.
+     * @param resources The resource bundle containing the caste text values.
+     * @return The generated Sibko code.
+     * @throws IllegalStateException if the course index is unexpected.
+     */
+    private static String generateSibkoCode(Campaign campaign, Person person, Integer courseIndex, ResourceBundle resources) {
+        LocalDate birthDate = person.getRecruitment();
+        String caste;
+
+        switch (courseIndex) {
+            case 0:
             case 1:
-                type = resources.getString("typeAcademy.text");
-                break;
             case 2:
-                type = resources.getString("typeCollege.text");
-                break;
             case 3:
-                type = resources.getString("typeInstitute.text");
-                break;
             case 4:
-                type = resources.getString("typeUniversity.text");
-                break;
             case 5:
-                type = resources.getString("typePolytechnic.text");
-                break;
             case 6:
-                type = resources.getString("typeSchool.text");
+                caste = resources.getString("graduatedWarrior.text");
+                break;
+            case 7:
+                caste = resources.getString("graduatedScientist.text");
+                break;
+            case 8:
+                caste = resources.getString("graduatedMerchant.text");
+                break;
+            case 9:
+                caste = resources.getString("graduatedTechnician.text");
+                break;
+            case 10:
+                caste = resources.getString("graduatedLabour.text");
                 break;
             default:
-                throw new IllegalStateException("Unexpected roll in generateName() (type): " + roll);
+                throw new IllegalStateException("Unexpected caste value in generateName: " + courseIndex);
         }
 
-        String suffix;
-        boolean systemNameInSuffix = false;
-        roll = Compute.d6(1);
-        if (roll <= 3) {
-            suffix = campus;
-            systemNameInSuffix = true;
-        } else {
-            roll = Compute.d6(1);
-            switch (roll) {
-                case 1:
-                    suffix = resources.getString("suffixTechnology.text");
-                    break;
-                case 2:
-                    suffix = resources.getString("suffixTechnologyAdvanced.text");
-                    break;
-                case 3:
-                    suffix = resources.getString("suffixScience.text");
-                    break;
-                case 4:
-                    suffix = resources.getString("suffixScienceAdvanced.text");
-                    break;
-                case 5:
-                    suffix = resources.getString("suffixStudies.text");
-                    break;
-                case 6:
-                    suffix = resources.getString("suffixHigherLearning.text");
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected roll in generateName() (suffix): " + roll);
-            }
+        return (caste + ' ' + birthDate.getYear() + birthDate.getMonth().getValue() + birthDate.getDayOfMonth() + campaign.getFaction().getShortName());
+    }
+
+    /**
+     * Generates a military academy prefix randomly selected from the resource bundle.
+     *
+     * @param resources the resource bundle containing the military prefix texts
+     * @return a randomly generated military prefix
+     * @throws IllegalStateException if an unexpected roll occurs
+     */
+    private static String generateMilitaryPrefix(ResourceBundle resources) {
+        switch (Compute.d6(1)) {
+            case 1:
+                return resources.getString("prefixCombinedArms.text");
+            case 2:
+                return resources.getString("prefixCombinedForces.text");
+            case 3:
+                return resources.getString("prefixMilitary.text");
+            case 4:
+                return resources.getString("prefixWar.text");
+            case 5:
+                return resources.getString("prefixWarFighting.text");
+            case 6:
+                return resources.getString("prefixCombat.text");
+            default:
+                throw new IllegalStateException("Unexpected roll in generateMilitaryPrefix");
         }
+    }
 
-        String prefix = null;
-        roll = Compute.d6(1);
-        if (!systemNameInSuffix) {
-            prefix = campus;
-        } else if (isMilitary) {
-            switch (roll) {
-                case 1:
-                    prefix = resources.getString("prefixCombinedArms.text");
-                    break;
-                case 2:
-                    prefix = resources.getString("prefixCombinedForces.text");
-                    break;
-                case 3:
-                    prefix = resources.getString("prefixMilitary.text");
-                    break;
-                case 4:
-                    prefix = resources.getString("prefixWar.text");
-                    break;
-                case 5:
-                    prefix = resources.getString("prefixWarFighting.text");
-                    break;
-                case 6:
-                    prefix = resources.getString("prefixCombat.text");
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected roll in generateName() (suffix): " + roll);
-            }
+    /**
+     * This method generates a academy suffix based on a random roll.
+     *
+     * @param resources The ResourceBundle containing the suffix texts.
+     * @return The generated suffix.
+     * @throws IllegalStateException if the random roll is unexpected.
+     */
+    private static String generateSuffix(ResourceBundle resources) {
+        switch (Compute.d6(1)) {
+            case 1:
+                return resources.getString("suffixTechnology.text");
+            case 2:
+                return resources.getString("suffixTechnologyAdvanced.text");
+            case 3:
+                return resources.getString("suffixScience.text");
+            case 4:
+                return resources.getString("suffixScienceAdvanced.text");
+            case 5:
+                return resources.getString("suffixStudies.text");
+            case 6:
+                return resources.getString("suffixHigherLearning.text");
+            default:
+                throw new IllegalStateException("Unexpected roll in generateSuffix()");
         }
+    }
 
-        StringBuilder name = new StringBuilder();
-
-        if (suffix != null) {
-            name.append(suffix).append(' ').append(resources.getString("conjoinerOf.text")).append(' ');
+    /**
+     * Generates a random educational institution type from the provided ResourceBundle.
+     *
+     * @param resources the ResourceBundle containing the localized strings for the educational institution types
+     * @return a randomly selected educational institution type
+     * @throws IllegalStateException if the generated roll is unexpected
+     */
+    private static String generateTypeAdult(ResourceBundle resources) {
+        switch (Compute.d6(1)) {
+            case 1:
+                return resources.getString("typeAcademy.text");
+            case 2:
+                return resources.getString("typeCollege.text");
+            case 3:
+                return resources.getString("typeInstitute.text");
+            case 4:
+                return resources.getString("typeUniversity.text");
+            case 5:
+                return resources.getString("typePolytechnic.text");
+            case 6:
+                return resources.getString("typeSchool.text");
+            default:
+                throw new IllegalStateException("Unexpected roll in generateTypeAdult");
         }
-
-        name.append(type);
-
-        if (prefix != null) {
-            name.append(' ').append(resources.getString("conjoinerOf.text")).append(' ').append(prefix);
-        }
-
-        return name.toString();
     }
 
     /**
@@ -245,7 +278,7 @@ public class EducationController {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
         for (Person person : campaign.getStudents()) {
-            Academy academy = getAcademy(person);
+            Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
             // is person in transit to the institution?
             if (journeyToAcademy(campaign, person, resources)) {
@@ -260,7 +293,7 @@ public class EducationController {
             }
 
             // if education has concluded and the journey home hasn't started, we begin the journey
-            Integer daysOfTravelFrom = beginJourneyHome(campaign, person, daysOfEducation, resources);
+            Integer daysOfTravelFrom = beginJourneyHome(campaign, person, academy, daysOfEducation, resources);
 
             if (daysOfTravelFrom == null) {
                 continue;
@@ -349,11 +382,22 @@ public class EducationController {
      * @return the number of travel days from the academy, or null if the person has no education days and no
      * previous travel days
      */
-    private static Integer beginJourneyHome(Campaign campaign, Person person, Integer daysOfEducation, ResourceBundle resources) {
+    private static Integer beginJourneyHome(Campaign campaign, Person person, Academy academy, Integer daysOfEducation, ResourceBundle resources) {
         int daysOfTravelFrom = person.getEduDaysOfTravelFromAcademy();
 
+        int travelTime;
+
         if ((daysOfEducation == 0) && (daysOfTravelFrom == 0)) {
-            int travelTime = Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(person.getEduAcademySystem()));
+            if ((academy.isClan()) && (academy.isLocal())) {
+                try {
+                    travelTime = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
+                } catch (Exception e) {
+                    // not all Clans have a starting planet, so we abstract it
+                    travelTime = 100;
+                }
+            } else {
+                travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemByName(person.getEduAcademySystem()));
+            }
 
             // We use a minimum of 2 days travel to avoid awkward grammar in the report.
             // This can be hand waved as being the time it takes for Person to get from campus and
@@ -382,7 +426,7 @@ public class EducationController {
      */
     private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfEducation, Integer daysOfTravelFrom, ResourceBundle resources) {
         if ((daysOfEducation < 1) && (daysOfTravelFrom > 0)) {
-            int travelTime = Campaign.getSimplifiedTravelTime(campaign, campaign.getSystemByName(person.getEduAcademySystem()));
+            int travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemByName(person.getEduAcademySystem()));
 
             // if true, it means the unit has moved since we last ran, so we need to adjust
             if (travelTime > daysOfEducation) {
@@ -399,19 +443,19 @@ public class EducationController {
     }
 
     /**
-     * Returns the academy where the given person is enrolled.
+     * Retrieves an Academy object based on the provided parameters.
      *
-     * @param person the person whose academy is being retrieved
-     * @return the academy where the person is enrolled,
-     * or null if the person is not enrolled in any academy
+     * @param academySetName The academy set name to match.
+     * @param academyNameInSet The academy name in the set to match.
+     * @return The Academy that matches the provided parameters or null if no match is found.
      */
-    private static Academy getAcademy(Person person) {
+    private static Academy getAcademy(String academySetName, String academyNameInSet) {
         List<String> setNames = AcademyFactory.getInstance().getAllSetNames();
 
-        return setNames.stream().filter(setName -> setName.equalsIgnoreCase(person.getEduAcademySet()))
+        return setNames.stream().filter(setName -> setName.equalsIgnoreCase(academySetName))
                 .map(setName -> AcademyFactory.getInstance().getAllAcademiesForSet(setName))
-                .flatMap(Collection::stream).filter(academy -> String.valueOf(academy.getName())
-                        .equals(person.getEduAcademyNameInSet())).findFirst().orElse(null);
+                .flatMap(Collection::stream).filter(academy -> String.valueOf(academyNameInSet)
+                        .equals(academyNameInSet)).findFirst().orElse(null);
     }
 
     /**
@@ -602,6 +646,7 @@ public class EducationController {
                                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
                                         .replaceAll("0", resources.getString("graduatedScientist.text")) + resources.getString("graduatedWarriorLabour.text"));
                                 person.setEduCourseIndex(10);
+                                person.setEduAcademyName(generateSibkoCode(campaign, person, 10, resources));
 
                                 break;
                             case 8:
@@ -610,6 +655,7 @@ public class EducationController {
                                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
                                         .replaceAll("0", resources.getString("graduatedMerchant.text")) + resources.getString("graduatedWarriorLabour.text"));
                                 person.setEduCourseIndex(10);
+                                person.setEduAcademyName(generateSibkoCode(campaign, person, 10, resources));
 
                                 break;
                             case 9:
@@ -618,6 +664,7 @@ public class EducationController {
                                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
                                         .replaceAll("0", resources.getString("graduatedTechnician.text")) + resources.getString("graduatedWarriorLabour.text"));
                                 person.setEduCourseIndex(10);
+                                person.setEduAcademyName(generateSibkoCode(campaign, person, 10, resources));
 
                                 break;
                             case 10:
@@ -742,6 +789,7 @@ public class EducationController {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
                     .replaceAll("0", resources.getString("graduatedWarrior.text")) + resources.getString("graduatedWarriorScience.text"));
             person.setEduCourseIndex(7);
+            person.setEduAcademyName(generateSibkoCode(campaign, person, 7, resources));
 
             return true;
         } else {
@@ -752,6 +800,7 @@ public class EducationController {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
                     .replaceAll("0", resources.getString("graduatedWarrior.text")) + resources.getString("graduatedWarriorMerchant.text"));
             person.setEduCourseIndex(8);
+            person.setEduAcademyName(generateSibkoCode(campaign, person, 8, resources));
 
             return true;
         } else {
@@ -762,6 +811,7 @@ public class EducationController {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
                     .replaceAll("0", resources.getString("graduatedWarrior.text")) + resources.getString("graduatedWarriorTechnician.text"));
             person.setEduCourseIndex(9);
+            person.setEduAcademyName(generateSibkoCode(campaign, person, 9, resources));
 
             return true;
         } else {
@@ -772,6 +822,7 @@ public class EducationController {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("washout.text")
                     .replaceAll("0", resources.getString("graduatedWarrior.text")) + resources.getString("graduatedWarriorLabour.text"));
             person.setEduCourseIndex(10);
+            person.setEduAcademyName(generateSibkoCode(campaign, person, 10, resources));
 
             return true;
         }
@@ -948,6 +999,7 @@ public class EducationController {
                             + resources.getString("graduatedWarriorFailed.text")
                             + resources.getString("graduatedWarriorScience.text"));
                     person.setEduCourseIndex(7);
+                    person.setEduAcademyName(generateSibkoCode(campaign, person, 7, resources));
 
                     proceed = false;
                 } else {
@@ -959,6 +1011,7 @@ public class EducationController {
                             + resources.getString("graduatedWarriorFailed.text")
                             + resources.getString("graduatedWarriorMerchant.text"));
                     person.setEduCourseIndex(8);
+                    person.setEduAcademyName(generateSibkoCode(campaign, person, 8, resources));
 
                     proceed = false;
                 } else {
@@ -970,6 +1023,7 @@ public class EducationController {
                             + resources.getString("graduatedWarriorFailed.text")
                             + resources.getString("graduatedWarriorTechnician.text"));
                     person.setEduCourseIndex(9);
+                    person.setEduAcademyName(generateSibkoCode(campaign, person, 9, resources));
 
                     proceed = false;
                 } else {
@@ -981,6 +1035,7 @@ public class EducationController {
                             + resources.getString("graduatedWarriorFailed.text")
                             + resources.getString("graduatedWarriorLabour.text"));
                     person.setEduCourseIndex(10);
+                    person.setEduAcademyName(generateSibkoCode(campaign, person, 10, resources));
 
                     proceed = false;
                 }
@@ -1041,9 +1096,9 @@ public class EducationController {
         if (person.getEduCourseIndex() == 7) {
             if (graduationRoll < 25) {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTrialFailed.text")
-                        .replaceAll("0", resources.getString("graduatedScience.text")));
+                        .replaceAll("0", resources.getString("graduatedScientist.text")));
 
-                ServiceLogger.eduClanFailed(person, campaign.getLocalDate(), resources.getString("graduatedScience.text"));
+                ServiceLogger.eduClanFailed(person, campaign.getLocalDate(), resources.getString("graduatedScientist.text"));
 
                 person.setEduCourseIndex(10);
             }
@@ -1051,11 +1106,11 @@ public class EducationController {
             if ((graduationRoll >= 25) && (graduationRoll < 90)) {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTrialPassed.text")
                         .replaceAll("0", resources.getString("graduatedClanBarely.text"))
-                        .replaceAll("1", resources.getString("graduatedScience.text")));
+                        .replaceAll("1", resources.getString("graduatedScientist.text")));
 
                 ServiceLogger.eduClanPassed(person, campaign.getLocalDate(),
                         resources.getString("graduatedClanBarely.text"),
-                        resources.getString("graduatedScience.text"));
+                        resources.getString("graduatedScientist.text"));
 
                 improveSkills(campaign, person, academy, true);
 
@@ -1067,11 +1122,11 @@ public class EducationController {
             if ((graduationRoll >= 90) && (graduationRoll < 99)) {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTrialPassed.text")
                         .replaceAll("0", resources.getString("graduatedEasily.text"))
-                        .replaceAll("1", resources.getString("graduatedScience.text")));
+                        .replaceAll("1", resources.getString("graduatedScientist.text")));
 
                 ServiceLogger.eduClanPassed(person, campaign.getLocalDate(),
                         resources.getString("graduatedEasily.text"),
-                        resources.getString("graduatedScience.text"));
+                        resources.getString("graduatedScientist.text"));
 
                 improveSkills(campaign, person, academy, true);
 
@@ -1087,11 +1142,11 @@ public class EducationController {
             if (graduationRoll == 99) {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTrialPassed.text")
                         .replaceAll("0", resources.getString("graduatedEffortlessly.text"))
-                        .replaceAll("1", resources.getString("graduatedScience.text")));
+                        .replaceAll("1", resources.getString("graduatedScientist.text")));
 
                 ServiceLogger.eduClanPassed(person, campaign.getLocalDate(),
                         resources.getString("graduatedEffortlessly.text"),
-                        resources.getString("graduatedScience.text"));
+                        resources.getString("graduatedScientist.text"));
 
                 improveSkills(campaign, person, academy, true);
 
