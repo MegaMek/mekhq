@@ -91,7 +91,7 @@ public class Scenario {
     private Map<String, Entity> externalIDLookup;
 
     /** map generation variables **/
-    private String terrainType;
+    private String mapGenerator;
     private int mapSizeX;
     private int mapSizeY;
     private String map;
@@ -235,10 +235,6 @@ public class Scenario {
         this.cloaked = cloaked;
     }
 
-    public String getTerrainType() {
-        return terrainType;
-    }
-
     public int getStartingPos() {
         return startingPos;
     }
@@ -295,10 +291,6 @@ public class Scenario {
         this.startingAnySEy = startingAnySEy;
     }
 
-    public void setTerrainType(String terrainType) {
-        this.terrainType = terrainType;
-    }
-
     public void setBoardType(int boardType) {
         this.boardType = boardType;
     }
@@ -329,6 +321,14 @@ public class Scenario {
 
     public void setMap(String map) {
         this.map = map;
+    }
+
+    public String getMapGenerator() {
+        return mapGenerator;
+    }
+
+    public void setMapGenerator(String s) {
+        mapGenerator = s;
     }
 
     public String getMapForDisplay() {
@@ -876,7 +876,7 @@ public class Scenario {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "boardType", boardType);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mapGenerator", mapGenerator);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasTrack", hasTrack);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mapSize", mapSizeX, mapSizeY);
@@ -1014,8 +1014,8 @@ public class Scenario {
                     retVal.setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("boardType")) {
                     retVal.boardType = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
-                    retVal.terrainType = wn2.getTextContent();
+                } else if (wn2.getNodeName().equalsIgnoreCase("mapGenerator")) {
+                    retVal.mapGenerator = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("hasTrack")) {
                     retVal.hasTrack = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {

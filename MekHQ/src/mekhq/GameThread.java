@@ -151,12 +151,12 @@ class GameThread extends Thread implements CloseClientListener {
                         if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
                             mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                         }
-                    } else if (scenario.getTerrainType() != null){
-                        File mapgenFile = new File("data/mapgen/" + scenario.getTerrainType() + ".xml"); // TODO : remove inline file path
+                    } else if (scenario.getMapGenerator() != null){
+                        File mapgenFile = new File("data/mapgen/" + scenario.getMapGenerator() + ".xml"); // TODO : remove inline file path
                         try (InputStream is = new FileInputStream(mapgenFile)) {
                             mapSettings = MapSettings.getInstance(is);
                         } catch (FileNotFoundException ex) {
-                            LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getTerrainType() + ".xml", ex);  // TODO : remove inline file path
+                            LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMapGenerator() + ".xml", ex);  // TODO : remove inline file path
                         }
 
                         if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
