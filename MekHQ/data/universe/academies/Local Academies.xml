@@ -323,7 +323,7 @@
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Warrant Officer</qualification>
-        <curriculum>Leadership, Negotiation</curriculum>
+        <curriculum>Leadership, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
     <academy>
@@ -335,7 +335,7 @@
         <constructionYear>2300</constructionYear>
         <tuition>5000</tuition>
         <durationDays>150</durationDays>
-        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Field Officer</qualification>
