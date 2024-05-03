@@ -132,30 +132,31 @@ class GameThread extends Thread implements CloseClientListener {
                 MapSettings mapSettings = MapSettings.getInstance();
 
                 // check that we have valid conditions for setting the mapSettings
-                if ((scenario.getMapSizeX() > 1) && (scenario.getMapSizeY() > 1) && (null != scenario.getMap())) {
+                if ((scenario.getMapSizeX() > 1) && (scenario.getMapSizeY() > 1)) {
 
                     mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
                     mapSettings.setMapSize(1, 1);
-                    mapSettings.getBoardsSelectedVector().clear();
 
                     // if the scenario is taking place in space, do space settings instead
                     if (scenario.getBoardType() == Scenario.T_SPACE) {
                         mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
+                        mapSettings.getBoardsSelectedVector().clear();
                         mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
-                    } else if (scenario.isUsingFixedMap()) {
+                    } else if (scenario.isUsingFixedMap() && scenario.getMap() != null) {
                         String board = scenario.getMap().replace(".board", ""); // TODO : remove inline file type
                         board = board.replace("\\", "/");
+                        mapSettings.getBoardsSelectedVector().clear();
                         mapSettings.getBoardsSelectedVector().add(board);
 
                         if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
                             mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                         }
-                    } else {
-                        File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml"); // TODO : remove inline file path
+                    } else if (scenario.getTerrainType() != null){
+                        File mapgenFile = new File("data/mapgen/" + scenario.getTerrainType() + ".xml"); // TODO : remove inline file path
                         try (InputStream is = new FileInputStream(mapgenFile)) {
                             mapSettings = MapSettings.getInstance(is);
                         } catch (FileNotFoundException ex) {
-                            LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getMap() + ".xml", ex);  // TODO : remove inline file path
+                            LogManager.getLogger().error("Could not load map file data/mapgen/" + scenario.getTerrainType() + ".xml", ex);  // TODO : remove inline file path
                         }
 
                         if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
@@ -165,7 +166,10 @@ class GameThread extends Thread implements CloseClientListener {
                         // duplicate code, but getting a new instance of map settings resets the size parameters
                         mapSettings.setBoardSize(scenario.getMapSizeX(), scenario.getMapSizeY());
                         mapSettings.setMapSize(1, 1);
+                        mapSettings.getBoardsSelectedVector().clear();
                         mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
+                    } else {
+                        LogManager.getLogger().error("invalid map settings provided for scenario " + scenario.getName());
                     }
                 } else {
                     LogManager.getLogger().error("invalid map settings provided for scenario " + scenario.getName());
