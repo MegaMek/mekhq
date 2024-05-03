@@ -141,7 +141,7 @@ public class ScenarioObjective {
 
     public ScenarioObjective() {
         description = "";
-        objectiveCriterion = ObjectiveCriterion.Destroy;
+        objectiveCriterion = ObjectiveCriterion.Preserve;
         destinationEdge = OffBoardDirection.NONE;
         percentage = 100;
     }
