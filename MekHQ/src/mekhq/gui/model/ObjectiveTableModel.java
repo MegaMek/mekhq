@@ -2,6 +2,7 @@ package mekhq.gui.model;
 
 import megamek.common.Entity;
 import mekhq.campaign.mission.Loot;
+import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioObjective;
 import mekhq.campaign.parts.Part;
 
@@ -17,9 +18,12 @@ public class ObjectiveTableModel extends AbstractTableModel {
     protected String[] columnNames;
     protected List<ScenarioObjective> data;
 
-    public final static int COL_DESC    = 0;
-
-    public final static int N_COL       = 1;
+    public final static int COL_CRITERION      = 0;
+    public final static int COL_AMOUNT         = 1;
+    public final static int COL_TIME           = 2;
+    public final static int COL_SUCCESS_EFFECT = 3;
+    public final static int COL_FAILURE_EFFECT = 4;
+    public final static int N_COL              = 5;
     //endregion Variable Declarations
 
     public ObjectiveTableModel(List<ScenarioObjective> entries) {
@@ -39,8 +43,16 @@ public class ObjectiveTableModel extends AbstractTableModel {
     @Override
     public String getColumnName(int column) {
         switch (column) {
-            case COL_DESC:
-                return "Description";
+            case COL_CRITERION:
+                return "Type";
+            case COL_AMOUNT:
+                return "Amount";
+            case COL_TIME:
+                return "Time limits";
+            case COL_SUCCESS_EFFECT:
+                return "On Success";
+            case COL_FAILURE_EFFECT:
+                return "On Failure";
             default:
                 return "?";
         }
@@ -61,8 +73,23 @@ public class ObjectiveTableModel extends AbstractTableModel {
         }
 
         switch (col) {
-            case COL_DESC:
-                return objective.getDescription();
+            case COL_CRITERION:
+                return objective.getObjectiveCriterion().toString();
+            case COL_AMOUNT:
+                return objective.getAmountType().equals(ScenarioObjective.ObjectiveAmountType.Percentage) ?
+                        objective.getPercentage() + "%" : objective.getAmount() + " units";
+            case COL_TIME:
+                if(objective.getTimeLimitType().equals(ScenarioObjective.TimeLimitType.None)) {
+                    return "None";
+                }
+                String timeDirection = objective.isTimeLimitAtMost() ? "At most " : "At least ";
+                return objective.getTimeLimitType().equals(ScenarioObjective.TimeLimitType.Fixed) ?
+                        timeDirection + objective.getTimeLimit() + " turns" :
+                        timeDirection + "(" + objective.getTimeLimitScaleFactor() + "x unit count) turns";
+            case COL_SUCCESS_EFFECT:
+                return Integer.toString(objective.getSuccessEffects().size()) + " Effect(s)";
+            case COL_FAILURE_EFFECT:
+                return Integer.toString(objective.getFailureEffects().size()) + " Effect(s)";
             default:
                 return "?";
         }
@@ -74,8 +101,6 @@ public class ObjectiveTableModel extends AbstractTableModel {
 
     public int getColumnWidth(int c) {
         switch (c) {
-            case COL_DESC:
-                return 100;
             default:
                 return 20;
         }
@@ -86,7 +111,33 @@ public class ObjectiveTableModel extends AbstractTableModel {
     }
 
     public String getTooltip(int row, int col) {
+        ScenarioObjective objective;
+        if (data.isEmpty()) {
+            return null;
+        } else {
+            objective = getObjectiveAt(row);
+        }
+        StringBuilder sb;
+
         switch (col) {
+            case COL_CRITERION:
+                return "<html>" + String.join("<br>", objective.getAssociatedForceNames()) +"</html>";
+            case COL_SUCCESS_EFFECT:
+                sb = new StringBuilder();
+                sb.append("<html>");
+                for(ObjectiveEffect effect : objective.getSuccessEffects()) {
+                    sb.append(effect.toString()).append("<br>");
+                }
+                sb.append("</html>");
+                return sb.toString();
+            case COL_FAILURE_EFFECT:
+                sb = new StringBuilder();
+                sb.append("<html>");
+                for(ObjectiveEffect effect : objective.getFailureEffects()) {
+                    sb.append(effect.toString()).append("<br>");
+                }
+                sb.append("</html>");
+                return sb.toString();
             default:
                 return null;
         }
