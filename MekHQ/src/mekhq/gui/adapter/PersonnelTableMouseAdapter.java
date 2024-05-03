@@ -64,7 +64,6 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.List;
@@ -362,10 +361,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_COMPLETE_STAGE: {
                 for (Person person : people) {
                     if (person.getEduDaysOfTravelToAcademy() > 0) {
+                        EducationController.completeJourneyTo(gui.getCampaign(), person);
                     } else if (person.getEduDaysOfEducation() > 0) {
                         EducationController.completeEducation(gui.getCampaign(), person);
                     } else {
-                        person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+                        person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), PersonnelStatus.ACTIVE);
                     }
                 }
                 break;

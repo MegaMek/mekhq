@@ -295,7 +295,7 @@ public class EducationController {
             }
 
             // if we reach this point it means Person is already in transit, so we continue their journey
-            processJourneyHome(campaign, person, daysOfEducation, daysOfTravelFrom, resources);
+            processJourneyHome(campaign, person, daysOfEducation, daysOfTravelFrom);
         }
     }
 
@@ -452,9 +452,8 @@ public class EducationController {
      * @param person           the person whose journey home is being processed
      * @param daysOfEducation  the number education days remaining
      * @param daysOfTravelFrom the number of days it takes for the person to travel from the campaign location to the unit
-     * @param resources        the ResourceBundle containing localized text resources
      */
-    private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfEducation, Integer daysOfTravelFrom, ResourceBundle resources) {
+    private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfEducation, Integer daysOfTravelFrom) {
         if ((daysOfEducation < 1) && (daysOfTravelFrom > 0)) {
             int travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemByName(person.getEduAcademySystem()));
 
