@@ -5048,18 +5048,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return panel;
     }
 
-
     private JPanel createAccidentsAndEventsPanel() {
         chkAllAges = new JCheckBox(resources.getString("chkAllAges.text"));
         chkAllAges.setToolTipText(resources.getString("chkAllAges.toolTip"));
         chkAllAges.setName("chkAllAges");
-        chkAllAges.addActionListener(evt -> {
-            final boolean isEnabled = chkAllAges.isSelected();
-
-            chkLiveFireBlooding.setEnabled(isEnabled);
-            spnWarriorCasteAccidents.setEnabled(isEnabled);
-            spnOtherCasteAccidents.setEnabled(isEnabled);
-        });
 
         chkLiveFireBlooding = new JCheckBox(resources.getString("chkLiveFireBlooding.text"));
         chkLiveFireBlooding.setToolTipText(resources.getString("chkLiveFireBlooding.toolTip"));
@@ -5092,19 +5084,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkLiveFireBlooding.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         lblMilitaryAcademyAccidents.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnMilitaryAcademyAccidents.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
-        if ((campaign.getCampaignOptions().isUseEducationModule()) && (campaign.getCampaignOptions().isAllAges())) {
-            chkLiveFireBlooding.setEnabled(true);
-            lblWarriorCasteAccidents.setEnabled(true);
-            spnWarriorCasteAccidents.setEnabled(true);
-            lblOtherCasteAccidents.setEnabled(true);
-            spnOtherCasteAccidents.setEnabled(true);
-        } else {
-            chkLiveFireBlooding.setEnabled(false);
-            lblWarriorCasteAccidents.setEnabled(false);
-            spnWarriorCasteAccidents.setEnabled(false);
-            lblOtherCasteAccidents.setEnabled(false);
-            spnOtherCasteAccidents.setEnabled(false);
-        }
+        chkLiveFireBlooding.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblWarriorCasteAccidents.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnWarriorCasteAccidents.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblOtherCasteAccidents.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnOtherCasteAccidents.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // creating the layout
         final JPanel panel = new JPanel();

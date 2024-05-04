@@ -1199,6 +1199,8 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblEdge2 = new JLabel();
         JLabel lblEdgeAvail1 = new JLabel();
         JLabel lblEdgeAvail2 = new JLabel();
+        JLabel lblEducationLevel1 = new JLabel();
+        JLabel lblEducationLevel2 = new JLabel();
 
         GridBagConstraints gridBagConstraints;
 
@@ -1371,6 +1373,30 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblTough2, gridBagConstraints);
+        }
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            lblEducationLevel1.setName("lblEducationLevel1");
+            lblEducationLevel1.setText(resourceMap.getString("lblEducationLevel1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationLevel1, gridBagConstraints);
+
+            lblEducationLevel2.setName("lblEducationLevel2");
+            lblEducationLevel2.setText(String.valueOf(person.getEduHighestEducation()));
+            lblEducationLevel1.setLabelFor(lblEducationLevel2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationLevel2, gridBagConstraints);
         }
 
         return pnlSkills;

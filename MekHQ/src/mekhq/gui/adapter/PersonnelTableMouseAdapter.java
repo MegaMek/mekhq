@@ -1384,7 +1384,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             Campaign campaign = gui.getCampaign();
             boolean campaignIsClan = campaign.getFaction().isClan();
 
-            // TODO remove this once we have the MechWarrior Histories module
+            // TODO remove this once we have the Personnel Histories module
             // this tells mhq that all adults have completed high school.
             // this helps grandfather in existing campaign personnel.
             if ((!person.isChild(campaign.getLocalDate())) && (person.getEduHighestEducation() < 1)) {
@@ -1393,128 +1393,53 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (StaticChecks.areAllActive(selected)) {
                 // this next block preps variables for use by the menu & tooltip
-                int campaignYear = campaign.getLocalDate().getYear();
-
                 List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
                 Collections.sort(academySetNames);
 
-                // this filters out any academy sets that are disabled in Campaign Options
-                for (String academySet : academySetNames) {
-                    if ((academySet.equals("Local Academies")) && (!campaign.getCampaignOptions().isEnableLocalAcademies())) {
-                        academySetNames.remove(academySet);
-                    } else if ((academySet.equals("Prestigious Academies")) && (!campaign.getCampaignOptions().isEnablePrestigiousAcademies())) {
-                        academySetNames.remove(academySet);
-                    } else if ((academySet.equals("Clan Sibkos")) && (!campaign.getCampaignOptions().isEnableClanEducation())) {
-                        academySetNames.remove(academySet);
+                // this filters out any academy sets that are disabled in Campaign Options,
+                // or not applicable for the current campaign faction
+                if (academySetNames.contains("Clan Education")) {
+                    if ((!campaign.getCampaignOptions().isEnableClanEducation()) || (!campaignIsClan)) {
+                        academySetNames.remove("Clan Education");
+                    }
+                }
+
+                if (academySetNames.contains("Local Academies")) {
+                    if ((!campaign.getCampaignOptions().isEnableLocalAcademies()) || (campaignIsClan)) {
+                        academySetNames.remove("Local Academies");
+                    }
+                }
+
+                if (academySetNames.contains("Prestigious Academies")) {
+                    if ((!campaign.getCampaignOptions().isEnableLocalAcademies()) || (campaignIsClan)) {
+                        academySetNames.remove("Prestigious Academies");
                     }
                 }
 
                 // We then start processing the remaining academy sets
-                int currentYear = campaign.getLocalDate().getYear();
-                int personAge = person.getAge(campaign.getLocalDate());
-
                 for (String setName : academySetNames) {
                     JMenu setAcademyMenu = new JMenu(setName);
 
                     // we filter each academy into one of these three categories
                     JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
-                    setAcademyMenu.add(civilianMenu);
                     JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
-                    setAcademyMenu.add(militaryMenu);
                     JMenu clanMenu = new JMenu(resources.getString("eduClan.text"));
+
                     if (campaignIsClan) {
                         setAcademyMenu.add(clanMenu);
+                    } else {
+                        setAcademyMenu.add(civilianMenu);
+                        setAcademyMenu.add(militaryMenu);
                     }
 
-                    // time to start filtering the academies based on a few parameters.
                     List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
 
                     for (Academy academy : academiesOfSet) {
-                        // does the faction have access to Sibkos?
-                        if ((!academy.isClan()) || (campaignIsClan)) {
-                            // has the academy been constructed, is still standing, & has not closed?
-                            if ((currentYear >= academy.getConstructionYear()) && (currentYear < academy.getDestructionYear()) && (currentYear < academy.getClosureYear())) {
-                                // is the applicant within the right age bracket?
-                                if ((personAge < academy.getAgeMax()) && (personAge >= academy.getAgeMin())) {
-                                    // is the applicant qualified?
-                                    if (academy.isQualified(person)) {
-                                        // is the academy Local?
-                                        if (academy.isLocal()) {
-                                            // are any of the local academies accepting applicants from person's Faction or campaign's Faction?
-                                            String faction = academy.getCampusFilteredFaction(campaign, person, campaign.getCurrentSystem().getId());
-
-                                            // we add this exception so Clan players always have access to Trueborn Crèches and Sibkos.
-                                            if ((faction != null) || (academy.isClan())) {
-                                                // attach it to the right category
-                                                JMenu academyOption = new JMenu(academy.getName());
-
-                                                if (academy.isClan()) {
-                                                    clanMenu.add(academyOption);
-                                                } else if (academy.isMilitary()) {
-                                                    militaryMenu.add(academyOption);
-                                                } else {
-                                                    civilianMenu.add(academyOption);
-                                                }
-
-                                                // get the courses
-                                                if (academy.isClan()) {
-                                                    // again, Clans get a free pass
-                                                    buildEduSubMenus(academy, campaignYear, person, academyOption, "local", campaign.getFaction().getShortName());
-                                                } else {
-                                                    buildEduSubMenus(academy, campaignYear, person, academyOption, "local", faction);
-                                                }
-                                            } else {
-                                                JMenuItem academyOption = new JMenuItem(resources.getString("eduFactionConflict.text")
-                                                        .replaceAll("0", person.getFirstName()));
-
-                                                if (academy.isClan()) {
-                                                    clanMenu.add(academyOption);
-                                                } else if (academy.isMilitary()) {
-                                                    militaryMenu.add(academyOption);
-                                                } else {
-                                                    civilianMenu.add(academyOption);
-                                                }
-                                            }
-                                        } else {
-                                            // what campuses accept applicants from person's Faction & campaign Faction?
-                                            List<String> campuses = academy.getCampusesFilteredByFaction(campaign, person);
-
-                                            if (campuses != null) {
-                                                // of these, which is the nearest?
-                                                String nearestCampus = academy.getNearestCampus(campaign, campuses);
-
-                                                // is it within the maximum jump range set in Campaign Options?
-                                                if ((campaign.getSimplifiedTravelTime(campaign.getSystemByName(nearestCampus)) / 7) <= campaign.getCampaignOptions().getMaximumJumpCount()) {
-                                                    // attach it to the right category
-                                                    JMenu academyOption = new JMenu(academy.getName());
-
-                                                    if (academy.isClan()) {
-                                                        clanMenu.add(academyOption);
-                                                    } else if (academy.isMilitary()) {
-                                                        militaryMenu.add(academyOption);
-                                                    } else {
-                                                        civilianMenu.add(academyOption);
-                                                    }
-
-                                                    // get the courses
-                                                    String faction = academy.getCampusFilteredFaction(campaign, person, nearestCampus);
-                                                    buildEduSubMenus(academy, campaignYear, person, academyOption, nearestCampus, faction);
-                                                }
-                                            }
-                                        }
-                                    } else {
-                                        JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + " ---<i>" + resources.getString("eduUnqualified.text").replaceAll("0", String.valueOf(academy.getEducationLevelMin())));
-
-                                        if (academy.isClan()) {
-                                            clanMenu.add(academyOption);
-                                        } else if (academy.isMilitary()) {
-                                            militaryMenu.add(academyOption);
-                                        } else {
-                                            civilianMenu.add(academyOption);
-                                        }
-                                    }
-                                }
-                            }
+                        // time to start filtering the academies
+                        if ((academy.isClan()) && (campaignIsClan)) {
+                            buildEducationMenus(campaign, person, academy, clanMenu, militaryMenu, civilianMenu);
+                        } if ((!academy.isClan()) && (!campaignIsClan)) {
+                            buildEducationMenus(campaign, person, academy, clanMenu, militaryMenu, civilianMenu);
                         }
                     }
                     academyMenu.add(setAcademyMenu);
@@ -2537,27 +2462,180 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         return Optional.of(popup);
     }
 
+
     /**
-     * Builds submenus for the academies in a given campaign year, based on a person's qualifications.
+     * Builds education menus based on a number of parameters.
      *
-     * @param academies     the main menu item where the submenus will be added
-     * @param academy       the academy to build submenus for
-     * @param campaignYear  the campaign year to consider
-     * @param person        the person for whom the submenus are being built
+     * @param campaign      the campaign to check parameters against
+     * @param person        the person to check parameters against
+     * @param academy       the academy to build menus for
+     * @param clanMenu      the clan menu object
+     * @param militaryMenu  the military menu object
+     * @param civilianMenu  the civilian menu object
      */
-    private void buildEduSubMenus(Academy academy, int campaignYear, Person person, JMenu academyOption, String campus, String faction) {
+    private void buildEducationMenus(Campaign campaign, Person person, Academy academy, JMenu clanMenu, JMenu militaryMenu, JMenu civilianMenu) {
+        // has the academy been constructed, is still standing, & has not closed?
+        if ((campaign.getGameYear() >= academy.getConstructionYear())
+                && (campaign.getGameYear() < academy.getDestructionYear())
+                && (campaign.getGameYear() < academy.getClosureYear())) {
+            // is the applicant within the right age bracket?
+            int personAge = person.getAge(campaign.getLocalDate());
+
+            if ((personAge > academy.getAgeMax()) || (personAge < academy.getAgeMin())) {
+                JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduAgeConflict.text")
+                        .replaceAll("0", String.valueOf(academy.getAgeMin()))
+                        .replaceAll("1", String.valueOf(academy.getAgeMax())));
+
+                educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+                // is the applicant qualified?
+            } else if (!academy.isQualified(person)) {
+                JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduUnqualified.text")
+                        .replaceAll("0", String.valueOf(academy.getEducationLevelMin())));
+                educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+            } else if (academy.isLocal()) {
+                // are any of the local academies accepting applicants from person's Faction or campaign's Faction?
+                String faction = academy.getFilteredFaction(campaign, person, campaign.getCurrentSystem().getId());
+
+                // we add this exception so Clan players always have access to Trueborn Crèches and Sibkos.
+                if (faction == null) {
+                    JMenuItem academyOption;
+
+                    if (academy.isClan()) {
+                        academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduNotSecure.text"));
+                    } else {
+                        academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduFactionConflict.text"));
+                    }
+
+                    educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+                } else {
+                    JMenu academyOption = new JMenu(academy.getName());
+                    educationJMenuAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+
+                    buildEducationSubMenus(campaign, academy, person, academyOption,  campaign.getCurrentSystem().getId(), campaign.getFaction().getShortName());
+                }
+            } else {
+                if (academy.isClan()) {
+                    String campus;
+                    try {
+                        campus = campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()).getId();
+                    } catch (Exception e) {
+                        campus = null;
+                    }
+
+                    // Trueborn Clan Academies get a free pass, as applicants don't need to travel from the unit,
+                    // they're just popped out of an Iron Womb
+                    if (academy.isTrueborn()) {
+                        JMenu academyOption = new JMenu(academy.getName());
+
+                        educationJMenuAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+
+                        if (campus == null) {
+                            campus = "REDACTED";
+                        }
+
+                        buildEducationSubMenus(campaign, academy, person, academyOption, campus, campaign.getFaction().getShortName());
+                    } else {
+                        if (campus == null) {
+                            if (14 > campaign.getCampaignOptions().getMaximumJumpCount()) {
+                                JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
+                                educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+                            } else {
+                                JMenu academyOption = new JMenu(academy.getName());
+                                educationJMenuAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+
+                                buildEducationSubMenus(campaign, academy, person, academyOption, "REDACTED", campaign.getFaction().getShortName());
+                            }
+                        } else if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)) / 7) <= campaign.getCampaignOptions().getMaximumJumpCount()) {
+                            JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
+                            educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+                        } else {
+                            JMenu academyOption = new JMenu(academy.getName());
+                            educationJMenuAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+
+                            buildEducationSubMenus(campaign, academy, person, academyOption, campus, campaign.getFaction().getShortName());
+                        }
+                    }
+                } else {
+                    // what campuses accept applicants from person's Faction & campaign Faction?
+                    List<String> campuses = academy.getCampusesFilteredByFaction(campaign, person);
+
+                    if (campuses == null) {
+                        JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduFactionConflict.text"));
+                        educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+                    } else {
+                        // of these, which is the nearest?
+                        String nearestCampus = academy.getNearestCampus(campaign, campuses);
+
+                        // is it within the maximum jump range set in Campaign Options?
+                        if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(nearestCampus)) / 7) > campaign.getCampaignOptions().getMaximumJumpCount()) {
+                            JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
+                            educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+                        } else {
+                            JMenu academyOption = new JMenu(academy.getName());
+                            educationJMenuAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
+
+                            String faction = academy.getFilteredFaction(campaign, person, nearestCampus);
+                            buildEducationSubMenus(campaign, academy, person, academyOption, nearestCampus, faction);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds an education option to the appropriate JMenu based on the type of Academy.
+     * This version accepts JMenu objects.
+     *
+     * @param academy the Academy
+     * @param clanMenu the JMenu for clan education options
+     * @param militaryMenu the JMenu for military education options
+     * @param civilianMenu the JMenu for civilian education options
+     * @param option the option to be added to the appropriate JMenu
+     */
+    private static void educationJMenuAdder(Academy academy, JMenu clanMenu, JMenu militaryMenu, JMenu civilianMenu, JMenu option) {
+        if (academy.isClan()) {
+            clanMenu.add(option);
+        } else if (academy.isMilitary()) {
+            militaryMenu.add(option);
+        } else {
+            civilianMenu.add(option);
+        }
+    }
+
+    /**
+     * Adds an education option to the appropriate JMenu based on the type of Academy.
+     * This version accepts JMenuItem objects.
+     *
+     * @param academy the Academy
+     * @param clanMenu the JMenu for clan education options
+     * @param militaryMenu the JMenu for military education options
+     * @param civilianMenu the JMenu for civilian education options
+     * @param option the option to be added to the appropriate JMenu
+     */
+    private static void educationJMenuItemAdder(Academy academy, JMenu clanMenu, JMenu militaryMenu, JMenu civilianMenu, JMenuItem option) {
+        if (academy.isClan()) {
+            clanMenu.add(option);
+        } else if (academy.isMilitary()) {
+            militaryMenu.add(option);
+        } else {
+            civilianMenu.add(option);
+        }
+    }
+
+    private void buildEducationSubMenus(Campaign campaign, Academy academy, Person person, JMenu academyOption, String campus, String faction) {
         JMenuItem courses;
         int courseCount = academy.getQualifications().size();
 
         if (courseCount > 0) {
             for (int courseIndex = 0; courseIndex < (courseCount); courseIndex++) {
                 // we also need to make sure the course is being offered
-                if (campaignYear >= academy.getQualificationStartYears().get(courseIndex)) {
+                if (campaign.getGameYear() >= academy.getQualificationStartYears().get(courseIndex)) {
                     String course = academy.getQualifications().get(courseIndex);
                     courses = new JMenuItem(course);
-                    courses.setToolTipText(academy.getTooltip(gui.getCampaign(), person, courseIndex));
+                    courses.setToolTipText(academy.getTooltip(campaign, person, courseIndex));
                     if (academy.isLocal()) {
-                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), "local", faction));
+                        courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campaign.getCurrentSystem().getId(), faction));
                     } else {
                         courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campus, faction));
                     }

@@ -274,7 +274,7 @@ public class Academy {
      *
      * @return {@code true} if the academy is a Trueborn Sibko or Crèche, {@code false} otherwise.
      */
-    public Boolean getIsTrueborn() {
+    public Boolean isTrueborn() {
         return isTrueborn;
     }
 
@@ -701,14 +701,18 @@ public class Academy {
      * @param system The system in which the local campus is located.
      * @return The filtered faction for the local campus, or null if no faction is found.
      */
-    public String getCampusFilteredFaction(Campaign campaign, Person person, String system) {
+    public String getFilteredFaction(Campaign campaign, Person person, String system) {
         List<String> systemOwners = campaign.getSystemById(system).getFactions(campaign.getLocalDate());
 
         for (String faction : systemOwners) {
-            if ((isFactionRestricted) && (Objects.equals(person.getOriginFaction().getShortName(), faction))) {
+            if ((isFactionRestricted) && (Objects.equals(campaign.getFaction().getShortName(), faction))) {
                 return faction;
             } else if (!RandomFactionGenerator.getInstance().getFactionHints()
                     .isAtWarWith(person.getOriginFaction(), Factions.getInstance().getFaction(faction),
+                            campaign.getLocalDate())) {
+                return faction;
+            } else if (!RandomFactionGenerator.getInstance().getFactionHints()
+                    .isAtWarWith(campaign.getFaction(), Factions.getInstance().getFaction(faction),
                             campaign.getLocalDate())) {
                 return faction;
             }
@@ -726,25 +730,7 @@ public class Academy {
     public List<String> getCampusesFilteredByFaction(Campaign campaign, Person person) {
         List<String> campuses = locationSystems;
 
-        for (String campus : campuses) {
-            List<String> systemOwners = campaign.getSystemById(campus).getFactions(campaign.getLocalDate());
-
-            // we check for both academy faction and system owner faction, with the logic that system
-            // owners might be able to block applications
-            for (String ownerFaction : systemOwners) {
-                if ((isFactionRestricted) && (!ownerFaction.equals(person.getOriginFaction().getShortName()))) {
-                    campuses.remove(campus);
-                } else if ((isFactionRestricted) && (!ownerFaction.equals(faction))) {
-                    campuses.remove(campus);
-                } else if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
-                        Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
-                    campuses.remove(campus);
-                } else if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
-                        Factions.getInstance().getFaction(ownerFaction), campaign.getLocalDate())) {
-                    campuses.remove(campus);
-                }
-            }
-        }
+        campuses.removeIf(campus -> getFilteredFaction(campaign, person, campus) == null);
 
         if (!campuses.isEmpty()) {
             return campuses;
@@ -783,24 +769,15 @@ public class Academy {
     }
 
     /**
-     * Checks if there is a conflict between the factions related to the academy and person or campaign.
+     * Checks if there is a conflict between the factions related to the academy and person.
      *
      * @param campaign The current campaign.
      * @param person The person to check the faction conflict with.
      * @return true if there is a faction conflict, false otherwise.
      */
     public Boolean isFactionConflict(Campaign campaign, Person person) {
-        String faction = person.getEduAcademyFaction();
-
-        // if academy faction at war with person's faction?
-        if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
-                Factions.getInstance().getFaction(faction), campaign.getLocalDate())) {
-            return true;
-        } else {
-            // else, is academy faction at war with campaign's faction?
-            return RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
-                    Factions.getInstance().getFaction(faction), campaign.getLocalDate());
-        }
+        return RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
+                Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate());
     }
 
     /**
@@ -866,36 +843,61 @@ public class Academy {
             }
         }
 
+        tooltip.append("<br>");
+
         // with the skill content resolved, we can move onto the rest of the tooltip
-        tooltip.append("<br><b>").append(resources.getString("tuition.text")).append("</b> ")
-                .append(tuition * getFactionDiscountAdjusted(campaign, person)).append (" CSB").append("<br>");
-        if ((isPrepSchool) || (isClan)) {
+        if (tuition * getFactionDiscountAdjusted(campaign, person) > 0) {
+            tooltip.append("<b>").append(resources.getString("tuition.text")).append("</b> ")
+                    .append(tuition * getFactionDiscountAdjusted(campaign, person)).append(" CSB").append("<br>");
+        }
+        if (isPrepSchool) {
             tooltip.append("<b>").append(resources.getString("duration.text"))
                     .append("</b> ").append(' ').append(resources.getString("durationAge.text")
                             .replaceAll("0", String.valueOf(ageMax))).append("<br>");
         } else {
-            tooltip.append("<b>").append(resources.getString("duration.text"))
-                    .append("</b> ").append(durationDays / 7)
-                    .append(' ').append(resources.getString("durationWeeks.text")).append("<br>");
+            tooltip.append("<b>").append(resources.getString("duration.text")).append("</b> ");
+            if ((durationDays / 7) < 1) {
+                tooltip.append(durationDays).append(' ').append(resources.getString("durationDays.text")).append("<br>");
+            } else {
+                tooltip.append(durationDays / 7).append(' ').append(resources.getString("durationWeeks.text")).append("<br>");
+            }
         }
 
-        // we need to do a little extra work to get distance, to cover academies with multiple campuses
+        // we need to do a little extra work to get travel time, to cover academies with multiple campuses or Clan nonsense
         int distance = 2;
         PlanetarySystem destination = campaign.getCurrentSystem();
 
-        if (isClan) {
-            try {
-                distance = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
-            } catch (Exception e) {
-                distance = 100;
+        if ((isClan) && (!isLocal)) {
+            if (!isTrueborn) {
+                try {
+                    distance = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
+                } catch (Exception e) {
+                    distance = 100;
+                }
             }
         } else if (!isLocal) {
             distance = campaign.getSimplifiedTravelTime(campaign.getSystemById(getNearestCampus(campaign, locationSystems)));
         }
 
-        tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ")
-                .append(distance / 7).append(' ').append(resources.getString("durationWeeks.text"))
-                .append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
+        tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
+
+        if ((distance / 7) < 1) {
+            tooltip.append(distance).append(' ').append(resources.getString("durationDays.text"));
+        } else {
+            tooltip.append(distance / 7).append(' ').append(resources.getString("durationWeeks.text"));
+        }
+
+        if ((isClan) && (!isLocal)) {
+            try {
+                tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
+            } catch (Exception e) {
+                tooltip.append(" (").append(destination).append(")<br>");
+            }
+        } else {
+            tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
+        }
+
+        // we travel time out the way; all that's left is to add the last couple of entries
         tooltip.append("<b>").append(resources.getString("facultySkill.text")).append("</b> ")
                 .append(facultySkill).append ('+').append("<br>");
         tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")
