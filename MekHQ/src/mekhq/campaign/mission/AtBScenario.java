@@ -178,6 +178,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private Map<Integer, Integer> numPlayerMinefields;
 
+    private String terrainType;
+
     protected final transient ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
             MekHQ.getMHQOptions().getLocale());
 
@@ -251,6 +253,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     public String getDesc() {
         return getScenarioTypeDescription() + (isStandardScenario() ? (isAttacker() ? " (Attacker)" : " (Defender)") : "");
+    }
+
+    public String getTerrainType() {
+        return terrainType;
+    }
+
+    public void setTerrainType(String terrainType) {
+        this.terrainType = terrainType;
     }
 
     @Override
@@ -1515,6 +1525,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceCount", lanceCount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rerollsRemaining", rerollsRemaining);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "modifiedTemperature", modifiedTemperature);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
 
         if (null != bigBattleAllies && !bigBattleAllies.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "bigBattleAllies");
@@ -1615,6 +1626,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     rerollsRemaining = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("modifiedTemperature")) {
                     modifiedTemperature = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
+                    terrainType = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayer")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int i = 0; i < nl2.getLength(); i++) {
