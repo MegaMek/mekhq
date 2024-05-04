@@ -325,15 +325,15 @@ public class CustomizeScenarioDialog extends JDialog {
         // endregion Set up info panel
 
         initObjectivesPanel(resourceMap);
-        //panObjectives.setPreferredSize(new Dimension(300,150));
-        //panObjectives.setMinimumSize(new Dimension(300,150));
+        panObjectives.setPreferredSize(new Dimension(400,150));
+        panObjectives.setMinimumSize(new Dimension(400,150));
         panObjectives.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Scenario Objectives"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 
         initLootPanel(resourceMap);
-        //panLoot.setPreferredSize(new Dimension(300,150));
-        //panLoot.setMinimumSize(new Dimension(300,150));
+        panLoot.setPreferredSize(new Dimension(400,150));
+        panLoot.setMinimumSize(new Dimension(400,150));
         panLoot.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Scenario Costs & Payouts"),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
@@ -342,8 +342,8 @@ public class CustomizeScenarioDialog extends JDialog {
         panOtherForces.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("panOtherForces.title"))));
-        panOtherForces.setPreferredSize(new Dimension(600,150));
-        panOtherForces.setMinimumSize(new Dimension(600,150));
+        panOtherForces.setPreferredSize(new Dimension(600,250));
+        panOtherForces.setMinimumSize(new Dimension(600,250));
 
         // region Set up writing panel
         txtDesc = new MarkdownEditorPanel("Description");
@@ -411,30 +411,39 @@ public class CustomizeScenarioDialog extends JDialog {
         // layout main panel
         getContentPane().add(panMain, BorderLayout.CENTER);
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
+
+        JPanel panNW = new JPanel(new GridBagLayout());
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridheight = 2;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        panNW.add(panInfo, gbc);
+        gbc.gridx = 1;
+        gbc.gridheight = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        panNW.add(panObjectives, gbc);
+        gbc.gridy = 1;
+        panNW.add(panLoot, gbc);
+
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
-        gbc.gridheight = 2;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.BOTH;
-        panMain.add(panInfo, gbc);
+        panMain.add(panNW, gbc);
         gbc.gridx = 1;
         gbc.gridy = 0;
-        gbc.weighty = 0.5;
-        gbc.gridheight = 1;
-        panMain.add(panObjectives, gbc);
-        gbc.gridy = 1;
-        panMain.add(panLoot, gbc);
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        gbc.gridheight = 3;
+        gbc.gridheight = 2;
         gbc.weighty = 1.0;
         panMain.add(panWrite, gbc);
         gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
+        gbc.gridy = 1;
         gbc.gridheight = 1;
         panMain.add(panOtherForces, gbc);
 
