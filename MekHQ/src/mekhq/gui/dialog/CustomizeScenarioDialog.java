@@ -836,7 +836,7 @@ public class CustomizeScenarioDialog extends JDialog {
         rightGbc.anchor = GridBagConstraints.NORTHWEST;
 
         panMap.add(new JLabel(resourceMap.getString("lblBoardType.text")), leftGbc);
-        lblBoardType = new JLabel(Scenario.getBoardTypeName(scenario.getBoardType()));
+        lblBoardType = new JLabel(Scenario.getBoardTypeName(boardType));
         panMap.add(lblBoardType, rightGbc);
 
         leftGbc.gridy++;
@@ -861,7 +861,7 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void refreshMapSettings() {
-        lblBoardType.setText(Scenario.getBoardTypeName(scenario.getBoardType()));
+        lblBoardType.setText(Scenario.getBoardTypeName(boardType));
         StringBuilder sb = new StringBuilder();
         if(map == null) {
             sb.append("None");
@@ -875,7 +875,14 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void changeMapSettings() {
-        // TODO: Implement
+        EditMapSettingsDialog emsd = new EditMapSettingsDialog(frame, true, boardType, usingFixedMap,
+                map, mapSizeX, mapSizeY);
+        emsd.setVisible(true);
+        boardType = emsd.getBoardType();
+        usingFixedMap = emsd.getUsingFixedMap();
+        map = emsd.getMap();
+        mapSizeX = emsd.getMapSizeX();
+        mapSizeY = emsd.getMapSizeY();
         refreshMapSettings();
     }
 
