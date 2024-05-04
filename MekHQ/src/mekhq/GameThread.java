@@ -180,7 +180,7 @@ class GameThread extends Thread implements CloseClientListener {
                 planetaryConditions.setWind(scenario.getWind());
                 planetaryConditions.setFog(scenario.getFog());
                 planetaryConditions.setAtmosphere(scenario.getAtmosphere());
-                planetaryConditions.setTemperature(scenario.getModifiedTemperature());
+                planetaryConditions.setTemperature(scenario.getTemperature());
                 planetaryConditions.setGravity(scenario.getGravity());
                 planetaryConditions.setEMI(scenario.getEMI());
                 planetaryConditions.setBlowingSand(scenario.getBlowingSand());
