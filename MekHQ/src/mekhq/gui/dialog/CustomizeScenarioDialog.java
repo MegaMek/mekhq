@@ -70,6 +70,13 @@ public class CustomizeScenarioDialog extends JDialog {
     private Player player;
     private List<BotForce> botForces;
 
+    // map parameters
+    private int mapSizeX;
+    private int mapSizeY;
+    private String map;
+    private boolean usingFixedMap;
+    private int boardType;
+
     // objectives
     private List<ScenarioObjective> objectives;
     private JTable objectiveTable;
@@ -90,6 +97,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private JPanel panObjectives;
     private JPanel panOtherForces;
     private JPanel panPlanetaryConditions;
+    private JPanel panMap;
 
     // labels
     private JLabel lblAllowedUnitsDesc;
@@ -106,6 +114,9 @@ public class CustomizeScenarioDialog extends JDialog {
     private JLabel lblTemperatureDesc;
     private JLabel lblGravityDesc;
     private JLabel lblOtherConditionsDesc;
+    private JLabel lblMap;
+    private JLabel lblBoardType;
+    private JLabel lblMapSize;
     // end: labels
 
     // textfields
@@ -119,6 +130,7 @@ public class CustomizeScenarioDialog extends JDialog {
     private JButton btnDate;
     private JButton btnDeployment;
     private JButton btnPlanetaryConditions;
+    private JButton btnMapSettings;
     private JButton btnAddLoot;
     private JButton btnEditLoot;
     private JButton btnDeleteLoot;
@@ -174,12 +186,17 @@ public class CustomizeScenarioDialog extends JDialog {
         }
         lootModel = new LootTableModel(loots);
 
-        // FIXME: clone this so we don't change on a cancel
         objectives = new ArrayList<>();
         for(ScenarioObjective objective : scenario.getScenarioObjectives()) {
             objectives.add(new ScenarioObjective(objective));
         }
         objectiveModel = new ObjectiveTableModel(objectives);
+
+        map = scenario.getMap();
+        mapSizeX = scenario.getMapSizeX();
+        mapSizeY = scenario.getMapSizeY();
+        usingFixedMap = scenario.isUsingFixedMap();
+        boardType = scenario.getBoardType();
 
         initComponents();
         setLocationRelativeTo(parent);
@@ -299,8 +316,12 @@ public class CustomizeScenarioDialog extends JDialog {
 
         initPlanetaryConditionsPanel(resourceMap);
         gbc.gridy++;
-        gbc.fill = GridBagConstraints.BOTH;
         panInfo.add(panPlanetaryConditions, gbc);
+
+        initMapPanel(resourceMap);
+        gbc.gridy++;
+        panInfo.add(panMap, gbc);
+
         // endregion Set up info panel
 
         initObjectivesPanel(resourceMap);
@@ -457,6 +478,11 @@ public class CustomizeScenarioDialog extends JDialog {
         if (newScenario) {
             campaign.addScenario(scenario, mission);
         }
+        scenario.setMap(map);
+        scenario.setMapSizeX(mapSizeX);
+        scenario.setMapSizeY(mapSizeY);
+        scenario.setBoardType(boardType);
+        scenario.setUsingFixedMap(usingFixedMap);
         this.setVisible(false);
     }
 
@@ -730,8 +756,6 @@ public class CustomizeScenarioDialog extends JDialog {
         lblAtmosphereDesc = new JLabel(scenario.getAtmosphere().toString());
         rightGbc.gridy++;
         panPlanetaryConditions.add(lblAtmosphereDesc, rightGbc);
-
-
     }
 
     private void refreshPlanetaryConditions() {
@@ -762,6 +786,88 @@ public class CustomizeScenarioDialog extends JDialog {
             planetaryConditions = pc.getConditions();
         }
         refreshPlanetaryConditions();
+    }
+
+    private void initMapPanel(ResourceBundle resourceMap) {
+        panMap = new JPanel(new GridBagLayout());
+        panMap.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(0, 0, 10, 0),
+                BorderFactory.createTitledBorder(resourceMap.getString("panMap.title"))));
+
+        btnMapSettings = new JButton(resourceMap.getString("btnMapSettings.text"));
+        btnMapSettings.addActionListener(evt -> changeMapSettings());
+        btnMapSettings.setEnabled(scenario.getStatus().isCurrent());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 0, 0, 0);
+        panMap.add(btnMapSettings, gbc);
+
+        GridBagConstraints leftGbc = new GridBagConstraints();
+        leftGbc.gridx = 0;
+        leftGbc.gridy = 1;
+        leftGbc.gridwidth = 1;
+        leftGbc.weightx = 0.0;
+        leftGbc.weighty = 0.0;
+        leftGbc.insets = new Insets(0, 5, 5, 5);
+        leftGbc.fill = GridBagConstraints.NONE;
+        leftGbc.anchor = GridBagConstraints.NORTHWEST;
+
+        GridBagConstraints rightGbc = new GridBagConstraints();
+        rightGbc.gridx = 1;
+        rightGbc.gridy = 1;
+        rightGbc.gridwidth = 1;
+        rightGbc.weightx = 1.0;
+        rightGbc.weighty = 0.0;
+        rightGbc.insets = new Insets(0, 5, 5, 0);
+        rightGbc.fill = GridBagConstraints.NONE;
+        rightGbc.anchor = GridBagConstraints.NORTHWEST;
+
+        panMap.add(new JLabel(resourceMap.getString("lblBoardType.text")), leftGbc);
+        lblBoardType = new JLabel(Scenario.getBoardTypeName(scenario.getBoardType()));
+        panMap.add(lblBoardType, rightGbc);
+
+        leftGbc.gridy++;
+        rightGbc.gridy++;
+        panMap.add(new JLabel(resourceMap.getString("lblMap.text")), leftGbc);
+        StringBuilder sb = new StringBuilder();
+        if(map == null) {
+            sb.append("None");
+        } else {
+            sb.append(map).append(usingFixedMap ? " (Fixed)" : " (Random)");
+        }
+        lblMap = new JLabel(sb.toString());
+        panMap.add(lblMap, rightGbc);
+
+        leftGbc.gridy++;
+        rightGbc.gridy++;
+        panMap.add(new JLabel(resourceMap.getString("lblMapSize.text")), leftGbc);
+        sb = new StringBuilder();
+        sb.append(mapSizeX).append(" x ").append(mapSizeY);
+        lblMapSize = new JLabel(sb.toString());
+        panMap.add(lblMapSize, rightGbc);
+    }
+
+    private void refreshMapSettings() {
+        lblBoardType.setText(Scenario.getBoardTypeName(scenario.getBoardType()));
+        StringBuilder sb = new StringBuilder();
+        if(map == null) {
+            sb.append("None");
+        } else {
+            sb.append(map).append(usingFixedMap ? " (Fixed)" : " (Random)");
+        }
+        lblMap.setText(sb.toString());
+        sb = new StringBuilder();
+        sb.append(mapSizeX).append(" x ").append(mapSizeY);
+        lblMapSize.setText(sb.toString());
+    }
+
+    private void changeMapSettings() {
+        // TODO: Implement
+        refreshMapSettings();
     }
 
     private void initObjectivesPanel(ResourceBundle resourceMap) {

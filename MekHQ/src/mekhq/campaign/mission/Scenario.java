@@ -1177,4 +1177,8 @@ public class Scenario implements IPlayerSettings {
         hasTrack = b;
     }
 
+    public static String getBoardTypeName(int i) {
+        return typeNames[i];
+    }
+
 }
