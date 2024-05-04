@@ -475,7 +475,7 @@ public class ScenarioViewPanel extends JScrollablePanel {
         leftGbc.gridy++;
         pnlMap.add(lblTemperature, leftGbc);
 
-        JLabel lblTemperatureDesc = new JLabel(PlanetaryConditions.getTemperatureDisplayableName(scenario.getModifiedTemperature()));
+        JLabel lblTemperatureDesc = new JLabel(PlanetaryConditions.getTemperatureDisplayableName(scenario.getTemperature()));
         rightGbc.gridy++;
         pnlMap.add(lblTemperatureDesc, rightGbc);
 
