@@ -39,6 +39,7 @@ public enum PersonnelStatus {
     RETIRED("PersonnelStatus.RETIRED.text", "PersonnelStatus.RETIRED.toolTipText", "PersonnelStatus.RETIRED.reportText", "PersonnelStatus.RETIRED.logText"),
     DESERTED("PersonnelStatus.DESERTED.text", "PersonnelStatus.DESERTED.toolTipText", "PersonnelStatus.DESERTED.reportText", "PersonnelStatus.DESERTED.logText"),
     STUDENT("PersonnelStatus.STUDENT.text", "PersonnelStatus.STUDENT.toolTipText", "PersonnelStatus.STUDENT.reportText", "PersonnelStatus.STUDENT.logText"),
+    MISSING("PersonnelStatus.MISSING.text", "PersonnelStatus.MISSING.toolTipText", "PersonnelStatus.MISSING.reportText", "PersonnelStatus.MISSING.logText"),
     KIA("PersonnelStatus.KIA.text", "PersonnelStatus.KIA.toolTipText", "PersonnelStatus.KIA.reportText", "PersonnelStatus.KIA.logText"),
     HOMICIDE("PersonnelStatus.HOMICIDE.text", "PersonnelStatus.HOMICIDE.toolTipText", "PersonnelStatus.HOMICIDE.reportText", "PersonnelStatus.HOMICIDE.logText"),
     WOUNDS("PersonnelStatus.WOUNDS.text", "PersonnelStatus.WOUNDS.toolTipText", "PersonnelStatus.WOUNDS.reportText", "PersonnelStatus.WOUNDS.logText"),
@@ -118,6 +119,10 @@ public enum PersonnelStatus {
         return this == STUDENT;
     }
 
+    public boolean isMissing() {
+        return this == MISSING;
+    }
+
     public boolean isKIA() {
         return this == KIA;
     }
@@ -166,7 +171,7 @@ public enum PersonnelStatus {
      * @return true if a person is currently absent from the core force, otherwise false
      */
     public boolean isAbsent() {
-        return isMIA() || isPoW() || isOnLeave() || isAWOL() || isStudent();
+        return isMIA() || isPoW() || isOnLeave() || isAWOL() || isStudent() || isMissing();
     }
 
     /**
@@ -217,6 +222,8 @@ public enum PersonnelStatus {
                     return MIA;
                 case 4:
                     return STUDENT;
+                case 5:
+                    return MISSING;
                 default:
                     break;
             }

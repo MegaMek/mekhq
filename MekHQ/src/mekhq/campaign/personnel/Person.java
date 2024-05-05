@@ -198,6 +198,7 @@ public class Person {
     private int eduDaysOfTravelToAcademy;
     private int eduDaysOfEducation;
     private int eduDaysOfTravelFromAcademy;
+    private int eduDaysOfTravel;
     //endregion Education
 
     //region Flags
@@ -343,6 +344,7 @@ public class Person {
         eduDaysOfTravelToAcademy = 0;
         eduDaysOfEducation = 0;
         eduDaysOfTravelFromAcademy = 0;
+        eduDaysOfTravel = 0;
         eduAcademySet = null;
         eduAcademyNameInSet = null;
         eduAcademyFaction = null;
@@ -972,7 +974,12 @@ public class Person {
                     this.setEduCourseIndex(0);
                     this.setEduDaysOfTravelToAcademy(0);
                     this.setEduDaysOfTravelFromAcademy(0);
+                    this.setEduDaysOfTravel(0);
                     this.setEduDaysOfEducation(0);
+                } else if (getStatus().isMissing()) {
+                    campaign.addReport(String.format(resources.getString("returnedFromMissing.report"),
+                            getHyperlinkedFullTitle()));
+                    ServiceLogger.returnedFromMissing(this, campaign.getLocalDate());
                 } else if (getStatus().isAWOL()) {
                     campaign.addReport(String.format(resources.getString("returnedFromAWOL.report"),
                             getHyperlinkedFullTitle()));
@@ -1306,6 +1313,14 @@ public class Person {
 
     public void setEduDaysOfTravelFromAcademy(final int eduDaysOfTravelFromAcademy) {
         this.eduDaysOfTravelFromAcademy = eduDaysOfTravelFromAcademy;
+    }
+
+    public int getEduDaysOfTravel() {
+        return eduDaysOfTravel;
+    }
+
+    public void setEduDaysOfTravel(final int eduDaysOfTravel) {
+        this.eduDaysOfTravel = eduDaysOfTravel;
     }
 
     public int getEduDaysOfEducation() {
@@ -1652,6 +1667,10 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelFromAcademy", eduDaysOfTravelFromAcademy);
             }
 
+            if (eduDaysOfTravel != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravel", eduDaysOfTravel);
+            }
+
             if (eduAcademySystem != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
             }
@@ -1971,6 +1990,8 @@ public class Person {
                     retVal.eduDaysOfTravelToAcademy = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelFromAcademy")) {
                     retVal.eduDaysOfTravelFromAcademy = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravel")) {
+                    retVal.eduDaysOfTravel = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
                     retVal.eduAcademySystem = String.valueOf(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyName")) {

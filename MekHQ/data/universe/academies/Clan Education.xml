@@ -10,7 +10,7 @@
         <isLocal>false</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2807</constructionYear>
-        <durationDays>0</durationDays>
+        <durationDays>10</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMax>0</educationLevelMax>
         <ageMax>10</ageMax>
@@ -29,9 +29,54 @@
         <isLocal>false</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2807</constructionYear>
-        <durationDays>0</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMax>2</educationLevelMax>
+        <ageMin>10</ageMin>
+        <ageMax>20</ageMax>
+        <qualification>MechWarrior Sibko</qualification>
+        <curriculum>Small Arms, Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>ProtoMech Sibko</qualification>
+        <curriculum>Small Arms, Gunnery/ProtoMech, Bonus XP, Bonus XP</curriculum>
+        <qualificationStartYear>3060</qualificationStartYear>
+        <qualification>AeroSpace Sibko</qualification>
+        <curriculum>Small Arms, Piloting/Aerospace, Gunnery/Aerospace, Bonus XP</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Naval Sibko</qualification>
+        <curriculum>Small Arms, Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Elemental Sibko</qualification>
+        <curriculum>Small Arms, Gunnery/Battlesuit, Anti-Mech, Bonus XP</curriculum>
+        <qualificationStartYear>2868</qualificationStartYear>
+        <qualification>Combat Infantry Sibko</qualification>
+        <curriculum>Small Arms, Anti-Mech, Medtech, Bonus XP</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Vehicle Sibko</qualification>
+        <curriculum>Small Arms, Piloting/VTOL, Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Scientist Caste Apprenticeship</qualification>
+        <curriculum>Doctor, Administration, Hyperspace Navigation, Bonus XP</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Merchant Caste Apprenticeship</qualification>
+        <curriculum>Administration, Negotiation, Scrounge, Leadership</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Technician Caste Apprenticeship</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Labour Caste Apprenticeship</qualification>
+        <curriculum>Astech, Medtech, Bonus XP, Bonus XP</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <baseAcademicSkillLevel>3</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Freeborn Education</name>
+        <isPrepSchool>true</isPrepSchool>
+        <isClan>true</isClan>
+        <description>While not as sophisticated as the education received by Trueborn, a Freeborn's education is no less as intensive.</description>
+        <factionDiscount>0</factionDiscount>
+        <isLocal>false</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2807</constructionYear>
+        <facultySkill>5</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>20</ageMax>
         <qualification>MechWarrior Sibko</qualification>
@@ -68,54 +113,6 @@
         <curriculum>Astech, Medtech, Bonus XP, Bonus XP</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <baseAcademicSkillLevel>2</baseAcademicSkillLevel>
-    </academy>
-    <academy>
-        <name>Freeborn Education</name>
-        <isPrepSchool>true</isPrepSchool>
-        <isClan>true</isClan>
-        <description>While not as sophisticated as the education received by Trueborn, a Freeborn's education is no less as intensive.</description>
-        <factionDiscount>0</factionDiscount>
-        <isLocal>false</isLocal>
-        <locationSystem>Terra</locationSystem>
-        <constructionYear>2807</constructionYear>
-        <facultySkill>5</facultySkill>
-        <educationLevelMax>2</educationLevelMax>
-        <ageMin>10</ageMin>
-        <ageMax>20</ageMax>
-        <qualification>MechWarrior Sibko</qualification>
-        <curriculum>Small Arms, Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>ProtoMech Sibko</qualification>
-        <curriculum>Small Arms, Gunnery/ProtoMech, Bonus XP, Bonus XP</curriculum>
-        <qualificationStartYear>3060</qualificationStartYear>
-        <qualification>AeroSpace Sibko</qualification>
-        <curriculum>Small Arms, Piloting/Aerospace, Gunnery/Aerospace, Bonus XP</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Naval Sibko</qualification>
-        <curriculum>Small Arms, Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Elemental Sibko</qualification>
-        <curriculum>Small Arms, Gunnery/Battlesuit, Anti-Mech, Bonus XP</curriculum>
-        <qualificationStartYear>2868</qualificationStartYear>
-        <qualification>Combat Infantry Sibko</qualification>
-        <curriculum>Small Arms, Anti-Mech, Medtech, Bonus XP</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Vehicle Sibko</qualification>
-        <curriculum>Small Arms, Piloting/VTOL, Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Scientist Caste Apprenticeship</qualification>
-        <curriculum>Doctor, Administration, Hyperspace Navigation, Bonus XP</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Merchant Caste Apprenticeship</qualification>
-        <curriculum>Administration, Negotiation, Scrounge, Leadership</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Apprenticeship</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Labour Caste Apprenticeship</qualification>
-        <curriculum>Astech, Medtech, Bonus XP, Bonus XP</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Reeducation Camp [Local]</name>

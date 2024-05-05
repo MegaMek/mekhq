@@ -1391,7 +1391,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 person.setEduHighestEducation(1);
             }
 
-            if (StaticChecks.areAllActive(selected)) {
+            // TODO change this to check for just one selected
+            if ((true) && (StaticChecks.areAllActive(selected))) {
                 // this next block preps variables for use by the menu & tooltip
                 List<String> academySetNames = AcademyFactory.getInstance().getAllSetNames();
                 Collections.sort(academySetNames);
@@ -1436,11 +1437,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     for (Academy academy : academiesOfSet) {
                         // time to start filtering the academies
-                        if ((academy.isClan()) && (campaignIsClan)) {
-                            buildEducationMenus(campaign, person, academy, clanMenu, militaryMenu, civilianMenu);
-                        } if ((!academy.isClan()) && (!campaignIsClan)) {
-                            buildEducationMenus(campaign, person, academy, clanMenu, militaryMenu, civilianMenu);
-                        }
+                        buildEducationMenus(campaign, person, academy, clanMenu, militaryMenu, civilianMenu);
                     }
                     academyMenu.add(setAcademyMenu);
                 }
@@ -2481,10 +2478,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // is the applicant within the right age bracket?
             int personAge = person.getAge(campaign.getLocalDate());
 
-            if ((personAge > academy.getAgeMax()) || (personAge < academy.getAgeMin())) {
-                JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduAgeConflict.text")
-                        .replaceAll("0", String.valueOf(academy.getAgeMin()))
-                        .replaceAll("1", String.valueOf(academy.getAgeMax())));
+            if ((personAge >= academy.getAgeMax()) || (personAge < academy.getAgeMin())) {
+                JMenuItem academyOption;
+
+                if (academy.getAgeMax() != 9999) {
+                    academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduAgeConflictRange.text")
+                            .replaceAll("ageA", String.valueOf(academy.getAgeMin()))
+                            .replaceAll("ageB", String.valueOf(academy.getAgeMax())));
+                } else {
+                    academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduAgeConflictPlus.text")
+                            .replaceAll("0", String.valueOf(academy.getAgeMin())));
+                }
 
                 educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
                 // is the applicant qualified?

@@ -781,11 +781,10 @@ public class Academy {
                 Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate())) {
             return true;
         // is there a conflict between academy faction & campaign faction?
-        } else if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
-                Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate())) {
-            return true;
+        } else {
+            return RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
+                    Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate());
         }
-        return false;
     }
 
     /**
