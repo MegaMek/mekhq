@@ -12,10 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 public class EditMapSettingsDialog extends JDialog {
@@ -125,25 +123,28 @@ public class EditMapSettingsDialog extends JDialog {
         generatorModel.addElement("None");
         File dir = new File("data/mapgen/");
         File[] directoryListing = dir.listFiles();
+        ArrayList<String> generators = new ArrayList<>();
         if (directoryListing != null) {
             for (File child : directoryListing) {
                 if(child.isFile()) {
                     String s = child.getName().replace(".xml", "");
-                    generatorModel.addElement(s);
+                    generators.add(s);
                 }
             }
         }
-        if(!usingFixedMap) {
-            listMapGenerators.setSelectedValue(map, true);
-            scrChooseMap.setViewportView(listMapGenerators);
-        }
+        Collections.sort(generators);
+        generatorModel.addAll(generators);
 
         listFixedMaps = new JList<>(fixedMapModel);
         listFixedMaps.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         refreshBoardList();
+
         if(usingFixedMap) {
             listFixedMaps.setSelectedValue(map, true);
             scrChooseMap.setViewportView(listFixedMaps);
+        }  else {
+            listMapGenerators.setSelectedValue(map, true);
+            scrChooseMap.setViewportView(listMapGenerators);
         }
 
         comboBoardType = new JComboBox();
