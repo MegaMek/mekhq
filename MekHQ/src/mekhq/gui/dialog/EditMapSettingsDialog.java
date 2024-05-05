@@ -3,6 +3,8 @@ package mekhq.gui.dialog;
 import megamek.common.Board;
 import megamek.common.BoardDimensions;
 import megamek.common.Configuration;
+import megamek.common.MapSettings;
+import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.server.GameManager;
 import mekhq.campaign.mission.Scenario;
 import org.apache.logging.log4j.LogManager;
@@ -10,8 +12,11 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class EditMapSettingsDialog extends JDialog {
 
@@ -24,12 +29,14 @@ public class EditMapSettingsDialog extends JDialog {
 
     private JCheckBox checkFixed;
     private JComboBox<String> comboBoardType;
-    private JComboBox<Comparable> comboMapSize;
+    private JComboBox<BoardDimensions> comboMapSize;
     private JSpinner spnMapX;
     private JSpinner spnMapY;
     private JScrollPane scrChooseMap;
     private JList<String> listMapGenerators;
+    private JList<String> listFixedMaps;
     DefaultListModel<String> generatorModel = new DefaultListModel<>();
+    DefaultListModel<String> fixedMapModel = new DefaultListModel<>();
 
     JPanel panSizeRandom;
     JPanel panSizeFixed;
@@ -104,8 +111,14 @@ public class EditMapSettingsDialog extends JDialog {
         for (BoardDimensions size : getBoardSizes()) {
             comboMapSize.addItem(size);
         }
+        if(mapSizeX > 0 & mapSizeY > 0) {
+            comboMapSize.setSelectedItem(new BoardDimensions(mapSizeX, mapSizeY));
+        } else {
+            // if no board size yet set, use the default
+            comboMapSize.setSelectedItem(new BoardDimensions(16, 17));
+        }
+        comboMapSize.addActionListener(evt -> refreshBoardList());
         panSizeFixed.add(comboMapSize, BorderLayout.CENTER);
-
 
         listMapGenerators = new JList<>(generatorModel);
         listMapGenerators.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -120,8 +133,18 @@ public class EditMapSettingsDialog extends JDialog {
                 }
             }
         }
-        scrChooseMap.setViewportView(listMapGenerators);
-        listMapGenerators.setSelectedValue(map, true);
+        if(!usingFixedMap) {
+            listMapGenerators.setSelectedValue(map, true);
+            scrChooseMap.setViewportView(listMapGenerators);
+        }
+
+        listFixedMaps = new JList<>(fixedMapModel);
+        listFixedMaps.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        refreshBoardList();
+        if(usingFixedMap) {
+            listFixedMaps.setSelectedValue(map, true);
+            scrChooseMap.setViewportView(listFixedMaps);
+        }
 
         comboBoardType = new JComboBox();
         for (int i = Scenario.T_GROUND; i <= Scenario.T_SPACE; i++) {
@@ -186,9 +209,11 @@ public class EditMapSettingsDialog extends JDialog {
             panSizeFixed.setVisible(false);
             listMapGenerators.setSelectedIndex(0);
             listMapGenerators.setEnabled(false);
+            listFixedMaps.setEnabled(false);
         } else {
             checkFixed.setEnabled(true);
             listMapGenerators.setEnabled(true);
+            listFixedMaps.setEnabled(true);
         }
     }
 
@@ -196,10 +221,18 @@ public class EditMapSettingsDialog extends JDialog {
         if(checkFixed.isSelected()) {
             panSizeRandom.setVisible(false);
             panSizeFixed.setVisible(true);
+            scrChooseMap.setViewportView(listFixedMaps);
         } else {
             panSizeRandom.setVisible(true);
             panSizeFixed.setVisible(false);
+            scrChooseMap.setViewportView(listMapGenerators);
         }
+    }
+
+    private void refreshBoardList() {
+        List<String> boards = scanForBoards();
+        fixedMapModel.removeAllElements();
+        fixedMapModel.addAll(boards);
     }
 
     private Set<BoardDimensions> getBoardSizes() {
@@ -256,11 +289,68 @@ public class EditMapSettingsDialog extends JDialog {
         }
     }
 
+    /**
+     * Returns a list of path names of available boards of the size set in the given
+     * mapSettings. The path names are minus the '.board' extension and relative to
+     * the boards data directory.
+     */
+    private List<String> scanForBoards() {
+        BoardDimensions boardSize = (BoardDimensions) comboMapSize.getSelectedItem();
+        java.util.List<String> result = new ArrayList<>();
+
+        // Scan the Megamek boards directory
+        File boardDir = Configuration.boardsDir();
+        scanForBoardsInDir(boardDir, "", boardSize, result);
+
+        result.sort(String::compareTo);
+        return result.stream().map(this::backToForwardSlash).collect(Collectors.toList());
+    }
+
+    private String backToForwardSlash(String path) {
+        return path.replace("\\", "/");
+    }
+
+    /**
+     * Scans the given boardDir directory for map boards of the given size and
+     * returns them by adding them to the given boards list. Removes the .board extension.
+     */
+    private void scanForBoardsInDir(final File boardDir, final String basePath, final BoardDimensions dimensions,
+                                    List<String> boards) {
+        if (boardDir == null) {
+            throw new IllegalArgumentException("must provide searchDir");
+        } else if (basePath == null) {
+            throw new IllegalArgumentException("must provide basePath");
+        } else if (dimensions == null) {
+            throw new IllegalArgumentException("must provide dimensions");
+        } else if (boards == null) {
+            throw new IllegalArgumentException("must provide boards");
+        }
+
+        String[] fileList = boardDir.list();
+        if (fileList != null) {
+            for (String filename : fileList) {
+                File filePath = new MegaMekFile(boardDir, filename).getFile();
+                if (filePath.isDirectory()) {
+                    scanForBoardsInDir(filePath, basePath + File.separator + filename, dimensions, boards);
+                } else {
+                    if (filename.endsWith(".board")) {
+                        if (Board.boardIsSize(filePath, dimensions)) {
+                            boards.add(basePath + File.separator + filename.substring(0, filename.lastIndexOf(".")));
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public void done() {
         boardType = comboBoardType.getSelectedIndex();
         usingFixedMap = checkFixed.isSelected();
         if(usingFixedMap) {
-
+            map = listFixedMaps.getSelectedValue();
+            BoardDimensions boardSize = (BoardDimensions) comboMapSize.getSelectedItem();
+            mapSizeX = boardSize.width();
+            mapSizeY = boardSize.height();
         } else {
             map = listMapGenerators.getSelectedValue();
             if(listMapGenerators.getSelectedIndex() == 0) {
