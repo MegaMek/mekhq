@@ -18,6 +18,10 @@ public class EditMapSettingsDialog extends JDialog {
 
     private JCheckBox checkFixed;
     private JComboBox<String> comboBoardType;
+    private JSpinner spnMapX;
+    private JSpinner spnMapY;
+
+    JPanel panSizeRandom;
 
     public EditMapSettingsDialog(JFrame parent, boolean modal, int boardType, boolean usingFixedMap, String map,
                                  int mapSizeX, int mapSizeY) {
@@ -58,7 +62,8 @@ public class EditMapSettingsDialog extends JDialog {
     private void initComponents() {
 
         getContentPane().setLayout(new BorderLayout());
-        JPanel panMain = new JPanel(new GridLayout(2, 0));
+        JPanel panMain = new JPanel(new GridBagLayout());
+        panSizeRandom = new JPanel(new GridBagLayout());
         JPanel panButtons = new JPanel(new GridLayout(0, 2));
 
         checkFixed = new JCheckBox("Use fixed map");
@@ -70,8 +75,46 @@ public class EditMapSettingsDialog extends JDialog {
         }
         comboBoardType.setSelectedIndex(boardType);
 
-        panMain.add(checkFixed);
-        panMain.add(comboBoardType);
+        spnMapX = new JSpinner(new SpinnerNumberModel(mapSizeX, 0, null, 1));
+        spnMapY = new JSpinner(new SpinnerNumberModel(mapSizeY, 0, null, 1));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.0;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panSizeRandom.add(spnMapX, gbc);
+        gbc.gridx++;
+        panSizeRandom.add(new JLabel("x"));
+        gbc.gridx++;
+        gbc.weightx = 1.0;
+        panSizeRandom.add(spnMapY);
+
+       gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.0;
+        gbc.weighty = 0.0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        panMain.add(new JLabel("Board Type:"));
+        gbc.weightx = 1.0;
+        gbc.gridx++;
+        panMain.add(comboBoardType, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panMain.add(new JLabel("Map Size:"), gbc);
+        gbc.gridx++;
+        panMain.add(panSizeRandom, gbc);
+
+        gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy++;
+        panMain.add(checkFixed, gbc);
 
         JButton btnOK = new JButton("Done");
         btnOK.addActionListener(evt -> done());
@@ -87,6 +130,12 @@ public class EditMapSettingsDialog extends JDialog {
     public void done() {
         boardType = comboBoardType.getSelectedIndex();
         usingFixedMap = checkFixed.isSelected();
+        if(usingFixedMap) {
+
+        } else {
+            mapSizeX = (int) spnMapX.getValue();
+            mapSizeY = (int) spnMapY.getValue();
+        }
         setVisible(false);
     }
 
