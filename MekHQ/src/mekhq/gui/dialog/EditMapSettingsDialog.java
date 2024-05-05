@@ -4,6 +4,7 @@ import mekhq.campaign.mission.Scenario;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 
 public class EditMapSettingsDialog extends JDialog {
 
@@ -20,6 +21,9 @@ public class EditMapSettingsDialog extends JDialog {
     private JComboBox<String> comboBoardType;
     private JSpinner spnMapX;
     private JSpinner spnMapY;
+    private JScrollPane scrChooseMap;
+    private JList<String> listMapGenerators;
+    DefaultListModel<String> generatorModel = new DefaultListModel<>();
 
     JPanel panSizeRandom;
 
@@ -66,6 +70,8 @@ public class EditMapSettingsDialog extends JDialog {
         panSizeRandom = new JPanel(new GridBagLayout());
         JPanel panButtons = new JPanel(new GridLayout(0, 2));
 
+        scrChooseMap = new JScrollPane();
+
         checkFixed = new JCheckBox("Use fixed map");
         checkFixed.setSelected(usingFixedMap);
 
@@ -92,7 +98,23 @@ public class EditMapSettingsDialog extends JDialog {
         gbc.weightx = 1.0;
         panSizeRandom.add(spnMapY);
 
-       gbc = new GridBagConstraints();
+        listMapGenerators = new JList<>(generatorModel);
+        listMapGenerators.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        generatorModel.addElement("None");
+        File dir = new File("data/mapgen/");
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if(child.isFile()) {
+                    String s = child.getName().replace(".xml", "");
+                    generatorModel.addElement(s);
+                }
+            }
+        }
+        scrChooseMap.setViewportView(listMapGenerators);
+        listMapGenerators.setSelectedValue(map, true);
+
+        gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0.0;
@@ -107,14 +129,21 @@ public class EditMapSettingsDialog extends JDialog {
 
         gbc.gridx = 0;
         gbc.gridy++;
+        gbc.weightx = 0.0;
         panMain.add(new JLabel("Map Size:"), gbc);
         gbc.gridx++;
+        gbc.weightx = 1.0;
         panMain.add(panSizeRandom, gbc);
 
         gbc.gridwidth = 2;
         gbc.gridx = 0;
         gbc.gridy++;
         panMain.add(checkFixed, gbc);
+
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weighty = 1.0;
+        panMain.add(scrChooseMap, gbc);
 
         JButton btnOK = new JButton("Done");
         btnOK.addActionListener(evt -> done());
@@ -133,6 +162,10 @@ public class EditMapSettingsDialog extends JDialog {
         if(usingFixedMap) {
 
         } else {
+            map = listMapGenerators.getSelectedValue();
+            if(listMapGenerators.getSelectedIndex() == 0) {
+                map = null;
+            }
             mapSizeX = (int) spnMapX.getValue();
             mapSizeY = (int) spnMapY.getValue();
         }
