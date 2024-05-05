@@ -9,8 +9,6 @@ import java.io.File;
 public class EditMapSettingsDialog extends JDialog {
 
     private JFrame frame;
-    private boolean wasCancelled;
-
     private int mapSizeX;
     private int mapSizeY;
     private String map;
@@ -36,7 +34,6 @@ public class EditMapSettingsDialog extends JDialog {
         this.map = map;
         this.mapSizeX = mapSizeX;
         this.mapSizeY = mapSizeY;
-        wasCancelled = true;
 
         initComponents();
         setLocationRelativeTo(parent);
