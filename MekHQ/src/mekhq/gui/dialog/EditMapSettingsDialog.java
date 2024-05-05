@@ -1,10 +1,17 @@
 package mekhq.gui.dialog;
 
+import megamek.common.Board;
+import megamek.common.BoardDimensions;
+import megamek.common.Configuration;
+import megamek.server.GameManager;
 import mekhq.campaign.mission.Scenario;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class EditMapSettingsDialog extends JDialog {
 
@@ -17,6 +24,7 @@ public class EditMapSettingsDialog extends JDialog {
 
     private JCheckBox checkFixed;
     private JComboBox<String> comboBoardType;
+    private JComboBox<Comparable> comboMapSize;
     private JSpinner spnMapX;
     private JSpinner spnMapY;
     private JScrollPane scrChooseMap;
@@ -24,6 +32,7 @@ public class EditMapSettingsDialog extends JDialog {
     DefaultListModel<String> generatorModel = new DefaultListModel<>();
 
     JPanel panSizeRandom;
+    JPanel panSizeFixed;
 
     public EditMapSettingsDialog(JFrame parent, boolean modal, int boardType, boolean usingFixedMap, String map,
                                  int mapSizeX, int mapSizeY) {
@@ -65,18 +74,14 @@ public class EditMapSettingsDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         JPanel panMain = new JPanel(new GridBagLayout());
         panSizeRandom = new JPanel(new GridBagLayout());
+        panSizeFixed = new JPanel(new BorderLayout());
         JPanel panButtons = new JPanel(new GridLayout(0, 2));
 
         scrChooseMap = new JScrollPane();
 
         checkFixed = new JCheckBox("Use fixed map");
         checkFixed.setSelected(usingFixedMap);
-
-        comboBoardType = new JComboBox();
-        for (int i = Scenario.T_GROUND; i <= Scenario.T_SPACE; i++) {
-            comboBoardType.addItem(Scenario.getBoardTypeName(i));
-        }
-        comboBoardType.setSelectedIndex(boardType);
+        checkFixed.addActionListener(evt -> changeMapType());
 
         spnMapX = new JSpinner(new SpinnerNumberModel(mapSizeX, 0, null, 1));
         spnMapY = new JSpinner(new SpinnerNumberModel(mapSizeY, 0, null, 1));
@@ -95,6 +100,13 @@ public class EditMapSettingsDialog extends JDialog {
         gbc.weightx = 1.0;
         panSizeRandom.add(spnMapY);
 
+        comboMapSize = new JComboBox<>();
+        for (BoardDimensions size : getBoardSizes()) {
+            comboMapSize.addItem(size);
+        }
+        panSizeFixed.add(comboMapSize, BorderLayout.CENTER);
+
+
         listMapGenerators = new JList<>(generatorModel);
         listMapGenerators.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         generatorModel.addElement("None");
@@ -111,6 +123,13 @@ public class EditMapSettingsDialog extends JDialog {
         scrChooseMap.setViewportView(listMapGenerators);
         listMapGenerators.setSelectedValue(map, true);
 
+        comboBoardType = new JComboBox();
+        for (int i = Scenario.T_GROUND; i <= Scenario.T_SPACE; i++) {
+            comboBoardType.addItem(Scenario.getBoardTypeName(i));
+        }
+        comboBoardType.addActionListener(evt -> changeBoardType());
+        comboBoardType.setSelectedIndex(boardType);
+
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -119,7 +138,7 @@ public class EditMapSettingsDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panMain.add(new JLabel("Board Type:"));
+        panMain.add(new JLabel("Board Type:"), gbc);
         gbc.weightx = 1.0;
         gbc.gridx++;
         panMain.add(comboBoardType, gbc);
@@ -131,6 +150,12 @@ public class EditMapSettingsDialog extends JDialog {
         gbc.gridx++;
         gbc.weightx = 1.0;
         panMain.add(panSizeRandom, gbc);
+        panMain.add(panSizeFixed, gbc);
+        if(usingFixedMap) {
+            panSizeRandom.setVisible(false);
+        } else {
+            panSizeFixed.setVisible(false);
+        }
 
         gbc.gridwidth = 2;
         gbc.gridx = 0;
@@ -151,6 +176,84 @@ public class EditMapSettingsDialog extends JDialog {
 
         getContentPane().add(panMain, BorderLayout.CENTER);
         getContentPane().add(panButtons, BorderLayout.PAGE_END);
+    }
+
+    private void changeBoardType() {
+        if(comboBoardType.getSelectedIndex() == Scenario.T_SPACE) {
+            checkFixed.setSelected(false);
+            checkFixed.setEnabled(false);
+            panSizeRandom.setVisible(true);
+            panSizeFixed.setVisible(false);
+            listMapGenerators.setSelectedIndex(0);
+            listMapGenerators.setEnabled(false);
+        } else {
+            checkFixed.setEnabled(true);
+            listMapGenerators.setEnabled(true);
+        }
+    }
+
+    private void changeMapType() {
+        if(checkFixed.isSelected()) {
+            panSizeRandom.setVisible(false);
+            panSizeFixed.setVisible(true);
+        } else {
+            panSizeRandom.setVisible(true);
+            panSizeFixed.setVisible(false);
+        }
+    }
+
+    private Set<BoardDimensions> getBoardSizes() {
+        TreeSet<BoardDimensions> board_sizes = new TreeSet<>();
+
+        File boards_dir = Configuration.boardsDir();
+        // Slightly overkill sanity check...
+        if (boards_dir.isDirectory()) {
+            getBoardSizesInDir(boards_dir, board_sizes);
+        }
+
+        return board_sizes;
+    }
+
+    /**
+     * Recursively scan the specified path to determine the board sizes
+     * available.
+     *
+     * @param searchDir The directory to search below this path (may be null for all
+     *                  in base path).
+     * @param sizes     Where to store the discovered board sizes
+     */
+    private void getBoardSizesInDir(final File searchDir, TreeSet<BoardDimensions> sizes) {
+        if (searchDir == null) {
+            throw new IllegalArgumentException("must provide searchDir");
+        }
+
+        if (sizes == null) {
+            throw new IllegalArgumentException("must provide sizes");
+        }
+
+        String[] file_list = searchDir.list();
+
+        if (file_list != null) {
+            for (String filename : file_list) {
+                File query_file = new File(searchDir, filename);
+
+                if (query_file.isDirectory()) {
+                    getBoardSizesInDir(query_file, sizes);
+                } else {
+                    try {
+                        if (filename.endsWith(".board")) {
+                            BoardDimensions size = Board.getSize(query_file);
+                            if (size == null) {
+                                throw new Exception();
+                            }
+                            sizes.add(Board.getSize(query_file));
+                        }
+                    } catch (Exception e) {
+                        LogManager.getLogger().error("Error parsing board: " + query_file.getAbsolutePath(), e);
+                    }
+                }
+            }
+        }
     }
 
     public void done() {
