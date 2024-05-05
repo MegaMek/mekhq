@@ -328,7 +328,7 @@ public class CampaignOptions {
     private Integer fallbackScientist;
     private Integer fallbackMerchant;
     private Integer fallbackTechnician;
-    private Integer fallbackLabour;
+    private Integer fallbackLabor;
 
     // Death
     private boolean keepMarriedNameUponSpouseDeath;
@@ -805,7 +805,7 @@ public class CampaignOptions {
         setFallbackScientist(6);
         setFallbackMerchant(6);
         setFallbackTechnician(5);
-        setFallbackLabour(3);
+        setFallbackLabor(3);
 
         // Death
         setKeepMarriedNameUponSpouseDeath(true);
@@ -2331,12 +2331,12 @@ public class CampaignOptions {
         this.fallbackTechnician = fallbackTechnician;
     }
 
-    public Integer getFallbackLabour() {
-        return fallbackLabour;
+    public Integer getFallbackLabor() {
+        return fallbackLabor;
     }
 
-    public void setFallbackLabour(Integer fallbackLabour) {
-        this.fallbackLabour = fallbackLabour;
+    public void setFallbackLabor(Integer fallbackLabor) {
+        this.fallbackLabor = fallbackLabor;
     }
 
     /**
@@ -3963,7 +3963,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackScientist", getFallbackScientist());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackMerchant", getFallbackMerchant());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackTechnician", getFallbackTechnician());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackLabour", getFallbackLabour());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackLabor", getFallbackLabor());
         //endregion Education
 
         //region Death
@@ -4677,8 +4677,8 @@ public class CampaignOptions {
                     retVal.setFallbackMerchant(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fallbackTechnician")) {
                     retVal.setFallbackTechnician(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fallbackLabour")) {
-                    retVal.setFallbackLabour(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fallbackLabor")) {
+                    retVal.setFallbackLabor(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Education
 
                     //region Death

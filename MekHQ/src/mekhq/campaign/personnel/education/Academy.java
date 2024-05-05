@@ -769,15 +769,23 @@ public class Academy {
     }
 
     /**
-     * Checks if there is a conflict between the factions related to the academy and person.
+     * Checks if there is a conflict between the factions related to the academy and person or campaign.
      *
-     * @param campaign The current campaign.
+     * @param campaign The campaign to check the faction conflict with.
      * @param person The person to check the faction conflict with.
      * @return true if there is a faction conflict, false otherwise.
      */
     public Boolean isFactionConflict(Campaign campaign, Person person) {
-        return RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
-                Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate());
+        // is there a conflict between academy faction & person's faction?
+        if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
+                Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate())) {
+            return true;
+        // is there a conflict between academy faction & campaign faction?
+        } else if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
+                Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate())) {
+            return true;
+        }
+        return false;
     }
 
     /**

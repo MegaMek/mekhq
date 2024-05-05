@@ -362,8 +362,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnFallbackMerchant;
     private JLabel lblFallbackTechnician;
     private JSpinner spnFallbackTechnician;
-    private JLabel lblFallbackLabour;
-    private JSpinner spnFallbackLabour;
+    private JLabel lblFallbackLabor;
+    private JSpinner spnFallbackLabor;
     //endregion Life Paths Tab
 
     //region Finances Tab
@@ -4808,8 +4808,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             spnFallbackMerchant.setEnabled(isEnabled);
             lblFallbackTechnician.setEnabled(isEnabled);
             spnFallbackTechnician.setEnabled(isEnabled);
-            lblFallbackLabour.setEnabled(isEnabled);
-            spnFallbackLabour.setEnabled(isEnabled);
+            lblFallbackLabor.setEnabled(isEnabled);
+            spnFallbackLabor.setEnabled(isEnabled);
         });
 
         // this prevents a really annoying bug where disabled options don't stay disabled when
@@ -5157,12 +5157,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnFallbackTechnician.setToolTipText(resources.getString("lblFallbackTechnician.toolTip"));
         spnFallbackTechnician.setName("spnFallbackTechnician");
 
-        lblFallbackLabour = new JLabel(resources.getString("lblFallbackLabour.text"));
-        lblFallbackLabour.setToolTipText(resources.getString("lblFallbackLabour.toolTip"));
-        lblFallbackLabour.setName("lblFallbackLabour");
-        spnFallbackLabour = new JSpinner(new SpinnerNumberModel(3, 0, 100, 1));
-        spnFallbackLabour.setToolTipText(resources.getString("lblFallbackLabour.toolTip"));
-        spnFallbackLabour.setName("spnFallbackLabour");
+        lblFallbackLabor = new JLabel(resources.getString("lblFallbackLabor.text"));
+        lblFallbackLabor.setToolTipText(resources.getString("lblFallbackLabor.toolTip"));
+        lblFallbackLabor.setName("lblFallbackLabor");
+        spnFallbackLabor = new JSpinner(new SpinnerNumberModel(3, 0, 100, 1));
+        spnFallbackLabor.setToolTipText(resources.getString("lblFallbackLabor.toolTip"));
+        spnFallbackLabor.setName("spnFallbackLabor");
 
         // These prevent a really annoying bug where disabled options don't stay disabled when
         // reloading Campaign Options
@@ -5172,8 +5172,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblFallbackMerchant.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnFallbackTechnician.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         lblFallbackTechnician.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
-        spnFallbackLabour.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
-        lblFallbackLabour.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnFallbackLabor.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblFallbackLabor.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // creating the layout
         final JPanel panel = new JPanel();
@@ -5197,8 +5197,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblFallbackTechnician)
                                 .addComponent(spnFallbackTechnician, Alignment.LEADING)
                                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                        .addComponent(lblFallbackLabour)
-                                        .addComponent(spnFallbackLabour, Alignment.LEADING)))
+                                        .addComponent(lblFallbackLabor)
+                                        .addComponent(spnFallbackLabor, Alignment.LEADING)))
         );
 
         layout.setHorizontalGroup(
@@ -5213,8 +5213,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblFallbackTechnician)
                                 .addComponent(spnFallbackTechnician)
                                 .addGroup(layout.createSequentialGroup()
-                                        .addComponent(lblFallbackLabour)
-                                        .addComponent(spnFallbackLabour)))
+                                        .addComponent(lblFallbackLabor)
+                                        .addComponent(spnFallbackLabor)))
         );
 
         return panel;
@@ -6765,7 +6765,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnFallbackScientist.setValue(options.getFallbackScientist());
         spnFallbackMerchant.setValue(options.getFallbackMerchant());
         spnFallbackTechnician.setValue(options.getFallbackTechnician());
-        spnFallbackLabour.setValue(options.getFallbackLabour());
+        spnFallbackLabor.setValue(options.getFallbackLabor());
 
         // Death
         chkKeepMarriedNameUponSpouseDeath.setSelected(options.isKeepMarriedNameUponSpouseDeath());
@@ -7338,7 +7338,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setFallbackScientist((Integer) spnFallbackScientist.getValue());
             options.setFallbackMerchant((Integer) spnFallbackMerchant.getValue());
             options.setFallbackTechnician((Integer) spnFallbackTechnician.getValue());
-            options.setFallbackLabour((Integer) spnFallbackLabour.getValue());
+            options.setFallbackLabor((Integer) spnFallbackLabor.getValue());
 
             // Death
             options.setKeepMarriedNameUponSpouseDeath(chkKeepMarriedNameUponSpouseDeath.isSelected());

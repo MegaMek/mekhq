@@ -114,6 +114,10 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanWashout.text"), originCaste)));
     }
 
+    public static void eduClanFlee(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanFlee.text")));
+    }
+
     public static void eduClanWarriorFailed(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanWarriorFailed.text")));
     }
@@ -130,8 +134,8 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanPassed.text"), degree, caste)));
     }
 
-    public static void eduClanLabour(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanLabour.text")));
+    public static void eduClanLabor(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanLabor.text")));
     }
 
     public static void eduClanCreche(Person person, LocalDate date) {

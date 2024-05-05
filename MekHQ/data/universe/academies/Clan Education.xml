@@ -55,16 +55,16 @@
         <qualification>Vehicle Sibko</qualification>
         <curriculum>Small Arms, Piloting/VTOL, Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Scientist Caste</qualification>
+        <qualification>Scientist Caste Apprenticeship</qualification>
         <curriculum>Doctor, Administration, Hyperspace Navigation, Bonus XP</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Merchant Caste</qualification>
+        <qualification>Merchant Caste Apprenticeship</qualification>
         <curriculum>Administration, Negotiation, Scrounge, Leadership</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste</qualification>
+        <qualification>Technician Caste Apprenticeship</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Labour Caste</qualification>
+        <qualification>Labour Caste Apprenticeship</qualification>
         <curriculum>Astech, Medtech, Bonus XP, Bonus XP</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <baseAcademicSkillLevel>2</baseAcademicSkillLevel>
@@ -103,16 +103,16 @@
         <qualification>Vehicle Sibko</qualification>
         <curriculum>Small Arms, Piloting/VTOL, Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Scientist Caste</qualification>
+        <qualification>Scientist Caste Apprenticeship</qualification>
         <curriculum>Doctor, Administration, Hyperspace Navigation, Bonus XP</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Merchant Caste</qualification>
+        <qualification>Merchant Caste Apprenticeship</qualification>
         <curriculum>Administration, Negotiation, Scrounge, Leadership</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste</qualification>
+        <qualification>Technician Caste Apprenticeship</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Labour Caste</qualification>
+        <qualification>Labour Caste Apprenticeship</qualification>
         <curriculum>Astech, Medtech, Bonus XP, Bonus XP</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
@@ -150,7 +150,7 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2807</constructionYear>
         <durationDays>300</durationDays>
-        <ageMin>16</ageMin>
+        <ageMin>20</ageMin>
         <qualification>Scientist Caste Reeducation</qualification>
         <curriculum>Doctor, Administration, Hyperspace Navigation</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
