@@ -348,6 +348,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnChildrenDropoutChance;
     private JLabel lblWarriorCasteDropOutChance;
     private JSpinner spnWarriorCasteDropOutChance;
+    private JLabel lblOtherCasteDropOutChance;
+    private JSpinner spnOtherCasteDropOutChance;
     private JCheckBox chkAllAges;
     private JLabel lblMilitaryAcademyAccidents;
     private JSpinner spnMilitaryAcademyAccidents;
@@ -4790,6 +4792,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             spnChildrenDropoutChance.setEnabled(isEnabled);
             lblWarriorCasteDropOutChance.setEnabled(isEnabled);
             spnWarriorCasteDropOutChance.setEnabled(isEnabled);
+            lblOtherCasteDropOutChance.setEnabled(isEnabled);
+            spnOtherCasteDropOutChance.setEnabled(isEnabled);
 
             accidentsAndEventsPanel.setEnabled(isEnabled);
             chkAllAges.setEnabled(isEnabled);
@@ -4996,9 +5000,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblWarriorCasteDropOutChance = new JLabel(resources.getString("lblWarriorCasteDropOutChance.text"));
         lblWarriorCasteDropOutChance.setToolTipText(resources.getString("lblWarriorCasteDropOutChance.toolTip"));
         lblWarriorCasteDropOutChance.setName("lblWarriorCasteDropOutChance");
-        spnWarriorCasteDropOutChance = new JSpinner(new SpinnerNumberModel(5000, 0, 100000, 1));
+        spnWarriorCasteDropOutChance = new JSpinner(new SpinnerNumberModel(250, 0, 100000, 1));
         spnWarriorCasteDropOutChance.setToolTipText(resources.getString("lblWarriorCasteDropOutChance.toolTip"));
         spnWarriorCasteDropOutChance.setName("spnWarriorCasteDropOutChance");
+
+        lblOtherCasteDropOutChance = new JLabel(resources.getString("lblOtherCasteDropOutChance.text"));
+        lblOtherCasteDropOutChance.setToolTipText(resources.getString("lblOtherCasteDropOutChance.toolTip"));
+        lblOtherCasteDropOutChance.setName("lblOtherCasteDropOutChance");
+        spnOtherCasteDropOutChance = new JSpinner(new SpinnerNumberModel(5000, 0, 100000, 1));
+        spnOtherCasteDropOutChance.setToolTipText(resources.getString("lblOtherCasteDropOutChance.toolTip"));
+        spnOtherCasteDropOutChance.setName("spnOtherCasteDropOutChance");
 
         // These prevent a really annoying bug where disabled options don't stay disabled when
         // reloading Campaign Options
@@ -5008,6 +5019,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnChildrenDropoutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         lblWarriorCasteDropOutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnWarriorCasteDropOutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        lblOtherCasteDropOutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnOtherCasteDropOutChance.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // creating the layout
         final JPanel panel = new JPanel();
@@ -5030,6 +5043,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblWarriorCasteDropOutChance)
                                 .addComponent(spnWarriorCasteDropOutChance, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblOtherCasteDropOutChance)
+                                .addComponent(spnOtherCasteDropOutChance, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -5043,6 +5059,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblWarriorCasteDropOutChance)
                                 .addComponent(spnWarriorCasteDropOutChance))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblOtherCasteDropOutChance)
+                                .addComponent(spnOtherCasteDropOutChance))
         );
 
         return panel;
@@ -5067,14 +5086,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblWarriorCasteAccidents = new JLabel(resources.getString("lblWarriorCasteAccidents.text"));
         lblWarriorCasteAccidents.setToolTipText(resources.getString("lblWarriorCasteAccidents.toolTip"));
         lblWarriorCasteAccidents.setName("lblWarriorCasteAccidents");
-        spnWarriorCasteAccidents = new JSpinner(new SpinnerNumberModel(5000, 0, 100000, 1));
+        spnWarriorCasteAccidents = new JSpinner(new SpinnerNumberModel(250, 0, 100000, 1));
         spnWarriorCasteAccidents.setToolTipText(resources.getString("lblWarriorCasteAccidents.toolTip"));
         spnWarriorCasteAccidents.setName("spnWarriorCasteAccidents");
 
         lblOtherCasteAccidents = new JLabel(resources.getString("lblOtherCasteAccidents.text"));
         lblOtherCasteAccidents.setToolTipText(resources.getString("lblOtherCasteAccidents.toolTip"));
         lblOtherCasteAccidents.setName("lblOtherCasteAccidents");
-        spnOtherCasteAccidents = new JSpinner(new SpinnerNumberModel(10000, 0, 100000, 1));
+        spnOtherCasteAccidents = new JSpinner(new SpinnerNumberModel(5000, 0, 100000, 1));
         spnOtherCasteAccidents.setToolTipText(resources.getString("lblOtherCasteAccidents.toolTip"));
         spnOtherCasteAccidents.setName("spnOtherCasteAccidents");
 
@@ -5139,28 +5158,28 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblFallbackScientist = new JLabel(resources.getString("lblFallbackScientist.text"));
         lblFallbackScientist.setToolTipText(resources.getString("lblFallbackScientist.toolTip"));
         lblFallbackScientist.setName("lblFallbackScientist");
-        spnFallbackScientist = new JSpinner(new SpinnerNumberModel(6, 0, 100, 1));
+        spnFallbackScientist = new JSpinner(new SpinnerNumberModel(4, 0, 1000, 1));
         spnFallbackScientist.setToolTipText(resources.getString("lblFallbackScientist.toolTip"));
         spnFallbackScientist.setName("spnFallbackScientist");
 
         lblFallbackMerchant = new JLabel(resources.getString("lblFallbackMerchant.text"));
         lblFallbackMerchant.setToolTipText(resources.getString("lblFallbackMerchant.toolTip"));
         lblFallbackMerchant.setName("lblFallbackMerchant");
-        spnFallbackMerchant = new JSpinner(new SpinnerNumberModel(6, 0, 100, 1));
+        spnFallbackMerchant = new JSpinner(new SpinnerNumberModel(12, 0, 1000, 1));
         spnFallbackMerchant.setToolTipText(resources.getString("lblFallbackMerchant.toolTip"));
         spnFallbackMerchant.setName("spnFallbackMerchant");
 
         lblFallbackTechnician = new JLabel(resources.getString("lblFallbackTechnician.text"));
         lblFallbackTechnician.setToolTipText(resources.getString("lblFallbackTechnician.toolTip"));
         lblFallbackTechnician.setName("lblFallbackTechnician");
-        spnFallbackTechnician = new JSpinner(new SpinnerNumberModel(5, 0, 100, 1));
+        spnFallbackTechnician = new JSpinner(new SpinnerNumberModel(4, 0, 1000, 1));
         spnFallbackTechnician.setToolTipText(resources.getString("lblFallbackTechnician.toolTip"));
         spnFallbackTechnician.setName("spnFallbackTechnician");
 
         lblFallbackLabor = new JLabel(resources.getString("lblFallbackLabor.text"));
         lblFallbackLabor.setToolTipText(resources.getString("lblFallbackLabor.toolTip"));
         lblFallbackLabor.setName("lblFallbackLabor");
-        spnFallbackLabor = new JSpinner(new SpinnerNumberModel(3, 0, 100, 1));
+        spnFallbackLabor = new JSpinner(new SpinnerNumberModel(30, 0, 1000, 1));
         spnFallbackLabor.setToolTipText(resources.getString("lblFallbackLabor.toolTip"));
         spnFallbackLabor.setName("spnFallbackLabor");
 

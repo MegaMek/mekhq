@@ -320,6 +320,7 @@ public class CampaignOptions {
     private Integer adultDropoutChance;
     private Integer childrenDropoutChance;
     private Integer warriorCasteDropOutChance;
+    private Integer otherCasteDropOutChance;
     private boolean allAges;
     private Integer militaryAcademyAccidents;
     private Integer warriorCasteAccidents;
@@ -796,16 +797,17 @@ public class CampaignOptions {
         setEnableBonuses(true);
         setAdultDropoutChance(1000);
         setChildrenDropoutChance(10000);
-        setWarriorCasteDropOutChance(1000);
+        setWarriorCasteDropOutChance(250);
+        setOtherCasteDropOutChance(5000);
         setAllAges(false);
         setMilitaryAcademyAccidents(10000);
-        setWarriorCasteAccidents(1000);
-        setOtherCasteAccidents(10000);
+        setWarriorCasteAccidents(250);
+        setOtherCasteAccidents(5000);
         setLiveFireBlooding(true);
-        setFallbackScientist(6);
-        setFallbackMerchant(6);
-        setFallbackTechnician(5);
-        setFallbackLabor(3);
+        setFallbackScientist(4);
+        setFallbackMerchant(12);
+        setFallbackTechnician(4);
+        setFallbackLabor(30);
 
         // Death
         setKeepMarriedNameUponSpouseDeath(true);
@@ -2265,6 +2267,14 @@ public class CampaignOptions {
 
     public void setWarriorCasteDropOutChance(Integer warriorCasteDropOutChance) {
         this.warriorCasteDropOutChance = warriorCasteDropOutChance;
+    }
+
+    public Integer getOtherCasteDropOutChance() {
+        return otherCasteDropOutChance;
+    }
+
+    public void setOtherCasteDropOutChance(Integer otherCasteDropOutChance) {
+        this.otherCasteDropOutChance = otherCasteDropOutChance;
     }
 
     public boolean isAllAges() {
@@ -3955,6 +3965,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adultDropoutChance", getAdultDropoutChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childrenDropoutChance", getChildrenDropoutChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "warriorCasteDropOutChance", getWarriorCasteDropOutChance());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "otherCasteDropOutChance", getOtherCasteDropOutChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allAges", isAllAges());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "militaryAcademyAccidents", getMilitaryAcademyAccidents());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "warriorCasteAccidents", getWarriorCasteAccidents());
@@ -4661,6 +4672,8 @@ public class CampaignOptions {
                     retVal.setChildrenDropoutChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("warriorCasteDropOutChance")) {
                     retVal.setWarriorCasteDropOutChance(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("otherCasteDropOutChance")) {
+                    retVal.setOtherCasteDropOutChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("allAges")) {
                     retVal.setAllAges(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("militaryAcademyAccidents")) {

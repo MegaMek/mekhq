@@ -572,7 +572,7 @@ public class EducationController {
      * @param resources       The resource bundle used for obtaining localized strings.
      */
     private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person, int daysOfEducation, ResourceBundle resources) {
-        if (campaign.getCampaignOptions().isEnableRandomXp()) {
+        if ((campaign.getCampaignOptions().isEnableRandomXp()) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
             if (Compute.d6(2) >= academy.getFacultySkill()) {
                 person.awardXP(campaign, campaign.getCampaignOptions().getRandomXpRate());
             }
@@ -734,17 +734,29 @@ public class EducationController {
 
         int adultDiceSize = campaign.getCampaignOptions().getAdultDropoutChance();
         int childDiceSize = campaign.getCampaignOptions().getChildrenDropoutChance();
-        int clanDiceSize = campaign.getCampaignOptions().getWarriorCasteDropOutChance();
+        int clanWarriorDiceSize = campaign.getCampaignOptions().getWarriorCasteDropOutChance();
+        int clanOtherDiceSize = campaign.getCampaignOptions().getOtherCasteDropOutChance();
 
         if (academy.isClan()) {
-            if (clanDiceSize > 1) {
-                roll = Compute.randomInt(clanDiceSize);
-            } else {
-                // this is to avoid an exception for dice sizes of 0
-                roll = -1;
-            }
+            if ((person.getAge(campaign.getLocalDate()) < 20) && (person.getEduCourseIndex() <= 6)) {
+                if (clanWarriorDiceSize > 1) {
+                    roll = Compute.randomInt(clanWarriorDiceSize);
+                } else {
+                    // this is to avoid an exception for dice sizes of 0
+                    roll = -1;
+                }
 
-            diceSize = clanDiceSize;
+                diceSize = clanWarriorDiceSize;
+            } else {
+                if (clanOtherDiceSize > 1) {
+                    roll = Compute.randomInt(clanOtherDiceSize);
+                } else {
+                    // this is to avoid an exception for dice sizes of 0
+                    roll = -1;
+                }
+
+                diceSize = clanOtherDiceSize;
+            }
         } else if (person.isChild(campaign.getLocalDate())) {
             if (childDiceSize > 1) {
                 roll = Compute.randomInt(childDiceSize);
@@ -1021,22 +1033,14 @@ public class EducationController {
 
             improveSkills(campaign, person, academy, true);
 
-            if (campaign.getCampaignOptions().isEnableBonuses()) {
-                addBonus(campaign, person, academy, 2, resources);
-            }
+            processGraduation(campaign, person, academy, 2, resources);
 
-            int educationLevel = academy.getEducationLevel(person);
-
-            if (person.getEduHighestEducation() < educationLevel) {
-            person.setEduHighestEducation(educationLevel);
-            }
-
-            if (educationLevel == 3) {
+            if (person.getEduHighestEducation() == 3) {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedMasters.text"));
 
                 ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName());
 
-            } else if (educationLevel == 4) {
+            } else if (person.getEduHighestEducation() == 4) {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedDoctorate.text"));
 
                 ServiceLogger.eduGraduatedDoctorate(person, campaign.getLocalDate(), person.getEduAcademyName());
@@ -1078,11 +1082,7 @@ public class EducationController {
 
         improveSkills(campaign, person, academy, true);
 
-        int educationLevel = academy.getEducationLevel(person);
-
-        if (person.getEduHighestEducation() < educationLevel) {
-            person.setEduHighestEducation(educationLevel);
-        }
+        processGraduation(campaign, person, academy, 0, resources);
     }
 
     /**
@@ -1114,11 +1114,7 @@ public class EducationController {
 
         improveSkills(campaign, person, academy, true);
 
-        int educationLevel = academy.getEducationLevel(person);
-
-        if (person.getEduHighestEducation() < educationLevel) {
-            person.setEduHighestEducation(educationLevel);
-        }
+        processGraduation(campaign, person, academy, 0, resources);
     }
 
     /**
@@ -1141,11 +1137,7 @@ public class EducationController {
 
         improveSkills(campaign, person, academy, true);
 
-        int educationLevel = academy.getEducationLevel(person);
-
-        if (person.getEduHighestEducation() < educationLevel) {
-            person.setEduHighestEducation(educationLevel);
-        }
+        processGraduation(campaign, person, academy, 0, resources);
     }
 
     /**
@@ -1275,11 +1267,7 @@ public class EducationController {
 
             improveSkills(campaign, person, academy, true);
 
-            int educationLevel = academy.getEducationLevel(person);
-
-            if (person.getEduHighestEducation() < educationLevel) {
-                person.setEduHighestEducation(educationLevel);
-            }
+            processGraduation(campaign, person, academy, 0, resources);
 
             return true;
         }
@@ -1295,11 +1283,7 @@ public class EducationController {
                 addBonus(campaign, person, academy, 1, resources);
             }
 
-            int educationLevel = academy.getEducationLevel(person);
-
-            if (person.getEduHighestEducation() < educationLevel) {
-                person.setEduHighestEducation(educationLevel);
-            }
+            processGraduation(campaign, person, academy, 0, resources);
 
             return true;
         }
@@ -1377,11 +1361,7 @@ public class EducationController {
 
         improveSkills(campaign, person, academy, true);
 
-        int educationLevel = academy.getEducationLevel(person);
-
-        if (person.getEduHighestEducation() < educationLevel) {
-            person.setEduHighestEducation(educationLevel);
-        }
+        processGraduation(campaign, person, academy, 0, resources);
     }
 
     /**

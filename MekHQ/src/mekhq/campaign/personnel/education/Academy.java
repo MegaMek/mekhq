@@ -667,7 +667,7 @@ public class Academy {
      * @return the adjusted tuition value as an Integer
      */
     public Integer getTuitionAdjusted(Person person) {
-        if (getEducationLevel(person) < 1) {
+        if (getEducationLevel(person) < 2) {
             return tuition;
         } else {
             return tuition * getEducationLevel(person);
@@ -762,7 +762,7 @@ public class Academy {
         if ((person.getEduHighestEducation() + educationLevelMin) >= educationLevelMax) {
             educationLevel = educationLevelMax;
         } else {
-            educationLevel = person.getEduHighestEducation() + educationLevelMin;
+            educationLevel = person.getEduHighestEducation() + educationLevelMin + 1;
         }
 
         return educationLevel;
@@ -895,10 +895,12 @@ public class Academy {
         }
 
         if ((isClan) && (!isLocal)) {
+            destination = campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate());
+
             try {
                 tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
             } catch (Exception e) {
-                tooltip.append(" (").append(destination).append(")<br>");
+                tooltip.append(" (").append(resources.getString("destinationRedacted.text")).append(")<br>");
             }
         } else {
             tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
