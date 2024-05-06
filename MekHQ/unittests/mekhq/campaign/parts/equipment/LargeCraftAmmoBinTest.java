@@ -43,10 +43,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.*;
@@ -202,14 +199,14 @@ public class LargeCraftAmmoBinTest {
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
-        Mounted mounted = mock(Mounted.class);
+        AmmoMounted mounted = mock(AmmoMounted.class);
         when(mounted.getType()).thenReturn(ammoType);
-        when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
-        Mounted bay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<>();
-        bayAmmo.addElement(equipmentNum);
+        when(entity.getEquipment(equipmentNum)).thenReturn((Mounted) mounted);
+        WeaponMounted bay = mock(WeaponMounted.class);
+        List<AmmoMounted> bayAmmo = new ArrayList<>();
+        bayAmmo.add(mounted);
         when(bay.getBayAmmo()).thenReturn(bayAmmo);
-        when(entity.getEquipment(bayNum)).thenReturn(bay);
+        when(entity.getEquipment(bayNum)).thenReturn((Mounted) bay);
 
         // Set the bay as if we're in deserialization code
         ammoBin.setBay(bayNum);
@@ -232,14 +229,14 @@ public class LargeCraftAmmoBinTest {
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
-        Mounted mounted = mock(Mounted.class);
+        AmmoMounted mounted = mock(AmmoMounted.class);
         when(mounted.getType()).thenReturn(ammoType);
-        when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
+        when(entity.getEquipment(equipmentNum)).thenReturn((Mounted) mounted);
         WeaponMounted wrongWeaponBay = mock(WeaponMounted.class);
         when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<>());
         WeaponMounted weaponBay = mock(WeaponMounted.class);
-        Vector<Integer> bayAmmo = new Vector<>();
-        bayAmmo.addElement(equipmentNum);
+        List<AmmoMounted> bayAmmo = new ArrayList<>();
+        bayAmmo.add(mounted);
         when(weaponBay.getBayAmmo()).thenReturn(bayAmmo);
         when(entity.getEquipment(bayNum)).thenReturn((Mounted) weaponBay);
         ArrayList<WeaponMounted> weaponBays = new ArrayList<>();
@@ -266,14 +263,14 @@ public class LargeCraftAmmoBinTest {
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
-        Mounted mounted = mock(Mounted.class);
+        AmmoMounted mounted = mock(AmmoMounted.class);
         when(mounted.getType()).thenReturn(ammoType);
-        when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
+        when(entity.getEquipment(equipmentNum)).thenReturn((Mounted) mounted);
         WeaponMounted wrongWeaponBay = mock(WeaponMounted.class);
         when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<>());
         WeaponMounted weaponBay = mock(WeaponMounted.class);
-        Vector<Integer> bayAmmo = new Vector<>();
-        bayAmmo.addElement(equipmentNum);
+        List<AmmoMounted> bayAmmo = new ArrayList<>();
+        bayAmmo.add(mounted);
         when(weaponBay.getBayAmmo()).thenReturn(bayAmmo);
         ArrayList<WeaponMounted> weaponBays = new ArrayList<>();
         weaponBays.add(wrongWeaponBay);
@@ -303,9 +300,9 @@ public class LargeCraftAmmoBinTest {
         Mounted mounted = mock(Mounted.class);
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
-        Mounted bay = mock(Mounted.class);
-        when(bay.getBayAmmo()).thenReturn(new Vector<>());
-        when(entity.getEquipment(bayNum)).thenReturn(bay);
+        WeaponMounted bay = mock(WeaponMounted.class);
+        when(bay.getBayAmmo()).thenReturn(new ArrayList<>());
+        when(entity.getEquipment(bayNum)).thenReturn((Mounted) bay);
         when(entity.getWeaponBayList()).thenReturn(new ArrayList<>());
 
         // Set the bay without actually setting it (if through deserialization)

@@ -43,6 +43,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import static mekhq.campaign.parts.equipment.EquipmentUtilities.getEquipmentType;
@@ -1447,9 +1448,9 @@ public class EquipmentPartTest {
         WeaponMounted weaponBay = mock(WeaponMounted.class);
         when(weaponBay.getLocation()).thenReturn(location);
         when(weaponBay.getType()).thenReturn(bayWeaponType);
-        Vector<Integer> bayWeapons = new Vector<>();
-        bayWeapons.addElement(33);
-        bayWeapons.addElement(equipmentNum);
+        List<WeaponMounted> bayWeapons = new ArrayList<>();
+        //bayWeapons.addElement(33);
+        bayWeapons.add(weaponBay);
         when(weaponBay.getBayWeapons()).thenReturn(bayWeapons);
         doReturn(weaponBay).when(entity).getEquipment(eq(bayEqNum));
         doReturn(bayEqNum).when(entity).getEquipmentNum(eq(weaponBay));
@@ -1535,9 +1536,9 @@ public class EquipmentPartTest {
         WeaponMounted weaponBay = mock(WeaponMounted.class);
         when(weaponBay.getLocation()).thenReturn(location);
         when(weaponBay.getType()).thenReturn(bayWeaponType);
-        Vector<Integer> bayWeapons = new Vector<>();
-        bayWeapons.addElement(otherEqNum);
-        bayWeapons.addElement(equipmentNum);
+        List<WeaponMounted> bayWeapons = new ArrayList<>();
+        bayWeapons.add(otherMounted);
+        bayWeapons.add(weaponBay);
         when(weaponBay.getBayWeapons()).thenReturn(bayWeapons);
         doReturn(weaponBay).when(entity).getEquipment(eq(bayEqNum));
         doReturn(bayEqNum).when(entity).getEquipmentNum(eq(weaponBay));
@@ -1614,7 +1615,7 @@ public class EquipmentPartTest {
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
         int otherEqNum = 33;
-        Mounted otherMounted = mock(Mounted.class);
+        WeaponMounted otherMounted = mock(WeaponMounted.class);
         when(otherMounted.getLocation()).thenReturn(location);
         when(otherMounted.isDestroyed()).thenReturn(true);
         doReturn(otherMounted).when(entity).getEquipment(eq(otherEqNum));
@@ -1624,9 +1625,9 @@ public class EquipmentPartTest {
         WeaponMounted weaponBay = mock(WeaponMounted.class);
         when(weaponBay.getLocation()).thenReturn(location);
         when(weaponBay.getType()).thenReturn(bayWeaponType);
-        Vector<Integer> bayWeapons = new Vector<>();
-        bayWeapons.addElement(otherEqNum);
-        bayWeapons.addElement(equipmentNum);
+        List<WeaponMounted> bayWeapons = new ArrayList<>();
+        bayWeapons.add(otherMounted);
+        bayWeapons.add(weaponBay);
         when(weaponBay.getBayWeapons()).thenReturn(bayWeapons);
         doReturn(weaponBay).when(entity).getEquipment(eq(bayEqNum));
         doReturn(bayEqNum).when(entity).getEquipmentNum(eq(weaponBay));
@@ -1699,7 +1700,7 @@ public class EquipmentPartTest {
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
         int otherEqNum = 33;
-        Mounted otherMounted = mock(Mounted.class);
+        WeaponMounted otherMounted = mock(WeaponMounted.class);
         when(otherMounted.getLocation()).thenReturn(location);
         doReturn(otherMounted).when(entity).getEquipment(eq(otherEqNum));
 
@@ -1708,9 +1709,9 @@ public class EquipmentPartTest {
         WeaponMounted weaponBay = mock(WeaponMounted.class);
         when(weaponBay.getLocation()).thenReturn(location);
         when(weaponBay.getType()).thenReturn(bayWeaponType);
-        Vector<Integer> bayWeapons = new Vector<>();
-        bayWeapons.addElement(otherEqNum);
-        bayWeapons.addElement(equipmentNum);
+        List<WeaponMounted> bayWeapons = new ArrayList<>();
+        bayWeapons.add(otherMounted);
+        bayWeapons.add(weaponBay);
         when(weaponBay.getBayWeapons()).thenReturn(bayWeapons);
         doReturn(weaponBay).when(entity).getEquipment(eq(bayEqNum));
         doReturn(bayEqNum).when(entity).getEquipmentNum(eq(weaponBay));
