@@ -767,6 +767,12 @@ public class Academy {
             educationLevel = person.getEduHighestEducation() + educationLevelMin;
         }
 
+        if (educationLevel > 10) {
+            educationLevel = 10;
+        } else if (educationLevel < 0) {
+            educationLevel = 0;
+        }
+
         return educationLevel;
     }
 
@@ -829,6 +835,12 @@ public class Academy {
         tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
 
         int educationLevel = getEducationLevel(person) + baseAcademicSkillLevel;
+
+        if (educationLevel > 10) {
+            educationLevel = 10;
+        } else if (educationLevel < 0) {
+            educationLevel = 0;
+        }
 
         // here we display the skills
         String[] skills = curriculums.get(courseIndex).replaceAll(", ", ",").split(",");

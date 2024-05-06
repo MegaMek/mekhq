@@ -1605,6 +1605,12 @@ public class EducationController {
 
         int educationLevel = academy.getEducationLevel(person) + academy.getBaseAcademicSkillLevel();
 
+        if (educationLevel > 10) {
+            educationLevel = 10;
+        } else if (educationLevel < 0) {
+            educationLevel = 0;
+        }
+
         if (!isGraduating) {
             educationLevel--;
 
