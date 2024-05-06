@@ -255,6 +255,7 @@ public class EditMapSettingsDialog extends JDialog {
             listMapGenerators.setSelectedIndex(0);
             listMapGenerators.setEnabled(false);
             listFixedMaps.setEnabled(false);
+            scrChooseMap.setViewportView(listMapGenerators);
         } else {
             checkFixed.setEnabled(true);
             listMapGenerators.setEnabled(true);
@@ -343,12 +344,6 @@ public class EditMapSettingsDialog extends JDialog {
                     setToolTipText(null);
                     return super.getListCellRendererComponent(list, new File(board).getName(), index, isSelected, cellHasFocus);
                 } else {
-                    // There is a base image: make it into an icon, store it and use it
-                    //if (!listFixedMaps.isEnabled()) {
-                    //    ImageFilter filter = new GrayFilter(true, 50);
-                    //    ImageProducer producer = new FilteredImageSource(image.getSource(), filter);
-                    //    image = Toolkit.getDefaultToolkit().createImage(producer);
-                    //}
                     icon = new ImageIcon(image);
 
                     mapIcons.put(board, icon);
