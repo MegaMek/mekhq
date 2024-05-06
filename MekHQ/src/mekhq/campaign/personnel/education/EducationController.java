@@ -1610,11 +1610,22 @@ public class EducationController {
                 String skillParsed = Academy.skillParser(skill);
                 int bonus;
 
-                if ((person.hasSkill(skillParsed)) && (person.getSkillLevel(skillParsed) < educationLevel)) {
+                if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() < educationLevel)) {
                     bonus = person.getSkill(skillParsed).getBonus();
-                    person.addSkill(skillParsed, educationLevel, bonus);
-                } else {
-                    person.addSkill(skillParsed, educationLevel, 0);
+
+                    int skillLevel = 0;
+                    while (person.getSkill(skillParsed).getExperienceLevel() < educationLevel) {
+                        person.addSkill(skillParsed, skillLevel, bonus);
+                        skillLevel++;
+                    }
+                } else if (!person.hasSkill(skillParsed)) {
+                    int skillLevel = 0;
+                    person.addSkill(skillParsed, skillLevel, 0);
+
+                    while (person.getSkill(skillParsed).getExperienceLevel() < educationLevel) {
+                        person.addSkill(skillParsed, skillLevel, 0);
+                        skillLevel++;
+                    }
                 }
             }
         }

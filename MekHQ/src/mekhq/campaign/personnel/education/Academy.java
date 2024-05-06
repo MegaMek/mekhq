@@ -838,14 +838,10 @@ public class Academy {
             } else {
                 String skillParsed = skillParser(skill);
 
-                if (person.hasSkill(skillParsed)) {
-                    if (person.getSkillLevel(skillParsed) >= educationLevel) {
-                        tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
-                    } else {
-                        tooltip.append('+').append(educationLevel - person.getSkillLevel(skillParsed)).append(")<br>");
-                    }
+                if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() >= educationLevel)) {
+                    tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
                 } else {
-                    tooltip.append('+').append(educationLevel - person.getSkillLevel(skillParsed)).append(")<br>");
+                    tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
                 }
             }
         }

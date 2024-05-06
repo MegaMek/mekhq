@@ -65,7 +65,7 @@
         <qualification>Labour Caste Apprenticeship</qualification>
         <curriculum>Astech, Medtech, Bonus XP, Bonus XP</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <baseAcademicSkillLevel>3</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Freeborn Education</name>
@@ -112,7 +112,7 @@
         <qualification>Labour Caste Apprenticeship</qualification>
         <curriculum>Astech, Medtech, Bonus XP, Bonus XP</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <baseAcademicSkillLevel>2</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Reeducation Camp [Local]</name>
@@ -136,7 +136,7 @@
         <qualification>Labour Caste Reeducation</qualification>
         <curriculum>Astech, Medtech, Bonus XP</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Reeducation Camp</name>
@@ -160,6 +160,6 @@
         <qualification>Labour Caste Reeducation</qualification>
         <curriculum>Astech, Medtech, Bonus XP</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
 </academies>
