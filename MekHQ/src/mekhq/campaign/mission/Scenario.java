@@ -104,7 +104,6 @@ public class Scenario {
     protected Fog fog;
     protected Atmosphere atmosphere;
     private int temperature;
-    private int modifiedTemperature;
     protected float gravity;
     private EMI emi;
     private BlowingSand blowingSand;
@@ -386,14 +385,6 @@ public class Scenario {
 
     public void setTemperature(int temperature) {
         this.temperature = temperature;
-    }
-
-    public int getModifiedTemperature() {
-        return modifiedTemperature;
-    }
-
-    public void setModifiedTemperature(int modifiedTemperature) {
-        this.modifiedTemperature = modifiedTemperature;
     }
 
     public float getGravity() {
