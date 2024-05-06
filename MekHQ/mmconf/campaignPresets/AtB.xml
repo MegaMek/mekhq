@@ -135,11 +135,10 @@
 		<useRandomDependentAddition>true</useRandomDependentAddition>
 		<useRandomDependentRemoval>true</useRandomDependentRemoval>
 		<salaryCommissionMultiplier>1.2</salaryCommissionMultiplier>
-		<salaryEnlistedMultiplier>1.0</salaryEnlistedMultiplier>
 		<salaryAntiMekMultiplier>1.5</salaryAntiMekMultiplier>
-		<salarySpecialistInfantryMultiplier>1.0</salarySpecialistInfantryMultiplier>
+		<salarySpecialistInfantryMultiplier>1.28</salarySpecialistInfantryMultiplier>
 		<salaryXPMultiplier>0.6,0.6,1.0,1.6,3.2</salaryXPMultiplier>
-		<salaryTypeBase>1500 CSB,3000 CSB,900 CSB,900 CSB,900 CSB,900 CSB,900 CSB,1500 CSB,900 CSB,960 CSB,960 CSB,750 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
+		<salaryTypeBase>1500 CSB,2250 CSB,900 CSB,900 CSB,900 CSB,900 CSB,900 CSB,1500 CSB,900 CSB,960 CSB,960 CSB,750 CSB,1000 CSB,1000 CSB,1000 CSB,1000 CSB,800 CSB,800 CSB,800 CSB,800 CSB,400 CSB,1500 CSB,400 CSB,500 CSB,500 CSB,500 CSB,500 CSB,0 CSB,0 CSB</salaryTypeBase>
 		<useManualMarriages>true</useManualMarriages>
 		<useClannerMarriages>false</useClannerMarriages>
 		<usePrisonerMarriages>true</usePrisonerMarriages>

@@ -30,7 +30,7 @@ enable "Use Quirks"
 set "Waiting period (in days) between acquisition rolls" to 1 day.
 select "Administration" as "Acquisition Skill"
 enable "Only support personnel can make acquisition checks"
-set "Penalty for Clan Equipment" to 2 
+set "Penalty for Clan Equipment" to 2
 set "Penalty for Inner Sphere equipment" to 0
 set "Maximum Acquisition Per Day" to 2
 set "Delivery Time" to 2d6 + 0 days
@@ -67,7 +67,7 @@ select "Against the Bot" as market type
 enable "Use Against the Bot campaign rules"
 select desired Skill level
 click the "Set AtB costs for skills" and "Set AtB costs for speical abilities" buttons
-enable "Do retirement/defection rolls at contract completion"
+enable "Do Employee Turnover rolls at contract completion"
 enable "Customize retirement rolls"
 enable "Use leadership skill"
 enable "Use vehicles"
@@ -89,18 +89,18 @@ At this stage it is helpful to save the campaign via File -> Save Campaign as a 
 
 With the options done it is time to actually create the mechs and personnel you are going to use at the start of the campaign. The rules for this process are explained in detail in the above mentioned rules file in the section "Company_Creation".
 First of all enable "GM Mode".
-For a quick-start hire 12 mechwarriors, 10 techs, 1 doctor and 1 admin via Marketplace -> Hire or Marketplace -> Hire Personnel in Bulk.  
+For a quick-start hire 12 mechwarriors, 10 techs, 1 doctor and 1 admin via Marketplace -> Hire or Marketplace -> Hire Personnel in Bulk.
 The first hired mechwarrior is the force commanding officer and gets a +1 bonus to gunnery and piloting skills as well as two random points in Tactics, Strategy or Leadership. Use GM Edit to adjust values by going to the Personnel Tab and right-click -> GM Mode -> Edit on the person to be adjusted. The second to fourth mechwarriors hired are your officers and receive a +1 bonus to gunnery or piloting as well as one random point in Tactics, Strategy or Leadership. All veteran skilled pilots get a single random SPA, all elite pilots get two per the AtB rules.
 Mechs can be generated in several ways (or not at all) although I recommend to use the system detailed in the rules file under Company_Creation for the first time. If this file is not available a roll on the Chosen Rat can be an alternative. To add a mech Marketplace -> Purchase Unit, select Unit Type "Mech" and the desired weight class finish by using the "Add (GM)" button.
 
 Before accepting a contract it is necessary to fill out the TO&E, in order to do so mechwarriors need to be assigned to their rides, in the Personnel tab right-click on the pilot -> assign to unit -> select desired unit. As soon as all available mechs are assigned to a pilot you must sort them into lances in the TO&E tab. By right-clicking on the "My Campaign" force icon new forces can be added. A 12 mech company usually consists of three lances with four mechs each, every lance must be commanded by an officer. There are certain size and weight limits to lances see the rules file for more information.
-The unit is now established yet there is more preparation to be done. I recommend to use "Add Funds (GM)" under the Finance tab to add some starting capital, 5%-20% of your starting net worth is reasonable. Before the cash can be spend the options turned off during creation must be turned on again.  
+The unit is now established yet there is more preparation to be done. I recommend to use "Add Funds (GM)" under the Finance tab to add some starting capital, 5%-20% of your starting net worth is reasonable. Before the cash can be spend the options turned off during creation must be turned on again.
 
 File -> Campaign Options
 "Finance" Tab
 enable everything except "Use percentage based maintenance costs (Unofficial" and "Infantry Don't Count for Contract Pay".
 
-The last step before going on a mission is to buy a cache of ammunition and spare parts, Marketplace -> Purchase Parts, with the starting capital. I suggest some weapons, actuators and lots of ammunition and armour. If you run out of money at any time new funds can be made available by taking out a loan. The principal is restricted by your assets and rating in the AtB rules. Go to the Finance tab and use the "Get Loan" button to take out a loan. 
+The last step before going on a mission is to buy a cache of ammunition and spare parts, Marketplace -> Purchase Parts, with the starting capital. I suggest some weapons, actuators and lots of ammunition and armour. If you run out of money at any time new funds can be made available by taking out a loan. The principal is restricted by your assets and rating in the AtB rules. Go to the Finance tab and use the "Get Loan" button to take out a loan.
 
 Finally it is time to select the first contract, Marketplace -> Contract Market will bring up the contract market window which displays a few current offers at the start of the campaign. The offers are refreshed every month at the first of the month. For the first contract I strongly recommend a mission type of Cadre Duty, Garrison or Pirate Hunt; Guerilla Warfare or Planetary Invasion are almost certain to end very baldy. If no reasonable contract is available it is possible to generate new ones until an acceptable offer is made by using the "Generate (GM)" button in the contract window.
 The most important details of a contract are the location, enemy, monthly payout and salvage percentage. Too strong an enemy will put the survival of the company in jeopardy while insufficient payment and salvage percentages will collapse it financially. The location should be within a reasonable distance from your starting location, check the "Days (Jumps) to Location" entry on the contract offer to be certain.
@@ -133,7 +133,7 @@ If you find that these options produce unreasonable results the maintenance modi
 "Tech Limits" Tab
 In this tab it is possible to limit or expand the scope of the campaign.
 "Limit Units and Parts by Year" and "Disallow extinct units and parts" make sure that only equipment is available that should be there based on BattleTech lore. Every campaign is different and if you want to use Star League Era equipment during the 30th century disabling these options would allow you to do so.
-"Only allow canon units for purchase" is a good way to make sure that custom units or fan made variants included in MekHQ will not be present in the unit market during your campaign. 
+"Only allow canon units for purchase" is a good way to make sure that custom units or fan made variants included in MekHQ will not be present in the unit market during your campaign.
 
 "Personnel" Tab
 The options in this tab are mainly used to enable a wider range of individualism or role play. Toughness and Pilot Edge are good ways to keep important people alive while the advanced medical rules will make injuries more interesting, see the advanced_medical file for details.
@@ -156,7 +156,7 @@ As soon as you have played AtB for some time I recommend a trial and error appro
 Everything here is set by MekHQ via the buttons in the "Against the Button" tab. It sets the XP cost for every skill and SPA and there is no need to mess with it.
 
 "Skill Randomization" Tab
-This tab helps you to adjust generated personnel to your liking, perhaps to get recruits which better represent what you are looking for. "Personnel type Recruitment Bonus" put emphasis on what type of personnel you want while the other parts of the tab allow you to increase or decrease the probability of Artillery, Secondary, Tactics, SPAs and Small Arms skills. Since the AtB rules already give veteran and elite pilots SPAs increasing the likelihood of SPAs for veteran and elite here is a good idea.  
+This tab helps you to adjust generated personnel to your liking, perhaps to get recruits which better represent what you are looking for. "Personnel type Recruitment Bonus" put emphasis on what type of personnel you want while the other parts of the tab allow you to increase or decrease the probability of Artillery, Secondary, Tactics, SPAs and Small Arms skills. Since the AtB rules already give veteran and elite pilots SPAs increasing the likelihood of SPAs for veteran and elite here is a good idea.
 
 "Rank System" Tab
 The rank system of all major powers are available to choose from. As a mercenary it is appropriate to use the general Star League system or if you have a distinct origin choose the corresponding system. The custom option allows you to create any system you like.
@@ -171,7 +171,7 @@ The important thing is to make sure that it says "Market Type Against the Bot" a
 This is the most important and most obvious place to change something in your AtB campaign.
 "Skill level" as an influence on the amount of forces you will have to face, the difference between Ultra-Green and Elite can be significant and make every fight a lot more dangerous.
 How shares work is detailed in the campaign rules, the most important part is that they can give you a bonus to retirement rolls and keep your company together. Even if you play with shares you might not want everyone to have a stake in your operation and thus keep "All personnel have shares" off, for example a group of mechjockeys starts a company on a shares system but hires their techs. Even with shares salaries have to be paid to everyone.
-"Do retirement/defection rolls at contract completion" should always be enabled because it is an important part of the rules and mercenary life to keep everyone together. "Customize retirement rolls" can help make a bad situation easier to deal with. It allows you to set a general modifier for all your personnel and an individual modifier for each person. It can be used to simulate a lot of situations like an injured pilot thinking about retirement, a soldier with newborn children to take care off or a friend certain to stay in your company no matter what.
+"Do Employee Turnover rolls at contract completion" should always be enabled because it is an important part of the rules and mercenary life to keep everyone together. "Customize retirement rolls" can help make a bad situation easier to deal with. It allows you to set a general modifier for all your personnel and an individual modifier for each person. It can be used to simulate a lot of situations like an injured pilot thinking about retirement, a soldier with newborn children to take care off or a friend certain to stay in your company no matter what.
 "Track unit fatigue" corresponds to the optional contract fatigue rules and gives all your personnel a fatigue modifier on retirement rolls. If you want more realism this is one possible option since it forces you to make a decision between lucrative contracts with a risky retirement roll at the end or a steady but potentially unprofitable garrison duty. In the worst case you might have to stay out of contract somewhere for several months to reduce fatigue.
 "Track original unit" helps with bookkeeping if you want to remember who owns what even after several reshuffles. This is especially useful to give retiring pilots the correct unit.
 If you enable aerospace units keep in mind that the bot cannot use them and any aero units will give you a significant advantage over the bot. Fighters can also add to the required number of lances you must deploy to meet your contractual obligations and should probably not be added to simply expand your TO&E. In contrast vehicles work fine.
@@ -201,7 +201,7 @@ disabling "Track unit fatigue" will remove a negative modifier on retirement rol
 disabling "Restrict parts by mission" allow you to buy more parts during contracts and solves logistical headaches that way
 reducing "Intensity" decrease the number of battles thus allowing more time to repair and heal
 
-Besides adjusting options it is also important to remember the campaign rules and abide by their restrictions. Against the Bot creates the OpFor based on your lances' weight split in the four weight classes (0-130t light, 131-200t medium, 201-280t heavy, 280 -380t assault). I recommend medium and heavy lances as close to the tonnage limit as possible. Light and assault lances tend to generate more extreme odds scenarios. 
+Besides adjusting options it is also important to remember the campaign rules and abide by their restrictions. Against the Bot creates the OpFor based on your lances' weight split in the four weight classes (0-130t light, 131-200t medium, 201-280t heavy, 280 -380t assault). I recommend medium and heavy lances as close to the tonnage limit as possible. Light and assault lances tend to generate more extreme odds scenarios.
 ...
 
 tactical

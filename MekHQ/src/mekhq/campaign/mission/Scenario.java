@@ -88,9 +88,9 @@ public class Scenario implements IPlayerSettings {
     private Map<String, Entity> externalIDLookup;
 
     /** map generation variables **/
-    private String terrainType;
     private int mapSizeX;
     private int mapSizeY;
+    // map can be used to represent both fixed and random maps
     private String map;
     private boolean usingFixedMap;
 
@@ -232,11 +232,6 @@ public class Scenario implements IPlayerSettings {
         this.cloaked = cloaked;
     }
 
-    public String getTerrainType() {
-        return terrainType;
-    }
-
-    @Override
     public int getStartingPos() {
         return startingPos;
     }
@@ -304,10 +299,6 @@ public class Scenario implements IPlayerSettings {
     @Override
     public void setStartingAnySEy(int startingAnySEy) {
         this.startingAnySEy = startingAnySEy;
-    }
-
-    public void setTerrainType(String terrainType) {
-        this.terrainType = terrainType;
     }
 
     public void setBoardType(int boardType) {
@@ -912,7 +903,6 @@ public class Scenario implements IPlayerSettings {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "boardType", boardType);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasTrack", hasTrack);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mapSize", mapSizeX, mapSizeY);
@@ -1050,8 +1040,6 @@ public class Scenario implements IPlayerSettings {
                     retVal.setUsingFixedMap(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("boardType")) {
                     retVal.boardType = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
-                    retVal.terrainType = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("hasTrack")) {
                     retVal.hasTrack = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mapSize")) {
