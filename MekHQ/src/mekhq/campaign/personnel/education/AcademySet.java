@@ -30,6 +30,7 @@ import java.util.List;
 @XmlRootElement(name="academy")
 public class AcademySet {
     @XmlElement(name = "academy")
+    // IDEA says this is an error. Don't believe its lies.
     private List<Academy> academies;
 
     public AcademySet() {

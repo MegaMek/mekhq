@@ -14,7 +14,10 @@ import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * The EducationController class is responsible for managing the education process.
@@ -793,9 +796,13 @@ public class EducationController {
                 } else {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
                 }
+
+                return true;
             } else if ((roll < (diceSize / 20)) && (!academy.isPrepSchool())) {
                 // might as well scare the player
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
+
+                return true;
             }
         }
         return false;

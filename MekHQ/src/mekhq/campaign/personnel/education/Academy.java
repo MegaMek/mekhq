@@ -773,7 +773,7 @@ public class Academy {
     /**
      * Checks if there is a conflict between the factions related to the academy and person or campaign.
      *
-     * @param campaign The campaign to check the faction conflict with.
+     * @param campaign The campaign to check faction conflict with.
      * @param person The person to check the faction conflict with.
      * @return true if there is a faction conflict, false otherwise.
      */
