@@ -29,7 +29,6 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
 import java.util.Objects;
@@ -808,7 +807,7 @@ public class Academy {
      * @param courseIndex   the index of the course in the curriculum
      * @return the tooltip string
      */
-    public String getTooltip(Campaign campaign, Person person, int courseIndex) {
+    public String getTooltip(Campaign campaign, Person person, int courseIndex, PlanetarySystem destination) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
                 MekHQ.getMHQOptions().getLocale());
 
@@ -864,7 +863,6 @@ public class Academy {
 
         // we need to do a little extra work to get travel time, to cover academies with multiple campuses or Clan nonsense
         int distance = 2;
-        PlanetarySystem destination = campaign.getCurrentSystem();
 
         if ((isClan) && (!isLocal)) {
             if (!isTrueborn) {
@@ -874,8 +872,8 @@ public class Academy {
                     distance = 100;
                 }
             }
-        } else if (!isLocal) {
-            distance = campaign.getSimplifiedTravelTime(campaign.getSystemById(getNearestCampus(campaign, locationSystems)));
+        } else {
+            distance = campaign.getSimplifiedTravelTime(destination);
         }
 
         tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");

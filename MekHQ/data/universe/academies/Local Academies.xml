@@ -222,7 +222,6 @@
         <tuition>1250</tuition>
         <durationDays>70</durationDays>
         <facultySkill>7</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
         <ageMin>16</ageMin>
         <qualification>Mechanized Cavalry Bootcamp</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
