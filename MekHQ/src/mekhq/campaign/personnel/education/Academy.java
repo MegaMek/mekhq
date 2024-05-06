@@ -24,6 +24,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Factions;
@@ -41,7 +42,7 @@ import java.util.ResourceBundle;
  */
 @XmlRootElement(name = "academy")
 @XmlAccessorType(value = XmlAccessType.FIELD)
-public class Academy {
+public class Academy implements Comparable<Academy> {
     @XmlElement(name = "name")
     private String name = "Error: Name Missing";
 
@@ -124,6 +125,8 @@ public class Academy {
     @XmlElement(name = "baseAcademicSkillLevel")
     private Integer baseAcademicSkillLevel = 0;
 
+    private Integer id;
+
     private String set;
 
     /**
@@ -159,7 +162,8 @@ public class Academy {
      * @param qualifications          the list of qualifications provided by the academy
      * @param curriculums             the list of curriculums offered by the academy
      * @param qualificationStartYears the list of years when each qualification becomes available
-     * @param baseAcademicSkillLevel              the base skill level provided by the academy
+     * @param baseAcademicSkillLevel  the base skill level provided by the academy
+     * @param id                      the id number of the academy, used for sorting academies in mhq
      */
     public Academy(String set, String name, Boolean isMilitary, Boolean isClan, Boolean isTrueborn,
                    Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
@@ -167,7 +171,7 @@ public class Academy {
                    Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
                    Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax, Integer ageMin,
                    Integer ageMax, List<String> qualifications, List<String> curriculums, List<Integer> qualificationStartYears,
-                   Integer baseAcademicSkillLevel) {
+                   Integer baseAcademicSkillLevel, Integer id) {
         this.set = set;
         this.name = name;
         this.isMilitary = isMilitary;
@@ -194,6 +198,7 @@ public class Academy {
         this.curriculums = curriculums;
         this.qualificationStartYears = qualificationStartYears;
         this.baseAcademicSkillLevel = baseAcademicSkillLevel;
+        this.id = id;
     }
 
     /**
@@ -656,8 +661,41 @@ public class Academy {
         return baseAcademicSkillLevel;
     }
 
+    /**
+     * Sets the base academic skill level.
+     *
+     * @param baseAcademicSkillLevel the new base academic skill level
+     */
     public void setBaseAcademicSkillLevel(final Integer baseAcademicSkillLevel) {
         this.baseAcademicSkillLevel = baseAcademicSkillLevel;
+    }
+
+    /**
+     * Retrieves the ID of the academy.
+     *
+     * @return the ID of the academy
+     */
+    public Integer getId() {
+        return id;
+    }
+
+    /**
+     * Sets the id of the academy.
+     *
+     * @param id The id to be set.
+     */
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    /**
+     * Compares an academy with this one by priority: xp, edge and name. Used for sorting.
+     * @param other academy to be compared
+     * @return int used for sorting
+     */
+    @Override
+    public int compareTo(Academy other) {
+        return Integer.compare(this.id, other.id);
     }
 
     /**

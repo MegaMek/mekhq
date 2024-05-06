@@ -119,7 +119,10 @@ public class AcademyFactory {
 
             Map<String, Academy> tempAcademyMap = new HashMap<>();
             String currentSetName = fileName.replaceFirst("[.][^.]+$", "");
+            int id = 0;
             for (Academy academy : academySet.getAcademies()) {
+                academy.setId(id);
+                id++;
                 academy.setSet(currentSetName);
                 tempAcademyMap.put(academy.getName(), academy);
             }
