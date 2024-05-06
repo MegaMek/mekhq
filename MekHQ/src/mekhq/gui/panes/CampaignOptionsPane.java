@@ -333,10 +333,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEduEnableAutoAwardsIntegration;
     private JLabel lblMaximumJumpCount;
     private JSpinner spnMaximumJumpCount;
-    private JCheckBox chkShowIneligibleAcademies;
     private JCheckBox chkEnableLocalAcademies;
     private JCheckBox chkEnablePrestigiousAcademies;
     private JCheckBox chkEnableClanEducation;
+    private JCheckBox chkShowIneligibleAcademies;
+    private JCheckBox chkShowAgeConflict;
+    private JCheckBox chkShowUnqualified;
+    private JCheckBox chkShowFactionConflict;
+    private JCheckBox chkShowRangeConflict;
     private JCheckBox chkEnableRandomXp;
     private JCheckBox chkEnableBonuses;
     private JLabel lblRandomXpRate;
@@ -4714,10 +4718,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEduEnableAutoAwardsIntegration.setName("chkEduEnableAutoAwardsIntegration");
 
         // General Settings
-        chkShowIneligibleAcademies = new JCheckBox(resources.getString("chkShowIneligibleAcademies.text"));
-        chkShowIneligibleAcademies.setToolTipText(resources.getString("chkShowIneligibleAcademies.toolTip"));
-        chkShowIneligibleAcademies.setName("chkShowIneligibleAcademies");
-
         lblMaximumJumpCount = new JLabel(resources.getString("lblMaximumJumpCount.text"));
         lblMaximumJumpCount.setToolTipText(resources.getString("lblMaximumJumpCount.toolTip"));
         lblMaximumJumpCount.setName("lblMaximumJumpCount");
@@ -4727,6 +4727,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Academy Set Enable
         final JPanel enableStandardSetsPanel = createStandardSetsPanel();
+
+        // Show Ineligible Enable
+        chkShowIneligibleAcademies = new JCheckBox(resources.getString("chkShowIneligibleAcademies.text"));
+        chkShowIneligibleAcademies.setToolTipText(resources.getString("chkShowIneligibleAcademies.toolTip"));
+        chkShowIneligibleAcademies.setName("chkShowIneligibleAcademies");
+        chkShowIneligibleAcademies.addActionListener(evt -> {
+            final boolean isEnabled = chkShowIneligibleAcademies.isSelected();
+
+            chkShowAgeConflict.setEnabled(isEnabled);
+            chkShowUnqualified.setEnabled(isEnabled);
+            chkShowFactionConflict.setEnabled(isEnabled);
+            chkShowRangeConflict.setEnabled(isEnabled);
+        });
+
+        final JPanel enableShowIneligiblePanel = createShowIneligiblePanel();
 
         // XP & Skill Bonuses
         final JPanel xpAndSkillBonusesPanel = createXpAndSkillBonusesPanel();
@@ -4748,7 +4763,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final boolean isEnabled = chkUseEducationModule.isSelected();
 
             chkEduEnableAutoAwardsIntegration.setEnabled(isEnabled);
-            chkShowIneligibleAcademies.setEnabled(isEnabled);
             lblMaximumJumpCount.setEnabled(isEnabled);
             spnMaximumJumpCount.setEnabled(isEnabled);
 
@@ -4756,6 +4770,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkEnableLocalAcademies.setEnabled(isEnabled);
             chkEnablePrestigiousAcademies.setEnabled(isEnabled);
             chkEnableClanEducation.setEnabled(isEnabled);
+
+            enableShowIneligiblePanel.setEnabled(isEnabled);
+            chkShowIneligibleAcademies.setEnabled(isEnabled);
+            chkShowAgeConflict.setEnabled(isEnabled);
+            chkShowUnqualified.setEnabled(isEnabled);
+            chkShowFactionConflict.setEnabled(isEnabled);
+            chkShowRangeConflict.setEnabled(isEnabled);
 
             xpAndSkillBonusesPanel.setEnabled(isEnabled);
             chkEnableBonuses.setEnabled(isEnabled);
@@ -4798,9 +4819,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // reloading Campaign Options
         chkEduEnableAutoAwardsIntegration.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         lblMaximumJumpCount.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
-        chkShowIneligibleAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnMaximumJumpCount.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         enableStandardSetsPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        chkShowIneligibleAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        enableShowIneligiblePanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         xpAndSkillBonusesPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         dropoutChancePanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         accidentsAndEventsPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
@@ -4822,11 +4844,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGap(10)
                         .addComponent(chkEduEnableAutoAwardsIntegration)
                         .addGap(10)
-                        .addComponent(chkShowIneligibleAcademies)
                         .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblMaximumJumpCount)
                                 .addComponent(spnMaximumJumpCount))
                         .addComponent(enableStandardSetsPanel)
+                        .addComponent(chkShowIneligibleAcademies)
+                        .addComponent(enableShowIneligiblePanel)
                         .addComponent(xpAndSkillBonusesPanel)
                         .addComponent(dropoutChancePanel)
                         .addComponent(accidentsAndEventsPanel)
@@ -4839,11 +4862,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGap(10)
                         .addComponent(chkEduEnableAutoAwardsIntegration)
                         .addGap(10)
-                        .addComponent(chkShowIneligibleAcademies)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblMaximumJumpCount)
                                 .addComponent(spnMaximumJumpCount))
                         .addComponent(enableStandardSetsPanel)
+                        .addComponent(chkShowIneligibleAcademies)
+                        .addComponent(enableShowIneligiblePanel)
                         .addComponent(xpAndSkillBonusesPanel)
                         .addComponent(dropoutChancePanel)
                         .addComponent(accidentsAndEventsPanel)
@@ -4894,6 +4918,59 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkEnableLocalAcademies)
                         .addComponent(chkEnablePrestigiousAcademies)
                         .addComponent(chkEnableClanEducation)
+        );
+
+        return panel;
+    }
+
+    private JPanel createShowIneligiblePanel() {
+        chkShowAgeConflict = new JCheckBox(resources.getString("chkShowAgeConflict.text"));
+        chkShowAgeConflict.setToolTipText(resources.getString("chkShowAgeConflict.toolTip"));
+        chkShowAgeConflict.setName("chkShowAgeConflict");
+
+        chkShowUnqualified = new JCheckBox(resources.getString("chkShowUnqualified.text"));
+        chkShowUnqualified.setToolTipText(resources.getString("chkShowUnqualified.toolTip"));
+        chkShowUnqualified.setName("chkShowUnqualified");
+
+        chkShowFactionConflict = new JCheckBox(resources.getString("chkShowFactionConflict.text"));
+        chkShowFactionConflict.setToolTipText(resources.getString("chkShowFactionConflict.toolTip"));
+        chkShowFactionConflict.setName("chkShowFactionConflict");
+
+        chkShowRangeConflict = new JCheckBox(resources.getString("chkShowRangeConflict.text"));
+        chkShowRangeConflict.setToolTipText(resources.getString("chkShowRangeConflict.toolTip"));
+        chkShowRangeConflict.setName("chkShowRangeConflict");
+
+        // this prevents a really annoying bug where disabled options don't stay disabled when
+        // reloading Campaign Options
+        chkShowAgeConflict.setEnabled(campaign.getCampaignOptions().isEnableShowIneligibleAcademies());
+        chkShowUnqualified.setEnabled(campaign.getCampaignOptions().isEnableShowIneligibleAcademies());
+        chkShowFactionConflict.setEnabled(campaign.getCampaignOptions().isEnableShowIneligibleAcademies());
+        chkShowRangeConflict.setEnabled(campaign.getCampaignOptions().isEnableShowIneligibleAcademies());
+
+        // creating the layout
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("showIneligible.title")));
+        panel.setName("showIneligiblePanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkShowAgeConflict)
+                        .addComponent(chkShowUnqualified)
+                        .addComponent(chkShowFactionConflict)
+                        .addComponent(chkShowRangeConflict)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkShowAgeConflict)
+                        .addComponent(chkShowUnqualified)
+                        .addComponent(chkShowFactionConflict)
+                        .addComponent(chkShowRangeConflict)
         );
 
         return panel;
@@ -6745,11 +6822,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Education
         chkUseEducationModule.setSelected(options.isUseEducationModule());
         chkEduEnableAutoAwardsIntegration.setSelected(options.isEduEnableAutoAwardsIntegration());
-        chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
         spnMaximumJumpCount.setValue(options.getMaximumJumpCount());
         chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
         chkEnableClanEducation.setSelected(options.isEnableClanEducation());
+        chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
+        chkShowAgeConflict.setSelected(options.isEnableShowAgeConflict());
+        chkShowUnqualified.setSelected(options.isEnableShowUnqualified());
+        chkShowFactionConflict.setSelected(options.isEnableShowFactionConflict());
+        chkShowRangeConflict.setSelected(options.isEnableShowRangeConflict());
         chkEnableRandomXp.setSelected(options.isEnableRandomXp());
         spnRandomXpRate.setValue(options.getRandomXpRate());
         chkEnableBonuses.setSelected(options.isEnableBonuses());
@@ -7318,10 +7399,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Education
             options.setUseEducationModule(chkUseEducationModule.isSelected());
             options.setEduEnableAutoAwardsIntegration(chkEduEnableAutoAwardsIntegration.isSelected());
-            options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
             options.setEnableClanEducation(chkEnableClanEducation.isSelected());
+            options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
+            options.setEnableShowAgeConflict(chkShowAgeConflict.isSelected());
+            options.setEnableShowUnqualified(chkShowUnqualified.isSelected());
+            options.setEnableShowFactionConflict(chkShowFactionConflict.isSelected());
+            options.setEnableShowRangeConflict(chkShowRangeConflict.isSelected());
             options.setEnableRandomXp(chkEnableRandomXp.isSelected());
             options.setRandomXpRate((Integer) spnRandomXpRate.getValue());
             options.setEnableBonuses(chkEnableBonuses.isSelected());

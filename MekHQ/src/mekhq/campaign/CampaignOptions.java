@@ -309,10 +309,14 @@ public class CampaignOptions {
     private boolean useEducationModule;
     private boolean eduEnableAutoAwardsIntegration;
     private Integer maximumJumpCount;
-    private boolean enableShowIneligibleAcademies;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
     private boolean enableClanEducation;
+    private boolean enableShowIneligibleAcademies;
+    private boolean enableShowAgeConflict;
+    private boolean enableShowUnqualified;
+    private boolean enableShowFactionConflict;
+    private boolean enableShowRangeConflict;
     private boolean enableRandomXp;
     private Integer randomXpRate;
     private boolean enableBonuses;
@@ -787,9 +791,13 @@ public class CampaignOptions {
         setEduEnableAutoAwardsIntegration(true);
         setMaximumJumpCount(20);
         setEnableLocalAcademies(true);
-        setEnableShowIneligibleAcademies(true);
         setEnablePrestigiousAcademies(true);
         setEnableClanEducation(true);
+        setEnableShowIneligibleAcademies(true);
+        setEnableShowAgeConflict(true);
+        setEnableShowUnqualified(true);
+        setEnableShowFactionConflict(true);
+        setEnableShowRangeConflict(true);
         setEnableRandomXp(true);
         setRandomXpRate(1);
         setEnableBonuses(true);
@@ -2187,14 +2195,6 @@ public class CampaignOptions {
         this.enableLocalAcademies = enableLocalAcademies;
     }
 
-    public boolean isEnableShowIneligibleAcademies() {
-        return enableShowIneligibleAcademies;
-    }
-
-    public void setEnableShowIneligibleAcademies(boolean enableShowIneligibleAcademies) {
-        this.enableShowIneligibleAcademies = enableShowIneligibleAcademies;
-    }
-
     public boolean isEnablePrestigiousAcademies() {
         return enablePrestigiousAcademies;
     }
@@ -2209,6 +2209,46 @@ public class CampaignOptions {
 
     public void setEnableClanEducation(boolean enableClanEducation) {
         this.enableClanEducation = enableClanEducation;
+    }
+
+    public boolean isEnableShowIneligibleAcademies() {
+        return enableShowIneligibleAcademies;
+    }
+
+    public void setEnableShowIneligibleAcademies(boolean enableShowIneligibleAcademies) {
+        this.enableShowIneligibleAcademies = enableShowIneligibleAcademies;
+    }
+
+    public boolean isEnableShowAgeConflict() {
+        return enableShowAgeConflict;
+    }
+
+    public void setEnableShowAgeConflict(boolean enableShowAgeConflict) {
+        this.enableShowAgeConflict = enableShowAgeConflict;
+    }
+
+    public boolean isEnableShowUnqualified() {
+        return enableShowUnqualified;
+    }
+
+    public void setEnableShowUnqualified(boolean enableShowUnqualified) {
+        this.enableShowUnqualified = enableShowUnqualified;
+    }
+
+    public boolean isEnableShowFactionConflict() {
+        return enableShowFactionConflict;
+    }
+
+    public void setEnableShowFactionConflict(boolean enableShowFactionConflict) {
+        this.enableShowFactionConflict = enableShowFactionConflict;
+    }
+
+    public boolean isEnableShowRangeConflict() {
+        return enableShowRangeConflict;
+    }
+
+    public void setEnableShowRangeConflict(boolean enableShowRangeConflict) {
+        this.enableShowRangeConflict = enableShowRangeConflict;
     }
 
     public boolean isEnableRandomXp() {
@@ -3945,9 +3985,13 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEnableAutoAwardsIntegration", isEduEnableAutoAwardsIntegration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCunt", getMaximumJumpCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableClanEducation", isEnableClanEducation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowAgeConflict", isEnableShowAgeConflict());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowUnqualified", isEnableShowUnqualified());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowFactionConflict", isEnableShowFactionConflict());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowRangeConflict", isEnableShowRangeConflict());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRandomXp", isEnableRandomXp());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomXpRate", getRandomXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableBonuses", isEnableBonuses());
@@ -4641,12 +4685,20 @@ public class CampaignOptions {
                     retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableLocalAcademies")) {
                     retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
-                    retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
                     retVal.setEnablePrestigiousAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableClanEducation")) {
                     retVal.setEnableClanEducation(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
+                    retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowAgeConflict")) {
+                    retVal.setEnableShowAgeConflict(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowUnqualified")) {
+                    retVal.setEnableShowUnqualified(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowFactionConflict")) {
+                    retVal.setEnableShowFactionConflict(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowRangeConflict")) {
+                    retVal.setEnableShowRangeConflict(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableRandomXp")) {
                     retVal.setEnableRandomXp(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomXpRate")) {

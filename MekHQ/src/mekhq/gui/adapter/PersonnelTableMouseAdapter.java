@@ -2470,6 +2470,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param civilianMenu  the civilian menu object
      */
     private void buildEducationMenus(Campaign campaign, Person person, Academy academy, JMenu clanMenu, JMenu militaryMenu, JMenu civilianMenu) {
+        boolean showIneligibleAcademies = campaign.getCampaignOptions().isEnableShowIneligibleAcademies();
         // has the academy been constructed, is still standing, & has not closed?
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
@@ -2478,7 +2479,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             int personAge = person.getAge(campaign.getLocalDate());
 
             if ((personAge >= academy.getAgeMax()) || (personAge < academy.getAgeMin())) {
-                if (campaign.getCampaignOptions().isEnableShowIneligibleAcademies()) {
+                if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowAgeConflict())) {
                     JMenuItem academyOption;
 
                     if (academy.getAgeMax() != 9999) {
@@ -2494,7 +2495,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             // is the applicant qualified?
             } else if (!academy.isQualified(person)) {
-                if (campaign.getCampaignOptions().isEnableShowIneligibleAcademies()) {
+                if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowUnqualified())) {
                     JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduUnqualified.text")
                             .replaceAll("0", String.valueOf(academy.getEducationLevelMin())));
                     educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
@@ -2505,7 +2506,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 // we add this exception so Clan players always have access to Trueborn Crèches and Sibkos.
                 if (faction == null) {
-                    if (campaign.getCampaignOptions().isEnableShowIneligibleAcademies()) {
+                    if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowFactionConflict())) {
                         JMenuItem academyOption;
 
                         if (academy.isClan()) {
@@ -2546,7 +2547,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     } else {
                         if (campus == null) {
                             if (14 > campaign.getCampaignOptions().getMaximumJumpCount()) {
-                                if (campaign.getCampaignOptions().isEnableShowIneligibleAcademies()) {
+                                if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowRangeConflict())) {
                                     JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
                                     educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
                                 }
@@ -2557,7 +2558,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 buildEducationSubMenus(campaign, academy, person, academyOption, "REDACTED", campaign.getFaction().getShortName());
                             }
                         } else if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)) / 7) <= campaign.getCampaignOptions().getMaximumJumpCount()) {
-                            if (campaign.getCampaignOptions().isEnableShowIneligibleAcademies()) {
+                            if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowRangeConflict())) {
                                 JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
                                 educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
                             }
@@ -2573,7 +2574,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     List<String> campuses = academy.getCampusesFilteredByFaction(campaign, person);
 
                     if (campuses == null) {
-                        if (campaign.getCampaignOptions().isEnableShowIneligibleAcademies()) {
+                        if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowFactionConflict())) {
                             JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduFactionConflict.text"));
                             educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
                         }
@@ -2583,7 +2584,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                         // is it within the maximum jump range set in Campaign Options?
                         if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(nearestCampus)) / 7) > campaign.getCampaignOptions().getMaximumJumpCount()) {
-                            if (campaign.getCampaignOptions().isEnableShowIneligibleAcademies()) {
+                            if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowRangeConflict())) {
                                 JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
                                 educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
                             }
