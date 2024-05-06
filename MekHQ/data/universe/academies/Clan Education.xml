@@ -36,34 +36,37 @@
         <curriculum>Small Arms, Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>ProtoMech Sibko</qualification>
-        <curriculum>Small Arms, Gunnery/ProtoMech, Bonus XP, Bonus XP</curriculum>
+        <curriculum>Small Arms, Gunnery/ProtoMech</curriculum>
         <qualificationStartYear>3060</qualificationStartYear>
         <qualification>AeroSpace Sibko</qualification>
-        <curriculum>Small Arms, Piloting/Aerospace, Gunnery/Aerospace, Bonus XP</curriculum>
+        <curriculum>Small Arms, Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Naval Sibko</qualification>
         <curriculum>Small Arms, Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Elemental Sibko</qualification>
-        <curriculum>Small Arms, Gunnery/Battlesuit, Anti-Mech, Bonus XP</curriculum>
+        <curriculum>Small Arms, Gunnery/Battlesuit, Anti-Mech</curriculum>
         <qualificationStartYear>2868</qualificationStartYear>
         <qualification>Combat Infantry Sibko</qualification>
-        <curriculum>Small Arms, Anti-Mech, Medtech, Bonus XP</curriculum>
+        <curriculum>Small Arms, Anti-Mech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Vehicle Sibko</qualification>
         <curriculum>Small Arms, Piloting/VTOL, Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Scientist Caste Apprenticeship</qualification>
-        <curriculum>Doctor, Administration, Hyperspace Navigation, Bonus XP</curriculum>
+        <curriculum>Doctor, Administration, Hyperspace Navigation</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Merchant Caste Apprenticeship</qualification>
         <curriculum>Administration, Negotiation, Scrounge, Leadership</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Apprenticeship</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
+        <qualification>Technician Caste Apprenticeship [without BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Technician Caste Apprenticeship [with BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
+        <qualificationStartYear>2868</qualificationStartYear>
         <qualification>Labour Caste Apprenticeship</qualification>
-        <curriculum>Astech, Medtech, Bonus XP, Bonus XP</curriculum>
+        <curriculum>Astech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
@@ -83,34 +86,37 @@
         <curriculum>Small Arms, Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>ProtoMech Sibko</qualification>
-        <curriculum>Small Arms, Gunnery/ProtoMech, Bonus XP, Bonus XP</curriculum>
+        <curriculum>Small Arms, Gunnery/ProtoMech</curriculum>
         <qualificationStartYear>3060</qualificationStartYear>
         <qualification>AeroSpace Sibko</qualification>
-        <curriculum>Small Arms, Piloting/Aerospace, Gunnery/Aerospace, Bonus XP</curriculum>
+        <curriculum>Small Arms, Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Naval Sibko</qualification>
         <curriculum>Small Arms, Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Elemental Sibko</qualification>
-        <curriculum>Small Arms, Gunnery/Battlesuit, Anti-Mech, Bonus XP</curriculum>
+        <curriculum>Small Arms, Gunnery/Battlesuit, Anti-Mech</curriculum>
         <qualificationStartYear>2868</qualificationStartYear>
         <qualification>Combat Infantry Sibko</qualification>
-        <curriculum>Small Arms, Anti-Mech, Medtech, Bonus XP</curriculum>
+        <curriculum>Small Arms, Anti-Mech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Vehicle Sibko</qualification>
         <curriculum>Small Arms, Piloting/VTOL, Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Scientist Caste Apprenticeship</qualification>
-        <curriculum>Doctor, Administration, Hyperspace Navigation, Bonus XP</curriculum>
+        <curriculum>Doctor, Administration, Hyperspace Navigation</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Merchant Caste Apprenticeship</qualification>
         <curriculum>Administration, Negotiation, Scrounge, Leadership</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Apprenticeship</qualification>
+        <qualification>Technician Caste Apprenticeship [without BA]</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Technician Caste Apprenticeship [with BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
+        <qualificationStartYear>2868</qualificationStartYear>
         <qualification>Labour Caste Apprenticeship</qualification>
-        <curriculum>Astech, Medtech, Bonus XP, Bonus XP</curriculum>
+        <curriculum>Astech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
@@ -130,11 +136,14 @@
         <qualification>Merchant Caste Reeducation</qualification>
         <curriculum>Administration, Negotiation, Scrounge</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Reeducation</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
+        <qualification>Technician Caste Reeducation [without BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Technician Caste Reeducation [with BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
+        <qualificationStartYear>2868</qualificationStartYear>
         <qualification>Labour Caste Reeducation</qualification>
-        <curriculum>Astech, Medtech, Bonus XP</curriculum>
+        <curriculum>Astech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -154,11 +163,14 @@
         <qualification>Merchant Caste Reeducation</qualification>
         <curriculum>Administration, Negotiation, Scrounge</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Reeducation</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
+        <qualification>Technician Caste Reeducation [without BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Technician Caste Reeducation [with BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
+        <qualificationStartYear>2868</qualificationStartYear>
         <qualification>Labour Caste Reeducation</qualification>
-        <curriculum>Astech, Medtech, Bonus XP</curriculum>
+        <curriculum>Astech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
