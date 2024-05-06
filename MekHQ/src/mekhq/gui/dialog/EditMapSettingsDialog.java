@@ -133,7 +133,7 @@ public class EditMapSettingsDialog extends JDialog {
         panSizeRandom.add(spnMapY);
 
         comboMapSize = new JComboBox<>();
-        for (BoardDimensions size : getBoardSizes()) {
+        for (BoardDimensions size : GameManager.getBoardSizes()) {
             comboMapSize.addItem(size);
         }
         if(mapSizeX > 0 & mapSizeY > 0) {
@@ -269,18 +269,6 @@ public class EditMapSettingsDialog extends JDialog {
         listFixedMaps.clearSelection();
     }
 
-    private Set<BoardDimensions> getBoardSizes() {
-        TreeSet<BoardDimensions> board_sizes = new TreeSet<>();
-
-        File boards_dir = Configuration.boardsDir();
-        // Slightly overkill sanity check...
-        if (boards_dir.isDirectory()) {
-            getBoardSizesInDir(boards_dir, board_sizes);
-        }
-
-        return board_sizes;
-    }
-
     public void done() {
         boardType = comboBoardType.getSelectedIndex();
         usingFixedMap = checkFixed.isSelected();
@@ -302,49 +290,6 @@ public class EditMapSettingsDialog extends JDialog {
 
     public void cancel() {
         setVisible(false);
-    }
-
-
-    /**
-     * Recursively scan the specified path to determine the board sizes
-     * available.
-     *
-     * @param searchDir The directory to search below this path (may be null for all
-     *                  in base path).
-     * @param sizes     Where to store the discovered board sizes
-     */
-    private void getBoardSizesInDir(final File searchDir, TreeSet<BoardDimensions> sizes) {
-        if (searchDir == null) {
-            throw new IllegalArgumentException("must provide searchDir");
-        }
-
-        if (sizes == null) {
-            throw new IllegalArgumentException("must provide sizes");
-        }
-
-        String[] file_list = searchDir.list();
-
-        if (file_list != null) {
-            for (String filename : file_list) {
-                File query_file = new File(searchDir, filename);
-
-                if (query_file.isDirectory()) {
-                    getBoardSizesInDir(query_file, sizes);
-                } else {
-                    try {
-                        if (filename.endsWith(".board")) {
-                            BoardDimensions size = Board.getSize(query_file);
-                            if (size == null) {
-                                throw new Exception();
-                            }
-                            sizes.add(Board.getSize(query_file));
-                        }
-                    } catch (Exception e) {
-                        LogManager.getLogger().error("Error parsing board: " + query_file.getAbsolutePath(), e);
-                    }
-                }
-            }
-        }
     }
 
     /**
