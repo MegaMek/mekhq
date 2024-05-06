@@ -27,6 +27,7 @@ import megamek.common.MapSettings;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.server.GameManager;
 import megamek.server.ServerBoardHelper;
+import mekhq.MekHQ;
 import mekhq.campaign.mission.Scenario;
 import org.apache.logging.log4j.LogManager;
 
@@ -109,6 +110,9 @@ public class EditMapSettingsDialog extends JDialog {
     }
 
     private void initComponents() {
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditMapSettingsDialog",
+                MekHQ.getMHQOptions().getLocale());
+        setTitle(resourceMap.getString("dialog.title"));
 
         getContentPane().setLayout(new BorderLayout());
         JPanel panMain = new JPanel(new GridBagLayout());
@@ -121,7 +125,7 @@ public class EditMapSettingsDialog extends JDialog {
         scrChooseMap.setPreferredSize(new Dimension(600, 800));
 
 
-        checkFixed = new JCheckBox("Use fixed map");
+        checkFixed = new JCheckBox(resourceMap.getString("checkFixed.text"));
         checkFixed.setSelected(usingFixedMap);
         checkFixed.addActionListener(evt -> changeMapType());
 
@@ -157,7 +161,7 @@ public class EditMapSettingsDialog extends JDialog {
 
         listMapGenerators = new JList<>(generatorModel);
         listMapGenerators.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        generatorModel.addElement("None");
+        generatorModel.addElement(resourceMap.getString("listMapGenerators.none"));
         File dir = new File("data/mapgen/");
         File[] directoryListing = dir.listFiles();
         ArrayList<String> generators = new ArrayList<>();
@@ -202,7 +206,7 @@ public class EditMapSettingsDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panMain.add(new JLabel("Board Type:"), gbc);
+        panMain.add(new JLabel(resourceMap.getString("lblBoardType.text")), gbc);
         gbc.weightx = 1.0;
         gbc.gridx++;
         panMain.add(comboBoardType, gbc);
@@ -210,7 +214,7 @@ public class EditMapSettingsDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.weightx = 0.0;
-        panMain.add(new JLabel("Map Size:"), gbc);
+        panMain.add(new JLabel(resourceMap.getString("lblMapSize.text")), gbc);
         gbc.gridx++;
         gbc.weightx = 1.0;
         panMain.add(panSizeRandom, gbc);
@@ -231,9 +235,9 @@ public class EditMapSettingsDialog extends JDialog {
         gbc.weighty = 1.0;
         panMain.add(scrChooseMap, gbc);
 
-        JButton btnOK = new JButton("Done");
+        JButton btnOK = new JButton(resourceMap.getString("btnOK.text"));
         btnOK.addActionListener(evt -> done());
-        JButton btnCancel = new JButton("Cancel");
+        JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
         btnCancel.addActionListener(evt -> cancel());
         panButtons.add(btnOK);
         panButtons.add(btnCancel);

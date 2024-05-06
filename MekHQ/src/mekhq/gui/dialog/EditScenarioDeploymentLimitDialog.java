@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.UnitType;
+import mekhq.MekHQ;
 import mekhq.campaign.mission.ScenarioDeploymentLimit;
 import mekhq.campaign.mission.ScenarioDeploymentLimit.CountType;
 import mekhq.campaign.mission.ScenarioDeploymentLimit.QuantityType;
@@ -28,6 +29,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 public class EditScenarioDeploymentLimitDialog extends JDialog {
 
@@ -55,11 +57,10 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
     }
 
     private void initComponents() {
-        //final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditScenarioDeploymentLimitsDialog",
-        //        MekHQ.getMHQOptions().getLocale());
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.EditScenarioDeploymentLimitsDialog",
+                MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setName("Form");
-        setTitle("Edit Scenario Deployment Limits");
+        setTitle(resourceMap.getString("dialog.title"));
 
         getContentPane().setLayout(new BorderLayout());
         JPanel panMain = new JPanel(new GridBagLayout());
@@ -85,17 +86,15 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         rightGbc.fill = GridBagConstraints.HORIZONTAL;
         rightGbc.anchor = GridBagConstraints.NORTHWEST;
 
-        JLabel lblQuantityType = new JLabel("Quantity Type:");
-        panMain.add(lblQuantityType, leftGbc);
+        panMain.add(new JLabel(resourceMap.getString("lblQuantityType.text")), leftGbc);
         choiceQuantityType = new MMComboBox<>("choiceQuantityType", QuantityType.values());
         choiceQuantityType.setSelectedItem(deploymentLimit.getQuantityType());
         choiceQuantityType.addActionListener(this::setQuantityModel);
         panMain.add(choiceQuantityType, rightGbc);
 
 
-        JLabel lblCountType = new JLabel("Maximum Type:");
         leftGbc.gridy++;
-        panMain.add(lblCountType, leftGbc);
+        panMain.add(new JLabel(resourceMap.getString("lblCountType.text")), leftGbc);
         choiceCountType = new MMComboBox<>("choiceCountType", CountType.values());
         choiceCountType.setSelectedItem(deploymentLimit.getCountType());
         choiceCountType.addActionListener(this::setQuantityModel);
@@ -103,9 +102,8 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         panMain.add(choiceCountType, rightGbc);
 
 
-        JLabel lblQuantity = new JLabel("Maximum Quantity:");
         leftGbc.gridy++;
-        panMain.add(lblQuantity, leftGbc);
+        panMain.add(new JLabel(resourceMap.getString("lblQuantity.text")), leftGbc);
         spnQuantity = new JSpinner();
         spnQuantity.setValue(deploymentLimit.getQuantityLimit());
         setQuantityModel(null);
@@ -115,8 +113,8 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         JPanel panAllowedUnits = new JPanel(new GridLayout(UnitType.SIZE+1, 1));
         panAllowedUnits.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder("Allowed Units")));
-        checkAllUnits = new JCheckBox("Allow all units");
+                BorderFactory.createTitledBorder(resourceMap.getString("panAllowedUnits.title"))));
+        checkAllUnits = new JCheckBox(resourceMap.getString("checkAllUnits.text"));
         checkAllUnits.setSelected(deploymentLimit.getAllowedUnitTypes().isEmpty());
         checkAllUnits.addActionListener(this::checkAllUnits);
         panAllowedUnits.add(checkAllUnits);
@@ -139,9 +137,9 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         gbc.gridheight = 3;
         panMain.add(panAllowedUnits, gbc);
 
-        JButton btnOk = new JButton("OK");
+        JButton btnOk = new JButton(resourceMap.getString("btnOK.text"));
         btnOk.addActionListener(this::complete);
-        JButton btnClose = new JButton("Cancel");
+        JButton btnClose = new JButton(resourceMap.getString("btnCancel.text"));
         btnClose.addActionListener(this::cancel);
         panButtons.add(btnOk);
         panButtons.add(btnClose);
