@@ -1356,8 +1356,11 @@ public class StratconRulesManager {
             case HIGH:
                 moraleModifier = 5;
                 break;
-            case INVINCIBLE:
+            case VERY_HIGH:
                 moraleModifier = 10;
+                break;
+            case INVINCIBLE:
+                moraleModifier = 15;
                 break;
             default:
                 break;
