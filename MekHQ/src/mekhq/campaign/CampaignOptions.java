@@ -311,6 +311,7 @@ public class CampaignOptions {
     private boolean useEducationModule;
     private boolean eduEnableAutoAwardsIntegration;
     private Integer maximumJumpCount;
+    private boolean enableShowIneligibleAcademies;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
     private boolean enableClanEducation;
@@ -790,6 +791,7 @@ public class CampaignOptions {
         setEduEnableAutoAwardsIntegration(true);
         setMaximumJumpCount(20);
         setEnableLocalAcademies(true);
+        setEnableShowIneligibleAcademies(true);
         setEnablePrestigiousAcademies(true);
         setEnableClanEducation(true);
         setEnableRandomXp(true);
@@ -2203,6 +2205,14 @@ public class CampaignOptions {
 
     public void setEnableLocalAcademies(boolean enableLocalAcademies) {
         this.enableLocalAcademies = enableLocalAcademies;
+    }
+
+    public boolean isEnableShowIneligibleAcademies() {
+        return enableShowIneligibleAcademies;
+    }
+
+    public void setEnableShowIneligibleAcademies(boolean enableShowIneligibleAcademies) {
+        this.enableShowIneligibleAcademies = enableShowIneligibleAcademies;
     }
 
     public boolean isEnablePrestigiousAcademies() {
@@ -3957,6 +3967,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEnableAutoAwardsIntegration", isEduEnableAutoAwardsIntegration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCunt", getMaximumJumpCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableClanEducation", isEnableClanEducation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRandomXp", isEnableRandomXp());
@@ -4656,6 +4667,8 @@ public class CampaignOptions {
                     retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableLocalAcademies")) {
                     retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
+                    retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
                     retVal.setEnablePrestigiousAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableClanEducation")) {

@@ -335,6 +335,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEduEnableAutoAwardsIntegration;
     private JLabel lblMaximumJumpCount;
     private JSpinner spnMaximumJumpCount;
+    private JCheckBox chkShowIneligibleAcademies;
     private JCheckBox chkEnableLocalAcademies;
     private JCheckBox chkEnablePrestigiousAcademies;
     private JCheckBox chkEnableClanEducation;
@@ -4741,6 +4742,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEduEnableAutoAwardsIntegration.setName("chkEduEnableAutoAwardsIntegration");
 
         // General Settings
+        chkShowIneligibleAcademies = new JCheckBox(resources.getString("chkShowIneligibleAcademies.text"));
+        chkShowIneligibleAcademies.setToolTipText(resources.getString("chkShowIneligibleAcademies.toolTip"));
+        chkShowIneligibleAcademies.setName("chkShowIneligibleAcademies");
+
         lblMaximumJumpCount = new JLabel(resources.getString("lblMaximumJumpCount.text"));
         lblMaximumJumpCount.setToolTipText(resources.getString("lblMaximumJumpCount.toolTip"));
         lblMaximumJumpCount.setName("lblMaximumJumpCount");
@@ -4771,6 +4776,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final boolean isEnabled = chkUseEducationModule.isSelected();
 
             chkEduEnableAutoAwardsIntegration.setEnabled(isEnabled);
+            chkShowIneligibleAcademies.setEnabled(isEnabled);
             lblMaximumJumpCount.setEnabled(isEnabled);
             spnMaximumJumpCount.setEnabled(isEnabled);
 
@@ -4820,6 +4826,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // reloading Campaign Options
         chkEduEnableAutoAwardsIntegration.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         lblMaximumJumpCount.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        chkShowIneligibleAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnMaximumJumpCount.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         enableStandardSetsPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         xpAndSkillBonusesPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
@@ -4843,6 +4850,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGap(10)
                         .addComponent(chkEduEnableAutoAwardsIntegration)
                         .addGap(10)
+                        .addComponent(chkShowIneligibleAcademies)
                         .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblMaximumJumpCount)
                                 .addComponent(spnMaximumJumpCount))
@@ -4859,6 +4867,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGap(10)
                         .addComponent(chkEduEnableAutoAwardsIntegration)
                         .addGap(10)
+                        .addComponent(chkShowIneligibleAcademies)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblMaximumJumpCount)
                                 .addComponent(spnMaximumJumpCount))
@@ -6766,6 +6775,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Education
         chkUseEducationModule.setSelected(options.isUseEducationModule());
         chkEduEnableAutoAwardsIntegration.setSelected(options.isEduEnableAutoAwardsIntegration());
+        chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
         spnMaximumJumpCount.setValue(options.getMaximumJumpCount());
         chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
@@ -7340,6 +7350,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Education
             options.setUseEducationModule(chkUseEducationModule.isSelected());
             options.setEduEnableAutoAwardsIntegration(chkEduEnableAutoAwardsIntegration.isSelected());
+            options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
             options.setEnableClanEducation(chkEnableClanEducation.isSelected());
