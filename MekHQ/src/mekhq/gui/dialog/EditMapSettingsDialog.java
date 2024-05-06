@@ -9,6 +9,7 @@ import megamek.common.Configuration;
 import megamek.common.MapSettings;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.server.GameManager;
+import megamek.server.ServerBoardHelper;
 import mekhq.campaign.mission.Scenario;
 import org.apache.logging.log4j.LogManager;
 
@@ -263,7 +264,10 @@ public class EditMapSettingsDialog extends JDialog {
     private void refreshBoardList() {
         listFixedMaps.setFixedCellHeight(-1);
         listFixedMaps.setFixedCellWidth(-1);
-        List<String> boards = scanForBoards();
+        MapSettings mapSettings = MapSettings.getInstance();
+        BoardDimensions boardSize = (BoardDimensions) comboMapSize.getSelectedItem();
+        mapSettings.setBoardSize(boardSize.width(), boardSize.height());
+        List<String> boards = ServerBoardHelper.scanForBoards(mapSettings);
         fixedMapModel.removeAllElements();
         fixedMapModel.addAll(boards);
         listFixedMaps.clearSelection();
@@ -293,59 +297,8 @@ public class EditMapSettingsDialog extends JDialog {
     }
 
     /**
-     * Returns a list of path names of available boards of the size set in the given
-     * mapSettings. The path names are minus the '.board' extension and relative to
-     * the boards data directory.
+     * A modified version of the thumbnail board rendered from Megamek.ChatLounge
      */
-    private List<String> scanForBoards() {
-        BoardDimensions boardSize = (BoardDimensions) comboMapSize.getSelectedItem();
-        java.util.List<String> result = new ArrayList<>();
-
-        // Scan the Megamek boards directory
-        File boardDir = Configuration.boardsDir();
-        scanForBoardsInDir(boardDir, "", boardSize, result);
-
-        result.sort(String::compareTo);
-        return result.stream().map(this::backToForwardSlash).collect(Collectors.toList());
-    }
-
-    private String backToForwardSlash(String path) {
-        return path.replace("\\", "/");
-    }
-
-    /**
-     * Scans the given boardDir directory for map boards of the given size and
-     * returns them by adding them to the given boards list. Removes the .board extension.
-     */
-    private void scanForBoardsInDir(final File boardDir, final String basePath, final BoardDimensions dimensions,
-                                    List<String> boards) {
-        if (boardDir == null) {
-            throw new IllegalArgumentException("must provide searchDir");
-        } else if (basePath == null) {
-            throw new IllegalArgumentException("must provide basePath");
-        } else if (dimensions == null) {
-            throw new IllegalArgumentException("must provide dimensions");
-        } else if (boards == null) {
-            throw new IllegalArgumentException("must provide boards");
-        }
-
-        String[] fileList = boardDir.list();
-        if (fileList != null) {
-            for (String filename : fileList) {
-                File filePath = new MegaMekFile(boardDir, filename).getFile();
-                if (filePath.isDirectory()) {
-                    scanForBoardsInDir(filePath, basePath + File.separator + filename, dimensions, boards);
-                } else {
-                    if (filename.endsWith(".board")) {
-                        if (Board.boardIsSize(filePath, dimensions)) {
-                            boards.add(basePath + File.separator + filename.substring(0, filename.lastIndexOf(".")));
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     private class BoardNameRenderer extends DefaultListCellRenderer  {
 
         private Image image;
