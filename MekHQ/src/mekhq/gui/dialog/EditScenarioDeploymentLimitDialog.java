@@ -72,7 +72,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         leftGbc.gridwidth = 1;
         leftGbc.weightx = 0.0;
         leftGbc.weighty = 0.0;
-        leftGbc.insets = new Insets(0, 0, 5, 10);
+        leftGbc.insets = new Insets(5, 5, 5, 10);
         leftGbc.fill = GridBagConstraints.NONE;
         leftGbc.anchor = GridBagConstraints.NORTHWEST;
 
@@ -82,7 +82,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         rightGbc.gridwidth = 1;
         rightGbc.weightx = 1.0;
         rightGbc.weighty = 0.0;
-        rightGbc.insets = new Insets(0, 10, 5, 0);
+        rightGbc.insets = new Insets(5, 10, 5, 5);
         rightGbc.fill = GridBagConstraints.HORIZONTAL;
         rightGbc.anchor = GridBagConstraints.NORTHWEST;
 
@@ -134,6 +134,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.anchor = GridBagConstraints.NORTHWEST;
+        rightGbc.insets = new Insets(5, 5, 5, 5);
         gbc.gridheight = 3;
         panMain.add(panAllowedUnits, gbc);
 
