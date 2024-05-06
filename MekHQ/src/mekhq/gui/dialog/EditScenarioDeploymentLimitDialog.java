@@ -21,6 +21,8 @@ package mekhq.gui.dialog;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.UnitType;
 import mekhq.campaign.mission.ScenarioDeploymentLimit;
+import mekhq.campaign.mission.ScenarioDeploymentLimit.CountType;
+import mekhq.campaign.mission.ScenarioDeploymentLimit.QuantityType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,20 +31,18 @@ import java.util.ArrayList;
 
 public class EditScenarioDeploymentLimitDialog extends JDialog {
 
-    private JFrame frame;
     private ScenarioDeploymentLimit deploymentLimit;
     private boolean newLimit;
 
     private JSpinner spnQuantity;
-    private MMComboBox<ScenarioDeploymentLimit.QuantityType> choiceQuantityType;
-    private MMComboBox<ScenarioDeploymentLimit.CountType> choiceCountType;
+    private MMComboBox<QuantityType> choiceQuantityType;
+    private MMComboBox<CountType> choiceCountType;
     private JCheckBox checkAllUnits;
     private JCheckBox[] checkAllowedUnits;
 
     public EditScenarioDeploymentLimitDialog(JFrame parent, boolean modal, ScenarioDeploymentLimit limit) {
         super(parent, modal);
-        this.frame = parent;
-        if(limit == null) {
+        if (limit == null) {
             deploymentLimit = new ScenarioDeploymentLimit();
             newLimit = true;
         } else {
@@ -87,7 +87,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
 
         JLabel lblQuantityType = new JLabel("Quantity Type:");
         panMain.add(lblQuantityType, leftGbc);
-        choiceQuantityType = new MMComboBox("choiceQuantityType", ScenarioDeploymentLimit.QuantityType.values());
+        choiceQuantityType = new MMComboBox<>("choiceQuantityType", QuantityType.values());
         choiceQuantityType.setSelectedItem(deploymentLimit.getQuantityType());
         choiceQuantityType.addActionListener(this::setQuantityModel);
         panMain.add(choiceQuantityType, rightGbc);
@@ -96,7 +96,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         JLabel lblCountType = new JLabel("Maximum Type:");
         leftGbc.gridy++;
         panMain.add(lblCountType, leftGbc);
-        choiceCountType = new MMComboBox("choiceCountType", ScenarioDeploymentLimit.CountType.values());
+        choiceCountType = new MMComboBox<>("choiceCountType", CountType.values());
         choiceCountType.setSelectedItem(deploymentLimit.getCountType());
         choiceCountType.addActionListener(this::setQuantityModel);
         rightGbc.gridy++;
@@ -121,7 +121,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         checkAllUnits.addActionListener(this::checkAllUnits);
         panAllowedUnits.add(checkAllUnits);
         checkAllowedUnits = new JCheckBox [UnitType.SIZE];
-        for(int i = UnitType.MEK; i < UnitType.SIZE; i++) {
+        for (int i = UnitType.MEK; i < UnitType.SIZE; i++) {
             JCheckBox check = new JCheckBox(UnitType.getTypeName(i));
             check.setSelected(deploymentLimit.getAllowedUnitTypes().contains(i));
             check.setEnabled(!checkAllUnits.isSelected());
@@ -151,8 +151,8 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
     }
 
     private void checkAllUnits(ActionEvent evt) {
-        for(JCheckBox box : checkAllowedUnits) {
-            if(checkAllUnits.isSelected()) {
+        for (JCheckBox box : checkAllowedUnits) {
+            if (checkAllUnits.isSelected()) {
                 box.setSelected(false);
                 box.setEnabled(false);
             } else {
@@ -163,18 +163,18 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
 
     private void setQuantityModel(ActionEvent evt) {
         int currentQuantity = (int) spnQuantity.getValue();
-        if(currentQuantity < 1) {
+        if (currentQuantity < 1) {
             currentQuantity = 1;
         }
-        ScenarioDeploymentLimit.CountType currentCountType = choiceCountType.getSelectedItem();
-        ScenarioDeploymentLimit.QuantityType currentQuantityType = choiceQuantityType.getSelectedItem();
-        if(currentQuantityType == ScenarioDeploymentLimit.QuantityType.PERCENT) {
-            if(currentQuantity > 100) {
+        CountType currentCountType = choiceCountType.getSelectedItem();
+        QuantityType currentQuantityType = choiceQuantityType.getSelectedItem();
+        if (currentQuantityType == QuantityType.PERCENT) {
+            if (currentQuantity > 100) {
                 currentQuantity = 100;
             }
             spnQuantity.setModel(new SpinnerNumberModel(currentQuantity, 1, 100, 5));
         } else {
-            if(currentCountType == ScenarioDeploymentLimit.CountType.UNIT) {
+            if (currentCountType == CountType.UNIT) {
                 spnQuantity.setModel(new SpinnerNumberModel(currentQuantity, 1, null, 1));
             } else {
                 spnQuantity.setModel(new SpinnerNumberModel(currentQuantity, 1, null, 500));
@@ -186,10 +186,10 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
         deploymentLimit.setQuantityLimit((int) spnQuantity.getValue());
         deploymentLimit.setQuantityType(choiceQuantityType.getSelectedItem());
         deploymentLimit.setCountType(choiceCountType.getSelectedItem());
-        ArrayList<Integer> allowed = new ArrayList<Integer>();
-        if(!checkAllUnits.isSelected()) {
-            for(int i = UnitType.MEK; i < UnitType.SIZE; i++) {
-                if(checkAllowedUnits[i].isSelected()) {
+        ArrayList<Integer> allowed = new ArrayList<>();
+        if (!checkAllUnits.isSelected()) {
+            for (int i = UnitType.MEK; i < UnitType.SIZE; i++) {
+                if (checkAllowedUnits[i].isSelected()) {
                     allowed.add(i);
                 }
             }
@@ -199,7 +199,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
     }
 
     private void cancel(ActionEvent evt) {
-        if(newLimit) {
+        if (newLimit) {
             deploymentLimit = null;
         }
         this.setVisible(false);

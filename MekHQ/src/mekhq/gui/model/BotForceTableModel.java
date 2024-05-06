@@ -22,11 +22,9 @@
 package mekhq.gui.model;
 
 
-import megamek.common.IStartingPositions;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.universe.Factions;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -100,17 +98,12 @@ public class BotForceTableModel extends AbstractTableModel {
                 return botForce.getFixedEntityList().size() + " Units, BV: " + botForce.getFixedBV();
             case COL_RANDOM:
                 return ((null == botForce.getBotForceRandomizer()) ? "" : botForce.getBotForceRandomizer().
-                        getShortDescription(campaign));
+                        getShortDescription());
             case COL_DEPLOYMENT:
                 return Utilities.getDeploymentString(botForce);
             default:
                 return "?";
         }
-    }
-
-    @Override
-    public boolean isCellEditable(int row, int col) {
-        return false;
     }
 
     @Override

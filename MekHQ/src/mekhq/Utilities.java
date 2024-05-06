@@ -21,7 +21,6 @@ package mekhq;
 
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.client.ui.swing.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
@@ -1359,7 +1358,7 @@ public class Utilities {
     }
 
     /**
-     * pdate values of an object that implements IPlayerSettings from a player object
+     * Update values of an object that implements IPlayerSettings from a player object
      * @param settings An object that implements IPlayerSettings
      * @param player A Player object from which to read values
      */

@@ -18,20 +18,12 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.bot.princess.BehaviorSettings;
-import megamek.client.bot.princess.Princess;
 import megamek.client.ui.GBC;
-import megamek.client.ui.Messages;
-import megamek.client.ui.dialogs.BotConfigDialog;
-import megamek.client.ui.enums.DialogResult;
-import megamek.client.ui.swing.GUIPreferences;
 import megamek.client.ui.swing.util.UIUtil;
+import megamek.client.ui.swing.util.UIUtil.TipButton;
 import megamek.common.IStartingPositions;
 import megamek.common.Player;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.BotForce;
-import mekhq.campaign.mission.IPlayerSettings;
 
 import javax.swing.*;
 import javax.swing.text.DefaultFormatterFactory;
@@ -47,14 +39,12 @@ import static megamek.client.ui.swing.util.UIUtil.guiScaledFontHTML;
 
 public class EditDeploymentDialog extends JDialog {
 
-    private JFrame frame;
-
     Player player;
 
     private int currentStartPos;
 
     private final JPanel panStartButtons = new JPanel();
-    private final UIUtil.TipButton[] butStartPos = new UIUtil.TipButton[11];
+    private final TipButton[] butStartPos = new TipButton[11];
     private final NumberFormatter numFormatter = new NumberFormatter(NumberFormat.getIntegerInstance());
     private final DefaultFormatterFactory formatterFactory = new DefaultFormatterFactory(numFormatter);
     private final JFormattedTextField txtOffset = new JFormattedTextField(formatterFactory, 0);
@@ -80,7 +70,7 @@ public class EditDeploymentDialog extends JDialog {
 
         panStartButtons.setAlignmentX(Component.LEFT_ALIGNMENT);
         for (int i = 0; i < 11; i++) {
-            butStartPos[i] = new UIUtil.TipButton("");
+            butStartPos[i] = new TipButton("");
             butStartPos[i].addActionListener(startListener);
         }
         panStartButtons.setLayout(new GridLayout(4, 3));
@@ -153,7 +143,6 @@ public class EditDeploymentDialog extends JDialog {
     private void updateStartGrid() {
         StringBuilder[] butText = new StringBuilder[11];
         StringBuilder[] butTT = new StringBuilder[11];
-        boolean[] hasPlayer = new boolean[11];
 
         for (int i = 0; i < 11; i++) {
             butText[i] = new StringBuilder();

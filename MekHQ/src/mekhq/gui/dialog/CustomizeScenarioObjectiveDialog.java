@@ -23,6 +23,12 @@ import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.mission.*;
+import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectConditionType;
+import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
+import mekhq.campaign.mission.ScenarioObjective.ObjectiveAmountType;
+import mekhq.campaign.mission.ScenarioObjective.ObjectiveCriterion;
+import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,26 +39,23 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
     private ScenarioObjective objective;
     private List<String> botForceNames;
-    private JFrame frame;
-
     private JPanel panObjectiveType;
     private JPanel panForce;
     private JPanel panTimeLimits;
-    private JPanel panEffect;
     private JPanel panObjectiveEffect;
     private JTextField txtShortDescription;
-    private JComboBox<ScenarioObjective.ObjectiveCriterion> cboObjectiveType;
+    private JComboBox<ObjectiveCriterion> cboObjectiveType;
     private JComboBox<String> cboDirection;
     private JSpinner spnAmount;
     private SpinnerNumberModel modelPercent;
     private SpinnerNumberModel modelFixed;
-    private MMComboBox<ScenarioObjective.ObjectiveAmountType> cboCountType;
+    private MMComboBox<ObjectiveAmountType> cboCountType;
     private JComboBox<String> cboForceName;
 
     private JSpinner spnScore;
-    private JComboBox<ObjectiveEffect.EffectScalingType> cboScalingType;
-    private JComboBox<ObjectiveEffect.ObjectiveEffectType> cboEffectType;
-    private JComboBox<ObjectiveEffect.ObjectiveEffectConditionType> cboEffectCondition;
+    private JComboBox<EffectScalingType> cboScalingType;
+    private JComboBox<ObjectiveEffectType> cboEffectType;
+    private JComboBox<ObjectiveEffectConditionType> cboEffectCondition;
 
     private JList<ObjectiveEffect> successEffects;
     private JList<ObjectiveEffect> failureEffects;
@@ -60,7 +63,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private JButton btnRemoveFailure;
 
     private JComboBox<String> cboTimeLimitDirection;
-    private JComboBox<ScenarioObjective.TimeLimitType> cboTimeScaling;
+    private JComboBox<TimeLimitType> cboTimeScaling;
     private JSpinner spnTimeLimit;
 
     private JList<String> forceNames;
@@ -77,13 +80,12 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
     public CustomizeScenarioObjectiveDialog(JFrame parent, boolean modal, ScenarioObjective objective, List<String> botForceNames) {
         super(parent, modal);
-        this.frame = parent;
         this.objective = objective;
         this.botForceNames = botForceNames;
 
         initialize();
 
-        for(String forceName : objective.getAssociatedForceNames()) {
+        for (String forceName : objective.getAssociatedForceNames()) {
             forceModel.addElement(forceName);
         }
 
@@ -98,7 +100,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         cboTimeScaling.setSelectedItem(objective.getTimeLimitType());
         updateTimeLimitUI();
         cboTimeLimitDirection.setSelectedIndex(objective.isTimeLimitAtMost() ? 0 : 1);
-        if (objective.getTimeLimitType() == ScenarioObjective.TimeLimitType.ScaledToPrimaryUnitCount) {
+        if (objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
             spnTimeLimit.setValue(objective.getTimeLimitScaleFactor());
         } else {
             if (objective.getTimeLimit() != null) {
@@ -258,7 +260,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private void initObjectiveTypePanel() {
         panObjectiveType = new JPanel(new GridBagLayout());
         cboObjectiveType = new JComboBox<>();
-        for (ScenarioObjective.ObjectiveCriterion objectiveType : ScenarioObjective.ObjectiveCriterion.values()) {
+        for (ObjectiveCriterion objectiveType : ObjectiveCriterion.values()) {
             cboObjectiveType.addItem(objectiveType);
         }
         cboObjectiveType.addActionListener(e -> this.setDirectionDropdownVisibility());
@@ -267,7 +269,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         modelFixed = new SpinnerNumberModel(0, 0, null, 1);
         spnAmount = new JSpinner(modelPercent);
 
-        cboCountType = new MMComboBox("cboCountType", ScenarioObjective.ObjectiveAmountType.values());
+        cboCountType = new MMComboBox<>("cboCountType", ObjectiveAmountType.values());
         cboCountType.addActionListener(etv -> switchNumberModel());
 
 
@@ -303,7 +305,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
         cboForceName = new JComboBox<>();
         cboForceName.addItem(MHQConstants.EGO_OBJECTIVE_NAME);
-        for(String name : botForceNames) {
+        for (String name : botForceNames) {
             cboForceName.addItem(name);
         }
 
@@ -369,7 +371,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbcRight.gridy++;
         panObjectiveEffect.add(new JLabel(resourceMap.getString("lblEffectScaling.text")), gbcLeft);
         cboScalingType = new JComboBox<>();
-        for (ObjectiveEffect.EffectScalingType scalingType : ObjectiveEffect.EffectScalingType.values()) {
+        for (EffectScalingType scalingType : EffectScalingType.values()) {
             cboScalingType.addItem(scalingType);
         }
         panObjectiveEffect.add(cboScalingType, gbcRight);
@@ -378,7 +380,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbcRight.gridy++;
         panObjectiveEffect.add(new JLabel(resourceMap.getString("lblEffectType.text")), gbcLeft);
         cboEffectType = new JComboBox<>();
-        for (ObjectiveEffect.ObjectiveEffectType scalingType : ObjectiveEffect.ObjectiveEffectType.values()) {
+        for (ObjectiveEffectType scalingType : ObjectiveEffectType.values()) {
             cboEffectType.addItem(scalingType);
         }
         panObjectiveEffect.add(cboEffectType, gbcRight);
@@ -387,8 +389,8 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         gbcRight.gridy++;
         panObjectiveEffect.add(new JLabel(resourceMap.getString("lblEffectCondition.text")), gbcLeft);
         cboEffectCondition = new JComboBox<>();
-        cboEffectCondition.addItem(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess);
-        cboEffectCondition.addItem(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveFailure);
+        cboEffectCondition.addItem(ObjectiveEffectConditionType.ObjectiveSuccess);
+        cboEffectCondition.addItem(ObjectiveEffectConditionType.ObjectiveFailure);
         panObjectiveEffect.add(cboEffectCondition, gbcRight);
 
         JButton btnAdd = new JButton(resourceMap.getString("btnAdd.text"));
@@ -405,11 +407,11 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         failureEffects.addListSelectionListener(e -> btnRemoveFailure.setEnabled(!failureEffects.getSelectedValuesList().isEmpty()));
 
         btnRemoveSuccess = new JButton(resourceMap.getString("btnRemove.text"));
-        btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess));
+        btnRemoveSuccess.addActionListener(e -> this.removeEffect(ObjectiveEffectConditionType.ObjectiveSuccess));
         btnRemoveSuccess.setEnabled(false);
 
         btnRemoveFailure = new JButton(resourceMap.getString("btnRemove.text"));
-        btnRemoveFailure.addActionListener(e -> this.removeEffect(ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveFailure));
+        btnRemoveFailure.addActionListener(e -> this.removeEffect(ObjectiveEffectConditionType.ObjectiveFailure));
         btnRemoveFailure.setEnabled(false);
 
         JPanel panBottom = new JPanel(new GridBagLayout());
@@ -458,7 +460,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         cboTimeLimitDirection.addItem("at least");
 
         cboTimeScaling = new JComboBox<>();
-        for (ScenarioObjective.TimeLimitType timeLimitType : ScenarioObjective.TimeLimitType.values()) {
+        for (TimeLimitType timeLimitType : TimeLimitType.values()) {
             cboTimeScaling.addItem(timeLimitType);
         }
         cboTimeScaling.addActionListener(e -> this.updateTimeLimitUI());
@@ -481,7 +483,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
     private void switchNumberModel() {
         int value = (int) spnAmount.getValue();
-        if(cboCountType.getSelectedItem() == ScenarioObjective.ObjectiveAmountType.Percentage) {
+        if(cboCountType.getSelectedItem() == ObjectiveAmountType.Percentage) {
             if(value > 100) {
                 value = 100;
             }
@@ -499,11 +501,11 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     private void addEffect() {
 
         ObjectiveEffect effect = new ObjectiveEffect();
-        effect.howMuch = (int) spnScore.getValue();;
-        effect.effectScaling = (ObjectiveEffect.EffectScalingType) cboScalingType.getSelectedItem();
-        effect.effectType = (ObjectiveEffect.ObjectiveEffectType) cboEffectType.getSelectedItem();
+        effect.howMuch = (int) spnScore.getValue();
+        effect.effectScaling = (EffectScalingType) cboScalingType.getSelectedItem();
+        effect.effectType = (ObjectiveEffectType) cboEffectType.getSelectedItem();
 
-        if (cboEffectCondition.getSelectedItem() == ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess) {
+        if (cboEffectCondition.getSelectedItem() == ObjectiveEffectConditionType.ObjectiveSuccess) {
             successEffectsModel.addElement(effect);
             successEffects.repaint();
         } else {
@@ -513,11 +515,11 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         pack();
     }
 
-    private void removeEffect(ObjectiveEffect.ObjectiveEffectConditionType conditionType) {
+    private void removeEffect(ObjectiveEffectConditionType conditionType) {
         JList<ObjectiveEffect> targetList;
         DefaultListModel<ObjectiveEffect> modelToUpdate;
 
-        if (conditionType == ObjectiveEffect.ObjectiveEffectConditionType.ObjectiveSuccess) {
+        if (conditionType == ObjectiveEffectConditionType.ObjectiveSuccess) {
             targetList = successEffects;
             modelToUpdate = (DefaultListModel<ObjectiveEffect>) successEffects.getModel();
             btnRemoveSuccess.setEnabled(false);
@@ -556,7 +558,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void setDirectionDropdownVisibility() {
-        switch ((ScenarioObjective.ObjectiveCriterion) cboObjectiveType.getSelectedItem()) {
+        switch ((ObjectiveCriterion) cboObjectiveType.getSelectedItem()) {
             case PreventReachMapEdge:
             case ReachMapEdge:
                 cboDirection.setVisible(true);
@@ -568,8 +570,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void updateTimeLimitUI() {
-        boolean enable = !cboTimeScaling.getSelectedItem().equals(ScenarioObjective.TimeLimitType.None);
-
+        boolean enable = !cboTimeScaling.getSelectedItem().equals(TimeLimitType.None);
         spnTimeLimit.setEnabled(enable);
         cboTimeLimitDirection.setEnabled(enable);
     }
@@ -579,10 +580,10 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
     }
 
     private void saveObjectiveAndClose() {
-        objective.setObjectiveCriterion((ScenarioObjective.ObjectiveCriterion) cboObjectiveType.getSelectedItem());
+        objective.setObjectiveCriterion((ObjectiveCriterion) cboObjectiveType.getSelectedItem());
         objective.setDescription(txtShortDescription.getText());
         int number = (int) spnAmount.getValue();
-        if (cboCountType.getSelectedItem().equals(ScenarioObjective.ObjectiveAmountType.Percentage)) {
+        if (cboCountType.getSelectedItem().equals(ObjectiveAmountType.Percentage)) {
             objective.setPercentage(number);
             objective.setFixedAmount(null);
         } else {
@@ -617,9 +618,9 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         }
 
         int timeLimit = (int) spnTimeLimit.getValue();
-        objective.setTimeLimitType((ScenarioObjective.TimeLimitType) cboTimeScaling.getSelectedItem());
+        objective.setTimeLimitType((TimeLimitType) cboTimeScaling.getSelectedItem());
         if (spnTimeLimit.isEnabled()) {
-            if (objective.getTimeLimitType() == ScenarioObjective.TimeLimitType.ScaledToPrimaryUnitCount) {
+            if (objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
                 objective.setTimeLimitScaleFactor(timeLimit);
             } else {
                 objective.setTimeLimit(timeLimit);

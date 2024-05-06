@@ -18,19 +18,20 @@
  */
 package mekhq.gui.model;
 
-import megamek.common.Entity;
-import mekhq.campaign.mission.Loot;
 import mekhq.campaign.mission.ObjectiveEffect;
 import mekhq.campaign.mission.ScenarioObjective;
-import mekhq.campaign.parts.Part;
+import mekhq.campaign.mission.ScenarioObjective.ObjectiveAmountType;
+import mekhq.campaign.mission.ScenarioObjective.TimeLimitType;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * TableModel for displaying information about a scenario objective
+ */
 public class ObjectiveTableModel extends AbstractTableModel {
     //region Variable Declarations
     protected String[] columnNames;
@@ -94,20 +95,20 @@ public class ObjectiveTableModel extends AbstractTableModel {
             case COL_CRITERION:
                 return objective.getObjectiveCriterion().toString();
             case COL_AMOUNT:
-                return objective.getAmountType().equals(ScenarioObjective.ObjectiveAmountType.Percentage) ?
+                return objective.getAmountType().equals(ObjectiveAmountType.Percentage) ?
                         objective.getPercentage() + "%" : objective.getAmount() + " units";
             case COL_TIME:
-                if(objective.getTimeLimitType().equals(ScenarioObjective.TimeLimitType.None)) {
+                if(objective.getTimeLimitType().equals(TimeLimitType.None)) {
                     return "None";
                 }
                 String timeDirection = objective.isTimeLimitAtMost() ? "At most " : "At least ";
-                return objective.getTimeLimitType().equals(ScenarioObjective.TimeLimitType.Fixed) ?
+                return objective.getTimeLimitType().equals(TimeLimitType.Fixed) ?
                         timeDirection + objective.getTimeLimit() + " turns" :
-                        timeDirection + "(" + objective.getTimeLimitScaleFactor() + "x unit count) turns";
+                        timeDirection + '(' + objective.getTimeLimitScaleFactor() + "x unit count) turns";
             case COL_SUCCESS_EFFECT:
-                return Integer.toString(objective.getSuccessEffects().size()) + " Effect(s)";
+                return objective.getSuccessEffects().size() + " Effect(s)";
             case COL_FAILURE_EFFECT:
-                return Integer.toString(objective.getFailureEffects().size()) + " Effect(s)";
+                return objective.getFailureEffects().size() + " Effect(s)";
             default:
                 return "?";
         }
@@ -125,7 +126,10 @@ public class ObjectiveTableModel extends AbstractTableModel {
     }
 
     public int getAlignment(int col) {
-        return SwingConstants.LEFT;
+        switch (col) {
+            default:
+                return SwingConstants.LEFT;
+        }
     }
 
     public String getTooltip(int row, int col) {
@@ -167,8 +171,8 @@ public class ObjectiveTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
-    public ObjectiveTableModel.Renderer getRenderer() {
-        return new ObjectiveTableModel.Renderer();
+    public Renderer getRenderer() {
+        return new Renderer();
     }
 
     public class Renderer extends DefaultTableCellRenderer {

@@ -123,7 +123,7 @@ public class BotForce implements IPlayerSettings {
         copy.setCamouflage(this.getCamouflage().clone());
         copy.setColour(this.getColour());
         copy.setTemplateName(this.getTemplateName());
-        if(this.getBotForceRandomizer() != null) {
+        if (this.getBotForceRandomizer() != null) {
             copy.setBotForceRandomizer(this.getBotForceRandomizer().clone());
         }
         // UUID is immutable so this should work

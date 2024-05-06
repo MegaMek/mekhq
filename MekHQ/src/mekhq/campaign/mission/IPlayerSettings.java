@@ -22,25 +22,25 @@ package mekhq.campaign.mission;
 
 /**
  * This interface allows to identify classes that track player information like deployment, initiative bonuses,
- * minefields, etc, so we can identify getter and setter methods across these types. Currently, that applies to
+ * minefields, etc., so we can identify getter and setter methods across these types. Currently, that applies to
  * Scenario and BotForce.
  */
 public interface IPlayerSettings {
 
     // deployment information
-    public int getStartingPos();
-    public void setStartingPos(int i);
-    public int getStartWidth();
-    public void setStartWidth(int i);
-    public int getStartOffset();
-    public void setStartOffset(int i);
-    public int getStartingAnyNWx();
-    public void setStartingAnyNWx(int i);
-    public int getStartingAnyNWy();
-    public void setStartingAnyNWy(int i);
-    public int getStartingAnySEx();
-    public void setStartingAnySEx(int i);
-    public int getStartingAnySEy();
-    public void setStartingAnySEy(int i);
+    int getStartingPos();
+    void setStartingPos(int i);
+    int getStartWidth();
+    void setStartWidth(int i);
+    int getStartOffset();
+    void setStartOffset(int i);
+    int getStartingAnyNWx();
+    void setStartingAnyNWx(int i);
+    int getStartingAnyNWy();
+    void setStartingAnyNWy(int i);
+    int getStartingAnySEx();
+    void setStartingAnySEx(int i);
+    int getStartingAnySEy();
+    void setStartingAnySEy(int i);
 
 }

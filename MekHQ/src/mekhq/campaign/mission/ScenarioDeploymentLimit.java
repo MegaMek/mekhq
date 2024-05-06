@@ -355,7 +355,7 @@ public class ScenarioDeploymentLimit {
                 personNames.add(p.getFullName());
             }
         }
-        if(personNames.isEmpty()) {
+        if (personNames.isEmpty()) {
             return "None";
         }
         return String.join(", ", personNames);
@@ -419,7 +419,7 @@ public class ScenarioDeploymentLimit {
                 unitNames.add(u.getName());
             }
         }
-        if(unitNames.isEmpty()) {
+        if (unitNames.isEmpty()) {
             return "None";
         }
         return String.join(", ", unitNames);

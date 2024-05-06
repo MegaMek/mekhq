@@ -23,7 +23,6 @@ package mekhq.gui.dialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.PlanetaryConditionsDialog;
-import megamek.client.ui.swing.lobby.PlayerSettingsDialog;
 import megamek.common.Player;
 import megamek.common.planetaryconditions.PlanetaryConditions;
 import mekhq.MekHQ;
@@ -109,8 +108,6 @@ public class CustomizeScenarioDialog extends JDialog {
     private JLabel lblAtmosphereDesc;
     private JLabel lblWeatherDesc;
     private JLabel lblFogDesc;
-    private JLabel lblBlowingSandDesc;
-    private JLabel lblEMIDesc;
     private JLabel lblTemperatureDesc;
     private JLabel lblGravityDesc;
     private JLabel lblOtherConditionsDesc;
@@ -129,22 +126,15 @@ public class CustomizeScenarioDialog extends JDialog {
     // buttons
     private JButton btnDate;
     private JButton btnDeployment;
-    private JButton btnPlanetaryConditions;
-    private JButton btnMapSettings;
-    private JButton btnAddLoot;
     private JButton btnEditLoot;
     private JButton btnDeleteLoot;
 
-    private JButton btnAddObjective;
     private JButton btnEditObjective;
     private JButton btnDeleteObjective;
-    private JButton btnAddForce;
     private JButton btnEditForce;
     private JButton btnDeleteForce;
-    private JButton btnClose;
-    private JButton btnOK;
 
-    //region markdown editors
+    // markdown editors
     private MarkdownEditorPanel txtDesc;
     private MarkdownEditorPanel txtReport;
     //endregion Variable declarations
@@ -217,7 +207,6 @@ public class CustomizeScenarioDialog extends JDialog {
         JPanel panWrite = new JPanel(new GridBagLayout());
         JPanel panBtn = new JPanel(new GridLayout(0,2));
 
-        // region Set up info panel
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -290,7 +279,7 @@ public class CustomizeScenarioDialog extends JDialog {
             gbc.gridwidth = 1;
 
             modifierBox = new JComboBox<>();
-            EventTiming scenarioState = ((AtBDynamicScenario) scenario).getNumBots() > 0 ?
+            EventTiming scenarioState = scenario.getNumBots() > 0 ?
                     EventTiming.PostForceGeneration : EventTiming.PreForceGeneration;
 
             for (String modifierKey : AtBScenarioModifier.getOrderedModifierKeys()) {
@@ -322,8 +311,6 @@ public class CustomizeScenarioDialog extends JDialog {
         gbc.gridy++;
         panInfo.add(panMap, gbc);
 
-        // endregion Set up info panel
-
         initObjectivesPanel(resourceMap);
         panObjectives.setPreferredSize(new Dimension(400,150));
         panObjectives.setMinimumSize(new Dimension(400,150));
@@ -345,7 +332,6 @@ public class CustomizeScenarioDialog extends JDialog {
         panOtherForces.setPreferredSize(new Dimension(600,250));
         panOtherForces.setMinimumSize(new Dimension(600,250));
 
-        // region Set up writing panel
         txtDesc = new MarkdownEditorPanel("Description");
         txtDesc.setText(scenario.getDescription());
         txtDesc.setMinimumSize(new Dimension(400, 100));
@@ -377,9 +363,7 @@ public class CustomizeScenarioDialog extends JDialog {
             panWrite.add(txtReport, gbc);
             txtReport.setEnabled(!scenario.getStatus().isCurrent());
         }
-        // endregion Set up writing panel
 
-        // region Set up buttons
         if (newScenario && (mission instanceof AtBContract)) {
             JButton btnLoad = new JButton("Generate From Template");
             btnLoad.addActionListener(this::btnLoadActionPerformed);
@@ -389,7 +373,7 @@ public class CustomizeScenarioDialog extends JDialog {
                 (scenario.getStatus().isCurrent())) {
             JButton btnFinalize = new JButton();
 
-            if (((AtBDynamicScenario) scenario).getNumBots() > 0) {
+            if (scenario.getNumBots() > 0) {
                 btnFinalize.setText("Regenerate Bot Forces");
             } else {
                 btnFinalize.setText("Generate Bot Forces");
@@ -399,16 +383,14 @@ public class CustomizeScenarioDialog extends JDialog {
             panBtn.add(btnFinalize);
         }
 
-        btnOK = new JButton(resourceMap.getString("btnOkay.text"));
+        JButton btnOK = new JButton(resourceMap.getString("btnOkay.text"));
         btnOK.addActionListener(this::btnOKActionPerformed);
         panBtn.add(btnOK);
 
-        btnClose = new JButton(resourceMap.getString("btnCancel.text"));
+        JButton btnClose = new JButton(resourceMap.getString("btnCancel.text"));
         btnClose.addActionListener(this::btnCloseActionPerformed);
         panBtn.add(btnClose);
-        //endregion Set up buttons
 
-        // layout main panel
         getContentPane().add(panMain, BorderLayout.CENTER);
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
 
@@ -631,7 +613,7 @@ public class CustomizeScenarioDialog extends JDialog {
     }
 
     private void refreshDeploymentLimits() {
-        if(deploymentLimits != null) {
+        if (deploymentLimits != null) {
             lblAllowedUnitsDesc.setText("<html>" + deploymentLimits.getAllowedUnitTypeDesc() + "</html>");
             lblQuantityLimitDesc.setText("<html>" +deploymentLimits.getQuantityLimitDesc(scenario, campaign) + "</html>");
             lblRequiredPersonnelDesc.setText("<html>" + deploymentLimits.getRequiredPersonnelDesc(campaign) + "</html>");
@@ -662,7 +644,7 @@ public class CustomizeScenarioDialog extends JDialog {
                 BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("panPlanetaryConditions.title"))));
 
-        btnPlanetaryConditions = new JButton(resourceMap.getString("btnPlanetaryConditions.text"));
+        JButton btnPlanetaryConditions = new JButton(resourceMap.getString("btnPlanetaryConditions.text"));
         btnPlanetaryConditions.addActionListener(evt -> changePlanetaryConditions());
         btnPlanetaryConditions.setEnabled(scenario.getStatus().isCurrent());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -803,7 +785,7 @@ public class CustomizeScenarioDialog extends JDialog {
                 BorderFactory.createEmptyBorder(0, 0, 10, 0),
                 BorderFactory.createTitledBorder(resourceMap.getString("panMap.title"))));
 
-        btnMapSettings = new JButton(resourceMap.getString("btnMapSettings.text"));
+        JButton btnMapSettings = new JButton(resourceMap.getString("btnMapSettings.text"));
         btnMapSettings.addActionListener(evt -> changeMapSettings());
         btnMapSettings.setEnabled(scenario.getStatus().isCurrent());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -890,7 +872,7 @@ public class CustomizeScenarioDialog extends JDialog {
         panObjectives = new JPanel(new BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
-        btnAddObjective = new JButton(resourceMap.getString("btnAddObjective.text"));
+        JButton btnAddObjective = new JButton(resourceMap.getString("btnAddObjective.text"));
         btnAddObjective.addActionListener(evt -> addObjective());
         btnAddObjective.setEnabled(scenario.getStatus().isCurrent());
         panBtns.add(btnAddObjective);
@@ -978,7 +960,7 @@ public class CustomizeScenarioDialog extends JDialog {
         panLoot = new JPanel(new BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
-        btnAddLoot = new JButton(resourceMap.getString("btnAddLoot.text"));
+        JButton btnAddLoot = new JButton(resourceMap.getString("btnAddLoot.text"));
         btnAddLoot.addActionListener(evt -> addLoot());
         btnAddLoot.setEnabled(scenario.getStatus().isCurrent());
         panBtns.add(btnAddLoot);
@@ -1059,7 +1041,7 @@ public class CustomizeScenarioDialog extends JDialog {
         panOtherForces = new JPanel(new BorderLayout());
 
         JPanel panBtns = new JPanel(new GridLayout(1,0));
-        btnAddForce = new JButton(resourceMap.getString("btnAddForce.text"));
+        JButton btnAddForce = new JButton(resourceMap.getString("btnAddForce.text"));
         btnAddForce.addActionListener(evt -> addForce());
         btnAddForce.setEnabled(scenario.getStatus().isCurrent());
         panBtns.add(btnAddForce);
@@ -1110,14 +1092,12 @@ public class CustomizeScenarioDialog extends JDialog {
     private void editForce() {
         BotForce bf = forcesModel.getBotForceAt(forcesTable.getSelectedRow());
         String nameOld = bf.getName();
-        if (null != bf) {
-            CustomizeBotForceDialog cbfd = new CustomizeBotForceDialog(frame, true, bf, campaign);
-            cbfd.setVisible(true);
-            refreshForcesTable();
-            if(!bf.getName().equals(nameOld)) {
-                checkForceRename(nameOld, bf.getName());
-                refreshObjectiveTable();
-            }
+        CustomizeBotForceDialog cbfd = new CustomizeBotForceDialog(frame, true, bf, campaign);
+        cbfd.setVisible(true);
+        refreshForcesTable();
+        if (!bf.getName().equals(nameOld)) {
+            checkForceRename(nameOld, bf.getName());
+            refreshObjectiveTable();
         }
     }
 
@@ -1151,8 +1131,8 @@ public class CustomizeScenarioDialog extends JDialog {
      * If a force was renamed, we need to change its name in any corresponding scenario objectives
      */
     private void checkForceRename(String nameOld, String nameNew) {
-        for(ScenarioObjective objective : objectives) {
-            if(objective.getAssociatedForceNames().contains(nameOld)) {
+        for (ScenarioObjective objective : objectives) {
+            if (objective.getAssociatedForceNames().contains(nameOld)) {
                 objective.removeForce(nameOld);
                 objective.addForce(nameNew);
             }
@@ -1163,7 +1143,7 @@ public class CustomizeScenarioDialog extends JDialog {
      * If a force is deleted, check scenario objectives and remove it there as well
      */
     private void checkForceDelete(String nameRemove) {
-        for(ScenarioObjective objective : objectives) {
+        for (ScenarioObjective objective : objectives) {
             if (objective.getAssociatedForceNames().contains(nameRemove)) {
                 objective.removeForce(nameRemove);
             }

@@ -18,7 +18,6 @@
  */
 package mekhq.gui.dialog;
 
-import megamek.client.ui.swing.lobby.ChatLounge;
 import megamek.client.ui.swing.lobby.LobbyUtility;
 import megamek.client.ui.swing.minimap.Minimap;
 import megamek.common.Board;
@@ -34,9 +33,6 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageFilter;
-import java.awt.image.ImageProducer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,14 +42,9 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import static megamek.client.ui.swing.lobby.LobbyUtility.drawMinimapLabel;
-import static megamek.client.ui.swing.util.UIUtil.scaleStringForGUI;
 
 public class EditMapSettingsDialog extends JDialog {
 
-    private JFrame frame;
     private int mapSizeX;
     private int mapSizeY;
     private String map;
@@ -155,7 +146,7 @@ public class EditMapSettingsDialog extends JDialog {
         for (BoardDimensions size : GameManager.getBoardSizes()) {
             comboMapSize.addItem(size);
         }
-        if(mapSizeX > 0 & mapSizeY > 0) {
+        if (mapSizeX > 0 & mapSizeY > 0) {
             comboMapSize.setSelectedItem(new BoardDimensions(mapSizeX, mapSizeY));
         } else {
             // if no board size yet set, use the default
@@ -172,7 +163,7 @@ public class EditMapSettingsDialog extends JDialog {
         ArrayList<String> generators = new ArrayList<>();
         if (directoryListing != null) {
             for (File child : directoryListing) {
-                if(child.isFile()) {
+                if (child.isFile()) {
                     String s = child.getName().replace(".xml", "");
                     generators.add(s);
                 }
@@ -188,7 +179,7 @@ public class EditMapSettingsDialog extends JDialog {
         listFixedMaps.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         refreshBoardList();
 
-        if(usingFixedMap) {
+        if (usingFixedMap) {
             listFixedMaps.setSelectedValue(map, true);
             scrChooseMap.setViewportView(listFixedMaps);
         }  else {
@@ -196,7 +187,7 @@ public class EditMapSettingsDialog extends JDialog {
             scrChooseMap.setViewportView(listMapGenerators);
         }
 
-        comboBoardType = new JComboBox();
+        comboBoardType = new JComboBox<>();
         for (int i = Scenario.T_GROUND; i <= Scenario.T_SPACE; i++) {
             comboBoardType.addItem(Scenario.getBoardTypeName(i));
         }
@@ -224,7 +215,7 @@ public class EditMapSettingsDialog extends JDialog {
         gbc.weightx = 1.0;
         panMain.add(panSizeRandom, gbc);
         panMain.add(panSizeFixed, gbc);
-        if(usingFixedMap) {
+        if (usingFixedMap) {
             panSizeRandom.setVisible(false);
         } else {
             panSizeFixed.setVisible(false);
@@ -252,7 +243,7 @@ public class EditMapSettingsDialog extends JDialog {
     }
 
     private void changeBoardType() {
-        if(comboBoardType.getSelectedIndex() == Scenario.T_SPACE) {
+        if (comboBoardType.getSelectedIndex() == Scenario.T_SPACE) {
             checkFixed.setSelected(false);
             checkFixed.setEnabled(false);
             panSizeRandom.setVisible(true);
@@ -268,7 +259,7 @@ public class EditMapSettingsDialog extends JDialog {
     }
 
     private void changeMapType() {
-        if(checkFixed.isSelected()) {
+        if (checkFixed.isSelected()) {
             panSizeRandom.setVisible(false);
             panSizeFixed.setVisible(true);
             scrChooseMap.setViewportView(listFixedMaps);
@@ -294,14 +285,14 @@ public class EditMapSettingsDialog extends JDialog {
     public void done() {
         boardType = comboBoardType.getSelectedIndex();
         usingFixedMap = checkFixed.isSelected();
-        if(usingFixedMap) {
+        if (usingFixedMap) {
             map = listFixedMaps.getSelectedValue();
             BoardDimensions boardSize = (BoardDimensions) comboMapSize.getSelectedItem();
             mapSizeX = boardSize.width();
             mapSizeY = boardSize.height();
         } else {
             map = listMapGenerators.getSelectedValue();
-            if(listMapGenerators.getSelectedIndex() == 0) {
+            if (listMapGenerators.getSelectedIndex() == 0) {
                 map = null;
             }
             mapSizeX = (int) spnMapX.getValue();
@@ -364,7 +355,7 @@ public class EditMapSettingsDialog extends JDialog {
             // Found or created an icon; finish the panel
             setText("");
             if (listFixedMaps.isEnabled()) {
-                //setToolTipText(scaleStringForGUI(createBoardTooltip(board)));
+                setToolTipText(board);
             } else {
                 setToolTipText(null);
             }

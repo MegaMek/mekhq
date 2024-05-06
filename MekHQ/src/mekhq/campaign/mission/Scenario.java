@@ -636,33 +636,6 @@ public class Scenario implements IPlayerSettings {
         return stub;
     }
 
-    public BotForceStub generateBotStub(BotForce bf, Campaign c) {
-        List<String> stubs = generateEntityStub(bf.getFullEntityList(c));
-        return new BotForceStub("<html>" +
-                bf.getName() + " <i>" +
-                ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
-                " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStartingPos()] +
-                " Fixed BV: " + bf.getTotalBV(c) +
-                ((null == bf.getBotForceRandomizer()) ? "" : "<br>Random: " + bf.getBotForceRandomizer().getDescription(c)) +
-                "</html>", stubs);
-    }
-
-    public List<String> generateEntityStub(List<Entity> entities) {
-        List<String> stub = new ArrayList<>();
-        for (Entity en : entities) {
-            if (null == en) {
-                stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
-            } else {
-                stub.add("<html>" + en.getCrew().getName() + " (" +
-                        en.getCrew().getGunnery() + "/" +
-                        en.getCrew().getPiloting() + "), " +
-                        "<i>" + en.getShortName() + "</i>" +
-                        "</html>");
-            }
-        }
-        return stub;
-    }
-
     public boolean isAssigned(Unit unit, Campaign campaign) {
         for (UUID uid : getForces(campaign).getAllUnits(true)) {
             if (uid.equals(unit.getId())) {

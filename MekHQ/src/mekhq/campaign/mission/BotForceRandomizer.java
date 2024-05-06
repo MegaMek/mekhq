@@ -231,7 +231,7 @@ public class BotForceRandomizer {
      *                    is used to determine the total points allowed for this force.
      * @param botFixedEntities A List of The fixed Entities that might have also been declared in BotForce already.
      *                         This is used to calculate the starting points already used when generating the force.
-     * @param Campaign A Campaign object which is necessary for various information
+     * @param campaign A Campaign object which is necessary for various information
      * @return A List of Entities that will be added to the game by GameThread.
      */
     public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities, Campaign campaign) {
@@ -568,7 +568,7 @@ public class BotForceRandomizer {
         return sumWeightClass / ((double) nUnits);
     }
 
-    public String getShortDescription(Campaign campaign) {
+    public String getShortDescription() {
         StringBuilder sb = new StringBuilder();
         sb.append(forceMultiplier);
         sb.append(" (");
