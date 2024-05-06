@@ -243,7 +243,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
 
         getContentPane().add(panMain, BorderLayout.CENTER);
 
-        JPanel panButtons = new JPanel(new GridLayout(0, 2));
+        JPanel panButtons = new JPanel(new FlowLayout());
         JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));
         btnCancel.addActionListener(e -> this.setVisible(false));
         JButton btnOK = new JButton(resourceMap.getString("btnOK.text"));

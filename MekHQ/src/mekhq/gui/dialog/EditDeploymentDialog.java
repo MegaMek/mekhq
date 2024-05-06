@@ -129,7 +129,7 @@ public class EditDeploymentDialog extends JDialog {
         getContentPane().add(main, BorderLayout.CENTER);
         getContentPane().add(panStartButtons, BorderLayout.PAGE_START);
 
-        JPanel panButtons = new JPanel(new GridLayout(0, 2));
+        JPanel panButtons = new JPanel(new FlowLayout());
         JButton btnOK = new JButton(resourceMap.getString("btnOK.text"));
         btnOK.addActionListener(this::done);
         JButton btnCancel = new JButton(resourceMap.getString("btnCancel.text"));

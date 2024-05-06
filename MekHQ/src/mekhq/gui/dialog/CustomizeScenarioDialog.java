@@ -209,7 +209,7 @@ public class CustomizeScenarioDialog extends JDialog {
         JPanel panMain = new JPanel(new GridBagLayout());
         JPanel panInfo = new JPanel(new GridBagLayout());
         JPanel panWrite = new JPanel(new GridBagLayout());
-        JPanel panBtn = new JPanel(new GridLayout(0,2));
+        JPanel panBtn = new JPanel(new FlowLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;

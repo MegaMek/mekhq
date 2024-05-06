@@ -118,7 +118,7 @@ public class EditMapSettingsDialog extends JDialog {
         JPanel panMain = new JPanel(new GridBagLayout());
         panSizeRandom = new JPanel(new GridBagLayout());
         panSizeFixed = new JPanel(new BorderLayout());
-        JPanel panButtons = new JPanel(new GridLayout(0, 2));
+        JPanel panButtons = new JPanel(new FlowLayout());
 
         scrChooseMap = new JScrollPane();
         scrChooseMap.setMinimumSize(new Dimension(600, 800));

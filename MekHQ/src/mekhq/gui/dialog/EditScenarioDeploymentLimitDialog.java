@@ -64,7 +64,7 @@ public class EditScenarioDeploymentLimitDialog extends JDialog {
 
         getContentPane().setLayout(new BorderLayout());
         JPanel panMain = new JPanel(new GridBagLayout());
-        JPanel panButtons = new JPanel(new GridLayout(0, 2));
+        JPanel panButtons = new JPanel(new FlowLayout());
 
         GridBagConstraints leftGbc = new GridBagConstraints();
         leftGbc.gridx = 0;

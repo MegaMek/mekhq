@@ -133,7 +133,7 @@ public class CustomizeBotForceDialog  extends JDialog {
         getContentPane().add(panLeft, BorderLayout.WEST);
         getContentPane().add(panCenter, BorderLayout.CENTER);
 
-        JPanel panButtons = new JPanel(new GridLayout(0, 2));
+        JPanel panButtons = new JPanel(new FlowLayout());
         JButton btnOK = new JButton(resourceMap.getString("btnOK.text"));
         btnOK.addActionListener(this::done);
         JButton btnClose = new JButton(resourceMap.getString("btnClose.text"));
