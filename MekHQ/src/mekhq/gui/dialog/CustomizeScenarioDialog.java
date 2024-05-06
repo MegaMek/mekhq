@@ -200,7 +200,11 @@ public class CustomizeScenarioDialog extends JDialog {
                 MekHQ.getMHQOptions().getLocale());
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("Form");
-        setTitle(resourceMap.getString("title.new"));
+        if(newScenario) {
+            setTitle(resourceMap.getString("title.new"));
+        } else {
+            setTitle(resourceMap.getString("title"));
+        }
 
         JPanel panMain = new JPanel(new GridBagLayout());
         JPanel panInfo = new JPanel(new GridBagLayout());
@@ -290,7 +294,7 @@ public class CustomizeScenarioDialog extends JDialog {
             }
             panInfo.add(modifierBox, gbc);
 
-            JButton addEventButton = new JButton("Apply Modifier");
+            JButton addEventButton = new JButton(resourceMap.getString("addEventButton.text"));
             addEventButton.addActionListener(this::btnAddModifierActionPerformed);
             gbc.gridx = 1;
             panInfo.add(addEventButton, gbc);
@@ -316,14 +320,14 @@ public class CustomizeScenarioDialog extends JDialog {
         panObjectives.setPreferredSize(new Dimension(400,150));
         panObjectives.setMinimumSize(new Dimension(400,150));
         panObjectives.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Scenario Objectives"),
+                BorderFactory.createTitledBorder(resourceMap.getString("panObjectives.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 
         initLootPanel(resourceMap);
         panLoot.setPreferredSize(new Dimension(400,150));
         panLoot.setMinimumSize(new Dimension(400,150));
         panLoot.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Scenario Costs & Payouts"),
+                BorderFactory.createTitledBorder(resourceMap.getString("panLoot.title")),
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 
         initOtherForcesPanel(resourceMap);
@@ -333,7 +337,7 @@ public class CustomizeScenarioDialog extends JDialog {
         panOtherForces.setPreferredSize(new Dimension(600,250));
         panOtherForces.setMinimumSize(new Dimension(600,250));
 
-        txtDesc = new MarkdownEditorPanel("Description");
+        txtDesc = new MarkdownEditorPanel(resourceMap.getString("txtDesc.title"));
         txtDesc.setText(scenario.getDescription());
         txtDesc.setMinimumSize(new Dimension(400, 100));
         txtDesc.setPreferredSize(new Dimension(400, 250));
@@ -349,7 +353,7 @@ public class CustomizeScenarioDialog extends JDialog {
         panWrite.add(txtDesc, gbc);
 
         if (!scenario.getStatus().isCurrent()) {
-            txtReport = new MarkdownEditorPanel("After-Action Report");
+            txtReport = new MarkdownEditorPanel(resourceMap.getString("txtReport.title"));
             txtReport.setText(scenario.getReport());
             txtReport.setMinimumSize(new Dimension(400, 100));
             txtReport.setPreferredSize(new Dimension(400, 250));
@@ -546,11 +550,11 @@ public class CustomizeScenarioDialog extends JDialog {
                 BorderFactory.createTitledBorder(resourceMap.getString("panDeploymentLimits.title"))));
 
         JPanel panButtons = new JPanel(new GridLayout(0, 2));
-        JButton btnEditLimits = new JButton("Edit Limits");
+        JButton btnEditLimits = new JButton(resourceMap.getString("btnEditLimits.text"));
         btnEditLimits.setEnabled(scenario.getStatus().isCurrent());
         btnEditLimits.addActionListener(this::editLimits);
         panButtons.add(btnEditLimits);
-        JButton btnRemoveLimits = new JButton("Remove Limits");
+        JButton btnRemoveLimits = new JButton(resourceMap.getString("btnRemoveLimits.text"));
         btnRemoveLimits.setEnabled(scenario.getStatus().isCurrent());
         btnRemoveLimits.addActionListener(this::removeLimits);
         panButtons.add(btnRemoveLimits);
