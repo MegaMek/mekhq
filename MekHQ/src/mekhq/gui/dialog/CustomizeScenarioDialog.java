@@ -735,7 +735,7 @@ public class CustomizeScenarioDialog extends JDialog {
         leftGbc.gridy = 1;
         panPlanetaryConditions.add(new JLabel(resourceMap.getString("lblTemperature.text")), leftGbc);
 
-        lblTemperatureDesc = new JLabel(PlanetaryConditions.getTemperatureDisplayableName(scenario.getModifiedTemperature()));
+        lblTemperatureDesc = new JLabel(PlanetaryConditions.getTemperatureDisplayableName(scenario.getTemperature()));
         rightGbc.gridx = 3;
         rightGbc.gridy = 1;
         rightGbc.gridwidth = 1;
