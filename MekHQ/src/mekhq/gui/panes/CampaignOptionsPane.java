@@ -4926,7 +4926,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblRandomXpRate = new JLabel(resources.getString("lblRandomXpRate.text"));
         lblRandomXpRate.setToolTipText(resources.getString("lblRandomXpRate.toolTip"));
         lblRandomXpRate.setName("lblRandomXpRate");
-        spnRandomXpRate = new JSpinner(new SpinnerNumberModel(1, 0, 10, 1));
+        spnRandomXpRate = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
         spnRandomXpRate.setToolTipText(resources.getString("lblRandomXpRate.toolTip"));
         spnRandomXpRate.setName("spnRandomXpRate");
 
@@ -5000,7 +5000,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblWarriorCasteDropOutChance = new JLabel(resources.getString("lblWarriorCasteDropOutChance.text"));
         lblWarriorCasteDropOutChance.setToolTipText(resources.getString("lblWarriorCasteDropOutChance.toolTip"));
         lblWarriorCasteDropOutChance.setName("lblWarriorCasteDropOutChance");
-        spnWarriorCasteDropOutChance = new JSpinner(new SpinnerNumberModel(250, 0, 100000, 1));
+        spnWarriorCasteDropOutChance = new JSpinner(new SpinnerNumberModel(500, 0, 100000, 1));
         spnWarriorCasteDropOutChance.setToolTipText(resources.getString("lblWarriorCasteDropOutChance.toolTip"));
         spnWarriorCasteDropOutChance.setName("spnWarriorCasteDropOutChance");
 
@@ -5158,7 +5158,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblFallbackScientist = new JLabel(resources.getString("lblFallbackScientist.text"));
         lblFallbackScientist.setToolTipText(resources.getString("lblFallbackScientist.toolTip"));
         lblFallbackScientist.setName("lblFallbackScientist");
-        spnFallbackScientist = new JSpinner(new SpinnerNumberModel(4, 0, 1000, 1));
+        spnFallbackScientist = new JSpinner(new SpinnerNumberModel(6, 0, 1000, 1));
         spnFallbackScientist.setToolTipText(resources.getString("lblFallbackScientist.toolTip"));
         spnFallbackScientist.setName("spnFallbackScientist");
 
@@ -5172,14 +5172,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblFallbackTechnician = new JLabel(resources.getString("lblFallbackTechnician.text"));
         lblFallbackTechnician.setToolTipText(resources.getString("lblFallbackTechnician.toolTip"));
         lblFallbackTechnician.setName("lblFallbackTechnician");
-        spnFallbackTechnician = new JSpinner(new SpinnerNumberModel(4, 0, 1000, 1));
+        spnFallbackTechnician = new JSpinner(new SpinnerNumberModel(5, 0, 1000, 1));
         spnFallbackTechnician.setToolTipText(resources.getString("lblFallbackTechnician.toolTip"));
         spnFallbackTechnician.setName("spnFallbackTechnician");
 
         lblFallbackLabor = new JLabel(resources.getString("lblFallbackLabor.text"));
         lblFallbackLabor.setToolTipText(resources.getString("lblFallbackLabor.toolTip"));
         lblFallbackLabor.setName("lblFallbackLabor");
-        spnFallbackLabor = new JSpinner(new SpinnerNumberModel(30, 0, 1000, 1));
+        spnFallbackLabor = new JSpinner(new SpinnerNumberModel(31, 0, 1000, 1));
         spnFallbackLabor.setToolTipText(resources.getString("lblFallbackLabor.toolTip"));
         spnFallbackLabor.setName("spnFallbackLabor");
 

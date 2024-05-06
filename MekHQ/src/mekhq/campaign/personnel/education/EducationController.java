@@ -87,6 +87,7 @@ public class EducationController {
      *                 This parameter can be null if the academy is not a Clan Sibko.
      */
     public static void enrollPerson(Campaign campaign, Person person, Academy academy, String campus, String faction, Integer courseIndex) {
+        // change status will wipe the academic information, so must always precede the setters
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
 
         person.setEduAcademySet(academy.getSet());
@@ -551,7 +552,7 @@ public class EducationController {
      * @param academyNameInSet The academy name in the set to match.
      * @return The Academy that matches the provided parameters or null if no match is found.
      */
-    private static Academy getAcademy(String academySetName, String academyNameInSet) {
+    public static Academy getAcademy(String academySetName, String academyNameInSet) {
 
         List<String> setNames = AcademyFactory.getInstance().getAllSetNames();
 
@@ -854,6 +855,7 @@ public class EducationController {
                         .replaceAll("0", resources.getString("graduatedLabor.text")) + resources.getString("washoutLabor.text"));
 
                 person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
+                person.setEduDaysOfEducation(0);
                 break;
             default:
                 throw new IllegalStateException("Unexpected Clan Sibko Course Index: " + person.getEduCourseIndex());
@@ -923,6 +925,7 @@ public class EducationController {
                 } else {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestructionKilled.text"));
                     person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
+                    person.setEduDaysOfEducation(0);
                 }
             } else {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
@@ -1614,7 +1617,7 @@ public class EducationController {
                     bonus = person.getSkill(skillParsed).getBonus();
 
                     int skillLevel = 0;
-                    while (person.getSkill(skillParsed).getExperienceLevel() < educationLevel) {
+                    while (person.getSkill(skillParsed).getExperienceLevel() < (educationLevel + bonus)) {
                         person.addSkill(skillParsed, skillLevel, bonus);
                         skillLevel++;
                     }
@@ -1651,7 +1654,7 @@ public class EducationController {
 
                 // if 'person' already has a +1 bonus for the skill, we give them XP, instead
                 if (person.getSkill(skillParsed).getBonus() < 1) {
-                    int skillLevel = person.getSkillLevel(skillParsed);
+                    int skillLevel = person.getSkill(skillParsed).getLevel();
                     int bonus = person.getSkill(skillParsed).getBonus() + 1;
 
                     person.addSkill(skillParsed, skillLevel, bonus);
@@ -1659,11 +1662,20 @@ public class EducationController {
                     campaign.addReport(resources.getString("bonusAdded.text")
                             .replaceAll("0", person.getFirstName()));
                 } else {
-                    person.awardXP(campaign, Compute.d6(2));
+                    roll = Compute.d6(2);
+                    person.awardXP(campaign, roll);
+
+                    campaign.addReport(resources.getString("bonusXp.text")
+                            .replaceAll("0", person.getFirstName())
+                            .replaceAll("1", String.valueOf(roll)));
                 }
             } catch (Exception e) {
                 // if we get this, it means the 'skill' was Bonus XP
                 person.awardXP(campaign, Compute.d6(2));
+
+                campaign.addReport(resources.getString("bonusXp.text")
+                        .replaceAll("0", person.getFirstName())
+                        .replaceAll("1", String.valueOf(roll)));
             }
         }
     }

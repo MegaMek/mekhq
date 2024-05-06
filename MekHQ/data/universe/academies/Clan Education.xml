@@ -59,11 +59,8 @@
         <qualification>Merchant Caste Apprenticeship</qualification>
         <curriculum>Administration, Negotiation, Scrounge, Leadership</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Apprenticeship [with BA]</qualification>
+        <qualification>Technician Caste Apprenticeship</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
-        <qualificationStartYear>2868</qualificationStartYear>
-        <qualification>Technician Caste Apprenticeship [without BA]</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Labour Caste Apprenticeship</qualification>
         <curriculum>Astech, Medtech</curriculum>
@@ -109,10 +106,7 @@
         <qualification>Merchant Caste Apprenticeship</qualification>
         <curriculum>Administration, Negotiation, Scrounge, Leadership</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Apprenticeship [with BA]</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
-        <qualificationStartYear>2868</qualificationStartYear>
-        <qualification>Technician Caste Apprenticeship [without BA]</qualification>
+        <qualification>Technician Caste Apprenticeship</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Labour Caste Apprenticeship</qualification>
@@ -136,11 +130,8 @@
         <qualification>Merchant Caste Reeducation</qualification>
         <curriculum>Administration, Negotiation, Scrounge</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Reeducation [with BA]</qualification>
+        <qualification>Technician Caste Reeducation</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
-        <qualificationStartYear>2868</qualificationStartYear>
-        <qualification>Technician Caste Reeducation [without BA]</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Labour Caste Reeducation</qualification>
         <curriculum>Astech, Medtech</curriculum>
@@ -163,11 +154,8 @@
         <qualification>Merchant Caste Reeducation</qualification>
         <curriculum>Administration, Negotiation, Scrounge</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Reeducation [with BA]</qualification>
+        <qualification>Technician Caste Reeducation</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
-        <qualificationStartYear>2868</qualificationStartYear>
-        <qualification>Technician Caste Reeducation [without BA]</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Labour Caste Reeducation</qualification>
         <curriculum>Astech, Medtech</curriculum>

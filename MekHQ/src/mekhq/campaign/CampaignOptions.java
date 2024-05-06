@@ -797,17 +797,17 @@ public class CampaignOptions {
         setEnableBonuses(true);
         setAdultDropoutChance(1000);
         setChildrenDropoutChance(10000);
-        setWarriorCasteDropOutChance(250);
+        setWarriorCasteDropOutChance(500);
         setOtherCasteDropOutChance(5000);
         setAllAges(false);
         setMilitaryAcademyAccidents(10000);
         setWarriorCasteAccidents(250);
         setOtherCasteAccidents(5000);
         setLiveFireBlooding(true);
-        setFallbackScientist(4);
+        setFallbackScientist(6);
         setFallbackMerchant(12);
-        setFallbackTechnician(4);
-        setFallbackLabor(30);
+        setFallbackTechnician(5);
+        setFallbackLabor(31);
 
         // Death
         setKeepMarriedNameUponSpouseDeath(true);
