@@ -3518,7 +3518,9 @@ public class Campaign implements ITechManager {
 
         processNewDayPersonnel();
 
-        EducationController.processNewDay(this);
+        if (campaignOptions.isUseEducationModule()) {
+            EducationController.processNewDay(this);
+        }
 
         resetAstechMinutes();
 
