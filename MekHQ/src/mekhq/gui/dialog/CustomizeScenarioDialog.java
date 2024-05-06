@@ -267,6 +267,7 @@ public class CustomizeScenarioDialog extends JDialog {
         panInfo.add(new JLabel(resourceMap.getString("lblDeployment.text")), gbc);
 
         btnDeployment = new JButton(Utilities.getDeploymentString(player));
+        btnDeployment.setEnabled(scenario.getStatus().isCurrent());
         btnDeployment.addActionListener(evt -> changeDeployment());
         gbc.gridx = 1;
         gbc.gridwidth = 1;
@@ -546,9 +547,11 @@ public class CustomizeScenarioDialog extends JDialog {
 
         JPanel panButtons = new JPanel(new GridLayout(0, 2));
         JButton btnEditLimits = new JButton("Edit Limits");
+        btnEditLimits.setEnabled(scenario.getStatus().isCurrent());
         btnEditLimits.addActionListener(this::editLimits);
         panButtons.add(btnEditLimits);
         JButton btnRemoveLimits = new JButton("Remove Limits");
+        btnRemoveLimits.setEnabled(scenario.getStatus().isCurrent());
         btnRemoveLimits.addActionListener(this::removeLimits);
         panButtons.add(btnRemoveLimits);
         GridBagConstraints gbc = new GridBagConstraints();
