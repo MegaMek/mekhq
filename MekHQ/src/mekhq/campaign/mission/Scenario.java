@@ -101,7 +101,6 @@ public class Scenario implements IPlayerSettings {
     protected Fog fog;
     protected Atmosphere atmosphere;
     private int temperature;
-    private int modifiedTemperature;
     protected float gravity;
     private EMI emi;
     private BlowingSand blowingSand;
@@ -398,14 +397,6 @@ public class Scenario implements IPlayerSettings {
         this.temperature = temperature;
     }
 
-    public int getModifiedTemperature() {
-        return modifiedTemperature;
-    }
-
-    public void setModifiedTemperature(int modifiedTemperature) {
-        this.modifiedTemperature = modifiedTemperature;
-    }
-
     public float getGravity() {
         return gravity;
     }
@@ -457,7 +448,7 @@ public class Scenario implements IPlayerSettings {
         planetaryConditions.setWind(getWind());
         planetaryConditions.setFog(getFog());
         planetaryConditions.setAtmosphere(getAtmosphere());
-        planetaryConditions.setTemperature(getModifiedTemperature());
+        planetaryConditions.setTemperature(getTemperature());
         planetaryConditions.setGravity(getGravity());
         planetaryConditions.setEMI(getEMI());
         planetaryConditions.setBlowingSand(getBlowingSand());
