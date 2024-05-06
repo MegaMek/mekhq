@@ -761,8 +761,10 @@ public class Academy {
 
         if ((person.getEduHighestEducation() + educationLevelMin) >= educationLevelMax) {
             educationLevel = educationLevelMax;
-        } else {
+        } else if ((person.getEduHighestEducation() + educationLevelMin) == 0) {
             educationLevel = person.getEduHighestEducation() + educationLevelMin + 1;
+        } else {
+            educationLevel = person.getEduHighestEducation() + educationLevelMin;
         }
 
         return educationLevel;
@@ -896,7 +898,7 @@ public class Academy {
             try {
                 tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
             } catch (Exception e) {
-                tooltip.append(" (").append(resources.getString("destinationRedacted.text")).append(")<br>");
+                tooltip.append(resources.getString("destinationRedacted.text")).append(")<br>");
             }
         } else {
             tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");

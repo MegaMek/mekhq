@@ -59,12 +59,12 @@
         <qualification>Merchant Caste Apprenticeship</qualification>
         <curriculum>Administration, Negotiation, Scrounge, Leadership</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Apprenticeship [without BA]</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Technician Caste Apprenticeship [with BA]</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
         <qualificationStartYear>2868</qualificationStartYear>
+        <qualification>Technician Caste Apprenticeship [without BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Labour Caste Apprenticeship</qualification>
         <curriculum>Astech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
@@ -109,12 +109,12 @@
         <qualification>Merchant Caste Apprenticeship</qualification>
         <curriculum>Administration, Negotiation, Scrounge, Leadership</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Apprenticeship [without BA]</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Technician Caste Apprenticeship [with BA]</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
         <qualificationStartYear>2868</qualificationStartYear>
+        <qualification>Technician Caste Apprenticeship [without BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Labour Caste Apprenticeship</qualification>
         <curriculum>Astech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
@@ -136,12 +136,12 @@
         <qualification>Merchant Caste Reeducation</qualification>
         <curriculum>Administration, Negotiation, Scrounge</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Reeducation [without BA]</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Technician Caste Reeducation [with BA]</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
         <qualificationStartYear>2868</qualificationStartYear>
+        <qualification>Technician Caste Reeducation [without BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Labour Caste Reeducation</qualification>
         <curriculum>Astech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
@@ -156,19 +156,19 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2807</constructionYear>
         <durationDays>300</durationDays>
-        <ageMin>20</ageMin>
+        <ageMin>16</ageMin>
         <qualification>Scientist Caste Reeducation</qualification>
         <curriculum>Doctor, Administration, Hyperspace Navigation</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Merchant Caste Reeducation</qualification>
         <curriculum>Administration, Negotiation, Scrounge</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <qualification>Technician Caste Reeducation [without BA]</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
-        <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Technician Caste Reeducation [with BA]</qualification>
         <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Tech/BA</curriculum>
         <qualificationStartYear>2868</qualificationStartYear>
+        <qualification>Technician Caste Reeducation [without BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Labour Caste Reeducation</qualification>
         <curriculum>Astech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
