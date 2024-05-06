@@ -29,6 +29,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.List;
 import java.util.Objects;
@@ -73,7 +74,7 @@ public class Academy {
     private Boolean isLocal = false;
 
     @XmlElement(name = "locationSystem")
-    private List<String> locationSystems = null;
+    private List<String> locationSystems;
 
     @XmlElement(name = "constructionYear")
     private Integer constructionYear = 2300;
@@ -706,37 +707,18 @@ public class Academy {
 
         for (String faction : systemOwners) {
             if ((isFactionRestricted) && (Objects.equals(campaign.getFaction().getShortName(), faction))) {
-                return faction;
+                return Factions.getInstance().getFaction(faction).getShortName();
             } else if (!RandomFactionGenerator.getInstance().getFactionHints()
                     .isAtWarWith(person.getOriginFaction(), Factions.getInstance().getFaction(faction),
                             campaign.getLocalDate())) {
-                return faction;
+                return Factions.getInstance().getFaction(faction).getShortName();
             } else if (!RandomFactionGenerator.getInstance().getFactionHints()
                     .isAtWarWith(campaign.getFaction(), Factions.getInstance().getFaction(faction),
                             campaign.getLocalDate())) {
-                return faction;
+                return Factions.getInstance().getFaction(faction).getShortName();
             }
         }
         return null;
-    }
-
-    /**
-     * Retrieves a list of campuses filtered by faction restrictions.
-     *
-     * @param campaign the campaign object containing system and faction information
-     * @param person the person object representing the player
-     * @return a list of campuses filtered by faction, or null if no campuses are available
-     */
-    public List<String> getCampusesFilteredByFaction(Campaign campaign, Person person) {
-        List<String> campuses = locationSystems;
-
-        campuses.removeIf(campus -> getFilteredFaction(campaign, person, campus) == null);
-
-        if (!campuses.isEmpty()) {
-            return campuses;
-        } else {
-            return null;
-        }
     }
 
     /**
@@ -802,14 +784,14 @@ public class Academy {
      * @param campuses a list of campuses to consider
      * @return the nearest campus to the campaign
      */
-    public String getNearestCampus(Campaign campaign, List<String> campuses) {
-        int distance = 0;
+    public static String getNearestCampus(Campaign campaign, List<String> campuses) {
+        int distance = 999999999;
         String nearestCampus = "";
 
         for (String campus : campuses) {
             int travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById(campus));
 
-            if (travelTime > distance) {
+            if (travelTime < distance) {
                 distance = travelTime;
                 nearestCampus = campus;
             }

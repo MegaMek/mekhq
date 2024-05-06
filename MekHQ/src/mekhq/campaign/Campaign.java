@@ -4884,7 +4884,11 @@ public class Campaign implements ITechManager {
      * @return the simplified travel time in days
      */
     public int getSimplifiedTravelTime(PlanetarySystem destination) {
-        return (int) ((getCurrentSystem().getDistanceTo(destination) / 30) * 7);
+        if (Objects.equals(getCurrentSystem(), destination)) {
+            return 0;
+        } else {
+            return (int) ((getCurrentSystem().getDistanceTo(destination) / 30) * 7);
+        }
     }
 
     public void personUpdated(Person p) {
