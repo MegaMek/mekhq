@@ -423,15 +423,298 @@
         <faction>DA</faction>
         <locationSystem>Atreus</locationSystem>
         <constructionYear>2750</constructionYear>
-        <tuition>31500</tuition>
+        <tuition>42000</tuition>
         <durationDays>300</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Officer Graduate</qualification>
-        <curriculum>Administration, Leadership, Strategy, Tactics</curriculum>
+        <curriculum>Administration, Negotiation, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Blackjack School of Conflict</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
+        <description>The Blackjack School of Conflict is a private military academy within the Lyran Commonwealth known for its unorthodox curriculum. Founded by tutors who failed entrance exams at other academies, it offered courses that included unofficial lessons on the shadier aspects of military life.</description>
+        <faction>LC</faction>
+        <locationSystem>Blackjack</locationSystem>
+        <constructionYear>2750</constructionYear>
+        <destructionYear>3051</destructionYear>
+        <tuition>17500</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Training Cadre</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Scrounge</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Mechanized Training Cadre</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Scrounge</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Combat Training Cadre</qualification>
+        <curriculum>Small Arms, Anti-Mech, Artillery, Scrounge</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Combat Technician Training Cadre</qualification>
+        <curriculum>Tech/Mech, Tech/Mechanic, Scrounge</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Brotherhood Monastery</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
+        <description>Located in Hope City, the Brotherhood Monastery serves as the training ground for the Brotherhood of Randis, a group reminiscent of the legendary Templar Knights. Entry into this elite unit is highly selective, focusing on candidates who demonstrate a commitment to the Christian faith and moral integrity. The initiation process is rigorous, featuring four perilous trials testing endurance, strength, dexterity, and courage—culminating in an elaborate ceremony where successful initiates receive a distinctive uniform of red and black silk, steel mesh, and a sword.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <faction>FOR</faction>
+        <locationSystem>Randis IV</locationSystem>
+        <constructionYear>2988</constructionYear>
+        <tuition>21000</tuition>
+        <durationDays>900</durationDays>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Calloway Martial College</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
+        <description>Founded in the mid-28th century, the Calloway Martial College (CMC) was established to address the surge in military recruitment within the Free Worlds League. As the first of three new schools created by the Dormuth Council, CMC quickly became operational, featuring its own Calloway Training Battalion.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <faction>FWL</faction>
+        <locationSystem>Calloway VI</locationSystem>
+        <constructionYear>2765</constructionYear>
+        <destructionYear>2789</destructionYear>
+        <tuition>8750</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>5</facultySkill>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Canopian Institute of War</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description>Founded in 3058 by Magestrix Emma Centrella, the Canopian Institute of War, was established to elevate the Magistracy Armed Forces' training programs, inspired by the Sun Zhang MechWarrior Academy. Initially enrolling primarily veteran soldiers, CIW later expanded admission to top-performing students from provincial academies and selected international applicants. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <faction>MOC</faction>
+        <locationSystem>Canopus</locationSystem>
+        <constructionYear>3058</constructionYear>
+        <destructionYear>3071</destructionYear>
+        <tuition>15750</tuition>
+        <durationDays>1320</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Training Cadre</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Flight Officer Training Cadre</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Canopian Institute of War (3080)</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description>Rebuild in 3080, the Canopian Institute of War, continues to elevate the Magistracy Armed Forces' training programs, inspired by the Sun Zhang MechWarrior Academy. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <faction>MOC</faction>
+        <locationSystem>Canopus</locationSystem>
+        <constructionYear>3080</constructionYear>
+        <tuition>15750</tuition>
+        <durationDays>1320</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Training Cadre</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Flight Officer Training Cadre</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Capella War College</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description>The Capella War College, established concurrently with the Capellan Hegemony, is the oldest military academy in the Capellan Confederation. Known for its rigorous standards and extensive facilities, the college trains MechWarriors, aerospace pilots, DropShip and JumpShip crews, vehicle crews, and infantry. Training emphasizes combined-arms tactics and includes cross-training with the local Duchy RTC.</description>
+        <isFactionRestricted>true</isFactionRestricted>
+        <faction>CC</faction>
+        <locationSystem>Capella</locationSystem>
+        <constructionYear>2400</constructionYear>
+        <tuition>44625</tuition>
+        <durationDays>300</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Mechanized Officer Graduate</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Officer Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Advanced Infantry Officer Graduate</qualification>
+        <curriculum>Small Arms, Artillery, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Flight Officer Graduate</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <qualification>Interstellar Officer Graduate</qualification>
+        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Combined Arms Technical Officer Graduate</qualification>
+        <curriculum>Tech/Mech, Tech/Mechanic, Tech/Aero, Leadership, Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Combined Arms Technical Officer Graduate [with BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/BA, Leadership, Administration, Negotiation</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Combat College of New Earth</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description>Built in 2331, the Combat College was the first military academy on a foreign world. The college prided itself on being equal to any academy on Terra. To prove their worth, the graduating warrior and pilot class challenging the Sandhurst graduates to a military contest.</description>
+        <faction>TH</faction>
+        <locationSystem>New Earth</locationSystem>
+        <constructionYear>2331</constructionYear>
+        <closureYear>2788</closureYear>
+        <tuition>21000</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Mechanized Officer Graduate</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Infantry Officer Graduate</qualification>
+        <curriculum>Small Arms, Artillery, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Combat College of New Earth (ComStar)</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description>Built in 2331, the Combat College was the first military academy on a foreign world. The college prided itself on being equal to any academy on Terra. To prove their worth, the graduating warrior and pilot class challenging the Sandhurst graduates to a military contest.</description>
+        <factionDiscount>0</factionDiscount>
+        <faction>CS</faction>
+        <isLocal>true</isLocal>
+        <locationSystem>New Earth</locationSystem>
+        <constructionYear>2788</constructionYear>
+        <tuition>21000</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Mechanized Officer Graduate</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Infantry Officer Graduate</qualification>
+        <curriculum>Small Arms, Artillery, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Concordat Aerospace Flight School</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
+        <description>The Concordat Aerospace Flight School, serves as the premier training ground for military pilots. Operated by seasoned instructors hailing from the Outworlds Alliance, it boasts a reputation for excellence. While producing fewer graduates compared to the École Militaire, its focus on quality over quantity ensures that each cadet emerges as a skilled and disciplined pilot.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <faction>TC</faction>
+        <locationSystem>Samantha</locationSystem>
+        <tuition>4375</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Mechanized Graduate</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Piloting/VTOL</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Flight Graduate</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <qualification>Advanced Artillery Graduate</qualification>
+        <curriculum>Small Arms, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Coventry Academy</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description>The Coventry Academy, situated near the Coventry Metal Works plant on Dunnigan, is a pivotal institution. Originally focused solely on training MechWarriors, its ties to CMW have drawn criticism, but it persists as a crucial training ground.</description>
+        <faction>LC</faction>
+        <locationSystem>Coventry</locationSystem>
+        <constructionYear>2700</constructionYear>
+        <destructionYear>3058</destructionYear>
+        <tuition>15300</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>MechTech Officer Graduate</qualification>
+        <curriculum>Tech/Mech, Leadership, Administration, Negotiation</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Coventry Military Academy</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description>Originally called the Coventry Academy, the academy was originally focused solely on training MechWarriors, and its ties to CMW have drawn criticism. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourished with modern facilities and OmniMech training.</description>
+        <isFactionRestricted>true</isFactionRestricted>
+        <faction>LA</faction>
+        <locationSystem>Coventry</locationSystem>
+        <constructionYear>3060</constructionYear>
+        <tuition>18375</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>MechTech Officer Graduate</qualification>
+        <curriculum>Tech/Mech, Leadership, Administration, Negotiation</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
 </academies>
