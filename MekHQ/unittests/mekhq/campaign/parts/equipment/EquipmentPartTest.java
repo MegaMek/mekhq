@@ -1435,7 +1435,7 @@ public class EquipmentPartTest {
 
         int location = SmallCraft.LOC_HULL;
         int equipmentNum = 42;
-        Mounted mounted = mock(Mounted.class);
+        WeaponMounted mounted = mock(WeaponMounted.class);
         when(mounted.getLocation()).thenReturn(location);
         doAnswer(inv -> {
             when(mounted.isDestroyed()).thenReturn(true);
@@ -1449,8 +1449,7 @@ public class EquipmentPartTest {
         when(weaponBay.getLocation()).thenReturn(location);
         when(weaponBay.getType()).thenReturn(bayWeaponType);
         List<WeaponMounted> bayWeapons = new ArrayList<>();
-        //bayWeapons.addElement(33);
-        bayWeapons.add(weaponBay);
+        bayWeapons.add(mounted);
         when(weaponBay.getBayWeapons()).thenReturn(bayWeapons);
         doReturn(weaponBay).when(entity).getEquipment(eq(bayEqNum));
         doReturn(bayEqNum).when(entity).getEquipmentNum(eq(weaponBay));
@@ -1518,7 +1517,7 @@ public class EquipmentPartTest {
 
         int location = SmallCraft.LOC_HULL;
         int equipmentNum = 42;
-        Mounted mounted = mock(Mounted.class);
+        WeaponMounted mounted = mock(WeaponMounted.class);
         when(mounted.getLocation()).thenReturn(location);
         doAnswer(inv -> {
             when(mounted.isDestroyed()).thenReturn(true);
@@ -1538,7 +1537,7 @@ public class EquipmentPartTest {
         when(weaponBay.getType()).thenReturn(bayWeaponType);
         List<WeaponMounted> bayWeapons = new ArrayList<>();
         bayWeapons.add(otherMounted);
-        bayWeapons.add(weaponBay);
+        bayWeapons.add(mounted);
         when(weaponBay.getBayWeapons()).thenReturn(bayWeapons);
         doReturn(weaponBay).when(entity).getEquipment(eq(bayEqNum));
         doReturn(bayEqNum).when(entity).getEquipmentNum(eq(weaponBay));
@@ -1606,7 +1605,7 @@ public class EquipmentPartTest {
 
         int location = SmallCraft.LOC_HULL;
         int equipmentNum = 42;
-        Mounted mounted = mock(Mounted.class);
+        WeaponMounted mounted = mock(WeaponMounted.class);
         when(mounted.getLocation()).thenReturn(location);
         doAnswer(inv -> {
             when(mounted.isDestroyed()).thenReturn(true);
@@ -1627,7 +1626,7 @@ public class EquipmentPartTest {
         when(weaponBay.getType()).thenReturn(bayWeaponType);
         List<WeaponMounted> bayWeapons = new ArrayList<>();
         bayWeapons.add(otherMounted);
-        bayWeapons.add(weaponBay);
+        bayWeapons.add(mounted);
         when(weaponBay.getBayWeapons()).thenReturn(bayWeapons);
         doReturn(weaponBay).when(entity).getEquipment(eq(bayEqNum));
         doReturn(bayEqNum).when(entity).getEquipmentNum(eq(weaponBay));
@@ -1695,7 +1694,7 @@ public class EquipmentPartTest {
 
         int location = SmallCraft.LOC_HULL;
         int equipmentNum = 42;
-        Mounted mounted = mock(Mounted.class);
+        WeaponMounted mounted = mock(WeaponMounted.class);
         when(mounted.getLocation()).thenReturn(location);
         doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
 
@@ -1711,7 +1710,7 @@ public class EquipmentPartTest {
         when(weaponBay.getType()).thenReturn(bayWeaponType);
         List<WeaponMounted> bayWeapons = new ArrayList<>();
         bayWeapons.add(otherMounted);
-        bayWeapons.add(weaponBay);
+        bayWeapons.add(mounted);
         when(weaponBay.getBayWeapons()).thenReturn(bayWeapons);
         doReturn(weaponBay).when(entity).getEquipment(eq(bayEqNum));
         doReturn(bayEqNum).when(entity).getEquipmentNum(eq(weaponBay));
