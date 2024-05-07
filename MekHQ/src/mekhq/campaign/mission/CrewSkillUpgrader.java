@@ -20,6 +20,7 @@ package mekhq.campaign.mission;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
+import megamek.common.equipment.WeaponMounted;
 import megamek.common.options.OptionsConstants;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -240,10 +241,10 @@ public class CrewSkillUpgrader {
      * @return Weapon name
      */
     private String pickRandomWeapon(Entity entity, boolean clusterOnly) {
-        List<Mounted> weapons = entity.getIndividualWeaponList();
-        List<Mounted> eligibleWeapons = new ArrayList<>();
+        List<WeaponMounted> weapons = entity.getIndividualWeaponList();
+        List<WeaponMounted> eligibleWeapons = new ArrayList<>();
 
-        for (Mounted weapon : weapons) {
+        for (WeaponMounted weapon : weapons) {
             if (SpecialAbility.isWeaponEligibleForSPA(weapon.getType(), PersonnelRole.NONE, clusterOnly)) {
                 eligibleWeapons.add(weapon);
             }

@@ -22,12 +22,13 @@ import megamek.Version;
 import megamek.common.AmmoType;
 import megamek.common.Entity;
 import megamek.common.Mounted;
+import megamek.common.equipment.AmmoMounted;
+import megamek.common.equipment.WeaponMounted;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.Quartermaster;
 import mekhq.campaign.Warehouse;
 import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.InfantryAmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -42,10 +43,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.UUID;
-import java.util.Vector;
+import java.util.*;
 
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.*;
@@ -201,14 +199,14 @@ public class LargeCraftAmmoBinTest {
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
-        Mounted mounted = mock(Mounted.class);
+        AmmoMounted mounted = mock(AmmoMounted.class);
         when(mounted.getType()).thenReturn(ammoType);
-        when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
-        Mounted bay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<>();
-        bayAmmo.addElement(equipmentNum);
+        when(entity.getEquipment(equipmentNum)).thenReturn((Mounted) mounted);
+        WeaponMounted bay = mock(WeaponMounted.class);
+        List<AmmoMounted> bayAmmo = new ArrayList<>();
+        bayAmmo.add(mounted);
         when(bay.getBayAmmo()).thenReturn(bayAmmo);
-        when(entity.getEquipment(bayNum)).thenReturn(bay);
+        when(entity.getEquipment(bayNum)).thenReturn((Mounted) bay);
 
         // Set the bay as if we're in deserialization code
         ammoBin.setBay(bayNum);
@@ -231,17 +229,17 @@ public class LargeCraftAmmoBinTest {
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
-        Mounted mounted = mock(Mounted.class);
+        AmmoMounted mounted = mock(AmmoMounted.class);
         when(mounted.getType()).thenReturn(ammoType);
-        when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
-        Mounted wrongWeaponBay = mock(Mounted.class);
+        when(entity.getEquipment(equipmentNum)).thenReturn((Mounted) mounted);
+        WeaponMounted wrongWeaponBay = mock(WeaponMounted.class);
         when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<>());
-        Mounted weaponBay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<>();
-        bayAmmo.addElement(equipmentNum);
+        WeaponMounted weaponBay = mock(WeaponMounted.class);
+        List<AmmoMounted> bayAmmo = new ArrayList<>();
+        bayAmmo.add(mounted);
         when(weaponBay.getBayAmmo()).thenReturn(bayAmmo);
-        when(entity.getEquipment(bayNum)).thenReturn(weaponBay);
-        ArrayList<Mounted> weaponBays = new ArrayList<>();
+        when(entity.getEquipment(bayNum)).thenReturn((Mounted) weaponBay);
+        ArrayList<WeaponMounted> weaponBays = new ArrayList<>();
         weaponBays.add(wrongWeaponBay);
         weaponBays.add(weaponBay);
         when(entity.getWeaponBayList()).thenReturn(weaponBays);
@@ -265,16 +263,16 @@ public class LargeCraftAmmoBinTest {
         Unit unit = mock(Unit.class);
         Entity entity = mock(Entity.class);
         when(unit.getEntity()).thenReturn(entity);
-        Mounted mounted = mock(Mounted.class);
+        AmmoMounted mounted = mock(AmmoMounted.class);
         when(mounted.getType()).thenReturn(ammoType);
-        when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
-        Mounted wrongWeaponBay = mock(Mounted.class);
+        when(entity.getEquipment(equipmentNum)).thenReturn((Mounted) mounted);
+        WeaponMounted wrongWeaponBay = mock(WeaponMounted.class);
         when(wrongWeaponBay.getBayAmmo()).thenReturn(new Vector<>());
-        Mounted weaponBay = mock(Mounted.class);
-        Vector<Integer> bayAmmo = new Vector<>();
-        bayAmmo.addElement(equipmentNum);
+        WeaponMounted weaponBay = mock(WeaponMounted.class);
+        List<AmmoMounted> bayAmmo = new ArrayList<>();
+        bayAmmo.add(mounted);
         when(weaponBay.getBayAmmo()).thenReturn(bayAmmo);
-        ArrayList<Mounted> weaponBays = new ArrayList<>();
+        ArrayList<WeaponMounted> weaponBays = new ArrayList<>();
         weaponBays.add(wrongWeaponBay);
         weaponBays.add(weaponBay);
         when(entity.getWeaponBayList()).thenReturn(weaponBays);
@@ -302,9 +300,9 @@ public class LargeCraftAmmoBinTest {
         Mounted mounted = mock(Mounted.class);
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn(mounted);
-        Mounted bay = mock(Mounted.class);
-        when(bay.getBayAmmo()).thenReturn(new Vector<>());
-        when(entity.getEquipment(bayNum)).thenReturn(bay);
+        WeaponMounted bay = mock(WeaponMounted.class);
+        when(bay.getBayAmmo()).thenReturn(new ArrayList<>());
+        when(entity.getEquipment(bayNum)).thenReturn((Mounted) bay);
         when(entity.getWeaponBayList()).thenReturn(new ArrayList<>());
 
         // Set the bay without actually setting it (if through deserialization)
@@ -835,10 +833,10 @@ public class LargeCraftAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Entity mockEntity = mock(Entity.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and try to load it when the warehouse is empty.
@@ -871,10 +869,10 @@ public class LargeCraftAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Entity mockEntity = mock(Entity.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add ammo of the wrong type to the warehouse ...
@@ -914,10 +912,10 @@ public class LargeCraftAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Entity mockEntity = mock(Entity.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add just enough ammo of the right type to the warehouse ...
@@ -956,10 +954,10 @@ public class LargeCraftAmmoBinTest {
         Unit mockUnit = mock(Unit.class);
         Entity mockEntity = mock(Entity.class);
         when(mockUnit.getEntity()).thenReturn(mockEntity);
-        Mounted mockMounted = mock(Mounted.class);
+        AmmoMounted mockMounted = mock(AmmoMounted.class);
         when(mockMounted.getType()).thenReturn(ammoType);
         when(mockMounted.getBaseShotsLeft()).thenReturn(0);
-        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn(mockMounted);
+        when(mockEntity.getEquipment(eq(equipmentNum))).thenReturn((Mounted) mockMounted);
         ammoBin.setUnit(mockUnit);
 
         // ... and add more than enough ammo of the right type to the warehouse ...

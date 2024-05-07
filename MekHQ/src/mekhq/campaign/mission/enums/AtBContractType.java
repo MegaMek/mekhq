@@ -218,16 +218,16 @@ public enum AtBContractType {
             case CADRE_DUTY:
                 return -1;
             case RIOT_DUTY:
-            case GUERRILLA_WARFARE:
             case PIRATE_HUNTING:
                 return 1;
-            case RELIEF_DUTY:
-            case PLANETARY_ASSAULT:
-                return 2;
             case DIVERSIONARY_RAID:
             case EXTRACTION_RAID:
             case RECON_RAID:
+            case RELIEF_DUTY:
             case OBJECTIVE_RAID:
+                return 2;
+            case GUERRILLA_WARFARE:
+            case PLANETARY_ASSAULT:
                 return 3;
             default:
                 return 0;

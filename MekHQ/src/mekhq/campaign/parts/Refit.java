@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 import megamek.Version;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.MiscMounted;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.verifier.EntityVerifier;
@@ -2458,7 +2459,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
             return new AeroHeatSink(0, ((Aero) entity).getHeatType(), false, campaign);
         } else if (entity instanceof Mech) {
-            Optional<Mounted> mount = entity.getMisc().stream()
+            Optional<MiscMounted> mount = entity.getMisc().stream()
                     .filter(m -> m.getType().hasFlag(MiscType.F_HEAT_SINK)
                             || m.getType().hasFlag(MiscType.F_DOUBLE_HEAT_SINK))
                     .findAny();

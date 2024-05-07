@@ -26,6 +26,7 @@ import megamek.client.ui.swing.tileset.EntityImage;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.ArmorType;
 import megamek.common.icons.Camouflage;
 import megamek.common.options.IOption;
@@ -2715,10 +2716,10 @@ public class Unit implements ITechnology {
                     } else if (entity.usesWeaponBays()) {
                         apart = new LargeCraftAmmoBin((int) entity.getWeight(), (AmmoType) m.getType(), eqnum,
                                 fullShots - m.getBaseShotsLeft(), m.getSize(), getCampaign());
-                        ((LargeCraftAmmoBin) apart).setBay(entity.getBayByAmmo(m));
+                        ((LargeCraftAmmoBin) apart).setBay(entity.getBayByAmmo((AmmoMounted) m));
                     } else if (entity.isSupportVehicle()
                             && (((AmmoType) m.getType()).getAmmoType() == AmmoType.T_INFANTRY)) {
-                        Mounted weapon = m.getLinkedBy();
+                        Mounted<?> weapon = m.getLinkedBy();
                         while (weapon.getType() instanceof AmmoType) {
                             weapon = weapon.getLinkedBy();
                         }

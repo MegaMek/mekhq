@@ -124,7 +124,8 @@ public class AtBGameThread extends GameThread {
                 mapSettings.getBoardsSelectedVector().clear();
 
                 // if the scenario is taking place in space, do space settings instead
-                if (scenario.getBoardType() == Scenario.T_SPACE) {
+                if (scenario.getBoardType() == Scenario.T_SPACE
+                        || scenario.getTerrainType().equals("Space")) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
