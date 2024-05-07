@@ -3,6 +3,7 @@
     <academy>
         <name>Aerospace and Interstellar Institute [Midway]</name>
         <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
         <description>The Aerospace and Interstellar Institute specializes in training aerospace personnel, including DropShip and JumpShip crews. The curriculum spans up to two years, offering basic to advanced training in small arms, first aid, and specialized aerospace roles.</description>
         <faction>DC</faction>
         <locationSystem>Dover</locationSystem>
@@ -23,6 +24,7 @@
     <academy>
         <name>Aerospace and Interstellar Institute [Dover]</name>
         <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
         <description>Staffed by veteran officers from Operation SCOUR, the Aerospace and Interstellar Institute focuses on instructing experienced crew members in fleet combat subtleties. This initiative reflects a strategic adaptation to the evolving military needs and challenges in the post-Jihad era, aiming to enhance the capabilities of future fleet commanders and other high-ranking personnel in complex operational environments.</description>
         <faction>DC</faction>
         <locationSystem>Dover</locationSystem>
@@ -41,6 +43,7 @@
     <academy>
         <name>Aitutaki Academy (First Year Curriculum)</name>
         <isMilitary>true</isMilitary>
+        <promotion>Private</promotion>
         <description>Founded in 2414 by Hered Selaj, the Aitutaki Military Academy has been a center of anti-Marik sentiment. Initially exclusive to Regulan students, enrollment policies broadened under Thomas Marik's reign due to LCCC directives. The school's atmosphere includes strict traditions and practices, such as challenging trials by combat among cadets, which have been scrutinized by the LCCC. Graduates, mainly MechWarriors, often retain pro-Regulus sentiments, despite LCCC's efforts to diversify assignments.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -59,6 +62,7 @@
     <academy>
         <name>Aitutaki Academy (Second &amp; Third Year Curriculum)</name>
         <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
         <description>Founded in 2414 by Hered Selaj, the Aitutaki Military Academy has been a center of anti-Marik sentiment. The school's atmosphere includes strict traditions and practices, such as challenging trials by combat among cadets, which have been scrutinized by the LCCC. Graduates, mainly MechWarriors, often retain pro-Regulus sentiments, despite LCCC's efforts to diversify assignments.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -90,6 +94,7 @@
     <academy>
         <name>Alarion Naval Academy</name>
         <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
         <description>Founded in 3058 by Archon Katherine Steiner-Davion, the Alarion Naval Academy was established to meet the Lyran Alliance's needs for WarShip crew training, complementing the existing aerospace academies. It quickly became a crucial institution for naval training in the Inner Sphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -114,6 +119,7 @@
     <academy>
         <name>Albion Military Academy</name>
         <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
         <description>Founded in the 2400s, the Albion Military Academy (AMA) quickly became the Federated Suns' premier institution, gaining Star League recognition in 2604. Famously, it allowed graduates a unique buyout option to serve directly with the Federated Suns, circumventing SLDF service requirements. Post-Star League, AMA retained its elite status, even as it faced competition from the newly established NAIS College of Military Science.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -152,6 +158,7 @@
     <academy>
         <name>Algedi War College</name>
         <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
         <description>Established in 3075 in Algedi, the Algedi War College has quickly become a significant military institution, particularly recognized for its mobile warfare division. This development aligns with the increased production of military vehicles on the Arkab worlds. The college primarily admits candidates with an Azami background, reflecting its unique cultural focus.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -177,6 +184,7 @@
     <academy>
         <name>Allison MechWarrior Institute</name>
         <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
         <description>Located on New Olympia, the Allison MechWarrior Institute stands as a premier training facility for MechWarriors. Known for producing 375 MechWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed Mechwarriors to uphold loyalty.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -196,6 +204,7 @@
     <academy>
         <name>An Ting University</name>
         <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
         <description>An Ting University is a renowned military academy historically dedicated to training MechWarriors. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -220,6 +229,7 @@
     <academy>
         <name>An Ting University (3055)</name>
         <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
         <description>An Ting University is a renowned military academy historically dedicated to training MechWarriors. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence. After significant damage from both external attacks and internal strife, particularly in 3015 from Sun Zhang Cadre alumni, the academy was shuttered until 3055 when it reopened with advancements from the Helm Memory Core.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -233,16 +243,16 @@
         <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>3</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>BattleMech Training Cadre</qualification>
+        <qualification>BattleMech Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
-        <qualification>Aerospace Training Cadre</qualification>
+        <qualification>Aerospace Officer Graduate</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
-        <qualification>Battle Armor Training Cadre</qualification>
+        <qualification>Battle Armor Officer Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>3052</qualificationStartYear>
-        <qualification>AeroSpace Training Cadre</qualification>
+        <qualification>AeroSpace Officer Graduate</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>3060</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -250,6 +260,7 @@
     <academy>
         <name>Annapolis Naval Academy</name>
         <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
         <description>Situated on the shores of Maryland's ancient Earth, Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the Star League era, it evolved to command the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on a heritage that seamlessly transitions cadets from seafaring origins to mastering the vastness of space, ensuring that the tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -274,6 +285,7 @@
     <academy>
         <name>Annapolis Naval Academy (ComStar)</name>
         <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
         <description>Situated on the shores of Maryland's ancient Earth, Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the Star League era, it evolved to command the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on a heritage that seamlessly transitions cadets from seafaring origins to mastering the vastness of space, ensuring that the tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -298,6 +310,7 @@
     <academy>
         <name>Apollo Military Academy</name>
         <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
         <description>Known for its rigorous standards and distinguished graduates, the Apollo Military Academy excels in producing MechWarriors of superior leadership and combat skills, rivaling those from the most prestigious academies in the Inner Sphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -328,6 +341,7 @@
     <academy>
         <name>Armstrong Flight Academy</name>
         <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
         <description>The premier flight school of the Federated Suns and a leading institution in the Inner Sphere, well known for producing top-tier aerospace pilots and naval technicians. Strategically co-located at Galax near Federated-Boeing Interstellar, the largest spacecraft manufacturer in the region, the academy benefits from close interactions with leading engineers and test pilots. This relationship enhances practical training, allowing the academy to concentrate on high-level piloting and technician skills.</description>
         <faction>FS</faction>
         <locationSystem>Galax</locationSystem>
@@ -353,6 +367,7 @@
     <academy>
         <name>Armstrong Pheonix Academy</name>
         <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
         <description>Previously named the Armonstrong Flight Academy, the academy has been relocated and renamed Armstrong Phoenix Academy due to its original campus being rendered uninhabitable by a blood destroying bioweapon. Despite this, it maintains rigorous standards, with intense physical screenings and high skill requirements, leading to over half of the applicants being rejected pre-examination.</description>
         <faction>FS</faction>
         <locationSystem>Delavan</locationSystem>
@@ -377,6 +392,7 @@
     <academy>
         <name>Athene Combat School</name>
         <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
         <description>The Athene Combat School (ACS) was created during a period of high recruitment within the Free Worlds League, as part of efforts by the Dormuth Council to expand military education. Unique among its contemporaries, ACS focused exclusively on infantry training, addressing the significant demand for specialized infantry forces</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -400,6 +416,7 @@
     <academy>
         <name>Atreus Officer Training College</name>
         <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
         <description>The Officer Training College offers a unique year-long course focused on developing leadership and command skills, the only one of its kind in the League. The curriculum emphasizes practical skills over theoretical knowledge, preparing officers for the complexities of daily bureaucratic responsibilities with a strong focus on delegation and time management.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>

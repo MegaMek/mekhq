@@ -46,6 +46,9 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary = false;
 
+    @XmlElement(name = "promotion")
+    private String promotion = "None";
+
     @XmlElement(name = "isPrepSchool")
     private Boolean isPrepSchool = false;
 
@@ -137,6 +140,7 @@ public class Academy implements Comparable<Academy> {
      * @param set                     the set name of the academy
      * @param name                    the name of the academy
      * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
+     * @param promotion               indicates the promotion rank earned for completing an academic course
      * @param isClan                  indicates if the academy is a Clan Sibko or Crèche (true) or not (false)
      * @param isTrueborn              indicates if the Sibko is intended for Trueborn (true) or not (false)
      * @param isPrepSchool            indicates if the academy is focused on children (true) or not (false)
@@ -161,7 +165,7 @@ public class Academy implements Comparable<Academy> {
      * @param baseAcademicSkillLevel  the base skill level provided by the academy
      * @param id                      the id number of the academy, used for sorting academies in mhq
      */
-    public Academy(String set, String name, Boolean isMilitary, Boolean isClan, Boolean isTrueborn,
+    public Academy(String set, String name, Boolean isMilitary, String promotion, Boolean isClan, Boolean isTrueborn,
                    Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
                    String faction, List<String> locationSystems, Boolean isLocal, Integer constructionYear,
                    Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
@@ -171,6 +175,7 @@ public class Academy implements Comparable<Academy> {
         this.set = set;
         this.name = name;
         this.isMilitary = isMilitary;
+        this.promotion = promotion;
         this.isClan = isClan;
         this.isTrueborn = isTrueborn;
         this.isPrepSchool = isPrepSchool;
@@ -250,6 +255,24 @@ public class Academy implements Comparable<Academy> {
      */
     public void setIsMilitary(final boolean isMilitary) {
         this.isMilitary = isMilitary;
+    }
+
+    /**
+     * Retrieves the promotion awarded for completing an academic course.
+     *
+     * @return the promotion awarded for completing an academic course
+     */
+    public String getPromotion() {
+        return promotion;
+    }
+
+    /**
+     * Sets the promotion for the academy.
+     *
+     * @param promotion the promotion to be set
+     */
+    public void setPromotion(final String promotion) {
+        this.promotion = promotion;
     }
 
     /**
@@ -931,6 +954,10 @@ public class Academy implements Comparable<Academy> {
         }
 
         // we travel time out the way; all that's left is to add the last couple of entries
+        if ((isMilitary) && (!Objects.equals(promotion, "None"))) {
+            tooltip.append("<b>").append(resources.getString("promotion.text")).append("</b> ")
+                    .append(promotion).append("<br>");
+        }
         tooltip.append("<b>").append(resources.getString("facultySkill.text")).append("</b> ")
                 .append(facultySkill).append ('+').append("<br>");
         tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")

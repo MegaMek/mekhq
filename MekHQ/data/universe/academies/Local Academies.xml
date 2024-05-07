@@ -294,6 +294,7 @@
     <academy>
         <name>Boot Camp</name>
         <isMilitary>true</isMilitary>
+        <promotion>Private</promotion>
         <description>After a couple of months' hard training students are ready to serve on the line.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -323,7 +324,8 @@
     <academy>
         <name>Military Academy</name>
         <isMilitary>true</isMilitary>
-        <description>Military Academies offer the finest tuition for career-minded students. Graduation entitles a student to the rank of Private (or regional equivalent).</description>
+        <promotion>Corporal</promotion>
+        <description>Local Military Academies claim to offer the finest tuition for career-minded students. However, there is no replacement for in-the-field experience.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -358,18 +360,19 @@
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
     <academy>
-        <name>NCO Candidate School</name>
+        <name>NCO Candidate Bootcamp</name>
         <isMilitary>true</isMilitary>
-        <description>Here candidates are trained in the skills required to lead men. Graduation entitles a student to the rank of Corporal (or regional equivalent).</description>
+        <promotion>Corporal</promotion>
+        <description>Here, candidates are trained locally in the skills required to lead men.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
-        <tuition>4375</tuition>
+        <tuition>3000</tuition>
         <durationDays>70</durationDays>
         <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>1</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>NCO Candidacy</qualification>
+        <qualification>NCO Graduate</qualification>
         <curriculum>Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
@@ -377,35 +380,37 @@
     <academy>
         <name>Warrant Officer Candidate School</name>
         <isMilitary>true</isMilitary>
-        <description>Only the most qualified personnel are fit to become Warrant Officers. This is where they gain essential training and education. Graduation entitles a student to the rank of Warrant Officer (or regional equivalent).</description>
+        <promotion>Warrant Officer</promotion>
+        <description>In those forces that use them, Warrant Officers are essential military administrators and act as a go-between NCOs and Officers. Here they learn the skills needed to succeed.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
-        <tuition>8750</tuition>
-        <durationDays>70</durationDays>
+        <tuition>7000</tuition>
+        <durationDays>300</durationDays>
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Warrant Officer</qualification>
-        <curriculum>Leadership, Administration</curriculum>
+        <qualification>Warrant Officer Graduate</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
     <academy>
         <name>Officer Candidate School</name>
         <isMilitary>true</isMilitary>
-        <description>Only the most qualified personnel are fit to become Officers. This is where they gain essential training and education. Graduation entitles a student to the rank of Lieutenant (or regional equivalent).</description>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description>Only the most qualified personnel are fit to become Officers. This is where they gain essential training and education.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
-        <tuition>8750</tuition>
-        <durationDays>70</durationDays>
+        <tuition>7000</tuition>
+        <durationDays>300</durationDays>
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Field Officer</qualification>
+        <qualification>Field Officer Graduate</qualification>
         <curriculum>Leadership, Tactics</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Command Officer</qualification>
+        <qualification>Command Officer Graduate</qualification>
         <curriculum>Leadership, Strategy</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
