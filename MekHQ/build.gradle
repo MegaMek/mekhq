@@ -29,17 +29,18 @@ sourceSets {
 }
 
 dependencies {
-    implementation "org.megamek:megamek${mmBranchTag}:${version}"
-    implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
+    implementation "org.megamek:megamek:${version}"
+    implementation ("org.megamek:megameklab:${version}") {
         // We may want to specify different branches for MM and MML, so we need to exclude the
         // transitive MM dependency
-        exclude group: 'org.megamek', module: "megameklab${mmlBranchTag}"
+        exclude group: 'org.megamek', module: "megameklab"
         // We don't need the python and javascript engine taking up space
         exclude group: 'org.python', module: 'jython'
         exclude group: 'org.mozilla', module: 'rhino'
-        // Eclipse IDE Multiple Dependency errors. 
+        // Eclipse IDE Multiple Dependency errors.
         exclude group: 'xml-apis'
     }
+    implementation "org.megamek:mekhq:${version}"
 
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
     implementation 'javax.vecmath:vecmath:1.5.2'
@@ -55,7 +56,7 @@ dependencies {
     runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.2'
     // Required for mml printing scaled vector graphics (SVG) - Eclipse IDE Compatability.
     runtimeOnly 'xml-apis:xml-apis-ext:1.3.04'
-    
+
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testImplementation 'org.mockito:mockito-core:5.2.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
@@ -598,7 +599,7 @@ task javadocJar(type: Jar) {
 publishing {
     publications {
         publishMMLibrary(MavenPublication) {
-            artifactId = "mekhq${mmBranchTag}"
+            artifactId = "mekhq"
             from components.java
             artifact sourcesJar
 //            artifact javadocJar

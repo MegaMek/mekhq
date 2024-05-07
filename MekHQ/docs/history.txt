@@ -1,5 +1,9 @@
 MEKHQ VERSION HISTORY:
 ---------------
+0.49.19.1 (2024-05-06 1744 UTC)
++ Fix #4023: Save boardType to XML
++ Fix #4052: Move modifiedTemperature to AtBScenario
+
 0.49.19 (2024-04-19 2030 UTC)
 + Bug #3958: No selling units in scenario resolution if campaign disallows selling
 + Fix #3949: Custom ScenarioObjectives do not change ScenarioStatus in ResolveScenarioWizardDialog
@@ -13,44 +17,44 @@ MEKHQ VERSION HISTORY:
 + Fix: #3815: StratCon Modifier BadEvent is broken and doesnt do anything
 + PR: #3874: Fixes MegaMek #4464 - StratCon Mapgen Fix
 + PR: #3866: Fixed Typo and Removed Indents
-+ Data: #3865: 499 new callsigns 
++ Data: #3865: 499 new callsigns
 + PR: #3878: Interstellar Map Hiring Hall Highlight
-+ PR: #3869: Fix issue #3839 to prevent loading clientsettings.xml instead of most recent campaign save 
-+ Fix #3730: Names of Victory Points (Stratcon) 
-+ PR #3867: Adjusted Retirement TN and Payout Values 
++ PR: #3869: Fix issue #3839 to prevent loading clientsettings.xml instead of most recent campaign save
++ Fix #3730: Names of Victory Points (Stratcon)
++ PR #3867: Adjusted Retirement TN and Payout Values
 + Fix #3877: MekHQ units aren't defaulting to active probes for sensors
-+ Fix #1812: AtB/StratCon] Base Attack (Defender) Objective Changes 
-+ PR #3892: Corrected Typo in Mass Repair Dialog 
-+ Fix #2990: Stratcon draw counts as loss 
-+ PR #3895: Correct Starting Cash Dice Count in Company Generator 
-+ PR #3900: Disconnect quietly from GameThread for MekHQ 
++ Fix #1812: AtB/StratCon] Base Attack (Defender) Objective Changes
++ PR #3892: Corrected Typo in Mass Repair Dialog
++ Fix #2990: Stratcon draw counts as loss
++ PR #3895: Correct Starting Cash Dice Count in Company Generator
++ PR #3900: Disconnect quietly from GameThread for MekHQ
 + PR #3834: Update planetary conditions chance logic
 + Fix #3803: MekHQ fix for WOB.pm/.PM mismatch and missing parent faction check
 + Fix #3932: Added Nag for Wounded Personnel without Doctor
-+ Fix #3890: Add Tech/Vessel Column to Tech Skills View 
++ Fix #3890: Add Tech/Vessel Column to Tech Skills View
 + PR #3951: Add OperationalVP variable to CommonObjectiveFactory.java (prep for later work)
 + Fix #3925: update Aerospace handling and reporting in MHQ (for #3882)
 + PR #3930: Prevent advancing day with pending vanilla scenarios
 + PR #3937: Added Nag for Wounded Personnel without Doctor
 + PR #3901: add lances to the force string when sending data to megamek for bot forces
-+ PR #3922: Add missing cockpit costs and weights 
-+ PR #3944: Added Nag Dialog for Pregnant Combatants 
++ PR #3922: Add missing cockpit costs and weights
++ PR #3944: Added Nag Dialog for Pregnant Combatants
 + Fix #3943: Unmaintained Unit Nag Dialog Suppressed for Units set to Salvage
-+ PR #3933: Fixes for #3729,#3817,#3753: Clamped Unit Rating Mod for CamOps (redux) 
-+ PR #3923: Hide Toughness When 0 
-+ PR #3915: Added Dialog to Confirm New Campaign (redux) 
-+ PR #3908: Adjusted Default Tech Counts 
-+ PR #3967: Adjusted Zoom Speed on Interstellar Map Panel 
++ PR #3933: Fixes for #3729,#3817,#3753: Clamped Unit Rating Mod for CamOps (redux)
++ PR #3923: Hide Toughness When 0
++ PR #3915: Added Dialog to Confirm New Campaign (redux)
++ PR #3908: Adjusted Default Tech Counts
++ PR #3967: Adjusted Zoom Speed on Interstellar Map Panel
 + Fix #3348: Added Ability to Collapse/Expand Logs, Missions and Kills in Personnel Unit Screen
-+ PR #3970: Reduced Personnel Table Right-Click Menu Clutter 
++ PR #3970: Reduced Personnel Table Right-Click Menu Clutter
 + Fix #3981: Removed Unnecessary Error Log
-+ PR #3988: Added Scenario & Mission Tracking to Kills, Added Ability to Assign Kills to Scenario and/or Mission 
++ PR #3988: Added Scenario & Mission Tracking to Kills, Added Ability to Assign Kills to Scenario and/or Mission
 + Fix #3989: Fixed Ship Search Overvaluing Ultra-Green Personnel
-+ PR #3996: Add new player deployment variables to Scenario 
++ PR #3996: Add new player deployment variables to Scenario
 + PR #3973: Move new lance creation to AtBGameThread
 + Fix #3978: Fix a bug with saving
 + PR #3983: Load bot entities in the chat lounge
-+ PR #3991: Add all deployment variables to BotForce 
++ PR #3991: Add all deployment variables to BotForce
 + Fix #3767: NPE while scouting Stratcon map due to non-applicable SPAs for enemy force
 + PR #3997: Set default MHQ theme to match MM GUIPreferences default (Flat Darcula currently)
 + Fix #4002: Infinite loop when assigning SPAs to enemies from generated Scenario locked game UI
@@ -62,16 +66,16 @@ MEKHQ VERSION HISTORY:
 + PR #3788: Adjust campaign creation dialogs to have correct jdialod owner
 + Fix #3540: Manually set TO&E force commander
 + PR #3818: MUL parser updates
-+ PR #3816: Show if unit is in repair or salvage mode in repair bay. 
++ PR #3816: Show if unit is in repair or salvage mode in repair bay.
 + PR #3823, #3827, #3833: Rework of the internal representation of Armor
 + PR #3826: Adaptation to Mek Clan name separation in MM
 + Fix #3740: Consistent messaging in Daily Activity Log: ComStar bill vs. C-Bill
 + PR #3821: Add max contract salvage percentage to campaign options
 + Fix #3763: Reversing quality names in unit set quality GM menu
-+ Fix #3194: Awarding non-stackable medals to multiple people 
++ Fix #3194: Awarding non-stackable medals to multiple people
 + Issue #3781: Force commanders can be picked from among highest-ranking individuals
 + Fix #3843: Fix chassis lookup
-+ Fix #3842: Can't load prefab campaigns  
++ Fix #3842: Can't load prefab campaigns
 + PR #3849: StratCon Heavy Battles, by PhoenixHeart.
 
 
@@ -98,16 +102,16 @@ MEKHQ VERSION HISTORY:
 + PR #3768: Arano Restoration Campaign - Planetary Control
 
 0.49.14 (2023-07-28 2100 UTC)
-+ PR #3676: Gradle build fixes 
++ PR #3676: Gradle build fixes
 + Issue #3682: Prevent NPE when changing bot config
 + Issue #3683 - fix issue preventing loading saved campaigns containing MASC
 + Issue #3621 - prevent NPE completing ship search immediately after loading campaign
 + PR #3692: Adaptations to MM's #4474 (BV calculation and reports update)
 + Issue #3402, #3715: Only hostile units are now displayed on the killboard during scenario resolution, Stratcon fixes
-+ PR #3694: New StratCon feature - tracks now have individual terrain hexes (with graphics) and average temperatures; 
++ PR #3694: New StratCon feature - tracks now have individual terrain hexes (with graphics) and average temperatures;
     the terrain influences the map presets used for tactical battles; temperature is passed to megamek (may be hot!)
 + PR #3724: "Clan Personnel" special flag now correctly sets the person's clan status
-+ PR #3731: Fix nightly build from a missed method rename in MegaMek. 
++ PR #3731: Fix nightly build from a missed method rename in MegaMek.
 + Issue #3713: allied turrets have upgraded network security; defeat in evacuation scenarios results in facility capture instead of destruction
 
 0.49.13 (2023-05-23 2000 UTC)
@@ -421,7 +425,7 @@ MEKHQ VERSION HISTORY:
 + PR #2862: Removing Useless Shares Sorter
 + Issue #2865: Specialist Infantry Salary Multiplier
 + PR #2844: AbstractIcon: Force Camouflage: Layering and Properly Sending to MegaMek
-+ Data: Adding UlyssessSockdrawer's excellent Co-op guide to docs folder. 
++ Data: Adding UlyssessSockdrawer's excellent Co-op guide to docs folder.
 + Issue #2873: Part doesn't serialize brandNew flag
 + Issue #2878: Prevent DropShip bay doors from continuously breaking down when loading saves
 + Issue #1236: Adding full support for Tripod 'Meks
@@ -461,7 +465,7 @@ MEKHQ VERSION HISTORY:
     more abstractly: capability to substitute player units for bot units in designated scenario force templates
     prevent "regenerate bot forces" button from displaying when editing completed scenarios
     allow contract completion for scenarios with remaining "fixed" objectives (useful for when the enemy morale goes to rout or you win a base of operations attack)
-    explicitly show that objectives in defensive contracts must be held until contract completion   
+    explicitly show that objectives in defensive contracts must be held until contract completion
         fix clicked hex detection on StratCon map when viewing anything other than top left corner when map doesn't fit on single screen (smaller resolutions/bigger maps)
         added scroll pane to info panel in case it has more data than can be displayed (important on smaller resolutions)
         do not un-deploy force from track if it's assigned to a scenario on the track until the scenario is resolved one way or another
@@ -698,10 +702,10 @@ MEKHQ VERSION HISTORY:
 + Issues #2217 #2219: Cannot save Campaign with Refits and cannot start new Refits
 + Issue #2220: Implementing AwardFileFactory to handle loading pngs that aren't handled by Toolkit
 
-0.47.13 (2020-11-09 1600 UTC) 
+0.47.13 (2020-11-09 1600 UTC)
 + Issue #2213: Fix disastrous bug in AmmoStorage::ctor
 
-0.47.12 (2020-11-08 2230 UTC) 
+0.47.12 (2020-11-08 2230 UTC)
 + Issue #1970: Workaround for single hex ecm causing Small Craft to be overweight
 + Issue #1079: Add refit time for moving a part between locations
 + PR #2117: Fixing New Personnel Market Report

@@ -104,7 +104,6 @@ public class Scenario {
     protected Fog fog;
     protected Atmosphere atmosphere;
     private int temperature;
-    private int modifiedTemperature;
     protected float gravity;
     private EMI emi;
     private BlowingSand blowingSand;
@@ -394,14 +393,6 @@ public class Scenario {
 
     public void setTemperature(int temperature) {
         this.temperature = temperature;
-    }
-
-    public int getModifiedTemperature() {
-        return modifiedTemperature;
-    }
-
-    public void setModifiedTemperature(int modifiedTemperature) {
-        this.modifiedTemperature = modifiedTemperature;
     }
 
     public float getGravity() {
@@ -875,6 +866,7 @@ public class Scenario {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "date", date);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cloaked", isCloaked());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "boardType", boardType);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasTrack", hasTrack);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usingFixedMap", isUsingFixedMap());
