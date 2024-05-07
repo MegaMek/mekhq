@@ -29,6 +29,7 @@
         <qualification>General Education</qualification>
         <curriculum>Bonus XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Preparatory School</name>
@@ -38,7 +39,7 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>22500</tuition>
-        <facultySkill>5</facultySkill>
+        <facultySkill>6</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
@@ -70,7 +71,7 @@
         <constructionYear>2300</constructionYear>
         <tuition>6250</tuition>
         <educationLevelMax>0</educationLevelMax>
-        <facultySkill>7</facultySkill>
+        <facultySkill>8</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>MechTech Apprenticeship</qualification>
@@ -102,6 +103,7 @@
         <qualification>General Education</qualification>
         <curriculum>Bonus XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Technical College</name>
@@ -129,7 +131,6 @@
         <qualification>Black Naval Technologies</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Trade School</name>
@@ -151,48 +152,126 @@
         <qualification>Nursing School</qualification>
         <curriculum>Medtech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>University</name>
+        <name>University (Bachelor's)</name>
         <description>The upper crust of higher education, universities offer a wide range of courses and post-graduate options</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>7500</tuition>
         <durationDays>600</durationDays>
-        <facultySkill>5</facultySkill>
+        <facultySkill>6</facultySkill>
         <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>4</educationLevelMax>
+        <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Advanced BattleMech Technologies</qualification>
+        <qualification>Bachelor's in Advanced BattleMech Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
-        <qualification>Advanced Technology &amp; Development</qualification>
+        <qualification>Bachelor's in Advanced Technology &amp; Development</qualification>
         <curriculum>Tech/Mechanic</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced AeroSpace Technologies</qualification>
+        <qualification>Bachelor's in Advanced AeroSpace Technologies</qualification>
         <curriculum>Tech/Aero</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
-        <qualification>Battle Armor Technology &amp; Development</qualification>
+        <qualification>Bachelor's in Battle Armor Technology &amp; Development</qualification>
         <curriculum>Tech/BA</curriculum>
         <qualificationStartYear>3052</qualificationStartYear>
-        <qualification>Black Naval Technologies</qualification>
+        <qualification>Bachelor's in Black Naval Technologies</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Advanced Systems &amp; Technology</qualification>
+        <qualification>Bachelor's in Advanced Systems &amp; Technology</qualification>
         <curriculum>Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Applied Economics</qualification>
+        <qualification>Bachelor's in Applied Economics</qualification>
         <curriculum>Negotiation, Scrounge</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Medical School</qualification>
+        <qualification>Bachelor's in Advanced Medicine</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Applied Astrophysics</qualification>
+        <qualification>Bachelor's in Applied Astrophysics</qualification>
         <curriculum>Hyperspace Navigation</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University (Master's)</name>
+        <description>The upper crust of higher education, universities offer a wide range of courses and post-graduate options</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>3</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Masters's in Advanced BattleMech Technologies</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Masters's in Advanced Technology &amp; Development</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Masters's in Advanced AeroSpace Technologies</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <qualification>Masters's in Battle Armor Technology &amp; Development</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Masters's in Black Naval Technologies</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Masters's in Advanced Systems &amp; Technology</qualification>
+        <curriculum>Administration</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Masters's in Applied Economics</qualification>
+        <curriculum>Negotiation, Scrounge</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Masters's in Advanced Medicine</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Masters's in Applied Astrophysics</qualification>
+        <curriculum>Hyperspace Navigation</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>University (Doctorate)</name>
+        <description>The upper crust of higher education, universities offer a wide range of courses and post-graduate options</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>3</educationLevelMin>
+        <educationLevelMax>4</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Doctorate in Advanced BattleMech Technologies</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Doctorate in Advanced Technology &amp; Development</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Doctorate in Advanced AeroSpace Technologies</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <qualification>Doctorate in Battle Armor Technology &amp; Development</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Doctorate in Black Naval Technologies</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Doctorate in Advanced Systems &amp; Technology</qualification>
+        <curriculum>Administration</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Doctorate in Applied Economics</qualification>
+        <curriculum>Negotiation, Scrounge</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Doctorate in Advanced Medicine</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Doctorate in Applied Astrophysics</qualification>
+        <curriculum>Hyperspace Navigation</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
     </academy>
     <academy>
         <name>Police Academy</name>
@@ -220,8 +299,9 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>1250</tuition>
+        <educationLevelMax>0</educationLevelMax>
         <durationDays>70</durationDays>
-        <facultySkill>7</facultySkill>
+        <facultySkill>8</facultySkill>
         <ageMin>16</ageMin>
         <qualification>Mechanized Cavalry Bootcamp</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
@@ -238,7 +318,7 @@
         <qualification>Infantry Bootcamp</qualification>
         <curriculum>Small Arms</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military Academy</name>
@@ -276,7 +356,6 @@
         <qualification>Naval Academy</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Naval</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>NCO Candidate School</name>
@@ -285,13 +364,15 @@
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
-        <tuition>2500</tuition>
+        <tuition>4375</tuition>
         <durationDays>70</durationDays>
         <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>1</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>NCO Candidacy</qualification>
         <curriculum>Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrant Officer Candidate School</name>
@@ -300,15 +381,14 @@
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
-        <tuition>5000</tuition>
-        <durationDays>300</durationDays>
+        <tuition>8750</tuition>
+        <durationDays>70</durationDays>
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Warrant Officer</qualification>
         <curriculum>Leadership, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Officer Candidate School</name>
@@ -317,8 +397,8 @@
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
-        <tuition>5000</tuition>
-        <durationDays>300</durationDays>
+        <tuition>8750</tuition>
+        <durationDays>70</durationDays>
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
@@ -328,6 +408,5 @@
         <qualification>Command Officer</qualification>
         <curriculum>Leadership, Strategy</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
 </academies>

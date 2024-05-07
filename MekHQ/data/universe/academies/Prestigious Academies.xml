@@ -7,9 +7,9 @@
         <faction>DC</faction>
         <locationSystem>Dover</locationSystem>
         <constructionYear>3056</constructionYear>
-        <tuition>11375</tuition>
+        <tuition>18500</tuition>
         <durationDays>600</durationDays>
-        <facultySkill>5</facultySkill>
+        <facultySkill>4</facultySkill>
         <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
@@ -19,7 +19,6 @@
         <qualification>Advanced Interstellar Interception &amp; Combat</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Small Arms, Medtech</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Aerospace and Interstellar Institute [Dover]</name>
@@ -28,9 +27,9 @@
         <faction>DC</faction>
         <locationSystem>Dover</locationSystem>
         <constructionYear>3056</constructionYear>
-        <tuition>19000</tuition>
+        <tuition>39500</tuition>
         <durationDays>300</durationDays>
-        <facultySkill>4</facultySkill>
+        <facultySkill>5</facultySkill>
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
@@ -48,30 +47,29 @@
         <faction>DA</faction>
         <locationSystem>Aitutaki</locationSystem>
         <constructionYear>2414</constructionYear>
-        <tuition>9500</tuition>
+        <tuition>6500</tuition>
         <durationDays>300</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
         <qualification>Basic Training</qualification>
         <curriculum>Small Arms, Tactics</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Aitutaki Academy (Second &amp; Third Year Curriculum)</name>
         <isMilitary>true</isMilitary>
-        <description>Founded in 2414 by Hered Selaj, the Aitutaki Military Academy has been a center of anti-Marik sentiment. Initially exclusive to Regulan students, enrollment policies broadened under Thomas Marik's reign due to LCCC directives. The school's atmosphere includes strict traditions and practices, such as challenging trials by combat among cadets, which have been scrutinized by the LCCC. Graduates, mainly MechWarriors, often retain pro-Regulus sentiments, despite LCCC's efforts to diversify assignments.</description>
+        <description>Founded in 2414 by Hered Selaj, the Aitutaki Military Academy has been a center of anti-Marik sentiment. The school's atmosphere includes strict traditions and practices, such as challenging trials by combat among cadets, which have been scrutinized by the LCCC. Graduates, mainly MechWarriors, often retain pro-Regulus sentiments, despite LCCC's efforts to diversify assignments.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>DA</faction>
         <locationSystem>Aitutaki</locationSystem>
         <constructionYear>2414</constructionYear>
-        <tuition>4800</tuition>
+        <tuition>15750</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>3</educationLevelMax>
+        <educationLevelMax>2</educationLevelMax>
         <qualification>School of BattleMech Warfare</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Strategy</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
@@ -99,7 +97,7 @@
         <locationSystem>Alarion</locationSystem>
         <constructionYear>3060</constructionYear>
         <destructionYear>3069</destructionYear>
-        <tuition>8750</tuition>
+        <tuition>13125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>1</educationLevelMin>
@@ -111,6 +109,7 @@
         <qualification>Advanced Interstellar Interception &amp; Combat</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Tech/Aero</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Albion Military Academy</name>
@@ -121,58 +120,59 @@
         <faction>FS</faction>
         <locationSystem>Albion</locationSystem>
         <constructionYear>2400</constructionYear>
-        <tuition>8250</tuition>
+        <tuition>12000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>BattleMech Training Cadre</qualification>
+        <qualification>BattleMech Officer Training Cadre</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
-        <qualification>Mechanized Training Cadre</qualification>
+        <qualification>Mechanized Officer Training Cadre</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
-        <qualification>Battle Armor Training Cadre</qualification>
+        <qualification>Battle Armor Officer Training Cadre</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership</curriculum>
         <qualificationStartYear>3052</qualificationStartYear>
-        <qualification>Infantry Training Cadre</qualification>
-        <curriculum>Small Arms, Artillery, Anti-Mech</curriculum>
+        <qualification>Infantry Officer Training Cadre</qualification>
+        <curriculum>Small Arms, Artillery, Anti-Mech, Leadership</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
-        <qualification>Naval Training Cadre</qualification>
-        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel</curriculum>
+        <qualification>Naval Officer Training Cadre</qualification>
+        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Technician Training Cadre</qualification>
-        <curriculum>Tech/Mech, Tech/Mechanic</curriculum>
+        <qualification>Technician Officer Training Cadre</qualification>
+        <curriculum>Tech/Mech, Tech/Mechanic, Leadership</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
-        <qualification>Technician Training Cadre [with BA]</qualification>
-        <curriculum>Tech/Mech, Tech/Mechanic, Tech/BA</curriculum>
+        <qualification>Technician Officer Training Cadre [with BA]</qualification>
+        <curriculum>Tech/Mech, Tech/Mechanic, Tech/BA, Leadership</curriculum>
         <qualificationStartYear>3052</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Algedi War College</name>
         <isMilitary>true</isMilitary>
-        <description>Established in 3075 in Algedi, the Algedi War College has quickly become a significant military institution, particularly recognized for its new mobile warfare division. This development aligns with the increased production of military vehicles on the Arkab worlds. The college primarily admits candidates with an Azami background, reflecting its unique cultural focus.</description>
+        <description>Established in 3075 in Algedi, the Algedi War College has quickly become a significant military institution, particularly recognized for its mobile warfare division. This development aligns with the increased production of military vehicles on the Arkab worlds. The college primarily admits candidates with an Azami background, reflecting its unique cultural focus.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>DC</faction>
         <locationSystem>Algedi</locationSystem>
         <constructionYear>3075</constructionYear>
-        <tuition>7000.</tuition>
+        <tuition>10500</tuition>
         <durationDays>900</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
-        <qualification>Mechanized Training Cadre</qualification>
-        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership</curriculum>
+        <qualification>Mechanized College</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
-        <qualification>Battle Armor Training Cadre</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership</curriculum>
+        <qualification>Battle Armor College</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
         <qualificationStartYear>3052</qualificationStartYear>
-        <qualification>Infantry Training Cadre</qualification>
+        <qualification>Infantry College</qualification>
         <curriculum>Small Arms, Artillery, Anti-Mech</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Allison MechWarrior Institute</name>
@@ -191,6 +191,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Strategy, Tactics</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>An Ting University</name>
@@ -202,18 +203,19 @@
         <locationSystem>An Ting</locationSystem>
         <constructionYear>2750</constructionYear>
         <destructionYear>3015</destructionYear>
-        <tuition>5250</tuition>
+        <tuition>21000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>BattleMech Training Cadre</qualification>
-        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualification>BattleMech Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
-        <qualification>Aerospace Training Cadre</qualification>
-        <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
+        <qualification>Aerospace  Officer Graduate</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>An Ting University (3055)</name>
@@ -225,24 +227,25 @@
         <locationSystem>An Ting</locationSystem>
         <constructionYear>2750</constructionYear>
         <destructionYear>3015</destructionYear>
-        <tuition>5250</tuition>
+        <tuition>21000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>3</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>BattleMech Training Cadre</qualification>
-        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
         <qualification>Aerospace Training Cadre</qualification>
-        <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
         <qualification>Battle Armor Training Cadre</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>3052</qualificationStartYear>
         <qualification>AeroSpace Training Cadre</qualification>
-        <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>3060</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Annapolis Naval Academy</name>
@@ -260,12 +263,13 @@
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Interstellar Officer Training Cadre</qualification>
-        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel, Leadership, Tactics, Strategy</curriculum>
+        <qualification>Interstellar Officer Graduate</qualification>
+        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Marine Officer Training Cadre</qualification>
+        <qualification>Marine Officer Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Annapolis Naval Academy (ComStar)</name>
@@ -283,12 +287,13 @@
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Interstellar Officer Training Cadre</qualification>
-        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel, Leadership, Tactics, Strategy</curriculum>
+        <qualification>Interstellar Officer Graduate</qualification>
+        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Marine Officer Training Cadre</qualification>
+        <qualification>Marine Officer Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Apollo Military Academy</name>
@@ -300,25 +305,25 @@
         <locationSystem>Apollo</locationSystem>
         <constructionYear>2400</constructionYear>
         <closureYear>2780</closureYear>
-        <tuition>6000</tuition>
+        <tuition>35000</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>BattleMech Officers Academy</qualification>
-        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership</curriculum>
+        <qualification>BattleMech Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
-        <qualification>Mechanized Officers Academy</qualification>
-        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership</curriculum>
+        <qualification>Mechanized Officer Graduate</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
-        <qualification>Advanced Combat Officers Academy</qualification>
-        <curriculum>Small Arms, Artillery, Anti-Mech, Leadership</curriculum>
+        <qualification>Advanced Combat Officer Graduate</qualification>
+        <curriculum>Small Arms, Artillery, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
-        <qualification>Aerospace Officers Academy</qualification>
-        <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership</curriculum>
+        <qualification>Aerospace Officer Graduate</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Armstrong Flight Academy</name>
@@ -328,22 +333,22 @@
         <locationSystem>Galax</locationSystem>
         <constructionYear>2790</constructionYear>
         <destructionYear>3069</destructionYear>
-        <tuition>3500.</tuition>
+        <tuition>14000.</tuition>
         <durationDays>900</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Aerospace Training School</qualification>
+        <qualification>Aerospace Graduate</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
-        <qualification>Naval Training School</qualification>
+        <qualification>Naval Graduate</qualification>
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Interstellar Technician Training School</qualification>
+        <qualification>Interstellar Technician Graduate</qualification>
         <curriculum>Tech/Aero, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Armstrong Pheonix Academy</name>
@@ -352,7 +357,7 @@
         <faction>FS</faction>
         <locationSystem>Delavan</locationSystem>
         <constructionYear>2070</constructionYear>
-        <tuition>3500.</tuition>
+        <tuition>14000</tuition>
         <durationDays>900</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMin>1</educationLevelMin>
@@ -367,7 +372,7 @@
         <qualification>Interstellar Technician Training School</qualification>
         <curriculum>Tech/Aero, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Athene Combat School</name>
@@ -378,7 +383,7 @@
         <faction>DA</faction>
         <locationSystem>Atreus</locationSystem>
         <constructionYear>2760</constructionYear>
-        <tuition>2200</tuition>
+        <tuition>4375</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>1</educationLevelMin>
@@ -401,14 +406,14 @@
         <faction>DA</faction>
         <locationSystem>Atreus</locationSystem>
         <constructionYear>2750</constructionYear>
-        <tuition>10500</tuition>
+        <tuition>31500</tuition>
         <durationDays>300</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Officer Candidacy School</qualification>
-        <curriculum>Administration, Negotiation, Leadership, Strategy, Tactics</curriculum>
+        <qualification>Officer Graduate</qualification>
+        <curriculum>Administration, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>

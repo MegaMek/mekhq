@@ -35,9 +35,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
- * This class represents an academy.
- * The following fields are serialized to XML: name, description, locationSystems, constructionYear, destructionYear,
- * tuition, durationDays, tierMin, tierMax, skills, and baseAcademicSkillLevel.
+ * The Academy class represents an academy with various properties and methods.
  */
 @XmlRootElement(name = "academy")
 @XmlAccessorType(value = XmlAccessType.FIELD)
@@ -93,7 +91,7 @@ public class Academy implements Comparable<Academy> {
     private Integer durationDays = 11;
 
     @XmlElement(name = "facultySkill")
-    private Integer facultySkill = 6;
+    private Integer facultySkill = 7;
 
     // 0 = early childhood <= 10
     // 1 = (11-16) high school
@@ -113,19 +111,18 @@ public class Academy implements Comparable<Academy> {
     private Integer ageMax = 9999;
 
     @XmlElement(name = "qualification")
-    private List<String> qualifications = null;
+    private List<String> qualifications;
 
     @XmlElement(name = "curriculum")
-    private List<String> curriculums = null;
+    private List<String> curriculums;
 
     @XmlElement(name = "qualificationStartYear")
-    private List<Integer> qualificationStartYears = null;
+    private List<Integer> qualificationStartYears;
 
     @XmlElement(name = "baseAcademicSkillLevel")
-    private Integer baseAcademicSkillLevel = 0;
+    private Integer baseAcademicSkillLevel = -1;
 
     private Integer id;
-
     private String set;
 
     /**

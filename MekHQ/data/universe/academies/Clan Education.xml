@@ -17,7 +17,7 @@
         <qualification>Tuition &amp; Primary Care</qualification>
         <curriculum>Bonus XP, Small Arms</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>2</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Trueborn Education</name>
@@ -65,7 +65,7 @@
         <qualification>Labour Caste Apprenticeship</qualification>
         <curriculum>Astech, Medtech</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>2</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Freeborn Education</name>
