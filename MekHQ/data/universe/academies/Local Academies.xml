@@ -238,6 +238,7 @@
         <qualification>Infantry Bootcamp</qualification>
         <curriculum>Small Arms</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military Academy</name>
@@ -247,13 +248,16 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>3500</tuition>
-        <durationDays>300</durationDays>
+        <durationDays>600</durationDays>
         <educationLevelMin>1</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Academy</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Mechanized Academy</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Flight Academy</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
@@ -268,6 +272,9 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced War Fighting Academy</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Naval Academy</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Naval</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
@@ -294,13 +301,14 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>5000</tuition>
-        <durationDays>150</durationDays>
-        <educationLevelMin>1</educationLevelMin>
+        <durationDays>300</durationDays>
+        <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Warrant Officer</qualification>
         <curriculum>Leadership, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Officer Candidate School</name>
@@ -310,8 +318,8 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>5000</tuition>
-        <durationDays>150</durationDays>
-        <educationLevelMin>1</educationLevelMin>
+        <durationDays>300</durationDays>
+        <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>2</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Field Officer</qualification>
@@ -320,5 +328,6 @@
         <qualification>Command Officer</qualification>
         <curriculum>Leadership, Strategy</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
 </academies>

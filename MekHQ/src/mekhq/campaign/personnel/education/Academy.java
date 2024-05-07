@@ -24,7 +24,6 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.universe.Factions;
@@ -62,7 +61,7 @@ public class Academy implements Comparable<Academy> {
     private String description = "Error: no description";
 
     @XmlElement(name = "factionDiscount")
-    private Integer factionDiscount = 25;
+    private Integer factionDiscount = 10;
 
     @XmlElement(name = "isFactionRestricted")
     private Boolean isFactionRestricted = false;
