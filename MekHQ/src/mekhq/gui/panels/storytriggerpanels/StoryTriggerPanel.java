@@ -18,7 +18,7 @@ public abstract class StoryTriggerPanel extends AbstractMHQScrollablePanel {
         initialize();
     }
 
-    protected StoryTrigger getStoryTrigger() {
+    public StoryTrigger getStoryTrigger() {
         return storyTrigger;
     }
 
@@ -37,5 +37,5 @@ public abstract class StoryTriggerPanel extends AbstractMHQScrollablePanel {
 
     protected abstract void createMainPanel();
 
-    protected abstract void save();
+    public abstract void updateStoryStrigger();
 }

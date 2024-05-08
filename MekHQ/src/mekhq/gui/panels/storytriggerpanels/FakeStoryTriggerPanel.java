@@ -16,7 +16,8 @@ public class FakeStoryTriggerPanel extends StoryTriggerPanel {
     }
 
     @Override
-    protected void save() {
-
+    public void updateStoryStrigger() {
+        // nothing to update
     }
+
 }

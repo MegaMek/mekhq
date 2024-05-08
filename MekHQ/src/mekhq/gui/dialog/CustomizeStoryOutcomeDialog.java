@@ -1,15 +1,15 @@
 package mekhq.gui.dialog;
 
-import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryOutcome;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.StoryTrigger;
-import mekhq.gui.model.StoryTriggerListModel;
+import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import mekhq.gui.utilities.JSuggestField;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class CustomizeStoryOutcomeDialog extends JDialog {
@@ -20,7 +20,7 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
     String result;
     boolean isNewOutcome;
     private JSuggestField suggestNext;
-    private JList<StoryTrigger> listTriggers;
+    private ArrayList<StoryTriggerPanel> triggerPanels;
 
     public CustomizeStoryOutcomeDialog(JFrame parent, boolean modal, String result, StoryPoint sp, boolean isNew) {
         super(parent, modal);
@@ -88,23 +88,16 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
         gbc.gridy++;
         panMain.add(suggestNext, gbc);
 
-        JPanel panTriggers = new JPanel(new BorderLayout());
-        panTriggers.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Story Triggers"),
-                BorderFactory.createEmptyBorder(5,5,5,5)));
-        JPanel panTriggerButtons = new JPanel(new GridLayout(0, 2));
-        JComboBox comboNewTrigger = new JComboBox();
-        panTriggerButtons.add(comboNewTrigger);
-        panTriggerButtons.add(new JButton("Add Trigger"));
-        panTriggerButtons.add(new JButton("Edit Trigger"));
-        panTriggerButtons.add(new JButton("Delete Trigger"));
-        panTriggers.add(panTriggerButtons, BorderLayout.PAGE_START);
+        JPanel panTriggers = new JPanel();
+        panTriggers.setLayout(new BoxLayout(panTriggers, BoxLayout.Y_AXIS));
 
-        StoryTriggerListModel model = new StoryTriggerListModel();
-        model.setData(outcome.getStoryTriggers());
-        listTriggers = new JList<>(model);
-        listTriggers.setCellRenderer(model.getRenderer());
-        panTriggers.add(listTriggers, BorderLayout.CENTER);
+        triggerPanels = new ArrayList<>();
+        StoryTriggerPanel panTrigger;
+        for(StoryTrigger trigger : outcome.getStoryTriggers()) {
+            panTrigger = trigger.getPanel(frame);
+            panTriggers.add(panTrigger);
+            triggerPanels.add(panTrigger);
+        }
 
         gbc.gridy++;
         gbc.gridx = 0;
@@ -136,6 +129,12 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
             outcome.setResult(result);
             storyPoint.addStoryOutcome(result, outcome);
         }
+        ArrayList<StoryTrigger> triggers = new ArrayList<>();
+        for(StoryTriggerPanel panel : triggerPanels) {
+            panel.updateStoryStrigger();
+            triggers.add(panel.getStoryTrigger());
+        }
+        outcome.setStoryTriggers(triggers);
         setVisible(false);
     }
 
