@@ -290,15 +290,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     private void initBattle(Campaign campaign) {
         setTerrain();
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() &&
+                null != campaign.getMission(getMissionId())) {
+            setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
+        }
         if (campaign.getCampaignOptions().isUseLightConditions()) {
             setLightConditions();
         }
         if (campaign.getCampaignOptions().isUseWeatherConditions()) {
             setWeather();
-        }
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions() &&
-                null != campaign.getMission(getMissionId())) {
-            setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
         }
         setMapSize();
         setMapFile();
