@@ -3580,7 +3580,11 @@ public class Unit implements ITechnology {
         }
 
         // Clear any stale game data that may somehow have gotten set incorrectly
-        getCampaign().clearGameData(entity);
+        try {
+            getCampaign().clearGameData(entity);
+        } catch (NoSuchElementException e) {
+            LogManager.getLogger().error("Failure to reset entity " + entity.toString(), e);
+        }
         // Set up SPAs, Implants, Edge, etc
         if (getCampaign().getCampaignOptions().isUseAbilities()) {
             PilotOptions options = new PilotOptions(); // MegaMek-style as it is sent to MegaMek
