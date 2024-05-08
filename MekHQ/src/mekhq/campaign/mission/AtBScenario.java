@@ -185,6 +185,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private static TerrainConditionsOddsManifest TCO;
     private static StratconBiomeManifest SB;
+    private int modifiedTemperature;
     //endregion Variable Declarations
 
     public AtBScenario () {
@@ -313,6 +314,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 rerollsRemaining = getLance(campaign).getCommander(campaign).getSkill(SkillType.S_TACTICS).getLevel();
             }
         }
+    }
+
+    public int getModifiedTemperature() {
+        return modifiedTemperature;
+    }
+
+    public void setModifiedTemperature(int modifiedTemperature) {
+        this.modifiedTemperature = modifiedTemperature;
     }
 
     public void setTerrain() {
@@ -1515,6 +1524,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deploymentDelay", deploymentDelay);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceCount", lanceCount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rerollsRemaining", rerollsRemaining);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "modifiedTemperature", modifiedTemperature);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
 
         if (null != bigBattleAllies && !bigBattleAllies.isEmpty()) {
@@ -1614,6 +1624,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     lanceCount = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rerollsRemaining")) {
                     rerollsRemaining = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("modifiedTemperature")) {
+                    modifiedTemperature = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
                     terrainType = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayer")) {
