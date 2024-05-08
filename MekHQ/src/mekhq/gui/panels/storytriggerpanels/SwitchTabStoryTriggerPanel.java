@@ -10,7 +10,7 @@ import java.awt.*;
 
 public class SwitchTabStoryTriggerPanel extends StoryTriggerPanel {
 
-    MMComboBox<MHQTabType> comboTab;
+    private MMComboBox<MHQTabType> comboTab;
 
     public SwitchTabStoryTriggerPanel(JFrame frame, String name, SwitchTabStoryTrigger trigger) {
         super(frame, name, trigger);
