@@ -12,22 +12,14 @@ public class SwitchTabStoryTriggerPanel extends StoryTriggerPanel {
 
     MMComboBox<MHQTabType> comboTab;
 
-    public SwitchTabStoryTriggerPanel(JFrame frame, String name, StoryTrigger trigger) {
+    public SwitchTabStoryTriggerPanel(JFrame frame, String name, SwitchTabStoryTrigger trigger) {
         super(frame, name, trigger);
     }
 
     @Override
     protected void createMainPanel() {
-        SwitchTabStoryTrigger switchTrigger;
-        if(!(getStoryTrigger() instanceof SwitchTabStoryTrigger)) {
-            getMainPanel().add(new JLabel("Incorrect story trigger type!"));
-            return;
-        } else {
-            switchTrigger = (SwitchTabStoryTrigger) getStoryTrigger();
-        }
-
         comboTab = new MMComboBox<>("comboTab", MHQTabType.values());
-        comboTab.setSelectedItem(switchTrigger.getTab());
+        comboTab.setSelectedItem(((SwitchTabStoryTrigger) getStoryTrigger()).getTab());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -41,17 +33,10 @@ public class SwitchTabStoryTriggerPanel extends StoryTriggerPanel {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         getMainPanel().add(comboTab, gbc);
-
     }
 
     @Override
     public void updateStoryStrigger() {
-        SwitchTabStoryTrigger switchTrigger;
-        if(!(getStoryTrigger() instanceof SwitchTabStoryTrigger)) {
-            return;
-        } else {
-            switchTrigger = (SwitchTabStoryTrigger) getStoryTrigger();
-        }
-        switchTrigger.setTab(comboTab.getSelectedItem());
+        ((SwitchTabStoryTrigger) getStoryTrigger()).setTab(comboTab.getSelectedItem());
     }
 }

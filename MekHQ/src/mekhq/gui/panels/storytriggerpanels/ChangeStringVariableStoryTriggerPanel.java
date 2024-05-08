@@ -12,29 +12,22 @@ public class ChangeStringVariableStoryTriggerPanel extends StoryTriggerPanel {
     private JComboBox<String> comboKey;
     private JTextField txtValue;
 
-    public ChangeStringVariableStoryTriggerPanel(JFrame frame, String name, StoryTrigger trigger) {
+    public ChangeStringVariableStoryTriggerPanel(JFrame frame, String name, ChangeStringVariableStoryTrigger trigger) {
         super(frame, name, trigger);
     }
 
+
     @Override
     protected void createMainPanel() {
-        ChangeStringVariableStoryTrigger changeTrigger;
-        if(!(getStoryTrigger() instanceof ChangeStringVariableStoryTrigger)) {
-            getMainPanel().add(new JLabel("Incorrect story trigger type!"));
-            return;
-        } else {
-            changeTrigger = (ChangeStringVariableStoryTrigger) getStoryTrigger();
-        }
-
         getMainPanel().setLayout(new GridBagLayout());
-        comboKey = new JComboBox<>();
 
+        comboKey = new JComboBox<>();
         for(String key : getStoryTrigger().getStoryArc().getCustomStringVariables().keySet()) {
             comboKey.addItem(key);
         }
-        comboKey.setSelectedItem(changeTrigger.getKey());
+        comboKey.setSelectedItem(((ChangeStringVariableStoryTrigger) getStoryTrigger()).getKey());
 
-        txtValue = new JTextField(changeTrigger.getValue());
+        txtValue = new JTextField(((ChangeStringVariableStoryTrigger) getStoryTrigger()).getValue());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -52,13 +45,7 @@ public class ChangeStringVariableStoryTriggerPanel extends StoryTriggerPanel {
 
     @Override
     public void updateStoryStrigger() {
-        ChangeStringVariableStoryTrigger changeTrigger;
-        if(!(getStoryTrigger() instanceof ChangeStringVariableStoryTrigger)) {
-            return;
-        } else {
-            changeTrigger = (ChangeStringVariableStoryTrigger) getStoryTrigger();
-        }
-        changeTrigger.setKey((String) comboKey.getSelectedItem());
-        changeTrigger.setValue(txtValue.getText());
+        ((ChangeStringVariableStoryTrigger) getStoryTrigger()).setKey((String) comboKey.getSelectedItem());
+        ((ChangeStringVariableStoryTrigger) getStoryTrigger()).setValue(txtValue.getText());
     }
 }
