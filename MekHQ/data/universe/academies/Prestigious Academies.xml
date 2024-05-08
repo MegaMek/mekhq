@@ -120,7 +120,7 @@
         <name>Albion Military Academy</name>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
-        <description>Founded in the 2400s, the Albion Military Academy (AMA) quickly became the Federated Suns' premier institution, gaining Star League recognition in 2604. Famously, it allowed graduates a unique buyout option to serve directly with the Federated Suns, circumventing SLDF service requirements. Post-Star League, AMA retained its elite status, even as it faced competition from the newly established NAIS College of Military Science.</description>
+        <description>Founded in the 2400s, the Albion Military Academy quickly became the Federated Suns' premier institution, gaining Star League recognition in 2604. Famously, it allowed graduates a unique buyout option to serve directly with the Federated Suns, circumventing SLDF service requirements.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>FS</faction>
@@ -205,7 +205,7 @@
         <name>An Ting University</name>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
-        <description>An Ting University is a renowned military academy historically dedicated to training MechWarriors. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence.</description>
+        <description>An Ting University is a renowned military academy historically dedicated to training MechWarriors. The University, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>DC</faction>
@@ -230,7 +230,7 @@
         <name>An Ting University (3055)</name>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
-        <description>An Ting University is a renowned military academy historically dedicated to training MechWarriors. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence. After significant damage from both external attacks and internal strife, particularly in 3015 from Sun Zhang Cadre alumni, the academy was shuttered until 3055 when it reopened with advancements from the Helm Memory Core.</description>
+        <description>An Ting University is a renowned military academy historically dedicated to training MechWarriors. The University, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence. After significant damage from both external attacks and internal strife, particularly in 3015 from Sun Zhang Cadre alumni, the academy was shuttered until 3055 when it reopened with advancements from the Helm Memory Core.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>DC</faction>
@@ -261,9 +261,7 @@
         <name>Annapolis Naval Academy</name>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
-        <description>Situated on the shores of Maryland's ancient Earth, Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the Star League era, it evolved to command the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on a heritage that seamlessly transitions cadets from seafaring origins to mastering the vastness of space, ensuring that the tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
-        <factionDiscount>0</factionDiscount>
-        <isFactionRestricted>true</isFactionRestricted>
+        <description>Situated on the shores of Maryland, Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the Star League era, it evolved to command the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on a heritage that seamlessly transitions cadets from seafaring origins to mastering the vastness of space, ensuring that the tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
         <faction>SL</faction>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2572</constructionYear>
@@ -312,8 +310,7 @@
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
         <description>Known for its rigorous standards and distinguished graduates, the Apollo Military Academy excels in producing MechWarriors of superior leadership and combat skills, rivaling those from the most prestigious academies in the Inner Sphere.</description>
-        <factionDiscount>0</factionDiscount>
-        <isFactionRestricted>true</isFactionRestricted>
+        <factionDiscount>10</factionDiscount>
         <faction>RWR</faction>
         <locationSystem>Apollo</locationSystem>
         <constructionYear>2400</constructionYear>
@@ -393,7 +390,7 @@
         <name>Athene Combat School</name>
         <isMilitary>true</isMilitary>
         <promotion>Corporal</promotion>
-        <description>The Athene Combat School (ACS) was created during a period of high recruitment within the Free Worlds League, as part of efforts by the Dormuth Council to expand military education. Unique among its contemporaries, ACS focused exclusively on infantry training, addressing the significant demand for specialized infantry forces</description>
+        <description>The Athene Combat School was created during a period of high recruitment within the Free Worlds League, as part of efforts by the Dormuth Council to expand military education. Unique among its contemporaries, the school focuses exclusively on infantry training, addressing the significant demand for specialized infantry forces</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>DA</faction>
@@ -418,8 +415,6 @@
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
         <description>The Officer Training College offers a unique year-long course focused on developing leadership and command skills, the only one of its kind in the League. The curriculum emphasizes practical skills over theoretical knowledge, preparing officers for the complexities of daily bureaucratic responsibilities with a strong focus on delegation and time management.</description>
-        <factionDiscount>0</factionDiscount>
-        <isFactionRestricted>true</isFactionRestricted>
         <faction>DA</faction>
         <locationSystem>Atreus</locationSystem>
         <constructionYear>2750</constructionYear>
@@ -487,7 +482,7 @@
         <name>Calloway Martial College</name>
         <isMilitary>true</isMilitary>
         <promotion>Corporal</promotion>
-        <description>Founded in the mid-28th century, the Calloway Martial College (CMC) was established to address the surge in military recruitment within the Free Worlds League. As the first of three new schools created by the Dormuth Council, CMC quickly became operational, featuring its own Calloway Training Battalion.</description>
+        <description>Founded in the mid-28th century, the Calloway Martial College was established to address a surge in military recruitment within the Free Worlds League. As the first of three new schools created by the Dormuth Council, the college quickly became operational, featuring its own Calloway Training Battalion.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>FWL</faction>
@@ -498,7 +493,7 @@
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
+        <qualification>MechWarrior Training Cadre</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -556,12 +551,12 @@
         <name>Capella War College</name>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
-        <description>The Capella War College, established concurrently with the Capellan Hegemony, is the oldest military academy in the Capellan Confederation. Known for its rigorous standards and extensive facilities, the college trains MechWarriors, aerospace pilots, DropShip and JumpShip crews, vehicle crews, and infantry. Training emphasizes combined-arms tactics and includes cross-training with the local Duchy RTC.</description>
+        <description>The Capella War College, established concurrently with the Capellan Hegemony, is the oldest military academy in the Capellan Confederation. Known for its rigorous standards and extensive facilities, the college trains MechWarriors, aerospace pilots, DropShip and JumpShip crews, vehicle crews, and infantry.</description>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>CC</faction>
         <locationSystem>Capella</locationSystem>
         <constructionYear>2400</constructionYear>
-        <tuition>44625</tuition>
+        <tuition>40700</tuition>
         <durationDays>300</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMin>2</educationLevelMin>
@@ -576,7 +571,7 @@
         <qualification>Armored Infantry Officer Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>3052</qualificationStartYear>
-        <qualification>Advanced Infantry Officer Graduate</qualification>
+        <qualification>Infantry Officer Graduate</qualification>
         <curriculum>Small Arms, Artillery, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Flight Officer Graduate</qualification>
@@ -586,10 +581,10 @@
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Combined Arms Technical Officer Graduate</qualification>
-        <curriculum>Tech/Mech, Tech/Mechanic, Tech/Aero, Leadership, Administration, Negotiation</curriculum>
+        <curriculum>Tech/Mech, Tech/Mechanic, Tech/Aero, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Combined Arms Technical Officer Graduate [with BA]</qualification>
-        <curriculum>Tech/Mech, Tech/Aero, Tech/BA, Leadership, Administration, Negotiation</curriculum>
+        <curriculum>Tech/Mech, Tech/Mechanic, Tech/Aero, Tech/BA, Leadership</curriculum>
         <qualificationStartYear>3052</qualificationStartYear>
     </academy>
     <academy>
@@ -613,7 +608,7 @@
         <qualification>Mechanized Officer Graduate</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Officer Graduate</qualification>
+        <qualification>Infantry Officer Graduate</qualification>
         <curriculum>Small Arms, Artillery, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -640,7 +635,7 @@
         <qualification>Mechanized Officer Graduate</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Officer Graduate</qualification>
+        <qualification>Infantry Officer Graduate</qualification>
         <curriculum>Small Arms, Artillery, Anti-Mech, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -680,7 +675,7 @@
         <locationSystem>Coventry</locationSystem>
         <constructionYear>2700</constructionYear>
         <destructionYear>3058</destructionYear>
-        <tuition>15300</tuition>
+        <tuition>11000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>2</educationLevelMin>
@@ -690,7 +685,7 @@
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
         <qualification>MechTech Officer Graduate</qualification>
-        <curriculum>Tech/Mech, Leadership, Administration, Negotiation</curriculum>
+        <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -703,7 +698,7 @@
         <faction>LA</faction>
         <locationSystem>Coventry</locationSystem>
         <constructionYear>3060</constructionYear>
-        <tuition>18375</tuition>
+        <tuition>12125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
         <educationLevelMin>2</educationLevelMin>
@@ -713,8 +708,236 @@
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
         <qualification>MechTech Officer Graduate</qualification>
-        <curriculum>Tech/Mech, Leadership, Administration, Negotiation</curriculum>
+        <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Dieron District Gymnasium</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description>The Dieron District Gymnasium molds MechWarriors with its inclusive approach, admitting applicants based solely on merit. Cadets progress at individual paces, with classes held impromptu in the expansive gymnasium. Despite limited resources, it prioritizes combat readiness over prestige, producing adept warriors. Its innovative regimen, where study time earns simulator and 'Mech training, accelerates student advancement.</description>
+        <faction>DC</faction>
+        <locationSystem>Dieron</locationSystem>
+        <constructionYear>2800</constructionYear>
+        <closureYear>3068</closureYear>
+        <tuition>35000</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Armored Infantry Officer Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Infantry Officer Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Dieron District Gymnasium</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description>The Dieron District Gymnasium molds MechWarriors with its inclusive approach, admitting applicants based solely on merit. Cadets progress at individual paces, with classes held impromptu in the expansive gymnasium. Despite limited resources, it prioritizes combat readiness over prestige, producing adept warriors. Its innovative regimen, where study time earns simulator and 'Mech training, accelerates student advancement. Briefly closed in 3068, it reopened in 3078, drawing attention with its inaugural class of battlesuit trainees, including a notable presence of ISF agents.</description>
+        <faction>DC</faction>
+        <locationSystem>Dieron</locationSystem>
+        <constructionYear>3078</constructionYear>
+        <tuition>35000</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Armored Infantry Officer Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Infantry Officer Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Dieron Warriors' Academy</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
+        <description>The esteemed Dieron Warriors Academy operates as a foundational Military Academy within the Inner Sphere. Each year, it efficiently produces numerous highly proficient MechWarriors, focusing primarily on combat training rather than political affiliations.</description>
+        <faction>DC</faction>
+        <locationSystem>Shimonita</locationSystem>
+        <constructionYear>2700</constructionYear>
+        <destructionYear>2990</destructionYear>
+        <tuition>10500</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Training Cadre</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>People's Reconstruction Effort University of Ashio</name>
+        <description>After the establishment of The People's Reconstruction Effort, Zabu Kurita directed its efforts towards reconstruction and knowledge preservation. The University comprises professors and educators who lost their positions during the war's devastation. Through the establishment of a vast library, the University strives to safeguard and archive as much knowledge as feasible.</description>
+        <faction>DC</faction>
+        <locationSystem>Dover</locationSystem>
+        <constructionYear>2821</constructionYear>
+        <tuition>5250</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>4</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Advanced Science & Technology Graduate</qualification>
+        <curriculum>Doctor, Tech/Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Dover Institute for Higher Learning (Military Programs)</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
+        <description>The Dover Institute for Higher Learning (DIHL) emerged from the ashes of the People's Reconstruction Effort University of Ashio, decimated during the Shadow War of 2865. Established in 2910 under Coordinator Shinjiro Kurita's patronage, the institute prioritizes scientific and technical education, while also offering a comprehensive MechWarrior training program. Enrollment is open to all who meet basic criteria, with rigorous five-month basic training followed by a four-year curriculum exposing cadets to diverse combat scenarios.</description>
+        <faction>DC</faction>
+        <locationSystem>Dover</locationSystem>
+        <constructionYear>2910</constructionYear>
+        <tuition>5250</tuition>
+        <durationDays>1300</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Flight Graduate</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
+        <qualificationStartYear>3075</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Dover Institute for Higher Learning (Science Program)</name>
+        <description>The Dover Institute for Higher Learning (DIHL) emerged from the ashes of the People's Reconstruction Effort University of Ashio, decimated during the Shadow War of 2865. Established in 2910 under Coordinator Shinjiro Kurita's patronage, the institute prioritizes scientific and technical education, while also offering a comprehensive MechWarrior training program. Enrollment is open to all who meet basic criteria, with rigorous five-month basic training followed by a four-year curriculum exposing cadets to diverse combat scenarios.</description>
+        <faction>DC</faction>
+        <locationSystem>Dover</locationSystem>
+        <constructionYear>2910</constructionYear>
+        <tuition>5250</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>4</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Advanced Science & Technology Graduate</qualification>
+        <curriculum>Doctor, Tech/Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>École Militaire</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Corporal</promotion>
+        <description>The École Militaire is the most famous academy in the Taurian Concordat. Offering a comprehensive military education, graduates can expect field positions within a year of graduation.</description>
+        <faction>TC</faction>
+        <locationSystem>Taurus</locationSystem>
+        <destructionYear>3078</destructionYear>
+        <tuition>5250</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>4</facultySkill>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Mechanized Graduate</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Emma Centrella Martial Academy</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description><b>[SIGNAL CORRUPTED]</b></description>
+        <faction>MOC</faction>
+        <locationSystem>Canopus IV</locationSystem>
+        <constructionYear>3083</constructionYear>
+        <tuition>17500</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Mechanized Officer Graduate</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Piloting/VTOL, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Officer Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>3052</qualificationStartYear>
+        <qualification>Infantry Officer Graduate</qualification>
+        <curriculum>Small Arms, Artillery, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Flight Officer Graduate</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2439</qualificationStartYear>
+        <qualification>Interstellar Officer Graduate</qualification>
+        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Leadership, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Technology Officer Graduate</qualification>
+        <curriculum>Tech/Mech, Tech/Aero, Tech/Mechanic, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Ritza Academy</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description><b>[SIGNAL CORRUPTED]</b></description>
+        <faction>FS</faction>
+        <locationSystem>Emporia</locationSystem>
+        <destructionYear>3150</destructionYear>
+        <tuition>8750</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Mechanized Infantry Officer Graduate</qualification>
+        <curriculum>Small Arms, Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
+        <name>Emporia Military Academy</name>
+        <isMilitary>true</isMilitary>
+        <promotion>Lieutenant Jr. Grade</promotion>
+        <description><b>[SIGNAL CORRUPTED]</b></description>
+        <faction>FS</faction>
+        <locationSystem>Emporia</locationSystem>
+        <destructionYear>3150</destructionYear>
+        <tuition>8750</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>2</educationLevelMin>
+        <educationLevelMax>2</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Officer Graduate</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech, Leadership</curriculum>
+        <qualificationStartYear>2425</qualificationStartYear>
+        <qualification>Mechanized Infantry Officer Graduate</qualification>
+        <curriculum>Small Arms, Gunnery/Vehicle, Piloting/Ground Vehicle, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
     </academy>
 </academies>
