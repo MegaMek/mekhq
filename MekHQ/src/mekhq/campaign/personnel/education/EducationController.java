@@ -106,7 +106,7 @@ public class EducationController {
             try {
                 person.setEduAcademySystem(location.getId());
             } catch (Exception e) {
-                person.setEduAcademySystem("Redacted");
+                person.setEduAcademySystem("Strana Mechty");
             }
         } else {
             person.setEduDaysOfTravelToAcademy(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
@@ -472,16 +472,15 @@ public class EducationController {
             } else if ((academy.isClan()) && (!academy.isLocal())) {
                 try {
                     travelTime = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
-
-                    // We use a minimum of 2 days travel to avoid awkward grammar in the report.
-                    // This can be hand waved as being the time it takes for Person to get from campus and
-                    // recover from their education.
-                    if (travelTime < 2) {
-                        travelTime = 2;
-                    }
                 } catch (Exception e) {
-                    // not all Clans have a starting planet, so we abstract it
-                    travelTime = 100;
+                    travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById("Strana Mechty"));
+                }
+
+                // We use a minimum of 2 days travel to avoid awkward grammar in the report.
+                // This can be hand waved as being the time it takes for Person to get from campus and
+                // recover from their education.
+                if (travelTime < 2) {
+                    travelTime = 2;
                 }
             } else {
                 travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem()));

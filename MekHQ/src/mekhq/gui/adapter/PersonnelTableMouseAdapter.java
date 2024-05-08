@@ -2530,7 +2530,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     try {
                         campus = campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()).getId();
                     } catch (Exception e) {
-                        campus = null;
+                        campus = "Strana Mechty";
                     }
 
                     // Trueborn Clan Academies get a free pass, as applicants don't need to travel from the unit,
@@ -2540,25 +2540,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                         educationJMenuAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
 
-                        if (campus == null) {
-                            campus = "REDACTED";
-                        }
-
                         buildEducationSubMenus(campaign, academy, person, academyOption, campus, campaign.getFaction().getShortName());
                     } else {
-                        if (campus == null) {
-                            if (14 > campaign.getCampaignOptions().getMaximumJumpCount()) {
-                                if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowRangeConflict())) {
-                                    JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
-                                    educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
-                                }
-                            } else {
-                                JMenu academyOption = new JMenu(academy.getName());
-                                educationJMenuAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
-
-                                buildEducationSubMenus(campaign, academy, person, academyOption, "REDACTED", campaign.getFaction().getShortName());
-                            }
-                        } else if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)) / 7) <= campaign.getCampaignOptions().getMaximumJumpCount()) {
+                        if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)) / 7) <= campaign.getCampaignOptions().getMaximumJumpCount()) {
                             if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowRangeConflict())) {
                                 JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
                                 educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);

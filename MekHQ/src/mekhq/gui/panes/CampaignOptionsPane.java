@@ -328,7 +328,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private MMComboBox<FamilialRelationshipDisplayLevel> comboFamilyDisplayLevel;
 
     // Education
-    // TODO process these options in Campaign Options
     private JCheckBox chkUseEducationModule;
     private JCheckBox chkEduEnableAutoAwardsIntegration;
     private JLabel lblMaximumJumpCount;
@@ -4721,7 +4720,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblMaximumJumpCount = new JLabel(resources.getString("lblMaximumJumpCount.text"));
         lblMaximumJumpCount.setToolTipText(resources.getString("lblMaximumJumpCount.toolTip"));
         lblMaximumJumpCount.setName("lblMaximumJumpCount");
-        spnMaximumJumpCount = new JSpinner(new SpinnerNumberModel(20, 1, 200, 1));
+        spnMaximumJumpCount = new JSpinner(new SpinnerNumberModel(5, 1, 200, 1));
         spnMaximumJumpCount.setToolTipText(resources.getString("lblMaximumJumpCount.toolTip"));
         spnMaximumJumpCount.setName("spnMaximumJumpCount");
 

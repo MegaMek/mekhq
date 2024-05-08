@@ -789,7 +789,7 @@ public class CampaignOptions {
         // Education
         setUseEducationModule(true);
         setEduEnableAutoAwardsIntegration(true);
-        setMaximumJumpCount(20);
+        setMaximumJumpCount(5);
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
         setEnableClanEducation(true);
@@ -2176,7 +2176,6 @@ public class CampaignOptions {
     public void setEduEnableAutoAwardsIntegration(boolean eduEnableAutoAwardsIntegration) {
         this.eduEnableAutoAwardsIntegration = eduEnableAutoAwardsIntegration;
     }
-
 
     public Integer getMaximumJumpCount() {
         return maximumJumpCount;
@@ -3983,7 +3982,7 @@ public class CampaignOptions {
         //region Education
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEnableAutoAwardsIntegration", isEduEnableAutoAwardsIntegration());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCunt", getMaximumJumpCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCount", getMaximumJumpCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableClanEducation", isEnableClanEducation());

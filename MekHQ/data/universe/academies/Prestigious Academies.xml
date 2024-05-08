@@ -123,8 +123,8 @@
         <description>Founded in the 2400s, the Albion Military Academy quickly became the Federated Suns' premier institution, gaining Star League recognition in 2604. Famously, it allowed graduates a unique buyout option to serve directly with the Federated Suns, circumventing SLDF service requirements.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
-        <faction>FS</faction>
-        <locationSystem>Albion</locationSystem>
+        <faction>FC</faction>
+        <locationSystem>Albion (LC)</locationSystem>
         <constructionYear>2400</constructionYear>
         <tuition>12000</tuition>
         <durationDays>1200</durationDays>
@@ -262,7 +262,7 @@
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
         <description>Situated on the shores of Maryland, Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the Star League era, it evolved to command the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on a heritage that seamlessly transitions cadets from seafaring origins to mastering the vastness of space, ensuring that the tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
-        <faction>SL</faction>
+        <faction>TH</faction>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2572</constructionYear>
         <closureYear>2780</closureYear>
@@ -340,7 +340,7 @@
         <isMilitary>true</isMilitary>
         <promotion>Corporal</promotion>
         <description>The premier flight school of the Federated Suns and a leading institution in the Inner Sphere, well known for producing top-tier aerospace pilots and naval technicians. Strategically co-located at Galax near Federated-Boeing Interstellar, the largest spacecraft manufacturer in the region, the academy benefits from close interactions with leading engineers and test pilots. This relationship enhances practical training, allowing the academy to concentrate on high-level piloting and technician skills.</description>
-        <faction>FS</faction>
+        <faction>FC</faction>
         <locationSystem>Galax</locationSystem>
         <constructionYear>2790</constructionYear>
         <destructionYear>3069</destructionYear>
@@ -366,7 +366,7 @@
         <isMilitary>true</isMilitary>
         <promotion>Corporal</promotion>
         <description>Previously named the Armonstrong Flight Academy, the academy has been relocated and renamed Armstrong Phoenix Academy due to its original campus being rendered uninhabitable by a blood destroying bioweapon. Despite this, it maintains rigorous standards, with intense physical screenings and high skill requirements, leading to over half of the applicants being rejected pre-examination.</description>
-        <faction>FS</faction>
+        <faction>FC</faction>
         <locationSystem>Delavan</locationSystem>
         <constructionYear>2070</constructionYear>
         <tuition>14000</tuition>
@@ -394,7 +394,7 @@
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>DA</faction>
-        <locationSystem>Atreus</locationSystem>
+        <locationSystem>Atreus (FWL)</locationSystem>
         <constructionYear>2760</constructionYear>
         <tuition>4375</tuition>
         <durationDays>600</durationDays>
@@ -416,7 +416,7 @@
         <promotion>Lieutenant Jr. Grade</promotion>
         <description>The Officer Training College offers a unique year-long course focused on developing leadership and command skills, the only one of its kind in the League. The curriculum emphasizes practical skills over theoretical knowledge, preparing officers for the complexities of daily bureaucratic responsibilities with a strong focus on delegation and time management.</description>
         <faction>DA</faction>
-        <locationSystem>Atreus</locationSystem>
+        <locationSystem>Atreus (FWL)</locationSystem>
         <constructionYear>2750</constructionYear>
         <tuition>42000</tuition>
         <durationDays>300</durationDays>
@@ -434,7 +434,7 @@
         <isMilitary>true</isMilitary>
         <promotion>Corporal</promotion>
         <description>The Blackjack School of Conflict is a private military academy within the Lyran Commonwealth known for its unorthodox curriculum. Founded by tutors who failed entrance exams at other academies, it offered courses that included unofficial lessons on the shadier aspects of military life.</description>
-        <faction>LC</faction>
+        <faction>LA</faction>
         <locationSystem>Blackjack</locationSystem>
         <constructionYear>2750</constructionYear>
         <destructionYear>3051</destructionYear>
@@ -466,7 +466,7 @@
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>FOR</faction>
-        <locationSystem>Randis IV</locationSystem>
+        <locationSystem>Randis IV (Hope IV 2988-)</locationSystem>
         <constructionYear>2988</constructionYear>
         <tuition>21000</tuition>
         <durationDays>900</durationDays>
@@ -485,7 +485,7 @@
         <description>Founded in the mid-28th century, the Calloway Martial College was established to address a surge in military recruitment within the Free Worlds League. As the first of three new schools created by the Dormuth Council, the college quickly became operational, featuring its own Calloway Training Battalion.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
-        <faction>FWL</faction>
+        <faction>DA</faction>
         <locationSystem>Calloway VI</locationSystem>
         <constructionYear>2765</constructionYear>
         <destructionYear>2789</destructionYear>
@@ -506,7 +506,7 @@
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>MOC</faction>
-        <locationSystem>Canopus</locationSystem>
+        <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3058</constructionYear>
         <destructionYear>3071</destructionYear>
         <tuition>15750</tuition>
@@ -531,7 +531,7 @@
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>MOC</faction>
-        <locationSystem>Canopus</locationSystem>
+        <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3080</constructionYear>
         <tuition>15750</tuition>
         <durationDays>1320</durationDays>
@@ -671,7 +671,7 @@
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
         <description>The Coventry Academy, situated near the Coventry Metal Works plant on Dunnigan, is a pivotal institution. Originally focused solely on training MechWarriors, its ties to CMW have drawn criticism, but it persists as a crucial training ground.</description>
-        <faction>LC</faction>
+        <faction>LA</faction>
         <locationSystem>Coventry</locationSystem>
         <constructionYear>2700</constructionYear>
         <destructionYear>3058</destructionYear>
@@ -716,7 +716,7 @@
         <name>Dieron District Gymnasium</name>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
-        <description>The Dieron District Gymnasium molds MechWarriors with its inclusive approach, admitting applicants based solely on merit. Cadets progress at individual paces, with classes held impromptu in the expansive gymnasium. Despite limited resources, it prioritizes combat readiness over prestige, producing adept warriors. Its innovative regimen, where study time earns simulator and 'Mech training, accelerates student advancement.</description>
+        <description>The Dieron District Gymnasium molds MechWarriors with its inclusive approach, admitting applicants based solely on merit. Cadets progress at individual paces, with classes held impromptu in the expansive gymnasium. Despite limited resources, it prioritizes combat readiness over prestige, producing adept warriors. Its innovative regimen, where study time earns simulator and 'Mech training, speeding up student advancement.</description>
         <faction>DC</faction>
         <locationSystem>Dieron</locationSystem>
         <constructionYear>2800</constructionYear>
@@ -730,9 +730,6 @@
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
-        <qualification>Armored Infantry Officer Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
-        <qualificationStartYear>3052</qualificationStartYear>
         <qualification>Infantry Officer Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -742,7 +739,7 @@
         <name>Dieron District Gymnasium</name>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
-        <description>The Dieron District Gymnasium molds MechWarriors with its inclusive approach, admitting applicants based solely on merit. Cadets progress at individual paces, with classes held impromptu in the expansive gymnasium. Despite limited resources, it prioritizes combat readiness over prestige, producing adept warriors. Its innovative regimen, where study time earns simulator and 'Mech training, accelerates student advancement. Briefly closed in 3068, it reopened in 3078, drawing attention with its inaugural class of battlesuit trainees, including a notable presence of ISF agents.</description>
+        <description>The Dieron District Gymnasium molds MechWarriors with its inclusive approach, admitting applicants based solely on merit. Cadets progress at individual paces, with classes held impromptu in the expansive gymnasium. Despite limited resources, it prioritizes combat readiness over prestige, producing adept warriors. Its innovative regimen, where study time earns simulator and 'Mech training, speeding up student advancement. Briefly closed in 3068; it reopened in 3078, drawing attention with its inaugural class of battlesuit trainees, including a notable presence of ISF agents.</description>
         <faction>DC</faction>
         <locationSystem>Dieron</locationSystem>
         <constructionYear>3078</constructionYear>
@@ -757,7 +754,7 @@
         <qualificationStartYear>2425</qualificationStartYear>
         <qualification>Armored Infantry Officer Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
-        <qualificationStartYear>3052</qualificationStartYear>
+        <qualificationStartYear>3078</qualificationStartYear>
         <qualification>Infantry Officer Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Leadership, Tactics, Strategy</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -795,7 +792,7 @@
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>4</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Advanced Science & Technology Graduate</qualification>
+        <qualification>Advanced Science &amp; Technology Graduate</qualification>
         <curriculum>Doctor, Tech/Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
@@ -833,7 +830,7 @@
         <educationLevelMin>2</educationLevelMin>
         <educationLevelMax>4</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Advanced Science & Technology Graduate</qualification>
+        <qualification>Advanced Science &amp; Technology Graduate</qualification>
         <curriculum>Doctor, Tech/Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
@@ -903,7 +900,7 @@
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
         <description><b>[SIGNAL CORRUPTED]</b></description>
-        <faction>FS</faction>
+        <faction>FC</faction>
         <locationSystem>Emporia</locationSystem>
         <destructionYear>3150</destructionYear>
         <tuition>8750</tuition>
@@ -924,7 +921,7 @@
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
         <description><b>[SIGNAL CORRUPTED]</b></description>
-        <faction>FS</faction>
+        <faction>FC</faction>
         <locationSystem>Emporia</locationSystem>
         <destructionYear>3150</destructionYear>
         <tuition>8750</tuition>

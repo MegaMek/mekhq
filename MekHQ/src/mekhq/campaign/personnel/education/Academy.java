@@ -926,7 +926,7 @@ public class Academy implements Comparable<Academy> {
                 try {
                     distance = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
                 } catch (Exception e) {
-                    distance = 100;
+                    distance = campaign.getSimplifiedTravelTime(campaign.getSystemById("Strana Mechty"));
                 }
             }
         } else {
@@ -947,7 +947,7 @@ public class Academy implements Comparable<Academy> {
             try {
                 tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
             } catch (Exception e) {
-                tooltip.append(resources.getString("destinationRedacted.text")).append(")<br>");
+                tooltip.append("Strana Mechty").append(")<br>");
             }
         } else {
             tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");

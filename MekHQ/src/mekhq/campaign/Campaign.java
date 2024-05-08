@@ -4887,7 +4887,9 @@ public class Campaign implements ITechManager {
         if (Objects.equals(getCurrentSystem(), destination)) {
             return 0;
         } else {
-            return (int) ((getCurrentSystem().getDistanceTo(destination) / 30) * 7);
+            // I came to the value of 20 by eyeballing the average distance between planets within the Inner Sphere.
+            // It looked to be around 15-20LY, so 20LY seemed a good gauge
+            return (int) ((getCurrentSystem().getDistanceTo(destination) / 20) * 7);
         }
     }
 
