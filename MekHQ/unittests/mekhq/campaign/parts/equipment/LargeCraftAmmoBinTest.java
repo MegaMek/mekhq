@@ -208,10 +208,10 @@ public class LargeCraftAmmoBinTest {
         when(bay.getBayAmmo()).thenReturn(bayAmmo);
         when(entity.getEquipment(bayNum)).thenReturn((Mounted) bay);
 
+        ammoBin.setUnit(unit);
+
         // Set the bay as if we're in deserialization code
         ammoBin.setBay(bayNum);
-
-        ammoBin.setUnit(unit);
 
         assertEquals(bay, ammoBin.getBay());
     }
@@ -276,6 +276,7 @@ public class LargeCraftAmmoBinTest {
         weaponBays.add(wrongWeaponBay);
         weaponBays.add(weaponBay);
         when(entity.getWeaponBayList()).thenReturn(weaponBays);
+        when(entity.whichBay(equipmentNum)).thenReturn((WeaponMounted) weaponBay);
 
         // Add the ammo bin to the unit without setting up a bay
         ammoBin.setUnit(unit);
