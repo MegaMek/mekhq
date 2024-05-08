@@ -50,7 +50,7 @@ public abstract class StoryTrigger {
         this.arc = a;
     }
 
-    protected StoryArc getStoryArc() {
+    public StoryArc getStoryArc() {
         return arc;
     }
 
