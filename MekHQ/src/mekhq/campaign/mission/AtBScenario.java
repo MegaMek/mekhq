@@ -298,7 +298,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             setLightConditions();
         }
         if (campaign.getCampaignOptions().isUseWeatherConditions()) {
-            setWeather();
+            setWeatherConditions();
         }
         setMapSize();
         setMapFile();
@@ -334,7 +334,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setLight(TCO.rollLightCondition(getTerrainType()));
     }
 
-    public void setWeather() {
+    public void setWeatherConditions() {
         // weather is irrelevant in these situations.
         if (getBoardType() == AtBScenario.T_SPACE ||
                 getBoardType() == AtBScenario.T_ATMOSPHERE) {

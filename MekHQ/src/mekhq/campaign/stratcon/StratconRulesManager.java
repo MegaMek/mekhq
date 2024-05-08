@@ -232,7 +232,7 @@ public class StratconRulesManager {
                 backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
             }
             backingScenario.setLightConditions();
-            backingScenario.setWeather();
+            backingScenario.setWeatherConditions();
         }
     }
 
