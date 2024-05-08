@@ -40,7 +40,7 @@ public class CompleteMissionStoryTriggerPanel extends StoryTriggerPanel {
             currentMission = getStoryTrigger().getStoryArc().getStoryPoint(currentStoryPointId);
         }
         if(currentMission != null) {
-            comboMission.setSelectedItem(currentMission);
+            comboMission.setSelectedItem(currentMission.getName());
         }
 
         comboStatus = new MMComboBox<>("comboStatus", MissionStatus.values());
