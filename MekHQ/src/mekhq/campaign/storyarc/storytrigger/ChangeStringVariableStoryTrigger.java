@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
+import mekhq.gui.panels.storytriggerpanels.ChangeStringVariableStoryTriggerPanel;
 import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
 import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import mekhq.utilities.MHQXMLUtility;
@@ -51,8 +52,16 @@ public class ChangeStringVariableStoryTrigger extends StoryTrigger {
         return key;
     }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
+
     public String getValue() {
         return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 
     @Override
@@ -62,7 +71,7 @@ public class ChangeStringVariableStoryTrigger extends StoryTrigger {
 
     @Override
     public StoryTriggerPanel getPanel(JFrame frame) {
-        return new FakeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
+        return new ChangeStringVariableStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override
