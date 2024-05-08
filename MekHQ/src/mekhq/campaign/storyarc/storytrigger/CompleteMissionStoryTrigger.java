@@ -22,6 +22,7 @@ package mekhq.campaign.storyarc.storytrigger;
 
 import megamek.Version;
 import mekhq.gui.StoryPointHyperLinkListener;
+import mekhq.gui.panels.storytriggerpanels.CompleteMissionStoryTriggerPanel;
 import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
 import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import mekhq.utilities.MHQXMLUtility;
@@ -47,6 +48,22 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
 
     UUID missionStoryPointId;
     MissionStatus missionStatus;
+
+    public UUID getMissionStoryPointId() {
+        return missionStoryPointId;
+    }
+
+    public void setMissionStoryPointId(UUID missionStoryPointId) {
+        this.missionStoryPointId = missionStoryPointId;
+    }
+
+    public MissionStatus getMissionStatus() {
+        return missionStatus;
+    }
+
+    public void setMissionStatus(MissionStatus missionStatus) {
+        this.missionStatus = missionStatus;
+    }
 
     @Override
     protected void execute() {
@@ -79,7 +96,7 @@ public class CompleteMissionStoryTrigger extends StoryTrigger {
 
     @Override
     public StoryTriggerPanel getPanel(JFrame frame) {
-        return new FakeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
+        return new CompleteMissionStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override
