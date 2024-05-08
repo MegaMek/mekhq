@@ -44,6 +44,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
@@ -214,8 +216,8 @@ public class MissingLargeCraftAmmoBinTest {
         when(mounted.getType()).thenReturn(ammoType);
         when(entity.getEquipment(equipmentNum)).thenReturn((Mounted) mounted);
         WeaponMounted bay = mock(WeaponMounted.class);
-        Vector<Integer> bayAmmo = new Vector<>();
-        bayAmmo.addElement(equipmentNum);
+        List<AmmoMounted> bayAmmo = new ArrayList<>();
+        bayAmmo.add(mounted);
         when(bay.getBayAmmo()).thenReturn(bayAmmo);
         when(entity.getEquipment(bayNum)).thenReturn((Mounted) bay);
         missingAmmoBin.setUnit(unit);
