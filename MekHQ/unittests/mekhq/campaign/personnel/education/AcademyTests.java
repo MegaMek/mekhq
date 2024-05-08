@@ -1,80 +1,123 @@
 package mekhq.campaign.personnel.education;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
-import org.junit.jupiter.api.*;
-import org.mockito.InjectMocks;
-import org.mockito.MockitoAnnotations;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.PlanetarySystem;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+import java.util.Arrays;
 
 class AcademyTests {
-    @InjectMocks
-    Academy academy = new Academy();
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
+    @Test
+    void testSetName() {
+        Academy academy = new Academy();
+        academy.setName("Military Academy");
+        assertEquals("Military Academy", academy.getName());
     }
 
-    @AfterEach
-    void tearDown() {
-        MockitoAnnotations.openMocks(this);
+    @Test
+    void testSetTuition() {
+        Academy academy = new Academy();
+        academy.setTuition(5000);
+        assertEquals(5000, academy.getTuition());
     }
 
     @Test
     void testIsMilitary() {
-        Boolean result = academy.isMilitary();
-        Assertions.assertEquals(Boolean.FALSE, result);
-    }
-
-    @Test
-    void testSetIsMilitary() {
+        Academy academy = new Academy();
         academy.setIsMilitary(true);
+        assertTrue(academy.isMilitary());
     }
 
     @Test
-    void testIsClan() {
-        Boolean result = academy.isClan();
-        Assertions.assertEquals(Boolean.FALSE, result);
+    void testAcademyCreationAllFields() {
+        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", true, "Colonel", true,
+                true, true, "Top level MechWarrior Training",
+                20, true, "FWL",
+                Arrays.asList("Sol", "Terra"), false,
+                3045, 3089, 3099, 2000, 365,
+                10, 1, 4, 18, 35,
+                Arrays.asList("MechWarrior", "Leadership"), Arrays.asList("Combat", "Strategy"),
+                Arrays.asList(3050, 3055), 5, 101);
+        assertEquals("MekWarrior Academy", academy.getName());
+        assertTrue(academy.isMilitary());
+        assertEquals("Colonel", academy.getPromotion());
+        assertTrue(academy.isClan());
+        assertTrue(academy.isTrueborn());
+        assertEquals(20, academy.getFactionDiscount());
+        assertEquals("FWL", academy.getFaction());
+        assertEquals(2000, academy.getTuition());
+        assertEquals(Integer.valueOf(3089), academy.getDestructionYear());
+    }
+
+    @Test void testCompareToSameID() {
+        Academy academy1 = new Academy();
+        Academy academy2 = new Academy();
+        academy1.setId(100);
+        academy2.setId(100);
+        assertEquals(0, academy1.compareTo(academy2));
     }
 
     @Test
-    void testSetIsClan() {
-        academy.setIsClan(true);
+    void testCompareToDifferentID() {
+        Academy academy1 = new Academy();
+        Academy academy2 = new Academy();
+        academy1.setId(100);
+        academy2.setId(200);
+        assertTrue(academy1.compareTo(academy2) < 0);
     }
 
     @Test
-    void testIsPrepSchool() {
-        Boolean result = academy.isPrepSchool();
-        Assertions.assertEquals(Boolean.FALSE, result);
+    void testGetTuitionAdjustedLowEducationLevel() {
+        Academy academy = new Academy();
+        academy.setTuition(1000);
+        Person person = Mockito.mock(Person.class);
+        when(person.getEduHighestEducation()).thenReturn(1);
+        assertEquals(1000, academy.getTuitionAdjusted(person));
+    }
+
+    @Test void testGetTuitionAdjustedHighEducationLevel() {
+        Academy academy = new Academy();
+        academy.setTuition(1000);
+        academy.setEducationLevelMin(0);
+        academy.setEducationLevelMax(3);
+        Person person = Mockito.mock(Person.class);
+        when(person.getEduHighestEducation()).thenReturn(3);
+        assertEquals(3000, academy.getTuitionAdjusted(person));
+    }
+
+    @Test void testIsQualifiedTrue() {
+        Academy academy = new Academy();
+        academy.setEducationLevelMin(3);
+        Person person = Mockito.mock(Person.class);
+        when(person.getEduHighestEducation()).thenReturn(4);
+        assertTrue(academy.isQualified(person));
     }
 
     @Test
-    void testSetIsPrepSchool() {
-        academy.setIsPrepSchool(true);
+    void testIsQualifiedFalse() {
+        Academy academy = new Academy();
+        academy.setEducationLevelMin(3);
+        Person person = Mockito.mock(Person.class);
+        when(person.getEduHighestEducation()).thenReturn(2);
+        assertFalse(academy.isQualified(person));
     }
 
-    @Test
-    void testIsLocal() {
-        Boolean result = academy.isLocal();
-        Assertions.assertEquals(Boolean.FALSE, result);
-    }
-
-    @Test
-    void testSetIsLocal() {
-        academy.setIsLocal(true);
-    }
-
-    @Test
-    void testIsFactionRestricted() {
-        Boolean result = academy.isFactionRestricted();
-        Assertions.assertEquals(Boolean.FALSE, result);
-    }
-
-    @Test
-    void testSetIsFactionRestricted() {
-        academy.setIsFactionRestricted(true);
+    @Test void testGetFactionDiscountAdjustedNotPresentInLocationSystems() {
+        Academy academy = new Academy();
+        academy.setLocationSystems(Arrays.asList("Sol"));
+        academy.setFactionDiscount(10);
+        Person person = Mockito.mock(Person.class);
+        Campaign campaign = Mockito.mock(Campaign.class);
+        PlanetarySystem system = Mockito.mock(PlanetarySystem.class);
+        when(campaign.getSystemById("Sol")).thenReturn(system);
+        when(system.getFactions(Mockito.any())).thenReturn(Arrays.asList("Lyr"));
+        when(person.getOriginFaction()).thenReturn(new Faction("FWL", ""));
+        assertEquals(1.0, academy.getFactionDiscountAdjusted(campaign, person));
     }
 
     @Test
