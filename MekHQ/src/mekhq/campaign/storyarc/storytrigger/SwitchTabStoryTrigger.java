@@ -23,6 +23,7 @@ package mekhq.campaign.storyarc.storytrigger;
 import megamek.Version;
 import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
 import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.SwitchTabStoryTriggerPanel;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
@@ -43,6 +44,14 @@ public class SwitchTabStoryTrigger extends StoryTrigger {
 
     MHQTabType tab;
 
+    public MHQTabType getTab() {
+        return tab;
+    }
+
+    public void setTab(MHQTabType tab) {
+        this.tab = tab;
+    }
+
     @Override
     protected void execute() {
         getCampaign().getApp().getCampaigngui().setSelectedTab(tab);
@@ -55,7 +64,7 @@ public class SwitchTabStoryTrigger extends StoryTrigger {
 
     @Override
     public StoryTriggerPanel getPanel(JFrame frame) {
-        return new FakeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
+        return new SwitchTabStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override

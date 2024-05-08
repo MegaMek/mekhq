@@ -12,7 +12,7 @@ public abstract class StoryTriggerPanel extends AbstractMHQScrollablePanel {
     protected JPanel panMain;
 
 
-    protected StoryTriggerPanel(JFrame frame, String name, StoryTrigger trigger) {
+    public StoryTriggerPanel(JFrame frame, String name, StoryTrigger trigger) {
         super(frame, name);
         this.storyTrigger = trigger;
         initialize();
