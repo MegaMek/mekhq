@@ -5,11 +5,13 @@ import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 public abstract class StoryTriggerPanel extends AbstractMHQScrollablePanel {
 
     private StoryTrigger storyTrigger;
     protected JPanel panMain;
+    private JButton btnDelete;
 
 
     public StoryTriggerPanel(JFrame frame, String name, StoryTrigger trigger) {
@@ -28,9 +30,15 @@ public abstract class StoryTriggerPanel extends AbstractMHQScrollablePanel {
 
     @Override
     protected void initialize() {
+        setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder(storyTrigger.getClass().getSimpleName()),
+                BorderFactory.createEmptyBorder(5,5,5,5)));
         setLayout(new BorderLayout());
+        btnDelete = new JButton("Delete Trigger");
+        JPanel panTop = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panTop.add(btnDelete);
+        add(panTop, BorderLayout.PAGE_START);
         panMain = new JPanel();
-        add(new JLabel(storyTrigger.getClass().getSimpleName()), BorderLayout.PAGE_START);
         createMainPanel();
         add(panMain, BorderLayout.CENTER);
     }
