@@ -5691,10 +5691,12 @@ public class Campaign implements ITechManager {
         entity.setShutDown(false);
         entity.setSearchlightState(false);
 
-        if (entity.hasBAP()) {
-            entity.setNextSensor(entity.getSensors().lastElement());
-        } else if (!entity.getSensors().isEmpty()) {
-            entity.setNextSensor(entity.getSensors().firstElement());
+        if (!entity.getSensors().isEmpty()) {
+            if (entity.hasBAP()) {
+                entity.setNextSensor(entity.getSensors().lastElement());
+            } else {
+                entity.setNextSensor(entity.getSensors().firstElement());
+            }
         }
 
         if (entity instanceof IBomber) {
