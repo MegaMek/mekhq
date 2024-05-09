@@ -5,6 +5,8 @@ MEKHQ VERSION HISTORY:
 + Fix #4052: Move modifiedTemperature to AtBScenario
 + Fix #4061: Campaign no longer loads in 0.49.19+ due to unusual Person and Infantry attributes
 + Fix #4062: StratCon generating Weather, Light, and Planetary conditions despite Campaign options
++ Commit f6646c3: update data files
++ Fix for Commando case-based name collisions
 
 0.49.19 (2024-04-19 2030 UTC)
 + Bug #3958: No selling units in scenario resolution if campaign disallows selling
