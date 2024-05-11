@@ -14,7 +14,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Vector;
 
-public class CustomizeStoryOutcomeDialog extends JDialog implements ActionListener {
+public class CustomizeStoryOutcomeDialog extends JDialog {
 
     JFrame frame;
     StoryOutcome outcome;
@@ -128,14 +128,6 @@ public class CustomizeStoryOutcomeDialog extends JDialog implements ActionListen
             panTriggers.add(panel);
         }
         scrTriggers.setViewportView(panTriggers);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if(e.getSource() instanceof JButton) {
-            JButton source = (JButton) e.getSource();
-            triggerPanels.remove(source.getParent());
-        }
     }
 
     private void done(ActionEvent evt) {
