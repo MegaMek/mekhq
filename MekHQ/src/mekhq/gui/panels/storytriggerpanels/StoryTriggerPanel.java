@@ -20,6 +20,9 @@ public abstract class StoryTriggerPanel extends AbstractMHQScrollablePanel {
         initialize();
     }
 
+    public JButton getDeleteButton() {
+        return btnDelete;
+    }
     public StoryTrigger getStoryTrigger() {
         return storyTrigger;
     }

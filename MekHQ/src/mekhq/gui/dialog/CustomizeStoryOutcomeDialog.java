@@ -8,11 +8,13 @@ import mekhq.gui.utilities.JSuggestField;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Vector;
 
-public class CustomizeStoryOutcomeDialog extends JDialog {
+public class CustomizeStoryOutcomeDialog extends JDialog implements ActionListener {
 
     JFrame frame;
     StoryOutcome outcome;
@@ -21,6 +23,8 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
     boolean isNewOutcome;
     private JSuggestField suggestNext;
     private ArrayList<StoryTriggerPanel> triggerPanels;
+    private JPanel panTriggers;
+    private JScrollPane scrTriggers;
 
     public CustomizeStoryOutcomeDialog(JFrame parent, boolean modal, String result, StoryPoint sp, boolean isNew) {
         super(parent, modal);
@@ -88,17 +92,20 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
         gbc.gridy++;
         panMain.add(suggestNext, gbc);
 
-        JPanel panTriggers = new JPanel();
+        panTriggers = new JPanel();
         panTriggers.setLayout(new BoxLayout(panTriggers, BoxLayout.Y_AXIS));
 
         triggerPanels = new ArrayList<>();
-        StoryTriggerPanel panTrigger;
         for(StoryTrigger trigger : outcome.getStoryTriggers()) {
-            panTrigger = trigger.getPanel(frame);
+            StoryTriggerPanel panTrigger = trigger.getPanel(frame);
+            panTrigger.getDeleteButton().addActionListener(evt -> removePanel(panTrigger));
             panTriggers.add(panTrigger);
             triggerPanels.add(panTrigger);
         }
 
+        scrTriggers = new JScrollPane(panTriggers);
+        scrTriggers.setMinimumSize(new Dimension(400, 200));
+        scrTriggers.setPreferredSize(new Dimension(400, 200));
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -106,7 +113,29 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
         gbc.weighty = 1.0;
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        panMain.add(panTriggers, gbc);
+        panMain.add(scrTriggers, gbc);
+    }
+
+    private void removePanel(StoryTriggerPanel panel) {
+        triggerPanels.remove(panel);
+        refreshTriggerPanels();
+    }
+
+    private void refreshTriggerPanels() {
+        panTriggers = new JPanel();
+        panTriggers.setLayout(new BoxLayout(panTriggers, BoxLayout.Y_AXIS));
+        for(StoryTriggerPanel panel : triggerPanels) {
+            panTriggers.add(panel);
+        }
+        scrTriggers.setViewportView(panTriggers);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() instanceof JButton) {
+            JButton source = (JButton) e.getSource();
+            triggerPanels.remove(source.getParent());
+        }
     }
 
     private void done(ActionEvent evt) {
@@ -119,28 +148,26 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
                 break;
             }
         }
-
-        // if this is the default or new, we need to do some additional stuff
-        if (result.equals(StoryPoint.DEFAULT_OUTCOME)) {
-            // if the default, we apply directly to the story point
-            storyPoint.setNextStoryPointId(outcome.getNextStoryPointId());
-        } else if(isNewOutcome) {
-            // add a new outcome
-            outcome.setResult(result);
-            storyPoint.addStoryOutcome(result, outcome);
-        }
         ArrayList<StoryTrigger> triggers = new ArrayList<>();
         for(StoryTriggerPanel panel : triggerPanels) {
             panel.updateStoryStrigger();
             triggers.add(panel.getStoryTrigger());
         }
         outcome.setStoryTriggers(triggers);
+        // if this is the default or new, we need to do some additional stuff
+        if (result.equals(StoryPoint.DEFAULT_OUTCOME)) {
+            // if the default, we apply directly to the story point
+            storyPoint.setNextStoryPointId(outcome.getNextStoryPointId());
+            storyPoint.setStoryTriggers(outcome.getStoryTriggers());
+        } else if(isNewOutcome) {
+            // add a new outcome
+            outcome.setResult(result);
+            storyPoint.addStoryOutcome(result, outcome);
+        }
         setVisible(false);
     }
 
     private void cancel(ActionEvent evt) {
         setVisible(false);
     }
-
-
 }
