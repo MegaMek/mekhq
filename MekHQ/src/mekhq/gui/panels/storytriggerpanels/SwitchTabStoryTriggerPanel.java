@@ -18,6 +18,7 @@ public class SwitchTabStoryTriggerPanel extends StoryTriggerPanel {
 
     @Override
     protected void createMainPanel() {
+        getMainPanel().setLayout(new GridBagLayout());
         comboTab = new MMComboBox<>("comboTab", MHQTabType.values());
         comboTab.setSelectedItem(((SwitchTabStoryTrigger) getStoryTrigger()).getTab());
 
