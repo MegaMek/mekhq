@@ -5627,7 +5627,7 @@ public class Campaign implements ITechManager {
         }
         IUnitRating rating = getUnitRating();
         return getCampaignOptions().getUnitRatingMethod().isFMMR() ? rating.getUnitRatingAsInteger()
-                : MathUtility.clamp(rating.getModifier(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
+                : MathUtility.clamp((rating.getModifier() / 3), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
     }
 
     /**
