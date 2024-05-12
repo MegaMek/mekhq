@@ -232,7 +232,7 @@ public class StratconRulesManager {
                 backingScenario.setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
             }
             backingScenario.setLightConditions();
-            backingScenario.setWeather();
+            backingScenario.setWeatherConditions();
         }
     }
 
@@ -1356,8 +1356,11 @@ public class StratconRulesManager {
             case HIGH:
                 moraleModifier = 5;
                 break;
-            case INVINCIBLE:
+            case VERY_HIGH:
                 moraleModifier = 10;
+                break;
+            case INVINCIBLE:
+                moraleModifier = 15;
                 break;
             default:
                 break;

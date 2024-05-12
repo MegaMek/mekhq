@@ -147,7 +147,7 @@ public class RetirementDefectionDialog extends JDialog {
                 instructions = resourceMap.getString("txtInstructions.Overview.text");
             }
             if (null == contract) {
-                instructions += "\n\nDays since last retirement roll: "
+                instructions += "\n\nDays since last Employee Turnover check: "
                         + ChronoUnit.DAYS.between(rdTracker.getLastRetirementRoll(),
                         hqView.getCampaign().getLocalDate());
             }
@@ -217,7 +217,7 @@ public class RetirementDefectionDialog extends JDialog {
                 int row = personnelTable.convertRowIndexToModel(personnelTable.getSelectedRow());
                 UUID id = ((RetirementTableModel)(personnelTable.getModel())).getPerson(row).getId();
                 txtTargetDetails.setText(targetRolls.get(id).getDesc() +
-                        (payBonus(id)?" -1 (Bonus)":"") +
+                        (payBonus(id)?" -2 (Bonus)":"") +
                         ((miscModifier(id) != 0)?miscModifier(id) + " (Misc)":""));
             });
 
@@ -429,7 +429,7 @@ public class RetirementDefectionDialog extends JDialog {
             if (ev.getSource().equals(btnRoll)) {
                 for (UUID id : targetRolls.keySet()) {
                     if (payBonus(id)) {
-                        targetRolls.get(id).addModifier(-1, "Bonus");
+                        targetRolls.get(id).addModifier(-2, "Bonus");
                     }
 
                     if (miscModifier(id) != 0) {

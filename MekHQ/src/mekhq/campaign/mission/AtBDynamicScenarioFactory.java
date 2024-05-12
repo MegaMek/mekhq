@@ -720,7 +720,7 @@ public class AtBDynamicScenarioFactory {
      * @param scenario The scenario for which to set weather conditions.
      */
     private static void setWeather(AtBDynamicScenario scenario) {
-        scenario.setWeather();
+        scenario.setWeatherConditions();
     }
 
     /**
