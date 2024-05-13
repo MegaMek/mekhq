@@ -291,15 +291,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     private void initBattle(Campaign campaign) {
         setTerrain();
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() &&
+                null != campaign.getMission(getMissionId())) {
+            setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
+        }
         if (campaign.getCampaignOptions().isUseLightConditions()) {
             setLightConditions();
         }
         if (campaign.getCampaignOptions().isUseWeatherConditions()) {
-            setWeather();
-        }
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions() &&
-                null != campaign.getMission(getMissionId())) {
-            setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
+            setWeatherConditions();
         }
         setMapSize();
         setMapFile();
@@ -335,7 +335,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setLight(TCO.rollLightCondition(getTerrainType()));
     }
 
-    public void setWeather() {
+    public void setWeatherConditions() {
         // weather is irrelevant in these situations.
         if (getBoardType() == AtBScenario.T_SPACE ||
                 getBoardType() == AtBScenario.T_ATMOSPHERE) {

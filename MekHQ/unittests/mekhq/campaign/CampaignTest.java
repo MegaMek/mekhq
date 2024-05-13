@@ -21,7 +21,9 @@
 package mekhq.campaign;
 
 import megamek.common.Dropship;
+import megamek.common.Entity;
 import megamek.common.EquipmentType;
+import megamek.common.Infantry;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -145,6 +147,15 @@ public class CampaignTest {
         expected.add(mockTechActive);
         expected.add(mockTechActiveTwo);
         assertEquals(expected, testCampaign.getTechs(true));
+    }
+
+    @Test
+    public void testCampaignResetInfantry() {
+        // It is possible for Infantry to have BAP equal true, but empty Sensors vector.
+        Campaign campaign = new Campaign();
+        Entity infantry = spy(new Infantry());
+        when(infantry.hasBAP()).thenReturn(true);
+        campaign.clearGameData(infantry);
     }
 
     @Test

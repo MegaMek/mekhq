@@ -20,6 +20,7 @@ package mekhq.gui.dialog;
 
 import mekhq.campaign.storyarc.Personality;
 import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.storyarc.storypoint.DialogStoryPoint;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,9 +38,9 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
 
     private int imgWidth;
 
-    private StoryPoint storyPoint;
+    private DialogStoryPoint storyPoint;
 
-    public StoryDialog(final JFrame parent, StoryPoint sEvent) {
+    public StoryDialog(final JFrame parent, DialogStoryPoint sEvent) {
         super(parent, sEvent.getTitle(), true);
         this.storyPoint = sEvent;
     }
@@ -69,7 +70,7 @@ public abstract class StoryDialog extends JDialog implements ActionListener {
     protected abstract Container getMainPanel();
     //endregion initialization
 
-    protected StoryPoint getStoryPoint() {
+    protected DialogStoryPoint getStoryPoint() {
         return storyPoint;
     }
 

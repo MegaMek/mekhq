@@ -822,7 +822,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
             lblLightDesc.setText(scenario.getLight().toString());
         }
         if (chkReroll[REROLL_WEATHER] != null && chkReroll[REROLL_WEATHER].isSelected()) {
-            scenario.setWeather();
+            scenario.setWeatherConditions();
             scenario.useReroll();
             chkReroll[REROLL_WEATHER].setSelected(false);
             lblWeatherDesc.setText(scenario.getWeather().toString());
