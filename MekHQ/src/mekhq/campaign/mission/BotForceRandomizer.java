@@ -29,6 +29,7 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.rating.IUnitRating;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Bloodname;
@@ -59,7 +60,7 @@ public class BotForceRandomizer {
     //region Variable declarations
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    private enum BalancingMethod {
+    public enum BalancingMethod {
         BV,
         WEIGHT_ADJ,
         GENERIC_BV;
@@ -101,9 +102,6 @@ public class BotForceRandomizer {
     /** balancing method **/
     private BalancingMethod balancingMethod;
 
-    /** convenience campaign pointer **/
-    private Campaign campaign;
-
     /**
      * what percent of mek and aero forces should actually be conventional?
      * (tanks and conventional aircraft respectively)
@@ -126,6 +124,7 @@ public class BotForceRandomizer {
         factionCode = "MERC";
         skill = SkillLevel.REGULAR;
         unitType = UnitType.MEK;
+        quality = IUnitRating.DRAGOON_C;
         forceMultiplier = 1.0;
         percentConventional = 0;
         baChance = 0;
@@ -135,6 +134,23 @@ public class BotForceRandomizer {
     }
     //endregion Constructors
 
+    @Override
+    public BotForceRandomizer clone() {
+        BotForceRandomizer copy = new BotForceRandomizer();
+        copy.setFactionCode(this.getFactionCode());
+        copy.skill = this.skill;
+        copy.unitType = this.unitType;
+        copy.forceMultiplier = this.forceMultiplier;
+        copy.percentConventional = this.percentConventional;
+        copy.baChance = this.baChance;
+        copy.balancingMethod = this.balancingMethod;
+        copy.lanceSize = this.lanceSize;
+        copy.focalWeightClass = this.focalWeightClass;
+        copy.quality = this.quality;
+
+        return copy;
+    }
+
     //region Getters/Setters
     public String getFactionCode() {
         return factionCode;
@@ -142,6 +158,78 @@ public class BotForceRandomizer {
 
     public void setFactionCode(final String factionCode) {
         this.factionCode = factionCode;
+    }
+
+    public SkillLevel getSkill() {
+        return skill;
+    }
+
+    public void setSkill(SkillLevel s) {
+        skill = s;
+    }
+
+    public int getUnitType() {
+        return unitType;
+    }
+
+    public void setUnitType(int u) {
+        unitType = u;
+    }
+
+    public int getQuality() {
+        return quality;
+    }
+
+    public void setQuality(int q) {
+        quality = q;
+    }
+
+    public BalancingMethod getBalancingMethod() {
+        return balancingMethod;
+    }
+
+    public void setBalancingMethod(BalancingMethod bm) {
+        balancingMethod = bm;
+    }
+
+    public double getForceMultiplier() {
+        return forceMultiplier;
+    }
+
+    public void setForceMultiplier(double fm) {
+        forceMultiplier = fm;
+    }
+
+    public int getPercentConventional() {
+        return percentConventional;
+    }
+
+    public void setPercentConventional(int p) {
+        percentConventional = p;
+    }
+
+    public int getBaChance() {
+        return baChance;
+    }
+
+    public void setBaChance(int b) {
+        baChance = b;
+    }
+
+    public int getLanceSize() {
+        return lanceSize;
+    }
+
+    public void setLanceSize(int l) {
+        lanceSize = l;
+    }
+
+    public double getFocalWeightClass() {
+        return focalWeightClass;
+    }
+
+    public void setFocalWeightClass(double f) {
+        focalWeightClass = f;
     }
 
     public double getError() {
@@ -160,9 +248,10 @@ public class BotForceRandomizer {
      *                    is used to determine the total points allowed for this force.
      * @param botFixedEntities A List of The fixed Entities that might have also been declared in BotForce already.
      *                         This is used to calculate the starting points already used when generating the force.
+     * @param campaign A Campaign object which is necessary for various information
      * @return A List of Entities that will be added to the game by GameThread.
      */
-    public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities) {
+    public List<Entity> generateForce(List<Unit> playerUnits, List<Entity> botFixedEntities, Campaign campaign) {
         ArrayList<Entity> entityList = new ArrayList<>();
 
         double targetPoints = calculateMaxPoints(playerUnits);
@@ -214,8 +303,7 @@ public class BotForceRandomizer {
                         && (Compute.randomInt(100) <= percentConventional)) {
                     uType = UnitType.CONV_FIGHTER;
                 }
-
-                lanceList = generateLance(lanceSize, uType, weightClass);
+                lanceList = generateLance(lanceSize, uType, weightClass, campaign);
                 for (Entity e : lanceList) {
                     entityList.add(e);
                     currentPoints += calculatePoints(e);
@@ -252,13 +340,14 @@ public class BotForceRandomizer {
      * @param uType The UnitType of generated units
      * @param weightClass an int giving the weight class of generated units. The function applies some randomness
      *                    to this, so some entities within the lance may be heavier or lighter.
+     * @param campaign a Campaign object for campaign related information
      * @return A List of generated entities.
      */
-    public List<Entity> generateLance(int size, int uType, int weightClass) {
+    public List<Entity> generateLance(int size, int uType, int weightClass, Campaign campaign) {
         ArrayList<Entity> lanceList = new ArrayList<>();
 
         for (int i = 0; i < size; i++) {
-            Entity e = getEntity(uType, weightClass);
+            Entity e = getEntity(uType, weightClass, campaign);
             if (null != e) {
                 lanceList.add(e);
             }
@@ -268,7 +357,7 @@ public class BotForceRandomizer {
         if ((unitType == UnitType.MEK) && (baChance > 0)
                 && (Compute.randomInt(100) <= baChance)) {
             for (int i = 0; i < size; i++) {
-                Entity e = getEntity(UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED);
+                Entity e = getEntity(UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED, campaign);
                 if (null != e) {
                     lanceList.add(e);
                 }
@@ -284,9 +373,10 @@ public class BotForceRandomizer {
      *
      * @param uType    The UnitTableData constant for the type of unit to generate.
      * @param weightClass The weight class of the unit to generate
+     * @param campaign A campaign object
      * @return A new Entity with crew.
      */
-    public Entity getEntity(int uType, int weightClass) {
+    public Entity getEntity(int uType, int weightClass, Campaign campaign) {
         MechSummary ms;
 
         // allow some variation in actual weight class
@@ -311,16 +401,17 @@ public class BotForceRandomizer {
 
         ms = campaign.getUnitGenerator().generate(params);
 
-        return createEntityWithCrew(ms);
+        return createEntityWithCrew(ms, campaign);
     }
 
     /**
      * This creates the entity with a crew. Borrows heavily from AtBDynamicScenarioFactory#createEntityWithCrew
      *
      * @param ms Which entity to generate
+     * @param campaign A campaign file
      * @return A crewed entity
      */
-    public @Nullable Entity createEntityWithCrew(MechSummary ms) {
+    public @Nullable Entity createEntityWithCrew(MechSummary ms, Campaign campaign) {
         Entity en;
         try {
             en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
@@ -533,12 +624,21 @@ public class BotForceRandomizer {
         return sumWeightClass / ((double) nUnits);
     }
 
+    public String getShortDescription() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(forceMultiplier);
+        sb.append(" (");
+        sb.append(balancingMethod.toString());
+        sb.append(")");
+        return sb.toString();
+    }
+
     /**
      * This method returns a description of the random parameters of this object that will be shown in the
      * ScenarioViewPanel
      * @return a String giving the description.
      */
-    public String getDescription() {
+    public String getDescription(Campaign campaign) {
         StringBuilder sb = new StringBuilder();
         sb.append(Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()));
         sb.append(" ");
@@ -576,7 +676,6 @@ public class BotForceRandomizer {
     public static BotForceRandomizer generateInstanceFromXML(Node wn, Campaign c, Version version) {
         BotForceRandomizer retVal = new BotForceRandomizer();
 
-        retVal.campaign = c;
         try {
             // Okay, now load Part-specific fields!
             NodeList nl = wn.getChildNodes();
