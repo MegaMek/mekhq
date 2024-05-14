@@ -365,10 +365,10 @@
         <name>Armstrong Pheonix Academy</name>
         <isMilitary>true</isMilitary>
         <promotion>Corporal</promotion>
-        <description>Previously named the Armonstrong Flight Academy, the academy has been relocated and renamed Armstrong Phoenix Academy due to its original campus being rendered uninhabitable by a blood destroying bioweapon. Despite this, it maintains rigorous standards, with intense physical screenings and high skill requirements, leading to over half of the applicants being rejected pre-examination.</description>
+        <description>Previously named the Armstrong Flight Academy, the academy has been relocated and renamed Armstrong Phoenix Academy due to its original campus being rendered uninhabitable by a blood destroying bioweapon. Despite this, it maintains rigorous standards, with intense physical screenings and high skill requirements, leading to over half of the applicants being rejected pre-examination.</description>
         <faction>FC</faction>
         <locationSystem>Delavan</locationSystem>
-        <constructionYear>2070</constructionYear>
+        <constructionYear>3070</constructionYear>
         <tuition>14000</tuition>
         <durationDays>900</durationDays>
         <facultySkill>4</facultySkill>
