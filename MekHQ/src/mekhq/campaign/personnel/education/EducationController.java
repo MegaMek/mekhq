@@ -885,15 +885,8 @@ public class EducationController {
      */
     private static boolean checkForAcademyFactionConflict(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (academy.isFactionConflict(campaign, person)) {
-            if (Compute.d6(2) >= 5) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWar.text"));
-                if (!academy.isPrepSchool()) {
-                    person.setEduDaysOfEducation(person.getEduDaysOfEducation() + Compute.d6(2));
-                }
-            } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWarExpelled.text"));
-                person.setEduDaysOfEducation(0);
-            }
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWarExpelled.text"));
+            person.setEduDaysOfEducation(0);
 
             return true;
         }
