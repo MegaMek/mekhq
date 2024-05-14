@@ -73,14 +73,6 @@ public abstract class StoryPoint {
     /** A boolean that tracks whether the story point is currently active **/
     private boolean active;
 
-    /** A StorySplash image to display in a dialog. It can return a null image */
-    private StorySplash storySplash;
-
-    /**
-     * The id of a personality who is associated with this StoryPoint. May be null.
-     */
-    private UUID personalityId;
-
     /**
      * The id of the next story point to start when this one is completed. It can be null if a new story point should not be
      * triggered. It can also be overwritten by a StoryOutcome
@@ -97,7 +89,6 @@ public abstract class StoryPoint {
         active = false;
         storyOutcomes =  new LinkedHashMap<>();
         storyTriggers = new ArrayList<>();
-        storySplash = new StorySplash();
     }
 
     public void setStoryArc(StoryArc a) {
@@ -132,13 +123,6 @@ public abstract class StoryPoint {
 
     public String getName() {
         return name;
-    }
-
-    public Image getImage() {
-        if(storySplash.isDefault()) {
-            return null;
-        }
-        return storySplash.getImage();
     }
 
     /**
@@ -218,18 +202,6 @@ public abstract class StoryPoint {
         return storyArc.getStoryPoint(nextStoryPointId);
     }
 
-
-    /**
-     * Get the {@link Personality Personality} associated with this StoryPoint.
-     * @return A {@link Personality Personality} or null if no Personality is associated with the StoryPoint.
-     */
-    public Personality getPersonality() {
-        if (null == personalityId) {
-            return null;
-        }
-        return storyArc.getPersonality(personalityId);
-    }
-
     public Campaign getCampaign() {
         return getStoryArc().getCampaign();
     }
@@ -241,7 +213,6 @@ public abstract class StoryPoint {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyPoint", "name", name,"type", this.getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "id", id);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "active", active);
-        MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "personalityId", personalityId);
         MHQXMLUtility.writeSimpleXMLTag(pw1, indent, "nextStoryPointId", nextStoryPointId);
         if (!storyOutcomes.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw1, indent++, "storyOutcomes");
@@ -255,7 +226,6 @@ public abstract class StoryPoint {
                 trigger.writeToXml(pw1, indent);
             }
         }
-        storySplash.writeToXML(pw1, indent);
     }
 
     protected void writeToXmlEnd(PrintWriter pw1, int indent) {
@@ -289,15 +259,11 @@ public abstract class StoryPoint {
                     retVal.id = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("nextStoryPointId")) {
                     retVal.nextStoryPointId = UUID.fromString(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("personalityId")) {
-                    retVal.personalityId = UUID.fromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("active")) {
                     retVal.active = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("storyTrigger")) {
                     StoryTrigger trigger = StoryTrigger.generateInstanceFromXML(wn2, c, version);
                     retVal.storyTriggers.add(trigger);
-                } else if (wn2.getNodeName().equalsIgnoreCase(StorySplash.XML_TAG)) {
-                    retVal.storySplash = StorySplash.parseFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("storyOutcomes")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int y = 0; y < nl2.getLength(); y++) {

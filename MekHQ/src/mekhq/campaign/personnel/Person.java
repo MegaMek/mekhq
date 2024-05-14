@@ -31,6 +31,8 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -1772,9 +1774,22 @@ public class Person {
                         retVal.setOriginFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
-                    String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
-                    String planetId = wn2.getTextContent().trim();
-                    retVal.originPlanet = c.getSystemById(systemId).getPlanetById(planetId);
+                    String systemId = "", planetId = "";
+                    try {
+                        systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
+                        planetId = wn2.getTextContent().trim();
+                        PlanetarySystem ps = c.getSystemById(systemId);
+                        Planet p = null;
+                        if (ps == null) {
+                            ps = c.getSystemByName(systemId);
+                        }
+                        if (ps != null) {
+                            p = ps.getPlanetById(planetId);
+                        }
+                        retVal.originPlanet = p;
+                    } catch (NullPointerException e) {
+                        LogManager.getLogger().error("Error loading originPlanet for " + systemId + ", " + planetId, e);
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
