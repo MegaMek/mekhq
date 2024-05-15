@@ -39,7 +39,7 @@ import java.util.Map.Entry;
  * This StoryPoint creates a {@link StoryChoiceDialog StoryChoiceDialog} which offers the player
  * potentially more than one possible choice or response.
  */
-public class ChoiceStoryPoint extends StoryPoint {
+public class ChoiceStoryPoint extends DialogStoryPoint {
 
     private String title;
     private String question;
@@ -100,6 +100,7 @@ public class ChoiceStoryPoint extends StoryPoint {
 
     @Override
     protected void loadFieldsFromXmlNode(Node wn, Campaign c, Version version) throws ParseException {
+        super.loadFieldsFromXmlNode(wn, c, version);
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {

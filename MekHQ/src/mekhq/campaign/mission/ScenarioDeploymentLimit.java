@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 /**
  * This class is optionally used by Scenario to determine any limits on the type and quantity of units that the player
@@ -50,7 +51,7 @@ public class ScenarioDeploymentLimit {
     /**
      * The QuantityType enum tells this class how to interpret the meaning quantityLimit variable
      */
-    private enum QuantityType {
+    public enum QuantityType {
         /**
          * the PERCENT QuantityType will treat the quantityLimit variable as a percent of the player's valid forces
          */
@@ -64,7 +65,7 @@ public class ScenarioDeploymentLimit {
     /**
      * The CountType enum tells this class what the units of the quantity limits should be
      */
-    private enum CountType {
+    public enum CountType {
         /**
          * The BV CountType will limit deployed forces by BV
          */
@@ -117,6 +118,50 @@ public class ScenarioDeploymentLimit {
         countType = CountType.UNIT;
     }
     //endregion Constructors
+
+    public ScenarioDeploymentLimit getCopy() {
+        ScenarioDeploymentLimit copy = new ScenarioDeploymentLimit();
+        copy.quantityLimit = this.quantityLimit;
+        copy.quantityType = this.quantityType;
+        copy.countType = this.countType;
+        copy.requiredPersonnel = this.requiredPersonnel.stream().collect(Collectors.toList());
+        copy.requiredPersonnel = this.requiredUnits.stream().collect(Collectors.toList());
+        copy.allowedUnitTypes = this.allowedUnitTypes.stream().collect(Collectors.toList());
+
+        return copy;
+    }
+
+    public int getQuantityLimit() {
+        return quantityLimit;
+    }
+
+    public void setQuantityLimit(int quantityLimit) {
+        this.quantityLimit = quantityLimit;
+    }
+
+    public CountType getCountType() {
+        return countType;
+    }
+
+    public void setCountType(CountType countType) {
+        this.countType = countType;
+    }
+
+    public QuantityType getQuantityType() {
+        return quantityType;
+    }
+
+    public void setQuantityType(QuantityType quantityType) {
+        this.quantityType = quantityType;
+    }
+
+    public List<Integer> getAllowedUnitTypes() {
+        return allowedUnitTypes;
+    }
+
+    public void setAllowedUnitTypes(List<Integer> allowedUnitTypes) {
+        this.allowedUnitTypes = allowedUnitTypes;
+    }
 
     //region Unit type methods
     /**
@@ -310,6 +355,9 @@ public class ScenarioDeploymentLimit {
                 personNames.add(p.getFullName());
             }
         }
+        if (personNames.isEmpty()) {
+            return "None";
+        }
         return String.join(", ", personNames);
     }
     //endregion Required personnel methods
@@ -370,6 +418,9 @@ public class ScenarioDeploymentLimit {
             if (null != u) {
                 unitNames.add(u.getName());
             }
+        }
+        if (unitNames.isEmpty()) {
+            return "None";
         }
         return String.join(", ", unitNames);
     }
