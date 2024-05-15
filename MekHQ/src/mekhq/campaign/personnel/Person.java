@@ -1121,7 +1121,7 @@ public class Person {
     }
 
     public boolean isChild(final LocalDate today) {
-        return getAge(today) <= 18;
+        return getAge(today) < 18;
     }
 
     public Genealogy getGenealogy() {
