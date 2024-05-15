@@ -337,12 +337,9 @@ public class PersonViewPanel extends JScrollablePanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
-                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
+                int awardTierCount = person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize();
                 // Due to how mhq handles awards, this is going to give us one long string that contains all the filenames
-                String rawFileNames = award.getRibbonFileName(numberOfAwards);
-
-                // This processes that String and gives the file name we actually want
-                String ribbonFileName = getAwardImageFileName(rawFileNames, numberOfAwards);
+                String ribbonFileName = award.getRibbonFileName(awardTierCount);
 
                 ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/ribbons/", ribbonFileName);
@@ -391,10 +388,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image medal;
             try {
-                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String rawFileNames = award.getMedalFileName(numberOfAwards);
-
-                String medalFileName = getAwardImageFileName(rawFileNames, numberOfAwards);
+                int awardTierCount = person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize();
+                String medalFileName = award.getMedalFileName(awardTierCount);
 
                 medal = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/medals/", medalFileName);
@@ -427,21 +422,6 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlMedals;
     }
 
-    private String getAwardImageFileName(String fileNames, int numberOfAwards) {
-        List<String> allFileNames = Arrays.asList(fileNames
-                .replaceAll(", ", ",")
-                .split(","));
-
-        String fileName;
-
-        if (allFileNames.size() == 1) {
-            fileName = fileNames;
-        } else {
-            fileName = allFileNames.get(numberOfAwards / campaign.getCampaignOptions().getAwardTierSize());
-        }
-        return fileName;
-    }
-
     /**
      * Draws the misc awards below the medals.
      */
@@ -455,10 +435,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image miscAward;
             try {
-                int numberOfAwards = person.getAwardController().getNumberOfAwards(award);
-                String rawFileNames = award.getMiscFileName(numberOfAwards);
-
-                String miscFileName = getAwardImageFileName(rawFileNames, numberOfAwards);
+                int awardTierCount = person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize();
+                String miscFileName = award.getMiscFileName(awardTierCount);
 
                 Image miscAwardBufferedImage = (Image) MHQStaticDirectoryManager.getAwardIcons()
                         .getItem(award.getSet() + "/misc/", miscFileName);
