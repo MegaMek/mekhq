@@ -240,7 +240,7 @@ public class Award implements Comparable<Award> {
      * @return award with new date
      */
     public Award createCopy() {
-        return new Award(this.name, this.set, this.description, this.medals, this.ribbons, this.miscs,
+        return new Award(this.name, this.set, this.description, this.group, this.medals, this.ribbons, this.miscs,
                 this.xp, this.edge, this.stackable, this.qty, this.item, this.size, this.range, this.id);
     }
 

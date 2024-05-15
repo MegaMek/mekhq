@@ -63,7 +63,6 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -2387,8 +2386,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         return Optional.of(popup);
     }
 
+    /**
+     * Returns a JMenuItem for a given Award.
+     *
+     * @param award The Award object for which the JMenuItem is to be created.
+     * @return A JMenuItem representing the given Award.
+     */
     private JMenuItem getAwardMenuItem(Award award) {
-        JMenuItem menuItem;
         StringBuilder awardMenuItem = new StringBuilder();
         awardMenuItem.append(String.format("%s", award.getName()));
 
@@ -2424,7 +2428,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
 
-        menuItem = new JMenuItem(awardMenuItem.toString());
+        JMenuItem menuItem = new JMenuItem(awardMenuItem.toString());
         menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
         menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
         menuItem.addActionListener(this);
