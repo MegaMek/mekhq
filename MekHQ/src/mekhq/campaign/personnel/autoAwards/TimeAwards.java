@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 public class TimeAwards {
     /**
      * This function loops through Time Awards, checking whether the person is eligible to receive each type of award
+     *
      * @param campaign the campaign to be processed
      * @param person the person to check award eligibility for
      * @param awards the awards to be processed (should only include awards where item == Time)

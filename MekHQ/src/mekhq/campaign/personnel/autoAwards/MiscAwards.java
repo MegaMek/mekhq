@@ -20,6 +20,7 @@ public class MiscAwards {
     /**
      * This function loops through Misc Awards, checking whether the person is eligible to receive each type of award.
      * All Misc awards need to be coded as individual functions
+     *
      * @param campaign the current campaign
      * @param mission @Nullable the mission just completed (Null if no Mission was completed)
      * @param person the person to check award eligibility for
@@ -62,6 +63,7 @@ public class MiscAwards {
 
     /**
      * This function checks whether Mission Accomplished awards can be awarded to Person
+     *
      * @param campaign the current campaign
      * @param award the award to be processed
      * @param person the person to check award eligibility for
@@ -71,7 +73,8 @@ public class MiscAwards {
     }
 
     /**
-     * This function checks whether House World No War awards can be awarded to Person
+     * This function checks whether House World War/No War awards can be awarded to Person
+     *
      * @param campaign the current campaign
      * @param mission the Mission just completed
      * @param award the award to be processed
@@ -105,11 +108,13 @@ public class MiscAwards {
     }
 
     /**
-     * This function checks whether House World No War awards can be awarded to Person
+     * This method checks whether Periphery awards can be awarded to a person.
+     *
      * @param campaign the current campaign
-     * @param mission the Mission just completed
+     * @param mission the mission just completed (nullable)
      * @param award the award to be processed
      * @param person the person to check award eligibility for
+     * @return true if the person is eligible for the award, false otherwise
      */
     private static boolean Periphery(Campaign campaign, @Nullable Mission mission, Award award, UUID person) {
         if (award.canBeAwarded(campaign.getPerson(person))) {

@@ -12,12 +12,12 @@ import java.util.UUID;
 
 public class ScenarioKillAwards {
     /**
-     * This function processes Injury Awards and spits out eligibility into the Daily Report
+     * This function loops through Scenario Kill Awards, checking whether the person is eligible to receive each type of award.
      *
      * @param campaign the campaign to be processed
      * @param person the Person to check award eligibility for
      * @param kills a list of p's relevant kills
-     * @param awards awards the awards to be processed (should only include awards where item == injury && range == scenario)
+     * @param awards awards the awards to be processed (should only include awards where item == kill && ranges == scenario)
      */
     public static Map<Integer, List<Object>> ScenarioKillAwardsProcessor(Campaign campaign, UUID person, List<Award> awards, List<Kill> kills) {
         int killsNeeded;

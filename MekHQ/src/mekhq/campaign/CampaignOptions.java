@@ -2225,243 +2225,138 @@ public class CampaignOptions {
     //endregion Death
 
     //region Awards
-    /**
-     * @return whether to issue awards to dead personnel
-     */
     public boolean isIssuePosthumousAwards() {
         return issuePosthumousAwards;
     }
 
-    /**
-     * @param issuePosthumousAwards whether to issue awards to dead personnel or not
-     */
     public void setIssuePosthumousAwards(final boolean issuePosthumousAwards) {
         this.issuePosthumousAwards = issuePosthumousAwards;
     }
 
-    /**
-     * @return whether to issue only the best award, if personnel are eligible for multiple awards of
-     * the same type
-     */
     public boolean isIssueBestAwardOnly() {
         return issueBestAwardOnly;
     }
 
-    /**
-     * @param issueBestAwardOnly whether to issue only the best award or not
-     */
     public void setIssueBestAwardOnly(final boolean issueBestAwardOnly) {
         this.issueBestAwardOnly = issueBestAwardOnly;
     }
 
-    /**
-     * @return whether to issue only the best award, if personnel are eligible for multiple awards of
-     * the same type
-     */
     public boolean isIgnoreStandardSet() {
         return ignoreStandardSet;
     }
 
-    /**
-     * @param ignoreStandardSet whether to issue only the best award or not
-     */
     public void setIgnoreStandardSet(final boolean ignoreStandardSet) {
         this.ignoreStandardSet = ignoreStandardSet;
     }
 
-    /**
-     * @return how many times an award must be issued to use the next tier image
-     */
     public int getAwardTierSize() {
         return awardTierSize;
     }
 
-    /**
-     * @param awardTierSize set how many times an award must be issued to use the next tier image
-     */
     public void setAwardTierSize(final int awardTierSize) {
         this.awardTierSize = awardTierSize;
     }
 
-
-    /**
-     * @return what style of Award bonuses are enabled (if any)
-     */
     public AwardBonus getAwardBonusStyle() {
         return awardBonusStyle;
     }
 
-    /**
-     * @param awardBonusStyle type of Award bonuses to enable
-     */
     public void setAwardBonusStyle(final AwardBonus awardBonusStyle) {
         this.awardBonusStyle = awardBonusStyle;
     }
 
-    /**
-     * @return whether autoAwards is enabled
-     */
     public boolean isEnableAutoAwards() {
         return enableAutoAwards;
     }
 
-    /**
-     * @param enableAutoAwards whether to enable autoAwards or not
-     */
     public void setEnableAutoAwards(final boolean enableAutoAwards) {
         this.enableAutoAwards = enableAutoAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableContractAwards() {
         return enableContractAwards;
     }
 
-    /**
-     * @param enableContractAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableContractAwards(final boolean enableContractAwards) {
         this.enableContractAwards = enableContractAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableFactionHunterAwards() {
         return enableFactionHunterAwards;
     }
 
-    /**
-     * @param enableFactionHunterAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableFactionHunterAwards(final boolean enableFactionHunterAwards) {
         this.enableFactionHunterAwards = enableFactionHunterAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableInjuryAwards() {
         return enableInjuryAwards;
     }
 
-    /**
-     * @param enableInjuryAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableInjuryAwards(final boolean enableInjuryAwards) {
         this.enableInjuryAwards = enableInjuryAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableIndividualKillAwards() {
         return enableIndividualKillAwards;
     }
 
-    /**
-     * @param enableIndividualKillAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableIndividualKillAwards(final boolean enableIndividualKillAwards) {
         this.enableIndividualKillAwards = enableIndividualKillAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableFormationKillAwards() {
         return enableFormationKillAwards;
     }
 
-    /**
-     * @param enableFormationKillAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableFormationKillAwards(final boolean enableFormationKillAwards) {
         this.enableFormationKillAwards = enableFormationKillAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableRankAwards() {
         return enableRankAwards;
     }
 
-    /**
-     * @param enableRankAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableRankAwards(final boolean enableRankAwards) {
         this.enableRankAwards = enableRankAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableScenarioAwards() {
         return enableScenarioAwards;
     }
 
-    /**
-     * @param enableScenarioAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableScenarioAwards(final boolean enableScenarioAwards) {
         this.enableScenarioAwards = enableScenarioAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableSkillAwards() {
         return enableSkillAwards;
     }
 
-    /**
-     * @param enableSkillAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableSkillAwards(final boolean enableSkillAwards) {
         this.enableSkillAwards = enableSkillAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableTheatreOfWarAwards() {
         return enableTheatreOfWarAwards;
     }
 
-    /**
-     * @param enableTheatreOfWarAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableTheatreOfWarAwards(final boolean enableTheatreOfWarAwards) {
         this.enableTheatreOfWarAwards = enableTheatreOfWarAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableTimeAwards() {
         return enableTimeAwards;
     }
 
-    /**
-     * @param enableTimeAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableTimeAwards(final boolean enableTimeAwards) {
         this.enableTimeAwards = enableTimeAwards;
     }
 
-    /**
-     * @return whether to track award eligibility for this award type
-     */
     public boolean isEnableMiscAwards() {
         return enableMiscAwards;
     }
 
-    /**
-     * @param enableMiscAwards true to enable tracking of award eligibility for awards of this type
-     */
     public void setEnableMiscAwards(final boolean enableMiscAwards) {
         this.enableMiscAwards = enableMiscAwards;
     }

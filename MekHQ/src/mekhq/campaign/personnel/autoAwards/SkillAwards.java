@@ -11,6 +11,7 @@ import java.util.*;
 public class SkillAwards {
     /**
      * This function loops through Skill Awards, checking whether the person is eligible to receive each type of award
+     *
      * @param campaign the current campaign
      * @param person   the person to check award eligibility for
      * @param awards   the awards to be processed (should only include awards where item == Skill)
@@ -29,7 +30,8 @@ public class SkillAwards {
             }
 
             if (award.canBeAwarded(campaign.getPerson(person))) {
-                // this allows the user to specify multiple skills to be checked against, where all skill levels need to be met
+                // this allows the user to specify multiple skills to be checked against,
+                // where all skill levels need to be met.
                 // if the user puts two ',' next to each other (creating an empty skill) the system will just treat it as an invalid
                 // skill and break the current loop iteration
                 List<String> skills = Arrays.asList(award.getRange()
@@ -59,6 +61,7 @@ public class SkillAwards {
 
     /**
      * This function uses switches to feed the relevant skill/s into getSkillLevel()
+     *
      * @param campaign the current campaign
      * @param award the award being processed, this is for error logging
      * @param person the person whose skill levels we want
@@ -231,7 +234,7 @@ public class SkillAwards {
             default:
                 LogManager.getLogger().warn("Award {} from the {} set has invalid skill {}", award.getName(), award.getSet(), skill);
 
-                // this treats the malformed Skill as if Person was untrained
+                // this treats the malformed Skill as if a Person was untrained
                 return -1;
         }
 
@@ -239,8 +242,9 @@ public class SkillAwards {
     }
 
     /**
-     * This function loops through all relevant skills, calculating the max skill level. If all skills are untrained
-     * the function will default to -1.
+     * This function loops through all relevant skills, calculating the max skill level.
+     * If all skills are untrained, the function will default to -1.
+     *
      * @param campaign the current campaign
      * @param relevantSkills the list of Skills to check
      * @param personId the person whose Skill Levels are being checked

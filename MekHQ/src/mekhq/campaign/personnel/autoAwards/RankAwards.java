@@ -13,7 +13,7 @@ import java.util.UUID;
 public class RankAwards {
     /**
      * This function loops through Rank Awards, checking whether the person is eligible to receive each type of award.
-     * All Misc awards need to be hardcoded
+     *
      * @param campaign the current campaign
      * @param personId the person to check award eligibility for
      * @param awards the awards to be processed (should only include awards where item == Kill)

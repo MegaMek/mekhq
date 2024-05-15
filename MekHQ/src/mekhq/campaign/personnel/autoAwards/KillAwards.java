@@ -12,6 +12,7 @@ import java.util.*;
 public class KillAwards {
     /**
      * This function loops through Kill Awards, checking whether the person is eligible to receive each type of award
+     *
      * @param campaign the campaign to be processed
      * @param mission the mission just completed
      * @param person the person to check award eligibility for
@@ -61,7 +62,7 @@ public class KillAwards {
                 // this allows us to convert non-IS formations into IS equivalents
                 formationDepth = getFormation(campaign, award);
 
-                // we skip, if an invalid formationDepth has been provided
+                // we skip if an invalid formationDepth has been provided
                 if (formationDepth == -1) {
                     continue;
                 }
@@ -94,7 +95,7 @@ public class KillAwards {
                     continue;
                 }
 
-                // with all the parameters validated we can begin processing the award
+                // with all the parameters validated, we can begin processing the award
                 switch (formationDepth) {
                     // individual
                     case 0:
@@ -226,9 +227,10 @@ public class KillAwards {
 
         if (!groupAwards.isEmpty()) {
             if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
-                // we need to filter groupAwards into discrete Award Groups, as otherwise Forces become ineligible to
-                // Awards they should be eligible for, if they are eligible for a 'better' Award from another Award Group
-                // By removing each Award, as they're filtered, we can ensure all Awards have been removed
+                // we need to filter groupAwards into discrete Award Groups.
+                // otherwise, Forces become ineligible for Awards they should be entitled to
+                // if they are eligible for a 'better' Award from another Award Group.
+                // by removing each Award, as they're filtered, we can ensure all Awards have been removed
                 for (Award award : groupAwards) {
                     switch (getFormation(campaign, award)) {
                         case 1:
@@ -287,9 +289,12 @@ public class KillAwards {
     }
 
         /**
-         * This function uses switches to translate non-IS formations into the IS equivalent. It also
-         * validates award size, returning 'invalid' if a malformed size is provided.
+         * Retrieves the formation depth for a given award, translating non-IS formations into the IS equivalent.
+         * It also validates the award size and returns -1 if an invalid size is provided.
+         *
+         * @param campaign the campaign object
          * @param award the award providing the formation
+         * @return the formation depth or -1 if an invalid size is provided or if the formation kill awards are disabled
          */
         private static int getFormation(Campaign campaign, Award award){
             int formationDepth;
@@ -351,12 +356,12 @@ public class KillAwards {
          * @param campaign the campaign being processed
          * @param mission the mission just completed
          * @param forceId the id for the force we want to parse
-         * @param filterOtherMissionKills true if we should only count kills from the mission just completed
+         * @param filterOtherMissionKills true, if we should only count kills from the mission just completed
          */
         private static int getAllForceKills(Campaign campaign, Mission mission, int forceId, boolean filterOtherMissionKills){
             int killCount = 0;
 
-            // this grabs the kills for any loose units that exist outside of lances
+            // this grabs the kills for any loose units that exist outside lances
             Vector<Force> subForces = campaign.getForce(forceId).getSubForces();
 
             killCount += getForceKills(campaign, mission, forceId, filterOtherMissionKills);
@@ -375,7 +380,7 @@ public class KillAwards {
          * @param campaign the campaign being processed
          * @param mission the mission just completed
          * @param forceId the id for the force we want to parse
-         * @param filterOtherMissionKills true if we should only count kills from the mission just completed
+         * @param filterOtherMissionKills true, if we should only count kills from the mission just completed
          */
         private static int getForceKills(Campaign campaign, Mission mission, int forceId, boolean filterOtherMissionKills){
             int killCount;
@@ -394,10 +399,11 @@ public class KillAwards {
 
         /**
          * This function gathers kills from individual personnel
+         *
          * @param campaign the campaign being processed
          * @param mission the mission just completed
          * @param commander the unit commander whose kills are being counted
-         * @param filterOtherMissionKills true if we should only count kills from the mission just completed
+         * @param filterOtherMissionKills true, if we should only count kills from the mission just completed
          */
         private static int getIndividualKills(Campaign campaign, Mission mission, UUID commander, boolean filterOtherMissionKills){
             List<Kill> allKills;

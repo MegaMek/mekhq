@@ -11,7 +11,8 @@ import java.util.UUID;
 
 public class ScenarioAwards {
     /**
-     * This function loops through Scenario Awards, checking whether the person is eligible to receive each type of award
+     * This function loops through Scenario Awards, checking whether the person is eligible to receive each type of award.
+     *
      * @param campaign the campaign to be processed
      * @param person the person to check award eligibility for
      * @param awards the awards to be processed (should only include awards where item == Scenario)

@@ -18,6 +18,7 @@ import java.util.stream.IntStream;
 public class TheatreOfWarAwards {
     /**
      * This function loops through Theatre of War Awards, checking whether the person is eligible to receive each type of award
+     *
      * @param campaign the campaign to be processed
      * @param mission the mission just completed
      * @param person the person to check award eligibility for
@@ -104,6 +105,7 @@ public class TheatreOfWarAwards {
 
     /**
      * Streams through years covered by Contract, returns true if at least one is during wartime
+     *
      * @param wartime a list with two entries, war start year and war end year (can be identical)
      * @param contractStartYear the contract's start yet
      * @param currentYear the current campaign year
@@ -122,7 +124,8 @@ public class TheatreOfWarAwards {
     }
 
     /**
-     * Streams through contents of factions and returns true if any match missionFaction
+     * Streams through the contents of factions and returns true if any match missionFaction
+     *
      * @param missionFaction a single faction (either employer or enemy)
      * @param factions a list of factions (either a list of attackers, or of defenders)
      */
@@ -132,6 +135,7 @@ public class TheatreOfWarAwards {
 
     /**
      * Checks whether missionFaction matches the requirements of belligerent
+     *
      * @param missionFaction a single faction (either employer or enemy)
      * @param belligerent the faction, or super-faction, to be matched against
      */

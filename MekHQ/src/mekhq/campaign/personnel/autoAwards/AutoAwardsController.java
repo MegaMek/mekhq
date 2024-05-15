@@ -63,7 +63,7 @@ public class AutoAwardsController {
      *
      * @param c                    the campaign to be processed
      * @param m                    the mission just completed
-     * @param missionWasSuccessful true if Mission was a complete Success, otherwise false
+     * @param missionWasSuccessful true if the Mission was a complete Success, otherwise false
      */
     public void PostMissionController(Campaign c, Mission m, Boolean missionWasSuccessful) {
         LogManager.getLogger().info("autoAwards (Mission Conclusion) has started");
@@ -87,7 +87,7 @@ public class AutoAwardsController {
     }
 
     /**
-     * This function processes Kill(Scenario) and Injury Awards following the conclusion of a Scenario
+     * This function processes Kill (Scenario) and Injury Awards following the conclusion of a Scenario
      *
      * @param c           the campaign to be processed
      * @param scenarioId  id number for the Scenario just concluded
@@ -99,7 +99,7 @@ public class AutoAwardsController {
 
         campaign = c;
 
-        // we convert person into a Collection, as it allows us to utilize InjuryAwardsManager
+        // we convert a person into a Collection, as it allows us to use InjuryAwardsManager
         // outside of this function
         Collection<UUID> personnel = new ArrayList<>();
         personnel.add(person);
@@ -198,7 +198,7 @@ public class AutoAwardsController {
             LogManager.getLogger().info("Ignoring the Standard Set");
         }
 
-        // we start by building a master list of all awards
+        // we start by building a primary list of all awards
         if (!allSetNames.isEmpty()) {
             LogManager.getLogger().info("Getting all Award Sets");
 
@@ -208,7 +208,7 @@ public class AutoAwardsController {
 
                     awards.addAll(AwardsFactory.getInstance().getAllAwardsForSet(setName));
 
-                    // next we begin to filter the awards into discrete lists
+                    // next, we begin to filter the awards into discrete lists
                     switch (awardListCase) {
                         // Manual
                         case 0:
@@ -558,7 +558,7 @@ public class AutoAwardsController {
             }
 
             if (data != null) {
-                // as the unique identifiers get doubled-up as we loop through personnel, we extract the data from
+                // as the unique identifiers get doubled-up, as we loop through personnel, we extract the data from
                 // data and insert it into awardData (now under a new, truly unique, int identifier).
                 for (Integer dataKey : data.keySet()) {
                     awardData.put(awardDataKey, data.get(dataKey));
@@ -578,6 +578,7 @@ public class AutoAwardsController {
 
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> FactionHunterAwardsManager(Collection<UUID> personnel) {
@@ -613,6 +614,7 @@ public class AutoAwardsController {
 
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> InjuryAwardsManager(Collection<UUID> personnel, int injuryCount) {
@@ -647,6 +649,7 @@ public class AutoAwardsController {
 
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> KillAwardsManager(Collection<UUID> personnel) {
@@ -681,6 +684,7 @@ public class AutoAwardsController {
 
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> ScenarioKillAwardsManager(Collection<UUID> personnel, List<Kill> kills) {
@@ -715,6 +719,7 @@ public class AutoAwardsController {
 
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
      * @param personnel the personnel to be processed
      * @param missionWasSuccessful whether the mission just completed was successful
      */
@@ -749,6 +754,7 @@ public class AutoAwardsController {
 
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> RankAwardsManager(Collection<UUID> personnel) {
@@ -782,6 +788,7 @@ public class AutoAwardsController {
 
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> ScenarioAwardsManager(Collection<UUID> personnel) {
@@ -815,6 +822,7 @@ public class AutoAwardsController {
 
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> SkillAwardsManager(Collection<UUID> personnel) {
@@ -848,6 +856,7 @@ public class AutoAwardsController {
 
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> TheatreOfWarAwardsManager(Collection<UUID> personnel) {
@@ -881,6 +890,7 @@ public class AutoAwardsController {
 
     /**
      * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
      * @param personnel the personnel to be processed
      */
     private Map<Integer, List<Object>> TimeAwardsManager(Collection<UUID> personnel) {
@@ -914,7 +924,8 @@ public class AutoAwardsController {
     }
 
     /**
-     * This is called from within a Award Type module and prepares data for use by displayAwardCeremony()
+     * This is called from within an Award Type module and prepares data for use by displayAwardCeremony()
+     *
      * @param person the person being processed
      * @param eligibleAwards the Awards they are eligible for
      */

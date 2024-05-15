@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public class InjuryAwards {
     /**
-     * This function processes Injury Awards and spits out eligibility into the Daily Report
+     * This function loops through Injury Awards, checking whether the person is eligible to receive each type of award
      *
      * @param campaign the campaign to be processed
      * @param person the Person to check award eligibility for
