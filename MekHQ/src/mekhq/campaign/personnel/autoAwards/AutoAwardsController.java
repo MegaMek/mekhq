@@ -214,7 +214,7 @@ public class AutoAwardsController {
                         case 0:
                             for (Award award : awards) {
                                 switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
-                                    case "divider":
+                                    case "group":
                                         break;
                                     case "ignore":
                                     case "contract":

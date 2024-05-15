@@ -1324,12 +1324,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     for (Award award : awardsOfSet) {
                         if (oneSelected && !award.canBeAwarded(selected)) {
                             continue;
+                        } else if (award.getItem().equalsIgnoreCase("group")) {
+                            continue;
                         }
 
                         if (award.getGroup().equalsIgnoreCase(awardGroups.get(index))) {
                             menuItem = getAwardMenuItem(award);
                             awardGroupMenu.add(menuItem);
-                        } else if ((award.getGroup().equalsIgnoreCase("null")) && (index == 0)) {
+                        } else if ((!awardGroups.contains(award.getGroup())) && (index == 0)) {
                             menuItem = getAwardMenuItem(award);
                             awardGroupMenu.add(menuItem);
                         }

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <awards>
     <award>
-        <name>Manual</name>
+        <name>Manual Awards</name>
         <description>Awards not tracked by the automated award eligibility tracker</description>
         <item>Group</item>
     </award>
@@ -110,7 +110,7 @@
         <item>Ignore</item>
     </award>
     <award>
-        <name>Personal</name>
+        <name>Personal Awards</name>
         <description>Awards based on individual merit</description>
         <item>Group</item>
     </award>
@@ -157,7 +157,7 @@
         <item>Time</item>
     </award>
     <award>
-        <name>Scenario</name>
+        <name>Scenario Awards</name>
         <description>Awards earned during Scenarios</description>
         <item>Group</item>
     </award>
@@ -221,7 +221,7 @@
         <range>Scenario</range>
     </award>
     <award>
-        <name>Mission</name>
+        <name>Mission Awards</name>
         <description>Awards earned during a Mission or Contract</description>
         <item>Group</item>
     </award>
@@ -468,7 +468,7 @@
         <range>Mission</range>
     </award>
     <award>
-        <name>Time of War</name>
+        <name>Time of War Awards</name>
         <description>Awards earned during a specific Time of War</description>
         <item>Group</item>
     </award>
