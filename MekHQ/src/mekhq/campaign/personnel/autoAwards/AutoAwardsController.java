@@ -1,5 +1,6 @@
 package mekhq.campaign.personnel.autoAwards;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.mission.AtBContract;
@@ -120,12 +121,21 @@ public class AutoAwardsController {
             }
         }
 
-        // beginning the processing & filtering of Kill(Scenario) Awards
+        // beginning the processing & filtering of Kill (Scenario) Awards
         List<Kill> kills = campaign.getKillsFor(campaign.getPerson(person).getId());
         kills.removeIf(kill -> kill.getScenarioId() != scenarioId);
 
         if ((!kills.isEmpty()) && (!killAwards.isEmpty())) {
             processedData = ScenarioKillAwardsManager(personnel, kills);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+            }
+        }
+
+        // beginning the processing & filtering of Misc Awards
+        if ((injuryCount > 0) && (!kills.isEmpty()) && (!miscAwards.isEmpty())) {
+            processedData = MiscAwardsManager(personnel, false, kills.size(), injuryCount);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -436,10 +446,10 @@ public class AutoAwardsController {
     }
 
     /**
-     * Loops through provided personnel, checking whether each is eligible for an award
+     * Process the awards for the given personnel.
      *
-     * @param personnel all personnel that should be checked for award eligibility
-     * @param missionWasSuccessful whether the Mission ended in a Success
+     * @param personnel               the collection of personnel to process awards for
+     * @param missionWasSuccessful    true if the mission was successful, false otherwise
      */
     private void ProcessAwards(Collection<UUID> personnel, Boolean missionWasSuccessful) {
         Map<Integer, Map<Integer, List<Object>>> allAwardData = new HashMap<>();
@@ -477,7 +487,7 @@ public class AutoAwardsController {
         }
 
         if (!miscAwards.isEmpty()) {
-            processedData = MiscAwardsManager(personnel, missionWasSuccessful);
+            processedData = MiscAwardsManager(personnel, missionWasSuccessful, null, null);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -718,19 +728,23 @@ public class AutoAwardsController {
     }
 
     /**
-     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * This method is the manager for processing miscellaneous awards.
      *
-     * @param personnel the personnel to be processed
-     * @param missionWasSuccessful whether the mission just completed was successful
+     * @param personnel             the collection of personnel to be processed for awards
+     * @param missionWasSuccessful  a boolean indicating if the mission was successful
+     * @param killCount             an optional parameter specifying the kill count
+     * @param injuryCount           an optional parameter specifying the injury count
+     * @return a map containing the award data, or null if no awards are applicable
      */
-    private Map<Integer, List<Object>> MiscAwardsManager(Collection<UUID> personnel, boolean missionWasSuccessful) {
+    private Map<Integer, List<Object>> MiscAwardsManager(Collection<UUID> personnel, boolean missionWasSuccessful,
+                                                         @Nullable Integer killCount, @Nullable Integer injuryCount) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
         for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
             try {
-                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful);
+                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful, killCount, injuryCount);
             } catch (Exception e) {
                 data = null;
                 LogManager.getLogger().info("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());

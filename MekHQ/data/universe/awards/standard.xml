@@ -6,60 +6,6 @@
         <item>Group</item>
     </award>
     <award>
-        <name>Basic Training</name>
-        <description>Graduate of basic training.</description>
-        <group>Manual Awards</group>
-        <ribbon>4-08-1-BasicTraining.png</ribbon>
-        <xp>1</xp>
-        <qty>1</qty>
-        <item>Training</item>
-        <size>Individual</size>
-        <range>Career</range>
-    </award>
-    <award>
-        <name>NCO Academy Graduate</name>
-        <description>Graduate of NCO academy.</description>
-        <group>Manual Awards</group>
-        <ribbon>4-07-1-NCOGraduate.png</ribbon>
-        <xp>2</xp>
-        <qty>1</qty>
-        <item>Training</item>
-        <size>Individual</size>
-        <range>Career</range>
-    </award>
-    <award>
-        <name>Warrant Officer Graduate</name>
-        <description>Graduate of warrant officer training.</description>
-        <group>Manual Awards</group>
-        <ribbon>4-06-2-WarrantGraduate.png</ribbon>
-        <xp>3</xp>
-        <qty>21</qty>
-        <item>Training</item>
-        <size>Individual</size>
-        <range>Career</range>
-    </award>
-    <award>
-        <name>Officer Graduate</name>
-        <description>Graduate of OCS or equivalent.</description>
-        <group>Manual Awards</group>
-        <ribbon>4-06-1-OfficerGraduate.png</ribbon>
-        <xp>4</xp>
-        <edge>1</edge>
-        <qty>31</qty>
-        <item>Training</item>
-        <size>Individual</size>
-        <range>Career</range>
-    </award>
-    <award>
-        <name>Ceremonial Duty</name>
-        <description>Served as honor guard.</description>
-        <group>Manual Awards</group>
-        <ribbon>4-05-1-CeremonialDuty.png</ribbon>
-        <xp>1</xp>
-        <qty>1</qty>
-        <item>Ignore</item>
-    </award>
-    <award>
         <name>Drill Instructor</name>
         <description>Served as basic training drill instructor.</description>
         <group>Manual Awards</group>
@@ -75,18 +21,6 @@
         <medal>HumanitarianServiceM.png</medal>
         <ribbon>3-05-5-HumanitarianService.png</ribbon>
         <edge>2</edge>
-        <item>Ignore</item>
-    </award>
-    <award>
-        <name>Medal of Honor</name>
-        <description>Distinguished oneself conspicuously by gallantry and intrepidity at the risk of life above and beyond the call of duty.</description>
-        <group>Manual Awards</group>
-        <medal>MedalOfHonorM.png</medal>
-        <ribbon>1-01-1-MedalOfHonor.png</ribbon>
-        <xp>10</xp>
-        <edge>3</edge>
-        <stackable>true</stackable>
-        <qty>1</qty>
         <item>Ignore</item>
     </award>
     <award>
@@ -108,6 +42,56 @@
         <xp>5</xp>
         <edge>1</edge>
         <item>Ignore</item>
+    </award>
+    <award>
+        <name>Education Awards</name>
+        <description>Awards earned when graduating from academies</description>
+        <item>Group</item>
+    </award>
+    <award>
+        <name>Basic Training</name>
+        <description>Graduate of basic training.</description>
+        <group>Education Awards</group>
+        <ribbon>4-08-1-BasicTraining.png</ribbon>
+        <xp>1</xp>
+        <qty>1</qty>
+        <item>Training</item>
+        <size>Individual</size>
+        <range>Career</range>
+    </award>
+    <award>
+        <name>NCO Academy Graduate</name>
+        <description>Graduate of NCO academy.</description>
+        <group>Education Awards</group>
+        <ribbon>4-07-1-NCOGraduate.png</ribbon>
+        <xp>2</xp>
+        <qty>1</qty>
+        <item>Training</item>
+        <size>Individual</size>
+        <range>Career</range>
+    </award>
+    <award>
+        <name>Warrant Officer Graduate</name>
+        <description>Graduate of warrant officer training.</description>
+        <group>Education Awards</group>
+        <ribbon>4-06-2-WarrantGraduate.png</ribbon>
+        <xp>3</xp>
+        <qty>21</qty>
+        <item>Training</item>
+        <size>Individual</size>
+        <range>Career</range>
+    </award>
+    <award>
+        <name>Officer Graduate</name>
+        <description>Graduate of OCS or equivalent.</description>
+        <group>Education Awards</group>
+        <ribbon>4-06-1-OfficerGraduate.png</ribbon>
+        <xp>4</xp>
+        <edge>1</edge>
+        <qty>31</qty>
+        <item>Training</item>
+        <size>Individual</size>
+        <range>Career</range>
     </award>
     <award>
         <name>Personal Awards</name>
@@ -155,6 +139,19 @@
         <stackable>true</stackable>
         <qty>6</qty>
         <item>Time</item>
+    </award>
+    <award>
+        <name>Medal of Honor</name>
+        <description>Distinguished oneself conspicuously by gallantry and intrepidity at the risk of life above and beyond the call of duty.</description>
+        <group>Manual Awards</group>
+        <medal>MedalOfHonorM.png</medal>
+        <ribbon>1-01-1-MedalOfHonor.png</ribbon>
+        <xp>10</xp>
+        <edge>3</edge>
+        <stackable>true</stackable>
+        <item>Medal Of Honor</item>
+        <size>20</size>
+        <range>5</range>
     </award>
     <award>
         <name>Scenario Awards</name>
@@ -284,6 +281,14 @@
         <edge>1</edge>
         <item>Contract</item>
         <range>Raid</range>
+    </award>
+    <award>
+        <name>Ceremonial Duty</name>
+        <description>Served as honor guard.</description>
+        <group>Manual Awards</group>
+        <ribbon>4-05-1-CeremonialDuty.png</ribbon>
+        <xp>1</xp>
+        <item>Ceremonial Duty</item>
     </award>
     <award>
         <name>Galactic War on Pirating</name>
