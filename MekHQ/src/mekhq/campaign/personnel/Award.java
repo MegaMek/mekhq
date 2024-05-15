@@ -43,6 +43,9 @@ public class Award implements Comparable<Award> {
     @XmlElement(name = "description")
     private String description;
 
+    @XmlElement(name = "group")
+    private String group = "null";
+
     @XmlElement(name = "medal")
     private List<String> medals;
 
@@ -83,11 +86,12 @@ public class Award implements Comparable<Award> {
 
     }
 
-    public Award(String name, String set,  String description, List<String> medals, List<String> ribbons,
+    public Award(String name, String set,  String description, String group, List<String> medals, List<String> ribbons,
                  List<String> miscs, int xp, int edge, boolean stackable, int qty, String item, String size, String range, int id) {
         this.name = name;
         this.set = set;
         this.description = description;
+        this.group = group;
         this.medals = medals;
         this.ribbons = ribbons;
         this.miscs = miscs;
@@ -139,6 +143,14 @@ public class Award implements Comparable<Award> {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(final String group) {
+        this.group = group;
     }
 
     /**

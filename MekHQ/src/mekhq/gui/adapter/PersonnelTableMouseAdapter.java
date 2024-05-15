@@ -63,6 +63,7 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -1296,51 +1297,45 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             List<Award> awardsOfSet = AwardsFactory.getInstance().getAllAwardsForSet(setName);
             Collections.sort(awardsOfSet);
 
+            List<String> awardGroups = new ArrayList<>();
+            List<String> awardGroupDescriptions = new ArrayList<>();
+
             for (Award award : awardsOfSet) {
-                if (oneSelected && !award.canBeAwarded(selected)) {
-                    continue;
+                if ("group".equalsIgnoreCase(award.getItem())) {
+                    awardGroups.add(award.getName());
+                    awardGroupDescriptions.add(award.getDescription());
                 }
+            }
 
-                StringBuilder awardMenuItem = new StringBuilder();
-                awardMenuItem.append(String.format("%s", award.getName()));
+            if (awardGroups.isEmpty()) {
+                for (Award award : awardsOfSet) {
+                    if (oneSelected && !award.canBeAwarded(selected)) {
+                        continue;
+                    }
 
-                if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isBoth()) {
-                    if ((award.getXPReward() != 0) || (award.getEdgeReward() != 0)) {
-                        awardMenuItem.append(" (");
+                    menuItem = getAwardMenuItem(award);
+                    setAwardMenu.add(menuItem);
+                }
+            } else {
+                for (int index = 0; index < awardGroups.size(); index++) {
+                    JMenu awardGroupMenu = new JMenu(awardGroups.get(index));
+                    awardGroupMenu.setToolTipText(MultiLineTooltip.splitToolTip(awardGroupDescriptions.get(index)));
+                    setAwardMenu.add(awardGroupMenu);
 
-                        if (award.getXPReward() != 0) {
-                            awardMenuItem.append(award.getXPReward()).append(" XP");
-                            if (award.getEdgeReward() != 0) {
-                                awardMenuItem.append(" & ");
-                            }
+                    for (Award award : awardsOfSet) {
+                        if (oneSelected && !award.canBeAwarded(selected)) {
+                            continue;
                         }
 
-                        if (award.getEdgeReward() != 0) {
-                            awardMenuItem.append(award.getEdgeReward()).append(" Edge");
+                        if (award.getGroup().equalsIgnoreCase(awardGroups.get(index))) {
+                            menuItem = getAwardMenuItem(award);
+                            awardGroupMenu.add(menuItem);
+                        } else if ((award.getGroup().equalsIgnoreCase("null")) && (index == 0)) {
+                            menuItem = getAwardMenuItem(award);
+                            awardGroupMenu.add(menuItem);
                         }
-
-                        awardMenuItem.append(")");
-                    }
-                } else if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isXP()) {
-                    if (award.getXPReward() != 0) {
-                        awardMenuItem.append(" (");
-
-                        awardMenuItem.append(award.getXPReward()).append(" XP)");
-                    }
-                } else if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isEdge()) {
-
-                    if (award.getEdgeReward() != 0) {
-                        awardMenuItem.append(" (");
-
-                        awardMenuItem.append(award.getEdgeReward()).append(" Edge)");
                     }
                 }
-
-                menuItem = new JMenuItem(awardMenuItem.toString());
-                menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
-                menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
-                menuItem.addActionListener(this);
-                setAwardMenu.add(menuItem);
             }
 
             JMenuHelpers.addMenuIfNonEmpty(awardMenu, setAwardMenu);
@@ -2390,6 +2385,50 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         //endregion GM Menu
 
         return Optional.of(popup);
+    }
+
+    private JMenuItem getAwardMenuItem(Award award) {
+        JMenuItem menuItem;
+        StringBuilder awardMenuItem = new StringBuilder();
+        awardMenuItem.append(String.format("%s", award.getName()));
+
+        if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isBoth()) {
+            if ((award.getXPReward() != 0) || (award.getEdgeReward() != 0)) {
+                awardMenuItem.append(" (");
+
+                if (award.getXPReward() != 0) {
+                    awardMenuItem.append(award.getXPReward()).append(" XP");
+                    if (award.getEdgeReward() != 0) {
+                        awardMenuItem.append(" & ");
+                    }
+                }
+
+                if (award.getEdgeReward() != 0) {
+                    awardMenuItem.append(award.getEdgeReward()).append(" Edge");
+                }
+
+                awardMenuItem.append(")");
+            }
+        } else if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isXP()) {
+            if (award.getXPReward() != 0) {
+                awardMenuItem.append(" (");
+
+                awardMenuItem.append(award.getXPReward()).append(" XP)");
+            }
+        } else if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isEdge()) {
+
+            if (award.getEdgeReward() != 0) {
+                awardMenuItem.append(" (");
+
+                awardMenuItem.append(award.getEdgeReward()).append(" Edge)");
+            }
+        }
+
+        menuItem = new JMenuItem(awardMenuItem.toString());
+        menuItem.setToolTipText(MultiLineTooltip.splitToolTip(award.getDescription()));
+        menuItem.setActionCommand(makeCommand(CMD_ADD_AWARD, award.getSet(), award.getName()));
+        menuItem.addActionListener(this);
+        return menuItem;
     }
 
     private JMenuItem newMenuItem(String text, String command) {

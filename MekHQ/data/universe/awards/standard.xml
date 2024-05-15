@@ -1,13 +1,14 @@
 <?xml version="1.0"?>
 <awards>
     <award>
-        <name>+ + + MANUAL AWARDS + + +</name>
+        <name>Manual</name>
         <description>Awards not tracked by the automated award eligibility tracker</description>
-        <item>Divider</item>
+        <item>Group</item>
     </award>
     <award>
         <name>Basic Training</name>
         <description>Graduate of basic training.</description>
+        <group>Manual</group>
         <ribbon>4-08-1-BasicTraining.png</ribbon>
         <xp>1</xp>
         <qty>1</qty>
@@ -18,6 +19,7 @@
     <award>
         <name>NCO Academy Graduate</name>
         <description>Graduate of NCO academy.</description>
+        <group>Manual</group>
         <ribbon>4-07-1-NCOGraduate.png</ribbon>
         <xp>2</xp>
         <qty>1</qty>
@@ -28,6 +30,7 @@
     <award>
         <name>Warrant Officer Graduate</name>
         <description>Graduate of warrant officer training.</description>
+        <group>Manual</group>
         <ribbon>4-06-2-WarrantGraduate.png</ribbon>
         <xp>3</xp>
         <qty>21</qty>
@@ -38,6 +41,7 @@
     <award>
         <name>Officer Graduate</name>
         <description>Graduate of OCS or equivalent.</description>
+        <group>Manual</group>
         <ribbon>4-06-1-OfficerGraduate.png</ribbon>
         <xp>4</xp>
         <edge>1</edge>
@@ -49,6 +53,7 @@
     <award>
         <name>Ceremonial Duty</name>
         <description>Served as honor guard.</description>
+        <group>Manual</group>
         <ribbon>4-05-1-CeremonialDuty.png</ribbon>
         <xp>1</xp>
         <qty>1</qty>
@@ -57,6 +62,7 @@
     <award>
         <name>Drill Instructor</name>
         <description>Served as basic training drill instructor.</description>
+        <group>Manual</group>
         <ribbon>4-04-5-DrillInstructor.png</ribbon>
         <xp>2</xp>
         <edge>1</edge>
@@ -65,6 +71,7 @@
     <award>
         <name>Humanitarian Service</name>
         <description>Defense of civilian person or structures.</description>
+        <group>Manual</group>
         <medal>HumanitarianServiceM.png</medal>
         <ribbon>3-05-5-HumanitarianService.png</ribbon>
         <edge>2</edge>
@@ -73,6 +80,7 @@
     <award>
         <name>Medal of Honor</name>
         <description>Distinguished oneself conspicuously by gallantry and intrepidity at the risk of life above and beyond the call of duty.</description>
+        <group>Manual</group>
         <medal>MedalOfHonorM.png</medal>
         <ribbon>1-01-1-MedalOfHonor.png</ribbon>
         <xp>10</xp>
@@ -84,6 +92,7 @@
     <award>
         <name>Prisoner of War</name>
         <description>Taken prisoner during combat.</description>
+        <group>Manual</group>
         <medal>POWM.png</medal>
         <ribbon>3-01-1-PrisonerOfWar.png</ribbon>
         <xp>1</xp>
@@ -94,19 +103,21 @@
     <award>
         <name>Support Person Of The Year</name>
         <description>Awarded to the most outstanding non-combat member of the year.</description>
+        <group>Manual</group>
         <ribbon>3-02-8-SupportPersonOfTheYear.png</ribbon>
         <xp>5</xp>
         <edge>1</edge>
         <item>Ignore</item>
     </award>
     <award>
-        <name>+ + + PERSONNEL AWARDS + + +</name>
+        <name>Personal</name>
         <description>Awards based on individual merit</description>
-        <item>Divider</item>
+        <item>Group</item>
     </award>
     <award>
         <name>Marksmanship</name>
         <description>Gunnery Skill of 5+.</description>
+        <group>Personal</group>
         <ribbon>5-02-8-Marksmanship.png</ribbon>
         <xp>1</xp>
         <qty>5</qty>
@@ -116,6 +127,7 @@
     <award>
         <name>Expert Marksmanship</name>
         <description>Gunnery Skill of 7+.</description>
+        <group>Personal</group>
         <medal>ExpertMarksmanshipMedalM.png</medal>
         <ribbon>5-02-4-ExpertMarksmanship.png</ribbon>
         <xp>2</xp>
@@ -126,6 +138,7 @@
     <award>
         <name>Longevity</name>
         <description>Awarded for every 4 years of service.</description>
+        <group>Personal</group>
         <ribbon>4-03-1-Longevity.png</ribbon>
         <xp>2</xp>
         <stackable>true</stackable>
@@ -135,6 +148,7 @@
     <award>
         <name>Good Conduct</name>
         <description>Served 6 years of with no disciplinary action.</description>
+        <group>Personal</group>
         <ribbon>3-02-4-GoodConduct.png</ribbon>
         <xp>3</xp>
         <edge>1</edge>
@@ -143,13 +157,14 @@
         <item>Time</item>
     </award>
     <award>
-        <name>+ + + SCENARIO AWARDS + + +</name>
+        <name>Scenario</name>
         <description>Awards earned during Scenarios</description>
-        <item>Divider</item>
+        <item>Group</item>
     </award>
     <award>
         <name>Combat Action</name>
         <description>Involved in combat.</description>
+        <group>Scenario</group>
         <ribbon>1-13-1-CombatAction.png</ribbon>
         <edge>1</edge>
         <qty>1</qty>
@@ -158,6 +173,7 @@
     <award>
         <name>Purple Heart</name>
         <description>Wounded in combat due to enemy fire.</description>
+        <group>Scenario</group>
         <medal>PurpleHeartM.png</medal>
         <ribbon>1-09-1-PurpleHeart.png</ribbon>
         <xp>1</xp>
@@ -168,6 +184,7 @@
     <award>
         <name>Bronze Star</name>
         <description>4 pilot kills in a scenario.</description>
+        <group>Scenario</group>
         <medal>BronzeStarM.png</medal>
         <ribbon>1-08-1-BronzeStar.png</ribbon>
         <xp>3</xp>
@@ -180,6 +197,7 @@
     <award>
         <name>Silver Star</name>
         <description>8 pilot kills in a scenario.</description>
+        <group>Scenario</group>
         <medal>SilverStarM.png</medal>
         <ribbon>1-04-1-SilverStar.png</ribbon>
         <xp>5</xp>
@@ -192,6 +210,7 @@
     <award>
         <name>Combat Cross</name>
         <description>12 pilot kills in a scenario.</description>
+        <group>Scenario</group>
         <medal>CombatCrossM.png</medal>
         <ribbon>1-02-2-CombatCross.png</ribbon>
         <xp>7</xp>
@@ -202,13 +221,14 @@
         <range>Scenario</range>
     </award>
     <award>
-        <name>+ + + MISSION AWARDS + + +</name>
+        <name>Mission</name>
         <description>Awards earned during a Mission or Contract</description>
-        <item>Divider</item>
+        <item>Group</item>
     </award>
     <award>
         <name>Expeditionary</name>
         <description>Partook in combat on a house world not covered by a war.</description>
+        <group>Mission</group>
         <medal>ExpeditionaryM.png</medal>
         <ribbon>3-04-2-Expeditionary.png</ribbon>
         <xp>1</xp>
@@ -218,6 +238,7 @@
     <award>
         <name>House Defense</name>
         <description>Enlisted during a TOW and Defense of a house world.</description>
+        <group>Mission</group>
         <medal>HouseDefenseM.png</medal>
         <ribbon>3-05-1-HouseDefense.png</ribbon>
         <xp>1</xp>
@@ -227,6 +248,7 @@
     <award>
         <name>Periphery Expeditionary</name>
         <description>Partook in combat operations on a periphery world.</description>
+        <group>Mission</group>
         <medal>PeripheryExpeditionaryM.png</medal>
         <ribbon>3-07-4-PeripheryExpeditionary.png</ribbon>
         <xp>1</xp>
@@ -235,7 +257,8 @@
     </award>
     <award>
         <name>Galactic Service Deployment</name>
-        <description>Served over 3 consecutive months in a foreign theatre.</description>
+        <description>Served over 3 consecutive months in a foreign theater.</description>
+        <group>Mission</group>
         <ribbon>4-01-2-GalacticServiceDeployment.png</ribbon>
         <xp>1</xp>
         <qty>3</qty>
@@ -244,7 +267,8 @@
     </award>
     <award>
         <name>Galactic Service</name>
-        <description>Served a total of 12 months in foreign theatres.</description>
+        <description>Served a total of 12 months in foreign theaters.</description>
+        <group>Mission</group>
         <ribbon>4-02-2-GalacticService.png</ribbon>
         <xp>1</xp>
         <qty>12</qty>
@@ -254,6 +278,7 @@
     <award>
         <name>Covert Ops</name>
         <description>Served on a covert operations team.</description>
+        <group>Mission</group>
         <ribbon>4-02-8-CovertOps.png</ribbon>
         <xp>2</xp>
         <edge>1</edge>
@@ -263,6 +288,7 @@
     <award>
         <name>Galactic War on Pirating</name>
         <description>Partook in combat operations against pirates.</description>
+        <group>Mission</group>
         <medal>GalacticWarOnPiratingM.png</medal>
         <ribbon>3-05-2-GalacticWarOnPirating.png</ribbon>
         <xp>1</xp>
@@ -272,6 +298,7 @@
     <award>
         <name>Military Training Instructor</name>
         <description>Served as military instructor.</description>
+        <group>Mission</group>
         <ribbon>4-04-6-MilitaryTrainingInstructor.png</ribbon>
         <xp>1</xp>
         <edge>1</edge>
@@ -281,6 +308,7 @@
     <award>
         <name>Security Guard</name>
         <description>Served as security guard.</description>
+        <group>Mission</group>
         <ribbon>4-05-2-SecurityGuard.png</ribbon>
         <xp>1</xp>
         <edge>1</edge>
@@ -290,6 +318,7 @@
     <award>
         <name>Combat Achievement</name>
         <description>6 pilot kills in a mission.</description>
+        <group>Mission</group>
         <ribbon>1-12-3-CombatAchievement.png</ribbon>
         <xp>1</xp>
         <stackable>true</stackable>
@@ -301,6 +330,7 @@
     <award>
         <name>Combat Commendation</name>
         <description>9 pilot kills in a mission.</description>
+        <group>Mission</group>
         <medal>CombatCommendationM.png</medal>
         <ribbon>1-11-3-CombatCommendation.png</ribbon>
         <xp>2</xp>
@@ -313,6 +343,7 @@
     <award>
         <name>Distinguished Service</name>
         <description>12 pilot kills in a mission.</description>
+        <group>Mission</group>
         <medal>DistinguishedServiceM.png</medal>
         <ribbon>1-03-4-DistinguishedService.png</ribbon>
         <xp>3</xp>
@@ -325,6 +356,7 @@
     <award>
         <name>Meritorious Unit Commendation</name>
         <description>24 lance kills in a mission.</description>
+        <group>Mission</group>
         <ribbon>2-02-2-MeritoriousUnitCommendation.png</ribbon>
         <xp>2</xp>
         <stackable>true</stackable>
@@ -336,6 +368,7 @@
     <award>
         <name>Meritorious Service</name>
         <description>36 lance kills in a mission.</description>
+        <group>Mission</group>
         <medal>MeritoriousServiceM.png</medal>
         <ribbon>1-10-2-MeritoriousService.png</ribbon>
         <xp>3</xp>
@@ -348,6 +381,7 @@
     <award>
         <name>House Meritorious Service</name>
         <description>48 lance kills in a mission.</description>
+        <group>Mission</group>
         <medal>HouseMeritoriousServiceM.png</medal>
         <ribbon>1-10-1-HouseMeritoriousService.png</ribbon>
         <xp>4</xp>
@@ -360,6 +394,7 @@
     <award>
         <name>Combat Unit Commendation</name>
         <description>72 company kills in a mission.</description>
+        <group>Mission</group>
         <ribbon>2-01-7-CombatUnitCommendation.png</ribbon>
         <xp>3</xp>
         <stackable>true</stackable>
@@ -371,6 +406,7 @@
     <award>
         <name>Armed Forces</name>
         <description>108 company kills in a mission.</description>
+        <group>Mission</group>
         <medal>ArmedForcesM.png</medal>
         <ribbon>1-07-2-ArmedForces.png</ribbon>
         <xp>4</xp>
@@ -383,6 +419,7 @@
     <award>
         <name>Legion of Merit</name>
         <description>144 company kills in a mission.</description>
+        <group>Mission</group>
         <medal>LegionOfMeritM.png</medal>
         <ribbon>1-05-2-LegionOfMerit.png</ribbon>
         <xp>5</xp>
@@ -395,6 +432,7 @@
     <award>
         <name>House Unit Citation</name>
         <description>216 battalion kills in a mission.</description>
+        <group>Mission</group>
         <ribbon>2-01-2-HouseUnitCitation.png</ribbon>
         <xp>4</xp>
         <stackable>true</stackable>
@@ -406,6 +444,7 @@
     <award>
         <name>House Superior Service</name>
         <description>324 battalion kills in a mission.</description>
+        <group>Mission</group>
         <medal>HouseSuperiorServiceM.png</medal>
         <ribbon>1-05-1-HouseSuperiorService.png</ribbon>
         <xp>5</xp>
@@ -418,6 +457,7 @@
     <award>
         <name>House Distinguished Service</name>
         <description>432 battalion kills in a mission.</description>
+        <group>Mission</group>
         <medal>HouseDistinguishedServiceM.png</medal>
         <ribbon>1-03-1-HouseDistinguishedService.png</ribbon>
         <xp>6</xp>
@@ -428,13 +468,14 @@
         <range>Mission</range>
     </award>
     <award>
-        <name>+ + + TOW AWARDS + + +</name>
+        <name>Time of War</name>
         <description>Awards earned during a specific Time of War</description>
-        <item>Divider</item>
+        <item>Group</item>
     </award>
     <award>
         <name>Third Succession War Campaign</name>
         <description>Partook in combat actions in support of the 3rd Succession War.</description>
+        <group>Time of War</group>
         <medal>ThirdSuccessionWarM.png</medal>
         <ribbon>3-08-01-ThirdSuccessionWar.png</ribbon>
         <xp>1</xp>
@@ -445,6 +486,7 @@
     <award>
         <name>Fourth Succession War Campaign</name>
         <description>Partook in combat actions in support of the 4th Succession War.</description>
+        <group>Time of War</group>
         <medal>FourthSuccessionWarM.png</medal>
         <ribbon>3-08-02-FourthSuccessionWar.png</ribbon>
         <xp>1</xp>
@@ -455,6 +497,7 @@
     <award>
         <name>Andurien Wars Campaign</name>
         <description>Partook in combat actions in support of the Andurien Wars.</description>
+        <group>Time of War</group>
         <medal>AndurienWarsM.png</medal>
         <ribbon>3-08-03-AndurienWars.png</ribbon>
         <xp>1</xp>
@@ -465,6 +508,7 @@
     <award>
         <name>Ronin Wars Campaign</name>
         <description>Partook in combat actions in support of the Ronin Wars.</description>
+        <group>Time of War</group>
         <medal>RoninWarsM.png</medal>
         <ribbon>3-08-04-RoninWars.png</ribbon>
         <xp>1</xp>
@@ -475,6 +519,7 @@
     <award>
         <name>War of 3039 Campaign</name>
         <description>Partook in combat actions in support of the War of 3039.</description>
+        <group>Time of War</group>
         <medal>WarOf3039M.png</medal>
         <ribbon>3-08-05-WarOf3039.png</ribbon>
         <xp>1</xp>
@@ -485,6 +530,7 @@
     <award>
         <name>Clan Invasion Campaign</name>
         <description>Partook in combat actions in support of Clan Invasion.</description>
+        <group>Time of War</group>
         <medal>ClanInvasionM.png</medal>
         <ribbon>3-08-06-ClanInvasion.png</ribbon>
         <xp>1</xp>
@@ -495,6 +541,7 @@
     <award>
         <name>War of 3057 Campaign</name>
         <description>Partook in combat actions in support of the War of 3057.</description>
+        <group>Time of War</group>
         <medal>WarOf3057M.png</medal>
         <ribbon>3-08-07-WarOf3057.png</ribbon>
         <xp>1</xp>
@@ -505,6 +552,7 @@
     <award>
         <name>Task Force Serpent Campaign</name>
         <description>Partook in combat actions in support of Task Force Serpent.</description>
+        <group>Time of War</group>
         <medal>TaskForceSerpentM.png</medal>
         <ribbon>3-08-08-TaskForceSerpent.png</ribbon>
         <xp>1</xp>
@@ -515,6 +563,7 @@
     <award>
         <name>Capellan-St. Ives Civil War Campaign</name>
         <description>Partook in combat actions in support of Capellan-St. Ives War.</description>
+        <group>Time of War</group>
         <medal>CapellanStIvesWarM.png</medal>
         <ribbon>3-08-09-CapellanStIvesWar.png</ribbon>
         <xp>1</xp>
@@ -525,6 +574,7 @@
     <award>
         <name>FedCom Civil War Campaign</name>
         <description>Partook in combat actions in support of FedCom Civil War.</description>
+        <group>Time of War</group>
         <medal>FedComCivilWarM.png</medal>
         <ribbon>3-08-10-FedComCivilWar.png</ribbon>
         <xp>1</xp>
@@ -535,6 +585,7 @@
     <award>
         <name>Word of Blake Jihad Campaign</name>
         <description>Partook in combat actions in support of WoB Jihad.</description>
+        <group>Time of War</group>
         <medal>WoBJihadM.png</medal>
         <ribbon>3-08-11-WoBJihad.png</ribbon>
         <xp>1</xp>
