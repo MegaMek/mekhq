@@ -249,11 +249,23 @@ public class CampaignOptions {
     // Retirement
     private boolean useRetirementDateTracking;
     private RandomRetirementMethod randomRetirementMethod;
+    private Integer turnoverFixedTargetNumber;
     private boolean useYearEndRandomRetirement;
     private boolean useContractCompletionRandomRetirement;
     private boolean useCustomRetirementModifiers;
     private boolean useRandomFounderRetirement;
     private boolean trackUnitFatigue;
+
+    private Integer payoutRateOfficer;
+    private Integer payoutRateEnlisted;
+    private Integer payoutRetirementMultiplier;
+    private boolean usePayoutServiceBonus;
+    private Integer payoutServiceBonusRate;
+
+    private boolean useAgeModifiers;
+    private boolean useUnitRatingModifiers;
+    private boolean useFactionModifiers;
+    private boolean useLeadershipModifiers;
 
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
@@ -713,11 +725,23 @@ public class CampaignOptions {
         // Retirement
         setUseRetirementDateTracking(false);
         setRandomRetirementMethod(RandomRetirementMethod.NONE);
+        setTurnoverFixedTargetNumber(5);
         setUseYearEndRandomRetirement(true);
         setUseContractCompletionRandomRetirement(true);
         setUseCustomRetirementModifiers(true);
         setUseRandomFounderRetirement(true);
         setTrackUnitFatigue(false);
+
+        setUseAgeModifiers(true);
+        setUseUnitRatingModifiers(true);
+        setUseFactionModifiers(true);
+        setUseLeadershipModifiers(true);
+
+        setPayoutRateOfficer(3);
+        setPayoutRateEnlisted(3);
+        setPayoutRetirementMultiplier(24);
+        setUsePayoutServiceBonus(true);
+        setPayoutServiceBonusRate(10);
 
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
@@ -1608,6 +1632,86 @@ public class CampaignOptions {
 
     public void setTrackUnitFatigue(final boolean trackUnitFatigue) {
         this.trackUnitFatigue = trackUnitFatigue;
+    }
+
+    public Integer getTurnoverFixedTargetNumber() {
+        return turnoverFixedTargetNumber;
+    }
+
+    public void setTurnoverFixedTargetNumber(final Integer turnoverFixedTargetNumber) {
+        this.turnoverFixedTargetNumber = turnoverFixedTargetNumber;
+    }
+
+    public Integer getPayoutRateOfficer() {
+        return payoutRateOfficer;
+    }
+
+    public void setPayoutRateOfficer(final Integer payoutRateOfficer) {
+        this.payoutRateOfficer = payoutRateOfficer;
+    }
+
+    public Integer getPayoutRateEnlisted() {
+        return payoutRateEnlisted;
+    }
+
+    public void setPayoutRateEnlisted(final Integer payoutRateEnlisted) {
+        this.payoutRateEnlisted = payoutRateEnlisted;
+    }
+
+    public Integer getPayoutRetirementMultiplier() {
+        return payoutRetirementMultiplier;
+    }
+
+    public void setPayoutRetirementMultiplier(final Integer payoutRetirementMultiplier) {
+        this.payoutRetirementMultiplier = payoutRetirementMultiplier;
+    }
+
+    public boolean isUsePayoutServiceBonus() {
+        return usePayoutServiceBonus;
+    }
+
+    public void setUsePayoutServiceBonus(final boolean usePayoutServiceBonus) {
+        this.usePayoutServiceBonus = usePayoutServiceBonus;
+    }
+
+    public Integer getPayoutServiceBonusRate() {
+        return payoutServiceBonusRate;
+    }
+
+    public void setPayoutServiceBonusRate(final Integer payoutServiceBonusRate) {
+        this.payoutServiceBonusRate = payoutServiceBonusRate;
+    }
+
+    public boolean isUseAgeModifiers() {
+        return useAgeModifiers;
+    }
+
+    public void setUseAgeModifiers(final boolean useAgeModifiers) {
+        this.useAgeModifiers = useAgeModifiers;
+    }
+
+    public boolean isUseUnitRatingModifiers() {
+        return useUnitRatingModifiers;
+    }
+
+    public void setUseUnitRatingModifiers(final boolean useUnitRatingModifiers) {
+        this.useUnitRatingModifiers = useUnitRatingModifiers;
+    }
+
+    public boolean isUseFactionModifiers() {
+        return useFactionModifiers;
+    }
+
+    public void setUseFactionModifiers(final boolean useFactionModifiers) {
+        this.useFactionModifiers = useFactionModifiers;
+    }
+
+    public boolean isUseLeadershipModifiers() {
+        return useLeadershipModifiers;
+    }
+
+    public void setUseLeadershipModifiers(final boolean useLeadershipModifiers) {
+        this.useLeadershipModifiers = useLeadershipModifiers;
     }
     //endregion Retirement
 
@@ -3915,6 +4019,18 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAgeModifiers", isUseAgeModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnitRatingModifiers", isUseUnitRatingModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionModifiers", isUseFactionModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadershipModifiers", isUseLeadershipModifiers());
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverBaseTn", getTurnoverFixedTargetNumber());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateOfficer", getPayoutRateOfficer());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateEnlisted", getPayoutRateEnlisted());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRetirementMultiplier", getPayoutRetirementMultiplier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePayoutServiceBonus", isUsePayoutServiceBonus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutServiceBonusRate", getPayoutServiceBonusRate());
         //endregion Retirement
 
         //region Family
@@ -4546,6 +4662,26 @@ public class CampaignOptions {
                     retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
                     retVal.setTrackUnitFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAgeModifiers")) {
+                    retVal.setUseAgeModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRatingModifiers")) {
+                    retVal.setUseUnitRatingModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useFactionModifiers")) {
+                    retVal.setUseFactionModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useLeadershipModifiers")) {
+                    retVal.setUseLeadershipModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
+                    retVal.setTurnoverFixedTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateOfficer")) {
+                    retVal.setPayoutRateOfficer(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateEnlisted")) {
+                    retVal.setPayoutRateEnlisted(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payoutRetirementMultiplier")) {
+                    retVal.setPayoutRetirementMultiplier(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePayoutServiceBonus")) {
+                    retVal.setUsePayoutServiceBonus(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payoutServiceBonusRate")) {
+                    retVal.setPayoutServiceBonusRate(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Retirement
 
                     //region Family
