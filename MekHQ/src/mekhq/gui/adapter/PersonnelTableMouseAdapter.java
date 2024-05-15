@@ -1291,6 +1291,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         List<String> setNames = AwardsFactory.getInstance().getAllSetNames();
         Collections.sort(setNames);
         for (String setName : setNames) {
+            // we can't capitalize the set filename without breaking compatibility with older saves,
+            // so we have a special handler here.
+            if ((setName.equals("standard")) && (!setNames.contains("Standard"))) {
+                setName = "Standard";
+            }
+
             JMenu setAwardMenu = new JMenu(setName);
 
             List<Award> awardsOfSet = AwardsFactory.getInstance().getAllAwardsForSet(setName);
