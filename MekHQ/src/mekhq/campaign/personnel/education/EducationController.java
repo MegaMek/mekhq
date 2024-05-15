@@ -1038,8 +1038,6 @@ public class EducationController {
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
                     resources.getString("graduatedTopLog.text"), person.getEduAcademyName());
 
-            improveSkills(campaign, person, academy, true);
-
             processGraduation(campaign, person, academy, 2, resources);
 
             if (!academy.isMilitary()) {
@@ -1087,8 +1085,6 @@ public class EducationController {
         }
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
-
-        improveSkills(campaign, person, academy, true);
 
         processGraduation(campaign, person, academy, 0, resources);
 
@@ -1149,8 +1145,6 @@ public class EducationController {
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
 
-        improveSkills(campaign, person, academy, true);
-
         processGraduation(campaign, person, academy, 0, resources);
     }
 
@@ -1172,8 +1166,6 @@ public class EducationController {
 
         ServiceLogger.eduClanCreche(person, campaign.getLocalDate());
 
-        improveSkills(campaign, person, academy, true);
-
         processGraduation(campaign, person, academy, 0, resources);
     }
 
@@ -1191,25 +1183,21 @@ public class EducationController {
         // [0]MechWarrior, [1]ProtoMech, [2]AreoSpace, [3]Space, [4]BA, [5]CI, [6]Vehicle
         if (person.getEduCourseIndex() <= 6) {
             graduateWarriorCaste(campaign, person, academy, resources);
-            return;
         }
 
         // [7]Scientist Caste
         if (person.getEduCourseIndex() == 7) {
             graduateScientistCaste(campaign, person, academy, resources);
-            return;
         }
 
         // [8]Merchant Caste
         if (person.getEduCourseIndex() == 8) {
             graduateMerchantCaste(campaign, person, academy, resources);
-            return;
         }
 
         // [9]Technician Caste
         if (person.getEduCourseIndex() == 9) {
             graduateTechnicianCaste(campaign, person, academy, resources);
-            return;
         }
 
         // [10]Laborer Caste
@@ -1256,7 +1244,8 @@ public class EducationController {
             processGraduation(campaign, person, academy, 0, resources);
 
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedRankClan.text")
-                    .replaceAll("0", resources.getString("graduatedRankClanWarrior.text")));
+                    .replaceAll("0", resources.getString("graduatedRankClanWarrior.text"))
+                    .replaceAll("1", resources.getString("graduatedWeightLight.text")));
 
             return;
         }
@@ -1269,7 +1258,8 @@ public class EducationController {
             processGraduation(campaign, person, academy, 1, resources);
 
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedRankClan.text")
-                    .replaceAll("0", resources.getString("graduatedRankStarCommander.text")));
+                    .replaceAll("0", resources.getString("graduatedRankStarCommander.text"))
+                    .replaceAll("1", resources.getString("graduatedWeightMedium.text")));
 
             return;
         }
@@ -1281,7 +1271,8 @@ public class EducationController {
         processGraduation(campaign, person, academy, 2, resources);
 
         campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedRankClan.text")
-                .replaceAll("0", resources.getString("graduatedRankStarCaptain.text")));
+                .replaceAll("0", resources.getString("graduatedRankStarCaptain.text"))
+                .replaceAll("1", resources.getString("graduatedWeightHeavy.text")));
     }
 
     /**

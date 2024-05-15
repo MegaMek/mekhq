@@ -91,7 +91,7 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "durationDays")
     // this number is chosen so that PrepSchools still experience dropouts
     // otherwise 300/year
-    private Integer durationDays = 11;
+    private Integer durationDays = 10;
 
     @XmlElement(name = "facultySkill")
     private Integer facultySkill = 7;
@@ -763,6 +763,8 @@ public class Academy implements Comparable<Academy> {
 
         for (String faction : systemOwners) {
             if ((isFactionRestricted) && (Objects.equals(campaign.getFaction().getShortName(), faction))) {
+                return Factions.getInstance().getFaction(faction).getShortName();
+            } else if ((isFactionRestricted) && (Objects.equals(person.getOriginFaction().getShortName(), faction))) {
                 return Factions.getInstance().getFaction(faction).getShortName();
             } else if (!RandomFactionGenerator.getInstance().getFactionHints()
                     .isAtWarWith(person.getOriginFaction(), Factions.getInstance().getFaction(faction),
