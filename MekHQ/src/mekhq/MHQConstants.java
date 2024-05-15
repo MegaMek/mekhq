@@ -172,6 +172,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_SHORT_DEPLOYMENT = "nagShortDeployment";
     public static final String NAG_UNRESOLVED_STRATCON_CONTACTS = "nagUnresolvedStratConContacts";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
+    public static final String NAG_CARGO_CAPACITY = "nagCargoCapacity";
     //endregion Nag Tab
 
     //region Miscellaneous Options

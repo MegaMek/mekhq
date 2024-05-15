@@ -256,8 +256,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseRandomDependentRemoval;
 
     // Salary
-    private JSpinner spnCommissionedSalary;
-    private JSpinner spnEnlistedSalary;
     private JSpinner spnAntiMekSalary;
     private JSpinner spnSpecialistInfantrySalary;
     private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
@@ -4075,22 +4073,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel createSalaryMultiplierPanel() {
         // Create Panel Components
-        final JLabel lblCommissionedSalary = new JLabel(resources.getString("lblCommissionedSalary.text"));
-        lblCommissionedSalary.setToolTipText(resources.getString("lblCommissionedSalary.toolTipText"));
-        lblCommissionedSalary.setName("lblCommissionedSalary");
-
-        spnCommissionedSalary = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
-        spnCommissionedSalary.setToolTipText(resources.getString("lblCommissionedSalary.toolTipText"));
-        spnCommissionedSalary.setName("spnCommissionedSalary");
-
-        final JLabel lblEnlistedSalary = new JLabel(resources.getString("lblEnlistedSalary.text"));
-        lblEnlistedSalary.setToolTipText(resources.getString("lblEnlistedSalary.toolTipText"));
-        lblEnlistedSalary.setName("lblEnlistedSalary");
-
-        spnEnlistedSalary = new JSpinner(new SpinnerNumberModel(0, 0, 10, 0.05));
-        spnEnlistedSalary.setToolTipText(resources.getString("lblEnlistedSalary.toolTipText"));
-        spnEnlistedSalary.setName("spnEnlistedSalary");
-
         final JLabel lblAntiMekSalary = new JLabel(resources.getString("lblAntiMekSalary.text"));
         lblAntiMekSalary.setToolTipText(resources.getString("lblAntiMekSalary.toolTipText"));
         lblAntiMekSalary.setName("lblAntiMekSalary");
@@ -4107,9 +4089,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnSpecialistInfantrySalary.setToolTipText(resources.getString("lblSpecialistInfantrySalary.toolTipText"));
         spnSpecialistInfantrySalary.setName("spnSpecialistInfantrySalary");
 
-        // Programmatically Assign Accessibility Labels
-        lblCommissionedSalary.setLabelFor(spnCommissionedSalary);
-        lblEnlistedSalary.setLabelFor(spnEnlistedSalary);
+        // Programmatically Assign Accessibility Labels\
         lblAntiMekSalary.setLabelFor(spnAntiMekSalary);
         lblSpecialistInfantrySalary.setLabelFor(spnSpecialistInfantrySalary);
 
@@ -4127,10 +4107,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblCommissionedSalary)
-                                .addComponent(spnCommissionedSalary)
-                                .addComponent(lblEnlistedSalary)
-                                .addComponent(spnEnlistedSalary)
                                 .addComponent(lblAntiMekSalary)
                                 .addComponent(spnAntiMekSalary)
                                 .addComponent(lblSpecialistInfantrySalary)
@@ -4140,10 +4116,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblCommissionedSalary)
-                                .addComponent(spnCommissionedSalary)
-                                .addComponent(lblEnlistedSalary)
-                                .addComponent(spnEnlistedSalary)
                                 .addComponent(lblAntiMekSalary)
                                 .addComponent(spnAntiMekSalary)
                                 .addComponent(lblSpecialistInfantrySalary)
@@ -6352,8 +6324,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
 
         // Salary
-        spnCommissionedSalary.setValue(options.getSalaryCommissionMultiplier());
-        spnEnlistedSalary.setValue(options.getSalaryEnlistedMultiplier());
         spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
         spnSpecialistInfantrySalary.setValue(options.getSalarySpecialistInfantryMultiplier());
         for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
@@ -6942,8 +6912,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 
             // Salary
-            options.setSalaryCommissionMultiplier((Double) spnCommissionedSalary.getValue());
-            options.setSalaryEnlistedMultiplier((Double) spnEnlistedSalary.getValue());
             options.setSalaryAntiMekMultiplier((Double) spnAntiMekSalary.getValue());
             options.setSalarySpecialistInfantryMultiplier((Double) spnSpecialistInfantrySalary.getValue());
             for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {

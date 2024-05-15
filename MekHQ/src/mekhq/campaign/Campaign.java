@@ -30,6 +30,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.BombMounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
@@ -3157,6 +3158,7 @@ public class Campaign implements ITechManager {
             fatigueLevel -= 2;
         }
         fatigueLevel = Math.max(fatigueLevel, 0);
+        addReport("Your fatigue level is: " + fatigueLevel);
     }
 
     private void processNewDayATB() {
@@ -5625,7 +5627,7 @@ public class Campaign implements ITechManager {
         }
         IUnitRating rating = getUnitRating();
         return getCampaignOptions().getUnitRatingMethod().isFMMR() ? rating.getUnitRatingAsInteger()
-                : MathUtility.clamp(rating.getModifier(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
+                : MathUtility.clamp((rating.getModifier() / 3), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
     }
 
     /**
@@ -5742,23 +5744,22 @@ public class Campaign implements ITechManager {
         entity.setShutDown(false);
         entity.setSearchlightState(false);
 
-        if (entity.hasBAP()) {
-            entity.setNextSensor(entity.getSensors().lastElement());
-        } else if (!entity.getSensors().isEmpty()) {
-            entity.setNextSensor(entity.getSensors().firstElement());
+        if (!entity.getSensors().isEmpty()) {
+            if (entity.hasBAP()) {
+                entity.setNextSensor(entity.getSensors().lastElement());
+            } else {
+                entity.setNextSensor(entity.getSensors().firstElement());
+            }
         }
 
         if (entity instanceof IBomber) {
             IBomber bomber = (IBomber) entity;
-            List<Mounted> mountedBombs = bomber.getBombs();
+            List<BombMounted> mountedBombs = bomber.getBombs();
             if (!mountedBombs.isEmpty()) {
                 // These should return an int[] filled with 0's
                 int[] intBombChoices = bomber.getIntBombChoices();
                 int[] extBombChoices = bomber.getExtBombChoices();
-                for (Mounted m : mountedBombs) {
-                    if (!(m.getType() instanceof BombType)) {
-                        continue;
-                    }
+                for (BombMounted m : mountedBombs) {
                     if (m.getBaseShotsLeft() == 1) {
                         if (m.isInternalBomb()) {
                             intBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
@@ -6817,8 +6818,8 @@ public class Campaign implements ITechManager {
             // FIXME : Localize
             Object[] options = { "Show Retirement Dialog", "Not Now" };
             return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
-                    "It has been a year since the last retirement/defection roll, and it is time to do another.",
-                    "Retirement/Defection roll required", JOptionPane.OK_CANCEL_OPTION,
+                    "It has been a year since the last Employee Turnover roll, and it is time to do another.",
+                    "Employee Turnover roll required", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         }
         return false;
