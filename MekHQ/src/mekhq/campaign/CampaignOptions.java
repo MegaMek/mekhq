@@ -726,7 +726,7 @@ public class CampaignOptions {
         setUseRetirementDateTracking(false);
         setRandomRetirementMethod(RandomRetirementMethod.NONE);
         setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.NEGOTIATION);
-        setTurnoverFixedTargetNumber(5);
+        setTurnoverFixedTargetNumber(3);
         setUseYearEndRandomRetirement(true);
         setUseContractCompletionRandomRetirement(true);
         setUseCustomRetirementModifiers(true);

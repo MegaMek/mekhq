@@ -32,6 +32,8 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.universe.FactionHints;
+import mekhq.campaign.universe.Factions;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -192,7 +194,7 @@ public class RetirementDefectionTracker {
             }
 
             /* Infantry units retire or defect by platoon */
-            if ((null != p.getUnit()) && p.getUnit().usesSoldiers() && !p.getUnit().isCommander(p)) {
+            if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (!p.getUnit().isCommander(p))) {
                 continue;
             }
 
@@ -259,6 +261,10 @@ public class RetirementDefectionTracker {
                 if (p.getOriginFaction().isClan()) {
                     target.addModifier(-2, "Clan");
                 }
+
+                if (FactionHints.defaultFactionHints().isAtWarWith(campaign.getFaction(), p.getOriginFaction(), campaign.getLocalDate())) {
+                    target.addModifier(1, "Enemy Faction");
+                }
             }
 
             // Officer Modifiers
@@ -302,13 +308,8 @@ public class RetirementDefectionTracker {
                     }
                 }
                 if (c != null) {
-                    target.addModifier(-((c.getSharesPct() - 20) / 10), "Shares");
+                    target.addModifier(-((c.getSharesPct() - 10) / 10), "Shares");
                 }
-            }
-
-            // Role Modifiers
-            if (p.getPrimaryRole().isSoldier()) {
-                target.addModifier(-1, p.getPrimaryRole().toString());
             }
 
             // Injury Modifiers
@@ -336,25 +337,28 @@ public class RetirementDefectionTracker {
         return targets;
     }
 
+    /**
+     * This method calculates the base target number.
+     *
+     * @param campaign the campaign for which the base target number is calculated
+     * @return the base target number
+     */
     private static Integer getBaseTargetNumber(Campaign campaign) {
-        if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
-            try {
+        try {
+            if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
                 return campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN)
                         .getSkill(SkillType.S_ADMIN)
                         .getFinalSkillValue();
-            } catch (Exception e) {
-                return 13;
-            }
-        } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
-            try {
+            } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
                 return campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_NEG)
                         .getSkill(SkillType.S_NEG)
                         .getFinalSkillValue();
-            } catch (Exception e) {
-                return 13;
+            } else {
+                return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
             }
-        } else {
-            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
+        // this means there isn't someone in the campaign with the relevant skill
+        } catch (Exception e) {
+            return 13;
         }
     }
 
@@ -399,8 +403,23 @@ public class RetirementDefectionTracker {
                 if (mission != null) {
                     unresolvedPersonnel.get(mission.getId()).add(id);
                 }
-                payouts.put(id, new Payout(campaign, campaign.getPerson(id),
-                        shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
+
+                Person p = campaign.getPerson(id);
+
+                // TODO differentiate between retirement and defection, here.
+                //  This behavior only makes sense for defection.
+                // if the retiree is the commander of an infantry platoon, all non-founders in the platoon follow them into retirement
+                if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (!p.getUnit().isCommander(p))) {
+                    for (Person person : p.getUnit().getActiveCrew()) {
+                        if ((!person.isFounder()) || (campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
+                            payouts.put(id, new Payout(campaign, campaign.getPerson(id),
+                                    shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
+                        }
+                    }
+                } else {
+                    payouts.put(id, new Payout(campaign, campaign.getPerson(id),
+                            shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
+                }
             }
         }
 
