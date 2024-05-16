@@ -1939,8 +1939,6 @@ public class Person {
         }
 
         // If the salary is negative, then use the standard amounts
-        // TODO : Figure out a way to allow negative salaries... could be used to simulate a Holovid
-        // TODO : star paying to be part of the company, for example
         Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getPrimaryRole().ordinal()];
 
         // SpecInf is a special case, this needs to be applied first to bring base salary up to RAW.
@@ -1983,7 +1981,11 @@ public class Person {
 
         // TODO: distinguish DropShip, JumpShip, and WarShip crew
         // TODO: Add era mod to salary calc..
-        return primaryBase.plus(secondaryBase);
+        if (getRank().getPayMultiplier() > 0) {
+            return primaryBase.plus(secondaryBase).multipliedBy(getRank().getPayMultiplier());
+        } else {
+            return primaryBase.plus(secondaryBase);
+        }
     }
 
     /**
