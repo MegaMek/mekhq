@@ -42,6 +42,7 @@ import org.w3c.dom.NodeList;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Neoancient
@@ -53,12 +54,12 @@ import java.util.*;
  */
 public class RetirementDefectionTracker {
     /* In case the dialog is closed after making the retirement rolls
-     * and determining payouts but before the retirees have been paid,
+     * and determining payouts, but before the retirees have been paid,
      * we store those results to avoid making the rolls again.
      */
-    private Set<Integer> rollRequired;
-    private Map<Integer, HashSet<UUID>> unresolvedPersonnel;
-    private Map<UUID, Payout> payouts;
+    final private Set<Integer> rollRequired;
+    final private Map<Integer, HashSet<UUID>> unresolvedPersonnel;
+    final private Map<UUID, Payout> payouts;
     private LocalDate lastRetirementRoll;
 
     public RetirementDefectionTracker() {
@@ -240,11 +241,6 @@ public class RetirementDefectionTracker {
                 target.addModifier(1, "Failed mission");
             }
 
-            // Fatigue Modifiers
-            if (campaign.getCampaignOptions().isTrackUnitFatigue()) {
-                target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
-            }
-
             // Faction Modifiers
             if (campaign.getCampaignOptions().isUseFactionModifiers()) {
                 if (campaign.getFaction().isPirate()) {
@@ -266,6 +262,25 @@ public class RetirementDefectionTracker {
                 }
             }
 
+            // Age modifiers
+            if (campaign.getCampaignOptions().isUseAgeModifiers()) {
+                int age = p.getAge(campaign.getLocalDate());
+                int ageMod = getAgeMod(age);
+
+                if (ageMod != 0) {
+                    target.addModifier(ageMod, "Age");
+                }
+            }
+
+            // Injury Modifiers
+            int injuryMod = (int) p.getInjuries()
+                    .stream()
+                    .filter(Injury::isPermanent).count();
+
+            if (injuryMod > 0) {
+                target.addModifier(injuryMod, "Permanent Injuries");
+            }
+
             // Officer Modifiers
             if (p.getRank().isOfficer()) {
                 target.addModifier(-1, "Officer");
@@ -281,14 +296,9 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            // Age modifiers
-            if (campaign.getCampaignOptions().isUseAgeModifiers()) {
-                int age = p.getAge(campaign.getLocalDate());
-                int ageMod = getAgeMod(age);
-
-                if (ageMod != 0) {
-                    target.addModifier(ageMod, "Age");
-                }
+            // Founder Modifier
+            if (p.isFounder()) {
+                target.addModifier(2, "Founder");
             }
 
             // Shares Modifiers
@@ -311,15 +321,6 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            // Injury Modifiers
-            int injuryMod = (int) p.getInjuries()
-                    .stream()
-                    .filter(Injury::isPermanent).count();
-
-            if (injuryMod > 0) {
-                target.addModifier(injuryMod, "Permanent Injuries");
-            }
-
             // Leadership Modifiers
             if(campaign.getCampaignOptions().isUseLeadershipModifiers()) {
                 if ((combatLeadershipMod != 0) && p.getPrimaryRole().isCombat()) {
@@ -329,6 +330,11 @@ public class RetirementDefectionTracker {
                 if ((supportLeadershipMod != 0) && p.getPrimaryRole().isSupport()) {
                     target.addModifier(supportLeadershipMod, "Leadership (Support)");
                 }
+            }
+
+            // Fatigue Modifiers
+            if (campaign.getCampaignOptions().isTrackUnitFatigue()) {
+                target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
             }
 
             targets.put(p.getId(), target);
@@ -764,11 +770,11 @@ public class RetirementDefectionTracker {
                         }
                         if (wn3.getNodeName().equalsIgnoreCase("contract")) {
                             int id = Integer.parseInt(wn3.getAttributes().getNamedItem("id").getTextContent());
-                            HashSet<UUID> pids = new HashSet<>();
                             String [] ids = wn3.getTextContent().split(",");
-                            for (String s : ids) {
-                                pids.add(UUID.fromString(s));
-                            }
+                            HashSet<UUID> pids = Arrays
+                                    .stream(ids)
+                                    .map(UUID::fromString)
+                                    .collect(Collectors.toCollection(HashSet::new));
                             retVal.unresolvedPersonnel.put(id, pids);
                         }
                     }
