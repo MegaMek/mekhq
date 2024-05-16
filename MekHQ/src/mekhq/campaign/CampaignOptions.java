@@ -253,9 +253,8 @@ public class CampaignOptions {
     private Integer turnoverFixedTargetNumber;
     private boolean useYearEndRandomRetirement;
     private boolean useContractCompletionRandomRetirement;
-    private boolean useCustomRetirementModifiers;
     private boolean useRandomFounderRetirement;
-    private boolean trackUnitFatigue;
+    private boolean useSubContractSoldiers;
 
     private Integer payoutRateOfficer;
     private Integer payoutRateEnlisted;
@@ -263,9 +262,11 @@ public class CampaignOptions {
     private boolean usePayoutServiceBonus;
     private Integer payoutServiceBonusRate;
 
+    private boolean useCustomRetirementModifiers;
     private boolean useAgeModifiers;
     private boolean useUnitRatingModifiers;
     private boolean useFactionModifiers;
+    private boolean trackUnitFatigue;
     private boolean useLeadershipModifiers;
 
     // Family
@@ -731,6 +732,7 @@ public class CampaignOptions {
         setUseContractCompletionRandomRetirement(true);
         setUseCustomRetirementModifiers(true);
         setUseRandomFounderRetirement(true);
+        setUseSubContractSoldiers(false);
         setTrackUnitFatigue(false);
 
         setUseAgeModifiers(true);
@@ -1586,7 +1588,7 @@ public class CampaignOptions {
         this.useRetirementDateTracking = useRetirementDateTracking;
     }
 
-    public boolean getUseRandomRetirement() {
+    public boolean isUseRandomRetirement() {
         return useRandomRetirement;
     }
 
@@ -1632,6 +1634,14 @@ public class CampaignOptions {
 
     public void setUseRandomFounderRetirement(final boolean useRandomFounderRetirement) {
         this.useRandomFounderRetirement = useRandomFounderRetirement;
+    }
+
+    public boolean isUseSubContractSoldiers() {
+        return useSubContractSoldiers;
+    }
+
+    public void setUseSubContractSoldiers(final boolean useSubContractSoldiers) {
+        this.useSubContractSoldiers = useSubContractSoldiers;
     }
 
     public boolean isTrackUnitFatigue() {
@@ -4013,17 +4023,18 @@ public class CampaignOptions {
 
         //region Retirement
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", getUseRandomRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", isUseRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverTargetNumberMethod", getTurnoverTargetNumberMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSubContractSoldiers", isUseSubContractSoldiers());
 
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAgeModifiers", isUseAgeModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnitRatingModifiers", isUseUnitRatingModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionModifiers", isUseFactionModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadershipModifiers", isUseLeadershipModifiers());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverBaseTn", getTurnoverFixedTargetNumber());
@@ -4658,18 +4669,20 @@ public class CampaignOptions {
                     retVal.setUseYearEndRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useContractCompletionRandomRetirement")) {
                     retVal.setUseContractCompletionRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
-                    retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomFounderRetirement")) {
                     retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
-                    retVal.setTrackUnitFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useSubContractSoldiers")) {
+                    retVal.setUseSubContractSoldiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
+                    retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAgeModifiers")) {
                     retVal.setUseAgeModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRatingModifiers")) {
                     retVal.setUseUnitRatingModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFactionModifiers")) {
                     retVal.setUseFactionModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
+                    retVal.setTrackUnitFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useLeadershipModifiers")) {
                     retVal.setUseLeadershipModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {

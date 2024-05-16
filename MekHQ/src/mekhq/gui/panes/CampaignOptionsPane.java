@@ -260,13 +260,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnTurnoverFixedTargetNumber;
     private JCheckBox chkUseYearEndRandomRetirement;
     private JCheckBox chkUseContractCompletionRandomRetirement;
-    private JCheckBox chkUseCustomRetirementModifiers;
     private JCheckBox chkUseRandomFounderRetirement;
-    private JCheckBox chkTrackUnitFatigue;
+    private JCheckBox chkUseSubContractSoldiers;
     private JPanel turnoverModifiersPanel;
+    private JCheckBox chkUseCustomRetirementModifiers;
     private JCheckBox chkUseAgeModifiers;
     private JCheckBox chkUseUnitRatingModifiers;
     private JCheckBox chkUseFactionModifiers;
+    private JCheckBox chkTrackUnitFatigue;
     private JCheckBox chkUseLeadershipModifiers;
     private JPanel turnoverPayoutPanel;
     private JLabel lblPayoutRateOfficer;
@@ -3634,7 +3635,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         });
 
         // this prevents a really annoying bug where disabled options don't stay disabled when reloading Campaign Options
-        randomRetirementPanel.setEnabled(campaign.getCampaignOptions().getUseRandomRetirement());
+        randomRetirementPanel.setEnabled(campaign.getCampaignOptions().isUseRandomRetirement());
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -3717,6 +3718,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomFounderRetirement.setToolTipText(resources.getString("chkUseRandomFounderRetirement.toolTipText"));
         chkUseRandomFounderRetirement.setName("chkUseRandomFounderRetirement");
 
+        chkUseSubContractSoldiers = new JCheckBox(resources.getString("chkUseSubContractSoldiers.text"));
+        chkUseSubContractSoldiers.setToolTipText(resources.getString("chkUseSubContractSoldiers.toolTipText"));
+        chkUseSubContractSoldiers.setName("chkUseSubContractSoldiers");
+
         turnoverModifiersPanel = createTurnoverModifiersPanel();
         turnoverPayoutPanel = createTurnoverPayoutPanel();
 
@@ -3743,6 +3748,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseYearEndRandomRetirement)
                         .addComponent(chkUseContractCompletionRandomRetirement)
                         .addComponent(chkUseRandomFounderRetirement)
+                        .addComponent(chkUseSubContractSoldiers)
                         .addComponent(turnoverModifiersPanel)
                         .addComponent(turnoverPayoutPanel)
         );
@@ -3758,6 +3764,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseYearEndRandomRetirement)
                         .addComponent(chkUseContractCompletionRandomRetirement)
                         .addComponent(chkUseRandomFounderRetirement)
+                        .addComponent(chkUseSubContractSoldiers)
                         .addComponent(turnoverModifiersPanel)
                         .addComponent(turnoverPayoutPanel)
         );
@@ -6918,13 +6925,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Retirement
         chkUseRetirementDateTracking.setSelected(options.isUseRetirementDateTracking());
-        chkUseRandomRetirement.setSelected(options.getUseRandomRetirement());
+        chkUseRandomRetirement.setSelected(options.isUseRandomRetirement());
         comboTurnoverTargetNumberMethod.setSelectedItem(options.getTurnoverTargetNumberMethod());
         spnTurnoverFixedTargetNumber.setValue(options.getTurnoverFixedTargetNumber());
         chkUseYearEndRandomRetirement.setSelected(options.isUseYearEndRandomRetirement());
         chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
         chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
         chkUseRandomFounderRetirement.setSelected(options.isUseRandomFounderRetirement());
+        chkUseSubContractSoldiers.setSelected(options.isUseSubContractSoldiers());
         chkTrackUnitFatigue.setSelected(options.isTrackUnitFatigue());
 
         chkUseAgeModifiers.setSelected(options.isUseAgeModifiers());
@@ -7539,6 +7547,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
             options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
             options.setUseRandomFounderRetirement(chkUseRandomFounderRetirement.isSelected());
+            options.setUseSubContractSoldiers(chkUseSubContractSoldiers.isSelected());
             options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
 
             options.setUseAgeModifiers(chkUseAgeModifiers.isSelected());

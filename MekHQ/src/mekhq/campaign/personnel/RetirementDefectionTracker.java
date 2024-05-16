@@ -193,9 +193,10 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            /* Infantry units retire or defect by platoon */
-            if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (!p.getUnit().isCommander(p))) {
-                continue;
+            if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
+                if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (!p.getUnit().isCommander(p))) {
+                    continue;
+                }
             }
 
             TargetRoll target = new TargetRoll(getBaseTargetNumber(campaign), "Base");
@@ -414,17 +415,20 @@ public class RetirementDefectionTracker {
                 // TODO differentiate between retirement and defection, here.
                 //  This behavior only makes sense for defection.
                 // if the retiree is the commander of an infantry platoon, all non-founders in the platoon follow them into retirement
-                if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (p.getUnit().isCommander(p))) {
-                    for (Person person : p.getUnit().getSoldiers()) {
-                        if ((!person.isFounder()) || (campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
-                            payouts.put(person.getId(), new Payout(campaign, campaign.getPerson(id),
-                                    shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
+                if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
+                    if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (p.getUnit().isCommander(p))) {
+                        for (Person person : p.getUnit().getSoldiers()) {
+                            if ((!person.isFounder()) || (campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
+                                payouts.put(person.getId(), new Payout(campaign, campaign.getPerson(id), shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
+                            }
                         }
+
+                        continue;
                     }
-                } else {
-                    payouts.put(id, new Payout(campaign, campaign.getPerson(id),
-                            shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
                 }
+
+                payouts.put(id, new Payout(campaign, campaign.getPerson(id),
+                            shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
             }
         }
 
