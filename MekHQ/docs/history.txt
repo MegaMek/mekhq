@@ -17,7 +17,10 @@ MEKHQ VERSION HISTORY:
 + Fix #3931: Add new Scenario features to CustomizeScenarioDialog
 + PR #4041: Updated isChild()
 + Fix #4080: Updated Tooltips for the Marriageable & Trying to Conceive Flags
++ Fix #4083: Added Customizable Log Display Settings to Campaign Options
 
+0.49.19.1 (2024-05-14 1800 UTC)
++ Milestone Release. Backported fixes.
 
 0.49.19 (2024-04-19 2030 UTC)
 + Bug #3958: No selling units in scenario resolution if campaign disallows selling
