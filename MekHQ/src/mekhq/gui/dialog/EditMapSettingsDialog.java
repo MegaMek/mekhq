@@ -391,11 +391,11 @@ public class EditMapSettingsDialog extends JDialog {
             mapSettings.setBoardSize(boardSize.width(), boardSize.height());
             File boardFile = new MegaMekFile(Configuration.boardsDir(), boardName + ".board").getFile();
             Board board;
-            StringBuffer errs = new StringBuffer();
+            List<String> errors = new ArrayList<>();
             if (boardFile.exists()) {
                 board = new Board();
                 try (InputStream is = new FileInputStream(boardFile)) {
-                    board.load(is, errs, true);
+                    board.load(is, errors, true);
                 } catch (IOException ex) {
                     board = Board.createEmptyBoard(mapSettings.getBoardWidth(), mapSettings.getBoardHeight());
                 }
@@ -435,7 +435,7 @@ public class EditMapSettingsDialog extends JDialog {
             // Add the board name label and the server-side board label if necessary
             String text = LobbyUtility.cleanBoardName(boardName, mapSettings);
             Graphics g = bufImage.getGraphics();
-            LobbyUtility.drawMinimapLabel(text, bufImage.getWidth(), bufImage.getHeight(), g, errs.length() != 0);
+            LobbyUtility.drawMinimapLabel(text, bufImage.getWidth(), bufImage.getHeight(), g, !errors.isEmpty());
             g.dispose();
 
             synchronized(baseImages) {
