@@ -2247,7 +2247,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 || !gui.getCampaign().getCampaignOptions().getRandomMarriageMethod().isNone())
                 && Stream.of(selected).allMatch(p -> p.isMarriageable() == person.isMarriageable())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miMarriageable.text"));
-            cbMenuItem.setToolTipText(resources.getString("miMarriageable.toolTipText"));
+            cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(String.format(resources.getString("miMarriageable.toolTipText"),
+                    gui.getCampaign().getCampaignOptions().getMinimumMarriageAge()), 100));
             cbMenuItem.setName("miMarriageable");
             cbMenuItem.setSelected(person.isMarriageable());
             cbMenuItem.addActionListener(evt -> {
@@ -2262,7 +2263,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 && Stream.of(selected).allMatch(p -> p.getGender().isFemale())
                 && Stream.of(selected).allMatch(p -> p.isTryingToConceive() == person.isTryingToConceive())) {
             cbMenuItem = new JCheckBoxMenuItem(resources.getString("miTryingToConceive.text"));
-            cbMenuItem.setToolTipText(resources.getString("miTryingToConceive.toolTipText"));
+            cbMenuItem.setToolTipText(MultiLineTooltip.splitToolTip(resources.getString("miTryingToConceive.toolTipText"), 100));
             cbMenuItem.setName("miTryingToConceive");
             cbMenuItem.setSelected(person.isTryingToConceive());
             cbMenuItem.addActionListener(evt -> {
