@@ -24,7 +24,6 @@ import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.FinancialReport;
@@ -33,6 +32,7 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -101,6 +101,7 @@ public class RetirementDefectionTracker {
      */
     private static int getAgeMod(int age) {
         int ageMod = 0;
+
         if (age <= 20) {
             ageMod = -1;
         } else if ((age >= 50) && (age < 65)) {
@@ -139,7 +140,7 @@ public class RetirementDefectionTracker {
             rollRequired.add(contract.getId());
         }
 
-        if (campaign.getCampaignOptions().isUseLeadership()) {
+        if (campaign.getCampaignOptions().isUseLeadershipModifiers()) {
             int combat = 0;
             int proto = 0;
             int support = 0;
@@ -195,7 +196,7 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            TargetRoll target = new TargetRoll(3, "Base");
+            TargetRoll target = new TargetRoll(campaign.getCampaignOptions().getTurnoverFixedTargetNumber(), "Base");
 
             // Skill Rating modifier
             int skillRating = p.getExperienceLevel(campaign, false);
@@ -228,17 +229,10 @@ public class RetirementDefectionTracker {
             target.addModifier(skillRating, skillRatingDescription);
 
             // Unit Rating modifier
-            int unitRating = 0;
-
-            if (campaign.getUnitRatingMod() < 1) {
-                unitRating = 2;
-            } else if (campaign.getUnitRatingMod() == 1) {
-                unitRating = 1;
-            } else if (campaign.getUnitRatingMod() > 3) {
-                unitRating = -1;
+            if (campaign.getCampaignOptions().isUseUnitRatingModifiers()) {
+                int unitRatingModifier = getUnitRatingModifier(campaign);
+                target.addModifier(unitRatingModifier, "Unit Rating");
             }
-
-            target.addModifier(unitRating, "Unit Rating");
 
             /* Retirement rolls are made before the contract status is set */
             if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
@@ -246,23 +240,25 @@ public class RetirementDefectionTracker {
             }
 
             // Fatigue Modifiers
-            if (campaign.getCampaignOptions().isTrackUnitFatigue() && (campaign.getFatigueLevel() >= 10)) {
+            if (campaign.getCampaignOptions().isTrackUnitFatigue()) {
                 target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
             }
 
             // Faction Modifiers
-            if (campaign.getFaction().isPirate()) {
-                target.addModifier(1, "Pirate Company");
-            } else if (p.getOriginFaction().isPirate()) {
-                target.addModifier(1,"Pirate");
-            }
+            if (campaign.getCampaignOptions().isUseFactionModifiers()) {
+                if (campaign.getFaction().isPirate()) {
+                    target.addModifier(1, "Pirate Company");
+                } else if (p.getOriginFaction().isPirate()) {
+                    target.addModifier(1, "Pirate");
+                }
 
-            if (p.getOriginFaction().isMercenary()) {
-                target.addModifier(1, "Mercenary");
-            }
+                if (p.getOriginFaction().isMercenary()) {
+                    target.addModifier(1, "Mercenary");
+                }
 
-            if (p.getOriginFaction().isClan()) {
-                target.addModifier(-2, "Clan");
+                if (p.getOriginFaction().isClan()) {
+                    target.addModifier(-2, "Clan");
+                }
             }
 
             // Officer Modifiers
@@ -280,12 +276,14 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            // Old Age modifier
-            int age = p.getAge(campaign.getLocalDate());
-            int ageMod = getAgeMod(age);
+            // Age modifiers
+            if (campaign.getCampaignOptions().isUseAgeModifiers()) {
+                int age = p.getAge(campaign.getLocalDate());
+                int ageMod = getAgeMod(age);
 
-            if (ageMod > 0) {
-                target.addModifier(ageMod, "Age");
+                if (ageMod != 0) {
+                    target.addModifier(ageMod, "Age");
+                }
             }
 
             // Shares Modifiers
@@ -314,24 +312,23 @@ public class RetirementDefectionTracker {
             }
 
             // Injury Modifiers
-            int injuryMod = 0;
-            for (Injury i : p.getInjuries()) {
-                if (i.isPermanent()) {
-                    injuryMod++;
-                }
-            }
+            int injuryMod = (int) p.getInjuries()
+                    .stream()
+                    .filter(Injury::isPermanent).count();
 
             if (injuryMod > 0) {
                 target.addModifier(injuryMod, "Permanent Injuries");
             }
 
             // Leadership Modifiers
-            if ((combatLeadershipMod != 0) && p.getPrimaryRole().isCombat()) {
-                target.addModifier(combatLeadershipMod, "Leadership (Combatant)");
-            }
+            if(campaign.getCampaignOptions().isUseLeadershipModifiers()) {
+                if ((combatLeadershipMod != 0) && p.getPrimaryRole().isCombat()) {
+                    target.addModifier(combatLeadershipMod, "Leadership (Combatant)");
+                }
 
-            if ((supportLeadershipMod != 0) && p.getPrimaryRole().isSupport()) {
-                target.addModifier(supportLeadershipMod, "Leadership (Support)");
+                if ((supportLeadershipMod != 0) && p.getPrimaryRole().isSupport()) {
+                    target.addModifier(supportLeadershipMod, "Leadership (Support)");
+                }
             }
 
             targets.put(p.getId(), target);
@@ -339,7 +336,28 @@ public class RetirementDefectionTracker {
         return targets;
     }
 
-  /**
+
+
+    /**
+     * Returns the unit rating modifier for the campaign.
+     *
+     * @param campaign the campaign from which to derive the unit rating modifier
+     * @return the unit rating modifier
+     */
+    private static int getUnitRatingModifier(Campaign campaign) {
+        int unitRating = 0;
+
+        if (campaign.getUnitRatingMod() < 1) {
+            unitRating = 2;
+        } else if (campaign.getUnitRatingMod() == 1) {
+            unitRating = 1;
+        } else if (campaign.getUnitRatingMod() > 3) {
+            unitRating = -1;
+        }
+        return unitRating;
+    }
+
+    /**
      * Makes rolls for Employee Turnover based on previously calculated target rolls,
      * and tracks all retirees in the unresolvedPersonnel hash in case the dialog
      * is closed before payments are resolved, to avoid re-rolling the results.
@@ -347,7 +365,7 @@ public class RetirementDefectionTracker {
      * @param mission Nullable mission value
      * @param targets The hash previously generated by calculateTargetNumbers.
      * @param shareValue The value of each share in the unit; if not using the share system, this is zero.
-     * @param campaign
+     * @param campaign the current campaign
      */
     public void rollRetirement(final @Nullable Mission mission, final Map<UUID, TargetRoll> targets,
                                final Money shareValue, final Campaign campaign) {
@@ -385,25 +403,24 @@ public class RetirementDefectionTracker {
      *
      * @param person The person to be removed from the campaign
      * @param killed True if killed in battle, false if sacked
-     * @param campaign
+     * @param campaign the ongoing campaign
      * @param contract If not null, the payout must be resolved before the contract can be resolved.
-     * @return true if the person is due a payout; otherwise false
+     * @return true, if the person is due a payout, otherwise false
      */
     public boolean removeFromCampaign(Person person, boolean killed, Campaign campaign,
                                       AtBContract contract) {
-        /* Payouts to Infantry/Battle armor platoons/squads/points are
-         * handled as a unit in the AtB rules, so we're just going to ignore
-         * them here.
-         */
-        if (person.getPrimaryRole().isSoldierOrBattleArmour() || !person.getPrisonerStatus().isFree()) {
+        if (!person.getPrisonerStatus().isFree()) {
             return false;
         }
+
         payouts.put(person.getId(), new Payout(campaign, person, getShareValue(campaign),
                 killed, campaign.getCampaignOptions().isSharesForAll()));
+
         if (null != contract) {
             unresolvedPersonnel.computeIfAbsent(contract.getId(), k -> new HashSet<>());
             unresolvedPersonnel.get(contract.getId()).add(person.getId());
         }
+
         return true;
     }
 
@@ -438,8 +455,8 @@ public class RetirementDefectionTracker {
         return unresolvedPersonnel.containsKey(id);
     }
 
-    /* Called by when all payouts have been resolved for the contract.
-     * If contract is null, the dialog has been invoked without a
+    /** Called by when all payouts have been resolved for the contract.
+     * If the contract is null, the dialog has been invoked without a
      * specific contract and all outstanding payouts have been resolved.
      */
     public void resolveAllContracts() {
@@ -483,8 +500,18 @@ public class RetirementDefectionTracker {
      * @param person the person to get the bonus cost for
      * @return The amount in C-bills required to get a bonus to the Employee Turnover roll
      */
-    public static Money getBonusCost(final Campaign campaign, Person person) {
-        return person.getSalary(campaign).multipliedBy(24);
+    public static Money getPayoutOrBonusValue(final Campaign campaign, Person person) {
+        int bonusMultiplier = campaign.getCampaignOptions().getPayoutRateEnlisted();
+
+        if (person.getRank().isOfficer()) {
+            bonusMultiplier = campaign.getCampaignOptions().getPayoutRateOfficer();
+        }
+
+        if (campaign.getCampaignOptions().isUsePayoutServiceBonus()) {
+            bonusMultiplier += person.getYearsInService(campaign) * (campaign.getCampaignOptions().getPayoutServiceBonusRate() / 100);
+        }
+
+        return person.getSalary(campaign).multipliedBy(bonusMultiplier);
     }
 
     /**
@@ -508,9 +535,11 @@ public class RetirementDefectionTracker {
         public Payout(final Campaign campaign, final Person person, final Money shareValue,
                       final boolean killed, final boolean sharesForAll) {
             calculatePayout(campaign, person, killed, shareValue.isPositive());
+
             if (shareValue.isPositive()) {
                 payoutAmount = payoutAmount.plus(shareValue.multipliedBy(person.getNumShares(campaign, sharesForAll)));
             }
+
             if (killed) {
                 switch (Compute.d6()) {
                     case 2:
@@ -535,6 +564,7 @@ public class RetirementDefectionTracker {
         private void calculatePayout(final Campaign campaign, final Person person,
                                      final boolean killed, final boolean shareSystem) {
             int roll;
+
             if (killed) {
                 roll = Utilities.dice(1, 5);
             } else {
@@ -548,13 +578,9 @@ public class RetirementDefectionTracker {
                 stolenUnit = true;
             } else {
                 final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
-                if (profession.isInfantry()) {
-                    if (person.getUnit() != null) {
-                        payoutAmount = Money.of(50000);
-                    }
-                } else {
-                    payoutAmount = getBonusCost(campaign, person);
-                }
+
+                // TODO when we differentiate between types of retirement we'll need to edit this.
+                payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
 
                 if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
                         && (person.getOriginalUnitWeight() > 0)) {

@@ -533,7 +533,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkSharesExcludeLargeCraft;
     private JCheckBox chkSharesForAll;
     private JCheckBox chkAeroRecruitsHaveUnits;
-    private JCheckBox chkUseLeadership;
     private JCheckBox chkTrackOriginalUnit;
     private JCheckBox chkUseAero;
     private JCheckBox chkUseVehicles;
@@ -2744,11 +2743,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAeroRecruitsHaveUnits.setToolTipText(resources.getString("chkAeroRecruitsHaveUnits.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkAeroRecruitsHaveUnits, gridBagConstraints);
-
-        chkUseLeadership = new JCheckBox(resources.getString("chkUseLeadership.text"));
-        chkUseLeadership.setToolTipText(resources.getString("chkUseLeadership.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkUseLeadership, gridBagConstraints);
 
         chkTrackOriginalUnit = new JCheckBox(resources.getString("chkTrackOriginalUnit.text"));
         chkTrackOriginalUnit.setToolTipText(resources.getString("chkTrackOriginalUnit.toolTipText"));
@@ -7232,7 +7226,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
         chkSharesForAll.setSelected(options.isSharesForAll());
         chkAeroRecruitsHaveUnits.setSelected(options.isAeroRecruitsHaveUnits());
-        chkUseLeadership.setSelected(options.isUseLeadership());
         chkTrackOriginalUnit.setSelected(options.isTrackOriginalUnit());
         chkUseAero.setSelected(options.isUseAero());
         chkUseVehicles.setSelected(options.isUseVehicles());
@@ -7695,7 +7688,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
             options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
             options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
-            options.setUseLeadership(chkUseLeadership.isSelected());
             options.setUseStrategy(chkUseStrategy.isSelected());
             options.setBaseStrategyDeployment((Integer) spnBaseStrategyDeployment.getValue());
             options.setAdditionalStrategyDeployment((Integer) spnAdditionalStrategyDeployment.getValue());

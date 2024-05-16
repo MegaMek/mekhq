@@ -477,7 +477,6 @@ public class CampaignOptions {
     private boolean sharesExcludeLargeCraft;
     private boolean sharesForAll;
     private boolean aeroRecruitsHaveUnits;
-    private boolean useLeadership;
     private boolean trackOriginalUnit;
     private boolean useAero;
     private boolean useVehicles;
@@ -1016,7 +1015,6 @@ public class CampaignOptions {
         sharesExcludeLargeCraft = false;
         sharesForAll = false;
         aeroRecruitsHaveUnits = false;
-        useLeadership = true;
         trackOriginalUnit = false;
         useAero = false;
         useVehicles = true;
@@ -3731,14 +3729,6 @@ public class CampaignOptions {
         this.usePlanetaryConditions = usePlanetaryConditions;
     }
 
-    public boolean isUseLeadership() {
-        return useLeadership;
-    }
-
-    public void setUseLeadership(final boolean useLeadership) {
-        this.useLeadership = useLeadership;
-    }
-
     public boolean isUseStrategy() {
         return useStrategy;
     }
@@ -4251,7 +4241,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useWeatherConditions", useWeatherConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLightConditions", useLightConditions);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePlanetaryConditions", usePlanetaryConditions);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadership", useLeadership);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useStrategy", useStrategy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "baseStrategyDeployment", baseStrategyDeployment);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
@@ -5141,8 +5130,6 @@ public class CampaignOptions {
                     retVal.useLightConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("usePlanetaryConditions")) {
                     retVal.usePlanetaryConditions = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("useLeadership")) {
-                    retVal.useLeadership = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("useStrategy")) {
                     retVal.useStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("baseStrategyDeployment")) {

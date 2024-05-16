@@ -724,7 +724,7 @@ public class RetirementDefectionDialog extends JDialog {
         Money retVal = Money.zero();
         for (UUID id : targetRolls.keySet()) {
             if (((RetirementTableModel) personnelTable.getModel()).getPayBonus(id)) {
-                retVal = retVal.plus(RetirementDefectionTracker.getBonusCost(hqView.getCampaign(),
+                retVal = retVal.plus(RetirementDefectionTracker.getPayoutOrBonusValue(hqView.getCampaign(),
                         hqView.getCampaign().getPerson(id)));
             }
         }

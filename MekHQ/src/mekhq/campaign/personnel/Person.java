@@ -1131,6 +1131,24 @@ public class Person {
                 .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
+    public Integer getYearsInService(final Campaign campaign) {
+        // Get time in service based on year
+        if (getRecruitment() == null) {
+            //use "" they haven't been recruited or are dependents
+            return 0;
+        }
+
+        LocalDate today = campaign.getLocalDate();
+
+        // If the person is dead, we only care about how long they spent in service to the company
+        if (getDateOfDeath() != null) {
+            //use date of death instead of the current day
+            today = getDateOfDeath();
+        }
+
+        return Math.toIntExact(ChronoUnit.YEARS.between(getRecruitment(), today));
+    }
+
     public @Nullable LocalDate getLastRankChangeDate() {
         return lastRankChangeDate;
     }
