@@ -249,6 +249,7 @@ public class CampaignOptions {
     // Retirement
     private boolean useRetirementDateTracking;
     private RandomRetirementMethod randomRetirementMethod;
+    private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
     private Integer turnoverFixedTargetNumber;
     private boolean useYearEndRandomRetirement;
     private boolean useContractCompletionRandomRetirement;
@@ -724,6 +725,7 @@ public class CampaignOptions {
         // Retirement
         setUseRetirementDateTracking(false);
         setRandomRetirementMethod(RandomRetirementMethod.NONE);
+        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.NEGOTIATION);
         setTurnoverFixedTargetNumber(5);
         setUseYearEndRandomRetirement(true);
         setUseContractCompletionRandomRetirement(true);
@@ -1590,6 +1592,14 @@ public class CampaignOptions {
 
     public void setRandomRetirementMethod(final RandomRetirementMethod randomRetirementMethod) {
         this.randomRetirementMethod = randomRetirementMethod;
+    }
+
+    public TurnoverTargetNumberMethod getTurnoverTargetNumberMethod() {
+        return turnoverTargetNumberMethod;
+    }
+
+    public void setTurnoverTargetNumberMethod (final TurnoverTargetNumberMethod turnoverTargetNumberMethod) {
+        this.turnoverTargetNumberMethod = turnoverTargetNumberMethod;
     }
 
     public boolean isUseYearEndRandomRetirement() {
@@ -4004,6 +4014,7 @@ public class CampaignOptions {
         //region Retirement
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomRetirementMethod", getRandomRetirementMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverTargetNumberMethod", getTurnoverTargetNumberMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
@@ -4641,6 +4652,8 @@ public class CampaignOptions {
                     retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomRetirementMethod")) {
                     retVal.setRandomRetirementMethod(RandomRetirementMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverTargetNumberMethod")) {
+                    retVal.setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useYearEndRandomRetirement")) {
                     retVal.setUseYearEndRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useContractCompletionRandomRetirement")) {

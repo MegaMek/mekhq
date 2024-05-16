@@ -83,10 +83,10 @@ public class RetirementDefectionTracker {
                 netWorth = netWorth.minus(r.getLargeCraftValue());
         }
 
-        int totalShares = 0;
-        for (Person p : campaign.getActivePersonnel()) {
-            totalShares += p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll());
-        }
+        int totalShares = campaign.getActivePersonnel()
+                .stream()
+                .mapToInt(p -> p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll()))
+                .sum();
 
         if (totalShares <= 0) {
             return Money.zero();
@@ -126,7 +126,7 @@ public class RetirementDefectionTracker {
      * all active personnel who are not dependents, prisoners, or bondsmen.
      *
      * @param contract The contract that is being resolved; if the retirement roll is not due to
-     *                 contract resolutions (e.g. &gt; 12 months since last roll), this can be null.
+     *                 contract resolutions (e.g., &gt; 12 months since last roll), this can be null.
      * @param campaign  The campaign to calculate target numbers for
      * @return A map with person ids as key and calculated target roll as value.
      */
@@ -196,7 +196,7 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            TargetRoll target = new TargetRoll(campaign.getCampaignOptions().getTurnoverFixedTargetNumber(), "Base");
+            TargetRoll target = new TargetRoll(getBaseTargetNumber(campaign), "Base");
 
             // Skill Rating modifier
             int skillRating = p.getExperienceLevel(campaign, false);
@@ -223,7 +223,7 @@ public class RetirementDefectionTracker {
                     break;
                 default:
                     skillRatingDescription = "Error, please see log";
-                    LogManager.getLogger().error("RetirementDefectionTracker: Unable to parse skillRating. Returning " + skillRating);
+                    LogManager.getLogger().error("RetirementDefectionTracker: Unable to parse skillRating. Returning {}", skillRating);
             }
 
             target.addModifier(skillRating, skillRatingDescription);
@@ -336,6 +336,27 @@ public class RetirementDefectionTracker {
         return targets;
     }
 
+    private static Integer getBaseTargetNumber(Campaign campaign) {
+        if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
+            try {
+                return campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN)
+                        .getSkill(SkillType.S_ADMIN)
+                        .getFinalSkillValue();
+            } catch (Exception e) {
+                return 13;
+            }
+        } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
+            try {
+                return campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_NEG)
+                        .getSkill(SkillType.S_NEG)
+                        .getFinalSkillValue();
+            } catch (Exception e) {
+                return 13;
+            }
+        } else {
+            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
+        }
+    }
 
 
     /**
