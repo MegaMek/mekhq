@@ -207,6 +207,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkPersonnelLogSkillGain;
     private JCheckBox chkPersonnelLogAbilityGain;
     private JCheckBox chkPersonnelLogEdgeGain;
+    private JCheckBox chkDisplayPersonnelLog;
+    private JCheckBox chkDisplayScenarioLog;
+    private JCheckBox chkDisplayKillRecord;
 
     // Expanded Personnel
     private JCheckBox chkUseTimeInService;
@@ -3249,6 +3252,18 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkPersonnelLogEdgeGain.setToolTipText(resources.getString("chkPersonnelLogEdgeGain.toolTipText"));
         chkPersonnelLogEdgeGain.setName("chkPersonnelLogEdgeGain");
 
+        chkDisplayPersonnelLog = new JCheckBox(resources.getString("chkDisplayPersonnelLog.text"));
+        chkDisplayPersonnelLog.setToolTipText(resources.getString("chkDisplayPersonnelLog.toolTipText"));
+        chkDisplayPersonnelLog.setName("chkDisplayPersonnelLog");
+
+        chkDisplayScenarioLog = new JCheckBox(resources.getString("chkDisplayScenarioLog.text"));
+        chkDisplayScenarioLog.setToolTipText(resources.getString("chkDisplayScenarioLog.toolTipText"));
+        chkDisplayScenarioLog.setName("chkDisplayScenarioLog");
+
+        chkDisplayKillRecord = new JCheckBox(resources.getString("chkDisplayKillRecord.text"));
+        chkDisplayKillRecord.setToolTipText(resources.getString("chkDisplayKillRecord.toolTipText"));
+        chkDisplayKillRecord.setName("chkDisplayKillRecord");
+
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(""));
@@ -3275,6 +3290,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkPersonnelLogSkillGain)
                         .addComponent(chkPersonnelLogAbilityGain)
                         .addComponent(chkPersonnelLogEdgeGain)
+                        .addComponent(chkDisplayPersonnelLog)
+                        .addComponent(chkDisplayScenarioLog)
+                        .addComponent(chkDisplayKillRecord)
         );
 
         layout.setHorizontalGroup(
@@ -3293,6 +3311,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkPersonnelLogSkillGain)
                         .addComponent(chkPersonnelLogAbilityGain)
                         .addComponent(chkPersonnelLogEdgeGain)
+                        .addComponent(chkDisplayPersonnelLog)
+                        .addComponent(chkDisplayScenarioLog)
+                        .addComponent(chkDisplayKillRecord)
         );
 
         return panel;
@@ -6872,6 +6893,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkPersonnelLogSkillGain.setSelected(options.isPersonnelLogSkillGain());
         chkPersonnelLogAbilityGain.setSelected(options.isPersonnelLogAbilityGain());
         chkPersonnelLogEdgeGain.setSelected(options.isPersonnelLogEdgeGain());
+        chkDisplayPersonnelLog.setSelected(options.isDisplayPersonnelLog());
+        chkDisplayScenarioLog.setSelected(options.isDisplayScenarioLog());
+        chkDisplayKillRecord.setSelected(options.isDisplayKillRecord());
 
         // Expanded Personnel Information
         if (chkUseTimeInService.isSelected() != options.isUseTimeInService()) {
@@ -7489,6 +7513,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setPersonnelLogSkillGain(chkPersonnelLogSkillGain.isSelected());
             options.setPersonnelLogAbilityGain(chkPersonnelLogAbilityGain.isSelected());
             options.setPersonnelLogEdgeGain(chkPersonnelLogEdgeGain.isSelected());
+            options.setDisplayPersonnelLog(chkDisplayPersonnelLog.isSelected());
+            options.setDisplayScenarioLog(chkDisplayScenarioLog.isSelected());
+            options.setDisplayKillRecord(chkDisplayKillRecord.isSelected());
 
             // Expanded Personnel Information
             options.setUseTimeInService(chkUseTimeInService.isSelected());

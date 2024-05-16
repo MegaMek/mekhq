@@ -204,6 +204,9 @@ public class CampaignOptions {
     private boolean personnelLogSkillGain;
     private boolean personnelLogAbilityGain;
     private boolean personnelLogEdgeGain;
+    private boolean displayPersonnelLog;
+    private boolean displayScenarioLog;
+    private boolean displayKillRecord;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -644,6 +647,9 @@ public class CampaignOptions {
         setPersonnelLogSkillGain(false);
         setPersonnelLogAbilityGain(false);
         setPersonnelLogEdgeGain(false);
+        setDisplayPersonnelLog(false);
+        setDisplayScenarioLog(false);
+        setDisplayKillRecord(false);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -1357,6 +1363,30 @@ public class CampaignOptions {
 
     public void setPersonnelLogEdgeGain(final boolean personnelLogEdgeGain) {
         this.personnelLogEdgeGain = personnelLogEdgeGain;
+    }
+
+    public boolean isDisplayPersonnelLog() {
+        return displayPersonnelLog;
+    }
+
+    public void setDisplayPersonnelLog(final boolean displayPersonnelLog) {
+        this.displayPersonnelLog = displayPersonnelLog;
+    }
+
+    public boolean isDisplayScenarioLog() {
+        return displayScenarioLog;
+    }
+
+    public void setDisplayScenarioLog(final boolean displayScenarioLog) {
+        this.displayScenarioLog = displayScenarioLog;
+    }
+
+    public boolean isDisplayKillRecord() {
+        return displayKillRecord;
+    }
+
+    public void setDisplayKillRecord(final boolean displayKillRecord) {
+        this.displayKillRecord = displayKillRecord;
     }
     //endregion General Personnel
 
@@ -3968,6 +3998,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogSkillGain", isPersonnelLogSkillGain());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogAbilityGain", isPersonnelLogAbilityGain());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelLogEdgeGain", isPersonnelLogEdgeGain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPersonnelLog", isDisplayPersonnelLog());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", isDisplayScenarioLog());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", isDisplayKillRecord());
         //endregion General Personnel
 
         //region Expanded Personnel Information
@@ -4545,6 +4578,12 @@ public class CampaignOptions {
                     retVal.setPersonnelLogAbilityGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelLogEdgeGain")) {
                     retVal.setPersonnelLogEdgeGain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("displayPersonnelLog")) {
+                    retVal.setDisplayPersonnelLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("displayScenarioLog")) {
+                    retVal.setDisplayScenarioLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("displayKillRecord")) {
+                    retVal.setDisplayKillRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion General Personnel
 
                 //region Expanded Personnel Information
