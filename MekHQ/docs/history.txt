@@ -18,6 +18,8 @@ MEKHQ VERSION HISTORY:
 + PR #4041: Updated isChild()
 + Fix #4080: Updated Tooltips for the Marriageable & Trying to Conceive Flags
 + Fix #4083: Added Customizable Log Display Settings to Campaign Options
++ Fix #4088: MM code adaptation for boards validation
++ PR #4087: Reintegrate Pay Multiplier into Salary Calculation
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
