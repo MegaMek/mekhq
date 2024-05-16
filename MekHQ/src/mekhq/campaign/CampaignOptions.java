@@ -248,7 +248,7 @@ public class CampaignOptions {
 
     // Retirement
     private boolean useRetirementDateTracking;
-    private RandomRetirementMethod randomRetirementMethod;
+    private boolean useRandomRetirement;
     private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
     private Integer turnoverFixedTargetNumber;
     private boolean useYearEndRandomRetirement;
@@ -724,7 +724,7 @@ public class CampaignOptions {
 
         // Retirement
         setUseRetirementDateTracking(false);
-        setRandomRetirementMethod(RandomRetirementMethod.NONE);
+        setUseRandomRetirement(true);
         setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.NEGOTIATION);
         setTurnoverFixedTargetNumber(3);
         setUseYearEndRandomRetirement(true);
@@ -1586,12 +1586,12 @@ public class CampaignOptions {
         this.useRetirementDateTracking = useRetirementDateTracking;
     }
 
-    public RandomRetirementMethod getRandomRetirementMethod() {
-        return randomRetirementMethod;
+    public boolean getUseRandomRetirement() {
+        return useRandomRetirement;
     }
 
-    public void setRandomRetirementMethod(final RandomRetirementMethod randomRetirementMethod) {
-        this.randomRetirementMethod = randomRetirementMethod;
+    public void setUseRandomRetirement(final boolean useRandomRetirement) {
+        this.useRandomRetirement = useRandomRetirement;
     }
 
     public TurnoverTargetNumberMethod getTurnoverTargetNumberMethod() {
@@ -4013,7 +4013,7 @@ public class CampaignOptions {
 
         //region Retirement
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomRetirementMethod", getRandomRetirementMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", getUseRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverTargetNumberMethod", getTurnoverTargetNumberMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
@@ -4277,7 +4277,7 @@ public class CampaignOptions {
     }
 
     public static CampaignOptions generateCampaignOptionsFromXml(Node wn, Version version) {
-        LogManager.getLogger().info("Loading Campaign Options from Version " + version + " XML...");
+        LogManager.getLogger().info("Loading Campaign Options from Version {} XML...", version);
 
         wn.normalize();
         CampaignOptions retVal = new CampaignOptions();
@@ -4650,8 +4650,8 @@ public class CampaignOptions {
                     //region Retirement
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
                     retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomRetirementMethod")) {
-                    retVal.setRandomRetirementMethod(RandomRetirementMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
+                    retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverTargetNumberMethod")) {
                     retVal.setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useYearEndRandomRetirement")) {
@@ -5197,11 +5197,6 @@ public class CampaignOptions {
                     retVal.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
                     retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("retirementRolls")) { // Legacy - 0.49.7 Removal
-                    final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
-                    retVal.setRandomRetirementMethod((value && retVal.isUseAtB()) ? RandomRetirementMethod.AGAINST_THE_BOT : RandomRetirementMethod.NONE);
-                    retVal.setUseYearEndRandomRetirement(value);
-                    retVal.setUseContractCompletionRandomRetirement(value);
                 } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) { // Legacy - 0.49.7 Removal
                     retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) { // Legacy - 0.49.7 Removal

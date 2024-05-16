@@ -253,8 +253,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // Retirement
     private JCheckBox chkUseRetirementDateTracking;
     private JPanel randomRetirementPanel;
-    private MMComboBox<RandomRetirementMethod> comboRandomRetirementMethod;
+    private JCheckBox chkUseRandomRetirement;
+    private JLabel lblTurnoverTargetNumberMethod;
     private MMComboBox<TurnoverTargetNumberMethod> comboTurnoverTargetNumberMethod;
+    private JLabel lblTurnoverFixedTargetNumber;
     private JSpinner spnTurnoverFixedTargetNumber;
     private JCheckBox chkUseYearEndRandomRetirement;
     private JCheckBox chkUseContractCompletionRandomRetirement;
@@ -267,8 +269,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseFactionModifiers;
     private JCheckBox chkUseLeadershipModifiers;
     private JPanel turnoverPayoutPanel;
+    private JLabel lblPayoutRateOfficer;
     private JSpinner spnPayoutRateOfficer;
+    private JLabel lblPayoutRateEnlisted;
     private JSpinner spnPayoutRateEnlisted;
+    private JLabel lblPayoutRetirementMultiplier;
     private JSpinner spnPayoutRetirementMultiplier;
     private JCheckBox chkUsePayoutServiceBonus;
     private JLabel lblPayoutServiceBonusRate;
@@ -2658,7 +2663,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             if (randomRetirementPanel.isEnabled() != enabled) {
                 randomRetirementPanel.setEnabled(enabled);
                 if (enabled) {
-                    comboRandomRetirementMethod.setSelectedItem(comboRandomRetirementMethod.getSelectedItem());
+                    chkUseRandomRetirement.setSelected(true);
                 }
             }
 
@@ -3606,7 +3611,30 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRetirementDateTracking.setToolTipText(resources.getString("chkUseRetirementDateTracking.toolTipText"));
         chkUseRetirementDateTracking.setName("chkUseRetirementDateTracking");
 
-        createRandomRetirementPanel();
+        JPanel randomRetirementPanel = createRandomRetirementPanel();
+
+        // global enable
+        chkUseRandomRetirement = new JCheckBox(resources.getString("chkUseRandomRetirement.text"));
+        chkUseRandomRetirement.setToolTipText(resources.getString("chkUseRandomRetirement.toolTipText"));
+        chkUseRandomRetirement.setName("chkUseRandomRetirement");
+        chkUseRandomRetirement.addActionListener(evt -> {
+            final boolean isEnabled = chkUseRandomRetirement.isSelected();
+
+            // general handler
+            for (int index = 0; index < Arrays.stream(randomRetirementPanel.getComponents()).count(); index++) {
+                randomRetirementPanel.getComponent(index).setEnabled(isEnabled);
+            }
+
+            // special handlers
+            randomRetirementPanel.setEnabled((isEnabled));
+            lblTurnoverFixedTargetNumber.setEnabled(isEnabled
+                    && Objects.requireNonNull(comboTurnoverTargetNumberMethod.getSelectedItem()).isFixed());
+            spnTurnoverFixedTargetNumber.setEnabled(isEnabled
+                    && Objects.requireNonNull(comboTurnoverTargetNumberMethod.getSelectedItem()).isFixed());
+        });
+
+        // this prevents a really annoying bug where disabled options don't stay disabled when reloading Campaign Options
+        randomRetirementPanel.setEnabled(campaign.getCampaignOptions().getUseRandomRetirement());
 
         // Layout the Panel
         final JPanel panel = new JPanel();
@@ -3621,21 +3649,23 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseRetirementDateTracking)
+                        .addComponent(chkUseRandomRetirement)
                         .addComponent(randomRetirementPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseRetirementDateTracking)
+                        .addComponent(chkUseRandomRetirement)
                         .addComponent(randomRetirementPanel)
         );
 
         return panel;
     }
 
-    private void createRandomRetirementPanel() {
+    private JPanel createRandomRetirementPanel() {
         // Create Panel Components
-        final JLabel lblTurnoverFixedTargetNumber = new JLabel(resources.getString("lblTurnoverFixedTargetNumber.text"));
+        lblTurnoverFixedTargetNumber = new JLabel(resources.getString("lblTurnoverFixedTargetNumber.text"));
         lblTurnoverFixedTargetNumber.setToolTipText(resources.getString("lblTurnoverFixedTargetNumber.toolTipText"));
         lblTurnoverFixedTargetNumber.setName("lblTurnoverFixedTargetNumber");
         lblTurnoverFixedTargetNumber.setEnabled(false);
@@ -3645,7 +3675,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnTurnoverFixedTargetNumber.setName("lblTurnoverFixedTargetNumber");
         lblTurnoverFixedTargetNumber.setEnabled(false);
 
-        final JLabel lblTurnoverTargetNumberMethod = new JLabel(resources.getString("lblTurnoverTargetNumberMethod.text"));
+        lblTurnoverTargetNumberMethod = new JLabel(resources.getString("lblTurnoverTargetNumberMethod.text"));
         lblTurnoverTargetNumberMethod.setToolTipText(resources.getString("lblTurnoverTargetNumberMethod.toolTipText"));
         lblTurnoverTargetNumberMethod.setName("lblTurnoverTargetNumberMethod");
 
@@ -3683,61 +3713,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseContractCompletionRandomRetirement.setToolTipText(resources.getString("chkUseContractCompletionRandomRetirement.toolTipText"));
         chkUseContractCompletionRandomRetirement.setName("chkUseContractCompletionRandomRetirement");
 
-        chkUseCustomRetirementModifiers = new JCheckBox(resources.getString("chkUseCustomRetirementModifiers.text"));
-        chkUseCustomRetirementModifiers.setToolTipText(resources.getString("chkUseCustomRetirementModifiers.toolTipText"));
-        chkUseCustomRetirementModifiers.setName("chkUseCustomRetirementModifiers");
-
         chkUseRandomFounderRetirement = new JCheckBox(resources.getString("chkUseRandomFounderRetirement.text"));
         chkUseRandomFounderRetirement.setToolTipText(resources.getString("chkUseRandomFounderRetirement.toolTipText"));
         chkUseRandomFounderRetirement.setName("chkUseRandomFounderRetirement");
 
-        chkTrackUnitFatigue = new JCheckBox(resources.getString("chkTrackUnitFatigue.text"));
-        chkTrackUnitFatigue.setToolTipText(resources.getString("chkTrackUnitFatigue.toolTipText"));
-        chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
-
-        JPanel turnoverModifiersPanel = createTurnoverModifiersPanel();
-        JPanel turnoverPayoutPanel = createTurnoverPayoutPanel();
-
-        // main controller option
-        final JLabel lblRandomRetirementMethod = new JLabel(resources.getString("lblRandomRetirementMethod.text"));
-        lblRandomRetirementMethod.setToolTipText(resources.getString("lblRandomRetirementMethod.toolTipText"));
-        lblRandomRetirementMethod.setName("lblRandomRetirementMethod");
-
-        comboRandomRetirementMethod = new MMComboBox<>("comboRandomRetirementMethod", RandomRetirementMethod.values());
-        comboRandomRetirementMethod.setToolTipText(resources.getString("lblRandomRetirementMethod.toolTipText"));
-        comboRandomRetirementMethod.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof RandomRetirementMethod) {
-                    list.setToolTipText(((RandomRetirementMethod) value).getToolTipText());
-                }
-                return this;
-            }
-        });
-        comboRandomRetirementMethod.addActionListener(evt -> {
-            final RandomRetirementMethod method = comboRandomRetirementMethod.getSelectedItem();
-            if (method == null) {
-                return;
-            }
-            final boolean enabled = randomRetirementPanel.isEnabled() && !method.isNone();
-            lblTurnoverTargetNumberMethod.setEnabled(enabled);
-            comboTurnoverTargetNumberMethod.setEnabled(enabled);
-            lblTurnoverFixedTargetNumber.setEnabled(enabled && campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isFixed());
-            spnTurnoverFixedTargetNumber.setEnabled(enabled && campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isFixed());
-            chkUseYearEndRandomRetirement.setEnabled(enabled);
-            chkUseContractCompletionRandomRetirement.setEnabled(enabled);
-            chkUseCustomRetirementModifiers.setEnabled(enabled);
-            chkUseRandomFounderRetirement.setEnabled(enabled);
-            chkTrackUnitFatigue.setEnabled(enabled);
-            turnoverModifiersPanel.setEnabled(enabled);
-            turnoverPayoutPanel.setEnabled(enabled);
-        });
+        turnoverModifiersPanel = createTurnoverModifiersPanel();
+        turnoverPayoutPanel = createTurnoverPayoutPanel();
 
         // Programmatically Assign Accessibility Labels
-        lblRandomRetirementMethod.setLabelFor(comboRandomRetirementMethod);
         lblTurnoverTargetNumberMethod.setLabelFor(comboTurnoverTargetNumberMethod);
 
         // Layout the Panel
@@ -3752,9 +3735,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblRandomRetirementMethod)
-                                .addComponent(comboRandomRetirementMethod, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblTurnoverTargetNumberMethod)
                                 .addComponent(comboTurnoverTargetNumberMethod, Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -3763,17 +3743,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseYearEndRandomRetirement)
                         .addComponent(chkUseContractCompletionRandomRetirement)
                         .addComponent(chkUseRandomFounderRetirement)
-                        .addComponent(chkUseCustomRetirementModifiers)
-                        .addComponent(chkTrackUnitFatigue)
                         .addComponent(turnoverModifiersPanel)
                         .addComponent(turnoverPayoutPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRandomRetirementMethod)
-                                .addComponent(comboRandomRetirementMethod))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblTurnoverTargetNumberMethod)
                                 .addComponent(comboTurnoverTargetNumberMethod))
@@ -3783,14 +3758,18 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseYearEndRandomRetirement)
                         .addComponent(chkUseContractCompletionRandomRetirement)
                         .addComponent(chkUseRandomFounderRetirement)
-                        .addComponent(chkUseCustomRetirementModifiers)
-                        .addComponent(chkTrackUnitFatigue)
                         .addComponent(turnoverModifiersPanel)
                         .addComponent(turnoverPayoutPanel)
         );
+
+        return randomRetirementPanel;
     }
 
     private JPanel createTurnoverModifiersPanel() {
+        chkUseCustomRetirementModifiers = new JCheckBox(resources.getString("chkUseCustomRetirementModifiers.text"));
+        chkUseCustomRetirementModifiers.setToolTipText(resources.getString("chkUseCustomRetirementModifiers.toolTipText"));
+        chkUseCustomRetirementModifiers.setName("chkUseCustomRetirementModifiers");
+
         chkUseAgeModifiers = new JCheckBox(resources.getString("chkUseAgeModifiers.text"));
         chkUseAgeModifiers.setToolTipText(resources.getString("chkUseAgeModifiers.toolTipText"));
         chkUseAgeModifiers.setName("chkUseAgeModifiers");
@@ -3802,6 +3781,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseFactionModifiers = new JCheckBox(resources.getString("chkUseFactionModifiers.text"));
         chkUseFactionModifiers.setToolTipText(resources.getString("chkUseFactionModifiers.toolTipText"));
         chkUseFactionModifiers.setName("chkUseFactionModifiers");
+
+        chkTrackUnitFatigue = new JCheckBox(resources.getString("chkTrackUnitFatigue.text"));
+        chkTrackUnitFatigue.setToolTipText(resources.getString("chkTrackUnitFatigue.toolTipText"));
+        chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
 
         chkUseLeadershipModifiers = new JCheckBox(resources.getString("chkUseLeadershipModifiers.text"));
         chkUseLeadershipModifiers.setToolTipText(resources.getString("chkUseLeadershipModifiers.toolTipText"));
@@ -3817,17 +3800,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addComponent(chkUseCustomRetirementModifiers)
                         .addComponent(chkUseAgeModifiers)
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
+                        .addComponent(chkTrackUnitFatigue)
                         .addComponent(chkUseLeadershipModifiers)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseCustomRetirementModifiers)
                         .addComponent(chkUseAgeModifiers)
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
+                        .addComponent(chkTrackUnitFatigue)
                         .addComponent(chkUseLeadershipModifiers)
         );
 
@@ -3835,7 +3822,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createTurnoverPayoutPanel() {
-        final JLabel lblPayoutRateOfficer = new JLabel(resources.getString("lblPayoutRateOfficer.text"));
+        lblPayoutRateOfficer = new JLabel(resources.getString("lblPayoutRateOfficer.text"));
         lblPayoutRateOfficer.setToolTipText(resources.getString("lblPayoutRateOfficer.toolTipText"));
         lblPayoutRateOfficer.setName("lblPayoutRateOfficer");
 
@@ -3843,7 +3830,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPayoutRateOfficer.setToolTipText(resources.getString("lblPayoutRateOfficer.toolTipText"));
         spnPayoutRateOfficer.setName("lblPayoutRateOfficer");
 
-        final JLabel lblPayoutRateEnlisted = new JLabel(resources.getString("lblPayoutRateEnlisted.text"));
+        lblPayoutRateEnlisted = new JLabel(resources.getString("lblPayoutRateEnlisted.text"));
         lblPayoutRateEnlisted.setToolTipText(resources.getString("lblPayoutRateEnlisted.toolTipText"));
         lblPayoutRateEnlisted.setName("lblPayoutRateEnlisted");
 
@@ -3851,7 +3838,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPayoutRateEnlisted.setToolTipText(resources.getString("lblPayoutRateEnlisted.toolTipText"));
         spnPayoutRateEnlisted.setName("lblPayoutRateEnlisted");
 
-        final JLabel lblPayoutRetirementMultiplier = new JLabel(resources.getString("lblPayoutRetirementMultiplier.text"));
+        lblPayoutRetirementMultiplier = new JLabel(resources.getString("lblPayoutRetirementMultiplier.text"));
         lblPayoutRetirementMultiplier.setToolTipText(resources.getString("lblPayoutRetirementMultiplier.toolTipText"));
         lblPayoutRetirementMultiplier.setName("lblPayoutRetirementMultiplier");
 
@@ -6931,7 +6918,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Retirement
         chkUseRetirementDateTracking.setSelected(options.isUseRetirementDateTracking());
-        comboRandomRetirementMethod.setSelectedItem(options.getRandomRetirementMethod());
+        chkUseRandomRetirement.setSelected(options.getUseRandomRetirement());
         comboTurnoverTargetNumberMethod.setSelectedItem(options.getTurnoverTargetNumberMethod());
         spnTurnoverFixedTargetNumber.setValue(options.getTurnoverFixedTargetNumber());
         chkUseYearEndRandomRetirement.setSelected(options.isUseYearEndRandomRetirement());
@@ -7545,7 +7532,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Retirement
             options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
-            options.setRandomRetirementMethod(comboRandomRetirementMethod.getSelectedItem());
+            options.setUseRandomRetirement(chkUseRandomRetirement.isSelected());
             options.setTurnoverTargetNumberMethod(comboTurnoverTargetNumberMethod.getSelectedItem());
             options.setTurnoverFixedTargetNumber((Integer) spnTurnoverFixedTargetNumber.getValue());
             options.setUseYearEndRandomRetirement(chkUseYearEndRandomRetirement.isSelected());

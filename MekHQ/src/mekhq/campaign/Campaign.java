@@ -6843,7 +6843,7 @@ public class Campaign implements ITechManager {
     }
 
     public boolean checkYearlyRetirements() {
-        if (!getCampaignOptions().getRandomRetirementMethod().isNone()
+        if (getCampaignOptions().getUseRandomRetirement()
                 && getCampaignOptions().isUseYearEndRandomRetirement()
                 && (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate())
                         == getRetirementDefectionTracker().getLastRetirementRoll().lengthOfYear())) {

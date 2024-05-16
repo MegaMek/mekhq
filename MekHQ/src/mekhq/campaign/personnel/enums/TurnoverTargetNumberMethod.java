@@ -24,8 +24,8 @@ import java.util.ResourceBundle;
 
 public enum TurnoverTargetNumberMethod {
     FIXED("TurnoverTargetNumberMethod.FIXED.text", "TurnoverTargetNumberMethod.FIXED.toolTipText"),
-    ADMINISTRATION("RandomRetirementMethod.ADMINISTRATION.text", "RandomRetirementMethod.ADMINISTRATION.toolTipText"),
-    NEGOTIATION("RandomRetirementMethod.NEGOTIATION.text", "RandomRetirementMethod.NEGOTIATION.toolTipText");
+    ADMINISTRATION("TurnoverTargetNumberMethod.ADMINISTRATION.text", "TurnoverTargetNumberMethod.ADMINISTRATION.toolTipText"),
+    NEGOTIATION("TurnoverTargetNumberMethod.NEGOTIATION.text", "TurnoverTargetNumberMethod.NEGOTIATION.toolTipText");
 
     private final String name;
     private final String toolTipText;
