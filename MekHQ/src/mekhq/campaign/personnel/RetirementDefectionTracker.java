@@ -419,7 +419,8 @@ public class RetirementDefectionTracker {
                     if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (p.getUnit().isCommander(p))) {
                         for (Person person : p.getUnit().getSoldiers()) {
                             if ((!person.isFounder()) || (campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
-                                payouts.put(person.getId(), new Payout(campaign, campaign.getPerson(id), shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
+                                payouts.put(person.getId(), new Payout(campaign, campaign.getPerson(person.getId()),
+                                        shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
                             }
                         }
 
