@@ -33,7 +33,6 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.universe.FactionHints;
-import mekhq.campaign.universe.Factions;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
