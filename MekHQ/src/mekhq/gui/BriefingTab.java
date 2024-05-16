@@ -357,7 +357,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 return;
             }
 
-            if (getCampaign().getCampaignOptions().getUseRandomRetirement()
+            if (getCampaign().getCampaignOptions().isUseRandomRetirement()
                     && getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
                 RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
                         (AtBContract) mission, true);

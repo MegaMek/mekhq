@@ -922,7 +922,7 @@ public class CampaignGUI extends JPanel {
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
         miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
         miRetirementDefectionDialog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().getUseRandomRetirement());
+        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().isUseRandomRetirement());
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
 
@@ -2474,7 +2474,7 @@ public class CampaignGUI extends JPanel {
         fundsScheduler.schedule();
         refreshPartsAvailability();
 
-        miRetirementDefectionDialog.setVisible(evt.getOptions().getUseRandomRetirement());
+        miRetirementDefectionDialog.setVisible(evt.getOptions().isUseRandomRetirement());
         miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }
 
