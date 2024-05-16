@@ -32,9 +32,9 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.MedicalViewDialog;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.PersonnelEventLogModel;
 import mekhq.gui.model.PersonnelKillLogModel;
 import mekhq.gui.utilities.ImageHelpers;
@@ -212,11 +212,12 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlLogHeader = new JPanel();
             pnlLogHeader.setName("pnlLogHeader");
             pnlLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLogHeader.title")));
+            pnlLogHeader.setVisible(!campaign.getCampaignOptions().isDisplayPersonnelLog());
 
             JPanel pnlLog = fillLog();
-            pnlLog.setVisible(false);
             pnlLog.setName("pnlLog");
             pnlLog.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlLog.title")));
+            pnlLog.setVisible(campaign.getCampaignOptions().isDisplayPersonnelLog());
 
             pnlLogHeader.addMouseListener(getSwitchListener(pnlLogHeader, pnlLog));
             pnlLog.addMouseListener(getSwitchListener(pnlLog, pnlLogHeader));
@@ -237,6 +238,7 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlScenariosLogHeader = new JPanel();
             pnlScenariosLogHeader.setName("scenarioLogHeader");
             pnlScenariosLogHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("scenarioLogHeader.title")));
+            pnlScenariosLogHeader.setVisible(!campaign.getCampaignOptions().isDisplayScenarioLog());
 
             JPanel pnlScenariosLog = fillScenarioLog();
 
@@ -244,11 +246,10 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlScenariosLog.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("scenarioLog.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            pnlScenariosLog.setVisible(false);
+            pnlScenariosLog.setVisible(campaign.getCampaignOptions().isDisplayScenarioLog());
 
             pnlScenariosLogHeader.addMouseListener(getSwitchListener(pnlScenariosLogHeader, pnlScenariosLog));
             pnlScenariosLog.addMouseListener(getSwitchListener(pnlScenariosLog, pnlScenariosLogHeader));
-
 
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
@@ -266,6 +267,7 @@ public class PersonViewPanel extends JScrollablePanel {
             JPanel pnlKillsHeader = new JPanel();
             pnlKillsHeader.setName("killsHeader");
             pnlKillsHeader.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("pnlKillsHeader.title")));
+            pnlKillsHeader.setVisible(!campaign.getCampaignOptions().isDisplayKillRecord());
 
             JPanel pnlKills = fillKillRecord();
 
@@ -273,7 +275,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlKills.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createTitledBorder(resourceMap.getString("pnlKills.title")),
                     BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-            pnlKills.setVisible(false);
+            pnlKills.setVisible(campaign.getCampaignOptions().isDisplayKillRecord());
 
             pnlKillsHeader.addMouseListener(getSwitchListener(pnlKillsHeader, pnlKills));
             pnlKills.addMouseListener(getSwitchListener(pnlKills, pnlKillsHeader));
