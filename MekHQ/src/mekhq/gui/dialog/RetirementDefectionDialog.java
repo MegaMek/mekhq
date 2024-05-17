@@ -789,13 +789,9 @@ public class RetirementDefectionDialog extends JDialog {
                 btnRemoveUnit.setEnabled(false);
             } else if (unitAssignments.containsKey(pid)) {
                 btnAddUnit.setEnabled(false);
-                if ((hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit() &&
-                        unitAssignments.get(pid).equals(hqView.getCampaign().getPerson(pid).getOriginalUnitId())) &&
-                        !btnEdit.isSelected()) {
-                    btnRemoveUnit.setEnabled(false);
-                } else {
-                    btnRemoveUnit.setEnabled(true);
-                }
+                btnRemoveUnit.setEnabled((!hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit()
+                        || !unitAssignments.get(pid).equals(hqView.getCampaign().getPerson(pid).getOriginalUnitId()))
+                        || btnEdit.isSelected());
             } else if (null != rdTracker.getPayout(pid) &&
                     rdTracker.getPayout(pid).getWeightClass() > 0) {
                 if (unitAssignmentTable.getSelectedRow() < 0) {
