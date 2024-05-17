@@ -272,7 +272,10 @@ public class CampaignOptions {
     private boolean useFactionModifiers;
     private boolean useMissionStatusModifiers;
     private boolean trackUnitFatigue;
-    private boolean useLeadershipModifiers;
+
+    private boolean useAdministrativeStrain;
+    private Integer combatantStrain;
+    private Integer nonCombatantStrain;
 
     private boolean useShareSystem;
     private boolean sharesExcludeLargeCraft;
@@ -749,13 +752,16 @@ public class CampaignOptions {
         setUseUnitRatingModifiers(true);
         setUseFactionModifiers(true);
         setUseMissionStatusModifiers(true);
-        setUseLeadershipModifiers(true);
 
         setPayoutRateOfficer(3);
         setPayoutRateEnlisted(3);
         setPayoutRetirementMultiplier(24);
         setUsePayoutServiceBonus(true);
         setPayoutServiceBonusRate(10);
+
+        setUseAdministrativeStrain(true);
+        setCombatantStrain(12);
+        setNonCombatantStrain(24);
 
         setUseShareSystem(false);
         setSharesExcludeLargeCraft(true);
@@ -1776,12 +1782,28 @@ public class CampaignOptions {
         this.useMissionStatusModifiers = useMissionStatusModifiers;
     }
 
-    public boolean isUseLeadershipModifiers() {
-        return useLeadershipModifiers;
+    public boolean isUseAdministrativeStrain() {
+        return useAdministrativeStrain;
     }
 
-    public void setUseLeadershipModifiers(final boolean useLeadershipModifiers) {
-        this.useLeadershipModifiers = useLeadershipModifiers;
+    public void setUseAdministrativeStrain(final boolean useAdministrativeStrain) {
+        this.useAdministrativeStrain = useAdministrativeStrain;
+    }
+
+    public Integer getCombatantStrain() {
+        return combatantStrain;
+    }
+
+    public void setCombatantStrain(final Integer combatantStrain) {
+        this.combatantStrain = combatantStrain;
+    }
+
+    public Integer getNonCombatantStrain() {
+        return nonCombatantStrain;
+    }
+
+    public void setNonCombatantStrain(final Integer nonCombatantStrain) {
+        this.nonCombatantStrain = nonCombatantStrain;
     }
     //endregion Retirement
 
@@ -4092,7 +4114,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionModifiers", isUseFactionModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMissionStatusModifiers", isUseMissionStatusModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadershipModifiers", isUseLeadershipModifiers());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverBaseTn", getTurnoverFixedTargetNumber());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateOfficer", getPayoutRateOfficer());
@@ -4100,6 +4121,10 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRetirementMultiplier", getPayoutRetirementMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePayoutServiceBonus", isUsePayoutServiceBonus());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutServiceBonusRate", getPayoutServiceBonusRate());
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdministrativeStrain", isUseAdministrativeStrain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatantStrain", getCombatantStrain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nonCombatantStrain", getNonCombatantStrain());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", isUseShareSystem());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", isSharesExcludeLargeCraft());
@@ -4751,8 +4776,6 @@ public class CampaignOptions {
                     retVal.setUseMissionStatusModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
                     retVal.setTrackUnitFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useLeadershipModifiers")) {
-                    retVal.setUseLeadershipModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
                     retVal.setTurnoverFixedTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateOfficer")) {
@@ -4765,6 +4788,12 @@ public class CampaignOptions {
                     retVal.setUsePayoutServiceBonus(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutServiceBonusRate")) {
                     retVal.setPayoutServiceBonusRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAdministrativeStrain")) {
+                    retVal.setUseAdministrativeStrain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("combatantStrain")) {
+                    retVal.setCombatantStrain(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("nonCombatantStrain")) {
+                    retVal.setNonCombatantStrain(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
                     retVal.setUseShareSystem(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {

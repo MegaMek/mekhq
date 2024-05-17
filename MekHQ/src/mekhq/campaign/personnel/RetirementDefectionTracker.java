@@ -62,6 +62,8 @@ public class RetirementDefectionTracker {
     final private Map<UUID, Payout> payouts;
     private LocalDate lastRetirementRoll;
 
+    private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionTracker");
+
     public RetirementDefectionTracker() {
         rollRequired = new HashSet<>();
         unresolvedPersonnel = new HashMap<>();
@@ -132,177 +134,131 @@ public class RetirementDefectionTracker {
      * @param campaign  The campaign to calculate target numbers for
      * @return A map with person ids as key and calculated target roll as value.
      */
-    public Map<UUID, TargetRoll> calculateTargetNumbers(final @Nullable AtBContract contract,
-                                                        final Campaign campaign) {
+    public Map<UUID, TargetRoll> calculateTargetNumbers(final @Nullable AtBContract contract, final Campaign campaign) {
         final Map <UUID, TargetRoll> targets = new HashMap<>();
-        int combatLeadershipMod = 0;
-        int supportLeadershipMod = 0;
 
         if (null != contract) {
             rollRequired.add(contract.getId());
         }
 
-        if (campaign.getCampaignOptions().isUseLeadershipModifiers()) {
-            int combat = 0;
-            int proto = 0;
-            int support = 0;
-            for (Person p : campaign.getActivePersonnel()) {
-                if (p.getPrimaryRole().isCivilian() || !p.getPrisonerStatus().isFree()) {
-                    continue;
-                }
-
-                if (p.getPrimaryRole().isSupport()) {
-                    support++;
-                } else if ((null == p.getUnit()) ||
-                        ((null != p.getUnit()) && p.getUnit().isCommander(p))) {
-                    /*
-                     * The AtB rules do not state that crews count as a
-                     * single person for leadership purposes, but to do otherwise
-                     * would tax all but the most exceptional commanders of
-                     * vehicle or infantry units.
-                     */
-                    if (p.getPrimaryRole().isProtoMechPilot()) {
-                        proto++;
-                    } else {
-                        combat++;
-                    }
-                }
-            }
-            combat += proto / 5;
-            int max = 12;
-            if ((null != campaign.getFlaggedCommander()) &&
-                    (null != campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER))) {
-                max += 6 * campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER).getLevel();
-            }
-
-            if (combat > 2 * max) {
-                combatLeadershipMod = 2;
-            } else if (combat > max) {
-                combatLeadershipMod = 1;
-            }
-
-            if (support > 2 * max) {
-                supportLeadershipMod = 2;
-            } else if (support > max) {
-                supportLeadershipMod = 1;
-            }
-        }
-
-        for (Person p : campaign.getActivePersonnel()) {
-            if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()) {
+        for (Person person : campaign.getActivePersonnel()) {
+            if ((person.getPrimaryRole().isDependent()) || (!person.getPrisonerStatus().isFree()) || (person.isDeployed())) {
                 continue;
             }
 
-            if ((p.isFounder()) && (!campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
+            if ((person.isFounder()) && (!campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
                 continue;
             }
 
             if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
-                if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (!p.getUnit().isCommander(p))) {
+                if ((person.getUnit() != null) && (person.getUnit().usesSoldiers()) && (!person.getUnit().isCommander(person))) {
                     continue;
                 }
             }
 
-            TargetRoll target = new TargetRoll(getBaseTargetNumber(campaign), "Base");
+            TargetRoll targetNumber = new TargetRoll(getBaseTargetNumber(campaign), resources.getString("base.text"));
 
             // Skill Rating modifier
             if (campaign.getCampaignOptions().isUseSkillModifiers()) {
-                int skillRating = p.getExperienceLevel(campaign, false);
+                int skillRating;
                 String skillRatingDescription;
+
+                try {
+                    skillRating = person.getExperienceLevel(campaign, true);
+                } catch (Exception e) {
+                    skillRating = -1;
+                }
 
                 switch (skillRating) {
                     case -1:
-                        skillRatingDescription = "Unskilled";
+                        targetNumber.addModifier(0, resources.getString("skillUnskilled.text"));
                         break;
                     case 0:
-                        skillRatingDescription = "Ultra-Green";
+                        targetNumber.addModifier(skillRating, resources.getString("skillUltraGreen.text"));
                         break;
                     case 1:
-                        skillRatingDescription = "Green";
+                        targetNumber.addModifier(skillRating, resources.getString("skillGreen.text"));
                         break;
                     case 2:
-                        skillRatingDescription = "Regular";
+                        targetNumber.addModifier(skillRating, resources.getString("skillRegular.text"));
                         break;
                     case 3:
-                        skillRatingDescription = "Veteran";
+                        targetNumber.addModifier(skillRating, resources.getString("skillVeteran.text"));
                         break;
                     case 4:
-                        skillRatingDescription = "Elite";
+                        targetNumber.addModifier(skillRating, resources.getString("skillElite.text"));
                         break;
                     default:
-                        skillRatingDescription = "Error, please see log";
                         LogManager.getLogger().error("RetirementDefectionTracker: Unable to parse skillRating. Returning {}", skillRating);
                 }
-
-                target.addModifier(skillRating, skillRatingDescription);
             }
 
             // Unit Rating modifier
             if (campaign.getCampaignOptions().isUseUnitRatingModifiers()) {
                 int unitRatingModifier = getUnitRatingModifier(campaign);
-                target.addModifier(unitRatingModifier, "Unit Rating");
+                targetNumber.addModifier(unitRatingModifier, resources.getString("unitRating.text"));
             }
 
             // Mission completion status modifiers
             if ((contract != null) && (campaign.getCampaignOptions().isUseMissionStatusModifiers())) {
                 if (contract.getStatus().isSuccess()) {
-                    target.addModifier(-1, "Recent Success");
+                    targetNumber.addModifier(-1, resources.getString("missionSuccess.text"));
                 } else if (contract.getStatus().isFailed()) {
-                    target.addModifier(1, "Recent Failure");
+                    targetNumber.addModifier(1, resources.getString("missionFailure.text"));
                 } else if (contract.getStatus().isBreach()) {
-                    target.addModifier(2, "Recent Contract Breach");
+                    targetNumber.addModifier(2, resources.getString("missionBreach.text"));
                 }
             }
 
             // Faction Modifiers
             if (campaign.getCampaignOptions().isUseFactionModifiers()) {
                 if (campaign.getFaction().isPirate()) {
-                    target.addModifier(1, "Pirate Company");
-                } else if (p.getOriginFaction().isPirate()) {
-                    target.addModifier(1, "Pirate");
+                    targetNumber.addModifier(1, resources.getString("factionPirateCompany.text"));
+                } else if (person.getOriginFaction().isPirate()) {
+                    targetNumber.addModifier(1, resources.getString("factionPirate.text"));
                 }
 
-                if (p.getOriginFaction().isMercenary()) {
-                    target.addModifier(1, "Mercenary");
+                if (person.getOriginFaction().isMercenary()) {
+                    targetNumber.addModifier(1, resources.getString("factionMercenary.text"));
                 }
 
-                if (p.getOriginFaction().isClan()) {
-                    target.addModifier(-2, "Clan");
+                if (person.getOriginFaction().isClan()) {
+                    targetNumber.addModifier(-2, resources.getString("factionClan.text"));
                 }
 
-                if (FactionHints.defaultFactionHints().isAtWarWith(campaign.getFaction(), p.getOriginFaction(), campaign.getLocalDate())) {
-                    target.addModifier(1, "Enemy Faction");
+                if (FactionHints.defaultFactionHints().isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
+                    targetNumber.addModifier(1, resources.getString("factionEnemy.text"));
                 }
             }
 
             // Age modifiers
             if (campaign.getCampaignOptions().isUseAgeModifiers()) {
-                int age = p.getAge(campaign.getLocalDate());
+                int age = person.getAge(campaign.getLocalDate());
                 int ageMod = getAgeMod(age);
 
                 if (ageMod != 0) {
-                    target.addModifier(ageMod, "Age");
+                    targetNumber.addModifier(ageMod, resources.getString("age.text"));
                 }
             }
 
             // Injury Modifiers
-            int injuryMod = (int) p.getInjuries()
+            int injuryMod = (int) person.getInjuries()
                     .stream()
                     .filter(Injury::isPermanent).count();
 
             if (injuryMod > 0) {
-                target.addModifier(injuryMod, "Permanent Injuries");
+                targetNumber.addModifier(injuryMod, resources.getString("injuries.text"));
             }
 
             // Officer Modifiers
-            if (p.getRank().isOfficer()) {
-                target.addModifier(-1, "Officer");
+            if (person.getRank().isOfficer()) {
+                targetNumber.addModifier(-1, resources.getString("officer.text"));
             } else {
-                for (Enumeration<IOption> i = p.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
+                for (Enumeration<IOption> i = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES); i.hasMoreElements(); ) {
                     IOption ability = i.nextElement();
                     if (ability.booleanValue()) {
                         if (ability.getName().equals("tactical_genius")) {
-                            target.addModifier(1, "Non-officer tactical genius");
+                            targetNumber.addModifier(1, resources.getString("tacticalGenius.text"));
                             break;
                         }
                     }
@@ -310,8 +266,8 @@ public class RetirementDefectionTracker {
             }
 
             // Founder Modifier
-            if (p.isFounder()) {
-                target.addModifier(2, "Founder");
+            if (person.isFounder()) {
+                targetNumber.addModifier(2, resources.getString("founder.text"));
             }
 
             // Shares Modifiers
@@ -330,29 +286,92 @@ public class RetirementDefectionTracker {
                     }
                 }
                 if (c != null) {
-                    target.addModifier(- (c.getSharesPct() / 10), "Shares");
+                    targetNumber.addModifier(- (c.getSharesPct() / 10), resources.getString("shares.text"));
                 }
             }
 
-            // Leadership Modifiers
-            if(campaign.getCampaignOptions().isUseLeadershipModifiers()) {
-                if ((combatLeadershipMod != 0) && p.getPrimaryRole().isCombat()) {
-                    target.addModifier(combatLeadershipMod, "Leadership (Combatant)");
+            // Administrative Strain Modifiers
+            if (campaign.getCampaignOptions().isUseAdministrativeStrain()) {
+                int nonCombatantStrainModifier = getNonCombatantStrainModifier(campaign);
+                int combatantStrainModifier = getCombatantStrainModifier(campaign);
+
+                if ((nonCombatantStrainModifier > 0) && (person.getUnit() == null)) {
+                    targetNumber.addModifier(nonCombatantStrainModifier, resources.getString("administrativeStrain.text"));
                 }
 
-                if ((supportLeadershipMod != 0) && p.getPrimaryRole().isSupport()) {
-                    target.addModifier(supportLeadershipMod, "Leadership (Support)");
+                if ((combatantStrainModifier > 0) && (person.getUnit() != null)) {
+                    targetNumber.addModifier(combatantStrainModifier, resources.getString("administrativeStrain.text"));
                 }
             }
 
             // Fatigue Modifiers
             if (campaign.getCampaignOptions().isTrackUnitFatigue()) {
-                target.addModifier(campaign.getFatigueLevel() / 10, "Fatigue");
+                targetNumber.addModifier(campaign.getFatigueLevel() / 10, resources.getString("fatigue.text"));
             }
 
-            targets.put(p.getId(), target);
+            targets.put(person.getId(), targetNumber);
         }
         return targets;
+    }
+
+    /**
+     * This method calculates the combatant strain modifier based on the active personnel assigned to units.
+     *
+     * @param campaign the campaign for which to calculate the strain modifier
+     * @return the strain modifier
+     */
+    private static int getCombatantStrainModifier(Campaign campaign) {
+        int combatants = 0;
+        int proto = 0;
+
+        for (Person person : campaign.getActivePersonnel()) {
+            if (person.getPrimaryRole().isCivilian() || !person.getPrisonerStatus().isFree()) {
+                continue;
+            }
+
+            // personnel without a unit are treated as non-combatants
+            if (person.getUnit() != null) {
+                // we treat multi-crewed units as one, for Administrative Strain,
+                // as otherwise users would be penalized for their use
+                if (person.getUnit().isCommander(person)) {
+                    if (person.getUnit().getEntity().isProtoMek()) {
+                        proto++;
+                    } else {
+                        combatants++;
+                    }
+                }
+            }
+        }
+
+        combatants += proto / 5;
+
+        int maximumStrain = campaign.getCampaignOptions().getCombatantStrain();
+
+        int skillLevel = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_ADMIN)
+                .getSkill(SkillType.S_ADMIN)
+                .getLevel();
+
+        return (maximumStrain * skillLevel) / combatants;
+    }
+
+    /**
+     * This method calculates the non-combatant strain modifier based on the active personnel not assigned to units.
+     *
+     * @param campaign the campaign for which to calculate the strain modifier
+     * @return the strain modifier
+     */
+    private int getNonCombatantStrainModifier(Campaign campaign) {
+        int nonCombatants = (int) campaign.getActivePersonnel().stream()
+                .filter(person -> !person.getPrimaryRole().isCivilian() && person.getPrisonerStatus().isFree())
+                .filter(person -> person.getUnit() == null).count();
+
+        int maximumStrain = campaign.getCampaignOptions().getNonCombatantStrain();
+
+        int skillLevel = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN)
+                .getSkill(SkillType.S_ADMIN)
+                .getLevel();
+
+        return (maximumStrain * skillLevel) / nonCombatants;
     }
 
     /**
