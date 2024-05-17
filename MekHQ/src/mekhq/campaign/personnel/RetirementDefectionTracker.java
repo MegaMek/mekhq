@@ -23,6 +23,7 @@ package mekhq.campaign.personnel;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
 import megamek.common.options.IOption;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -160,35 +161,41 @@ public class RetirementDefectionTracker {
 
             // Skill Rating modifier
             if (campaign.getCampaignOptions().isUseSkillModifiers()) {
-                int skillRating;
+                SkillLevel skillRating;
 
                 try {
-                    skillRating = person.getExperienceLevel(campaign, true);
+                    skillRating = person.getSkillLevel(campaign, false);
                 } catch (Exception e) {
-                    skillRating = -1;
+                    skillRating = SkillLevel.NONE;
                 }
 
                 switch (skillRating) {
-                    case -1:
-                        targetNumber.addModifier(0, resources.getString("skillUnskilled.text"));
+                    case NONE:
+                        targetNumber.addModifier(0, resources.getString("skillRatingUnskilled.text"));
                         break;
-                    case 0:
-                        targetNumber.addModifier(skillRating, resources.getString("skillUltraGreen.text"));
+                    case ULTRA_GREEN:
+                        targetNumber.addModifier(0, skillRating.name());
                         break;
-                    case 1:
-                        targetNumber.addModifier(skillRating, resources.getString("skillGreen.text"));
+                    case GREEN:
+                        targetNumber.addModifier(1, skillRating.name());
                         break;
-                    case 2:
-                        targetNumber.addModifier(skillRating, resources.getString("skillRegular.text"));
+                    case REGULAR:
+                        targetNumber.addModifier(2, skillRating.name());
                         break;
-                    case 3:
-                        targetNumber.addModifier(skillRating, resources.getString("skillVeteran.text"));
+                    case VETERAN:
+                        targetNumber.addModifier(3, skillRating.name());
                         break;
-                    case 4:
-                        targetNumber.addModifier(skillRating, resources.getString("skillElite.text"));
+                    case ELITE:
+                        targetNumber.addModifier(4, skillRating.name());
+                        break;
+                    case HEROIC:
+                        targetNumber.addModifier(5, skillRating.name());
+                        break;
+                    case LEGENDARY:
+                        targetNumber.addModifier(6, skillRating.name());
                         break;
                     default:
-                        LogManager.getLogger().error("RetirementDefectionTracker: Unable to parse skillRating. Returning {}", skillRating);
+                        LogManager.getLogger().error("RetirementDefectionTracker: Unable to parse skillRating. Returning {}", skillRating.toString());
                 }
             }
 
@@ -291,15 +298,15 @@ public class RetirementDefectionTracker {
 
             // Administrative Strain Modifiers
             if (campaign.getCampaignOptions().isUseAdministrativeStrain()) {
-                int nonCombatantStrainModifier = getNonCombatantStrainModifier(campaign);
                 int combatantStrainModifier = getCombatantStrainModifier(campaign);
-
-                if ((nonCombatantStrainModifier > 0) && (person.getUnit() == null)) {
-                    targetNumber.addModifier(nonCombatantStrainModifier, resources.getString("administrativeStrain.text"));
-                }
+                int nonCombatantStrainModifier = getNonCombatantStrainModifier(campaign);
 
                 if ((combatantStrainModifier > 0) && (person.getUnit() != null)) {
                     targetNumber.addModifier(combatantStrainModifier, resources.getString("administrativeStrain.text"));
+                }
+
+                if ((nonCombatantStrainModifier > 0) && (person.getUnit() == null)) {
+                    targetNumber.addModifier(nonCombatantStrainModifier, resources.getString("administrativeStrain.text"));
                 }
             }
 
@@ -324,33 +331,52 @@ public class RetirementDefectionTracker {
         int proto = 0;
 
         for (Person person : campaign.getActivePersonnel()) {
-            if (person.getPrimaryRole().isCivilian() || !person.getPrisonerStatus().isFree()) {
+            if ((person.getPrimaryRole().isCivilian()) || (person.getPrisonerStatus().isPrisoner()) || (person.getPrisonerStatus().isPrisonerDefector())) {
                 continue;
             }
 
             // personnel without a unit are treated as non-combatants
             if (person.getUnit() != null) {
-                // we treat multi-crewed units as one, for Administrative Strain,
-                // as otherwise users would be penalized for their use
                 if (person.getUnit().isCommander(person)) {
                     if (person.getUnit().getEntity().isProtoMek()) {
                         proto++;
                     } else {
-                        combatants++;
+                        combatants += Math.max(1, person.getUnit().getCrew().size() / campaign.getCampaignOptions().getMultiCrewStrainDivider());
                     }
                 }
             }
         }
 
-        combatants += proto / 5;
+        combatants += proto / campaign.getCampaignOptions().getMultiCrewStrainDivider();
 
-        int maximumStrain = campaign.getCampaignOptions().getCombatantStrain();
+        int maximumStrain = campaign.getCampaignOptions().getCombatantStrain() * getCombinedSkillValues(campaign);
 
-        int skillLevel = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_COMMAND, SkillType.S_ADMIN)
-                .getSkill(SkillType.S_ADMIN)
-                .getLevel();
+        if (maximumStrain != 0) {
+            return combatants / maximumStrain;
+        } else {
+            return combatants;
+        }
+    }
 
-        return (maximumStrain * skillLevel) / combatants;
+    /**
+     * Calculates the combined skill values of active Admin/HR personnel.
+     *
+     * @param campaign the campaign for which to calculate the combined skill values
+     * @return the combined skill values of active Admin/HR personnel in the campaign
+     */
+    private static int getCombinedSkillValues(Campaign campaign) {
+        int combinedSkillValues = 0;
+
+        for (Person person : campaign.getActivePersonnel()) {
+            if ((!person.getPrisonerStatus().isPrisoner()) || (!person.getPrisonerStatus().isPrisonerDefector())) {
+                if (person.getPrimaryRole().isAdministratorHR()) {
+                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getFinalSkillValue();
+                } else if (person.getSecondaryRole().isAdministratorHR()) {
+                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getFinalSkillValue();
+                }
+            }
+        }
+        return combinedSkillValues;
     }
 
     /**
@@ -361,17 +387,45 @@ public class RetirementDefectionTracker {
      */
     private int getNonCombatantStrainModifier(Campaign campaign) {
         int nonCombatants = (int) campaign.getActivePersonnel().stream()
-                .filter(person -> !person.getPrimaryRole().isCivilian() && person.getPrisonerStatus().isFree() && person.getUnit() == null)
-                .filter(person -> (!person.getPrimaryRole().isAstech()) && (!person.getPrimaryRole().isMedic()))
+                .filter(person -> (!person.getPrimaryRole().isCivilian()) && (!person.getPrisonerStatus().isPrisoner()) && (!person.getPrisonerStatus().isPrisonerDefector()))
+                .filter(person -> (!person.getPrimaryRole().isMedic()) && (!person.getPrimaryRole().isAstech()))
                 .count();
 
-        int maximumStrain = campaign.getCampaignOptions().getNonCombatantStrain();
+        int maximumStrain = campaign.getCampaignOptions().getNonCombatantStrain() * getCombinedSkillValues(campaign);
 
-        int skillLevel = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN)
-                .getSkill(SkillType.S_ADMIN)
-                .getLevel();
+        if (maximumStrain != 0) {
+            return nonCombatants / maximumStrain;
+        } else {
+            return nonCombatants;
+        }
+    }
 
-        return (maximumStrain * skillLevel) / nonCombatants;
+    /**
+     * Returns a difficulty modifier based on the turnover difficulty campaign setting.
+     *
+     * @param campaign the current campaign
+     * @return the difficulty modifier as an integer value
+     */
+    private static Integer getDifficultyModifier(Campaign campaign) {
+        switch (campaign.getCampaignOptions().getTurnoverDifficulty()) {
+            case NONE:
+            case ULTRA_GREEN:
+                return -2;
+            case GREEN:
+                return -1;
+            case REGULAR:
+                return 0;
+            case VETERAN:
+                return 1;
+            case ELITE:
+                return 2;
+            case HEROIC:
+                return 3;
+            case LEGENDARY:
+                return 4;
+            default:
+                return 0;
+        }
     }
 
     /**
@@ -383,19 +437,27 @@ public class RetirementDefectionTracker {
     private static Integer getBaseTargetNumber(Campaign campaign) {
         try {
             if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
-                return campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN)
-                        .getSkill(SkillType.S_ADMIN)
-                        .getFinalSkillValue();
+                Person bestInRole = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
+
+                int skillRating = bestInRole.getSkill(SkillType.S_ADMIN).getFinalSkillValue();
+                int difficulty = getDifficultyModifier(campaign);
+                int targetNumber = bestInRole.getSkill(SkillType.S_ADMIN).getType().getTarget();
+
+                return targetNumber - skillRating - difficulty;
             } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
-                return campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_NEG)
-                        .getSkill(SkillType.S_NEG)
-                        .getFinalSkillValue();
+                Person bestInRole = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_NEG);
+
+                int skillRating = bestInRole.getSkill(SkillType.S_NEG).getFinalSkillValue();
+                int difficulty = getDifficultyModifier(campaign);
+                int targetNumber = bestInRole.getSkill(SkillType.S_NEG).getType().getTarget();
+
+                return targetNumber - skillRating - difficulty;
             } else {
                 return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
             }
         // this means there isn't someone in the campaign with the relevant skill or role
         } catch (Exception e) {
-            return 13;
+            return 12;
         }
     }
 

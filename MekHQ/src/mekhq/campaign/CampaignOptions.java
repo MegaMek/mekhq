@@ -253,6 +253,7 @@ public class CampaignOptions {
     private boolean useRetirementDateTracking;
     private boolean useRandomRetirement;
     private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
+    private SkillLevel turnoverDifficulty;
     private Integer turnoverFixedTargetNumber;
     private boolean useYearEndRandomRetirement;
     private boolean useContractCompletionRandomRetirement;
@@ -275,6 +276,7 @@ public class CampaignOptions {
 
     private boolean useAdministrativeStrain;
     private Integer combatantStrain;
+    private Integer multiCrewStrainDivider;
     private Integer nonCombatantStrain;
 
     private boolean useShareSystem;
@@ -739,6 +741,7 @@ public class CampaignOptions {
         setUseRetirementDateTracking(false);
         setUseRandomRetirement(true);
         setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.NEGOTIATION);
+        setTurnoverDifficulty(SkillLevel.REGULAR);
         setTurnoverFixedTargetNumber(3);
         setUseYearEndRandomRetirement(true);
         setUseContractCompletionRandomRetirement(true);
@@ -760,8 +763,9 @@ public class CampaignOptions {
         setPayoutServiceBonusRate(10);
 
         setUseAdministrativeStrain(true);
-        setCombatantStrain(12);
-        setNonCombatantStrain(24);
+        setCombatantStrain(2);
+        setMultiCrewStrainDivider(5);
+        setNonCombatantStrain(3);
 
         setUseShareSystem(false);
         setSharesExcludeLargeCraft(true);
@@ -1646,6 +1650,14 @@ public class CampaignOptions {
         this.turnoverTargetNumberMethod = turnoverTargetNumberMethod;
     }
 
+    public SkillLevel getTurnoverDifficulty() {
+        return turnoverDifficulty;
+    }
+
+    public void setTurnoverDifficulty (final SkillLevel turnoverDifficulty) {
+        this.turnoverDifficulty = turnoverDifficulty;
+    }
+
     public boolean isUseYearEndRandomRetirement() {
         return useYearEndRandomRetirement;
     }
@@ -1796,6 +1808,14 @@ public class CampaignOptions {
 
     public void setCombatantStrain(final Integer combatantStrain) {
         this.combatantStrain = combatantStrain;
+    }
+
+    public Integer getMultiCrewStrainDivider() {
+        return multiCrewStrainDivider;
+    }
+
+    public void setMultiCrewStrainDivider(final Integer multiCrewStrainDivider) {
+        this.multiCrewStrainDivider = multiCrewStrainDivider;
     }
 
     public Integer getNonCombatantStrain() {
@@ -4102,6 +4122,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRetirementDateTracking", isUseRetirementDateTracking());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomRetirement", isUseRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverTargetNumberMethod", getTurnoverTargetNumberMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverDifficulty", getTurnoverDifficulty().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverBaseTn", getTurnoverFixedTargetNumber());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
@@ -4115,7 +4137,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMissionStatusModifiers", isUseMissionStatusModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
 
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverBaseTn", getTurnoverFixedTargetNumber());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateOfficer", getPayoutRateOfficer());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateEnlisted", getPayoutRateEnlisted());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRetirementMultiplier", getPayoutRetirementMultiplier());
@@ -4124,6 +4145,7 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdministrativeStrain", isUseAdministrativeStrain());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatantStrain", getCombatantStrain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiCrewStrainDivider", getMultiCrewStrainDivider());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nonCombatantStrain", getNonCombatantStrain());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", isUseShareSystem());
@@ -4754,6 +4776,10 @@ public class CampaignOptions {
                     retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverTargetNumberMethod")) {
                     retVal.setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverDifficulty")) {
+                    retVal.setTurnoverDifficulty(SkillLevel.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
+                    retVal.setTurnoverFixedTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useYearEndRandomRetirement")) {
                     retVal.setUseYearEndRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useContractCompletionRandomRetirement")) {
@@ -4776,8 +4802,6 @@ public class CampaignOptions {
                     retVal.setUseMissionStatusModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
                     retVal.setTrackUnitFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
-                    retVal.setTurnoverFixedTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateOfficer")) {
                     retVal.setPayoutRateOfficer(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateEnlisted")) {
@@ -4792,6 +4816,8 @@ public class CampaignOptions {
                     retVal.setUseAdministrativeStrain(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatantStrain")) {
                     retVal.setCombatantStrain(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("multiCrewStrainDivider")) {
+                    retVal.setMultiCrewStrainDivider(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("nonCombatantStrain")) {
                     retVal.setNonCombatantStrain(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
