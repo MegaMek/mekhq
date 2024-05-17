@@ -161,7 +161,6 @@ public class RetirementDefectionTracker {
             // Skill Rating modifier
             if (campaign.getCampaignOptions().isUseSkillModifiers()) {
                 int skillRating;
-                String skillRatingDescription;
 
                 try {
                     skillRating = person.getExperienceLevel(campaign, true);
