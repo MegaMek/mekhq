@@ -275,9 +275,8 @@ public class CampaignOptions {
     private boolean trackUnitFatigue;
 
     private boolean useAdministrativeStrain;
-    private Integer combatantStrain;
+    private Integer administrativeStrain;
     private Integer multiCrewStrainDivider;
-    private Integer nonCombatantStrain;
 
     private boolean useShareSystem;
     private boolean sharesExcludeLargeCraft;
@@ -763,9 +762,8 @@ public class CampaignOptions {
         setPayoutServiceBonusRate(10);
 
         setUseAdministrativeStrain(true);
-        setCombatantStrain(2);
+        setAdministrativeStrain(10);
         setMultiCrewStrainDivider(5);
-        setNonCombatantStrain(3);
 
         setUseShareSystem(false);
         setSharesExcludeLargeCraft(true);
@@ -1802,12 +1800,12 @@ public class CampaignOptions {
         this.useAdministrativeStrain = useAdministrativeStrain;
     }
 
-    public Integer getCombatantStrain() {
-        return combatantStrain;
+    public Integer getAdministrativeStrain() {
+        return administrativeStrain;
     }
 
-    public void setCombatantStrain(final Integer combatantStrain) {
-        this.combatantStrain = combatantStrain;
+    public void setAdministrativeStrain(final Integer administrativeStrain) {
+        this.administrativeStrain = administrativeStrain;
     }
 
     public Integer getMultiCrewStrainDivider() {
@@ -1816,14 +1814,6 @@ public class CampaignOptions {
 
     public void setMultiCrewStrainDivider(final Integer multiCrewStrainDivider) {
         this.multiCrewStrainDivider = multiCrewStrainDivider;
-    }
-
-    public Integer getNonCombatantStrain() {
-        return nonCombatantStrain;
-    }
-
-    public void setNonCombatantStrain(final Integer nonCombatantStrain) {
-        this.nonCombatantStrain = nonCombatantStrain;
     }
     //endregion Retirement
 
@@ -4144,9 +4134,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutServiceBonusRate", getPayoutServiceBonusRate());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdministrativeStrain", isUseAdministrativeStrain());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatantStrain", getCombatantStrain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "administrativeStrain", getAdministrativeStrain());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiCrewStrainDivider", getMultiCrewStrainDivider());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "nonCombatantStrain", getNonCombatantStrain());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", isUseShareSystem());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", isSharesExcludeLargeCraft());
@@ -4814,12 +4803,10 @@ public class CampaignOptions {
                     retVal.setPayoutServiceBonusRate(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAdministrativeStrain")) {
                     retVal.setUseAdministrativeStrain(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("combatantStrain")) {
-                    retVal.setCombatantStrain(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("administrativeStrain")) {
+                    retVal.setAdministrativeStrain(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("multiCrewStrainDivider")) {
                     retVal.setMultiCrewStrainDivider(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("nonCombatantStrain")) {
-                    retVal.setNonCombatantStrain(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
                     retVal.setUseShareSystem(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {

@@ -27,9 +27,15 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import static mekhq.campaign.personnel.RetirementDefectionTracker.getAdministrativeStrain;
+import static mekhq.campaign.personnel.RetirementDefectionTracker.getAdministrativeStrainModifier;
+import static mekhq.campaign.personnel.RetirementDefectionTracker.getCombinedSkillValues;
 
 /**
  * calculates and stores summary information on a campaign for use in reporting, mostly for the command center
@@ -275,5 +281,33 @@ public class CampaignSummary {
         }
 
         return percentTransported + "% bay capacity" + dropshipAppend;
+    }
+
+    /**
+     * Generates an administrative capacity report for the Command Center.
+     *
+     * @param campaign the campaign for which the administrative capacity report is generated
+     * @return the administrative capacity report in HTML format
+     */
+    public String getAdministrativeCapacityReport(Campaign campaign) {
+        int combinedSkillValues = getCombinedSkillValues(campaign);
+
+        StringBuilder administrativeCapacityReport = new StringBuilder("<html> ")
+                .append(getAdministrativeStrain(campaign)).append(" / ")
+                .append(campaign.getCampaignOptions().getAdministrativeStrain() * combinedSkillValues)
+                .append(" personnel");
+
+        if (getAdministrativeStrainModifier(campaign) > 0) {
+            administrativeCapacityReport
+                    .append(" (+")
+                    .append(getAdministrativeStrainModifier(campaign))
+                    .append(')');
+        }
+
+        return administrativeCapacityReport.toString();
+    }
+
+    private String createCsv(Collection<?> coll) {
+        return StringUtils.join(coll, ",");
     }
 }

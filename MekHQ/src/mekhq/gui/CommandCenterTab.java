@@ -22,8 +22,8 @@ import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.common.MechSummaryCache;
 import megamek.common.event.Subscribe;
-import mekhq.MekHQ;
 import mekhq.MHQOptionsChangedEvent;
+import mekhq.MekHQ;
 import mekhq.campaign.event.*;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
@@ -46,7 +46,6 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -66,6 +65,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblRepairStatus;
     private JLabel lblTransportCapacity;
     private JLabel lblCargoSummary;
+    private JLabel lblAdminstrativeCapacity;
 
     // objectives panel
     private JPanel panObjectives;
@@ -243,6 +243,22 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblPersonnel, gridBagConstraints);
+
+        if (getCampaign().getCampaignOptions().isUseAdministrativeStrain()) {
+            JLabel lblAdministrativeCapacityHead = new JLabel(resourceMap.getString("lblAdministrativeCapacity.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(1, 5, 1, 5);
+            panInfo.add(lblAdministrativeCapacityHead, gridBagConstraints);
+            lblAdminstrativeCapacity = new JLabel(getCampaign().getCampaignSummary().getAdministrativeCapacityReport(getCampaign()));
+            lblAdministrativeCapacityHead.setLabelFor(lblAdminstrativeCapacity);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.weightx = 1.0;
+            panInfo.add(lblAdminstrativeCapacity, gridBagConstraints);
+        }
 
         JLabel lblCompositionHead = new JLabel(resourceMap.getString("lblComposition.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -514,6 +530,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport());
         lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());
         lblTransportCapacity.setText(getCampaign().getCampaignSummary().getTransportCapacity());
+        lblAdminstrativeCapacity.setText(getCampaign().getCampaignSummary().getAdministrativeCapacityReport(getCampaign()));
     }
 
     private void refreshObjectives() {

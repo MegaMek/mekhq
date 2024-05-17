@@ -291,12 +291,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel unitCohesionPanel;
     private JPanel administrativeStrainPanel;
     private JCheckBox chkUseAdministrativeStrain;
-    private JLabel lblCombatantStrain;
-    private JSpinner spnCombatantStrain;
+    private JLabel lblAdministrativeStrain;
+    private JSpinner spnAdministrativeStrain;
     private JLabel lblMultiCrewStrainDivider;
     private JSpinner spnMultiCrewStrainDivider;
-    private JLabel lblNonCombatantStrain;
-    private JSpinner spnNonCombatantStrain;
 
     private JPanel sharesPanel;
     private JCheckBox chkUseShareSystem;
@@ -3661,12 +3659,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             comboTurnoverDifficulty.setEnabled(isEnabled
                     && !comboTurnoverTargetNumberMethod.getSelectedItem().isFixed());
 
-            lblCombatantStrain.setEnabled(isEnabled && chkUseAdministrativeStrain.isSelected());
-            spnCombatantStrain.setEnabled(isEnabled && chkUseAdministrativeStrain.isSelected());
+            lblAdministrativeStrain.setEnabled(isEnabled && chkUseAdministrativeStrain.isSelected());
+            spnAdministrativeStrain.setEnabled(isEnabled && chkUseAdministrativeStrain.isSelected());
             lblMultiCrewStrainDivider.setEnabled(isEnabled && chkUseAdministrativeStrain.isSelected());
             spnMultiCrewStrainDivider.setEnabled(isEnabled && chkUseAdministrativeStrain.isSelected());
-            lblNonCombatantStrain.setEnabled(isEnabled && chkUseAdministrativeStrain.isSelected());
-            spnNonCombatantStrain.setEnabled(isEnabled && chkUseAdministrativeStrain.isSelected());
         });
 
         // Random Turnover Panel Handlers
@@ -4015,13 +4011,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createAdministrativeStrainPanel() {
-        lblCombatantStrain = new JLabel(resources.getString("lblCombatantStrain.text"));
-        lblCombatantStrain.setToolTipText(resources.getString("lblCombatantStrain.toolTipText"));
-        lblCombatantStrain.setName("lblCombatantStrain");
+        lblAdministrativeStrain = new JLabel(resources.getString("lblAdministrativeStrain.text"));
+        lblAdministrativeStrain.setToolTipText(resources.getString("lblAdministrativeStrain.toolTipText"));
+        lblAdministrativeStrain.setName("lblAdministrativeStrain");
 
-        spnCombatantStrain = new JSpinner(new SpinnerNumberModel(12, 1, 120, 1));
-        spnCombatantStrain.setToolTipText(resources.getString("lblCombatantStrain.toolTipText"));
-        spnCombatantStrain.setName("spnCombatantStrain");
+        spnAdministrativeStrain = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
+        spnAdministrativeStrain.setToolTipText(resources.getString("lblAdministrativeStrain.toolTipText"));
+        spnAdministrativeStrain.setName("spnAdministrativeStrain");
 
         lblMultiCrewStrainDivider = new JLabel(resources.getString("lblMultiCrewStrainDivider.text"));
         lblMultiCrewStrainDivider.setToolTipText(resources.getString("lblMultiCrewStrainDivider.toolTipText"));
@@ -4029,15 +4025,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         spnMultiCrewStrainDivider = new JSpinner(new SpinnerNumberModel(5, 1, 100, 1));
         spnMultiCrewStrainDivider.setToolTipText(resources.getString("lblMultiCrewStrainDivider.toolTipText"));
-        spnMultiCrewStrainDivider.setName("spnCombatantStrain");
-
-        lblNonCombatantStrain = new JLabel(resources.getString("lblNonCombatantStrain.text"));
-        lblNonCombatantStrain.setToolTipText(resources.getString("lblNonCombatantStrain.toolTipText"));
-        lblNonCombatantStrain.setName("lblNonCombatantStrain");
-
-        spnNonCombatantStrain = new JSpinner(new SpinnerNumberModel(12, 1, 120, 1));
-        spnNonCombatantStrain.setToolTipText(resources.getString("lblNonCombatantStrain.toolTipText"));
-        spnNonCombatantStrain.setName("spnNonCombatantStrain");
+        spnMultiCrewStrainDivider.setName("spnMultiCrewStrainDivider");
 
         administrativeStrainPanel = new JDisableablePanel("administrativeStrainPanel");
         administrativeStrainPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("administrativeStrainPanel.title")));
@@ -4050,27 +4038,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblCombatantStrain)
-                                .addComponent(spnCombatantStrain, Alignment.LEADING))
+                                .addComponent(lblAdministrativeStrain)
+                                .addComponent(spnAdministrativeStrain, Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblMultiCrewStrainDivider)
                                 .addComponent(spnMultiCrewStrainDivider, Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblNonCombatantStrain)
-                                .addComponent(spnNonCombatantStrain, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblCombatantStrain)
-                                .addComponent(spnCombatantStrain))
+                                .addComponent(lblAdministrativeStrain)
+                                .addComponent(spnAdministrativeStrain))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblMultiCrewStrainDivider)
                                 .addComponent(spnMultiCrewStrainDivider))
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblNonCombatantStrain)
-                                .addComponent(spnNonCombatantStrain))
         );
 
         return administrativeStrainPanel;
@@ -7167,8 +7149,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPayoutServiceBonusRate.setValue(options.getPayoutServiceBonusRate());
 
         chkUseAdministrativeStrain.setSelected(options.isUseAdministrativeStrain());
-        spnCombatantStrain.setValue(options.getCombatantStrain());
-        spnNonCombatantStrain.setValue(options.getNonCombatantStrain());
+        spnAdministrativeStrain.setValue(options.getAdministrativeStrain());
 
         chkUseShareSystem.setSelected(options.isUseShareSystem());
         chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
@@ -7792,8 +7773,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setPayoutServiceBonusRate((Integer) spnPayoutServiceBonusRate.getValue());
 
             options.setUseAdministrativeStrain(chkUseAdministrativeStrain.isSelected());
-            options.setCombatantStrain((Integer) spnCombatantStrain.getValue());
-            options.setNonCombatantStrain((Integer) spnNonCombatantStrain.getValue());
+            options.setAdministrativeStrain((Integer) spnAdministrativeStrain.getValue());
 
             options.setUseShareSystem(chkUseShareSystem.isSelected());
             options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());

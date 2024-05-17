@@ -298,15 +298,10 @@ public class RetirementDefectionTracker {
 
             // Administrative Strain Modifiers
             if (campaign.getCampaignOptions().isUseAdministrativeStrain()) {
-                int combatantStrainModifier = getCombatantStrainModifier(campaign);
-                int nonCombatantStrainModifier = getNonCombatantStrainModifier(campaign);
+                int administrativeStrainModifier = getAdministrativeStrainModifier(campaign);
 
-                if ((combatantStrainModifier > 0) && (person.getUnit() != null)) {
-                    targetNumber.addModifier(combatantStrainModifier, resources.getString("administrativeStrain.text"));
-                }
-
-                if ((nonCombatantStrainModifier > 0) && (person.getUnit() == null)) {
-                    targetNumber.addModifier(nonCombatantStrainModifier, resources.getString("administrativeStrain.text"));
+                if ((administrativeStrainModifier > 0) && (person.getUnit() != null)) {
+                    targetNumber.addModifier(administrativeStrainModifier, resources.getString("administrativeStrain.text"));
                 }
             }
 
@@ -326,8 +321,26 @@ public class RetirementDefectionTracker {
      * @param campaign the campaign for which to calculate the strain modifier
      * @return the strain modifier
      */
-    private static int getCombatantStrainModifier(Campaign campaign) {
-        int combatants = 0;
+    public static int getAdministrativeStrainModifier(Campaign campaign) {
+        int personnel = getAdministrativeStrain(campaign);
+
+        int maximumStrain = campaign.getCampaignOptions().getAdministrativeStrain() * getCombinedSkillValues(campaign);
+
+        if (maximumStrain != 0) {
+            return personnel / maximumStrain;
+        } else {
+            return personnel;
+        }
+    }
+
+    /**
+     * Calculates the administrative strain for a given campaign.
+     *
+     * @param campaign the campaign for which to calculate the administrative strain
+     * @return the total administrative strain of the campaign
+     */
+    public static int getAdministrativeStrain(Campaign campaign) {
+        int personnel = 0;
         int proto = 0;
 
         for (Person person : campaign.getActivePersonnel()) {
@@ -335,27 +348,31 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            // personnel without a unit are treated as non-combatants
             if (person.getUnit() != null) {
                 if (person.getUnit().isCommander(person)) {
                     if (person.getUnit().getEntity().isProtoMek()) {
                         proto++;
                     } else {
-                        combatants += Math.max(1, person.getUnit().getCrew().size() / campaign.getCampaignOptions().getMultiCrewStrainDivider());
+                        personnel += Math.max(1, person.getUnit().getCrew().size() / campaign.getCampaignOptions().getMultiCrewStrainDivider());
                     }
                 }
+            } else {
+                if ((person.getPrimaryRole().isAstech()) && person.getSecondaryRole().isNone()) {
+                    continue;
+                } else if ((person.getPrimaryRole().isMedic()) && person.getSecondaryRole().isNone()) {
+                    continue;
+                } else if ((person.getPrimaryRole().isMedic()) && person.getSecondaryRole().isAstech()) {
+                    continue;
+                } else if ((person.getPrimaryRole().isAstech()) && person.getSecondaryRole().isMedic()) {
+                    continue;
+                }
+
+                personnel++;
             }
         }
 
-        combatants += proto / campaign.getCampaignOptions().getMultiCrewStrainDivider();
-
-        int maximumStrain = campaign.getCampaignOptions().getCombatantStrain() * getCombinedSkillValues(campaign);
-
-        if (maximumStrain != 0) {
-            return combatants / maximumStrain;
-        } else {
-            return combatants;
-        }
+        personnel += proto / campaign.getCampaignOptions().getMultiCrewStrainDivider();
+        return personnel;
     }
 
     /**
@@ -364,40 +381,21 @@ public class RetirementDefectionTracker {
      * @param campaign the campaign for which to calculate the combined skill values
      * @return the combined skill values of active Admin/HR personnel in the campaign
      */
-    private static int getCombinedSkillValues(Campaign campaign) {
+    public static int getCombinedSkillValues(Campaign campaign) {
         int combinedSkillValues = 0;
 
         for (Person person : campaign.getActivePersonnel()) {
             if ((!person.getPrisonerStatus().isPrisoner()) || (!person.getPrisonerStatus().isPrisonerDefector())) {
                 if (person.getPrimaryRole().isAdministratorHR()) {
-                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getFinalSkillValue();
+                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getLevel();
+                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getBonus();
                 } else if (person.getSecondaryRole().isAdministratorHR()) {
-                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getFinalSkillValue();
+                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getLevel();
+                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getBonus();
                 }
             }
         }
         return combinedSkillValues;
-    }
-
-    /**
-     * This method calculates the non-combatant strain modifier based on the active personnel not assigned to units.
-     *
-     * @param campaign the campaign for which to calculate the strain modifier
-     * @return the strain modifier
-     */
-    private int getNonCombatantStrainModifier(Campaign campaign) {
-        int nonCombatants = (int) campaign.getActivePersonnel().stream()
-                .filter(person -> (!person.getPrimaryRole().isCivilian()) && (!person.getPrisonerStatus().isPrisoner()) && (!person.getPrisonerStatus().isPrisonerDefector()))
-                .filter(person -> (!person.getPrimaryRole().isMedic()) && (!person.getPrimaryRole().isAstech()))
-                .count();
-
-        int maximumStrain = campaign.getCampaignOptions().getNonCombatantStrain() * getCombinedSkillValues(campaign);
-
-        if (maximumStrain != 0) {
-            return nonCombatants / maximumStrain;
-        } else {
-            return nonCombatants;
-        }
     }
 
     /**
