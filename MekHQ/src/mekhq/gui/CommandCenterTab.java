@@ -60,12 +60,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblRating;
     private JLabel lblExperience;
     private JLabel lblPersonnel;
+    private JLabel lblAdminstrativeCapacity;
     private JLabel lblMissionSuccess;
+    private JLabel lblFatigue;
     private JLabel lblComposition;
     private JLabel lblRepairStatus;
     private JLabel lblTransportCapacity;
     private JLabel lblCargoSummary;
-    private JLabel lblAdminstrativeCapacity;
 
     // objectives panel
     private JPanel panObjectives;
@@ -202,6 +203,23 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblRating, gridBagConstraints);
+
+        if(getCampaign().getCampaignOptions().isTrackUnitFatigue()) {
+            JLabel lblFatigueHead = new JLabel(resourceMap.getString("lblFatigue.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(1, 5, 1, 5);
+            panInfo.add(lblFatigueHead, gridBagConstraints);
+            lblFatigue = new JLabel(getCampaign().getCampaignSummary().getFatigueReport());
+            lblFatigueHead.setLabelFor(lblFatigue);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.weightx = 1.0;
+            panInfo.add(lblFatigue, gridBagConstraints);
+        }
+
         JLabel lblExperienceHead = new JLabel(resourceMap.getString("lblExperience.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -523,6 +541,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         getCampaign().getUnitRating().reInitialize();
         getCampaign().getCampaignSummary().updateInformation();
         lblRating.setText(getCampaign().getUnitRatingText());
+        lblFatigue.setText(getCampaign().getCampaignSummary().getFatigueReport());
         lblPersonnel.setText(getCampaign().getCampaignSummary().getPersonnelReport());
         lblMissionSuccess.setText(getCampaign().getCampaignSummary().getMissionSuccessReport());
         lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());

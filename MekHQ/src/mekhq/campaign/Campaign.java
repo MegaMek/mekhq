@@ -3169,7 +3169,6 @@ public class Campaign implements ITechManager {
             fatigueLevel -= 2;
         }
         fatigueLevel = Math.max(fatigueLevel, 0);
-        addReport("Your fatigue level is: " + fatigueLevel);
     }
 
     private void processNewDayATB() {

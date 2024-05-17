@@ -240,6 +240,15 @@ public class CampaignSummary {
     }
 
     /**
+     * Retrieves the fatigue report for the campaign.
+     *
+     * @return The fatigue report as a string.
+     */
+    public String getFatigueReport() {
+        return campaign.getFatigueLevel() + " (+" + campaign.getFatigueLevel() / 10 + ')';
+    }
+
+    /**
      * A report that gives the percentage of successful missions
      * @return a <code>String</code> of the report
      */
@@ -292,7 +301,7 @@ public class CampaignSummary {
     public String getAdministrativeCapacityReport(Campaign campaign) {
         int combinedSkillValues = getCombinedSkillValues(campaign);
 
-        StringBuilder administrativeCapacityReport = new StringBuilder("<html> ")
+        StringBuilder administrativeCapacityReport = new StringBuilder()
                 .append(getAdministrativeStrain(campaign)).append(" / ")
                 .append(campaign.getCampaignOptions().getAdministrativeStrain() * combinedSkillValues)
                 .append(" personnel");
