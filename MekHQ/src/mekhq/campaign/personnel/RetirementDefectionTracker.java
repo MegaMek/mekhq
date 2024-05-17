@@ -361,8 +361,9 @@ public class RetirementDefectionTracker {
      */
     private int getNonCombatantStrainModifier(Campaign campaign) {
         int nonCombatants = (int) campaign.getActivePersonnel().stream()
-                .filter(person -> !person.getPrimaryRole().isCivilian() && person.getPrisonerStatus().isFree())
-                .filter(person -> person.getUnit() == null).count();
+                .filter(person -> !person.getPrimaryRole().isCivilian() && person.getPrisonerStatus().isFree() && person.getUnit() == null)
+                .filter(person -> (!person.getPrimaryRole().isAstech()) && (!person.getPrimaryRole().isMedic()))
+                .count();
 
         int maximumStrain = campaign.getCampaignOptions().getNonCombatantStrain();
 
