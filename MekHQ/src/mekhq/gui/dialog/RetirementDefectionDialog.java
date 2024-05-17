@@ -167,6 +167,7 @@ public class RetirementDefectionDialog extends JDialog {
             for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
                 cbGroupOverview.addItem(filter);
             }
+
             JPanel panTop = new JPanel();
             panTop.setLayout(new BoxLayout(panTop, BoxLayout.X_AXIS));
             panTop.add(cbGroupOverview);
@@ -650,16 +651,21 @@ public class RetirementDefectionDialog extends JDialog {
         if (null == rdTracker.getRetirees(contract)) {
             return Money.zero();
         }
+
         Money retVal = Money.zero();
+
         for (UUID id : rdTracker.getRetirees(contract)) {
-            if (null == rdTracker.getPayout(id)) {
+            if (rdTracker.getPayout(id) == null) {
                 continue;
             }
+
             if (((RetirementTableModel) retireeTable.getModel()).getAltPayout().containsKey(id)) {
                 retVal = retVal.plus(((RetirementTableModel) retireeTable.getModel()).getAltPayout().get(id));
                 continue;
             }
+
             Money payout = rdTracker.getPayout(id).getPayoutAmount();
+
             /* If no unit is required as part of the payout, the unit is part or all of the
              * final payout.
              */
@@ -667,21 +673,23 @@ public class RetirementDefectionDialog extends JDialog {
                     null != unitAssignments.get(id) &&
                             null != hqView.getCampaign().getUnit(unitAssignments.get(id)))) {
                 payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
-            } else if ((hqView.getCampaign().getCampaignOptions().isUseShareSystem() &&
-                            hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit() &&
-                            hqView.getCampaign().getPerson(id).getOriginalUnitId() == unitAssignments.get(id)) &&
-                    null != hqView.getCampaign().getUnit(unitAssignments.get(id))) {
+            } else if ((hqView.getCampaign().getCampaignOptions().isUseShareSystem()
+                    && hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit()
+                    && Objects.equals(hqView.getCampaign().getPerson(id).getOriginalUnitId(), unitAssignments.get(id)))
+                    && hqView.getCampaign().getUnit(unitAssignments.get(id)) != null) {
                 payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
             }
+
             /*  If using the share system and tracking the original unit,
              * the payout is also reduced by the value of the unit.
              */
-            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem() &&
-                    hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit() &&
-                    hqView.getCampaign().getPerson(id).getOriginalUnitId() == unitAssignments.get(id) &&
-                    null != hqView.getCampaign().getUnit(unitAssignments.get(id))) {
+            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()
+                    && hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit()
+                    && Objects.equals(hqView.getCampaign().getPerson(id).getOriginalUnitId(), unitAssignments.get(id))
+                    && hqView.getCampaign().getUnit(unitAssignments.get(id)) != null) {
                 payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
             }
+
             /* If the unit given in payment is of lower quality than required, pay
              * an additional 3M C-bills per class.
              */
@@ -690,10 +698,12 @@ public class RetirementDefectionDialog extends JDialog {
                         rdTracker.getPayout(id).getWeightClass(),
                         RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id)))));
             }
+
             /* If the pilot has stolen a unit, there is no payout */
             if (rdTracker.getPayout(id).hasStolenUnit() && (null != unitAssignments.get(id))) {
                 payout = Money.zero();
             }
+
             // If the payout is negative just set it to zero
             if (payout.isNegative()) {
                 payout = Money.zero();

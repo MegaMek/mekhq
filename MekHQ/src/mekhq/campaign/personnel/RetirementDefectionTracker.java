@@ -189,7 +189,11 @@ public class RetirementDefectionTracker {
         }
 
         for (Person p : campaign.getActivePersonnel()) {
-            if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed() || (p.isFounder() && !campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
+            if (p.getPrimaryRole().isDependent() || !p.getPrisonerStatus().isFree() || p.isDeployed()) {
+                continue;
+            }
+
+            if ((p.isFounder()) && (!campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
                 continue;
             }
 
@@ -202,34 +206,36 @@ public class RetirementDefectionTracker {
             TargetRoll target = new TargetRoll(getBaseTargetNumber(campaign), "Base");
 
             // Skill Rating modifier
-            int skillRating = p.getExperienceLevel(campaign, false);
-            String skillRatingDescription;
+            if (campaign.getCampaignOptions().isUseSkillModifiers()) {
+                int skillRating = p.getExperienceLevel(campaign, false);
+                String skillRatingDescription;
 
-            switch (skillRating) {
-                case -1:
-                    skillRatingDescription = "Unskilled";
-                    break;
-                case 0:
-                    skillRatingDescription = "Ultra-Green";
-                    break;
-                case 1:
-                    skillRatingDescription = "Green";
-                    break;
-                case 2:
-                    skillRatingDescription = "Regular";
-                    break;
-                case 3:
-                    skillRatingDescription = "Veteran";
-                    break;
-                case 4:
-                    skillRatingDescription = "Elite";
-                    break;
-                default:
-                    skillRatingDescription = "Error, please see log";
-                    LogManager.getLogger().error("RetirementDefectionTracker: Unable to parse skillRating. Returning {}", skillRating);
+                switch (skillRating) {
+                    case -1:
+                        skillRatingDescription = "Unskilled";
+                        break;
+                    case 0:
+                        skillRatingDescription = "Ultra-Green";
+                        break;
+                    case 1:
+                        skillRatingDescription = "Green";
+                        break;
+                    case 2:
+                        skillRatingDescription = "Regular";
+                        break;
+                    case 3:
+                        skillRatingDescription = "Veteran";
+                        break;
+                    case 4:
+                        skillRatingDescription = "Elite";
+                        break;
+                    default:
+                        skillRatingDescription = "Error, please see log";
+                        LogManager.getLogger().error("RetirementDefectionTracker: Unable to parse skillRating. Returning {}", skillRating);
+                }
+
+                target.addModifier(skillRating, skillRatingDescription);
             }
-
-            target.addModifier(skillRating, skillRatingDescription);
 
             // Unit Rating modifier
             if (campaign.getCampaignOptions().isUseUnitRatingModifiers()) {
@@ -237,9 +243,15 @@ public class RetirementDefectionTracker {
                 target.addModifier(unitRatingModifier, "Unit Rating");
             }
 
-            /* Retirement rolls are made before the contract status is set */
-            if ((contract != null) && (contract.getStatus().isFailed() || contract.getStatus().isBreach())) {
-                target.addModifier(1, "Failed mission");
+            // Mission completion status modifiers
+            if ((contract != null) && (campaign.getCampaignOptions().isUseMissionStatusModifiers())) {
+                if (contract.getStatus().isSuccess()) {
+                    target.addModifier(-1, "Recent Success");
+                } else if (contract.getStatus().isFailed()) {
+                    target.addModifier(1, "Recent Failure");
+                } else if (contract.getStatus().isBreach()) {
+                    target.addModifier(2, "Recent Contract Breach");
+                }
             }
 
             // Faction Modifiers
@@ -318,7 +330,7 @@ public class RetirementDefectionTracker {
                     }
                 }
                 if (c != null) {
-                    target.addModifier(-((c.getSharesPct() - 10) / 10), "Shares");
+                    target.addModifier(- (c.getSharesPct() / 10), "Shares");
                 }
             }
 
@@ -362,7 +374,7 @@ public class RetirementDefectionTracker {
             } else {
                 return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
             }
-        // this means there isn't someone in the campaign with the relevant skill
+        // this means there isn't someone in the campaign with the relevant skill or role
         } catch (Exception e) {
             return 13;
         }
@@ -582,14 +594,14 @@ public class RetirementDefectionTracker {
 
         }
 
-        public Payout(final Campaign campaign, final Person person, final Money shareValue,
-                      final boolean killed, final boolean sharesForAll) {
+        public Payout(final Campaign campaign, final Person person, final Money shareValue, final boolean killed, final boolean sharesForAll) {
             calculatePayout(campaign, person, killed, shareValue.isPositive());
 
-            if (shareValue.isPositive()) {
+            if ((shareValue.isPositive()) && (campaign.getCampaignOptions().isUseShareSystem())) {
                 payoutAmount = payoutAmount.plus(shareValue.multipliedBy(person.getNumShares(campaign, sharesForAll)));
             }
 
+            // TODO investigate if these actually do anything
             if (killed) {
                 switch (Compute.d6()) {
                     case 2:
@@ -611,8 +623,7 @@ public class RetirementDefectionTracker {
             }
         }
 
-        private void calculatePayout(final Campaign campaign, final Person person,
-                                     final boolean killed, final boolean shareSystem) {
+        private void calculatePayout(final Campaign campaign, final Person person, final boolean killed, final boolean shareSystem) {
             int roll;
 
             if (killed) {

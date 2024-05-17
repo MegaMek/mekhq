@@ -266,11 +266,17 @@ public class CampaignOptions {
     private Integer payoutServiceBonusRate;
 
     private boolean useCustomRetirementModifiers;
+    private boolean useSkillModifiers;
     private boolean useAgeModifiers;
     private boolean useUnitRatingModifiers;
     private boolean useFactionModifiers;
+    private boolean useMissionStatusModifiers;
     private boolean trackUnitFatigue;
     private boolean useLeadershipModifiers;
+
+    private boolean useShareSystem;
+    private boolean sharesExcludeLargeCraft;
+    private boolean sharesForAll;
 
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
@@ -478,9 +484,6 @@ public class CampaignOptions {
     private SkillLevel skillLevel;
 
     // Unit Administration
-    private boolean useShareSystem;
-    private boolean sharesExcludeLargeCraft;
-    private boolean sharesForAll;
     private boolean aeroRecruitsHaveUnits;
     private boolean trackOriginalUnit;
     private boolean useAero;
@@ -742,8 +745,10 @@ public class CampaignOptions {
         setTrackUnitFatigue(false);
 
         setUseAgeModifiers(true);
+        setUseSkillModifiers(true);
         setUseUnitRatingModifiers(true);
         setUseFactionModifiers(true);
+        setUseMissionStatusModifiers(true);
         setUseLeadershipModifiers(true);
 
         setPayoutRateOfficer(3);
@@ -751,6 +756,10 @@ public class CampaignOptions {
         setPayoutRetirementMultiplier(24);
         setUsePayoutServiceBonus(true);
         setPayoutServiceBonusRate(10);
+
+        setUseShareSystem(false);
+        setSharesExcludeLargeCraft(true);
+        setSharesForAll(false);
 
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
@@ -1021,9 +1030,6 @@ public class CampaignOptions {
         setSkillLevel(SkillLevel.REGULAR);
 
         // Unit Administration
-        useShareSystem = false;
-        sharesExcludeLargeCraft = false;
-        sharesForAll = false;
         aeroRecruitsHaveUnits = false;
         trackOriginalUnit = false;
         useAero = false;
@@ -1730,6 +1736,14 @@ public class CampaignOptions {
         this.payoutServiceBonusRate = payoutServiceBonusRate;
     }
 
+    public boolean isUseSkillModifiers() {
+        return useSkillModifiers;
+    }
+
+    public void setUseSkillModifiers(final boolean useSkillModifiers) {
+        this.useSkillModifiers = useSkillModifiers;
+    }
+
     public boolean isUseAgeModifiers() {
         return useAgeModifiers;
     }
@@ -1752,6 +1766,14 @@ public class CampaignOptions {
 
     public void setUseFactionModifiers(final boolean useFactionModifiers) {
         this.useFactionModifiers = useFactionModifiers;
+    }
+
+    public boolean isUseMissionStatusModifiers() {
+        return useMissionStatusModifiers;
+    }
+
+    public void setUseMissionStatusModifiers(final boolean useMissionStatusModifiers) {
+        this.useMissionStatusModifiers = useMissionStatusModifiers;
     }
 
     public boolean isUseLeadershipModifiers() {
@@ -4064,9 +4086,11 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSubContractSoldiers", isUseSubContractSoldiers());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSkillModifiers", isUseSkillModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAgeModifiers", isUseAgeModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnitRatingModifiers", isUseUnitRatingModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionModifiers", isUseFactionModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMissionStatusModifiers", isUseMissionStatusModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadershipModifiers", isUseLeadershipModifiers());
 
@@ -4076,6 +4100,10 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRetirementMultiplier", getPayoutRetirementMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePayoutServiceBonus", isUsePayoutServiceBonus());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutServiceBonusRate", getPayoutServiceBonusRate());
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", isUseShareSystem());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", isSharesExcludeLargeCraft());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", isSharesForAll());
         //endregion Retirement
 
         //region Family
@@ -4283,9 +4311,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForUsesVTOLs", isOpForUsesVTOLs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", useDropShips);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", useShareSystem);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", sharesExcludeLargeCraft);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", sharesForAll);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", mercSizeLimited);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackOriginalUnit", trackOriginalUnit);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regionalMechVariations", regionalMechVariations);
@@ -4714,12 +4739,16 @@ public class CampaignOptions {
                     retVal.setUseSubContractSoldiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
                     retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useSkillModifiers")) {
+                    retVal.setUseSkillModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAgeModifiers")) {
                     retVal.setUseAgeModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRatingModifiers")) {
                     retVal.setUseUnitRatingModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFactionModifiers")) {
                     retVal.setUseFactionModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMissionStatusModifiers")) {
+                    retVal.setUseMissionStatusModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
                     retVal.setTrackUnitFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useLeadershipModifiers")) {
@@ -4736,6 +4765,12 @@ public class CampaignOptions {
                     retVal.setUsePayoutServiceBonus(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutServiceBonusRate")) {
                     retVal.setPayoutServiceBonusRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
+                    retVal.setUseShareSystem(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
+                    retVal.setSharesExcludeLargeCraft(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
+                    retVal.setSharesForAll(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Retirement
 
                     //region Family
@@ -5159,12 +5194,6 @@ public class CampaignOptions {
                     retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("aeroRecruitsHaveUnits")) {
                     retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
-                    retVal.useShareSystem = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
-                    retVal.sharesExcludeLargeCraft = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
-                    retVal.sharesForAll = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {
                     retVal.trackOriginalUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mercSizeLimited")) {

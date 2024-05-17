@@ -265,13 +265,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseContractCompletionRandomRetirement;
     private JCheckBox chkUseRandomFounderRetirement;
     private JCheckBox chkUseSubContractSoldiers;
+
     private JPanel turnoverModifiersPanel;
     private JCheckBox chkUseCustomRetirementModifiers;
+    private JCheckBox chkUseSkillModifiers;
     private JCheckBox chkUseAgeModifiers;
     private JCheckBox chkUseUnitRatingModifiers;
     private JCheckBox chkUseFactionModifiers;
+    private JCheckBox chkUseMissionStatusModifiers;
     private JCheckBox chkTrackUnitFatigue;
     private JCheckBox chkUseLeadershipModifiers;
+
     private JPanel turnoverPayoutPanel;
     private JLabel lblPayoutRateOfficer;
     private JSpinner spnPayoutRateOfficer;
@@ -282,6 +286,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUsePayoutServiceBonus;
     private JLabel lblPayoutServiceBonusRate;
     private JSpinner spnPayoutServiceBonusRate;
+
+    private JPanel sharesPanel;
+    private JCheckBox chkUseShareSystem;
+    private JCheckBox chkSharesExcludeLargeCraft;
+    private JCheckBox chkSharesForAll;
 
     // Marriage
     private JCheckBox chkUseManualMarriages;
@@ -539,9 +548,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private MMComboBox<SkillLevel> comboSkillLevel;
 
     // unit administration
-    private JCheckBox chkUseShareSystem;
-    private JCheckBox chkSharesExcludeLargeCraft;
-    private JCheckBox chkSharesForAll;
     private JCheckBox chkAeroRecruitsHaveUnits;
     private JCheckBox chkTrackOriginalUnit;
     private JCheckBox chkUseAero;
@@ -2728,27 +2734,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panAtB.add(chkUseStratCon, gridBagConstraints);
 
         // AtB options: "Unit Administration" frame controls
-        chkUseShareSystem = new JCheckBox(resources.getString("chkUseShareSystem.text"));
-        chkUseShareSystem.setToolTipText(resources.getString("chkUseShareSystem.toolTipText"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBAdmin.add(chkUseShareSystem, gridBagConstraints);
-
-        chkSharesExcludeLargeCraft = new JCheckBox(resources.getString("chkSharesExcludeLargeCraft.text"));
-        chkSharesExcludeLargeCraft.setToolTipText(resources.getString("chkSharesExcludeLargeCraft.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkSharesExcludeLargeCraft, gridBagConstraints);
-
-        chkSharesForAll = new JCheckBox(resources.getString("chkSharesForAll.text"));
-        chkSharesForAll.setToolTipText(resources.getString("chkSharesForAll.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkSharesForAll, gridBagConstraints);
-
         chkAeroRecruitsHaveUnits = new JCheckBox(resources.getString("chkAeroRecruitsHaveUnits.text"));
         chkAeroRecruitsHaveUnits.setToolTipText(resources.getString("chkAeroRecruitsHaveUnits.toolTipText"));
         gridBagConstraints.gridy++;
@@ -3633,7 +3618,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRetirementDateTracking.setToolTipText(resources.getString("chkUseRetirementDateTracking.toolTipText"));
         chkUseRetirementDateTracking.setName("chkUseRetirementDateTracking");
 
-        JPanel randomRetirementPanel = createRandomRetirementPanel();
+        randomRetirementPanel = createRandomRetirementPanel();
+        sharesPanel = createSharesPanel();
 
         // global enable
         chkUseRandomRetirement = new JCheckBox(resources.getString("chkUseRandomRetirement.text"));
@@ -3673,6 +3659,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseRetirementDateTracking)
                         .addComponent(chkUseRandomRetirement)
                         .addComponent(randomRetirementPanel)
+                        .addComponent(sharesPanel)
         );
 
         layout.setHorizontalGroup(
@@ -3680,6 +3667,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseRetirementDateTracking)
                         .addComponent(chkUseRandomRetirement)
                         .addComponent(randomRetirementPanel)
+                        .addComponent(sharesPanel)
         );
 
         return panel;
@@ -3798,6 +3786,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseCustomRetirementModifiers.setToolTipText(resources.getString("chkUseCustomRetirementModifiers.toolTipText"));
         chkUseCustomRetirementModifiers.setName("chkUseCustomRetirementModifiers");
 
+        chkUseSkillModifiers = new JCheckBox(resources.getString("chkUseSkillModifiers.text"));
+        chkUseSkillModifiers.setToolTipText(resources.getString("chkUseSkillModifiers.toolTipText"));
+        chkUseSkillModifiers.setName("chkUseSkillModifiers");
+
         chkUseAgeModifiers = new JCheckBox(resources.getString("chkUseAgeModifiers.text"));
         chkUseAgeModifiers.setToolTipText(resources.getString("chkUseAgeModifiers.toolTipText"));
         chkUseAgeModifiers.setName("chkUseAgeModifiers");
@@ -3809,6 +3801,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseFactionModifiers = new JCheckBox(resources.getString("chkUseFactionModifiers.text"));
         chkUseFactionModifiers.setToolTipText(resources.getString("chkUseFactionModifiers.toolTipText"));
         chkUseFactionModifiers.setName("chkUseFactionModifiers");
+
+        chkUseMissionStatusModifiers = new JCheckBox(resources.getString("chkUseMissionStatusModifiers.text"));
+        chkUseMissionStatusModifiers.setToolTipText(resources.getString("chkUseMissionStatusModifiers.toolTipText"));
+        chkUseMissionStatusModifiers.setName("chkUseMissionStatusModifiers");
 
         chkTrackUnitFatigue = new JCheckBox(resources.getString("chkTrackUnitFatigue.text"));
         chkTrackUnitFatigue.setToolTipText(resources.getString("chkTrackUnitFatigue.toolTipText"));
@@ -3829,9 +3825,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseCustomRetirementModifiers)
+                        .addComponent(chkUseSkillModifiers)
                         .addComponent(chkUseAgeModifiers)
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
+                        .addComponent(chkUseMissionStatusModifiers)
                         .addComponent(chkTrackUnitFatigue)
                         .addComponent(chkUseLeadershipModifiers)
         );
@@ -3839,9 +3837,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseCustomRetirementModifiers)
+                        .addComponent(chkUseSkillModifiers)
                         .addComponent(chkUseAgeModifiers)
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
+                        .addComponent(chkUseMissionStatusModifiers)
                         .addComponent(chkTrackUnitFatigue)
                         .addComponent(chkUseLeadershipModifiers)
         );
@@ -3929,6 +3929,52 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         );
 
         return turnoverPayoutPanel;
+    }
+
+    private JPanel createSharesPanel() {
+        chkUseShareSystem = new JCheckBox(resources.getString("chkUseShareSystem.text"));
+        chkUseShareSystem.setToolTipText(resources.getString("chkUseShareSystem.toolTipText"));
+        chkUseShareSystem.setName("chkUseShareSystem");
+        chkUseShareSystem.addActionListener(evt -> {
+            final boolean isEnabled = chkUseShareSystem.isSelected();
+
+            chkSharesExcludeLargeCraft.setEnabled(isEnabled);
+            chkSharesForAll.setEnabled(isEnabled);
+        });
+
+        chkSharesExcludeLargeCraft = new JCheckBox(resources.getString("chkSharesExcludeLargeCraft.text"));
+        chkSharesExcludeLargeCraft.setToolTipText(resources.getString("chkSharesExcludeLargeCraft.toolTipText"));
+        chkSharesExcludeLargeCraft.setName("chkSharesExcludeLargeCraft");
+        chkSharesExcludeLargeCraft.setEnabled(chkUseShareSystem.isSelected());
+
+        chkSharesForAll = new JCheckBox(resources.getString("chkSharesForAll.text"));
+        chkSharesForAll.setToolTipText(resources.getString("chkSharesForAll.toolTipText"));
+        chkSharesForAll.setName("chkSharesForAll");
+        chkSharesForAll.setEnabled(chkUseShareSystem.isSelected());
+
+        sharesPanel = new JDisableablePanel("sharesPanel");
+        sharesPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("sharesPanel.title")));
+
+        final GroupLayout layout = new GroupLayout(sharesPanel);
+        sharesPanel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseShareSystem)
+                        .addComponent(chkSharesExcludeLargeCraft)
+                        .addComponent(chkSharesForAll)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseShareSystem)
+                        .addComponent(chkSharesExcludeLargeCraft)
+                        .addComponent(chkSharesForAll)
+        );
+
+        return sharesPanel;
     }
 
     private JPanel createFamilyPanel() {
@@ -6960,8 +7006,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkTrackUnitFatigue.setSelected(options.isTrackUnitFatigue());
 
         chkUseAgeModifiers.setSelected(options.isUseAgeModifiers());
+        chkUseSkillModifiers.setSelected(options.isUseSkillModifiers());
         chkUseUnitRatingModifiers.setSelected(options.isUseUnitRatingModifiers());
         chkUseFactionModifiers.setSelected(options.isUseFactionModifiers());
+        chkUseMissionStatusModifiers.setSelected(options.isUseMissionStatusModifiers());
         chkUseLeadershipModifiers.setSelected(options.isUseLeadershipModifiers());
 
         spnPayoutRateOfficer.setValue(options.getPayoutRateOfficer());
@@ -6969,6 +7017,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPayoutRetirementMultiplier.setValue(options.getPayoutRetirementMultiplier());
         chkUsePayoutServiceBonus.setSelected(options.isUsePayoutServiceBonus());
         spnPayoutServiceBonusRate.setValue(options.getPayoutServiceBonusRate());
+
+        chkUseShareSystem.setSelected(options.isUseShareSystem());
+        chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
+        chkSharesForAll.setSelected(options.isSharesForAll());
 
         // Family
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
@@ -7284,9 +7336,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
         chkUseStratCon.setSelected(options.isUseStratCon());
         comboSkillLevel.setSelectedItem(options.getSkillLevel());
-        chkUseShareSystem.setSelected(options.isUseShareSystem());
-        chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
-        chkSharesForAll.setSelected(options.isSharesForAll());
         chkAeroRecruitsHaveUnits.setSelected(options.isAeroRecruitsHaveUnits());
         chkTrackOriginalUnit.setSelected(options.isTrackOriginalUnit());
         chkUseAero.setSelected(options.isUseAero());
@@ -7578,8 +7627,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
 
             options.setUseAgeModifiers(chkUseAgeModifiers.isSelected());
+            options.setUseSkillModifiers(chkUseSkillModifiers.isSelected());
             options.setUseUnitRatingModifiers(chkUseUnitRatingModifiers.isSelected());
             options.setUseFactionModifiers(chkUseFactionModifiers.isSelected());
+            options.setUseMissionStatusModifiers(chkUseMissionStatusModifiers.isSelected());
             options.setUseLeadershipModifiers(chkUseLeadershipModifiers.isSelected());
 
             options.setPayoutRateOfficer((Integer) spnPayoutRateOfficer.getValue());
@@ -7587,6 +7638,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setPayoutRetirementMultiplier((Integer) spnPayoutRetirementMultiplier.getValue());
             options.setUsePayoutServiceBonus(chkUsePayoutServiceBonus.isSelected());
             options.setPayoutServiceBonusRate((Integer) spnPayoutServiceBonusRate.getValue());
+
+            options.setUseShareSystem(chkUseShareSystem.isSelected());
+            options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
+            options.setSharesForAll(chkSharesForAll.isSelected());
 
             // Family
             options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
@@ -7748,9 +7803,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseAtB(chkUseAtB.isSelected());
             options.setUseStratCon(chkUseStratCon.isSelected());
             options.setSkillLevel(comboSkillLevel.getSelectedItem());
-            options.setUseShareSystem(chkUseShareSystem.isSelected());
-            options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
-            options.setSharesForAll(chkSharesForAll.isSelected());
             options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
             options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
             options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
