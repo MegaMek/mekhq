@@ -174,25 +174,25 @@ public class RetirementDefectionTracker {
                         targetNumber.addModifier(0, resources.getString("skillRatingUnskilled.text"));
                         break;
                     case ULTRA_GREEN:
-                        targetNumber.addModifier(0, skillRating.name());
+                        targetNumber.addModifier(0, skillRating.toString());
                         break;
                     case GREEN:
-                        targetNumber.addModifier(1, skillRating.name());
+                        targetNumber.addModifier(1, skillRating.toString());
                         break;
                     case REGULAR:
-                        targetNumber.addModifier(2, skillRating.name());
+                        targetNumber.addModifier(2, skillRating.toString());
                         break;
                     case VETERAN:
-                        targetNumber.addModifier(3, skillRating.name());
+                        targetNumber.addModifier(3, skillRating.toString());
                         break;
                     case ELITE:
-                        targetNumber.addModifier(4, skillRating.name());
+                        targetNumber.addModifier(4, skillRating.toString());
                         break;
                     case HEROIC:
-                        targetNumber.addModifier(5, skillRating.name());
+                        targetNumber.addModifier(5, skillRating.toString());
                         break;
                     case LEGENDARY:
-                        targetNumber.addModifier(6, skillRating.name());
+                        targetNumber.addModifier(6, skillRating.toString());
                         break;
                     default:
                         LogManager.getLogger().error("RetirementDefectionTracker: Unable to parse skillRating. Returning {}", skillRating.toString());
@@ -413,8 +413,6 @@ public class RetirementDefectionTracker {
                 return -2;
             case GREEN:
                 return -1;
-            case REGULAR:
-                return 0;
             case VETERAN:
                 return 1;
             case ELITE:
@@ -435,29 +433,56 @@ public class RetirementDefectionTracker {
      * @return the base target number
      */
     private static Integer getBaseTargetNumber(Campaign campaign) {
-        try {
-            if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
-                Person bestInRole = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_ADMIN);
+        int personnelCount = 0;
+        int combinedSkill = 0;
 
-                int skillRating = bestInRole.getSkill(SkillType.S_ADMIN).getFinalSkillValue();
-                int difficulty = getDifficultyModifier(campaign);
-                int targetNumber = bestInRole.getSkill(SkillType.S_ADMIN).getType().getTarget();
 
-                return targetNumber - skillRating - difficulty;
-            } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
-                Person bestInRole = campaign.findBestInRole(PersonnelRole.ADMINISTRATOR_HR, SkillType.S_NEG);
+        if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
+            for (Person person : campaign.getActivePersonnel()) {
+                if ((person.getPrisonerStatus().isPrisoner()) || (person.getPrisonerStatus().isPrisonerDefector())) {
+                    continue;
+                }
 
-                int skillRating = bestInRole.getSkill(SkillType.S_NEG).getFinalSkillValue();
-                int difficulty = getDifficultyModifier(campaign);
-                int targetNumber = bestInRole.getSkill(SkillType.S_NEG).getType().getTarget();
-
-                return targetNumber - skillRating - difficulty;
-            } else {
-                return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
+                if ((person.getPrimaryRole().isAdministratorHR()) || (person.getSecondaryRole().isAdministratorHR())) {
+                    personnelCount++;
+                    combinedSkill += person.getSkill(SkillType.S_NEG).getFinalSkillValue();
+                }
             }
-        // this means there isn't someone in the campaign with the relevant skill or role
-        } catch (Exception e) {
-            return 12;
+
+            if (personnelCount != 0) {
+                combinedSkill = combinedSkill / personnelCount;
+            }
+
+            int difficulty = getDifficultyModifier(campaign);
+
+            Skills skill = new Skills();
+            int targetNumber = skill.getSkill(SkillType.S_ADMIN).getType().getTarget();
+
+            return targetNumber - combinedSkill + difficulty;
+        } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
+            for (Person person : campaign.getActivePersonnel()) {
+                if ((person.getPrisonerStatus().isPrisoner()) || (person.getPrisonerStatus().isPrisonerDefector())) {
+                    continue;
+                }
+
+                if ((person.getPrimaryRole().isAdministratorHR()) || (person.getSecondaryRole().isAdministratorHR())) {
+                    personnelCount++;
+                    combinedSkill += person.getSkill(SkillType.S_ADMIN).getFinalSkillValue();
+                }
+            }
+
+            if (personnelCount != 0) {
+                combinedSkill = combinedSkill / personnelCount;
+            }
+
+            int difficulty = getDifficultyModifier(campaign);
+
+            Skills skill = new Skills();
+            int targetNumber = skill.getSkill(SkillType.S_ADMIN).getType().getTarget();
+
+            return targetNumber - combinedSkill + difficulty;
+        } else {
+            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
         }
     }
 
