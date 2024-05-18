@@ -24,6 +24,7 @@ import megamek.common.UnitType;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
@@ -299,7 +300,7 @@ public class CampaignSummary {
      * @return the administrative capacity report in HTML format
      */
     public String getAdministrativeCapacityReport(Campaign campaign) {
-        int combinedSkillValues = getCombinedSkillValues(campaign);
+        int combinedSkillValues = getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
         StringBuilder administrativeCapacityReport = new StringBuilder()
                 .append(getAdministrativeStrain(campaign)).append(" / ")

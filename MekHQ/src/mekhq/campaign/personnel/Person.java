@@ -2388,6 +2388,36 @@ public class Person {
             return getRankNumeric() > other.getRankNumeric();
         }
     }
+
+    /**
+     * Checks if the current person outranks another person using a skill tiebreaker.
+     * If the other person is null, it is considered that the current person outranks them.
+     * If both persons have the same rank numeric value, the rank level is compared.
+     * If both persons have the same rank numeric value and rank level, the experience levels are compared.
+     *
+     * @param campaign   the campaign used to calculate the experience levels
+     * @param otherPerson the other person to compare ranks with
+     * @return true if the current person outranks the other person, false otherwise
+     */
+    public boolean outRanksUsingSkillTiebreaker(Campaign campaign, @Nullable Person otherPerson) {
+        if (otherPerson == null) {
+            return true;
+        } else if (getRankNumeric() == otherPerson.getRankNumeric()) {
+             if (getRankLevel() > otherPerson.getRankLevel()) {
+                 return true;
+             } else if (getRankLevel() < otherPerson.getRankLevel()) {
+                 return false;
+             } else {
+                 if (getExperienceLevel(campaign, false) == otherPerson.getExperienceLevel(campaign, false)) {
+                     return getExperienceLevel(campaign, true) > otherPerson.getExperienceLevel(campaign, true);
+                 } else {
+                     return getExperienceLevel(campaign, false) > otherPerson.getExperienceLevel(campaign, false);
+                 }
+             }
+        } else {
+            return getRankNumeric() > otherPerson.getRankNumeric();
+        }
+    }
     //endregion Ranks
 
     @Override

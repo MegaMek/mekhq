@@ -23,7 +23,6 @@ package mekhq.campaign.personnel;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
 import megamek.common.options.IOption;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
@@ -63,6 +62,26 @@ public class RetirementDefectionTracker {
     final private Map<UUID, Payout> payouts;
     private LocalDate lastRetirementRoll;
 
+    private static Person asfCommander;
+    private static Integer asfCommanderModifier;
+    private static Person vehicleCrewCommander;
+    private static Integer vehicleCrewCommanderModifier;
+    private static Person infantryCommander;
+    private static Integer infantryCommanderModifier;
+    private static Person navalCommander;
+    private static Integer navalCommanderModifier;
+    private static Person techCommander;
+    private static Integer techCommanderModifier;
+    private static Person medicalCommander;
+    private static Integer medicalCommanderModifier;
+    private static Person administrationCommander;
+    private static Integer administrationCommanderModifier;
+    private static Person mechWarriorCommander;
+    private static Integer mechWarriorCommanderModifier;
+
+    private Integer hrSkill;
+    private Integer difficulty;
+
     private final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionTracker");
 
     public RetirementDefectionTracker() {
@@ -70,60 +89,6 @@ public class RetirementDefectionTracker {
         unresolvedPersonnel = new HashMap<>();
         payouts = new HashMap<>();
         lastRetirementRoll = LocalDate.now();
-    }
-
-    /**
-     * @param campaign the campaign to get share values for
-     * @return The value of each share in C-bills
-     */
-    public static Money getShareValue(Campaign campaign) {
-        if (!campaign.getCampaignOptions().isUseShareSystem()) {
-            return Money.zero();
-        }
-
-        FinancialReport r = FinancialReport.calculate(campaign);
-
-        Money netWorth = r.getNetWorth();
-        if (campaign.getCampaignOptions().isSharesExcludeLargeCraft()) {
-                netWorth = netWorth.minus(r.getLargeCraftValue());
-        }
-
-        int totalShares = campaign.getActivePersonnel()
-                .stream()
-                .mapToInt(p -> p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll()))
-                .sum();
-
-        if (totalShares <= 0) {
-            return Money.zero();
-        }
-
-        return netWorth.dividedBy(totalShares);
-    }
-
-    /**
-     * @param age the age of the employee
-     * @return the age-based modifier
-     */
-    private static int getAgeMod(int age) {
-        int ageMod = 0;
-
-        if (age <= 20) {
-            ageMod = -1;
-        } else if ((age >= 50) && (age < 65)) {
-            ageMod = 1;
-        } else if ((age >= 65) && (age < 75)) {
-            ageMod = 2;
-        } else if ((age >= 75) && (age < 85)) {
-            ageMod = 3;
-        } else if ((age >= 85) && (age < 95)) {
-            ageMod = 4;
-        } else if ((age >= 95) && (age < 105)) {
-            ageMod = 5;
-        } else if (age >= 105) {
-            ageMod = 6;
-        }
-
-        return ageMod;
     }
 
     /**
@@ -135,15 +100,24 @@ public class RetirementDefectionTracker {
      * @param campaign  The campaign to calculate target numbers for
      * @return A map with person ids as key and calculated target roll as value.
      */
-    public Map<UUID, TargetRoll> calculateTargetNumbers(final @Nullable AtBContract contract, final Campaign campaign) {
+    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable AtBContract contract, final Campaign campaign) {
         final Map <UUID, TargetRoll> targets = new HashMap<>();
 
         if (null != contract) {
             rollRequired.add(contract.getId());
         }
 
+        if (!campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isFixed()) {
+            setHrSkill(campaign);
+            getDifficultyModifier(campaign);
+        }
+
+        if (campaign.getCampaignOptions().isUseManagementSkill()) {
+            getManagementSkillValues(campaign);
+        }
+
         for (Person person : campaign.getActivePersonnel()) {
-            if ((person.getPrimaryRole().isDependent()) || (!person.getPrisonerStatus().isFree()) || (person.isDeployed())) {
+            if ((person.getPrimaryRole().isCivilian()) || (!person.getPrisonerStatus().isFree()) || (person.isDeployed())) {
                 continue;
             }
 
@@ -159,43 +133,41 @@ public class RetirementDefectionTracker {
 
             TargetRoll targetNumber = new TargetRoll(getBaseTargetNumber(campaign), resources.getString("base.text"));
 
-            // Skill Rating modifier
+            // Desirability modifier
             if (campaign.getCampaignOptions().isUseSkillModifiers()) {
-                SkillLevel skillRating;
+                targetNumber.addModifier(person.getExperienceLevel(campaign, false), resources.getString("desirability.text"));
+            }
 
-                try {
-                    skillRating = person.getSkillLevel(campaign, false);
-                } catch (Exception e) {
-                    skillRating = SkillLevel.NONE;
+            // Administrative Strain Modifiers
+            if (campaign.getCampaignOptions().isUseAdministrativeStrain()) {
+                int administrativeStrainModifier = getAdministrativeStrainModifier(campaign);
+
+                if (administrativeStrainModifier > 0) {
+                    targetNumber.addModifier(administrativeStrainModifier, resources.getString("administrativeStrain.text"));
+                }
+            }
+
+            // Management Skill Modifier
+            if (campaign.getCampaignOptions().isUseManagementSkill()) {
+                targetNumber.addModifier(getManagementSkillModifier(person), resources.getString("managementSkill.text"));
+            }
+
+            // Shares Modifiers
+            if (campaign.getCampaignOptions().isUseShareSystem()) {
+                // If this retirement roll is not being made at the end of a contract (e.g. >12 months since last roll),
+                // the share percentage should still apply.
+                // In the case of multiple active contracts, pick the one with the best percentage.
+                AtBContract c = contract;
+                if (c == null) {
+                    for (AtBContract atBContract : campaign.getActiveAtBContracts()) {
+                        if ((c == null) || (c.getSharesPct() < atBContract.getSharesPct())) {
+                            c = atBContract;
+                        }
+                    }
                 }
 
-                switch (skillRating) {
-                    case NONE:
-                        targetNumber.addModifier(0, resources.getString("skillRatingUnskilled.text"));
-                        break;
-                    case ULTRA_GREEN:
-                        targetNumber.addModifier(0, skillRating.toString());
-                        break;
-                    case GREEN:
-                        targetNumber.addModifier(1, skillRating.toString());
-                        break;
-                    case REGULAR:
-                        targetNumber.addModifier(2, skillRating.toString());
-                        break;
-                    case VETERAN:
-                        targetNumber.addModifier(3, skillRating.toString());
-                        break;
-                    case ELITE:
-                        targetNumber.addModifier(4, skillRating.toString());
-                        break;
-                    case HEROIC:
-                        targetNumber.addModifier(5, skillRating.toString());
-                        break;
-                    case LEGENDARY:
-                        targetNumber.addModifier(6, skillRating.toString());
-                        break;
-                    default:
-                        LogManager.getLogger().error("RetirementDefectionTracker: Unable to parse skillRating. Returning {}", skillRating.toString());
+                if (c != null) {
+                    targetNumber.addModifier(- (c.getSharesPct() / 10), resources.getString("shares.text"));
                 }
             }
 
@@ -203,6 +175,11 @@ public class RetirementDefectionTracker {
             if (campaign.getCampaignOptions().isUseUnitRatingModifiers()) {
                 int unitRatingModifier = getUnitRatingModifier(campaign);
                 targetNumber.addModifier(unitRatingModifier, resources.getString("unitRating.text"));
+            }
+
+            // Fatigue Modifiers
+            if (campaign.getCampaignOptions().isTrackUnitFatigue()) {
+                targetNumber.addModifier(campaign.getFatigueLevel() / 10, resources.getString("fatigue.text"));
             }
 
             // Mission completion status modifiers
@@ -276,43 +253,239 @@ public class RetirementDefectionTracker {
                 targetNumber.addModifier(2, resources.getString("founder.text"));
             }
 
-            // Shares Modifiers
-            if (campaign.getCampaignOptions().isUseShareSystem()) {
-                /* If this retirement roll is not being made at the end
-                 * of a contract (e.g. >12 months since last roll), the
-                 * share percentage should still apply. In the case of multiple
-                 * active contracts, pick the one with the best percentage.
-                 */
-                AtBContract c = contract;
-                if (c == null) {
-                    for (AtBContract atBContract : campaign.getActiveAtBContracts()) {
-                        if ((c == null) || (c.getSharesPct() < atBContract.getSharesPct())) {
-                            c = atBContract;
-                        }
-                    }
-                }
-                if (c != null) {
-                    targetNumber.addModifier(- (c.getSharesPct() / 10), resources.getString("shares.text"));
-                }
-            }
-
-            // Administrative Strain Modifiers
-            if (campaign.getCampaignOptions().isUseAdministrativeStrain()) {
-                int administrativeStrainModifier = getAdministrativeStrainModifier(campaign);
-
-                if ((administrativeStrainModifier > 0) && (person.getUnit() != null)) {
-                    targetNumber.addModifier(administrativeStrainModifier, resources.getString("administrativeStrain.text"));
-                }
-            }
-
-            // Fatigue Modifiers
-            if (campaign.getCampaignOptions().isTrackUnitFatigue()) {
-                targetNumber.addModifier(campaign.getFatigueLevel() / 10, resources.getString("fatigue.text"));
-            }
-
             targets.put(person.getId(), targetNumber);
         }
         return targets;
+    }
+
+    /**
+     * Sets the HR skill averaged across all Admin/HR personnel.
+     *
+     * @param campaign the Campaign object to get personnel from.
+     */
+    private void setHrSkill(Campaign campaign) {
+        int hrPersonnelCount = (int) campaign.getActivePersonnel().stream()
+                .filter(person -> (!person.getPrisonerStatus().isPrisoner()) && (!person.getPrisonerStatus().isPrisonerDefector()))
+                .filter(person -> (person.getPrimaryRole().isAdministratorHR()) || (person.getSecondaryRole().isAdministratorHR()))
+                .count();
+
+        if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
+            hrSkill = getCombinedSkillValues(campaign, SkillType.S_NEG) / hrPersonnelCount;
+        } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
+            hrSkill = getCombinedSkillValues(campaign, SkillType.S_ADMIN) / hrPersonnelCount;
+        }
+    }
+
+    /**
+     * Calculates the management skill modifier for a person
+     *
+     * @param person the individual we're fetching the modifier for
+     * @return the management skill modifier
+     */
+    private static int getManagementSkillModifier(Person person) {
+        if ((person.getPrimaryRole().isCivilian()) || (!person.getPrisonerStatus().isFree())) {
+            return 0;
+        }
+
+        if (person.getSecondaryRole() == PersonnelRole.NONE) {
+            return -getCommanderManagementSkill(person.getPrimaryRole());
+        } else {
+            return -((getCommanderManagementSkill(person.getPrimaryRole()) + getCommanderManagementSkill(person.getSecondaryRole())) / 2);
+        }
+    }
+
+    /**
+     * Returns the management skill modifier for a commander based on the given personnel role.
+     *
+     * @param role the personnel role of the person we're fetching the modifier for
+     * @return the management skill modifier for the commander
+     */
+    private static int getCommanderManagementSkill(PersonnelRole role) {
+        switch (Profession.getProfessionFromPersonnelRole(role)) {
+            case AEROSPACE:
+                return asfCommanderModifier;
+            case VEHICLE:
+                return vehicleCrewCommanderModifier;
+            case INFANTRY:
+                return infantryCommanderModifier;
+            case NAVAL:
+                return navalCommanderModifier;
+            case TECH:
+                return techCommanderModifier;
+            case MEDICAL:
+                return medicalCommanderModifier;
+            case ADMINISTRATOR:
+                return administrationCommanderModifier;
+            case MECHWARRIOR:
+                return mechWarriorCommanderModifier;
+            case CIVILIAN:
+                return 0;
+        }
+        return 0;
+    }
+
+    /**
+     * This method calculates the management skill values for the different commanding officers.
+     * Each commander's management skill value is calculated based on their role and rank within the campaign.
+     * The management skill modifier is calculated by adding the base modifier
+     * (retrieved from campaign options) and the commander's individual leadership skill.
+     * If no suitable commander is found for a particular role,
+     * the management skill modifier for that role remains the same as the base modifier.
+     *
+     * @param campaign The Campaign object for which to calculate the management skill values.
+     */
+    private void getManagementSkillValues(Campaign campaign) {
+        int baseModifier = campaign.getCampaignOptions().getManagementSkillPenalty();
+
+        if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
+            Person commander = campaign.getFlaggedCommander();
+
+            if ((commander != null) && (commander.hasSkill(SkillType.S_LEADER))) {
+                int commanderSkill = baseModifier + commander.getSkill(SkillType.S_LEADER).getFinalSkillValue();
+
+                asfCommanderModifier = commanderSkill;
+                vehicleCrewCommanderModifier = commanderSkill;
+                infantryCommanderModifier = commanderSkill;
+                navalCommanderModifier = commanderSkill;
+                techCommanderModifier = commanderSkill;
+                medicalCommanderModifier = commanderSkill;
+                administrationCommanderModifier = commanderSkill;
+                mechWarriorCommanderModifier = commanderSkill;
+            } else {
+                asfCommanderModifier = baseModifier;
+                vehicleCrewCommanderModifier = baseModifier;
+                infantryCommanderModifier = baseModifier;
+                navalCommanderModifier = baseModifier;
+                techCommanderModifier = baseModifier;
+                medicalCommanderModifier = baseModifier;
+                administrationCommanderModifier = baseModifier;
+                mechWarriorCommanderModifier = baseModifier;
+            }
+
+            return;
+        }
+
+        for (Person person : campaign.getActivePersonnel()) {
+            if ((person.getPrimaryRole().isCivilian())
+                    || (person.getPrisonerStatus().isPrisoner())
+                    || (person.getPrisonerStatus().isPrisonerDefector())) {
+                continue;
+            }
+
+            switch (Profession.getProfessionFromPersonnelRole(person.getPrimaryRole())) {
+                case AEROSPACE:
+                    if (person.outRanksUsingSkillTiebreaker(campaign, asfCommander)) {
+                        asfCommander = person;
+                        asfCommanderModifier = baseModifier + getIndividualCommanderLeadership(asfCommander);
+                    }
+                    break;
+                case VEHICLE:
+                    if (person.outRanksUsingSkillTiebreaker(campaign, vehicleCrewCommander)) {
+                        vehicleCrewCommander = person;
+                        vehicleCrewCommanderModifier = baseModifier + getIndividualCommanderLeadership(vehicleCrewCommander);
+                    }
+                    break;
+                case INFANTRY:
+                    if (person.outRanksUsingSkillTiebreaker(campaign, infantryCommander)) {
+                        infantryCommander = person;
+                        infantryCommanderModifier = baseModifier + getIndividualCommanderLeadership(infantryCommander);
+                    }
+                    break;
+                case NAVAL:
+                    if (person.outRanksUsingSkillTiebreaker(campaign, navalCommander)) {
+                        navalCommander = person;
+                        navalCommanderModifier = baseModifier + getIndividualCommanderLeadership(navalCommander);
+                    }
+                    break;
+                case TECH:
+                    if (person.outRanksUsingSkillTiebreaker(campaign, techCommander)) {
+                        techCommander = person;
+                        techCommanderModifier = baseModifier + getIndividualCommanderLeadership(techCommander);
+                    }
+                    break;
+                case MEDICAL:
+                    if (person.outRanksUsingSkillTiebreaker(campaign, medicalCommander)) {
+                        medicalCommander = person;
+                        medicalCommanderModifier = baseModifier + getIndividualCommanderLeadership(medicalCommander);
+                    }
+                    break;
+                case ADMINISTRATOR:
+                    if (person.outRanksUsingSkillTiebreaker(campaign, administrationCommander)) {
+                        administrationCommander = person;
+                        administrationCommanderModifier = baseModifier + getIndividualCommanderLeadership(administrationCommander);
+                    }
+                    break;
+                case MECHWARRIOR:
+                    if (person.outRanksUsingSkillTiebreaker(campaign, mechWarriorCommander)) {
+                        mechWarriorCommander = person;
+                        mechWarriorCommanderModifier = baseModifier + getIndividualCommanderLeadership(mechWarriorCommander);
+                    }
+                    break;
+                case CIVILIAN:
+                    break;
+            }
+        }
+
+        for (Profession profession : Profession.values()) {
+            switch (profession) {
+                case AEROSPACE:
+                    if (asfCommander == null) {
+                        asfCommanderModifier = baseModifier;
+                    }
+                    break;
+                case VEHICLE:
+                    if (vehicleCrewCommander == null) {
+                        vehicleCrewCommanderModifier = baseModifier;
+                    }
+                    break;
+                case INFANTRY:
+                    if (infantryCommander == null) {
+                        infantryCommanderModifier = baseModifier;
+                    }
+                    break;
+                case NAVAL:
+                    if (navalCommander == null) {
+                        navalCommanderModifier = baseModifier;
+                    }
+                    break;
+                case TECH:
+                    if (techCommander == null) {
+                        techCommanderModifier = baseModifier;
+                    }
+                    break;
+                case MEDICAL:
+                    if (medicalCommander == null) {
+                        medicalCommanderModifier = baseModifier;
+                    }
+                    break;
+                case ADMINISTRATOR:
+                    if (administrationCommander == null) {
+                        administrationCommanderModifier = baseModifier;
+                    }
+                    break;
+                case MECHWARRIOR:
+                    if (mechWarriorCommander == null) {
+                        mechWarriorCommanderModifier = baseModifier;
+                    }
+                    break;
+                case CIVILIAN:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Calculates the individual commander Leadership skill based on the provided commander.
+     *
+     * @param commander the commander for which the skill is being calculated
+     * @return the Leadership skill
+     */
+    private static int getIndividualCommanderLeadership(Person commander) {
+        if (commander.hasSkill(SkillType.S_LEADER)) {
+            return commander.getSkill(SkillType.S_LEADER).getFinalSkillValue();
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -324,7 +497,7 @@ public class RetirementDefectionTracker {
     public static int getAdministrativeStrainModifier(Campaign campaign) {
         int personnel = getAdministrativeStrain(campaign);
 
-        int maximumStrain = campaign.getCampaignOptions().getAdministrativeStrain() * getCombinedSkillValues(campaign);
+        int maximumStrain = campaign.getCampaignOptions().getAdministrativeStrain() * getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
         if (maximumStrain != 0) {
             return personnel / maximumStrain;
@@ -381,17 +554,17 @@ public class RetirementDefectionTracker {
      * @param campaign the campaign for which to calculate the combined skill values
      * @return the combined skill values of active Admin/HR personnel in the campaign
      */
-    public static int getCombinedSkillValues(Campaign campaign) {
+    public static int getCombinedSkillValues(Campaign campaign, String skillType) {
         int combinedSkillValues = 0;
 
         for (Person person : campaign.getActivePersonnel()) {
             if ((!person.getPrisonerStatus().isPrisoner()) || (!person.getPrisonerStatus().isPrisonerDefector())) {
                 if (person.getPrimaryRole().isAdministratorHR()) {
-                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getLevel();
-                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getBonus();
+                    combinedSkillValues += person.getSkill(skillType).getLevel();
+                    combinedSkillValues += person.getSkill(skillType).getBonus();
                 } else if (person.getSecondaryRole().isAdministratorHR()) {
-                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getLevel();
-                    combinedSkillValues += person.getSkill(SkillType.S_ADMIN).getBonus();
+                    combinedSkillValues += person.getSkill(skillType).getLevel();
+                    combinedSkillValues += person.getSkill(skillType).getBonus();
                 }
             }
         }
@@ -402,25 +575,33 @@ public class RetirementDefectionTracker {
      * Returns a difficulty modifier based on the turnover difficulty campaign setting.
      *
      * @param campaign the current campaign
-     * @return the difficulty modifier as an integer value
      */
-    private static Integer getDifficultyModifier(Campaign campaign) {
+    private void getDifficultyModifier(Campaign campaign) {
         switch (campaign.getCampaignOptions().getTurnoverDifficulty()) {
             case NONE:
+                difficulty = -6;
+                break;
             case ULTRA_GREEN:
-                return -2;
+                difficulty = -5;
+                break;
             case GREEN:
-                return -1;
+                difficulty = -4;
+                break;
+            case REGULAR:
+                difficulty = -3;
+                break;
             case VETERAN:
-                return 1;
+                difficulty = -2;
+                break;
             case ELITE:
-                return 2;
+                difficulty = -1;
+                break;
             case HEROIC:
-                return 3;
+                difficulty = 0;
+                break;
             case LEGENDARY:
-                return 4;
-            default:
-                return 0;
+                difficulty = 1;
+                break;
         }
     }
 
@@ -430,60 +611,25 @@ public class RetirementDefectionTracker {
      * @param campaign the campaign for which the base target number is calculated
      * @return the base target number
      */
-    private static Integer getBaseTargetNumber(Campaign campaign) {
-        int personnelCount = 0;
-        int combinedSkill = 0;
+    private int getBaseTargetNumber(Campaign campaign) {
+        if (!campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isFixed()) {
+            int targetNumber;
 
+            Person person = new Person(campaign);
 
-        if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
-            for (Person person : campaign.getActivePersonnel()) {
-                if ((person.getPrisonerStatus().isPrisoner()) || (person.getPrisonerStatus().isPrisonerDefector())) {
-                    continue;
-                }
-
-                if ((person.getPrimaryRole().isAdministratorHR()) || (person.getSecondaryRole().isAdministratorHR())) {
-                    personnelCount++;
-                    combinedSkill += person.getSkill(SkillType.S_NEG).getFinalSkillValue();
-                }
+            if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
+                person.addSkill(SkillType.S_NEG, 1, 0);
+                targetNumber = person.getSkills().getSkill(SkillType.S_NEG).getType().getTarget();
+            } else {
+                person.addSkill(SkillType.S_ADMIN, 1, 0);
+                targetNumber = person.getSkills().getSkill(SkillType.S_ADMIN).getType().getTarget();
             }
 
-            if (personnelCount != 0) {
-                combinedSkill = combinedSkill / personnelCount;
-            }
-
-            int difficulty = getDifficultyModifier(campaign);
-
-            Skills skill = new Skills();
-            int targetNumber = skill.getSkill(SkillType.S_ADMIN).getType().getTarget();
-
-            return targetNumber - combinedSkill + difficulty;
-        } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
-            for (Person person : campaign.getActivePersonnel()) {
-                if ((person.getPrisonerStatus().isPrisoner()) || (person.getPrisonerStatus().isPrisonerDefector())) {
-                    continue;
-                }
-
-                if ((person.getPrimaryRole().isAdministratorHR()) || (person.getSecondaryRole().isAdministratorHR())) {
-                    personnelCount++;
-                    combinedSkill += person.getSkill(SkillType.S_ADMIN).getFinalSkillValue();
-                }
-            }
-
-            if (personnelCount != 0) {
-                combinedSkill = combinedSkill / personnelCount;
-            }
-
-            int difficulty = getDifficultyModifier(campaign);
-
-            Skills skill = new Skills();
-            int targetNumber = skill.getSkill(SkillType.S_ADMIN).getType().getTarget();
-
-            return targetNumber - combinedSkill + difficulty;
+            return targetNumber - hrSkill + difficulty;
         } else {
             return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
         }
     }
-
 
     /**
      * Returns the unit rating modifier for the campaign.
@@ -505,12 +651,66 @@ public class RetirementDefectionTracker {
     }
 
     /**
+     * @param campaign the campaign to get share values for
+     * @return The value of each share in C-bills
+     */
+    public static Money getShareValue(Campaign campaign) {
+        if (!campaign.getCampaignOptions().isUseShareSystem()) {
+            return Money.zero();
+        }
+
+        FinancialReport r = FinancialReport.calculate(campaign);
+
+        Money netWorth = r.getNetWorth();
+        if (campaign.getCampaignOptions().isSharesExcludeLargeCraft()) {
+            netWorth = netWorth.minus(r.getLargeCraftValue());
+        }
+
+        int totalShares = campaign.getActivePersonnel()
+                .stream()
+                .mapToInt(p -> p.getNumShares(campaign, campaign.getCampaignOptions().isSharesForAll()))
+                .sum();
+
+        if (totalShares <= 0) {
+            return Money.zero();
+        }
+
+        return netWorth.dividedBy(totalShares);
+    }
+
+    /**
+     * @param age the age of the employee
+     * @return the age-based modifier
+     */
+    private static int getAgeMod(int age) {
+        int ageMod = 0;
+
+        if (age <= 20) {
+            ageMod = -1;
+        } else if ((age >= 50) && (age < 65)) {
+            ageMod = 1;
+        } else if ((age >= 65) && (age < 75)) {
+            ageMod = 2;
+        } else if ((age >= 75) && (age < 85)) {
+            ageMod = 3;
+        } else if ((age >= 85) && (age < 95)) {
+            ageMod = 4;
+        } else if ((age >= 95) && (age < 105)) {
+            ageMod = 5;
+        } else if (age >= 105) {
+            ageMod = 6;
+        }
+
+        return ageMod;
+    }
+
+    /**
      * Makes rolls for Employee Turnover based on previously calculated target rolls,
      * and tracks all retirees in the unresolvedPersonnel hash in case the dialog
      * is closed before payments are resolved, to avoid re-rolling the results.
      *
      * @param mission Nullable mission value
-     * @param targets The hash previously generated by calculateTargetNumbers.
+     * @param targets The hash previously generated by getTargetNumbers.
      * @param shareValue The value of each share in the unit; if not using the share system, this is zero.
      * @param campaign the current campaign
      */

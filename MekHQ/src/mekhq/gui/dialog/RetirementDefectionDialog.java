@@ -113,7 +113,7 @@ public class RetirementDefectionDialog extends JDialog {
         this.contract = contract;
         rdTracker = hqView.getCampaign().getRetirementDefectionTracker();
         if (doRetirement) {
-            targetRolls = rdTracker.calculateTargetNumbers(contract, hqView.getCampaign());
+            targetRolls = rdTracker.getTargetNumbers(contract, hqView.getCampaign());
         }
         currentPanel = doRetirement?PAN_OVERVIEW:PAN_RESULTS;
         setSize(new Dimension(800, 600));

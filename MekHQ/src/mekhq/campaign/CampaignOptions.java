@@ -278,6 +278,10 @@ public class CampaignOptions {
     private Integer administrativeStrain;
     private Integer multiCrewStrainDivider;
 
+    private boolean useManagementSkill;
+    private boolean useCommanderLeadershipOnly;
+    private Integer managementSkillPenalty;
+
     private boolean useShareSystem;
     private boolean sharesExcludeLargeCraft;
     private boolean sharesForAll;
@@ -764,6 +768,10 @@ public class CampaignOptions {
         setUseAdministrativeStrain(true);
         setAdministrativeStrain(10);
         setMultiCrewStrainDivider(5);
+
+        setUseManagementSkill(true);
+        setUseCommanderLeadershipOnly(true);
+        setManagementSkillPenalty(-2);
 
         setUseShareSystem(false);
         setSharesExcludeLargeCraft(true);
@@ -1814,6 +1822,30 @@ public class CampaignOptions {
 
     public void setMultiCrewStrainDivider(final Integer multiCrewStrainDivider) {
         this.multiCrewStrainDivider = multiCrewStrainDivider;
+    }
+
+    public boolean isUseManagementSkill() {
+        return useManagementSkill;
+    }
+
+    public void setUseManagementSkill(final boolean useManagementSkill) {
+        this.useManagementSkill = useManagementSkill;
+    }
+
+    public boolean isUseCommanderLeadershipOnly() {
+        return useCommanderLeadershipOnly;
+    }
+
+    public void setUseCommanderLeadershipOnly(final boolean useCommanderLeadershipOnly) {
+        this.useCommanderLeadershipOnly = useCommanderLeadershipOnly;
+    }
+
+    public Integer getManagementSkillPenalty() {
+        return managementSkillPenalty;
+    }
+
+    public void setManagementSkillPenalty(final Integer managementSkillPenalty) {
+        this.managementSkillPenalty = managementSkillPenalty;
     }
     //endregion Retirement
 
@@ -4137,6 +4169,10 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "administrativeStrain", getAdministrativeStrain());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiCrewStrainDivider", getMultiCrewStrainDivider());
 
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManagementSkill", isUseManagementSkill());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCommanderLeadershipOnly", isUseCommanderLeadershipOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "managementSkillPenalty", getManagementSkillPenalty());
+
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", isUseShareSystem());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", isSharesExcludeLargeCraft());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", isSharesForAll());
@@ -4807,6 +4843,12 @@ public class CampaignOptions {
                     retVal.setAdministrativeStrain(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("multiCrewStrainDivider")) {
                     retVal.setMultiCrewStrainDivider(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useManagementSkill")) {
+                    retVal.setUseManagementSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useCommanderLeadershipOnly")) {
+                    retVal.setUseCommanderLeadershipOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("managementSkillPenalty")) {
+                    retVal.setManagementSkillPenalty(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
                     retVal.setUseShareSystem(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
