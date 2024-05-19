@@ -255,6 +255,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // Retirement
     private JCheckBox chkUseRetirementDateTracking;
+
     private JPanel randomRetirementPanel;
     private JCheckBox chkUseRandomRetirement;
     private JLabel lblTurnoverTargetNumberMethod;
@@ -276,6 +277,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseFactionModifiers;
     private JCheckBox chkUseMissionStatusModifiers;
     private JCheckBox chkTrackUnitFatigue;
+
+    private JPanel loyaltyPanel;
+    private JCheckBox chkUseLoyaltyModifiers;
+    private JCheckBox chkUseHideLoyalty;
 
     private JPanel turnoverPayoutPanel;
     private JLabel lblPayoutRateOfficer;
@@ -3865,6 +3870,23 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkTrackUnitFatigue.setToolTipText(resources.getString("chkTrackUnitFatigue.toolTipText"));
         chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
 
+        chkUseLoyaltyModifiers = new JCheckBox(resources.getString("chkUseLoyaltyModifiers.text"));
+        chkUseLoyaltyModifiers.setToolTipText(resources.getString("chkUseLoyaltyModifiers.toolTipText"));
+        chkUseLoyaltyModifiers.setName("chkUseLoyaltyModifiers");
+        chkUseLoyaltyModifiers.addActionListener(evt -> {
+            final boolean isEnabled = randomRetirementPanel.isEnabled() && chkUseLoyaltyModifiers.isSelected();
+
+            // general handler
+            for (Component component : loyaltyPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            // border handler
+            loyaltyPanel.setEnabled(isEnabled);
+        });
+
+        loyaltyPanel = createLoyaltyPanel();
+
         turnoverModifiersPanel = new JDisableablePanel("turnoverModifierPanel");
         turnoverModifiersPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverModifierPanel.title")));
 
@@ -3882,6 +3904,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseFactionModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
                         .addComponent(chkTrackUnitFatigue)
+                        .addComponent(chkUseLoyaltyModifiers)
+                        .addComponent(loyaltyPanel)
         );
 
         layout.setHorizontalGroup(
@@ -3893,9 +3917,37 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseFactionModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
                         .addComponent(chkTrackUnitFatigue)
+                        .addComponent(chkUseLoyaltyModifiers)
+                        .addComponent(loyaltyPanel)
         );
 
         return turnoverModifiersPanel;
+    }
+
+    private JPanel createLoyaltyPanel() {
+        chkUseHideLoyalty = new JCheckBox(resources.getString("chkUseHideLoyalty.text"));
+        chkUseHideLoyalty.setToolTipText(resources.getString("chkUseHideLoyalty.toolTipText"));
+        chkUseHideLoyalty.setName("chkUseHideLoyalty");
+
+        loyaltyPanel = new JDisableablePanel("loyaltyPanel");
+        loyaltyPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("loyaltyPanel.title")));
+
+        final GroupLayout layout = new GroupLayout(loyaltyPanel);
+        loyaltyPanel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseHideLoyalty)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseHideLoyalty)
+        );
+
+        return loyaltyPanel;
     }
 
     private JPanel createTurnoverPayoutPanel() {
@@ -7202,16 +7254,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnTurnoverFixedTargetNumber.setValue(options.getTurnoverFixedTargetNumber());
         chkUseYearEndRandomRetirement.setSelected(options.isUseYearEndRandomRetirement());
         chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
-        chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
         chkUseRandomFounderRetirement.setSelected(options.isUseRandomFounderRetirement());
         chkUseSubContractSoldiers.setSelected(options.isUseSubContractSoldiers());
-        chkTrackUnitFatigue.setSelected(options.isTrackUnitFatigue());
 
+        chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
         chkUseAgeModifiers.setSelected(options.isUseAgeModifiers());
         chkUseSkillModifiers.setSelected(options.isUseSkillModifiers());
         chkUseUnitRatingModifiers.setSelected(options.isUseUnitRatingModifiers());
         chkUseFactionModifiers.setSelected(options.isUseFactionModifiers());
         chkUseMissionStatusModifiers.setSelected(options.isUseMissionStatusModifiers());
+        chkTrackUnitFatigue.setSelected(options.isTrackUnitFatigue());
+
+        chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
+        chkUseHideLoyalty.setSelected(options.isUseHideLoyalty());
 
         spnPayoutRateOfficer.setValue(options.getPayoutRateOfficer());
         spnPayoutRateEnlisted.setValue(options.getPayoutRateEnlisted());
@@ -7831,16 +7886,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setTurnoverFixedTargetNumber((Integer) spnTurnoverFixedTargetNumber.getValue());
             options.setUseYearEndRandomRetirement(chkUseYearEndRandomRetirement.isSelected());
             options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
-            options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
             options.setUseRandomFounderRetirement(chkUseRandomFounderRetirement.isSelected());
             options.setUseSubContractSoldiers(chkUseSubContractSoldiers.isSelected());
-            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
 
+            options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
             options.setUseAgeModifiers(chkUseAgeModifiers.isSelected());
             options.setUseSkillModifiers(chkUseSkillModifiers.isSelected());
             options.setUseUnitRatingModifiers(chkUseUnitRatingModifiers.isSelected());
             options.setUseFactionModifiers(chkUseFactionModifiers.isSelected());
             options.setUseMissionStatusModifiers(chkUseMissionStatusModifiers.isSelected());
+            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
+
+            options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
+            options.setUseHideLoyalty(chkUseHideLoyalty.isSelected());
 
             options.setPayoutRateOfficer((Integer) spnPayoutRateOfficer.getValue());
             options.setPayoutRateEnlisted((Integer) spnPayoutRateEnlisted.getValue());

@@ -119,10 +119,12 @@ public class Person {
     private LocalDate birthday;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
-    private LocalDate retirement;
     private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
     private List<LogEntry> scenarioLog;
+
+    private LocalDate retirement;
+    private int loyalty;
 
     private Skills skills;
     private PersonnelOptions options;
@@ -326,6 +328,7 @@ public class Person {
         recruitment = null;
         lastRankChangeDate = null;
         retirement = null;
+        loyalty = 0;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -1174,14 +1177,6 @@ public class Person {
                 .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
-    public @Nullable LocalDate getRetirement() {
-        return retirement;
-    }
-
-    public void setRetirement(final @Nullable LocalDate retirement) {
-        this.retirement = retirement;
-    }
-
     public void setId(final UUID id) {
         this.id = id;
     }
@@ -1197,6 +1192,24 @@ public class Person {
     public Genealogy getGenealogy() {
         return genealogy;
     }
+
+    //region Turnover and Retention
+    public @Nullable LocalDate getRetirement() {
+        return retirement;
+    }
+
+    public void setRetirement(final @Nullable LocalDate retirement) {
+        this.retirement = retirement;
+    }
+
+    public Integer getLoyalty() {
+        return loyalty;
+    }
+
+    public void setLoyalty(final Integer loyalty) {
+        this.loyalty = loyalty;
+    }
+    //region Turnover and Retention
 
     //region Pregnancy
     public LocalDate getDueDate() {
@@ -1599,6 +1612,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitment", getRecruitment());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
             }
@@ -1904,6 +1918,8 @@ public class Person {
                     retVal.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
                     retVal.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("loyalty")) {
+                    retVal.setLoyalty(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
@@ -3594,6 +3610,29 @@ public class Person {
                     techUnits.remove(ii);
                 }
             }
+        }
+    }
+
+    /**
+     * Generates the loyalty value for a person.
+     */
+    public void generateLoyalty() {
+        int roll = Compute.d6(3);
+
+        if (roll == 3) {
+            setLoyalty(-3);
+        } else if (roll == 4) {
+            setLoyalty(-2);
+        } else if (roll < 7) {
+            setLoyalty(-1);
+        } else if (roll == 18) {
+            setLoyalty(3);
+        } else if (roll == 17) {
+            setLoyalty(2);
+        } else if (roll > 14) {
+            setLoyalty(1);
+        } else {
+            setLoyalty(0);
         }
     }
 }

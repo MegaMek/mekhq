@@ -131,7 +131,7 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            TargetRoll targetNumber = new TargetRoll(getBaseTargetNumber(campaign), resources.getString("base.text"));
+            TargetRoll targetNumber = new TargetRoll(getBaseTargetNumber(campaign, person), resources.getString("base.text"));
 
             // Desirability modifier
             if (campaign.getCampaignOptions().isUseSkillModifiers()) {
@@ -191,6 +191,13 @@ public class RetirementDefectionTracker {
                 } else if (contract.getStatus().isBreach()) {
                     targetNumber.addModifier(2, resources.getString("missionBreach.text"));
                 }
+            }
+
+            // Loyalty
+            if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                    && (!campaign.getCampaignOptions().isUseHideLoyalty())
+                    && (person.getLoyalty() != 0)) {
+                targetNumber.addModifier(-person.getLoyalty(), resources.getString("loyalty.text"));
             }
 
             // Faction Modifiers
@@ -269,10 +276,14 @@ public class RetirementDefectionTracker {
                 .filter(person -> (person.getPrimaryRole().isAdministratorHR()) || (person.getSecondaryRole().isAdministratorHR()))
                 .count();
 
-        if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
-            hrSkill = getCombinedSkillValues(campaign, SkillType.S_NEG) / hrPersonnelCount;
-        } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
-            hrSkill = getCombinedSkillValues(campaign, SkillType.S_ADMIN) / hrPersonnelCount;
+        if (hrPersonnelCount != 0) {
+            if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
+                hrSkill = getCombinedSkillValues(campaign, SkillType.S_NEG) / hrPersonnelCount;
+            } else if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isAdministration()) {
+                hrSkill = getCombinedSkillValues(campaign, SkillType.S_ADMIN) / hrPersonnelCount;
+            }
+        } else {
+            hrSkill = 0;
         }
     }
 
@@ -611,23 +622,32 @@ public class RetirementDefectionTracker {
      * @param campaign the campaign for which the base target number is calculated
      * @return the base target number
      */
-    private int getBaseTargetNumber(Campaign campaign) {
+    private int getBaseTargetNumber(Campaign campaign, Person person) {
         if (!campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isFixed()) {
             int targetNumber;
 
-            Person person = new Person(campaign);
+            // we use 'shellPerson' as we have no way to ensure 'person' has the necessary skills, and we'll get an NPE if they don't
+            Person shellPerson = new Person(campaign);
 
             if (campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isNegotiation()) {
-                person.addSkill(SkillType.S_NEG, 1, 0);
-                targetNumber = person.getSkills().getSkill(SkillType.S_NEG).getType().getTarget();
+                shellPerson.addSkill(SkillType.S_NEG, 1, 0);
+                targetNumber = shellPerson.getSkills().getSkill(SkillType.S_NEG).getType().getTarget();
             } else {
-                person.addSkill(SkillType.S_ADMIN, 1, 0);
-                targetNumber = person.getSkills().getSkill(SkillType.S_ADMIN).getType().getTarget();
+                shellPerson.addSkill(SkillType.S_ADMIN, 1, 0);
+                targetNumber = shellPerson.getSkills().getSkill(SkillType.S_ADMIN).getType().getTarget();
             }
 
-            return targetNumber - hrSkill + difficulty;
+            if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
+                return targetNumber - hrSkill + difficulty - person.getLoyalty();
+            } else {
+                return targetNumber - hrSkill + difficulty;
+            }
         } else {
-            return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
+            if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
+                return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() - person.getLoyalty();
+            } else {
+                return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
+            }
         }
     }
 

@@ -274,6 +274,9 @@ public class CampaignOptions {
     private boolean useMissionStatusModifiers;
     private boolean trackUnitFatigue;
 
+    private boolean useLoyaltyModifiers;
+    private boolean useHideLoyalty;
+
     private boolean useAdministrativeStrain;
     private Integer administrativeStrain;
     private Integer multiCrewStrainDivider;
@@ -748,16 +751,19 @@ public class CampaignOptions {
         setTurnoverFixedTargetNumber(3);
         setUseYearEndRandomRetirement(true);
         setUseContractCompletionRandomRetirement(true);
-        setUseCustomRetirementModifiers(true);
         setUseRandomFounderRetirement(true);
         setUseSubContractSoldiers(false);
-        setTrackUnitFatigue(false);
 
-        setUseAgeModifiers(true);
+        setUseCustomRetirementModifiers(true);
         setUseSkillModifiers(true);
+        setUseAgeModifiers(true);
         setUseUnitRatingModifiers(true);
         setUseFactionModifiers(true);
         setUseMissionStatusModifiers(true);
+        setTrackUnitFatigue(false);
+
+        setUseLoyaltyModifiers(true);
+        setUseHideLoyalty(true);
 
         setPayoutRateOfficer(3);
         setPayoutRateEnlisted(3);
@@ -1686,6 +1692,22 @@ public class CampaignOptions {
 
     public void setUseCustomRetirementModifiers(final boolean useCustomRetirementModifiers) {
         this.useCustomRetirementModifiers = useCustomRetirementModifiers;
+    }
+
+    public boolean isUseLoyaltyModifiers() {
+        return useLoyaltyModifiers;
+    }
+
+    public void setUseLoyaltyModifiers(final boolean useLoyaltyModifiers) {
+        this.useLoyaltyModifiers = useLoyaltyModifiers;
+    }
+
+    public boolean isUseHideLoyalty() {
+        return useHideLoyalty;
+    }
+
+    public void setUseHideLoyalty(final boolean useHideLoyalty) {
+        this.useHideLoyalty = useHideLoyalty;
     }
 
     public boolean isUseRandomFounderRetirement() {
@@ -4159,6 +4181,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMissionStatusModifiers", isUseMissionStatusModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackUnitFatigue", isTrackUnitFatigue());
 
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoyaltyModifiers", isUseLoyaltyModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useHideLoyalty", isUseHideLoyalty());
+
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateOfficer", getPayoutRateOfficer());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateEnlisted", getPayoutRateEnlisted());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRetirementMultiplier", getPayoutRetirementMultiplier());
@@ -4827,6 +4852,10 @@ public class CampaignOptions {
                     retVal.setUseMissionStatusModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("trackUnitFatigue")) {
                     retVal.setTrackUnitFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useLoyaltyModifiers")) {
+                    retVal.setUseLoyaltyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useHideLoyalty")) {
+                    retVal.setUseHideLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateOfficer")) {
                     retVal.setPayoutRateOfficer(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateEnlisted")) {

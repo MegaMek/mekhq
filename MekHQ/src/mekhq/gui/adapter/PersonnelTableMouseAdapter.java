@@ -41,6 +41,7 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -124,6 +125,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
     private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE";
+    private static final String CMD_LOYALTY = "LOYALTY";
 
     private static final String CMD_IMPRISON = "IMPRISON";
     private static final String CMD_FREE = "FREE";
@@ -946,6 +948,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         String.format(resources.getString("givePayment.format"),
                                 selectedPerson.getFullName()));
 
+                break;
+            }
+            case CMD_LOYALTY: {
+                for (Person person : people) {
+                    person.generateLoyalty();
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
                 break;
             }
 
@@ -2451,6 +2460,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
                 }
+            }
+
+            if (gui.getCampaign().getCampaignOptions().isUseLoyaltyModifiers()) {
+                menuItem = new JMenuItem(resources.getString("regenerateLoyalty.text"));
+                menuItem.setActionCommand(CMD_LOYALTY);
+                menuItem.addActionListener(this);
+                menu.add(menuItem);
             }
 
             JMenuHelpers.addMenuIfNonEmpty(popup, menu);

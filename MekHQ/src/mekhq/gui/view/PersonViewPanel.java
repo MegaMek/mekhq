@@ -1204,6 +1204,9 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblEdgeAvail1 = new JLabel();
         JLabel lblEdgeAvail2 = new JLabel();
 
+        JLabel lblLoyalty1 = new JLabel();
+        JLabel lblLoyalty2 = new JLabel();
+
         // education
         JLabel lblEducationLevel1 = new JLabel();
         JLabel lblEducationLevel2 = new JLabel();
@@ -1385,6 +1388,34 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblTough2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())
+                && (person.getLoyalty() != 0)) {
+            lblLoyalty1.setName("lblLoyalty1");
+            lblLoyalty1.setText(resourceMap.getString("lblLoyalty1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblLoyalty1, gridBagConstraints);
+
+            lblLoyalty2.setName("lblLoyalty2");
+            lblLoyalty2.setText(String.valueOf(person.getLoyalty()));
+            lblLoyalty2.setLabelFor(lblLoyalty2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblLoyalty2, gridBagConstraints);
 
             firsty++;
         }
