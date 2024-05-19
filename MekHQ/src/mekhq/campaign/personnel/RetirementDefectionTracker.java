@@ -41,6 +41,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -132,6 +133,11 @@ public class RetirementDefectionTracker {
             }
 
             TargetRoll targetNumber = new TargetRoll(getBaseTargetNumber(campaign, person), resources.getString("base.text"));
+
+            // Service Contract
+            if (ChronoUnit.MONTHS.between(person.getRecruitment(), campaign.getLocalDate()) < campaign.getCampaignOptions().getServiceContractDuration()) {
+                targetNumber.addModifier(campaign.getCampaignOptions().getServiceContractModifier(), resources.getString("contract.text"));
+            }
 
             // Desirability modifier
             if (campaign.getCampaignOptions().isUseSkillModifiers()) {
@@ -571,11 +577,15 @@ public class RetirementDefectionTracker {
         for (Person person : campaign.getActivePersonnel()) {
             if ((!person.getPrisonerStatus().isPrisoner()) || (!person.getPrisonerStatus().isPrisonerDefector())) {
                 if (person.getPrimaryRole().isAdministratorHR()) {
-                    combinedSkillValues += person.getSkill(skillType).getLevel();
-                    combinedSkillValues += person.getSkill(skillType).getBonus();
+                    if (person.hasSkill(skillType)) {
+                        combinedSkillValues += person.getSkill(skillType).getLevel();
+                        combinedSkillValues += person.getSkill(skillType).getBonus();
+                    }
                 } else if (person.getSecondaryRole().isAdministratorHR()) {
-                    combinedSkillValues += person.getSkill(skillType).getLevel();
-                    combinedSkillValues += person.getSkill(skillType).getBonus();
+                    if (person.hasSkill(skillType)) {
+                        combinedSkillValues += person.getSkill(skillType).getLevel();
+                        combinedSkillValues += person.getSkill(skillType).getBonus();
+                    }
                 }
             }
         }

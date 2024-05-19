@@ -259,6 +259,8 @@ public class CampaignOptions {
     private boolean useContractCompletionRandomRetirement;
     private boolean useRandomFounderRetirement;
     private boolean useSubContractSoldiers;
+    private Integer serviceContractDuration;
+    private Integer serviceContractModifier;
 
     private Integer payoutRateOfficer;
     private Integer payoutRateEnlisted;
@@ -753,6 +755,8 @@ public class CampaignOptions {
         setUseContractCompletionRandomRetirement(true);
         setUseRandomFounderRetirement(true);
         setUseSubContractSoldiers(false);
+        setServiceContractDuration(36);
+        setServiceContractModifier(8);
 
         setUseCustomRetirementModifiers(true);
         setUseSkillModifiers(true);
@@ -1868,6 +1872,22 @@ public class CampaignOptions {
 
     public void setManagementSkillPenalty(final Integer managementSkillPenalty) {
         this.managementSkillPenalty = managementSkillPenalty;
+    }
+
+    public Integer getServiceContractDuration() {
+        return serviceContractDuration;
+    }
+
+    public void setServiceContractDuration(final Integer serviceContractDuration) {
+        this.serviceContractDuration = serviceContractDuration;
+    }
+
+    public Integer getServiceContractModifier() {
+        return serviceContractModifier;
+    }
+
+    public void setServiceContractModifier(final Integer serviceContractModifier) {
+        this.serviceContractModifier = serviceContractModifier;
     }
     //endregion Retirement
 
@@ -4172,6 +4192,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSubContractSoldiers", isUseSubContractSoldiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractDuration", getServiceContractDuration());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractModifier", getServiceContractModifier());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSkillModifiers", isUseSkillModifiers());
@@ -4838,6 +4860,10 @@ public class CampaignOptions {
                     retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useSubContractSoldiers")) {
                     retVal.setUseSubContractSoldiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("serviceContractDuration")) {
+                    retVal.setServiceContractDuration(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("serviceContractModifier")) {
+                    retVal.setServiceContractModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
                     retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useSkillModifiers")) {
