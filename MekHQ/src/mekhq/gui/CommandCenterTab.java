@@ -319,7 +319,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panInfo.add(lblCargoSummary, gridBagConstraints);
 
         if (getCampaign().getCampaignOptions().isUseCombatFatigue()) {
-            if ((getCampaign().getCampaignOptions().getFieldKitchenCapacity() > 0) || (getCampaign().getCampaignOptions().getMashCapacity() > 0)) {
+            if (getCampaign().getCampaignOptions().getFieldKitchenCapacity() > 0) {
                 JLabel lblFacilityCapacitiesHead = new JLabel(resourceMap.getString("lblFacilityCapacities.text"));
                 gridBagConstraints = new GridBagConstraints();
                 gridBagConstraints.gridx = 0;

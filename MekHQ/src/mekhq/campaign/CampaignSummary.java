@@ -311,23 +311,15 @@ public class CampaignSummary {
     /**
      * Returns a summary of combat fatigue related facilities.
      *
-     * @param campaign the campaign object for which to generate the summary
-     * @return a String representing the combat fatigue facility summary
+     * @return A summary of combat fatigue related facilities.
      */
     public String getCombatFatigueSummary() {
         int personnelCount = campaign.getActivePersonnel().size();
-        List<Integer> facilityCapacities = campaign.calculateFacilityCapacities();
+        int fieldKitchenCapacity = campaign.checkFieldKitchenCapacity();
 
-        if ((facilityCapacities.get(0) > 0) && (facilityCapacities.get(1) > 0)) {
-            return String.format("Kitchens (%s/%s), Hospitals (%s/%s)",
-                    personnelCount, campaign.calculateFacilityCapacities().get(0),
-                    personnelCount, campaign.calculateFacilityCapacities().get(1));
-        } else if (facilityCapacities.get(0) > 0) {
+        if (fieldKitchenCapacity > 0) {
             return String.format("Kitchens (%s/%s)",
-                    personnelCount, campaign.calculateFacilityCapacities().get(0));
-        } else if (facilityCapacities.get(1) > 0) {
-            return String.format("Hospitals (%s/%s)",
-                    personnelCount, campaign.calculateFacilityCapacities().get(1));
+                    personnelCount, campaign.checkFieldKitchenCapacity());
         } else {
             return "";
         }

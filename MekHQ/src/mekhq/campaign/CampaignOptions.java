@@ -208,9 +208,7 @@ public class CampaignOptions {
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
     private boolean useCombatFatigue;
-    private Integer combatFatigueThreshold;
     private Integer fieldKitchenCapacity;
-    private Integer mashCapacity;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -669,9 +667,7 @@ public class CampaignOptions {
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
         setUseCombatFatigue(true);
-        setCombatFatigueThreshold(5);
         setFieldKitchenCapacity(150);
-        setMashCapacity(250);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -1434,28 +1430,12 @@ public class CampaignOptions {
         this.useCombatFatigue = useCombatFatigue;
     }
 
-    public Integer getCombatFatigueThreshold() {
-        return combatFatigueThreshold;
-    }
-
-    public void setCombatFatigueThreshold(final Integer combatFatigueThreshold) {
-        this.combatFatigueThreshold = combatFatigueThreshold;
-    }
-
     public Integer getFieldKitchenCapacity() {
         return fieldKitchenCapacity;
     }
 
     public void setFieldKitchenCapacity(final Integer fieldKitchenCapacity) {
         this.fieldKitchenCapacity = fieldKitchenCapacity;
-    }
-
-    public Integer getMashCapacity() {
-        return mashCapacity;
-    }
-
-    public void setMashCapacity(final Integer mashCapacity) {
-        this.mashCapacity = mashCapacity;
     }
     //endregion General Personnel
 
@@ -4159,9 +4139,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", isDisplayScenarioLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", isDisplayKillRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCombatFatigue", isUseCombatFatigue());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatFatigueThreshold", getCombatFatigueThreshold());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mashCapacity", getMashCapacity());
         //endregion General Personnel
 
         //region Expanded Personnel Information
@@ -4762,12 +4740,8 @@ public class CampaignOptions {
                     retVal.setDisplayKillRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useCombatFatigue")) {
                     retVal.setUseCombatFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("combatFatigueThreshold")) {
-                    retVal.setCombatFatigueThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
                     retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("mashCapacity")) {
-                    retVal.setMashCapacity(Integer.parseInt(wn2.getTextContent().trim()));
                 //endregion General Personnel
 
                 //region Expanded Personnel Information

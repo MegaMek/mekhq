@@ -525,18 +525,10 @@ public class StratconRulesManager {
      * @param campaign the campaign
      */
     private static void increaseCombatFatigue(int forceID, Campaign campaign) {
-        boolean isUseCombatFatigue = campaign.getCampaignOptions().isUseCombatFatigue();
-
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
                 person.setCombatFatigue(person.getCombatFatigue() + 1);
-
-                if (isUseCombatFatigue) {
-                    person.calculateCombatFatigueModifier(campaign);
-                    campaign.reportCombatFatigue(person);
-                } else {
-                    person.setCombatFatigueModifier(0);
-                }
+                campaign.reportCombatFatigue(person);
             }
         }
     }

@@ -126,7 +126,6 @@ public class Person {
     private LocalDate retirement;
     private Integer loyalty;
     private Integer combatFatigue;
-    private Integer combatFatigueModifier;
     private Boolean isRecoveringFromFatigue;
 
     private Skills skills;
@@ -333,7 +332,6 @@ public class Person {
         retirement = null;
         loyalty = 0;
         combatFatigue = 0;
-        combatFatigueModifier = 0;
         isRecoveringFromFatigue = false;
         skills = new Skills();
         options = new PersonnelOptions();
@@ -1224,14 +1222,6 @@ public class Person {
         this.combatFatigue = combatFatigue;
     }
 
-    public Integer getCombatFatigueModifier() {
-        return combatFatigueModifier;
-    }
-
-    public void setCombatFatigueModifier(final Integer combatFatigueModifier) {
-        this.combatFatigueModifier = combatFatigueModifier;
-    }
-
     public boolean getIsRecoveringFromFatigue() {
         return isRecoveringFromFatigue;
     }
@@ -1644,7 +1634,6 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatFatigue", getCombatFatigue());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatFatigueModifier", getCombatFatigueModifier());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
@@ -1955,8 +1944,6 @@ public class Person {
                     retVal.loyalty = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatFatigue")) {
                     retVal.combatFatigue = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("combatFatigueModifier")) {
-                    retVal.combatFatigueModifier = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("isRecoveringFromFatigue")) {
                     retVal.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
@@ -3676,18 +3663,6 @@ public class Person {
     }
 
     /**
-     * Calculates a person's combat fatigue modifier.
-     *
-     * @param campaign the campaign
-     */
-    public void calculateCombatFatigueModifier(Campaign campaign) {
-        combatFatigueModifier = getEffectiveCombatFatigue(campaign) / campaign.getCampaignOptions().getCombatFatigueThreshold();
-        if (combatFatigueModifier > 0) {
-            isRecoveringFromFatigue = true;
-        }
-    }
-
-    /**
      * Calculates the effective combat fatigue for a person.
      *
      * @param campaign the campaign for which to calculate the effective combat fatigue
@@ -3716,10 +3691,8 @@ public class Person {
                 break;
         }
 
-        for (Boolean capacityStatus : campaign.getFieldFacilityCapacities()) {
-            if (capacityStatus) {
-                effectiveCombatFatigue--;
-            }
+        if (campaign.getFieldKitchenWithinCapacity()) {
+            effectiveCombatFatigue--;
         }
 
         return effectiveCombatFatigue;

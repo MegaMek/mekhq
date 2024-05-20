@@ -186,7 +186,7 @@ public class Campaign implements ITechManager {
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
-    private ArrayList<Boolean> fieldFacilityCapacities;
+    private Boolean fieldKitchenWithinCapacity;
 
     // this is updated and used per gaming session, it is enabled/disabled via the Campaign options
     // we're re-using the LogEntry class that is used to store Personnel entries
@@ -292,7 +292,7 @@ public class Campaign implements ITechManager {
         hasActiveContract = false;
         campaignSummary = new CampaignSummary(this);
         quartermaster = new Quartermaster(this);
-        fieldFacilityCapacities = new ArrayList<>(Arrays.asList(false, false));
+        fieldKitchenWithinCapacity = false;
     }
 
     /**
@@ -1341,12 +1341,12 @@ public class Campaign implements ITechManager {
         return person;
     }
 
-    public ArrayList<Boolean> getFieldFacilityCapacities() {
-        return fieldFacilityCapacities;
+    public Boolean getFieldKitchenWithinCapacity() {
+        return fieldKitchenWithinCapacity;
     }
 
-    public void setFieldFacilityCapacities(final ArrayList<Boolean> fieldFacilityCapacities) {
-        this.fieldFacilityCapacities = fieldFacilityCapacities;
+    public void setFieldKitchenWithinCapacity(final Boolean fieldKitchenWithinCapacity) {
+        this.fieldKitchenWithinCapacity = fieldKitchenWithinCapacity;
     }
     //endregion Person Creation
 
@@ -3517,7 +3517,7 @@ public class Campaign implements ITechManager {
         getFinances().newDay(this, yesterday, getLocalDate());
 
         // Combat Fatigue Region
-        if (getLocalDate().getDayOfMonth() == 1) {
+        if (getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
             // even if Combat Fatigue is disabled, we still want to process recovery so fatigued personnel aren't frozen in that state
             processCombatFatigueRecovery();
         }
@@ -3525,14 +3525,10 @@ public class Campaign implements ITechManager {
         if (campaignOptions.isUseCombatFatigue()) {
             // we store these values, so this only needs to be checked once per day,
             // otherwise we would need to check it once for each active person in the campaign
-            fieldFacilityCapacities = new ArrayList<>(checkFieldFacilityCapacities());
+            fieldKitchenWithinCapacity = getActivePersonnel().size() <= checkFieldKitchenCapacity();
         } else {
-            fieldFacilityCapacities = new ArrayList<>(Arrays.asList(false, false));
+            fieldKitchenWithinCapacity = false;
         }
-
-        // if Combat Fatigue is disabled, we reset everyone's fatigue modifier to 0,
-        // this means we don't have to check to see whether Combat Fatigue every time we make a roll affected by Combat Fatigue
-        setCombatFatigueModifiersForActivePersonnel();
         // End Combat Fatigue Region
 
         MekHQ.triggerEvent(new NewDayEvent(this));
@@ -6985,28 +6981,12 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * This method counts the number of field kitchens and Mash units available and compares them to the number of active personnel.
+     * Calculates the total capacity of field kitchens based on the units present.
      *
-     * @return A list of booleans indicating the status of the field facilities' capacities.
-     *         True if the capacity of each field facility is not exceeded by the number of active personnel,
-     *         false otherwise.
+     * @return The total capacity of field kitchens.
      */
-    public List<Boolean> checkFieldFacilityCapacities() {
-        List<Integer> facilityCapacities = calculateFacilityCapacities();
-
-        return Arrays.asList(getActivePersonnel().size() <= facilityCapacities.get(0),
-        getActivePersonnel().size() <= facilityCapacities.get(1));
-    }
-
-    /**
-     * Calculates the facility capacities based on the units present.
-     *
-     * @return A list containing the calculated capacities for field kitchens
-     *         and mash facilities.
-     */
-    public List<Integer> calculateFacilityCapacities() {
+    public Integer checkFieldKitchenCapacity() {
         int fieldKitchenCount = 0;
-        int mashCount = 0;
 
         Collection<Unit> allUnits = getUnits();
 
@@ -7023,56 +7003,39 @@ public class Campaign implements ITechManager {
                 List<MiscMounted> miscItems = unit.getEntity().getMisc();
 
                 if (!miscItems.isEmpty()) {
-                    for (MiscMounted item : unit.getEntity().getMisc()) {
-                        if (item.getType().hasFlag(MiscType.F_FIELD_KITCHEN)) {
-                            fieldKitchenCount++;
-                        } else if (item.getType().hasFlag(MiscType.F_MASH)) {
-                            mashCount++;
-                        }
-                    }
+                    fieldKitchenCount += (int) unit.getEntity().getMisc().stream()
+                            .filter(item -> item.getType().hasFlag(MiscType.F_FIELD_KITCHEN))
+                            .count();
                 }
             }
         }
 
-        return Arrays.asList(fieldKitchenCount * campaignOptions.getFieldKitchenCapacity(), mashCount * campaignOptions.getMashCapacity());
-    }
-
-
-    /**
-     * Sets the combat fatigue modifiers for all active personnel.
-     * If Combat Fatigue is disabled, all Fatigue Modifiers are set to 0.
-     */
-    public void setCombatFatigueModifiersForActivePersonnel() {
-        for (Person person : getActivePersonnel()) {
-            if (campaignOptions.isUseCombatFatigue()) {
-                person.calculateCombatFatigueModifier(this);
-            } else {
-                person.setCombatFatigueModifier(0);
-            }
-        }
+        return fieldKitchenCount * campaignOptions.getFieldKitchenCapacity();
     }
 
     /**
-     * Reports the combat fatigue of a person.
+     * Reports the combat fatigue of a person and, if appropriate, sets setIsRecoveringFromFatigue to true.
      *
      * @param person the person for which the combat fatigue needs to be reported
      */
     public void reportCombatFatigue(Person person) {
-        switch (person.getCombatFatigue()) {
-            case 0:
-                break;
-            case 1:
-                addReport(person.getHyperlinkedFullTitle() + ' '
-                        + resources.getString("combatFatigueVeryTired.text"));
-            case 2:
-                addReport(person.getHyperlinkedFullTitle() + ' '
-                        + resources.getString("combatFatigueFatigued.text"));
-            case 3:
-                addReport(person.getHyperlinkedFullTitle() + ' '
-                        + resources.getString("combatFatigueExhausted.text"));
-            default:
-                addReport(person.getHyperlinkedFullTitle() + ' ' +
-                        String.format(resources.getString("combatFatigueCritical.text"), person.getCombatFatigueModifier()));
+        int combatFatigue = person.getCombatFatigue();
+
+        if (getCampaignOptions().isUseCombatFatigue()) {
+            if ((combatFatigue >= 3) && (combatFatigue < 7)) {
+                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("combatFatigueTired.text"));
+                person.setIsRecoveringFromFatigue(true);
+            } else if ((combatFatigue >= 7) && (combatFatigue < 12)) {
+                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("combatFatigueFatigued.text"));
+                person.setIsRecoveringFromFatigue(true);
+            } else if (combatFatigue >= 12) {
+                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("combatFatigueExhausted.text"));
+                person.setIsRecoveringFromFatigue(true);
+            }
+        } else {
+            if (combatFatigue >=3) {
+                person.setIsRecoveringFromFatigue(true);
+            }
         }
     }
 
@@ -7083,7 +7046,6 @@ public class Campaign implements ITechManager {
         for (Person person : getActivePersonnel()) {
             if (person.getCombatFatigue() > 0) {
                 person.setCombatFatigue(person.getCombatFatigue() - 1);
-                person.calculateCombatFatigueModifier(this);
 
                 if ((getCampaignOptions().isUseCombatFatigue()) && (person.getIsRecoveringFromFatigue())) {
                     if (person.getCombatFatigue() == 0) {

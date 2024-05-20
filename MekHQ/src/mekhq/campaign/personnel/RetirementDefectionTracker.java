@@ -146,8 +146,10 @@ public class RetirementDefectionTracker {
 
             // Combat Fatigue modifier
             if (campaign.getCampaignOptions().isUseCombatFatigue()) {
-                if (person.getCombatFatigueModifier() > 1) {
-                    targetNumber.addModifier(person.getCombatFatigueModifier() / 2, resources.getString("combatFatigue.text"));
+                int combatFatigueModifier = person.getCombatFatigue() / 5;
+
+                if (combatFatigueModifier > 0) {
+                    targetNumber.addModifier(combatFatigueModifier, resources.getString("combatFatigue.text"));
                 }
             }
 
