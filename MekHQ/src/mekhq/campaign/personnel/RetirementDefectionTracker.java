@@ -144,6 +144,13 @@ public class RetirementDefectionTracker {
                 targetNumber.addModifier(person.getExperienceLevel(campaign, false), resources.getString("desirability.text"));
             }
 
+            // Combat Fatigue modifier
+            if (campaign.getCampaignOptions().isUseCombatFatigue()) {
+                if (person.getCombatFatigueModifier() > 1) {
+                    targetNumber.addModifier(person.getCombatFatigueModifier() / 2, resources.getString("combatFatigue.text"));
+                }
+            }
+
             // Administrative Strain Modifiers
             if (campaign.getCampaignOptions().isUseAdministrativeStrain()) {
                 int administrativeStrainModifier = getAdministrativeStrainModifier(campaign);
