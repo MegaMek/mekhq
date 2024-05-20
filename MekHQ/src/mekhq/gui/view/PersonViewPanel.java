@@ -1434,16 +1434,18 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblFatigue1, gridBagConstraints);
 
-            StringBuilder fatigueDisplay = new StringBuilder(person.getFatigue());
+            StringBuilder fatigueDisplay = new StringBuilder();
             int effectiveFatigue = person.getEffectiveFatigue(campaign);
             int fatigueTurnoverModifier = effectiveFatigue / 5;
 
+            fatigueDisplay.append(person.getFatigue());
+
             if (person.getFatigue() != effectiveFatigue) {
-                fatigueDisplay.append(" (").append(effectiveFatigue).append(')');
+                fatigueDisplay.append(" / ").append(effectiveFatigue);
             }
 
             if (fatigueTurnoverModifier > 0) {
-                fatigueDisplay.append(" -").append(fatigueTurnoverModifier);
+                fatigueDisplay.append(" (-").append(fatigueTurnoverModifier).append(')');
             }
 
             lblFatigue2.setName("lblFatigue2");
