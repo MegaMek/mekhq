@@ -473,8 +473,12 @@ public class StratconRulesManager {
         // reveal facility in deployed coordinates (and all adjacent coordinates for scout lances)
         // reveal scenario in deployed coordinates (and all adjacent coordinates for scout lances)
 
+        // we want to ensure we only increase Fatigue once
+        boolean hasFatigueIncreased = false;
+
         if (!track.getRevealedCoords().contains(coords)) {
             increaseFatigue(forceID, campaign);
+            hasFatigueIncreased = true;
         }
 
         track.getRevealedCoords().add(coords);
@@ -511,6 +515,11 @@ public class StratconRulesManager {
                     MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
                 }
 
+                if ((!track.getRevealedCoords().contains(checkCoords)) && (!hasFatigueIncreased)) {
+                    increaseFatigue(forceID, campaign);
+                    hasFatigueIncreased = true;
+                }
+
                 track.getRevealedCoords().add(coords.translate(direction));
             }
         }
@@ -530,7 +539,7 @@ public class StratconRulesManager {
     private static void increaseFatigue(int forceID, Campaign campaign) {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
-                person.setFatigue(person.getFatigue() + 1);
+                person.setFatigue(person.getFatigue() + campaign.getCampaignOptions().getFatigueRate());
                 campaign.reportFatigue(person);
             }
         }

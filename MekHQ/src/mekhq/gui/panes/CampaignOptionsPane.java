@@ -214,6 +214,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel fatiguePanel;
     private JLabel lblFatigueWarning;
     private JCheckBox chkUseFatigue;
+    private JLabel lblFatigueRate;
+    private JSpinner spnFatigueRate;
     private JLabel lblFieldKitchenCapacity;
     private JSpinner spnFieldKitchenCapacity;
 
@@ -3360,6 +3362,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblFatigueWarning.setName("lblFatigueWarning");
         lblFatigueWarning.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
+        lblFatigueRate = new JLabel(resources.getString("lblFatigueRate.text"));
+        lblFatigueRate.setToolTipText(resources.getString("lblFatigueRate.toolTipText"));
+        lblFatigueRate.setName("lblFatigueRate");
+        lblFatigueRate.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        spnFatigueRate = new JSpinner(new SpinnerNumberModel(150, 0, 450, 1));
+        spnFatigueRate.setToolTipText(resources.getString("lblFatigueRate.toolTipText"));
+        spnFatigueRate.setName("spnFatigueRate");
+        spnFatigueRate.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
         lblFieldKitchenCapacity = new JLabel(resources.getString("lblFieldKitchenCapacity.text"));
         lblFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
         lblFieldKitchenCapacity.setName("lblFieldKitchenCapacity");
@@ -3384,6 +3396,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createSequentialGroup()
                         .addComponent(lblFatigueWarning)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblFatigueRate)
+                                .addComponent(spnFatigueRate, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblFieldKitchenCapacity)
                                 .addComponent(spnFieldKitchenCapacity, Alignment.LEADING))
         );
@@ -3391,6 +3406,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(lblFatigueWarning)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblFatigueRate)
+                                .addComponent(spnFatigueRate))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFieldKitchenCapacity)
                                 .addComponent(spnFieldKitchenCapacity))
@@ -7293,6 +7311,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkDisplayKillRecord.setSelected(options.isDisplayKillRecord());
 
         chkUseFatigue.setSelected(options.isUseFatigue());
+        spnFatigueRate.setValue(options.getFatigueRate());
         spnFieldKitchenCapacity.setValue(options.getFieldKitchenCapacity());
 
         // Expanded Personnel Information
@@ -7932,6 +7951,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             options.setUseFatigue(chkUseFatigue.isSelected());
             options.setFieldKitchenCapacity((Integer) spnFieldKitchenCapacity.getValue());
+            options.setFatigueRate((Integer) spnFatigueRate.getValue());
 
             // Expanded Personnel Information
             options.setUseTimeInService(chkUseTimeInService.isSelected());

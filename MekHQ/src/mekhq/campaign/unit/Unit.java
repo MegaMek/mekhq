@@ -4005,7 +4005,13 @@ public class Unit implements ITechnology {
         entity.getCrew().setGunneryB(Math.min(Math.max(gunnery, 0), 7), slot);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 7), slot);
         entity.getCrew().setToughness(p.getToughness(), slot);
-        entity.getCrew().setFatigue(p.getFatigue(), slot);
+
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            entity.getCrew().setFatigue(p.getFatigue(), slot);
+        } else {
+            entity.getCrew().setFatigue(0, slot);
+        }
+
         entity.getCrew().setExternalIdAsString(p.getId().toString(), slot);
         entity.getCrew().setMissing(false, slot);
     }

@@ -208,6 +208,7 @@ public class CampaignOptions {
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
     private boolean useFatigue;
+    private Integer fatigueRate;
     private Integer fieldKitchenCapacity;
 
     // Expanded Personnel Information
@@ -667,6 +668,7 @@ public class CampaignOptions {
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
         setUseFatigue(true);
+        setFatigueRate(1);
         setFieldKitchenCapacity(150);
 
         // Expanded Personnel Information
@@ -1428,6 +1430,14 @@ public class CampaignOptions {
 
     public void setUseFatigue(final boolean useFatigue) {
         this.useFatigue = useFatigue;
+    }
+
+    public Integer getFatigueRate() {
+        return fatigueRate;
+    }
+
+    public void setFatigueRate(final Integer fatigueRate) {
+        this.fatigueRate = fatigueRate;
     }
 
     public Integer getFieldKitchenCapacity() {
@@ -4139,6 +4149,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", isDisplayScenarioLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", isDisplayKillRecord());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigue", isUseFatigue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueRate", getFatigueRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
         //endregion General Personnel
 
@@ -4740,6 +4751,8 @@ public class CampaignOptions {
                     retVal.setDisplayKillRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFatigue")) {
                     retVal.setUseFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fatigueRate")) {
+                    retVal.setFatigueRate(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
                     retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
                 //endregion General Personnel
