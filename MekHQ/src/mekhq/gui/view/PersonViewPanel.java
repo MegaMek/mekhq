@@ -18,6 +18,7 @@
  */
 package mekhq.gui.view;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.options.IOption;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
@@ -1436,7 +1437,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             StringBuilder fatigueDisplay = new StringBuilder();
             int effectiveFatigue = person.getEffectiveFatigue(campaign);
-            int fatigueTurnoverModifier = effectiveFatigue / 5;
+            int fatigueTurnoverModifier = MathUtility.clamp(((person.getFatigue() - 1) / 4) - 1, 0, 3);
 
             fatigueDisplay.append(person.getFatigue());
 
