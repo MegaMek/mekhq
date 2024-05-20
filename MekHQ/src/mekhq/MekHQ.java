@@ -39,7 +39,6 @@ import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.handler.XPHandler;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.stratcon.StratconRulesManager;
