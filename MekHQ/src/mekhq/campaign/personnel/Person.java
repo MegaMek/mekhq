@@ -127,6 +127,7 @@ public class Person {
     private Integer loyalty;
     private Integer combatFatigue;
     private Integer combatFatigueModifier;
+    private Boolean isRecoveringFromFatigue;
 
     private Skills skills;
     private PersonnelOptions options;
@@ -333,6 +334,7 @@ public class Person {
         loyalty = 0;
         combatFatigue = 0;
         combatFatigueModifier = 0;
+        isRecoveringFromFatigue = false;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -1229,6 +1231,14 @@ public class Person {
     public void setCombatFatigueModifier(final Integer combatFatigueModifier) {
         this.combatFatigueModifier = combatFatigueModifier;
     }
+
+    public boolean getIsRecoveringFromFatigue() {
+        return isRecoveringFromFatigue;
+    }
+
+    public void setIsRecoveringFromFatigue(final boolean isRecoveringFromFatigue) {
+        this.isRecoveringFromFatigue = isRecoveringFromFatigue;
+    }
     //region Turnover and Retention
 
     //region Pregnancy
@@ -1634,6 +1644,8 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatFatigue", getCombatFatigue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatFatigueModifier", getCombatFatigueModifier());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
             }
@@ -1940,9 +1952,13 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
                     retVal.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("loyalty")) {
-                    retVal.setLoyalty(Integer.parseInt(wn2.getTextContent()));
+                    retVal.loyalty = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("combatFatigue")) {
-                    retVal.setCombatFatigue(Integer.parseInt(wn2.getTextContent()));
+                    retVal.combatFatigue = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("combatFatigueModifier")) {
+                    retVal.combatFatigueModifier = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("isRecoveringFromFatigue")) {
+                    retVal.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
@@ -3666,6 +3682,9 @@ public class Person {
      */
     public void calculateCombatFatigueModifier(Campaign campaign) {
         combatFatigueModifier = getEffectiveCombatFatigue(campaign) / campaign.getCampaignOptions().getCombatFatigueThreshold();
+        if (combatFatigueModifier > 0) {
+            isRecoveringFromFatigue = true;
+        }
     }
 
     /**

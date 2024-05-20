@@ -7083,6 +7083,14 @@ public class Campaign implements ITechManager {
         for (Person person : getActivePersonnel()) {
             if (person.getCombatFatigue() > 0) {
                 person.setCombatFatigue(person.getCombatFatigue() - 1);
+                person.calculateCombatFatigueModifier(this);
+
+                if ((getCampaignOptions().isUseCombatFatigue()) && (person.getIsRecoveringFromFatigue())) {
+                    if (person.getCombatFatigue() == 0) {
+                        addReport(person.getHyperlinkedFullTitle() + ' '
+                                + resources.getString("combatFatigueRecovered.text"));
+                    }
+                }
             }
         }
     }
