@@ -207,10 +207,6 @@ public class CampaignOptions {
     private boolean displayPersonnelLog;
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
-    private boolean useFatigue;
-    private Integer fatigueRate;
-    private Integer fieldKitchenCapacity;
-    private Integer fatigueLeaveThreshold;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -235,6 +231,12 @@ public class CampaignOptions {
     private boolean prisonerBabyStatus;
     private boolean useAtBPrisonerDefection;
     private boolean useAtBPrisonerRansom;
+
+    // Fatigue
+    private boolean useFatigue;
+    private Integer fatigueRate;
+    private Integer fieldKitchenCapacity;
+    private Integer fatigueLeaveThreshold;
 
     // Dependent
     private RandomDependentMethod randomDependentMethod;
@@ -267,6 +269,7 @@ public class CampaignOptions {
     private Integer serviceContractModifier;
 
     private boolean useCustomRetirementModifiers;
+    private boolean useFatigueModifiers;
     private boolean useSkillModifiers;
     private boolean useAgeModifiers;
     private boolean useUnitRatingModifiers;
@@ -765,6 +768,7 @@ public class CampaignOptions {
         setServiceContractModifier(8);
 
         setUseCustomRetirementModifiers(true);
+        setUseFatigueModifiers(true);
         setUseSkillModifiers(true);
         setUseAgeModifiers(true);
         setUseUnitRatingModifiers(true);
@@ -1733,6 +1737,14 @@ public class CampaignOptions {
 
     public void setUseCustomRetirementModifiers(final boolean useCustomRetirementModifiers) {
         this.useCustomRetirementModifiers = useCustomRetirementModifiers;
+    }
+
+    public boolean isUseFatigueModifiers() {
+        return useFatigueModifiers;
+    }
+
+    public void setUseFatigueModifiers(final boolean useFatigueModifiers) {
+        this.useFatigueModifiers = useFatigueModifiers;
     }
 
     public boolean isUseLoyaltyModifiers() {
@@ -4229,6 +4241,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractModifier", getServiceContractModifier());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigueModifiers", isUseFatigueModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSkillModifiers", isUseSkillModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAgeModifiers", isUseAgeModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnitRatingModifiers", isUseUnitRatingModifiers());
@@ -4906,6 +4919,8 @@ public class CampaignOptions {
                     retVal.setServiceContractModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
                     retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useFatigueModifiers")) {
+                    retVal.setUseFatigueModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useSkillModifiers")) {
                     retVal.setUseSkillModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAgeModifiers")) {
@@ -5455,10 +5470,6 @@ public class CampaignOptions {
                     retVal.getRandomOriginOptions().setExtraRandomOrigin(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("originDistanceScale")) { // Legacy, 0.49.7 Removal
                     retVal.getRandomOriginOptions().setOriginDistanceScale(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("customRetirementMods")) { // Legacy - 0.49.7 Removal
-                    retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("foundersNeverRetire")) { // Legacy - 0.49.7 Removal
-                    retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("atbAddDependents")) { // Legacy - 0.49.7 Removal
                     final boolean value = Boolean.parseBoolean(wn2.getTextContent().trim());
                     retVal.setRandomDependentMethod((value && retVal.isUseAtB()) ? RandomDependentMethod.AGAINST_THE_BOT : RandomDependentMethod.NONE);

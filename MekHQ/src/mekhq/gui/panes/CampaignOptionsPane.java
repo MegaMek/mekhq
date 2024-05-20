@@ -212,6 +212,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkDisplayKillRecord;
 
     private JPanel fatiguePanel;
+    private JPanel fatiguePanelElements;
     private JLabel lblFatigueWarning;
     private JCheckBox chkUseFatigue;
     private JLabel lblFatigueRate;
@@ -3152,7 +3153,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridx++;
         personnelPanel.add(createPrisonerPanel(), gbc);
 
+        gbc.gridx = 0;
         gbc.gridy++;
+        personnelPanel.add(createFatiguePanel(), gbc);
+
+        gbc.gridx++;
         personnelPanel.add(createDependentPanel(), gbc);
 
         gbc.gridx = 0;
@@ -3283,23 +3288,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkDisplayKillRecord.setToolTipText(resources.getString("chkDisplayKillRecord.toolTipText"));
         chkDisplayKillRecord.setName("chkDisplayKillRecord");
 
-        chkUseFatigue = new JCheckBox(resources.getString("chkUseFatigue.text"));
-        chkUseFatigue.setToolTipText(resources.getString("chkUseFatigue.toolTipText"));
-        chkUseFatigue.setName("chkUseFatigue");
-        chkUseFatigue.addActionListener(evt -> {
-            final boolean isEnabled = chkUseFatigue.isSelected();
-
-            // general handler
-            for (Component component : fatiguePanel.getComponents()) {
-                component.setEnabled(isEnabled);
-            }
-
-            // border handler
-            fatiguePanel.setEnabled(isEnabled);
-        });
-
-        fatiguePanel = createFatiguePanel();
-
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(""));
@@ -3329,8 +3317,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkDisplayPersonnelLog)
                         .addComponent(chkDisplayScenarioLog)
                         .addComponent(chkDisplayKillRecord)
-                        .addComponent(chkUseFatigue)
-                        .addComponent(fatiguePanel)
         );
 
         layout.setHorizontalGroup(
@@ -3352,14 +3338,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkDisplayPersonnelLog)
                         .addComponent(chkDisplayScenarioLog)
                         .addComponent(chkDisplayKillRecord)
-                        .addComponent(chkUseFatigue)
-                        .addComponent(fatiguePanel)
         );
 
         return panel;
     }
 
-    private JPanel createFatiguePanel() {
+    private JPanel createFatiguePanelElements() {
         lblFatigueWarning = new JLabel(resources.getString("lblFatigueWarning.text"));
         lblFatigueWarning.setName("lblFatigueWarning");
         lblFatigueWarning.setEnabled(campaign.getCampaignOptions().isUseFatigue());
@@ -3394,15 +3378,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnFatigueLeaveThreshold.setName("spnFatigueLeaveThreshold");
         spnFatigueLeaveThreshold.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
-        fatiguePanel = new JPanel();
-        fatiguePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("fatiguePanel.title")));
-        fatiguePanel.setName("fatiguePanel");
-        fatiguePanel.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+        fatiguePanelElements = new JPanel();
+        fatiguePanelElements.setName("fatiguePanelElements");
+        fatiguePanelElements.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
-        final GroupLayout layout = new GroupLayout(fatiguePanel);
+        final GroupLayout layout = new GroupLayout(fatiguePanelElements);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
-        fatiguePanel.setLayout(layout);
+        fatiguePanelElements.setLayout(layout);
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
@@ -3432,7 +3415,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnFatigueLeaveThreshold))
         );
 
-        return fatiguePanel;
+        return fatiguePanelElements;
     }
 
     private JPanel createExpandedPersonnelInformationPanel() {
@@ -4425,6 +4408,44 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(randomDependentPanel)
+        );
+
+        return panel;
+    }
+
+    private JPanel createFatiguePanel() {
+        chkUseFatigue = new JCheckBox(resources.getString("chkUseFatigue.text"));
+        chkUseFatigue.setToolTipText(resources.getString("chkUseFatigue.toolTipText"));
+        chkUseFatigue.setName("chkUseFatigue");
+        chkUseFatigue.addActionListener(evt -> {
+            final boolean isEnabled = chkUseFatigue.isSelected();
+
+            for (Component component : fatiguePanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+        });
+
+        fatiguePanel = createFatiguePanelElements();
+
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("fatiguePanel.title")));
+        panel.setName("fatiguePanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        panel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseFatigue)
+                        .addComponent(fatiguePanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseFatigue)
+                        .addComponent(fatiguePanel)
         );
 
         return panel;
