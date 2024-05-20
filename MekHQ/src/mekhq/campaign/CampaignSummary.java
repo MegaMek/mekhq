@@ -241,15 +241,6 @@ public class CampaignSummary {
     }
 
     /**
-     * Retrieves the fatigue report for the campaign.
-     *
-     * @return The fatigue report as a string.
-     */
-    public String getFatigueReport() {
-        return campaign.getFatigueLevel() + " (+" + campaign.getFatigueLevel() / 10 + ')';
-    }
-
-    /**
      * A report that gives the percentage of successful missions
      * @return a <code>String</code> of the report
      */
@@ -315,6 +306,31 @@ public class CampaignSummary {
         }
 
         return administrativeCapacityReport.toString();
+    }
+
+    /**
+     * Returns a summary of combat fatigue related facilities.
+     *
+     * @param campaign the campaign object for which to generate the summary
+     * @return a String representing the combat fatigue facility summary
+     */
+    public String getCombatFatigueSummary() {
+        int personnelCount = campaign.getActivePersonnel().size();
+        List<Integer> facilityCapacities = campaign.calculateFacilityCapacities();
+
+        if ((facilityCapacities.get(0) > 0) && (facilityCapacities.get(1) > 0)) {
+            return String.format("Kitchens (%s/%s), Hospitals (%s/%s)",
+                    personnelCount, campaign.calculateFacilityCapacities().get(0),
+                    personnelCount, campaign.calculateFacilityCapacities().get(1));
+        } else if (facilityCapacities.get(0) > 0) {
+            return String.format("Kitchens (%s/%s)",
+                    personnelCount, campaign.calculateFacilityCapacities().get(0));
+        } else if (facilityCapacities.get(1) > 0) {
+            return String.format("Hospitals (%s/%s)",
+                    personnelCount, campaign.calculateFacilityCapacities().get(1));
+        } else {
+            return "";
+        }
     }
 
     private String createCsv(Collection<?> coll) {

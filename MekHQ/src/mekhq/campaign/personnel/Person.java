@@ -124,7 +124,9 @@ public class Person {
     private List<LogEntry> scenarioLog;
 
     private LocalDate retirement;
-    private int loyalty;
+    private Integer loyalty;
+    private Integer combatFatigue;
+    private Integer combatFatigueModifier;
 
     private Skills skills;
     private PersonnelOptions options;
@@ -329,6 +331,8 @@ public class Person {
         lastRankChangeDate = null;
         retirement = null;
         loyalty = 0;
+        combatFatigue = 0;
+        combatFatigueModifier = 0;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -1209,6 +1213,22 @@ public class Person {
     public void setLoyalty(final Integer loyalty) {
         this.loyalty = loyalty;
     }
+
+    public Integer getCombatFatigue() {
+        return combatFatigue;
+    }
+
+    public void setCombatFatigue(final Integer combatFatigue) {
+        this.combatFatigue = combatFatigue;
+    }
+
+    public Integer getCombatFatigueModifier() {
+        return combatFatigueModifier;
+    }
+
+    public void setCombatFatigueModifier(final Integer combatFatigueModifier) {
+        this.combatFatigueModifier = combatFatigueModifier;
+    }
     //region Turnover and Retention
 
     //region Pregnancy
@@ -1613,6 +1633,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatFatigue", getCombatFatigue());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
             }
@@ -1920,6 +1941,8 @@ public class Person {
                     retVal.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("loyalty")) {
                     retVal.setLoyalty(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("combatFatigue")) {
+                    retVal.setCombatFatigue(Integer.parseInt(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
@@ -3634,5 +3657,52 @@ public class Person {
         } else {
             setLoyalty(0);
         }
+    }
+
+    /**
+     * Calculates a person's combat fatigue modifier.
+     *
+     * @param campaign the campaign
+     */
+    public void calculateCombatFatigueModifier(Campaign campaign) {
+        combatFatigueModifier = getEffectiveCombatFatigue(campaign) / campaign.getCampaignOptions().getCombatFatigueThreshold();
+    }
+
+    /**
+     * Calculates the effective combat fatigue for a person.
+     *
+     * @param campaign the campaign for which to calculate the effective combat fatigue
+     * @return the effective combat fatigue value
+     */
+    public int getEffectiveCombatFatigue(Campaign campaign) {
+        int effectiveCombatFatigue = combatFatigue;
+
+        if (isClanPersonnel()) {
+            effectiveCombatFatigue -= 2;
+        }
+
+        switch (getSkillLevel(campaign, false)) {
+            case NONE:
+            case ULTRA_GREEN:
+            case GREEN:
+            case REGULAR:
+                break;
+            case VETERAN:
+                effectiveCombatFatigue--;
+                break;
+            case ELITE:
+            case HEROIC:
+            case LEGENDARY:
+                effectiveCombatFatigue -= 2;
+                break;
+        }
+
+        for (Boolean capacityStatus : campaign.getFieldFacilityCapacities()) {
+            if (capacityStatus) {
+                effectiveCombatFatigue--;
+            }
+        }
+
+        return effectiveCombatFatigue;
     }
 }

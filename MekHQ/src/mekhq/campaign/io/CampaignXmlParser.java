@@ -720,8 +720,6 @@ public class CampaignXmlParser {
                     retVal.setAstechPoolOvertime(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("medicPool")) {
                     retVal.setMedicPool(Integer.parseInt(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("fatigueLevel")) {
-                    retVal.setFatigueLevel(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("id")) {
                     retVal.setId(UUID.fromString(wn.getTextContent().trim()));
                 }

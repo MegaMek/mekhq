@@ -1207,6 +1207,9 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblLoyalty1 = new JLabel();
         JLabel lblLoyalty2 = new JLabel();
 
+        JLabel lblCombatFatigue1 = new JLabel();
+        JLabel lblCombatFatigue2 = new JLabel();
+
         // education
         JLabel lblEducationLevel1 = new JLabel();
         JLabel lblEducationLevel2 = new JLabel();
@@ -1416,6 +1419,43 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblLoyalty2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if ((campaign.getCampaignOptions().isUseCombatFatigue())
+                && (person.getEffectiveCombatFatigue(campaign) > 0)) {
+            lblCombatFatigue1.setName("lblCombatFatigue1");
+            lblCombatFatigue1.setText(resourceMap.getString("lblCombatFatigue1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblCombatFatigue1, gridBagConstraints);
+
+            StringBuilder combatFatigueDisplay = new StringBuilder(person.getCombatFatigue());
+
+            if (person.getCombatFatigue() != person.getEffectiveCombatFatigue(campaign)) {
+                combatFatigueDisplay.append(" (").append(person.getEffectiveCombatFatigue(campaign)).append(')');
+            }
+
+            if (person.getCombatFatigueModifier() > 0) {
+                combatFatigueDisplay.append(" +").append(person.getCombatFatigueModifier());
+            }
+
+            lblCombatFatigue2.setName("lblCombatFatigue2");
+            lblCombatFatigue2.setText(combatFatigueDisplay.toString());
+            lblCombatFatigue2.setLabelFor(lblCombatFatigue2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblCombatFatigue2, gridBagConstraints);
 
             firsty++;
         }

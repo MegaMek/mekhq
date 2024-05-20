@@ -31,6 +31,7 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.BombMounted;
+import megamek.common.equipment.MiscMounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
@@ -185,6 +186,8 @@ public class Campaign implements ITechManager {
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
+    private ArrayList<Boolean> fieldFacilityCapacities;
+
     // this is updated and used per gaming session, it is enabled/disabled via the Campaign options
     // we're re-using the LogEntry class that is used to store Personnel entries
     public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
@@ -223,7 +226,6 @@ public class Campaign implements ITechManager {
     private transient AbstractProcreation procreation;
 
     private RetirementDefectionTracker retirementDefectionTracker; // AtB
-    private int fatigueLevel; //AtB
     private AtBConfiguration atbConfig; //AtB
     private AtBEventProcessor atbEventProcessor; //AtB
     private LocalDate shipSearchStart; //AtB
@@ -285,12 +287,12 @@ public class Campaign implements ITechManager {
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
-        fatigueLevel = 0;
         atbConfig = null;
         autosaveService = new AutosaveService();
         hasActiveContract = false;
         campaignSummary = new CampaignSummary(this);
         quartermaster = new Quartermaster(this);
+        fieldFacilityCapacities = new ArrayList<>(Arrays.asList(false, false));
     }
 
     /**
@@ -477,14 +479,6 @@ public class Campaign implements ITechManager {
 
     public RetirementDefectionTracker getRetirementDefectionTracker() {
         return retirementDefectionTracker;
-    }
-
-    public void setFatigueLevel(int fl) {
-        fatigueLevel = fl;
-    }
-
-    public int getFatigueLevel() {
-        return fatigueLevel;
     }
 
     /**
@@ -1345,6 +1339,14 @@ public class Campaign implements ITechManager {
         }
 
         return person;
+    }
+
+    public ArrayList<Boolean> getFieldFacilityCapacities() {
+        return fieldFacilityCapacities;
+    }
+
+    public void setFieldFacilityCapacities(final ArrayList<Boolean> fieldFacilityCapacities) {
+        this.fieldFacilityCapacities = fieldFacilityCapacities;
     }
     //endregion Person Creation
 
@@ -3158,19 +3160,6 @@ public class Campaign implements ITechManager {
         }
     }
 
-    private void processNewDayATBFatigue() {
-        boolean inContract = false;
-        for (final AtBContract contract : getActiveAtBContracts()) {
-            fatigueLevel += contract.getContractType().getFatigue();
-            inContract = true;
-        }
-
-        if (!inContract && location.isOnPlanet()) {
-            fatigueLevel -= 2;
-        }
-        fatigueLevel = Math.max(fatigueLevel, 0);
-    }
-
     private void processNewDayATB() {
         contractMarket.generateContractOffers(this); // TODO : AbstractContractMarket : Remove
 
@@ -3234,7 +3223,7 @@ public class Campaign implements ITechManager {
 
         if (getLocalDate().getDayOfMonth() == 1) {
             /*
-             * First of the month; roll morale, track unit fatigue.
+             * First of the month; roll morale.
              */
             IUnitRating rating = getUnitRating();
             rating.reInitialize();
@@ -3243,11 +3232,6 @@ public class Campaign implements ITechManager {
                 contract.checkMorale(getLocalDate(), getUnitRatingMod());
                 addReport("Enemy morale is now " + contract.getMoraleLevel()
                         + " on contract " + contract.getName());
-            }
-
-            // Account for fatigue
-            if (getCampaignOptions().isTrackUnitFatigue()) {
-                processNewDayATBFatigue();
             }
         }
 
@@ -3531,6 +3515,25 @@ public class Campaign implements ITechManager {
 
         // check for anything in finances
         getFinances().newDay(this, yesterday, getLocalDate());
+
+        // Combat Fatigue Region
+        if (getLocalDate().getDayOfMonth() == 1) {
+            // even if Combat Fatigue is disabled, we still want to process recovery so fatigued personnel aren't frozen in that state
+            processCombatFatigueRecovery();
+        }
+
+        if (campaignOptions.isUseCombatFatigue()) {
+            // we store these values, so this only needs to be checked once per day,
+            // otherwise we would need to check it once for each active person in the campaign
+            fieldFacilityCapacities = new ArrayList<>(checkFieldFacilityCapacities());
+        } else {
+            fieldFacilityCapacities = new ArrayList<>(Arrays.asList(false, false));
+        }
+
+        // if Combat Fatigue is disabled, we reset everyone's fatigue modifier to 0,
+        // this means we don't have to check to see whether Combat Fatigue every time we make a roll affected by Combat Fatigue
+        setCombatFatigueModifiersForActivePersonnel();
+        // End Combat Fatigue Region
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
@@ -4183,7 +4186,6 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastMissionId", lastMissionId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastScenarioId", lastScenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "calendar", getLocalDate());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLevel", fatigueLevel);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "nameGen");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", RandomNameGenerator.getInstance().getChosenFaction());
@@ -6980,5 +6982,108 @@ public class Campaign implements ITechManager {
     @Override
     public boolean showExtinct() {
         return !campaignOptions.isDisallowExtinctStuff();
+    }
+
+    /**
+     * This method counts the number of field kitchens and Mash units available and compares them to the number of active personnel.
+     *
+     * @return A list of booleans indicating the status of the field facilities' capacities.
+     *         True if the capacity of each field facility is not exceeded by the number of active personnel,
+     *         false otherwise.
+     */
+    public List<Boolean> checkFieldFacilityCapacities() {
+        List<Integer> facilityCapacities = calculateFacilityCapacities();
+
+        return Arrays.asList(getActivePersonnel().size() <= facilityCapacities.get(0),
+        getActivePersonnel().size() <= facilityCapacities.get(1));
+    }
+
+    /**
+     * Calculates the facility capacities based on the units present.
+     *
+     * @return A list containing the calculated capacities for field kitchens
+     *         and mash facilities.
+     */
+    public List<Integer> calculateFacilityCapacities() {
+        int fieldKitchenCount = 0;
+        int mashCount = 0;
+
+        Collection<Unit> allUnits = getUnits();
+
+        if (!allUnits.isEmpty()) {
+            for (Unit unit : getUnits()) {
+                if ((unit.isDeployed())
+                        || (unit.isDamaged())
+                        || (unit.getCrewState().isUncrewed())
+                        || (unit.getCrewState().isPartiallyCrewed())
+                        || (unit.isUnmaintained())) {
+                    continue;
+                }
+
+                List<MiscMounted> miscItems = unit.getEntity().getMisc();
+
+                if (!miscItems.isEmpty()) {
+                    for (MiscMounted item : unit.getEntity().getMisc()) {
+                        if (item.getType().hasFlag(MiscType.F_FIELD_KITCHEN)) {
+                            fieldKitchenCount++;
+                        } else if (item.getType().hasFlag(MiscType.F_MASH)) {
+                            mashCount++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return Arrays.asList(fieldKitchenCount * campaignOptions.getFieldKitchenCapacity(), mashCount * campaignOptions.getMashCapacity());
+    }
+
+
+    /**
+     * Sets the combat fatigue modifiers for all active personnel.
+     * If Combat Fatigue is disabled, all Fatigue Modifiers are set to 0.
+     */
+    public void setCombatFatigueModifiersForActivePersonnel() {
+        for (Person person : getActivePersonnel()) {
+            if (campaignOptions.isUseCombatFatigue()) {
+                person.calculateCombatFatigueModifier(this);
+            } else {
+                person.setCombatFatigueModifier(0);
+            }
+        }
+    }
+
+    /**
+     * Reports the combat fatigue of a person.
+     *
+     * @param person the person for which the combat fatigue needs to be reported
+     */
+    public void reportCombatFatigue(Person person) {
+        switch (person.getCombatFatigue()) {
+            case 0:
+                break;
+            case 1:
+                addReport(person.getHyperlinkedFullTitle() + ' '
+                        + resources.getString("combatFatigueVeryTired.text"));
+            case 2:
+                addReport(person.getHyperlinkedFullTitle() + ' '
+                        + resources.getString("combatFatigueFatigued.text"));
+            case 3:
+                addReport(person.getHyperlinkedFullTitle() + ' '
+                        + resources.getString("combatFatigueExhausted.text"));
+            default:
+                addReport(person.getHyperlinkedFullTitle() + ' ' +
+                        String.format(resources.getString("combatFatigueCritical.text"), person.getCombatFatigueModifier()));
+        }
+    }
+
+    /**
+     * Decreases the combat fatigue of all active personnel by 1.
+     */
+    public void processCombatFatigueRecovery() {
+        for (Person person : getActivePersonnel()) {
+            if (person.getCombatFatigue() > 0) {
+                person.setCombatFatigue(person.getCombatFatigue() - 1);
+            }
+        }
     }
 }

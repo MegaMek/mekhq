@@ -211,6 +211,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkDisplayScenarioLog;
     private JCheckBox chkDisplayKillRecord;
 
+    private JPanel combatFatiguePanel;
+    private JLabel lblCombatFatigueWarning;
+    private JCheckBox chkUseCombatFatigue;
+    private JLabel lblCombatFatigueThreshold;
+    private JSpinner spnCombatFatigueThreshold;
+    private JLabel lblFieldKitchenCapacity;
+    private JSpinner spnFieldKitchenCapacity;
+    private JLabel lblMashCapacity;
+    private JSpinner spnMashCapacity;
+
     // Expanded Personnel
     private JCheckBox chkUseTimeInService;
     private MMComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
@@ -280,7 +290,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseUnitRatingModifiers;
     private JCheckBox chkUseFactionModifiers;
     private JCheckBox chkUseMissionStatusModifiers;
-    private JCheckBox chkTrackUnitFatigue;
 
     private JPanel loyaltyPanel;
     private JCheckBox chkUseLoyaltyModifiers;
@@ -3274,6 +3283,23 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkDisplayKillRecord.setToolTipText(resources.getString("chkDisplayKillRecord.toolTipText"));
         chkDisplayKillRecord.setName("chkDisplayKillRecord");
 
+        chkUseCombatFatigue = new JCheckBox(resources.getString("chkUseCombatFatigue.text"));
+        chkUseCombatFatigue.setToolTipText(resources.getString("chkUseCombatFatigue.toolTipText"));
+        chkUseCombatFatigue.setName("chkUseCombatFatigue");
+        chkUseCombatFatigue.addActionListener(evt -> {
+            final boolean isEnabled = chkUseCombatFatigue.isSelected();
+
+            // general handler
+            for (Component component : combatFatiguePanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            // border handler
+            combatFatiguePanel.setEnabled(isEnabled);
+        });
+
+        combatFatiguePanel = createCombatFatiguePanel();
+
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(""));
@@ -3303,6 +3329,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkDisplayPersonnelLog)
                         .addComponent(chkDisplayScenarioLog)
                         .addComponent(chkDisplayKillRecord)
+                        .addComponent(chkUseCombatFatigue)
+                        .addComponent(combatFatiguePanel)
         );
 
         layout.setHorizontalGroup(
@@ -3324,9 +3352,87 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkDisplayPersonnelLog)
                         .addComponent(chkDisplayScenarioLog)
                         .addComponent(chkDisplayKillRecord)
+                        .addComponent(chkUseCombatFatigue)
+                        .addComponent(combatFatiguePanel)
         );
 
         return panel;
+    }
+
+    private JPanel createCombatFatiguePanel() {
+        lblCombatFatigueWarning = new JLabel(resources.getString("lblCombatFatigueWarning.text"));
+        lblCombatFatigueWarning.setName("lblCombatFatigueWarning");
+        lblCombatFatigueWarning.setEnabled(campaign.getCampaignOptions().isUseCombatFatigue());
+
+        lblCombatFatigueThreshold = new JLabel(resources.getString("lblCombatFatigueThreshold.text"));
+        lblCombatFatigueThreshold.setToolTipText(resources.getString("lblCombatFatigueThreshold.toolTipText"));
+        lblCombatFatigueThreshold.setName("lblCombatFatigueThreshold");
+        lblCombatFatigueThreshold.setEnabled(campaign.getCampaignOptions().isUseCombatFatigue());
+
+        spnCombatFatigueThreshold = new JSpinner(new SpinnerNumberModel(5, 0, 15, 1));
+        spnCombatFatigueThreshold.setToolTipText(resources.getString("lblCombatFatigueThreshold.toolTipText"));
+        spnCombatFatigueThreshold.setName("spnCombatFatigueThreshold");
+        spnCombatFatigueThreshold.setEnabled(campaign.getCampaignOptions().isUseCombatFatigue());
+
+        lblFieldKitchenCapacity = new JLabel(resources.getString("lblFieldKitchenCapacity.text"));
+        lblFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
+        lblFieldKitchenCapacity.setName("lblFieldKitchenCapacity");
+        lblFieldKitchenCapacity.setEnabled(campaign.getCampaignOptions().isUseCombatFatigue());
+
+        spnFieldKitchenCapacity = new JSpinner(new SpinnerNumberModel(150, 0, 450, 1));
+        spnFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
+        spnFieldKitchenCapacity.setName("spnFieldKitchenCapacity");
+        spnFieldKitchenCapacity.setEnabled(campaign.getCampaignOptions().isUseCombatFatigue());
+
+        lblMashCapacity = new JLabel(resources.getString("lblMashCapacity.text"));
+        lblMashCapacity.setToolTipText(resources.getString("lblMashCapacity.toolTipText"));
+        lblMashCapacity.setName("lblMashCapacity");
+        lblMashCapacity.setEnabled(campaign.getCampaignOptions().isUseCombatFatigue());
+
+        spnMashCapacity = new JSpinner(new SpinnerNumberModel(250, 0, 750, 1));
+        spnMashCapacity.setToolTipText(resources.getString("lblMashCapacity.toolTipText"));
+        spnMashCapacity.setName("spnMashCapacity");
+        spnMashCapacity.setEnabled(campaign.getCampaignOptions().isUseCombatFatigue());
+
+        combatFatiguePanel = new JPanel();
+        combatFatiguePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("combatFatiguePanel.title")));
+        combatFatiguePanel.setName("combatFatiguePanel");
+        combatFatiguePanel.setEnabled(campaign.getCampaignOptions().isUseCombatFatigue());
+
+        final GroupLayout layout = new GroupLayout(combatFatiguePanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        combatFatiguePanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(lblCombatFatigueWarning)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblCombatFatigueThreshold)
+                                .addComponent(spnCombatFatigueThreshold, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblFieldKitchenCapacity)
+                                .addComponent(spnFieldKitchenCapacity, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(spnMashCapacity)
+                                .addComponent(lblMashCapacity, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(lblCombatFatigueWarning)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblCombatFatigueThreshold)
+                                .addComponent(spnCombatFatigueThreshold))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblFieldKitchenCapacity)
+                                .addComponent(spnFieldKitchenCapacity))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMashCapacity)
+                                .addComponent(spnMashCapacity))
+        );
+
+        return combatFatiguePanel;
     }
 
     private JPanel createExpandedPersonnelInformationPanel() {
@@ -3898,10 +4004,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMissionStatusModifiers.setToolTipText(resources.getString("chkUseMissionStatusModifiers.toolTipText"));
         chkUseMissionStatusModifiers.setName("chkUseMissionStatusModifiers");
 
-        chkTrackUnitFatigue = new JCheckBox(resources.getString("chkTrackUnitFatigue.text"));
-        chkTrackUnitFatigue.setToolTipText(resources.getString("chkTrackUnitFatigue.toolTipText"));
-        chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
-
         chkUseLoyaltyModifiers = new JCheckBox(resources.getString("chkUseLoyaltyModifiers.text"));
         chkUseLoyaltyModifiers.setToolTipText(resources.getString("chkUseLoyaltyModifiers.toolTipText"));
         chkUseLoyaltyModifiers.setName("chkUseLoyaltyModifiers");
@@ -3935,7 +4037,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
-                        .addComponent(chkTrackUnitFatigue)
                         .addComponent(chkUseLoyaltyModifiers)
                         .addComponent(loyaltyPanel)
         );
@@ -3948,7 +4049,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
-                        .addComponent(chkTrackUnitFatigue)
                         .addComponent(chkUseLoyaltyModifiers)
                         .addComponent(loyaltyPanel)
         );
@@ -7228,6 +7328,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkDisplayScenarioLog.setSelected(options.isDisplayScenarioLog());
         chkDisplayKillRecord.setSelected(options.isDisplayKillRecord());
 
+        chkUseCombatFatigue.setSelected(options.isUseCombatFatigue());
+        spnCombatFatigueThreshold.setValue(options.getCombatFatigueThreshold());
+        spnFieldKitchenCapacity.setValue(options.getFieldKitchenCapacity());
+        spnMashCapacity.setValue(options.getMashCapacity());
+
         // Expanded Personnel Information
         if (chkUseTimeInService.isSelected() != options.isUseTimeInService()) {
             chkUseTimeInService.doClick();
@@ -7297,7 +7402,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseUnitRatingModifiers.setSelected(options.isUseUnitRatingModifiers());
         chkUseFactionModifiers.setSelected(options.isUseFactionModifiers());
         chkUseMissionStatusModifiers.setSelected(options.isUseMissionStatusModifiers());
-        chkTrackUnitFatigue.setSelected(options.isTrackUnitFatigue());
 
         chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
         chkUseHideLoyalty.setSelected(options.isUseHideLoyalty());
@@ -7864,6 +7968,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setDisplayScenarioLog(chkDisplayScenarioLog.isSelected());
             options.setDisplayKillRecord(chkDisplayKillRecord.isSelected());
 
+            options.setUseCombatFatigue(chkUseCombatFatigue.isSelected());
+            options.setCombatFatigueThreshold((Integer) spnCombatFatigueThreshold.getValue());
+            options.setFieldKitchenCapacity((Integer) spnFieldKitchenCapacity.getValue());
+            options.setMashCapacity((Integer) spnMashCapacity.getValue());
+
             // Expanded Personnel Information
             options.setUseTimeInService(chkUseTimeInService.isSelected());
             options.setTimeInServiceDisplayFormat(comboTimeInServiceDisplayFormat.getSelectedItem());
@@ -7931,7 +8040,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseUnitRatingModifiers(chkUseUnitRatingModifiers.isSelected());
             options.setUseFactionModifiers(chkUseFactionModifiers.isSelected());
             options.setUseMissionStatusModifiers(chkUseMissionStatusModifiers.isSelected());
-            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
 
             options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
             options.setUseHideLoyalty(chkUseHideLoyalty.isSelected());
@@ -8115,7 +8223,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseStratCon(chkUseStratCon.isSelected());
             options.setSkillLevel(comboSkillLevel.getSelectedItem());
             options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
-            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
             options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
             options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
             options.setUseStrategy(chkUseStrategy.isSelected());

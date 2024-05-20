@@ -34,6 +34,7 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
@@ -509,10 +510,35 @@ public class StratconRulesManager {
             }
         }
 
+        increaseCombatFatigue(forceID, campaign);
+
         // the force may be located in other places on the track - clear it out
         track.unassignForce(forceID);
         track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
         MekHQ.triggerEvent(new StratconDeploymentEvent(campaign.getForce(forceID)));
+    }
+
+    /**
+     * Increases the combat fatigue for all crew members per Unit in a force.
+     *
+     * @param forceID the ID of the force
+     * @param campaign the campaign
+     */
+    private static void increaseCombatFatigue(int forceID, Campaign campaign) {
+        boolean isUseCombatFatigue = campaign.getCampaignOptions().isUseCombatFatigue();
+
+        for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
+            for (Person person : campaign.getUnit(unit).getCrew()) {
+                person.setCombatFatigue(person.getCombatFatigue() + 1);
+
+                if (isUseCombatFatigue) {
+                    person.calculateCombatFatigueModifier(campaign);
+                    campaign.reportCombatFatigue(person);
+                } else {
+                    person.setCombatFatigueModifier(0);
+                }
+            }
+        }
     }
 
     /**

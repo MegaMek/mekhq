@@ -183,11 +183,6 @@ public class RetirementDefectionTracker {
                 targetNumber.addModifier(unitRatingModifier, resources.getString("unitRating.text"));
             }
 
-            // Fatigue Modifiers
-            if (campaign.getCampaignOptions().isTrackUnitFatigue()) {
-                targetNumber.addModifier(campaign.getFatigueLevel() / 10, resources.getString("fatigue.text"));
-            }
-
             // Mission completion status modifiers
             if ((contract != null) && (campaign.getCampaignOptions().isUseMissionStatusModifiers())) {
                 if (contract.getStatus().isSuccess()) {

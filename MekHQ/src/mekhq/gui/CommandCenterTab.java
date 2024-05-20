@@ -62,11 +62,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblPersonnel;
     private JLabel lblAdminstrativeCapacity;
     private JLabel lblMissionSuccess;
-    private JLabel lblFatigue;
     private JLabel lblComposition;
     private JLabel lblRepairStatus;
     private JLabel lblTransportCapacity;
     private JLabel lblCargoSummary;
+    private JLabel lblFacilityCapacities;
 
     // objectives panel
     private JPanel panObjectives;
@@ -204,22 +204,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblRating, gridBagConstraints);
 
-        if(getCampaign().getCampaignOptions().isTrackUnitFatigue()) {
-            JLabel lblFatigueHead = new JLabel(resourceMap.getString("lblFatigue.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new Insets(1, 5, 1, 5);
-            panInfo.add(lblFatigueHead, gridBagConstraints);
-            lblFatigue = new JLabel(getCampaign().getCampaignSummary().getFatigueReport());
-            lblFatigueHead.setLabelFor(lblFatigue);
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.weightx = 1.0;
-            panInfo.add(lblFatigue, gridBagConstraints);
-        }
-
         JLabel lblExperienceHead = new JLabel(resourceMap.getString("lblExperience.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -326,13 +310,31 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.gridy = y++;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new Insets(1, 5, 5, 5);
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblCargoSummaryHead, gridBagConstraints);
         lblCargoSummary = new JLabel(getCampaign().getCampaignSummary().getCargoCapacityReport());
         lblCargoSummaryHead.setLabelFor(lblCargoSummary);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblCargoSummary, gridBagConstraints);
+
+        if (getCampaign().getCampaignOptions().isUseCombatFatigue()) {
+            if ((getCampaign().getCampaignOptions().getFieldKitchenCapacity() > 0) || (getCampaign().getCampaignOptions().getMashCapacity() > 0)) {
+                JLabel lblFacilityCapacitiesHead = new JLabel(resourceMap.getString("lblFacilityCapacities.text"));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = y++;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                gridBagConstraints.insets = new Insets(1, 5, 1, 5);
+                panInfo.add(lblFacilityCapacitiesHead, gridBagConstraints);
+                lblFacilityCapacities = new JLabel(getCampaign().getCampaignSummary().getCombatFatigueSummary());
+                lblFacilityCapacitiesHead.setLabelFor(lblFacilityCapacities);
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.weightx = 1.0;
+                panInfo.add(lblFacilityCapacities, gridBagConstraints);
+            }
+        }
 
         panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panInfo.title")));
     }
@@ -541,7 +543,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         getCampaign().getUnitRating().reInitialize();
         getCampaign().getCampaignSummary().updateInformation();
         lblRating.setText(getCampaign().getUnitRatingText());
-        lblFatigue.setText(getCampaign().getCampaignSummary().getFatigueReport());
         lblPersonnel.setText(getCampaign().getCampaignSummary().getPersonnelReport());
         lblMissionSuccess.setText(getCampaign().getCampaignSummary().getMissionSuccessReport());
         lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
@@ -549,7 +550,14 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport());
         lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());
         lblTransportCapacity.setText(getCampaign().getCampaignSummary().getTransportCapacity());
-        lblAdminstrativeCapacity.setText(getCampaign().getCampaignSummary().getAdministrativeCapacityReport(getCampaign()));
+
+        try {
+            lblAdminstrativeCapacity.setText(getCampaign().getCampaignSummary().getAdministrativeCapacityReport(getCampaign()));
+        } catch (Exception ignored) {}
+
+        try {
+            lblFacilityCapacities.setText(getCampaign().getCampaignSummary().getCombatFatigueSummary());
+        } catch (Exception ignored) {}
     }
 
     private void refreshObjectives() {
