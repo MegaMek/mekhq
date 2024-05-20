@@ -30,7 +30,7 @@ import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
-import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RetirementDefectionTracker;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -65,7 +65,7 @@ public class RetirementDefectionDialog extends JDialog {
     private String currentPanel;
 
     private CampaignGUI hqView;
-    private AtBContract contract;
+    private Mission contract;
     private RetirementDefectionTracker rdTracker;
 
     private Map<UUID, TargetRoll> targetRolls;
@@ -106,14 +106,14 @@ public class RetirementDefectionDialog extends JDialog {
     private final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.RetirementDefectionDialog",
             MekHQ.getMHQOptions().getLocale());
 
-    public RetirementDefectionDialog (CampaignGUI gui, AtBContract contract, boolean doRetirement) {
+    public RetirementDefectionDialog (CampaignGUI gui, Mission mission, boolean doRetirement) {
         super(gui.getFrame(), true);
         hqView = gui;
         unitAssignments = new HashMap<>();
-        this.contract = contract;
+        this.contract = mission;
         rdTracker = hqView.getCampaign().getRetirementDefectionTracker();
         if (doRetirement) {
-            targetRolls = rdTracker.getTargetNumbers(contract, hqView.getCampaign());
+            targetRolls = rdTracker.getTargetNumbers(mission, hqView.getCampaign());
         }
         currentPanel = doRetirement?PAN_OVERVIEW:PAN_RESULTS;
         setSize(new Dimension(800, 600));

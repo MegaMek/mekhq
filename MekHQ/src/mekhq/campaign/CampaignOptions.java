@@ -765,7 +765,7 @@ public class CampaignOptions {
         setUseRandomFounderRetirement(true);
         setUseSubContractSoldiers(false);
         setServiceContractDuration(36);
-        setServiceContractModifier(8);
+        setServiceContractModifier(5);
 
         setUseCustomRetirementModifiers(true);
         setUseFatigueModifiers(true);
@@ -780,7 +780,7 @@ public class CampaignOptions {
 
         setPayoutRateOfficer(3);
         setPayoutRateEnlisted(3);
-        setPayoutRetirementMultiplier(24);
+        setPayoutRetirementMultiplier(12);
         setUsePayoutServiceBonus(true);
         setPayoutServiceBonusRate(10);
 

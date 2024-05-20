@@ -97,16 +97,16 @@ public class RetirementDefectionTracker {
      * Computes the target for retirement rolls for all eligible personnel; this includes
      * all active personnel who are not dependents, prisoners, or bondsmen.
      *
-     * @param contract The contract that is being resolved; if the retirement roll is not due to
+     * @param mission The contract that is being resolved; if the retirement roll is not due to
      *                 contract resolutions (e.g., &gt; 12 months since last roll), this can be null.
      * @param campaign  The campaign to calculate target numbers for
      * @return A map with person ids as key and calculated target roll as value.
      */
-    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable AtBContract contract, final Campaign campaign) {
+    public Map<UUID, TargetRoll> getTargetNumbers(final @Nullable Mission mission, final Campaign campaign) {
         final Map <UUID, TargetRoll> targets = new HashMap<>();
 
-        if (null != contract) {
-            rollRequired.add(contract.getId());
+        if (null != mission) {
+            rollRequired.add(mission.getId());
         }
 
         if (!campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isFixed()) {
@@ -137,7 +137,7 @@ public class RetirementDefectionTracker {
 
             // Service Contract
             if (ChronoUnit.MONTHS.between(person.getRecruitment(), campaign.getLocalDate()) < campaign.getCampaignOptions().getServiceContractDuration()) {
-                targetNumber.addModifier(campaign.getCampaignOptions().getServiceContractModifier(), resources.getString("contract.text"));
+                targetNumber.addModifier(-campaign.getCampaignOptions().getServiceContractModifier(), resources.getString("contract.text"));
             }
 
             // Desirability modifier
@@ -173,17 +173,29 @@ public class RetirementDefectionTracker {
                 // If this retirement roll is not being made at the end of a contract (e.g. >12 months since last roll),
                 // the share percentage should still apply.
                 // In the case of multiple active contracts, pick the one with the best percentage.
-                AtBContract c = contract;
-                if (c == null) {
-                    for (AtBContract atBContract : campaign.getActiveAtBContracts()) {
-                        if ((c == null) || (c.getSharesPct() < atBContract.getSharesPct())) {
-                            c = atBContract;
+
+                AtBContract contract;
+
+                try {
+                    contract = (AtBContract) mission;
+                } catch (Exception e) {
+                    contract = null;
+                }
+
+                if (contract == null) {
+                    List<AtBContract> atbContracts = campaign.getActiveAtBContracts();
+
+                    if (!atbContracts.isEmpty()) {
+                        for (AtBContract atbContract : atbContracts) {
+                            if ((contract == null) || (contract.getSharesPct() < atbContract.getSharesPct())) {
+                                contract = atbContract;
+                            }
                         }
                     }
                 }
 
-                if (c != null) {
-                    targetNumber.addModifier(- (c.getSharesPct() / 10), resources.getString("shares.text"));
+                if (contract != null) {
+                    targetNumber.addModifier(- (contract.getSharesPct() / 10), resources.getString("shares.text"));
                 }
             }
 
@@ -194,12 +206,12 @@ public class RetirementDefectionTracker {
             }
 
             // Mission completion status modifiers
-            if ((contract != null) && (campaign.getCampaignOptions().isUseMissionStatusModifiers())) {
-                if (contract.getStatus().isSuccess()) {
+            if ((mission != null) && (campaign.getCampaignOptions().isUseMissionStatusModifiers())) {
+                if (mission.getStatus().isSuccess()) {
                     targetNumber.addModifier(-1, resources.getString("missionSuccess.text"));
-                } else if (contract.getStatus().isFailed()) {
+                } else if (mission.getStatus().isFailed()) {
                     targetNumber.addModifier(1, resources.getString("missionFailure.text"));
-                } else if (contract.getStatus().isBreach()) {
+                } else if (mission.getStatus().isBreach()) {
                     targetNumber.addModifier(2, resources.getString("missionBreach.text"));
                 }
             }
