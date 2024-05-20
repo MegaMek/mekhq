@@ -175,6 +175,13 @@ public enum PersonnelStatus {
     }
 
     /**
+     * @return true if a person has left the unit, otherwise false
+     */
+    public boolean isDepartedUnit() {
+        return isDead() || isAWOL() || isRetired() || isDeserted() || isMissing();
+    }
+
+    /**
      * @return true if a person is dead, otherwise false
      */
     public boolean isDead() {

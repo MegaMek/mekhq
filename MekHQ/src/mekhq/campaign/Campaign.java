@@ -3517,10 +3517,8 @@ public class Campaign implements ITechManager {
         getFinances().newDay(this, yesterday, getLocalDate());
 
         // Fatigue Region
-        if (getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-            // even if Fatigue is disabled, we still want to process recovery so fatigued personnel aren't frozen in that state
-            processFatigueRecovery();
-        }
+        // even if Fatigue is disabled, we still want to process recovery so fatigued personnel aren't frozen in that state
+        processFatigueRecovery();
 
         if (campaignOptions.isUseFatigue()) {
             // we store these values, so this only needs to be checked once per day,
@@ -7013,47 +7011,90 @@ public class Campaign implements ITechManager {
         return fieldKitchenCount * campaignOptions.getFieldKitchenCapacity();
     }
 
+
     /**
-     * Reports the fatigue of a person and, if appropriate, sets setIsRecoveringFromFatigue to true.
+     * Reports the fatigue level of a person and perform actions based on the fatigue level.
      *
-     * @param person the person for which the fatigue needs to be reported
+     * @param person The person for which the fatigue level is reported.
      */
-    public void reportFatigue(Person person) {
-        int fatigue = MathUtility.clamp((person.getFatigue() - 1) / 4, 0, 4);
+    public void processFatigueActions(Person person) {
+        int effectiveFatigue = person.getEffectiveFatigue(this);
 
         if (getCampaignOptions().isUseFatigue()) {
-            if ((fatigue >= 5) && (fatigue < 9)) {
+            if ((effectiveFatigue >= 5) && (effectiveFatigue < 9)) {
                 addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueTired.text"));
                 person.setIsRecoveringFromFatigue(true);
-            } else if ((fatigue >= 9) && (fatigue < 12)) {
+            } else if ((effectiveFatigue >= 9) && (effectiveFatigue < 12)) {
                 addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueFatigued.text"));
                 person.setIsRecoveringFromFatigue(true);
-            } else if ((fatigue >= 12) && (fatigue < 16)) {
+            } else if ((effectiveFatigue >= 12) && (effectiveFatigue < 16)) {
                 addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueExhausted.text"));
                 person.setIsRecoveringFromFatigue(true);
-            } else if (fatigue >= 17) {
+            } else if (effectiveFatigue >= 17) {
                 addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueCritical.text"));
                 person.setIsRecoveringFromFatigue(true);
             }
-        } else {
-            if (fatigue >=3) {
-                person.setIsRecoveringFromFatigue(true);
-            }
+        }
+
+        if ((campaignOptions.getFatigueLeaveThreshold() != 0)
+                && (effectiveFatigue >= campaignOptions.getFatigueLeaveThreshold())) {
+            person.changeStatus(this, getLocalDate(), PersonnelStatus.ON_LEAVE);
         }
     }
 
     /**
-     * Decreases the fatigue of all active personnel by 1.
+     * Decreases the fatigue of all active personnel.
+     * Fatigue recovery is determined based on the following criteria:
+     * - Fatigue is adjusted based on various conditions:
+     *     - If it is Monday
+     *         - Fatigue is decreased by an 1
+     *         - If 'person' is on leave, decreased fatigue by an additional 1
+     *         - If there are no active contracts, decreased fatigue by an additional 1
+     * - If campaign options include fatigue usage and 'person' is recovering from fatigue:
+     *     - If fatigue reaches 0, trigger a report indicating fatigue recovery
+     *     - If fatigue leave threshold is not 0, and 'person' is on leave, change status to active
      */
     public void processFatigueRecovery() {
-        for (Person person : getActivePersonnel()) {
-            if (person.getFatigue() > 0) {
-                person.setFatigue(person.getFatigue() - 1);
+        List<Person> filteredPersonnel = getPersonnel().stream()
+                .filter(person -> !person.getStatus().isDepartedUnit())
+                .collect(Collectors.toList());
 
-                if ((getCampaignOptions().isUseFatigue()) && (person.getIsRecoveringFromFatigue())) {
+
+        for (Person person : filteredPersonnel) {
+            if (getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
+                if (person.getFatigue() > 0) {
+                    int fatigueAdjustment = 1;
+
+                    if (person.getStatus().isOnLeave()) {
+                        fatigueAdjustment++;
+                    }
+
+                    if (getActiveContracts().isEmpty()) {
+                        fatigueAdjustment++;
+                    }
+
+                    person.setFatigue(person.getFatigue() - fatigueAdjustment);
+
+                    if (person.getFatigue() < 0) {
+                        person.setFatigue(0);
+                    }
+                }
+            }
+
+            if (getCampaignOptions().isUseFatigue()) {
+                if ((!person.getStatus().isOnLeave()) && (!person.getIsRecoveringFromFatigue())) {
+                    processFatigueActions(person);
+                }
+
+                if (person.getIsRecoveringFromFatigue()) {
                     if (person.getFatigue() == 0) {
-                        addReport(person.getHyperlinkedFullTitle() + ' '
-                                + resources.getString("fatigueRecovered.text"));
+                        addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueRecovered.text"));
+
+                        person.setIsRecoveringFromFatigue(false);
+
+                        if ((getCampaignOptions().getFatigueLeaveThreshold() != 0) && (person.getStatus().isOnLeave())) {
+                            person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
+                        }
                     }
                 }
             }

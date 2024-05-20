@@ -1425,7 +1425,7 @@ public class ResolveScenarioTracker {
 
             if (!status.isDead()) {
                 person.setFatigue(person.getFatigue() + campaign.getCampaignOptions().getFatigueRate());
-                campaign.reportFatigue(person);
+                campaign.processFatigueActions(person);
             }
 
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {

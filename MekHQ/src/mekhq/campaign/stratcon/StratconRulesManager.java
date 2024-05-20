@@ -540,7 +540,7 @@ public class StratconRulesManager {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
                 person.setFatigue(person.getFatigue() + campaign.getCampaignOptions().getFatigueRate());
-                campaign.reportFatigue(person);
+                campaign.processFatigueActions(person);
             }
         }
     }

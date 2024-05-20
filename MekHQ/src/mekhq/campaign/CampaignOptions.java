@@ -210,6 +210,7 @@ public class CampaignOptions {
     private boolean useFatigue;
     private Integer fatigueRate;
     private Integer fieldKitchenCapacity;
+    private Integer fatigueLeaveThreshold;
 
     // Expanded Personnel Information
     private boolean useTimeInService;
@@ -670,6 +671,7 @@ public class CampaignOptions {
         setUseFatigue(true);
         setFatigueRate(1);
         setFieldKitchenCapacity(150);
+        setFatigueLeaveThreshold(13);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -1446,6 +1448,14 @@ public class CampaignOptions {
 
     public void setFieldKitchenCapacity(final Integer fieldKitchenCapacity) {
         this.fieldKitchenCapacity = fieldKitchenCapacity;
+    }
+
+    public Integer getFatigueLeaveThreshold() {
+        return fatigueLeaveThreshold;
+    }
+
+    public void setFatigueLeaveThreshold(final Integer fatigueLeaveThreshold) {
+        this.fatigueLeaveThreshold = fatigueLeaveThreshold;
     }
     //endregion General Personnel
 
@@ -4151,6 +4161,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigue", isUseFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueRate", getFatigueRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLeaveThreshold", getFatigueLeaveThreshold());
         //endregion General Personnel
 
         //region Expanded Personnel Information
@@ -4755,6 +4766,8 @@ public class CampaignOptions {
                     retVal.setFatigueRate(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
                     retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {
+                    retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 //endregion General Personnel
 
                 //region Expanded Personnel Information
