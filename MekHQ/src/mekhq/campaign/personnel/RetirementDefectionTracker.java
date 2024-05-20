@@ -20,6 +20,7 @@
  */
 package mekhq.campaign.personnel;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
@@ -144,12 +145,12 @@ public class RetirementDefectionTracker {
                 targetNumber.addModifier(person.getExperienceLevel(campaign, false), resources.getString("desirability.text"));
             }
 
-            // Combat Fatigue modifier
-            if (campaign.getCampaignOptions().isUseCombatFatigue()) {
-                int combatFatigueModifier = person.getCombatFatigue() / 5;
+            // Fatigue modifier
+            if (campaign.getCampaignOptions().isUseFatigue()) {
+                int fatigueModifier = MathUtility.clamp(((person.getFatigue() - 1) / 4) - 1, 0, 3);
 
-                if (combatFatigueModifier > 0) {
-                    targetNumber.addModifier(combatFatigueModifier, resources.getString("combatFatigue.text"));
+                if (fatigueModifier > 0) {
+                    targetNumber.addModifier(fatigueModifier, resources.getString("fatigue.text"));
                 }
             }
 

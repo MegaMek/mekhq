@@ -125,7 +125,7 @@ public class Person {
 
     private LocalDate retirement;
     private Integer loyalty;
-    private Integer combatFatigue;
+    private Integer fatigue;
     private Boolean isRecoveringFromFatigue;
 
     private Skills skills;
@@ -331,7 +331,7 @@ public class Person {
         lastRankChangeDate = null;
         retirement = null;
         loyalty = 0;
-        combatFatigue = 0;
+        fatigue = 0;
         isRecoveringFromFatigue = false;
         skills = new Skills();
         options = new PersonnelOptions();
@@ -1214,12 +1214,12 @@ public class Person {
         this.loyalty = loyalty;
     }
 
-    public Integer getCombatFatigue() {
-        return combatFatigue;
+    public Integer getFatigue() {
+        return fatigue;
     }
 
-    public void setCombatFatigue(final Integer combatFatigue) {
-        this.combatFatigue = combatFatigue;
+    public void setFatigue(final Integer fatigue) {
+        this.fatigue = fatigue;
     }
 
     public boolean getIsRecoveringFromFatigue() {
@@ -1633,7 +1633,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "combatFatigue", getCombatFatigue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
@@ -1942,8 +1942,8 @@ public class Person {
                     retVal.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("loyalty")) {
                     retVal.loyalty = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("combatFatigue")) {
-                    retVal.combatFatigue = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("fatigue")) {
+                    retVal.fatigue = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("isRecoveringFromFatigue")) {
                     retVal.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
@@ -3663,16 +3663,16 @@ public class Person {
     }
 
     /**
-     * Calculates the effective combat fatigue for a person.
+     * Calculates the effective fatigue for a person.
      *
-     * @param campaign the campaign for which to calculate the effective combat fatigue
-     * @return the effective combat fatigue value
+     * @param campaign the campaign for which to calculate the effective fatigue
+     * @return the effective fatigue value
      */
-    public int getEffectiveCombatFatigue(Campaign campaign) {
-        int effectiveCombatFatigue = combatFatigue;
+    public int getEffectiveFatigue(Campaign campaign) {
+        int effectiveFatigue = fatigue;
 
         if (isClanPersonnel()) {
-            effectiveCombatFatigue -= 2;
+            effectiveFatigue -= 2;
         }
 
         switch (getSkillLevel(campaign, false)) {
@@ -3682,19 +3682,19 @@ public class Person {
             case REGULAR:
                 break;
             case VETERAN:
-                effectiveCombatFatigue--;
+                effectiveFatigue--;
                 break;
             case ELITE:
             case HEROIC:
             case LEGENDARY:
-                effectiveCombatFatigue -= 2;
+                effectiveFatigue -= 2;
                 break;
         }
 
         if (campaign.getFieldKitchenWithinCapacity()) {
-            effectiveCombatFatigue--;
+            effectiveFatigue--;
         }
 
-        return effectiveCombatFatigue;
+        return effectiveFatigue;
     }
 }

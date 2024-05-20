@@ -318,7 +318,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblCargoSummary, gridBagConstraints);
 
-        if (getCampaign().getCampaignOptions().isUseCombatFatigue()) {
+        if (getCampaign().getCampaignOptions().isUseFatigue()) {
             if (getCampaign().getCampaignOptions().getFieldKitchenCapacity() > 0) {
                 JLabel lblFacilityCapacitiesHead = new JLabel(resourceMap.getString("lblFacilityCapacities.text"));
                 gridBagConstraints = new GridBagConstraints();
@@ -328,7 +328,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 gridBagConstraints.insets = new Insets(1, 5, 1, 5);
                 panInfo.add(lblFacilityCapacitiesHead, gridBagConstraints);
-                lblFacilityCapacities = new JLabel(getCampaign().getCampaignSummary().getCombatFatigueSummary());
+                lblFacilityCapacities = new JLabel(getCampaign().getCampaignSummary().getFatigueSummary());
                 lblFacilityCapacitiesHead.setLabelFor(lblFacilityCapacities);
                 gridBagConstraints.gridx = 1;
                 gridBagConstraints.weightx = 1.0;
@@ -556,7 +556,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         } catch (Exception ignored) {}
 
         try {
-            lblFacilityCapacities.setText(getCampaign().getCampaignSummary().getCombatFatigueSummary());
+            lblFacilityCapacities.setText(getCampaign().getCampaignSummary().getFatigueSummary());
         } catch (Exception ignored) {}
     }
 

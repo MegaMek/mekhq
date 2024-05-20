@@ -1207,8 +1207,8 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblLoyalty1 = new JLabel();
         JLabel lblLoyalty2 = new JLabel();
 
-        JLabel lblCombatFatigue1 = new JLabel();
-        JLabel lblCombatFatigue2 = new JLabel();
+        JLabel lblFatigue1 = new JLabel();
+        JLabel lblFatigue2 = new JLabel();
 
         // education
         JLabel lblEducationLevel1 = new JLabel();
@@ -1423,32 +1423,32 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if ((campaign.getCampaignOptions().isUseCombatFatigue())
-                && (person.getEffectiveCombatFatigue(campaign) > 0)) {
-            lblCombatFatigue1.setName("lblCombatFatigue1");
-            lblCombatFatigue1.setText(resourceMap.getString("lblCombatFatigue1.text"));
+        if ((campaign.getCampaignOptions().isUseFatigue())
+                && (person.getEffectiveFatigue(campaign) > 0)) {
+            lblFatigue1.setName("lblFatigue1");
+            lblFatigue1.setText(resourceMap.getString("lblFatigue1.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
             gridBagConstraints.gridy = firsty;
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblCombatFatigue1, gridBagConstraints);
+            pnlSkills.add(lblFatigue1, gridBagConstraints);
 
-            StringBuilder combatFatigueDisplay = new StringBuilder(person.getCombatFatigue());
-            int effectiveCombatFatigue = person.getEffectiveCombatFatigue(campaign);
-            int combatFatigueTurnoverModifier = effectiveCombatFatigue / 5;
+            StringBuilder fatigueDisplay = new StringBuilder(person.getFatigue());
+            int effectiveFatigue = person.getEffectiveFatigue(campaign);
+            int fatigueTurnoverModifier = effectiveFatigue / 5;
 
-            if (person.getCombatFatigue() != effectiveCombatFatigue) {
-                combatFatigueDisplay.append(" (").append(effectiveCombatFatigue).append(')');
+            if (person.getFatigue() != effectiveFatigue) {
+                fatigueDisplay.append(" (").append(effectiveFatigue).append(')');
             }
 
-            if (combatFatigueTurnoverModifier > 0) {
-                combatFatigueDisplay.append(" -").append(combatFatigueTurnoverModifier);
+            if (fatigueTurnoverModifier > 0) {
+                fatigueDisplay.append(" -").append(fatigueTurnoverModifier);
             }
 
-            lblCombatFatigue2.setName("lblCombatFatigue2");
-            lblCombatFatigue2.setText(combatFatigueDisplay.toString());
-            lblCombatFatigue2.setLabelFor(lblCombatFatigue2);
+            lblFatigue2.setName("lblFatigue2");
+            lblFatigue2.setText(fatigueDisplay.toString());
+            lblFatigue2.setLabelFor(lblFatigue2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
             gridBagConstraints.gridy = firsty;
@@ -1457,7 +1457,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.insets = new Insets(0, 10, 0, 0);
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblCombatFatigue2, gridBagConstraints);
+            pnlSkills.add(lblFatigue2, gridBagConstraints);
 
             firsty++;
         }

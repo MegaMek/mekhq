@@ -207,7 +207,7 @@ public class CampaignOptions {
     private boolean displayPersonnelLog;
     private boolean displayScenarioLog;
     private boolean displayKillRecord;
-    private boolean useCombatFatigue;
+    private boolean useFatigue;
     private Integer fieldKitchenCapacity;
 
     // Expanded Personnel Information
@@ -666,7 +666,7 @@ public class CampaignOptions {
         setDisplayPersonnelLog(false);
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
-        setUseCombatFatigue(true);
+        setUseFatigue(true);
         setFieldKitchenCapacity(150);
 
         // Expanded Personnel Information
@@ -1422,12 +1422,12 @@ public class CampaignOptions {
         this.displayKillRecord = displayKillRecord;
     }
 
-    public boolean isUseCombatFatigue() {
-        return useCombatFatigue;
+    public boolean isUseFatigue() {
+        return useFatigue;
     }
 
-    public void setUseCombatFatigue(final boolean useCombatFatigue) {
-        this.useCombatFatigue = useCombatFatigue;
+    public void setUseFatigue(final boolean useFatigue) {
+        this.useFatigue = useFatigue;
     }
 
     public Integer getFieldKitchenCapacity() {
@@ -4138,7 +4138,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPersonnelLog", isDisplayPersonnelLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", isDisplayScenarioLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", isDisplayKillRecord());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCombatFatigue", isUseCombatFatigue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigue", isUseFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
         //endregion General Personnel
 
@@ -4738,8 +4738,8 @@ public class CampaignOptions {
                     retVal.setDisplayScenarioLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("displayKillRecord")) {
                     retVal.setDisplayKillRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useCombatFatigue")) {
-                    retVal.setUseCombatFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useFatigue")) {
+                    retVal.setUseFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
                     retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
                 //endregion General Personnel

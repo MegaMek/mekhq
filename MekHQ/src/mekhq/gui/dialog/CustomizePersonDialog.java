@@ -86,6 +86,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private AbstractMHQScrollablePanel skillsPanel;
     private AbstractMHQScrollablePanel optionsPanel;
     private JTextField textToughness;
+    private JTextField textFatigue;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -160,7 +161,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         textNickname = new JTextField();
         textBloodname = new JTextField();
         textToughness = new JTextField();
+        textFatigue = new JTextField();
         JLabel lblToughness = new JLabel();
+        JLabel lblFatigue = new JLabel();
         JScrollPane scrOptions = new JScrollPane();
         JScrollPane scrSkills = new JScrollPane();
         JPanel panButtons = new JPanel();
@@ -637,6 +640,31 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             panDemog.add(textToughness, gridBagConstraints);
+
+            y++;
+        }
+
+        lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
+        lblFatigue.setName("lblFatigue");
+
+        textFatigue.setText(Integer.toString(person.getFatigue()));
+        textFatigue.setName("textFatigue");
+
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblFatigue, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textFatigue, gridBagConstraints);
+
+            y++;
         }
 
         JLabel lblUnit = new JLabel();
@@ -966,6 +994,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setClanPersonnel(chkClan.isSelected());
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
+        } catch (NumberFormatException ignored) { }
+        try {
+            person.setFatigue(Integer.parseInt(textFatigue.getText()));
         } catch (NumberFormatException ignored) { }
         if (null == choiceOriginalUnit.getSelectedItem()) {
             person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());

@@ -309,11 +309,11 @@ public class CampaignSummary {
     }
 
     /**
-     * Returns a summary of combat fatigue related facilities.
+     * Returns a summary of fatigue related facilities.
      *
-     * @return A summary of combat fatigue related facilities.
+     * @return A summary of fatigue related facilities.
      */
-    public String getCombatFatigueSummary() {
+    public String getFatigueSummary() {
         int personnelCount = campaign.getActivePersonnel().size();
         int fieldKitchenCapacity = campaign.checkFieldKitchenCapacity();
 

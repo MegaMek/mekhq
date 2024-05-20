@@ -3516,20 +3516,20 @@ public class Campaign implements ITechManager {
         // check for anything in finances
         getFinances().newDay(this, yesterday, getLocalDate());
 
-        // Combat Fatigue Region
+        // Fatigue Region
         if (getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-            // even if Combat Fatigue is disabled, we still want to process recovery so fatigued personnel aren't frozen in that state
-            processCombatFatigueRecovery();
+            // even if Fatigue is disabled, we still want to process recovery so fatigued personnel aren't frozen in that state
+            processFatigueRecovery();
         }
 
-        if (campaignOptions.isUseCombatFatigue()) {
+        if (campaignOptions.isUseFatigue()) {
             // we store these values, so this only needs to be checked once per day,
             // otherwise we would need to check it once for each active person in the campaign
             fieldKitchenWithinCapacity = getActivePersonnel().size() <= checkFieldKitchenCapacity();
         } else {
             fieldKitchenWithinCapacity = false;
         }
-        // End Combat Fatigue Region
+        // End Fatigue Region
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
@@ -7014,43 +7014,46 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Reports the combat fatigue of a person and, if appropriate, sets setIsRecoveringFromFatigue to true.
+     * Reports the fatigue of a person and, if appropriate, sets setIsRecoveringFromFatigue to true.
      *
-     * @param person the person for which the combat fatigue needs to be reported
+     * @param person the person for which the fatigue needs to be reported
      */
-    public void reportCombatFatigue(Person person) {
-        int combatFatigue = person.getCombatFatigue();
+    public void reportFatigue(Person person) {
+        int fatigue = MathUtility.clamp((person.getFatigue() - 1) / 4, 0, 4);
 
-        if (getCampaignOptions().isUseCombatFatigue()) {
-            if ((combatFatigue >= 3) && (combatFatigue < 7)) {
-                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("combatFatigueTired.text"));
+        if (getCampaignOptions().isUseFatigue()) {
+            if ((fatigue >= 5) && (fatigue < 9)) {
+                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueTired.text"));
                 person.setIsRecoveringFromFatigue(true);
-            } else if ((combatFatigue >= 7) && (combatFatigue < 12)) {
-                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("combatFatigueFatigued.text"));
+            } else if ((fatigue >= 9) && (fatigue < 12)) {
+                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueFatigued.text"));
                 person.setIsRecoveringFromFatigue(true);
-            } else if (combatFatigue >= 12) {
-                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("combatFatigueExhausted.text"));
+            } else if ((fatigue >= 12) && (fatigue < 16)) {
+                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueExhausted.text"));
+                person.setIsRecoveringFromFatigue(true);
+            } else if (fatigue >= 17) {
+                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueCritical.text"));
                 person.setIsRecoveringFromFatigue(true);
             }
         } else {
-            if (combatFatigue >=3) {
+            if (fatigue >=3) {
                 person.setIsRecoveringFromFatigue(true);
             }
         }
     }
 
     /**
-     * Decreases the combat fatigue of all active personnel by 1.
+     * Decreases the fatigue of all active personnel by 1.
      */
-    public void processCombatFatigueRecovery() {
+    public void processFatigueRecovery() {
         for (Person person : getActivePersonnel()) {
-            if (person.getCombatFatigue() > 0) {
-                person.setCombatFatigue(person.getCombatFatigue() - 1);
+            if (person.getFatigue() > 0) {
+                person.setFatigue(person.getFatigue() - 1);
 
-                if ((getCampaignOptions().isUseCombatFatigue()) && (person.getIsRecoveringFromFatigue())) {
-                    if (person.getCombatFatigue() == 0) {
+                if ((getCampaignOptions().isUseFatigue()) && (person.getIsRecoveringFromFatigue())) {
+                    if (person.getFatigue() == 0) {
                         addReport(person.getHyperlinkedFullTitle() + ' '
-                                + resources.getString("combatFatigueRecovered.text"));
+                                + resources.getString("fatigueRecovered.text"));
                     }
                 }
             }

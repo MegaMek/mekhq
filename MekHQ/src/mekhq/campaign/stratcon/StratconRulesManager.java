@@ -468,9 +468,14 @@ public class StratconRulesManager {
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign,
             StratconTrackState track, boolean sticky) {
         // plan of action:
+        // increase fatigue if the coordinates are not currently unrevealed
         // reveal deployed coordinates
         // reveal facility in deployed coordinates (and all adjacent coordinates for scout lances)
         // reveal scenario in deployed coordinates (and all adjacent coordinates for scout lances)
+
+        if (!track.getRevealedCoords().contains(coords)) {
+            increaseFatigue(forceID, campaign);
+        }
 
         track.getRevealedCoords().add(coords);
 
@@ -510,8 +515,6 @@ public class StratconRulesManager {
             }
         }
 
-        increaseCombatFatigue(forceID, campaign);
-
         // the force may be located in other places on the track - clear it out
         track.unassignForce(forceID);
         track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
@@ -519,16 +522,16 @@ public class StratconRulesManager {
     }
 
     /**
-     * Increases the combat fatigue for all crew members per Unit in a force.
+     * Increases the fatigue for all crew members per Unit in a force.
      *
      * @param forceID the ID of the force
      * @param campaign the campaign
      */
-    private static void increaseCombatFatigue(int forceID, Campaign campaign) {
+    private static void increaseFatigue(int forceID, Campaign campaign) {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
-                person.setCombatFatigue(person.getCombatFatigue() + 1);
-                campaign.reportCombatFatigue(person);
+                person.setFatigue(person.getFatigue() + 1);
+                campaign.reportFatigue(person);
             }
         }
     }
