@@ -287,6 +287,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel turnoverModifiersPanel;
     private JCheckBox chkUseCustomRetirementModifiers;
     private JCheckBox chkUseSkillModifiers;
+    private JCheckBox chkUseFatigueModifiers;
     private JCheckBox chkUseAgeModifiers;
     private JCheckBox chkUseUnitRatingModifiers;
     private JCheckBox chkUseFactionModifiers;
@@ -3971,6 +3972,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseSkillModifiers.setToolTipText(resources.getString("chkUseSkillModifiers.toolTipText"));
         chkUseSkillModifiers.setName("chkUseSkillModifiers");
 
+        chkUseFatigueModifiers = new JCheckBox(resources.getString("chkUseFatigueModifiers.text"));
+        chkUseFatigueModifiers.setToolTipText(resources.getString("chkUseFatigueModifiers.toolTipText"));
+        chkUseFatigueModifiers.setName("chkUseFatigueModifiers");
+
         chkUseAgeModifiers = new JCheckBox(resources.getString("chkUseAgeModifiers.text"));
         chkUseAgeModifiers.setToolTipText(resources.getString("chkUseAgeModifiers.toolTipText"));
         chkUseAgeModifiers.setName("chkUseAgeModifiers");
@@ -4016,6 +4021,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createSequentialGroup()
                         .addComponent(chkUseCustomRetirementModifiers)
                         .addComponent(chkUseSkillModifiers)
+                        .addComponent(chkUseFatigueModifiers)
                         .addComponent(chkUseAgeModifiers)
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
@@ -4028,6 +4034,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseCustomRetirementModifiers)
                         .addComponent(chkUseSkillModifiers)
+                        .addComponent(chkUseFatigueModifiers)
                         .addComponent(chkUseAgeModifiers)
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
@@ -7420,6 +7427,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
         chkUseAgeModifiers.setSelected(options.isUseAgeModifiers());
         chkUseSkillModifiers.setSelected(options.isUseSkillModifiers());
+        chkUseFatigueModifiers.setSelected(options.isUseFatigueModifiers());
         chkUseUnitRatingModifiers.setSelected(options.isUseUnitRatingModifiers());
         chkUseFactionModifiers.setSelected(options.isUseFactionModifiers());
         chkUseMissionStatusModifiers.setSelected(options.isUseMissionStatusModifiers());
@@ -8058,6 +8066,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
             options.setUseAgeModifiers(chkUseAgeModifiers.isSelected());
             options.setUseSkillModifiers(chkUseSkillModifiers.isSelected());
+            options.setUseFatigueModifiers(chkUseFatigueModifiers.isSelected());
             options.setUseUnitRatingModifiers(chkUseUnitRatingModifiers.isSelected());
             options.setUseFactionModifiers(chkUseFactionModifiers.isSelected());
             options.setUseMissionStatusModifiers(chkUseMissionStatusModifiers.isSelected());
