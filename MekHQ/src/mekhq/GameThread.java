@@ -24,6 +24,7 @@ import megamek.client.CloseClientListener;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
+import megamek.client.ui.swing.MegaMekGUI;
 import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.*;
 import megamek.common.planetaryconditions.PlanetaryConditions;
@@ -341,10 +342,8 @@ class GameThread extends Thread implements CloseClientListener {
     }
 
     public void createController() {
-        controller = new MegaMekController();
-        KeyboardFocusManager kbfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        kbfm.addKeyEventDispatcher(controller);
-
-        KeyBindParser.parseKeyBindings(controller);
+        MegaMekGUI megaMekGUI = new MegaMekGUI();
+        megaMekGUI.createController();
+        controller = MegaMekGUI.getKeyDispatcher();
     }
 }
