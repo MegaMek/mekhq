@@ -232,12 +232,6 @@ public class CampaignOptions {
     private boolean useAtBPrisonerDefection;
     private boolean useAtBPrisonerRansom;
 
-    // Fatigue
-    private boolean useFatigue;
-    private Integer fatigueRate;
-    private Integer fieldKitchenCapacity;
-    private Integer fatigueLeaveThreshold;
-
     // Dependent
     private RandomDependentMethod randomDependentMethod;
     private boolean useRandomDependentAddition;
@@ -292,6 +286,11 @@ public class CampaignOptions {
     private boolean useManagementSkill;
     private boolean useCommanderLeadershipOnly;
     private Integer managementSkillPenalty;
+
+    private boolean useFatigue;
+    private Integer fatigueRate;
+    private Integer fieldKitchenCapacity;
+    private Integer fatigueLeaveThreshold;
 
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
@@ -673,10 +672,6 @@ public class CampaignOptions {
         setDisplayPersonnelLog(false);
         setDisplayScenarioLog(false);
         setDisplayKillRecord(false);
-        setUseFatigue(true);
-        setFatigueRate(1);
-        setFieldKitchenCapacity(150);
-        setFatigueLeaveThreshold(13);
 
         // Expanded Personnel Information
         setUseTimeInService(false);
@@ -934,6 +929,11 @@ public class CampaignOptions {
         setUseManagementSkill(true);
         setUseCommanderLeadershipOnly(false);
         setManagementSkillPenalty(-2);
+
+        setUseFatigue(true);
+        setFatigueRate(1);
+        setFieldKitchenCapacity(150);
+        setFatigueLeaveThreshold(13);
         //endregion Turnover and Retention
 
         //region Finances Tab
@@ -4175,10 +4175,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayPersonnelLog", isDisplayPersonnelLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayScenarioLog", isDisplayScenarioLog());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "displayKillRecord", isDisplayKillRecord());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigue", isUseFatigue());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueRate", getFatigueRate());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLeaveThreshold", getFatigueLeaveThreshold());
         //endregion General Personnel
 
         //region Expanded Personnel Information
@@ -4270,9 +4266,10 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCommanderLeadershipOnly", isUseCommanderLeadershipOnly());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "managementSkillPenalty", getManagementSkillPenalty());
 
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", isUseShareSystem());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", isSharesExcludeLargeCraft());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", isSharesForAll());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigue", isUseFatigue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueRate", getFatigueRate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLeaveThreshold", getFatigueLeaveThreshold());
         //endregion Retirement
 
         //region Family
@@ -4425,6 +4422,11 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "damagedPartsValueMultiplier", getDamagedPartsValueMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unrepairablePartsValueMultiplier", getUnrepairablePartsValueMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cancelledOrderRefundMultiplier", getCancelledOrderRefundMultiplier());
+
+        // Shares
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", isUseShareSystem());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", isSharesExcludeLargeCraft());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", isSharesForAll());
         //endregion Price Multipliers
         //endregion Finances Tab
 
@@ -4778,14 +4780,6 @@ public class CampaignOptions {
                     retVal.setDisplayScenarioLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("displayKillRecord")) {
                     retVal.setDisplayKillRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useFatigue")) {
-                    retVal.setUseFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fatigueRate")) {
-                    retVal.setFatigueRate(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
-                    retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {
-                    retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 //endregion General Personnel
 
                 //region Expanded Personnel Information
@@ -4962,12 +4956,14 @@ public class CampaignOptions {
                     retVal.setUseCommanderLeadershipOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("managementSkillPenalty")) {
                     retVal.setManagementSkillPenalty(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
-                    retVal.setUseShareSystem(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
-                    retVal.setSharesExcludeLargeCraft(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
-                    retVal.setSharesForAll(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useFatigue")) {
+                    retVal.setUseFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fatigueRate")) {
+                    retVal.setFatigueRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
+                    retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {
+                    retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Retirement
 
                     //region Family
@@ -5291,6 +5287,14 @@ public class CampaignOptions {
                     retVal.setUnrepairablePartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("cancelledOrderRefundMultiplier")) {
                     retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+
+                // Shares
+                } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
+                    retVal.setUseShareSystem(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
+                    retVal.setSharesExcludeLargeCraft(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
+                    retVal.setSharesForAll(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion Price Multipliers
                 //endregion Finances Tab
 

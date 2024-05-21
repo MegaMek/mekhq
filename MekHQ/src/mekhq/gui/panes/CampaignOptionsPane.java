@@ -211,17 +211,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkDisplayScenarioLog;
     private JCheckBox chkDisplayKillRecord;
 
-    private JPanel fatiguePanel;
-    private JPanel fatiguePanelElements;
-    private JLabel lblFatigueWarning;
-    private JCheckBox chkUseFatigue;
-    private JLabel lblFatigueRate;
-    private JSpinner spnFatigueRate;
-    private JLabel lblFieldKitchenCapacity;
-    private JSpinner spnFieldKitchenCapacity;
-    private JLabel lblFatigueLeaveThreshold;
-    private JSpinner spnFatigueLeaveThreshold;
-
     // Expanded Personnel
     private JCheckBox chkUseTimeInService;
     private MMComboBox<TimeInDisplayFormat> comboTimeInServiceDisplayFormat;
@@ -324,6 +313,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseCommanderLeadershipOnly;
     private JLabel lblManagementSkillPenalty;
     private JSpinner spnManagementSkillPenalty;
+
+    // Fatigue
+    private JPanel fatiguePanel = new JPanel();
+    private JCheckBox chkUseFatigue;
+
+    private JPanel fatigueSubPanel = new JPanel();
+    private JLabel lblFatigueWarning;
+    private JLabel lblFatigueRate;
+    private JSpinner spnFatigueRate;
+    private JLabel lblFieldKitchenCapacity;
+    private JSpinner spnFieldKitchenCapacity;
+    private JLabel lblFatigueLeaveThreshold;
+    private JSpinner spnFatigueLeaveThreshold;
     //endregion Turnover and Retention Tab
 
     //region Life Paths Tab
@@ -3161,10 +3163,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridx++;
         personnelPanel.add(createPrisonerPanel(), gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        personnelPanel.add(createFatiguePanel(), gbc);
-
         gbc.gridx++;
         personnelPanel.add(createDependentPanel(), gbc);
 
@@ -3204,6 +3202,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gbc.gridx++;
         turnoverAndRetentionPanel.add(createTurnoverAndRetentionUnitCohesionPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        turnoverAndRetentionPanel.add(createFatiguePanel(), gbc);
 
         final JScrollPane scrollPersonnel = new JScrollPane(turnoverAndRetentionPanel);
         scrollPersonnel.setPreferredSize(new Dimension(500, 400));
@@ -3380,7 +3382,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return panel;
     }
 
-    private JPanel createFatiguePanelElements() {
+    private void createFatigueSubPanel() {
         lblFatigueWarning = new JLabel(resources.getString("lblFatigueWarning.text"));
         lblFatigueWarning.setName("lblFatigueWarning");
         lblFatigueWarning.setEnabled(campaign.getCampaignOptions().isUseFatigue());
@@ -3415,14 +3417,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnFatigueLeaveThreshold.setName("spnFatigueLeaveThreshold");
         spnFatigueLeaveThreshold.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
-        fatiguePanelElements = new JPanel();
-        fatiguePanelElements.setName("fatiguePanelElements");
-        fatiguePanelElements.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+        fatigueSubPanel.setBorder(BorderFactory.createTitledBorder(""));
+        fatigueSubPanel.setName("fatigueSubPanel");
+        fatigueSubPanel.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
-        final GroupLayout layout = new GroupLayout(fatiguePanelElements);
+        final GroupLayout layout = new GroupLayout(fatigueSubPanel);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
-        fatiguePanelElements.setLayout(layout);
+        fatigueSubPanel.setLayout(layout);
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
@@ -3451,8 +3453,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblFatigueLeaveThreshold)
                                 .addComponent(spnFatigueLeaveThreshold))
         );
-
-        return fatiguePanelElements;
     }
 
     private JPanel createExpandedPersonnelInformationPanel() {
@@ -3985,7 +3985,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseFatigueModifiers = new JCheckBox(resources.getString("chkUseFatigueModifiers.text"));
         chkUseFatigueModifiers.setToolTipText(resources.getString("chkUseFatigueModifiers.toolTipText"));
         chkUseFatigueModifiers.setName("chkUseFatigueModifiers");
-        chkUseFatigueModifiers.setEnabled(isUseTurnover);
+        chkUseFatigueModifiers.setEnabled((isUseTurnover) && (campaign.getCampaignOptions().isUseFatigue()));
 
         chkUseSkillModifiers = new JCheckBox(resources.getString("chkUseSkillModifiers.text"));
         chkUseSkillModifiers.setToolTipText(resources.getString("chkUseSkillModifiers.toolTipText"));
@@ -4073,7 +4073,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseHideLoyalty.setName("chkUseHideLoyalty");
         chkUseHideLoyalty.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
 
-        loyaltySubPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("loyaltySubPanel.title")));
+        loyaltySubPanel.setBorder(BorderFactory.createTitledBorder(""));
         loyaltySubPanel.setName("loyaltySubPanel");
         loyaltySubPanel.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
 
@@ -4198,7 +4198,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPayoutServiceBonusRate.setName("spnPayoutServiceBonusRate");
         spnPayoutServiceBonusRate.setEnabled((isUseTurnover) && (isUseServiceBonus));
 
-        payoutServiceBonusSubPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("payoutServiceBonusSubPanel.title")));
+        payoutServiceBonusSubPanel.setBorder(BorderFactory.createTitledBorder(""));
         payoutServiceBonusSubPanel.setName("payoutServiceBonusSubPanel");
         payoutServiceBonusSubPanel.setEnabled((isUseTurnover) && (isUseServiceBonus));
 
@@ -4309,7 +4309,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnMultiCrewStrainDivider.setName("spnMultiCrewStrainDivider");
         spnMultiCrewStrainDivider.setEnabled((isUseTurnover) && (isUseAdministrativeStrain));
 
-        administrativeStrainSubPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("administrativeStrainSubPanel.title")));
+        administrativeStrainSubPanel.setBorder(BorderFactory.createTitledBorder(""));
         administrativeStrainSubPanel.setName("administrativeStrainSubPanel");
         administrativeStrainSubPanel.setEnabled((isUseTurnover) && (isUseAdministrativeStrain));
 
@@ -4357,7 +4357,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnManagementSkillPenalty.setName("spnManagementSkillPenalty");
         spnManagementSkillPenalty.setEnabled((isUseTurnover) && (isUseManagementSkill));
 
-        managementSkillSubPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("managementSkillSubPanel.title")));
+        managementSkillSubPanel.setBorder(BorderFactory.createTitledBorder(""));
         managementSkillSubPanel.setName("managementSkillSubPanel");
         managementSkillSubPanel.setEnabled((isUseTurnover) && (isUseManagementSkill));
 
@@ -4491,35 +4491,38 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseFatigue.addActionListener(evt -> {
             final boolean isEnabled = chkUseFatigue.isSelected();
 
-            for (Component component : fatiguePanel.getComponents()) {
+            for (Component component : fatigueSubPanel.getComponents()) {
                 component.setEnabled(isEnabled);
             }
+
+            fatigueSubPanel.setEnabled(isEnabled);
+
+            chkUseFactionModifiers.setEnabled(isEnabled);
         });
 
-        fatiguePanel = createFatiguePanelElements();
+        createFatigueSubPanel();
 
-        final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("fatiguePanel.title")));
-        panel.setName("fatiguePanel");
+        fatiguePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("fatiguePanel.title")));
+        fatiguePanel.setName("fatiguePanel");
 
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
+        final GroupLayout layout = new GroupLayout(fatiguePanel);
+        fatiguePanel.setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseFatigue)
-                        .addComponent(fatiguePanel)
+                        .addComponent(fatigueSubPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseFatigue)
-                        .addComponent(fatiguePanel)
+                        .addComponent(fatigueSubPanel)
         );
 
-        return panel;
+        return fatiguePanel;
     }
 
     private void createRandomDependentPanel() {
