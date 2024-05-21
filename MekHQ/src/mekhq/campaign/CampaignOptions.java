@@ -217,6 +217,12 @@ public class CampaignOptions {
     private boolean trackTotalXPEarnings;
     private boolean showOriginFaction;
 
+    // Admin
+    private boolean adminsHaveNegotiation;
+    private boolean adminsHaveScrounge;
+    private boolean adminExperienceLevelIncludeNegotiation;
+    private boolean adminExperienceLevelIncludeScrounge;
+
     // Medical
     private boolean useAdvancedMedical; // Unofficial
     private int healWaitingPeriod;
@@ -646,6 +652,12 @@ public class CampaignOptions {
         setTrackTotalEarnings(false);
         setTrackTotalXPEarnings(false);
         setShowOriginFaction(true);
+
+        // Admin
+        setAdminsHaveNegotiation(true);
+        setAdminExperienceLevelIncludeNegotiation(true);
+        setAdminsHaveScrounge(false);
+        setAdminExperienceLevelIncludeScrounge(false);
 
         // Medical
         setUseAdvancedMedical(false);
@@ -1464,6 +1476,38 @@ public class CampaignOptions {
      */
     public void setShowOriginFaction(final boolean showOriginFaction) {
         this.showOriginFaction = showOriginFaction;
+    }
+
+    public boolean isAdminsHaveNegotiation() {
+        return adminsHaveNegotiation;
+    }
+
+    public void setAdminsHaveNegotiation(final boolean useAdminsHaveNegotiation) {
+        this.adminsHaveNegotiation = useAdminsHaveNegotiation;
+    }
+
+    public boolean isAdminsHaveScrounge() {
+        return adminsHaveScrounge;
+    }
+
+    public void setAdminsHaveScrounge(final boolean useAdminsHaveScrounge) {
+        this.adminsHaveScrounge = useAdminsHaveScrounge;
+    }
+
+    public boolean isAdminExperienceLevelIncludeNegotiation() {
+        return adminExperienceLevelIncludeNegotiation;
+    }
+
+    public void setAdminExperienceLevelIncludeNegotiation(final boolean useAdminExperienceLevelIncludeNegotiation) {
+        this.adminExperienceLevelIncludeNegotiation = useAdminExperienceLevelIncludeNegotiation;
+    }
+
+    public boolean isAdminExperienceLevelIncludeScrounge() {
+        return adminExperienceLevelIncludeScrounge;
+    }
+
+    public void setAdminExperienceLevelIncludeScrounge(final boolean useAdminExperienceLevelIncludeScrounge) {
+        this.adminExperienceLevelIncludeScrounge = useAdminExperienceLevelIncludeScrounge;
     }
     //endregion Expanded Personnel Information
 
@@ -3898,6 +3942,14 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackTotalXPEarnings", isTrackTotalXPEarnings());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showOriginFaction", isShowOriginFaction());
         //endregion Expanded Personnel Information
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "showOriginFaction", isShowOriginFaction());
+
+        //region Admin
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminsHaveNegotiation", isAdminsHaveNegotiation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminsHaveScrounge", isAdminsHaveScrounge());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminExperienceLevelIncludeNegotiation", isAdminExperienceLevelIncludeNegotiation());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adminExperienceLevelIncludeScrounge", isAdminExperienceLevelIncludeScrounge());
+        //endregion Admin
 
         //region Medical
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdvancedMedical", isUseAdvancedMedical());
@@ -4474,6 +4526,14 @@ public class CampaignOptions {
                     retVal.setTrackTotalXPEarnings(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("showOriginFaction")) {
                     retVal.setShowOriginFaction(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("adminsHaveNegotiation")) {
+                    retVal.setAdminsHaveNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("adminsHaveScrounge")) {
+                    retVal.setAdminsHaveScrounge(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("adminExperienceLevelIncludeNegotiation")) {
+                    retVal.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("adminExperienceLevelIncludeScrounge")) {
+                    retVal.setAdminExperienceLevelIncludeScrounge(Boolean.parseBoolean(wn2.getTextContent()));
                 //endregion Expanded Personnel Information
 
                 //region Medical

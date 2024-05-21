@@ -220,6 +220,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkTrackTotalXPEarnings;
     private JCheckBox chkShowOriginFaction;
 
+    // Admin
+    private JPanel administratorsPanel = new JPanel();
+    private JCheckBox chkAdminsHaveNegotiation;
+    private JCheckBox chkAdminsHaveScrounge;
+    private JCheckBox chkAdminExperienceLevelIncludeNegotiation;
+    private JCheckBox chkAdminExperienceLevelIncludeScrounge;
+
     // Medical
     private JCheckBox chkUseAdvancedMedical;
     private JSpinner spnHealWaitingPeriod;
@@ -3114,6 +3121,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gbc.gridx = 0;
         gbc.gridy++;
+        personnelPanel.add(createAdministratorsPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
         personnelPanel.add(createMedicalPanel(), gbc);
 
         gbc.gridx++;
@@ -3404,6 +3415,50 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         );
 
         return panel;
+    }
+
+    private Component createAdministratorsPanel() {
+        chkAdminsHaveNegotiation = new JCheckBox(resources.getString("chkAdminsHaveNegotiation.text"));
+        chkAdminsHaveNegotiation.setToolTipText(resources.getString("chkAdminsHaveNegotiation.toolTipText"));
+        chkAdminsHaveNegotiation.setName("chkAdminsHaveNegotiation");
+
+        chkAdminExperienceLevelIncludeNegotiation = new JCheckBox(resources.getString("chkAdminExperienceLevelIncludeNegotiation.text"));
+        chkAdminExperienceLevelIncludeNegotiation.setToolTipText(resources.getString("chkAdminExperienceLevelIncludeNegotiation.toolTipText"));
+        chkAdminExperienceLevelIncludeNegotiation.setName("chkAdminExperienceLevelIncludeNegotiation");
+
+        chkAdminsHaveScrounge = new JCheckBox(resources.getString("chkAdminsHaveScrounge.text"));
+        chkAdminsHaveScrounge.setToolTipText(resources.getString("chkAdminsHaveScrounge.toolTipText"));
+        chkAdminsHaveScrounge.setName("chkAdminsHaveScrounge");
+
+        chkAdminExperienceLevelIncludeScrounge = new JCheckBox(resources.getString("chkAdminExperienceLevelIncludeScrounge.text"));
+        chkAdminExperienceLevelIncludeScrounge.setToolTipText(resources.getString("chkAdminExperienceLevelIncludeScrounge.toolTipText"));
+        chkAdminExperienceLevelIncludeScrounge.setName("chkAdminExperienceLevelIncludeScrounge");
+
+        administratorsPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("administratorsPanel.title")));
+        administratorsPanel.setName("administratorsPanel");
+
+        final GroupLayout layout = new GroupLayout(administratorsPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        administratorsPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkAdminsHaveNegotiation)
+                        .addComponent(chkAdminExperienceLevelIncludeNegotiation)
+                        .addGap(15)
+                        .addComponent(chkAdminsHaveScrounge)
+                        .addComponent(chkAdminExperienceLevelIncludeScrounge)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkAdminsHaveNegotiation)
+                        .addComponent(chkAdminExperienceLevelIncludeNegotiation)
+                        .addComponent(chkAdminsHaveScrounge)
+                        .addComponent(chkAdminExperienceLevelIncludeScrounge)
+        );
+        return administratorsPanel;
     }
 
     private JPanel createMedicalPanel() {
@@ -6717,6 +6772,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkTrackTotalXPEarnings.setSelected(options.isTrackTotalXPEarnings());
         chkShowOriginFaction.setSelected(options.isShowOriginFaction());
 
+        // Administrators
+        chkAdminsHaveNegotiation.setSelected(options.isAdminsHaveNegotiation());
+        chkAdminExperienceLevelIncludeNegotiation.setSelected(options.isAdminExperienceLevelIncludeNegotiation());
+        chkAdminsHaveScrounge.setSelected(options.isAdminsHaveScrounge());
+        chkAdminExperienceLevelIncludeScrounge.setSelected(options.isAdminExperienceLevelIncludeScrounge());
+
         // Medical
         chkUseAdvancedMedical.setSelected(options.isUseAdvancedMedical());
         spnHealWaitingPeriod.setValue(options.getHealingWaitingPeriod());
@@ -7319,6 +7380,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setTrackTotalEarnings(chkTrackTotalEarnings.isSelected());
             options.setTrackTotalXPEarnings(chkTrackTotalXPEarnings.isSelected());
             options.setShowOriginFaction(chkShowOriginFaction.isSelected());
+
+            // Administrators
+            options.setAdminsHaveNegotiation(chkAdminsHaveNegotiation.isSelected());
+            options.setAdminExperienceLevelIncludeNegotiation(chkAdminExperienceLevelIncludeNegotiation.isSelected());
+            options.setAdminsHaveScrounge(chkAdminsHaveScrounge.isSelected());
+            options.setAdminExperienceLevelIncludeScrounge(chkAdminExperienceLevelIncludeScrounge.isSelected());
 
             // Medical
             options.setUseAdvancedMedical(chkUseAdvancedMedical.isSelected());
