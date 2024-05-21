@@ -295,7 +295,7 @@ public class CampaignSummary {
 
         StringBuilder administrativeCapacityReport = new StringBuilder()
                 .append(getAdministrativeStrain(campaign)).append(" / ")
-                .append(campaign.getCampaignOptions().getAdministrativeStrain() * combinedSkillValues)
+                .append(campaign.getCampaignOptions().getAdministrativeCapacity() * combinedSkillValues)
                 .append(" personnel");
 
         if (getAdministrativeStrainModifier(campaign) > 0) {

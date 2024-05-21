@@ -258,6 +258,7 @@ public class CampaignOptions {
     // Retirement
     private boolean useRetirementDateTracking;
     private boolean useRandomRetirement;
+
     private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
     private SkillLevel turnoverDifficulty;
     private Integer turnoverFixedTargetNumber;
@@ -275,26 +276,22 @@ public class CampaignOptions {
     private boolean useUnitRatingModifiers;
     private boolean useFactionModifiers;
     private boolean useMissionStatusModifiers;
+    private boolean useLoyaltyModifiers;
+    private boolean useHideLoyalty;
 
     private Integer payoutRateOfficer;
     private Integer payoutRateEnlisted;
     private Integer payoutRetirementMultiplier;
     private boolean usePayoutServiceBonus;
     private Integer payoutServiceBonusRate;
-    private boolean useLoyaltyModifiers;
-    private boolean useHideLoyalty;
 
     private boolean useAdministrativeStrain;
-    private Integer administrativeStrain;
+    private Integer administrativeCapacity;
     private Integer multiCrewStrainDivider;
 
     private boolean useManagementSkill;
     private boolean useCommanderLeadershipOnly;
     private Integer managementSkillPenalty;
-
-    private boolean useShareSystem;
-    private boolean sharesExcludeLargeCraft;
-    private boolean sharesForAll;
 
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
@@ -420,6 +417,11 @@ public class CampaignOptions {
     private double damagedPartsValueMultiplier;
     private double unrepairablePartsValueMultiplier;
     private double cancelledOrderRefundMultiplier;
+
+    // Shares
+    private boolean useShareSystem;
+    private boolean sharesExcludeLargeCraft;
+    private boolean sharesForAll;
     //endregion Finance Tab
 
     //region Mercenary Tab
@@ -754,48 +756,6 @@ public class CampaignOptions {
         setUseDylansRandomXP(false);
         setRandomOriginOptions(new RandomOriginOptions(true));
 
-        // Retirement
-        setUseRetirementDateTracking(false);
-        setUseRandomRetirement(true);
-        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.NEGOTIATION);
-        setTurnoverDifficulty(SkillLevel.REGULAR);
-        setTurnoverFixedTargetNumber(3);
-        setUseYearEndRandomRetirement(true);
-        setUseContractCompletionRandomRetirement(true);
-        setUseRandomFounderRetirement(true);
-        setUseSubContractSoldiers(false);
-        setServiceContractDuration(36);
-        setServiceContractModifier(5);
-
-        setUseCustomRetirementModifiers(true);
-        setUseFatigueModifiers(true);
-        setUseSkillModifiers(true);
-        setUseAgeModifiers(true);
-        setUseUnitRatingModifiers(true);
-        setUseFactionModifiers(true);
-        setUseMissionStatusModifiers(true);
-
-        setUseLoyaltyModifiers(true);
-        setUseHideLoyalty(true);
-
-        setPayoutRateOfficer(3);
-        setPayoutRateEnlisted(3);
-        setPayoutRetirementMultiplier(12);
-        setUsePayoutServiceBonus(true);
-        setPayoutServiceBonusRate(10);
-
-        setUseAdministrativeStrain(true);
-        setAdministrativeStrain(10);
-        setMultiCrewStrainDivider(5);
-
-        setUseManagementSkill(true);
-        setUseCommanderLeadershipOnly(true);
-        setManagementSkillPenalty(-2);
-
-        setUseShareSystem(false);
-        setSharesExcludeLargeCraft(true);
-        setSharesForAll(false);
-
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
 
@@ -936,6 +896,46 @@ public class CampaignOptions {
         getAgeRangeRandomDeathFemaleValues().put(TenYearAgeRange.EIGHTY_FIVE_OR_OLDER, 12870.0);
         //endregion Life Paths Tab
 
+        //region Turnover and Retention
+        // Retirement
+        setUseRetirementDateTracking(false);
+        setUseRandomRetirement(true);
+        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.NEGOTIATION);
+        setTurnoverDifficulty(SkillLevel.REGULAR);
+        setTurnoverFixedTargetNumber(3);
+        setUseYearEndRandomRetirement(true);
+        setUseContractCompletionRandomRetirement(true);
+        setUseRandomFounderRetirement(true);
+        setUseSubContractSoldiers(false);
+        setServiceContractDuration(36);
+        setServiceContractModifier(5);
+
+        setUseCustomRetirementModifiers(true);
+        setUseFatigueModifiers(true);
+        setUseSkillModifiers(true);
+        setUseAgeModifiers(true);
+        setUseUnitRatingModifiers(true);
+        setUseFactionModifiers(true);
+        setUseMissionStatusModifiers(true);
+
+        setUseLoyaltyModifiers(true);
+        setUseHideLoyalty(true);
+
+        setPayoutRateOfficer(3);
+        setPayoutRateEnlisted(3);
+        setPayoutRetirementMultiplier(12);
+        setUsePayoutServiceBonus(true);
+        setPayoutServiceBonusRate(10);
+
+        setUseAdministrativeStrain(true);
+        setAdministrativeCapacity(10);
+        setMultiCrewStrainDivider(5);
+
+        setUseManagementSkill(true);
+        setUseCommanderLeadershipOnly(false);
+        setManagementSkillPenalty(-2);
+        //endregion Turnover and Retention
+
         //region Finances Tab
         payForParts = false;
         payForRepairs = false;
@@ -967,6 +967,11 @@ public class CampaignOptions {
         setDamagedPartsValueMultiplier(0.33);
         setUnrepairablePartsValueMultiplier(0.1);
         setCancelledOrderRefundMultiplier(0.5);
+
+        // Shares
+        setUseShareSystem(true);
+        setSharesExcludeLargeCraft(true);
+        setSharesForAll(true);
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -1875,12 +1880,12 @@ public class CampaignOptions {
         this.useAdministrativeStrain = useAdministrativeStrain;
     }
 
-    public Integer getAdministrativeStrain() {
-        return administrativeStrain;
+    public Integer getAdministrativeCapacity() {
+        return administrativeCapacity;
     }
 
-    public void setAdministrativeStrain(final Integer administrativeStrain) {
-        this.administrativeStrain = administrativeStrain;
+    public void setAdministrativeCapacity(final Integer administrativeCapacity) {
+        this.administrativeCapacity = administrativeCapacity;
     }
 
     public Integer getMultiCrewStrainDivider() {
@@ -4258,7 +4263,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutServiceBonusRate", getPayoutServiceBonusRate());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAdministrativeStrain", isUseAdministrativeStrain());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "administrativeStrain", getAdministrativeStrain());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "administrativeStrain", getAdministrativeCapacity());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "multiCrewStrainDivider", getMultiCrewStrainDivider());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManagementSkill", isUseManagementSkill());
@@ -4948,7 +4953,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAdministrativeStrain")) {
                     retVal.setUseAdministrativeStrain(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("administrativeStrain")) {
-                    retVal.setAdministrativeStrain(Integer.parseInt(wn2.getTextContent().trim()));
+                    retVal.setAdministrativeCapacity(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("multiCrewStrainDivider")) {
                     retVal.setMultiCrewStrainDivider(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManagementSkill")) {

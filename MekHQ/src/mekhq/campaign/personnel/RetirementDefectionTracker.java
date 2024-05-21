@@ -531,7 +531,7 @@ public class RetirementDefectionTracker {
     public static int getAdministrativeStrainModifier(Campaign campaign) {
         int personnel = getAdministrativeStrain(campaign);
 
-        int maximumStrain = campaign.getCampaignOptions().getAdministrativeStrain() * getCombinedSkillValues(campaign, SkillType.S_ADMIN);
+        int maximumStrain = campaign.getCampaignOptions().getAdministrativeCapacity() * getCombinedSkillValues(campaign, SkillType.S_ADMIN);
 
         if (maximumStrain != 0) {
             return personnel / maximumStrain;
