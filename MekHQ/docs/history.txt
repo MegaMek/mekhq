@@ -20,6 +20,8 @@ MEKHQ VERSION HISTORY:
 + Fix #4083: Added Customizable Log Display Settings to Campaign Options
 + Fix #4088: MM code adaptation for boards validation
 + PR #4087: Reintegrate Pay Multiplier into Salary Calculation
++ PR #4095: Restored ranks.xml
++ PR #4094: MegaMek code adaptation
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
