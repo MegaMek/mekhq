@@ -242,6 +242,25 @@ public class CampaignOptions {
     private double salarySpecialistInfantryMultiplier;
     private Map<SkillLevel, Double> salaryXPMultipliers;
     private Money[] roleBaseSalaries;
+  
+    // Awards
+    private AwardBonus awardBonusStyle;
+    private boolean enableAutoAwards;
+    private boolean issuePosthumousAwards;
+    private boolean issueBestAwardOnly;
+    private boolean ignoreStandardSet;
+    private int awardTierSize;
+    private boolean enableContractAwards;
+    private boolean enableFactionHunterAwards;
+    private boolean enableInjuryAwards;
+    private boolean enableIndividualKillAwards;
+    private boolean enableFormationKillAwards;
+    private boolean enableRankAwards;
+    private boolean enableScenarioAwards;
+    private boolean enableSkillAwards;
+    private boolean enableTheatreOfWarAwards;
+    private boolean enableTimeAwards;
+    private boolean enableMiscAwards;
     //endregion Personnel Tab
 
     //region Life Paths Tab
@@ -771,6 +790,25 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
         setRoleBaseSalary(PersonnelRole.DEPENDENT, 0);
         setRoleBaseSalary(PersonnelRole.NONE, 0);
+      
+        // Awards
+        setAwardBonusStyle(AwardBonus.BOTH);
+        setEnableAutoAwards(true);
+        setIssuePosthumousAwards(false);
+        setIssueBestAwardOnly(true);
+        setIgnoreStandardSet(false);
+        setAwardTierSize(5);
+        setEnableContractAwards(true);
+        setEnableFactionHunterAwards(true);
+        setEnableInjuryAwards(true);
+        setEnableIndividualKillAwards(true);
+        setEnableFormationKillAwards(true);
+        setEnableRankAwards(true);
+        setEnableScenarioAwards(true);
+        setEnableSkillAwards(true);
+        setEnableTheatreOfWarAwards(true);
+        setEnableTimeAwards(true);
+        setEnableMiscAwards(true);
         //endregion Personnel Tab
 
         //region Life Paths Tab
@@ -3037,6 +3075,144 @@ public class CampaignOptions {
         this.ageRangeRandomDeathFemaleValues = ageRangeRandomDeathFemaleValues;
     }
     //endregion Death
+
+    //region Awards
+    public boolean isIssuePosthumousAwards() {
+        return issuePosthumousAwards;
+    }
+
+    public void setIssuePosthumousAwards(final boolean issuePosthumousAwards) {
+        this.issuePosthumousAwards = issuePosthumousAwards;
+    }
+
+    public boolean isIssueBestAwardOnly() {
+        return issueBestAwardOnly;
+    }
+
+    public void setIssueBestAwardOnly(final boolean issueBestAwardOnly) {
+        this.issueBestAwardOnly = issueBestAwardOnly;
+    }
+
+    public boolean isIgnoreStandardSet() {
+        return ignoreStandardSet;
+    }
+
+    public void setIgnoreStandardSet(final boolean ignoreStandardSet) {
+        this.ignoreStandardSet = ignoreStandardSet;
+    }
+
+    public int getAwardTierSize() {
+        return awardTierSize;
+    }
+
+    public void setAwardTierSize(final int awardTierSize) {
+        this.awardTierSize = awardTierSize;
+    }
+
+    public AwardBonus getAwardBonusStyle() {
+        return awardBonusStyle;
+    }
+
+    public void setAwardBonusStyle(final AwardBonus awardBonusStyle) {
+        this.awardBonusStyle = awardBonusStyle;
+    }
+
+    public boolean isEnableAutoAwards() {
+        return enableAutoAwards;
+    }
+
+    public void setEnableAutoAwards(final boolean enableAutoAwards) {
+        this.enableAutoAwards = enableAutoAwards;
+    }
+
+    public boolean isEnableContractAwards() {
+        return enableContractAwards;
+    }
+
+    public void setEnableContractAwards(final boolean enableContractAwards) {
+        this.enableContractAwards = enableContractAwards;
+    }
+
+    public boolean isEnableFactionHunterAwards() {
+        return enableFactionHunterAwards;
+    }
+
+    public void setEnableFactionHunterAwards(final boolean enableFactionHunterAwards) {
+        this.enableFactionHunterAwards = enableFactionHunterAwards;
+    }
+
+    public boolean isEnableInjuryAwards() {
+        return enableInjuryAwards;
+    }
+
+    public void setEnableInjuryAwards(final boolean enableInjuryAwards) {
+        this.enableInjuryAwards = enableInjuryAwards;
+    }
+
+    public boolean isEnableIndividualKillAwards() {
+        return enableIndividualKillAwards;
+    }
+
+    public void setEnableIndividualKillAwards(final boolean enableIndividualKillAwards) {
+        this.enableIndividualKillAwards = enableIndividualKillAwards;
+    }
+
+    public boolean isEnableFormationKillAwards() {
+        return enableFormationKillAwards;
+    }
+
+    public void setEnableFormationKillAwards(final boolean enableFormationKillAwards) {
+        this.enableFormationKillAwards = enableFormationKillAwards;
+    }
+
+    public boolean isEnableRankAwards() {
+        return enableRankAwards;
+    }
+
+    public void setEnableRankAwards(final boolean enableRankAwards) {
+        this.enableRankAwards = enableRankAwards;
+    }
+
+    public boolean isEnableScenarioAwards() {
+        return enableScenarioAwards;
+    }
+
+    public void setEnableScenarioAwards(final boolean enableScenarioAwards) {
+        this.enableScenarioAwards = enableScenarioAwards;
+    }
+
+    public boolean isEnableSkillAwards() {
+        return enableSkillAwards;
+    }
+
+    public void setEnableSkillAwards(final boolean enableSkillAwards) {
+        this.enableSkillAwards = enableSkillAwards;
+    }
+
+    public boolean isEnableTheatreOfWarAwards() {
+        return enableTheatreOfWarAwards;
+    }
+
+    public void setEnableTheatreOfWarAwards(final boolean enableTheatreOfWarAwards) {
+        this.enableTheatreOfWarAwards = enableTheatreOfWarAwards;
+    }
+
+    public boolean isEnableTimeAwards() {
+        return enableTimeAwards;
+    }
+
+    public void setEnableTimeAwards(final boolean enableTimeAwards) {
+        this.enableTimeAwards = enableTimeAwards;
+    }
+
+    public boolean isEnableMiscAwards() {
+        return enableMiscAwards;
+    }
+
+    public void setEnableMiscAwards(final boolean enableMiscAwards) {
+        this.enableMiscAwards = enableMiscAwards;
+    }
+    //endregion Awards
     //endregion Personnel Tab
 
     //region Finances Tab
@@ -4467,6 +4643,26 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salaryXPMultipliers");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
+      
+        //region Awards
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardBonusStyle", getAwardBonusStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", isEnableAutoAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issuePosthumousAwards", isIssuePosthumousAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issueBestAwardOnly", isIssueBestAwardOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreStandardSet", isIgnoreStandardSet());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardTierSize", getAwardTierSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableContractAwards", isEnableContractAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFactionHunterAwards", isEnableFactionHunterAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableInjuryAwards", isEnableInjuryAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableIndividualKillAwards", isEnableIndividualKillAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFormationKillAwards", isEnableFormationKillAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRankAwards", isEnableRankAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableScenarioAwards", isEnableScenarioAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableSkillAwards", isEnableSkillAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTheatreOfWarAwards", isEnableTheatreOfWarAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTimeAwards", isEnableTimeAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableMiscAwards", isEnableMiscAwards());
+        //endregion Awards
         //endregion Personnel Tab
 
         //region Life Paths Tab
@@ -5150,6 +5346,43 @@ public class CampaignOptions {
                         retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
                     }
                 //endregion Salary
+                  
+                //region Awards
+                } else if (wn2.getNodeName().equalsIgnoreCase("awardBonusStyle")) {
+                    retVal.setAwardBonusStyle(AwardBonus.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableAutoAwards")) {
+                    retVal.setEnableAutoAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("issuePosthumousAwards")) {
+                    retVal.setIssuePosthumousAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("issueBestAwardOnly")) {
+                    retVal.setIssueBestAwardOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("ignoreStandardSet")) {
+                    retVal.setIgnoreStandardSet(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("awardTierSize")) {
+                    retVal.setAwardTierSize(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableContractAwards")) {
+                    retVal.setEnableContractAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableFactionHunterAwards")) {
+                    retVal.setEnableFactionHunterAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableInjuryAwards")) {
+                    retVal.setEnableInjuryAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableIndividualKillAwards")) {
+                    retVal.setEnableIndividualKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableFormationKillAwards")) {
+                    retVal.setEnableFormationKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableRankAwards")) {
+                    retVal.setEnableRankAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableScenarioAwards")) {
+                    retVal.setEnableScenarioAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableSkillAwards")) {
+                    retVal.setEnableSkillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableTheatreOfWarAwards")) {
+                    retVal.setEnableTheatreOfWarAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableTimeAwards")) {
+                    retVal.setEnableTimeAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableMiscAwards")) {
+                    retVal.setEnableMiscAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Awards
                 //endregion Personnel Tab
 
                 //region Life Paths Tab
@@ -5166,127 +5399,6 @@ public class CampaignOptions {
                     }
                     retVal.setRandomOriginOptions(randomOriginOptions);
                     //endregion Personnel Randomization
-
-                    //region Retirement
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
-                    retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
-                    retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverTargetNumberMethod")) {
-                    retVal.setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverDifficulty")) {
-                    retVal.setTurnoverDifficulty(SkillLevel.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
-                    retVal.setTurnoverFixedTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useYearEndRandomRetirement")) {
-                    retVal.setUseYearEndRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useContractCompletionRandomRetirement")) {
-                    retVal.setUseContractCompletionRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomFounderRetirement")) {
-                    retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useSubContractSoldiers")) {
-                    retVal.setUseSubContractSoldiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("serviceContractDuration")) {
-                    retVal.setServiceContractDuration(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("serviceContractModifier")) {
-                    retVal.setServiceContractModifier(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
-                    retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useFatigueModifiers")) {
-                    retVal.setUseFatigueModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useSkillModifiers")) {
-                    retVal.setUseSkillModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAgeModifiers")) {
-                    retVal.setUseAgeModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRatingModifiers")) {
-                    retVal.setUseUnitRatingModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useFactionModifiers")) {
-                    retVal.setUseFactionModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMissionStatusModifiers")) {
-                    retVal.setUseMissionStatusModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useLoyaltyModifiers")) {
-                    retVal.setUseLoyaltyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useHideLoyalty")) {
-                    retVal.setUseHideLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateOfficer")) {
-                    retVal.setPayoutRateOfficer(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateEnlisted")) {
-                    retVal.setPayoutRateEnlisted(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("payoutRetirementMultiplier")) {
-                    retVal.setPayoutRetirementMultiplier(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("usePayoutServiceBonus")) {
-                    retVal.setUsePayoutServiceBonus(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("payoutServiceBonusRate")) {
-                    retVal.setPayoutServiceBonusRate(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useAdministrativeStrain")) {
-                    retVal.setUseAdministrativeStrain(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("administrativeStrain")) {
-                    retVal.setAdministrativeCapacity(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("multiCrewStrainDivider")) {
-                    retVal.setMultiCrewStrainDivider(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useManagementSkill")) {
-                    retVal.setUseManagementSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useCommanderLeadershipOnly")) {
-                    retVal.setUseCommanderLeadershipOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("managementSkillPenalty")) {
-                    retVal.setManagementSkillPenalty(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useFatigue")) {
-                    retVal.setUseFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fatigueRate")) {
-                    retVal.setFatigueRate(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
-                    retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {
-                    retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMorale")) {
-                    retVal.setUseMorale(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("stepSize")) {
-                    retVal.setStepSize(Double.parseDouble(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("forceReliabilityMethod")) {
-                    retVal.setForceReliabilityMethod(ForceReliabilityMethod.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useDesertions")) {
-                    retVal.setUseDesertions(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useEmergencyBonuses")) {
-                    retVal.setUseEmergencyBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useSabotage")) {
-                    retVal.setUseSabotage(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useTheft")) {
-                    retVal.setUseTheft(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMutinies")) {
-                    retVal.setUseMutinies(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerFieldControl")) {
-                    retVal.setUseMoraleTriggerFieldControl(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMissionStatus")) {
-                    retVal.setUseMoraleTriggerMissionStatus(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerLeaderLoss")) {
-                    retVal.setUseMoraleTriggerModifierLeaderLoss(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerCombatLoss")) {
-                    retVal.setUseMoraleTriggerCombatLoss(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerDesertion")) {
-                    retVal.setUseMoraleTriggerDesertion(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMutiny")) {
-                    retVal.setUseMoraleTriggerMutiny(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerFatigue")) {
-                    retVal.setUseMoraleTriggerFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("customMoraleModifier")) {
-                    retVal.setCustomMoraleModifier(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierExperienceLevel")) {
-                    retVal.setUseMoraleModifierExperienceLevel(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierFaction")) {
-                    retVal.setUseMoraleModifierFaction(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierProfession")) {
-                    retVal.setUseMoraleModifierProfession(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierForceReliability")) {
-                    retVal.setUseMoraleModifierForceReliability(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierCommanderLeadership")) {
-                    retVal.setUseMoraleModifierCommanderLeadership(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierLoyalty")) {
-                    retVal.setUseMoraleModifierLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMissedPayDay")) {
-                    retVal.setUseMoraleModifierMissedPayDay(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRuleWithIronFist")) {
-                    retVal.setUseRuleWithIronFist(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                    //endregion Retirement
 
                     //region Family
                 } else if (wn2.getNodeName().equalsIgnoreCase("familyDisplayLevel")
@@ -5540,8 +5652,130 @@ public class CampaignOptions {
 
                         }
                     }
+                }
                     //endregion Death
                 //endregion Life Paths Tab
+              
+                //region Turnover and Retention
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
+                    retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomRetirement")) {
+                    retVal.setUseRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverTargetNumberMethod")) {
+                    retVal.setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverDifficulty")) {
+                    retVal.setTurnoverDifficulty(SkillLevel.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
+                    retVal.setTurnoverFixedTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useYearEndRandomRetirement")) {
+                    retVal.setUseYearEndRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useContractCompletionRandomRetirement")) {
+                    retVal.setUseContractCompletionRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomFounderRetirement")) {
+                    retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useSubContractSoldiers")) {
+                    retVal.setUseSubContractSoldiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("serviceContractDuration")) {
+                    retVal.setServiceContractDuration(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("serviceContractModifier")) {
+                    retVal.setServiceContractModifier(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
+                    retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useFatigueModifiers")) {
+                    retVal.setUseFatigueModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useSkillModifiers")) {
+                    retVal.setUseSkillModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAgeModifiers")) {
+                    retVal.setUseAgeModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useUnitRatingModifiers")) {
+                    retVal.setUseUnitRatingModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useFactionModifiers")) {
+                    retVal.setUseFactionModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMissionStatusModifiers")) {
+                    retVal.setUseMissionStatusModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useLoyaltyModifiers")) {
+                    retVal.setUseLoyaltyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useHideLoyalty")) {
+                    retVal.setUseHideLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateOfficer")) {
+                    retVal.setPayoutRateOfficer(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateEnlisted")) {
+                    retVal.setPayoutRateEnlisted(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payoutRetirementMultiplier")) {
+                    retVal.setPayoutRetirementMultiplier(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePayoutServiceBonus")) {
+                    retVal.setUsePayoutServiceBonus(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payoutServiceBonusRate")) {
+                    retVal.setPayoutServiceBonusRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useAdministrativeStrain")) {
+                    retVal.setUseAdministrativeStrain(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("administrativeStrain")) {
+                    retVal.setAdministrativeCapacity(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("multiCrewStrainDivider")) {
+                    retVal.setMultiCrewStrainDivider(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useManagementSkill")) {
+                    retVal.setUseManagementSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useCommanderLeadershipOnly")) {
+                    retVal.setUseCommanderLeadershipOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("managementSkillPenalty")) {
+                    retVal.setManagementSkillPenalty(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useFatigue")) {
+                    retVal.setUseFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fatigueRate")) {
+                    retVal.setFatigueRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
+                    retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {
+                    retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMorale")) {
+                    retVal.setUseMorale(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("stepSize")) {
+                    retVal.setStepSize(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("forceReliabilityMethod")) {
+                    retVal.setForceReliabilityMethod(ForceReliabilityMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useDesertions")) {
+                    retVal.setUseDesertions(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useEmergencyBonuses")) {
+                    retVal.setUseEmergencyBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useSabotage")) {
+                    retVal.setUseSabotage(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTheft")) {
+                    retVal.setUseTheft(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMutinies")) {
+                    retVal.setUseMutinies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerFieldControl")) {
+                    retVal.setUseMoraleTriggerFieldControl(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMissionStatus")) {
+                    retVal.setUseMoraleTriggerMissionStatus(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerLeaderLoss")) {
+                    retVal.setUseMoraleTriggerModifierLeaderLoss(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerCombatLoss")) {
+                    retVal.setUseMoraleTriggerCombatLoss(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerDesertion")) {
+                    retVal.setUseMoraleTriggerDesertion(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMutiny")) {
+                    retVal.setUseMoraleTriggerMutiny(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerFatigue")) {
+                    retVal.setUseMoraleTriggerFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("customMoraleModifier")) {
+                    retVal.setCustomMoraleModifier(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierExperienceLevel")) {
+                    retVal.setUseMoraleModifierExperienceLevel(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierFaction")) {
+                    retVal.setUseMoraleModifierFaction(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierProfession")) {
+                    retVal.setUseMoraleModifierProfession(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierForceReliability")) {
+                    retVal.setUseMoraleModifierForceReliability(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierCommanderLeadership")) {
+                    retVal.setUseMoraleModifierCommanderLeadership(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierLoyalty")) {
+                    retVal.setUseMoraleModifierLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMissedPayDay")) {
+                    retVal.setUseMoraleModifierMissedPayDay(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRuleWithIronFist")) {
+                    retVal.setUseRuleWithIronFist(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Turnover and Retention
 
                 //region Finances Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
