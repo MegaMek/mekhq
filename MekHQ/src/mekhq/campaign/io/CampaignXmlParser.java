@@ -47,10 +47,14 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.*;
-import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
@@ -271,6 +275,8 @@ public class CampaignXmlParser {
                     processLanceNodes(retVal, wn);
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
+                } else if (xn.equalsIgnoreCase("Morale")) {
+                    retVal.setMorale(Integer.parseInt(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
                     retVal.setShipSearchStart(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {

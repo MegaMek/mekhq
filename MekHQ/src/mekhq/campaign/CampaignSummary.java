@@ -25,6 +25,7 @@ import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
@@ -34,9 +35,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static mekhq.campaign.personnel.RetirementDefectionTracker.getAdministrativeStrain;
-import static mekhq.campaign.personnel.RetirementDefectionTracker.getAdministrativeStrainModifier;
-import static mekhq.campaign.personnel.RetirementDefectionTracker.getCombinedSkillValues;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getCombinedSkillValues;
 
 /**
  * calculates and stores summary information on a campaign for use in reporting, mostly for the command center
@@ -315,14 +316,9 @@ public class CampaignSummary {
      */
     public String getFatigueSummary() {
         int personnelCount = campaign.getActivePersonnel().size();
-        int fieldKitchenCapacity = campaign.checkFieldKitchenCapacity();
 
-        if (fieldKitchenCapacity > 0) {
-            return String.format("Kitchens (%s/%s)",
-                    personnelCount, campaign.checkFieldKitchenCapacity());
-        } else {
-            return "";
-        }
+        return String.format("Kitchens (%s/%s)",
+                personnelCount, Fatigue.checkFieldKitchenCapacity(campaign));
     }
 
     private String createCsv(Collection<?> coll) {

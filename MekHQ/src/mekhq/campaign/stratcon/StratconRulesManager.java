@@ -36,6 +36,7 @@ import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
@@ -540,7 +541,7 @@ public class StratconRulesManager {
         for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
             for (Person person : campaign.getUnit(unit).getCrew()) {
                 person.setFatigue(person.getFatigue() + campaign.getCampaignOptions().getFatigueRate());
-                campaign.processFatigueActions(person);
+                Fatigue.processFatigueActions(campaign, person);
             }
         }
     }

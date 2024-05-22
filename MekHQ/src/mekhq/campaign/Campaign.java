@@ -31,13 +31,16 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.BombMounted;
-import megamek.common.equipment.MiscMounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
+import megamek.common.weapons.autocannons.ACWeapon;
+import megamek.common.weapons.flamers.FlamerWeapon;
+import megamek.common.weapons.gaussrifles.GaussWeapon;
+import megamek.common.weapons.lasers.EnergyWeapon;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -88,6 +91,8 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -225,7 +230,9 @@ public class Campaign implements ITechManager {
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
 
-    private RetirementDefectionTracker retirementDefectionTracker; // AtB
+    private RetirementDefectionTracker retirementDefectionTracker;
+    private int morale;
+
     private AtBConfiguration atbConfig; //AtB
     private AtBEventProcessor atbEventProcessor; //AtB
     private LocalDate shipSearchStart; //AtB
@@ -287,6 +294,7 @@ public class Campaign implements ITechManager {
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
+        morale = 4;
         atbConfig = null;
         autosaveService = new AutosaveService();
         hasActiveContract = false;
@@ -470,6 +478,14 @@ public class Campaign implements ITechManager {
 
     public void setProcreation(final AbstractProcreation procreation) {
         this.procreation = procreation;
+    }
+
+    public Integer getMorale() {
+        return morale;
+    }
+
+    public void setMorale(final Integer morale) {
+        this.morale = morale;
     }
     //endregion Personnel Modules
 
@@ -1550,7 +1566,7 @@ public class Campaign implements ITechManager {
             if (getCampaignOptions().getUnitRatingMethod().isEnabled()) {
                 IUnitRating rating = getUnitRating();
                 bloodnameTarget += IUnitRating.DRAGOON_C - (getCampaignOptions().getUnitRatingMethod().equals(
-                        mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV)
+                        UnitRatingMethod.FLD_MAN_MERCS_REV)
                         ? rating.getUnitRatingAsInteger() : rating.getModifier());
             }
 
@@ -3223,14 +3239,14 @@ public class Campaign implements ITechManager {
 
         if (getLocalDate().getDayOfMonth() == 1) {
             /*
-             * First of the month; roll morale.
+             * First of the month; roll Morale.
              */
             IUnitRating rating = getUnitRating();
             rating.reInitialize();
 
             for (AtBContract contract : getActiveAtBContracts()) {
                 contract.checkMorale(getLocalDate(), getUnitRatingMod());
-                addReport("Enemy morale is now " + contract.getMoraleLevel()
+                addReport("Enemy Morale is now " + contract.getMoraleLevel()
                         + " on contract " + contract.getName());
             }
         }
@@ -3518,12 +3534,12 @@ public class Campaign implements ITechManager {
 
         // Fatigue Region
         // even if Fatigue is disabled, we still want to process recovery so fatigued personnel aren't frozen in that state
-        processFatigueRecovery();
+        Fatigue.processFatigueRecovery(this);
 
         if (campaignOptions.isUseFatigue()) {
             // we store these values, so this only needs to be checked once per day,
             // otherwise we would need to check it once for each active person in the campaign
-            fieldKitchenWithinCapacity = getActivePersonnel().size() <= checkFieldKitchenCapacity();
+            fieldKitchenWithinCapacity = getActivePersonnel().size() <= Fatigue.checkFieldKitchenCapacity(this);
         } else {
             fieldKitchenWithinCapacity = false;
         }
@@ -4194,6 +4210,8 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "currentReport");
 
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "info");
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "Morale", morale);
         //endregion Basic Campaign Info
 
         //region Campaign Options
@@ -5150,34 +5168,34 @@ public class Campaign implements ITechManager {
                  * a minimum for non-flamer energy weapons, which was the reason this rule was
                  * included in AtB to begin with.
                  */
-                if (et instanceof megamek.common.weapons.lasers.EnergyWeapon
-                        && !(et instanceof megamek.common.weapons.flamers.FlamerWeapon)
+                if (et instanceof EnergyWeapon
+                        && !(et instanceof FlamerWeapon)
                         && partAvailability < EquipmentType.RATING_C) {
                     partAvailability = EquipmentType.RATING_C;
                     partAvailabilityLog.append(";(non-flamer lasers)");
                 }
-                if (et instanceof megamek.common.weapons.autocannons.ACWeapon) {
+                if (et instanceof ACWeapon) {
                     partAvailability -= 2;
                     partAvailabilityLog.append(";(autocannon): -2");
                 }
-                if (et instanceof megamek.common.weapons.gaussrifles.GaussWeapon
-                        || et instanceof megamek.common.weapons.flamers.FlamerWeapon) {
+                if (et instanceof GaussWeapon
+                        || et instanceof FlamerWeapon) {
                     partAvailability--;
                     partAvailabilityLog.append(";(gauss rifle or flamer): -1");
                 }
-                if (et instanceof megamek.common.AmmoType) {
-                    switch (((megamek.common.AmmoType) et).getAmmoType()) {
-                        case megamek.common.AmmoType.T_AC:
+                if (et instanceof AmmoType) {
+                    switch (((AmmoType) et).getAmmoType()) {
+                        case AmmoType.T_AC:
                             partAvailability -= 2;
                             partAvailabilityLog.append(";(autocannon ammo): -2");
                             break;
-                        case megamek.common.AmmoType.T_GAUSS:
+                        case AmmoType.T_GAUSS:
                             partAvailability -= 1;
                             partAvailabilityLog.append(";(gauss ammo): -1");
                             break;
                     }
                     if (EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(
-                            ((megamek.common.AmmoType) et).getMunitionType())){
+                            ((AmmoType) et).getMunitionType())){
                         partAvailability--;
                         partAvailabilityLog.append(";(standard ammo): -1");
                     }
@@ -5186,10 +5204,10 @@ public class Campaign implements ITechManager {
 
             if (((getGameYear() < 2950) || (getGameYear() > 3040))
                     && (acquisition instanceof Armor || acquisition instanceof MissingMekActuator
-                            || acquisition instanceof mekhq.campaign.parts.MissingMekCockpit
-                            || acquisition instanceof mekhq.campaign.parts.MissingMekLifeSupport
-                            || acquisition instanceof mekhq.campaign.parts.MissingMekLocation
-                            || acquisition instanceof mekhq.campaign.parts.MissingMekSensor)) {
+                            || acquisition instanceof MissingMekCockpit
+                            || acquisition instanceof MissingMekLifeSupport
+                            || acquisition instanceof MissingMekLocation
+                            || acquisition instanceof MissingMekSensor)) {
                 partAvailability--;
                 partAvailabilityLog.append("(Mek part prior to 2950 or after 3040): - 1");
             }
@@ -6295,7 +6313,7 @@ public class Campaign implements ITechManager {
      * @param part A part to lookup its current inventory.
      * @return A PartInventory object detailing the current counts of
      * the part on hand, in transit, and ordered.
-     * @see mekhq.campaign.parts.PartInventory
+     * @see PartInventory
      */
     public PartInventory getPartInventory(Part part) {
         PartInventory inventory = new PartInventory();
@@ -6771,7 +6789,7 @@ public class Campaign implements ITechManager {
                             String mech = e.getDesc().substring(12);
                             MechSummary ms = MechSummaryCache.getInstance().getMech(mech);
                             if (null != ms && (p.isFounder()
-                                    || ms.getWeightClass() < megamek.common.EntityWeightClass.WEIGHT_ASSAULT)) {
+                                    || ms.getWeightClass() < EntityWeightClass.WEIGHT_ASSAULT)) {
                                 p.setOriginalUnitWeight(ms.getWeightClass());
                                 if (ms.isClan()) {
                                     p.setOriginalUnitTech(Person.TECH_CLAN);
@@ -6976,128 +6994,5 @@ public class Campaign implements ITechManager {
     @Override
     public boolean showExtinct() {
         return !campaignOptions.isDisallowExtinctStuff();
-    }
-
-    /**
-     * Calculates the total capacity of field kitchens based on the units present.
-     *
-     * @return The total capacity of field kitchens.
-     */
-    public Integer checkFieldKitchenCapacity() {
-        int fieldKitchenCount = 0;
-
-        Collection<Unit> allUnits = getUnits();
-
-        if (!allUnits.isEmpty()) {
-            for (Unit unit : getUnits()) {
-                if ((unit.isDeployed())
-                        || (unit.isDamaged())
-                        || (unit.getCrewState().isUncrewed())
-                        || (unit.getCrewState().isPartiallyCrewed())
-                        || (unit.isUnmaintained())) {
-                    continue;
-                }
-
-                List<MiscMounted> miscItems = unit.getEntity().getMisc();
-
-                if (!miscItems.isEmpty()) {
-                    fieldKitchenCount += (int) unit.getEntity().getMisc().stream()
-                            .filter(item -> item.getType().hasFlag(MiscType.F_FIELD_KITCHEN))
-                            .count();
-                }
-            }
-        }
-
-        return fieldKitchenCount * campaignOptions.getFieldKitchenCapacity();
-    }
-
-
-    /**
-     * Reports the fatigue level of a person and perform actions based on the fatigue level.
-     *
-     * @param person The person for which the fatigue level is reported.
-     */
-    public void processFatigueActions(Person person) {
-        int effectiveFatigue = person.getEffectiveFatigue(this);
-
-        if (getCampaignOptions().isUseFatigue()) {
-            if ((effectiveFatigue >= 5) && (effectiveFatigue < 9)) {
-                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueTired.text"));
-                person.setIsRecoveringFromFatigue(true);
-            } else if ((effectiveFatigue >= 9) && (effectiveFatigue < 12)) {
-                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueFatigued.text"));
-                person.setIsRecoveringFromFatigue(true);
-            } else if ((effectiveFatigue >= 12) && (effectiveFatigue < 16)) {
-                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueExhausted.text"));
-                person.setIsRecoveringFromFatigue(true);
-            } else if (effectiveFatigue >= 17) {
-                addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueCritical.text"));
-                person.setIsRecoveringFromFatigue(true);
-            }
-        }
-
-        if ((campaignOptions.getFatigueLeaveThreshold() != 0)
-                && (effectiveFatigue >= campaignOptions.getFatigueLeaveThreshold())) {
-            person.changeStatus(this, getLocalDate(), PersonnelStatus.ON_LEAVE);
-        }
-    }
-
-    /**
-     * Decreases the fatigue of all active personnel.
-     * Fatigue recovery is determined based on the following criteria:
-     * - Fatigue is adjusted based on various conditions:
-     *     - If it is Monday
-     *         - Fatigue is decreased by an 1
-     *         - If 'person' is on leave, decreased fatigue by an additional 1
-     *         - If there are no active contracts, decreased fatigue by an additional 1
-     * - If campaign options include fatigue usage and 'person' is recovering from fatigue:
-     *     - If fatigue reaches 0, trigger a report indicating fatigue recovery
-     *     - If fatigue leave threshold is not 0, and 'person' is on leave, change status to active
-     */
-    public void processFatigueRecovery() {
-        List<Person> filteredPersonnel = getPersonnel().stream()
-                .filter(person -> !person.getStatus().isDepartedUnit())
-                .collect(Collectors.toList());
-
-
-        for (Person person : filteredPersonnel) {
-            if (getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-                if (person.getFatigue() > 0) {
-                    int fatigueAdjustment = 1;
-
-                    if (person.getStatus().isOnLeave()) {
-                        fatigueAdjustment++;
-                    }
-
-                    if (getActiveContracts().isEmpty()) {
-                        fatigueAdjustment++;
-                    }
-
-                    person.setFatigue(person.getFatigue() - fatigueAdjustment);
-
-                    if (person.getFatigue() < 0) {
-                        person.setFatigue(0);
-                    }
-                }
-            }
-
-            if (getCampaignOptions().isUseFatigue()) {
-                if ((!person.getStatus().isOnLeave()) && (!person.getIsRecoveringFromFatigue())) {
-                    processFatigueActions(person);
-                }
-
-                if (person.getIsRecoveringFromFatigue()) {
-                    if (person.getFatigue() == 0) {
-                        addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("fatigueRecovered.text"));
-
-                        person.setIsRecoveringFromFatigue(false);
-
-                        if ((getCampaignOptions().getFatigueLeaveThreshold() != 0) && (person.getStatus().isOnLeave())) {
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
-                        }
-                    }
-                }
-            }
-        }
     }
 }

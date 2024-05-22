@@ -25,6 +25,7 @@ import megamek.common.event.Subscribe;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
+import mekhq.campaign.personnel.turnoverAndRetention.Morale;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -60,6 +61,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JLabel lblRating;
     private JLabel lblExperience;
     private JLabel lblPersonnel;
+    private JLabel lblMorale;
     private JLabel lblAdminstrativeCapacity;
     private JLabel lblMissionSuccess;
     private JLabel lblComposition;
@@ -262,6 +264,22 @@ public final class CommandCenterTab extends CampaignGuiTab {
             panInfo.add(lblAdminstrativeCapacity, gridBagConstraints);
         }
 
+        if (getCampaign().getCampaignOptions().isUseMorale()) {
+            JLabel lblMoraleHead = new JLabel(resourceMap.getString("lblMorale.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(1, 5, 1, 5);
+            panInfo.add(lblMoraleHead, gridBagConstraints);
+            lblMorale = new JLabel(getCampaign().getMorale() + " (" + Morale.getMoraleLevel(getCampaign()) + ')');
+            lblMoraleHead.setLabelFor(lblMorale);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.weightx = 1.0;
+            panInfo.add(lblMorale, gridBagConstraints);
+        }
+
         JLabel lblCompositionHead = new JLabel(resourceMap.getString("lblComposition.text"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -319,21 +337,19 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panInfo.add(lblCargoSummary, gridBagConstraints);
 
         if (getCampaign().getCampaignOptions().isUseFatigue()) {
-            if (getCampaign().getCampaignOptions().getFieldKitchenCapacity() > 0) {
-                JLabel lblFacilityCapacitiesHead = new JLabel(resourceMap.getString("lblFacilityCapacities.text"));
-                gridBagConstraints = new GridBagConstraints();
-                gridBagConstraints.gridx = 0;
-                gridBagConstraints.gridy = y++;
-                gridBagConstraints.fill = GridBagConstraints.NONE;
-                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-                gridBagConstraints.insets = new Insets(1, 5, 1, 5);
-                panInfo.add(lblFacilityCapacitiesHead, gridBagConstraints);
-                lblFacilityCapacities = new JLabel(getCampaign().getCampaignSummary().getFatigueSummary());
-                lblFacilityCapacitiesHead.setLabelFor(lblFacilityCapacities);
-                gridBagConstraints.gridx = 1;
-                gridBagConstraints.weightx = 1.0;
-                panInfo.add(lblFacilityCapacities, gridBagConstraints);
-            }
+            JLabel lblFacilityCapacitiesHead = new JLabel(resourceMap.getString("lblFacilityCapacities.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y++;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            gridBagConstraints.insets = new Insets(1, 5, 1, 5);
+            panInfo.add(lblFacilityCapacitiesHead, gridBagConstraints);
+            lblFacilityCapacities = new JLabel(getCampaign().getCampaignSummary().getFatigueSummary());
+            lblFacilityCapacitiesHead.setLabelFor(lblFacilityCapacities);
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.weightx = 1.0;
+            panInfo.add(lblFacilityCapacities, gridBagConstraints);
         }
 
         panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panInfo.title")));
@@ -551,13 +567,23 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());
         lblTransportCapacity.setText(getCampaign().getCampaignSummary().getTransportCapacity());
 
-        try {
-            lblAdminstrativeCapacity.setText(getCampaign().getCampaignSummary().getAdministrativeCapacityReport(getCampaign()));
-        } catch (Exception ignored) {}
+        if (getCampaign().getCampaignOptions().isUseMorale()) {
+            try {
+                lblMorale.setText(getCampaign().getMorale() + " (" + Morale.getMoraleLevel(getCampaign()) + ')');
+            } catch (Exception ignored) {}
+        }
 
-        try {
-            lblFacilityCapacities.setText(getCampaign().getCampaignSummary().getFatigueSummary());
-        } catch (Exception ignored) {}
+        if (getCampaign().getCampaignOptions().isUseAdministrativeStrain()) {
+            try {
+                lblAdminstrativeCapacity.setText(getCampaign().getCampaignSummary().getAdministrativeCapacityReport(getCampaign()));
+            } catch (Exception ignored) {}
+        }
+
+        if (getCampaign().getCampaignOptions().isUseFatigue()) {
+            try {
+                lblFacilityCapacities.setText(getCampaign().getCampaignSummary().getFatigueSummary());
+            } catch (Exception ignored) {}
+        }
     }
 
     private void refreshObjectives() {

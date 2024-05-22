@@ -39,6 +39,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
@@ -1425,7 +1426,7 @@ public class ResolveScenarioTracker {
 
             if (!status.isDead()) {
                 person.setFatigue(person.getFatigue() + campaign.getCampaignOptions().getFatigueRate());
-                campaign.processFatigueActions(person);
+                Fatigue.processFatigueActions(campaign, person);
             }
 
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {

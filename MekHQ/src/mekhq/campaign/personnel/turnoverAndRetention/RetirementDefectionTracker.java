@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
  */
-package mekhq.campaign.personnel;
+package mekhq.campaign.personnel.turnoverAndRetention;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
@@ -31,6 +31,10 @@ import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.universe.FactionHints;
