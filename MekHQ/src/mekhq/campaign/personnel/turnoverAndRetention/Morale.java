@@ -3,18 +3,22 @@ package mekhq.campaign.personnel.turnoverAndRetention;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.ForceReliabilityMethod;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Morale {
 
@@ -389,10 +393,12 @@ public class Morale {
 
         double morale = campaign.getMorale();
 
-        ArrayList<Unit> unitList = new ArrayList<>();
+        ArrayList<Unit> theftTargets = new ArrayList<>();
 
         if (isDesertion) {
-            unitList = (ArrayList<Unit>) campaign.getUnits();
+            theftTargets = campaign.getHangar().getUnits().stream()
+                    .filter(unit -> (!unit.isDamaged()) || (!unit.isDeployed()) || (!unit.getEntity().isLargeCraft()) || (!unit.getEntity().isWarShip()))
+                    .collect(Collectors.toCollection(ArrayList::new));
         }
 
         boolean someoneHasDeserted = false;
@@ -407,7 +413,8 @@ public class Morale {
 
             if (roll <= targetNumber) {
                 if (isDesertion) {
-                    if ((processDesertion(campaign, person, roll, targetNumber, morale, unitList, resources)) && (!someoneHasDeserted)) {
+                    if ((processDesertion(campaign, person, roll, targetNumber, morale, theftTargets, resources))
+                            && (!someoneHasDeserted)) {
                         someoneHasDeserted = true;
                     }
                 } else {
@@ -444,7 +451,7 @@ public class Morale {
         if (roll <= (targetNumber - 2)) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DESERTED);
 
-            if ((roll <= (morale - 4)) && (campaign.getCampaignOptions().isUseTheftUnit())) {
+            if ((roll <= (morale - 4)) && (campaign.getCampaignOptions().isUseTheftUnit()) && (!unitList.isEmpty())) {
                 processUnitTheft(campaign, unitList, resources);
             } else if ((roll <= (morale - 3)) && (campaign.getCampaignOptions().isUseTheftMoney())) {
                 processMoneyTheft(campaign, resources);
@@ -469,38 +476,25 @@ public class Morale {
      * @param resources  the resource bundle for retrieving localized strings
      */
     private static void processUnitTheft(Campaign campaign, ArrayList<Unit> unitList, ResourceBundle resources) {
-        boolean committingTheft = true;
-        int attempts = 3;
+        Unit desiredUnit = unitList.get(new Random().nextInt(unitList.size()));
 
-        while (committingTheft) {
-            Unit desiredUnit = unitList.get(new Random().nextInt(unitList.size()));
+        StringBuilder unitName = new StringBuilder(desiredUnit.getName());
 
-            if ((desiredUnit.getEntity().isLargeCraft()) || (desiredUnit.getEntity().isWarShip()) || (desiredUnit.isDeployed())) {
-                attempts--;
-
-                if (attempts == 0) {
-                    if (campaign.getCampaignOptions().isUseTheftMoney()) {
-                        processMoneyTheft(campaign, resources);
-                    } else {
-                        processPettyTheft(campaign, resources);
-                    }
-                    committingTheft = false;
-                }
-            } else {
-                StringBuilder unitName = new StringBuilder(desiredUnit.getName());
-
-                if (!Objects.equals(desiredUnit.getFluffName(), "")) {
-                    unitName.append(' ').append(desiredUnit.getFluffName());
-                }
-
-                campaign.addReport(String.format(resources.getString("desertionTheftUnit.text"), unitName));
-
-                campaign.removeUnit(desiredUnit.getId());
-                unitList.remove(desiredUnit);
-
-                committingTheft = false;
-            }
+        if (!Objects.equals(desiredUnit.getFluffName(), "")) {
+            unitName.append(' ').append(desiredUnit.getFluffName());
         }
+
+        if ((!campaign.getFaction().isClan()) && (Compute.d6(1) >= 3)) {
+            campaign.getUnitMarket().addOffers(campaign, 1, UnitMarketType.BLACK_MARKET, desiredUnit.getEntity().getUnitType(),
+                    campaign.getFaction(), desiredUnit.getQuality(), 6);
+
+            campaign.addReport(String.format(resources.getString("desertionTheftUnitBlackMarket.text"), unitName));
+        } else {
+            campaign.addReport(String.format(resources.getString("desertionTheftUnit.text"), unitName));
+        }
+
+        campaign.removeUnit(desiredUnit.getId());
+        unitList.remove(desiredUnit);
     }
 
     /**

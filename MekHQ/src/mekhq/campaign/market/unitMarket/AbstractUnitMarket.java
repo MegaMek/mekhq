@@ -97,10 +97,7 @@ public abstract class AbstractUnitMarket {
      * @param quality the quality of the unit to generate
      * @param priceTarget the target number used to determine the percent
      */
-    protected abstract void addOffers(final Campaign campaign, final int number,
-                                      UnitMarketType market, final int unitType,
-                                      @Nullable Faction faction, final int quality,
-                                      final int priceTarget);
+    public abstract void addOffers(final Campaign campaign, final int number, UnitMarketType market, final int unitType, @Nullable Faction faction, final int quality, final int priceTarget);
 
     /**
      * @param campaign the campaign to use to generate the unit
