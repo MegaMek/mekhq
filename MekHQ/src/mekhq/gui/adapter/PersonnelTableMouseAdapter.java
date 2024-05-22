@@ -2675,7 +2675,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         }
-      
+    }
+
     /**
      * Returns a JMenuItem for a given Award.
      *
@@ -2701,7 +2702,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     awardMenuItem.append(award.getEdgeReward()).append(" Edge");
                 }
 
-                awardMenuItem.append(")");
+                awardMenuItem.append(')');
             }
         } else if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isXP()) {
             if (award.getXPReward() != 0) {
