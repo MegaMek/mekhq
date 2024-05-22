@@ -409,7 +409,7 @@ public class Morale {
                 if (isDesertion) {
                     // TODO emergency bonuses give reroll
 
-                    if ((processDisertion(campaign, person, roll, targetNumber, morale, unitList, resources)) && (!someoneHasDeserted)) {
+                    if ((processDesertion(campaign, person, roll, targetNumber, morale, unitList, resources)) && (!someoneHasDeserted)) {
                         someoneHasDeserted = true;
                     }
                 } else {
@@ -429,12 +429,16 @@ public class Morale {
         }
     }
 
-    private static boolean processDisertion(Campaign campaign, Person person, int roll, double targetNumber, double morale, ArrayList<Unit> unitList, ResourceBundle resources) {
+    private static boolean processDesertion(Campaign campaign, Person person, int roll, double targetNumber, double morale, ArrayList<Unit> unitList, ResourceBundle resources) {
         if (roll <= (targetNumber - 2)) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DESERTED);
 
-            if ((roll <= (morale - 4)) && (campaign.getCampaignOptions().isUseTheft())) {
-                processTheft(campaign, unitList, resources);
+            if ((roll <= (morale - 4)) && (campaign.getCampaignOptions().isUseTheftUnit())) {
+                processUnitTheft(campaign, unitList, resources);
+            } else if ((roll <= (morale - 3)) && (campaign.getCampaignOptions().isUseTheftMoney())) {
+                processMoneyTheft(campaign, resources);
+            } else if (roll <= (morale - 2)) {
+                processPettyTheft(campaign, resources);
             }
 
             return true;
@@ -447,13 +451,13 @@ public class Morale {
     }
 
     /**
-     * Process theft of units and money.
+     * Process theft of units.
      *
      * @param campaign   the campaign from which units or funds are stolen
      * @param unitList   the list of available units
      * @param resources  the resource bundle for retrieving localized strings
      */
-    private static void processTheft(Campaign campaign, ArrayList<Unit> unitList, ResourceBundle resources) {
+    private static void processUnitTheft(Campaign campaign, ArrayList<Unit> unitList, ResourceBundle resources) {
         boolean committingTheft = true;
         int attempts = 3;
 
@@ -464,9 +468,11 @@ public class Morale {
                 attempts--;
 
                 if (attempts == 0) {
-                    Money stolenMoney = campaign.getFinances().getBalance().multipliedBy(0.1);
-
-                    campaign.getFinances().debit(TransactionType.THEFT, campaign.getLocalDate(), stolenMoney, resources.getString("desertionHeist.text"));
+                    if (campaign.getCampaignOptions().isUseTheftMoney()) {
+                        processMoneyTheft(campaign, resources);
+                    } else {
+                        processPettyTheft(campaign, resources);
+                    }
                     committingTheft = false;
                 }
             } else {
@@ -484,6 +490,167 @@ public class Morale {
                 committingTheft = false;
             }
         }
+    }
+
+    /**
+     * Processes money theft.
+     *
+     * @param campaign the campaign for which the theft is being processed
+     * @param resources the ResourceBundle containing the necessary resources
+     */
+    private static void processMoneyTheft(Campaign campaign, ResourceBundle resources) {
+        int theftPercentage = campaign.getCampaignOptions().getTheftValue();
+
+        switch(Compute.d6(2)) {
+            case 2:
+                theftPercentage += 3;
+                break;
+            case 3:
+                theftPercentage += 2;
+                break;
+            case 4:
+            case 5:
+                theftPercentage++;
+                break;
+            case 9:
+                theftPercentage--;
+                break;
+            case 10:
+            case 11:
+                theftPercentage -= 2;
+                break;
+            case 12:
+                theftPercentage -= 3;
+                break;
+            default:
+                break;
+        }
+
+        Money theft = campaign.getFunds().multipliedBy(MathUtility.clamp(theftPercentage, 1, 100) / 100).round();
+
+        if (theft.isPositive()) {
+            campaign.getFinances().debit(TransactionType.THEFT, campaign.getLocalDate(), theft, resources.getString("desertionHeist.text"));
+
+            campaign.addReport(String.format(resources.getString("desertionHeistReport.text"), theft.getAmount()));
+        } else {
+            processPettyTheft(campaign, resources);
+        }
+    }
+
+    /**
+     * This method is used to process a petty theft incident in a company.
+     * It randomly selects an item from a list of stolen items and adds the item to the campaign report.
+     *
+     * @param campaign   The campaign object to add the report to.
+     * @param resources  The ResourceBundle object to retrieve localized strings.
+     */
+    private static void processPettyTheft(Campaign campaign, ResourceBundle resources) {
+        List<String> items = List.of("officeSupplies.text",
+                "mascot.text",
+                "phones.text",
+                "tablets.text",
+                "hardDrives.text",
+                "flashDrive.text",
+                "companyCreditCard.text",
+                "officePet.text",
+                "confidentialReports.text",
+                "clientLists.text",
+                "unitSchematics.text",
+                "businessPlans.text",
+                "marketingMaterials.text",
+                "trainingPresentations.text",
+                "softwareLicenses.text",
+                "employeeBelongings.text",
+                "financialRecords.text",
+                "employeeRecords.text",
+                "proprietarySoftware.text",
+                "networkAccessCredentials.text",
+                "companyUniforms.text",
+                "desks.text",
+                "monitors.text",
+                "printers.text",
+                "projectors.text",
+                "carKeys.text",
+                "dartboard.text",
+                "securityBadges.text",
+                "officeKeys.text",
+                "pettyCashBox.text",
+                "cheques.text",
+                "diary.text",
+                "giftCards.text",
+                "coupons.text",
+                "personalDataOfCoworkers.text",
+                "battlePlans.text",
+                "legalDocuments.text",
+                "signedContracts.text",
+                "clientFeedbackForms.text",
+                "trainingManuals.text",
+                "marketResearch.text",
+                "businessContacts.text",
+                "meetingNotes.text",
+                "contractLeads.text",
+                "urbanMechPlushie.text",
+                "brandedMugs.text",
+                "companyPhoneDirectories.text",
+                "logbooks.text",
+                "inventoryLists.text",
+                "confidentialHpgMessages.text",
+                "strategyDocuments.text",
+                "passwordLists.text",
+                "internalMemos.text",
+                "surveillanceCameraRecordings.text",
+                "brandedPens.text",
+                "engineeringBlueprints.text",
+                "codeRepositories.text",
+                "internalNewsletters.text",
+                "hrPolicies.text",
+                "companyHandbooks.text",
+                "procedureManuals.text",
+                "securityPolicies.text",
+                "simulationData.text",
+                "businessCards.text",
+                "ndaAgreements.text",
+                "nonCompeteAgreements.text",
+                "softwareCode.text",
+                "technicalSpecifications.text",
+                "securitySchedules.text",
+                "underWear.text",
+                "marketAnalysis.text",
+                "salesContracts.text",
+                "expenseReports.text",
+                "reimbursementReceipts.text",
+                "invoices.text",
+                "employeeBenefitsInformation.text",
+                "insuranceDocuments.text",
+                "lightBulbs.text",
+                "strategicAlliancesInformation.text",
+                "computers.text",
+                "boots.text",
+                "employeeDiscountStructures.text",
+                "meetingMinutes.text",
+                "itInfrastructureDetails.text",
+                "serverAccessCodes.text",
+                "backupDrives.text",
+                "missionData.text",
+                "executiveMeetingNotes.text",
+                "toe.text",
+                "clientComplaints.text",
+                "inventoryControlSystems.text",
+                "chairs.text",
+                "shippingLogs.text",
+                "printerPaper.text",
+                "internalAuditReports.text",
+                "corruption.text",
+                "officePlants.text",
+                "battlefieldPerformanceReports.text",
+                "companyStandard.text",
+                "analyticsReports.text",
+                "fridge.text",
+                "coffeeMachine.text",
+                "mug.text",
+                "toiletSeats.text");
+
+        campaign.addReport(String.format(resources.getString("desertionStolen.text"), new Random().nextInt(items.size())));
     }
 
     /**

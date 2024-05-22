@@ -318,7 +318,9 @@ public class CampaignOptions {
     private ForceReliabilityMethod forceReliabilityMethod;
     private boolean useEmergencyBonuses;
     private boolean useSabotage;
-    private boolean useTheft;
+    private boolean useTheftUnit;
+    private boolean useTheftMoney;
+    private Integer theftValue;
 
     private boolean useMoraleTriggerFieldControl;
     private boolean useMoraleTriggerMissionStatus;
@@ -1007,7 +1009,9 @@ public class CampaignOptions {
         setUseEmergencyBonuses(true);
         setUseSabotage(true);
         setUseMutinies(true);
-        setUseTheft(true);
+        setUseTheftUnit(true);
+        setUseTheftMoney(true);
+        setUseTheftValue(10);
 
         setCustomMoraleModifier(2);
         setUseMoraleTriggerFieldControl(true);
@@ -1607,12 +1611,28 @@ public class CampaignOptions {
         this.useSabotage = useSabotage;
     }
 
-    public boolean isUseTheft() {
-        return useTheft;
+    public boolean isUseTheftUnit() {
+        return useTheftUnit;
     }
 
-    public void setUseTheft(final boolean useTheft) {
-        this.useTheft = useTheft;
+    public void setUseTheftUnit(final boolean useTheftUnit) {
+        this.useTheftUnit = useTheftUnit;
+    }
+
+    public boolean isUseTheftMoney() {
+        return useTheftMoney;
+    }
+
+    public void setUseTheftMoney(final boolean useTheftMoney) {
+        this.useTheftMoney = useTheftMoney;
+    }
+
+    public Integer getTheftValue() {
+        return theftValue;
+    }
+
+    public void setTheftValue(final Integer theftValue) {
+        this.theftValue = theftValue;
     }
 
     public boolean isUseMutinies() {
@@ -4721,7 +4741,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEmergencyBonuses", isUseEmergencyBonuses());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSabotage", isUseSabotage());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMutinies", isUseMutinies());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTheft", isUseTheft());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTheftUnit", isUseTheftUnit());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTheftMoney", isUseTheftMoney());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "theftValue", getTheftValue());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "customMoraleModifier", getCustomMoraleModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleTriggerFieldControl", isUseMoraleTriggerFieldControl());
@@ -5738,8 +5760,12 @@ public class CampaignOptions {
                     retVal.setUseEmergencyBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useSabotage")) {
                     retVal.setUseSabotage(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useTheft")) {
-                    retVal.setUseTheft(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTheftUnit")) {
+                    retVal.setUseTheftUnit(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTheftMoney")) {
+                    retVal.setUseTheftMoney(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("theftValue")) {
+                    retVal.setTheftValue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMutinies")) {
                     retVal.setUseMutinies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerFieldControl")) {
