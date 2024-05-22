@@ -242,6 +242,25 @@ public class CampaignOptions {
     private double salarySpecialistInfantryMultiplier;
     private Map<SkillLevel, Double> salaryXPMultipliers;
     private Money[] roleBaseSalaries;
+  
+    // Awards
+    private AwardBonus awardBonusStyle;
+    private boolean enableAutoAwards;
+    private boolean issuePosthumousAwards;
+    private boolean issueBestAwardOnly;
+    private boolean ignoreStandardSet;
+    private int awardTierSize;
+    private boolean enableContractAwards;
+    private boolean enableFactionHunterAwards;
+    private boolean enableInjuryAwards;
+    private boolean enableIndividualKillAwards;
+    private boolean enableFormationKillAwards;
+    private boolean enableRankAwards;
+    private boolean enableScenarioAwards;
+    private boolean enableSkillAwards;
+    private boolean enableTheatreOfWarAwards;
+    private boolean enableTimeAwards;
+    private boolean enableMiscAwards;
     //endregion Personnel Tab
 
     //region Life Paths Tab
@@ -709,6 +728,25 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
         setRoleBaseSalary(PersonnelRole.DEPENDENT, 0);
         setRoleBaseSalary(PersonnelRole.NONE, 0);
+      
+        // Awards
+        setAwardBonusStyle(AwardBonus.BOTH);
+        setEnableAutoAwards(true);
+        setIssuePosthumousAwards(false);
+        setIssueBestAwardOnly(true);
+        setIgnoreStandardSet(false);
+        setAwardTierSize(5);
+        setEnableContractAwards(true);
+        setEnableFactionHunterAwards(true);
+        setEnableInjuryAwards(true);
+        setEnableIndividualKillAwards(true);
+        setEnableFormationKillAwards(true);
+        setEnableRankAwards(true);
+        setEnableScenarioAwards(true);
+        setEnableSkillAwards(true);
+        setEnableTheatreOfWarAwards(true);
+        setEnableTimeAwards(true);
+        setEnableMiscAwards(true);
         //endregion Personnel Tab
 
         //region Life Paths Tab
@@ -2494,6 +2532,144 @@ public class CampaignOptions {
         this.ageRangeRandomDeathFemaleValues = ageRangeRandomDeathFemaleValues;
     }
     //endregion Death
+
+    //region Awards
+    public boolean isIssuePosthumousAwards() {
+        return issuePosthumousAwards;
+    }
+
+    public void setIssuePosthumousAwards(final boolean issuePosthumousAwards) {
+        this.issuePosthumousAwards = issuePosthumousAwards;
+    }
+
+    public boolean isIssueBestAwardOnly() {
+        return issueBestAwardOnly;
+    }
+
+    public void setIssueBestAwardOnly(final boolean issueBestAwardOnly) {
+        this.issueBestAwardOnly = issueBestAwardOnly;
+    }
+
+    public boolean isIgnoreStandardSet() {
+        return ignoreStandardSet;
+    }
+
+    public void setIgnoreStandardSet(final boolean ignoreStandardSet) {
+        this.ignoreStandardSet = ignoreStandardSet;
+    }
+
+    public int getAwardTierSize() {
+        return awardTierSize;
+    }
+
+    public void setAwardTierSize(final int awardTierSize) {
+        this.awardTierSize = awardTierSize;
+    }
+
+    public AwardBonus getAwardBonusStyle() {
+        return awardBonusStyle;
+    }
+
+    public void setAwardBonusStyle(final AwardBonus awardBonusStyle) {
+        this.awardBonusStyle = awardBonusStyle;
+    }
+
+    public boolean isEnableAutoAwards() {
+        return enableAutoAwards;
+    }
+
+    public void setEnableAutoAwards(final boolean enableAutoAwards) {
+        this.enableAutoAwards = enableAutoAwards;
+    }
+
+    public boolean isEnableContractAwards() {
+        return enableContractAwards;
+    }
+
+    public void setEnableContractAwards(final boolean enableContractAwards) {
+        this.enableContractAwards = enableContractAwards;
+    }
+
+    public boolean isEnableFactionHunterAwards() {
+        return enableFactionHunterAwards;
+    }
+
+    public void setEnableFactionHunterAwards(final boolean enableFactionHunterAwards) {
+        this.enableFactionHunterAwards = enableFactionHunterAwards;
+    }
+
+    public boolean isEnableInjuryAwards() {
+        return enableInjuryAwards;
+    }
+
+    public void setEnableInjuryAwards(final boolean enableInjuryAwards) {
+        this.enableInjuryAwards = enableInjuryAwards;
+    }
+
+    public boolean isEnableIndividualKillAwards() {
+        return enableIndividualKillAwards;
+    }
+
+    public void setEnableIndividualKillAwards(final boolean enableIndividualKillAwards) {
+        this.enableIndividualKillAwards = enableIndividualKillAwards;
+    }
+
+    public boolean isEnableFormationKillAwards() {
+        return enableFormationKillAwards;
+    }
+
+    public void setEnableFormationKillAwards(final boolean enableFormationKillAwards) {
+        this.enableFormationKillAwards = enableFormationKillAwards;
+    }
+
+    public boolean isEnableRankAwards() {
+        return enableRankAwards;
+    }
+
+    public void setEnableRankAwards(final boolean enableRankAwards) {
+        this.enableRankAwards = enableRankAwards;
+    }
+
+    public boolean isEnableScenarioAwards() {
+        return enableScenarioAwards;
+    }
+
+    public void setEnableScenarioAwards(final boolean enableScenarioAwards) {
+        this.enableScenarioAwards = enableScenarioAwards;
+    }
+
+    public boolean isEnableSkillAwards() {
+        return enableSkillAwards;
+    }
+
+    public void setEnableSkillAwards(final boolean enableSkillAwards) {
+        this.enableSkillAwards = enableSkillAwards;
+    }
+
+    public boolean isEnableTheatreOfWarAwards() {
+        return enableTheatreOfWarAwards;
+    }
+
+    public void setEnableTheatreOfWarAwards(final boolean enableTheatreOfWarAwards) {
+        this.enableTheatreOfWarAwards = enableTheatreOfWarAwards;
+    }
+
+    public boolean isEnableTimeAwards() {
+        return enableTimeAwards;
+    }
+
+    public void setEnableTimeAwards(final boolean enableTimeAwards) {
+        this.enableTimeAwards = enableTimeAwards;
+    }
+
+    public boolean isEnableMiscAwards() {
+        return enableMiscAwards;
+    }
+
+    public void setEnableMiscAwards(final boolean enableMiscAwards) {
+        this.enableMiscAwards = enableMiscAwards;
+    }
+    //endregion Awards
     //endregion Personnel Tab
 
     //region Finances Tab
@@ -3932,6 +4108,26 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salaryXPMultipliers");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
+      
+        //region Awards
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardBonusStyle", getAwardBonusStyle().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", isEnableAutoAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issuePosthumousAwards", isIssuePosthumousAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "issueBestAwardOnly", isIssueBestAwardOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "ignoreStandardSet", isIgnoreStandardSet());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardTierSize", getAwardTierSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableContractAwards", isEnableContractAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFactionHunterAwards", isEnableFactionHunterAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableInjuryAwards", isEnableInjuryAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableIndividualKillAwards", isEnableIndividualKillAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableFormationKillAwards", isEnableFormationKillAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRankAwards", isEnableRankAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableScenarioAwards", isEnableScenarioAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableSkillAwards", isEnableSkillAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTheatreOfWarAwards", isEnableTheatreOfWarAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTimeAwards", isEnableTimeAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableMiscAwards", isEnableMiscAwards());
+        //endregion Awards
         //endregion Personnel Tab
 
         //region Life Paths Tab
@@ -4553,6 +4749,43 @@ public class CampaignOptions {
                         retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
                     }
                 //endregion Salary
+                  
+                //region Awards
+                } else if (wn2.getNodeName().equalsIgnoreCase("awardBonusStyle")) {
+                    retVal.setAwardBonusStyle(AwardBonus.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableAutoAwards")) {
+                    retVal.setEnableAutoAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("issuePosthumousAwards")) {
+                    retVal.setIssuePosthumousAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("issueBestAwardOnly")) {
+                    retVal.setIssueBestAwardOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("ignoreStandardSet")) {
+                    retVal.setIgnoreStandardSet(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("awardTierSize")) {
+                    retVal.setAwardTierSize(Integer.parseInt(wn2.getTextContent()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableContractAwards")) {
+                    retVal.setEnableContractAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableFactionHunterAwards")) {
+                    retVal.setEnableFactionHunterAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableInjuryAwards")) {
+                    retVal.setEnableInjuryAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableIndividualKillAwards")) {
+                    retVal.setEnableIndividualKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableFormationKillAwards")) {
+                    retVal.setEnableFormationKillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableRankAwards")) {
+                    retVal.setEnableRankAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableScenarioAwards")) {
+                    retVal.setEnableScenarioAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableSkillAwards")) {
+                    retVal.setEnableSkillAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableTheatreOfWarAwards")) {
+                    retVal.setEnableTheatreOfWarAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableTimeAwards")) {
+                    retVal.setEnableTimeAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableMiscAwards")) {
+                    retVal.setEnableMiscAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                //endregion Awards
                 //endregion Personnel Tab
 
                 //region Life Paths Tab

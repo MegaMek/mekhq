@@ -5,6 +5,7 @@ import megamek.common.EntityWeightClass;
 import megamek.common.TechConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
+import mekhq.campaign.personnel.enums.AwardBonus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ public class PersonTest {
 
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
         Mockito.when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+        Mockito.when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);
@@ -61,6 +63,7 @@ public class PersonTest {
 
         CampaignOptions mockCampaignOpts = Mockito.mock(CampaignOptions.class);
         Mockito.when(mockCampaignOpts.isTrackTotalXPEarnings()).thenReturn(false);
+        Mockito.when(mockCampaignOpts.getAwardBonusStyle()).thenReturn(AwardBonus.BOTH);
 
         Campaign mockCampaign = Mockito.mock(Campaign.class);
         Mockito.when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOpts);

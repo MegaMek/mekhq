@@ -37,6 +37,7 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.TestUnit;
@@ -1413,6 +1414,7 @@ public class ResolveScenarioTracker {
             for (Kill k : status.getKills()) {
                 getCampaign().addKill(k);
             }
+
             if (status.isMissing()) {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
@@ -1429,6 +1431,20 @@ public class ResolveScenarioTracker {
 
             if (status.toRemove()) {
                 getCampaign().removePerson(person, false);
+            }
+
+            if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+                if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
+                    int injuryCount = 0;
+
+                    if (status.getHits() > person.getHits()) {
+                        injuryCount = status.getHits() - person.getHits();
+                    }
+
+                    AutoAwardsController autoAwardsController = new AutoAwardsController();
+
+                    autoAwardsController.PostScenarioController(campaign, scenario.getId(), person.getId(), injuryCount);
+                }
             }
         }
 

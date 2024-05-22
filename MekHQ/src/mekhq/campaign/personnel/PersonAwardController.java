@@ -123,16 +123,22 @@ public class PersonAwardController {
             awards.add(award);
         }
 
-        if (award.getXPReward() < 0) {
-            person.spendXP(-award.getXPReward());
-        } else {
-            person.awardXP(campaign, award.getXPReward());
+        if ((campaign.getCampaignOptions().getAwardBonusStyle().isBoth())
+                || (campaign.getCampaignOptions().getAwardBonusStyle().isXP())) {
+            if (award.getXPReward() < 0) {
+                person.spendXP(-award.getXPReward());
+            } else {
+                person.awardXP(campaign, award.getXPReward());
+            }
         }
 
-        if (award.getEdgeReward() > 0) {
-            person.changeEdge(award.getEdgeReward());
-            person.changeCurrentEdge(award.getEdgeReward());
-            PersonalLogger.gainedEdge(campaign, person, campaign.getLocalDate());
+        if ((campaign.getCampaignOptions().getAwardBonusStyle().isBoth())
+                || (campaign.getCampaignOptions().getAwardBonusStyle().isEdge())) {
+            if (award.getEdgeReward() > 0) {
+                person.changeEdge(award.getEdgeReward());
+                person.changeCurrentEdge(award.getEdgeReward());
+                PersonalLogger.gainedEdge(campaign, person, campaign.getLocalDate());
+            }
         }
 
         award.addDate(date);
