@@ -21,6 +21,7 @@ package mekhq.gui.adapter;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
+import megamek.common.Compute;
 import megamek.common.Crew;
 import megamek.common.Mounted;
 import megamek.common.options.IOption;
@@ -951,7 +952,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_LOYALTY: {
                 for (Person person : people) {
-                    person.generateLoyalty();
+                    person.generateLoyalty(Compute.d6(3));
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -2691,7 +2692,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
     }
-  
+
     /**
      * Returns a JMenuItem for a given Award.
      *

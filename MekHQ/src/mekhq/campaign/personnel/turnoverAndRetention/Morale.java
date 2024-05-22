@@ -141,6 +141,11 @@ public class Morale {
             }
         }
 
+        // Loyalty Modifier
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseMoraleModifierLoyalty())) {
+            modifier += getLoyaltyModifier(isDesertion, person.getLoyalty());
+        }
+
         // Iron Fist Modifier
         if (campaign.getCampaignOptions().isUseRuleWithIronFist()) {
             modifier++;
@@ -399,10 +404,6 @@ public class Morale {
         for (Person person : filteredPersonnel) {
             int modifier = getMoraleCheckModifiers(campaign, person, isDesertion, loyalty);
             int roll = Compute.d6(2) + modifier;
-
-            if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseMoraleModifierLoyalty())) {
-                roll += getLoyaltyModifier(isDesertion, person.getLoyalty());
-            }
 
             if (roll <= targetNumber) {
                 if (isDesertion) {

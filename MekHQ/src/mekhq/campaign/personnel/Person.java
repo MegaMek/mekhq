@@ -3653,11 +3653,12 @@ public class Person {
     }
 
     /**
-     * Generates the loyalty value for a person.
+     * Generates the loyalty value for a person based on the given roll value.
+     * Roll should be set to 3 for normal loyalty, 2 for low loyalty, or 4 for high loyalty.
+     *
+     * @param roll the roll value used to determine loyalty
      */
-    public void generateLoyalty() {
-        int roll = Compute.d6(3);
-
+    public void generateLoyalty(int roll) {
         if (roll == 3) {
             setLoyalty(-3);
         } else if (roll == 4) {
@@ -3666,7 +3667,7 @@ public class Person {
             setLoyalty(-1);
         } else if (roll == 18) {
             setLoyalty(3);
-        } else if (roll == 17) {
+        } else if (roll >= 17) {
             setLoyalty(2);
         } else if (roll > 14) {
             setLoyalty(1);

@@ -1484,6 +1484,8 @@ public class ResolveScenarioTracker {
                     getCampaign().addReport(String.format("You have convinced %s to defect.",
                             person.getHyperlinkedName()));
                 }
+
+                person.generateLoyalty(Compute.d6(2));
             } else {
                 continue;
             }
