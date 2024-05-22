@@ -292,6 +292,28 @@ public class CampaignOptions {
     private Integer fieldKitchenCapacity;
     private Integer fatigueLeaveThreshold;
 
+    private boolean useMorale;
+    private ForceReliabilityMethod forceReliabilityMethod;
+    private boolean useDesertions;
+    private boolean useEmergencyBonuses;
+    private boolean useSabotage;
+    private boolean useMutinies;
+    private boolean useRuleWithIronFist;
+
+    private Integer customMoraleModifier;
+    private boolean useMoraleModifierFieldControl;
+    private boolean useMoraleModifierMissionStatus;
+    private boolean useMoraleModifierLeaderLoss;
+    private boolean useMoraleModifierCombatLoss;
+    private boolean useMoraleModifierDesertion;
+    private boolean useMoraleModifierMutiny;
+    private boolean useMoraleModifierRest;
+    private boolean useMoraleModifierFatigue;
+    private boolean useMoraleModifierProfession;
+    private boolean useMoraleModifierForceReliability;
+    private boolean useMoraleModifierManagementSkill;
+    private boolean useMoraleModifierMissedPayDay;
+
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
 
@@ -934,6 +956,28 @@ public class CampaignOptions {
         setFatigueRate(1);
         setFieldKitchenCapacity(150);
         setFatigueLeaveThreshold(13);
+
+        setUseMorale(true);
+        setForceReliabilityMethod(ForceReliabilityMethod.LOYALTY);
+        setUseDesertions(true);
+        setUseEmergencyBonuses(true);
+        setUseSabotage(true);
+        setUseMutinies(true);
+        setUseRuleWithIronFist(false);
+
+        setCustomMoraleModifier(-2);
+        setUseMoraleModifierFieldControl(true);
+        setUseMoraleModifierMissionStatus(true);
+        setUseMoraleModifierLeaderLoss(true);
+        setUseMoraleModifierCombatLoss(true);
+        setUseMoraleModifierDesertion(true);
+        setUseMoraleModifierMutiny(true);
+        setUseMoraleModifierRest(true);
+        setUseMoraleModifierFatigue(true);
+        setUseMoraleModifierProfession(true);
+        setUseMoraleModifierForceReliability(true);
+        setUseMoraleModifierManagementSkill(true);
+        setUseMoraleModifierMissedPayDay(true);
         //endregion Turnover and Retention
 
         //region Finances Tab
@@ -1466,6 +1510,167 @@ public class CampaignOptions {
     public void setFatigueLeaveThreshold(final Integer fatigueLeaveThreshold) {
         this.fatigueLeaveThreshold = fatigueLeaveThreshold;
     }
+
+    public boolean isUseMorale() {
+        return useMorale;
+    }
+
+    public void setUseMorale(final boolean useMorale) {
+        this.useMorale = useMorale;
+    }
+
+    public ForceReliabilityMethod getForceReliabilityMethod() {
+        return forceReliabilityMethod;
+    }
+
+    public void setForceReliabilityMethod(final ForceReliabilityMethod forceReliabilityMethod) {
+        this.forceReliabilityMethod = forceReliabilityMethod;
+    }
+
+    public boolean isUseDesertions() {
+        return useDesertions;
+    }
+
+    public void setUseDesertions(final boolean useDesertions) {
+        this.useDesertions = useDesertions;
+    }
+
+    public boolean isUseEmergencyBonuses() {
+        return useEmergencyBonuses;
+    }
+
+    public void setUseEmergencyBonuses(final boolean useEmergencyBonuses) {
+        this.useEmergencyBonuses = useEmergencyBonuses;
+    }
+
+    public boolean isUseSabotage() {
+        return useSabotage;
+    }
+
+    public void setUseSabotage(final boolean useSabotage) {
+        this.useSabotage = useSabotage;
+    }
+
+    public boolean isUseMutinies() {
+        return useMutinies;
+    }
+
+    public void setUseMutinies(final boolean useMutinies) {
+        this.useMutinies = useMutinies;
+    }
+
+    public boolean isUseRuleWithIronFist() {
+        return useRuleWithIronFist;
+    }
+
+    public void setUseRuleWithIronFist(final boolean useRuleWithIronFist) {
+        this.useRuleWithIronFist = useRuleWithIronFist;
+    }
+
+    public Integer getCustomMoraleModifier() {
+        return customMoraleModifier;
+    }
+
+    public void setCustomMoraleModifier(final Integer customMoraleModifier) {
+        this.customMoraleModifier = customMoraleModifier;
+    }
+
+    public boolean isUseMoraleModifierProfession() {
+        return useMoraleModifierProfession;
+    }
+
+    public void setUseMoraleModifierProfession(final boolean useMoraleModifierProfession) {
+        this.useMoraleModifierProfession = useMoraleModifierProfession;
+    }
+
+    public boolean isUseMoraleModifierForceReliability() {
+        return useMoraleModifierForceReliability;
+    }
+
+    public void setUseMoraleModifierForceReliability(final boolean useMoraleModifierForceReliability) {
+        this.useMoraleModifierForceReliability = useMoraleModifierForceReliability;
+    }
+
+    public boolean isUseMoraleModifierManagementSkill() {
+        return useMoraleModifierManagementSkill;
+    }
+
+    public void setUseMoraleModifierManagementSkill(final boolean useMoraleModifierManagementSkill) {
+        this.useMoraleModifierManagementSkill = useMoraleModifierManagementSkill;
+    }
+
+    public boolean isUseMoraleModifierMissedPayDay() {
+        return useMoraleModifierMissedPayDay;
+    }
+
+    public void setUseMoraleModifierMissedPayDay(final boolean useMoraleModifierMissedPayDay) {
+        this.useMoraleModifierMissedPayDay = useMoraleModifierMissedPayDay;
+    }
+
+    public boolean isUseMoraleModifierFatigue() {
+        return useMoraleModifierFatigue;
+    }
+
+    public void setUseMoraleModifierFatigue(final boolean useMoraleModifierFatigue) {
+        this.useMoraleModifierFatigue = useMoraleModifierFatigue;
+    }
+
+    public boolean isUseMoraleModifierFieldControl() {
+        return useMoraleModifierFieldControl;
+    }
+
+    public void setUseMoraleModifierFieldControl(final boolean useMoraleModifierFieldControl) {
+        this.useMoraleModifierFieldControl = useMoraleModifierFieldControl;
+    }
+
+    public boolean isUseMoraleModifierMissionStatus() {
+        return useMoraleModifierMissionStatus;
+    }
+
+    public void setUseMoraleModifierMissionStatus(final boolean useMoraleModifierMissionStatus) {
+        this.useMoraleModifierMissionStatus = useMoraleModifierMissionStatus;
+    }
+
+    public boolean isUseMoraleModifierLeaderLoss() {
+        return useMoraleModifierLeaderLoss;
+    }
+
+    public void setUseMoraleModifierLeaderLoss(final boolean useMoraleModifierLeaderLoss) {
+        this.useMoraleModifierLeaderLoss = useMoraleModifierLeaderLoss;
+    }
+
+    public boolean isUseMoraleModifierCombatLoss() {
+        return useMoraleModifierCombatLoss;
+    }
+
+    public void setUseMoraleModifierCombatLoss(final boolean useMoraleModifierCombatLoss) {
+        this.useMoraleModifierCombatLoss = useMoraleModifierCombatLoss;
+    }
+
+    public boolean isUseMoraleModifierDesertion() {
+        return useMoraleModifierDesertion;
+    }
+
+    public void setUseMoraleModifierDesertion(final boolean useMoraleModifierDesertion) {
+        this.useMoraleModifierDesertion = useMoraleModifierDesertion;
+    }
+
+    public boolean isUseMoraleModifierMutiny() {
+        return useMoraleModifierMutiny;
+    }
+
+    public void setUseMoraleModifierMutiny(final boolean useMoraleModifierMutiny) {
+        this.useMoraleModifierMutiny = useMoraleModifierMutiny;
+    }
+
+    public boolean isUseMoraleModifierRest() {
+        return useMoraleModifierRest;
+    }
+
+    public void setUseMoraleModifierRest(final boolean useMoraleModifierRest) {
+        this.useMoraleModifierRest = useMoraleModifierRest;
+    }
+
     //endregion General Personnel
 
     //region Expanded Personnel Information
@@ -4270,6 +4475,28 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueRate", getFatigueRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLeaveThreshold", getFatigueLeaveThreshold());
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMorale", isUseMorale());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceReliabilityMethod", getForceReliabilityMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDesertions", isUseDesertions());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEmergencyBonuses", isUseEmergencyBonuses());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSabotage", isUseSabotage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMutinies", isUseMutinies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRuleWithIronFist", isUseRuleWithIronFist());
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "customMoraleModifier", getCustomMoraleModifier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierFieldControl", isUseMoraleModifierFieldControl());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierMissionStatus", isUseMoraleModifierMissionStatus());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierLeaderLoss", isUseMoraleModifierLeaderLoss());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierCombatLoss", isUseMoraleModifierCombatLoss());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierDesertion", isUseMoraleModifierDesertion());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierMutiny", isUseMoraleModifierMutiny());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierRest", isUseMoraleModifierRest());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierFatigue", isUseMoraleModifierFatigue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierProfession", isUseMoraleModifierProfession());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierForceReliability", isUseMoraleModifierForceReliability());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierManagementSkill", isUseMoraleModifierManagementSkill());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chkUseMoraleModifierMissedPayDay", isUseMoraleModifierMissedPayDay());
         //endregion Retirement
 
         //region Family
@@ -4964,6 +5191,46 @@ public class CampaignOptions {
                     retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {
                     retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMorale")) {
+                    retVal.setUseMorale(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("forceReliabilityMethod")) {
+                    retVal.setForceReliabilityMethod(ForceReliabilityMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useDesertions")) {
+                    retVal.setUseDesertions(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useEmergencyBonuses")) {
+                    retVal.setUseEmergencyBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useSabotage")) {
+                    retVal.setUseSabotage(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMutinies")) {
+                    retVal.setUseMutinies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRuleWithIronFist")) {
+                    retVal.setUseRuleWithIronFist(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("customMoraleModifier")) {
+                    retVal.setCustomMoraleModifier(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierScenarioStatus")) {
+                    retVal.setUseMoraleModifierFieldControl(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierMissionStatus")) {
+                    retVal.setUseMoraleModifierMissionStatus(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierLeaderLoss")) {
+                    retVal.setUseMoraleModifierLeaderLoss(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierCombatLoss")) {
+                    retVal.setUseMoraleModifierCombatLoss(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierDesertion")) {
+                    retVal.setUseMoraleModifierDesertion(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierMutiny")) {
+                    retVal.setUseMoraleModifierMutiny(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierInactivity")) {
+                    retVal.setUseMoraleModifierRest(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierFatigue")) {
+                    retVal.setUseMoraleModifierFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierRole")) {
+                    retVal.setUseMoraleModifierProfession(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierForceReliability")) {
+                    retVal.setUseMoraleModifierForceReliability(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierManagementSkill")) {
+                    retVal.setUseMoraleModifierManagementSkill(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierMissedPayment")) {
+                    retVal.setUseMoraleModifierMissedPayDay(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Retirement
 
                     //region Family
