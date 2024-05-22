@@ -242,7 +242,7 @@ public class CampaignOptions {
     private double salarySpecialistInfantryMultiplier;
     private Map<SkillLevel, Double> salaryXPMultipliers;
     private Money[] roleBaseSalaries;
-  
+
     // Awards
     private AwardBonus awardBonusStyle;
     private boolean enableAutoAwards;
@@ -790,7 +790,7 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
         setRoleBaseSalary(PersonnelRole.DEPENDENT, 0);
         setRoleBaseSalary(PersonnelRole.NONE, 0);
-      
+
         // Awards
         setAwardBonusStyle(AwardBonus.BOTH);
         setEnableAutoAwards(true);
@@ -4643,7 +4643,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salaryXPMultipliers");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
-      
+
         //region Awards
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardBonusStyle", getAwardBonusStyle().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", isEnableAutoAwards());
@@ -5346,7 +5346,7 @@ public class CampaignOptions {
                         retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
                     }
                 //endregion Salary
-                  
+
                 //region Awards
                 } else if (wn2.getNodeName().equalsIgnoreCase("awardBonusStyle")) {
                     retVal.setAwardBonusStyle(AwardBonus.valueOf(wn2.getTextContent().trim()));
@@ -5652,10 +5652,9 @@ public class CampaignOptions {
 
                         }
                     }
-                }
                     //endregion Death
                 //endregion Life Paths Tab
-              
+
                 //region Turnover and Retention
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRetirementDateTracking")) {
                     retVal.setUseRetirementDateTracking(Boolean.parseBoolean(wn2.getTextContent().trim()));
