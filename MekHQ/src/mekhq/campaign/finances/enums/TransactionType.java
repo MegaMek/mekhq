@@ -49,6 +49,7 @@ public enum TransactionType {
     SALVAGE_EXCHANGE("TransactionType.SALVAGE_EXCHANGE.text", "TransactionType.SALVAGE_EXCHANGE.toolTipText"),
     STARTING_CAPITAL("TransactionType.STARTING_CAPITAL.text", "TransactionType.STARTING_CAPITAL.toolTipText"),
     TAXES("TransactionType.TAXES.text", "TransactionType.TAXES.toolTipText"),
+    THEFT("TransactionType.THEFT.text", "TransactionType.THEFT.toolTipText"),
     TRANSPORTATION("TransactionType.TRANSPORTATION.text", "TransactionType.TRANSPORTATION.toolTipText"),
     UNIT_PURCHASE("TransactionType.UNIT_PURCHASE.text", "TransactionType.UNIT_PURCHASE.toolTipText"),
     UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText");
@@ -171,6 +172,10 @@ public enum TransactionType {
         return this == TAXES;
     }
 
+    public boolean isTheft() {
+        return this == THEFT;
+    }
+
     public boolean isTransportation() {
         return this == TRANSPORTATION;
     }
@@ -235,6 +240,8 @@ public enum TransactionType {
                     return RANSOM;
                 case 17:
                     return EDUCATION;
+                case 18:
+                    return THEFT;
                 default:
                     break;
             }

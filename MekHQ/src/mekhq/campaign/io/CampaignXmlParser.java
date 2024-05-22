@@ -276,7 +276,7 @@ public class CampaignXmlParser {
                 } else if (xn.equalsIgnoreCase("retirementDefectionTracker")) {
                     retVal.setRetirementDefectionTracker(RetirementDefectionTracker.generateInstanceFromXML(wn, retVal));
                 } else if (xn.equalsIgnoreCase("Morale")) {
-                    retVal.setMorale(Integer.parseInt(wn.getTextContent()));
+                    retVal.setMorale(Double.parseDouble(wn.getTextContent()));
                 } else if (xn.equalsIgnoreCase("shipSearchStart")) {
                     retVal.setShipSearchStart(MHQXMLUtility.parseDate(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("shipSearchType")) {

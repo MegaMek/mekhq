@@ -127,6 +127,7 @@ public class Person {
     private Integer loyalty;
     private Integer fatigue;
     private Boolean isRecoveringFromFatigue;
+    private Integer awolDays;
 
     private Skills skills;
     private PersonnelOptions options;
@@ -333,6 +334,7 @@ public class Person {
         loyalty = 0;
         fatigue = 0;
         isRecoveringFromFatigue = false;
+        awolDays = -1;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -1222,6 +1224,14 @@ public class Person {
         this.fatigue = fatigue;
     }
 
+    public Integer getAwolDays() {
+        return awolDays;
+    }
+
+    public void setAwolDays(final Integer awolDays) {
+        this.awolDays = awolDays;
+    }
+
     public boolean getIsRecoveringFromFatigue() {
         return isRecoveringFromFatigue;
     }
@@ -1634,7 +1644,8 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());;
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awolDays", getAwolDays());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
             }
@@ -1946,6 +1957,8 @@ public class Person {
                     retVal.fatigue = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("isRecoveringFromFatigue")) {
                     retVal.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("awolDays")) {
+                    retVal.awolDays = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {

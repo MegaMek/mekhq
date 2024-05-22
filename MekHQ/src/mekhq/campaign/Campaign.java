@@ -92,6 +92,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.personnel.turnoverAndRetention.Morale;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
@@ -231,7 +232,7 @@ public class Campaign implements ITechManager {
     private transient AbstractProcreation procreation;
 
     private RetirementDefectionTracker retirementDefectionTracker;
-    private int morale;
+    private double morale;
 
     private AtBConfiguration atbConfig; //AtB
     private AtBEventProcessor atbEventProcessor; //AtB
@@ -294,7 +295,7 @@ public class Campaign implements ITechManager {
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
-        morale = 4;
+        morale = 4.0;
         atbConfig = null;
         autosaveService = new AutosaveService();
         hasActiveContract = false;
@@ -480,11 +481,11 @@ public class Campaign implements ITechManager {
         this.procreation = procreation;
     }
 
-    public Integer getMorale() {
+    public Double getMorale() {
         return morale;
     }
 
-    public void setMorale(final Integer morale) {
+    public void setMorale(final Double morale) {
         this.morale = morale;
     }
     //endregion Personnel Modules
@@ -1631,6 +1632,16 @@ public class Campaign implements ITechManager {
     public List<Person> getActivePersonnel() {
         return getPersonnel().stream()
                 .filter(p -> p.getStatus().isActive())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Provides a filtered list of personnel including only Persons with the AWOL status.
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getAwolPersonnel() {
+        return getPersonnel().stream()
+                .filter(p -> p.getStatus().isAWOL())
                 .collect(Collectors.toList());
     }
 
@@ -3517,6 +3528,10 @@ public class Campaign implements ITechManager {
 
         processNewDayPersonnel();
 
+        processFatigueNewDay();
+
+        processMoraleNewDay();
+
         if (campaignOptions.isUseEducationModule()) {
             EducationController.processNewDay(this);
         }
@@ -3532,7 +3547,40 @@ public class Campaign implements ITechManager {
         // check for anything in finances
         getFinances().newDay(this, yesterday, getLocalDate());
 
-        // Fatigue Region
+        MekHQ.triggerEvent(new NewDayEvent(this));
+        return true;
+    }
+
+    private void processMoraleNewDay() {
+        // we still process awol personnel, even if Morale is disabled, to ensure they're not frozen in this state.
+        for (Person person : getAwolPersonnel()) {
+            if (person.getAwolDays() != -1) {
+                Morale.processAwolDays(this, person);
+            }
+        }
+
+        if (!campaignOptions.isUseMorale()) {
+            return;
+        }
+
+        if (getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
+            Morale.makeMoraleChecks(this, true);
+            Morale.makeMoraleChecks(this, false);
+
+            if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
+                Morale.processMoraleRecovery(this, 1);
+            }
+
+
+        }
+    }
+
+    /**
+     * This method is responsible for handling fatigue recovery and checking if the field kitchen is within capacity.
+     * Even if fatigue is disabled, fatigue recovery is still processed to ensure that fatigued personnel are not
+     * frozen in that state.
+     */
+    private void processFatigueNewDay() {
         // even if Fatigue is disabled, we still want to process recovery so fatigued personnel aren't frozen in that state
         Fatigue.processFatigueRecovery(this);
 
@@ -3543,10 +3591,6 @@ public class Campaign implements ITechManager {
         } else {
             fieldKitchenWithinCapacity = false;
         }
-        // End Fatigue Region
-
-        MekHQ.triggerEvent(new NewDayEvent(this));
-        return true;
     }
 
     public @Nullable Person getFlaggedCommander() {

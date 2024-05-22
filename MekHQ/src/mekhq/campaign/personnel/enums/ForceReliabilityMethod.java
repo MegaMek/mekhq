@@ -23,7 +23,7 @@ import mekhq.MekHQ;
 import java.util.ResourceBundle;
 
 public enum ForceReliabilityMethod {
-    EQUIPMENT("ForceReliabilityMethod.EQUIPMENT.text", "ForceReliabilityMethod.EQUIPMENT.toolTipText"),
+    UNIT_RATING("ForceReliabilityMethod.UNIT_RATING.text", "ForceReliabilityMethod.UNIT_RATING.toolTipText"),
     LOYALTY("ForceReliabilityMethod.LOYALTY.text", "ForceReliabilityMethod.LOYALTY.toolTipText"),
     OVERRIDE_A("ForceReliabilityMethod.OVERRIDE_A.text", "ForceReliabilityMethod.OVERRIDE_A.toolTipText"),
     OVERRIDE_B("ForceReliabilityMethod.OVERRIDE_B.text", "ForceReliabilityMethod.OVERRIDE_B.toolTipText"),
@@ -45,8 +45,8 @@ public enum ForceReliabilityMethod {
         return toolTipText;
     }
 
-    public boolean isEquipment() {
-        return this == EQUIPMENT;
+    public boolean isUnitRating() {
+        return this == UNIT_RATING;
     }
 
     public boolean isLoyalty() {

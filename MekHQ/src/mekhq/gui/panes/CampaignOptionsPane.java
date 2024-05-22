@@ -332,31 +332,36 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseMorale;
 
     private JPanel moraleSubPanel = new JPanel();
-    private JLabel lblForceReliabilityMethod;
-    private MMComboBox<ForceReliabilityMethod> comboForceReliabilityMethod;
+    private JLabel lblStepSize;
+    private JSpinner spnStepSize;
     private JCheckBox chkUseDesertions;
     private JCheckBox chkUseEmergencyBonuses;
+    private JLabel lblForceReliabilityMethod;
+    private MMComboBox<ForceReliabilityMethod> comboForceReliabilityMethod;
     private JCheckBox chkUseSabotage;
     private JCheckBox chkUseMutinies;
+    private JCheckBox chkUseTheft;
 
     private JPanel turnoverAndRetentionMoraleModifiersPanel = new JPanel();
     private JLabel lblCustomMoraleModifier;
     private JSpinner spnCustomMoraleModifier;
-    private JCheckBox chkUseMoraleModifierFatigue;
+    private JCheckBox chkUseMoraleModifierExperienceLevel;
+    private JCheckBox chkUseMoraleModifierFaction;
     private JCheckBox chkUseMoraleModifierProfession;
     private JCheckBox chkUseMoraleModifierForceReliability;
-    private JCheckBox chkUseMoraleModifierManagementSkill;
-    private JCheckBox chkUseMoraleModifierMissedPayDay;
+    private JCheckBox chkUseMoraleModifierCommanderSkill;
+    private JCheckBox chkUseMoraleModifierLoyalty;
     private JCheckBox chkUseRuleWithIronFist;
 
-    private JPanel turnoverAndRetentionMoraleChangePanel = new JPanel();
-    private JCheckBox chkUseMoraleModifierFieldControl;
-    private JCheckBox chkUseMoraleModifierMissionStatus;
-    private JCheckBox chkUseMoraleModifierLeaderLoss;
-    private JCheckBox chkUseMoraleModifierCombatLoss;
-    private JCheckBox chkUseMoraleModifierDesertion;
-    private JCheckBox chkUseMoraleModifierMutiny;
-    private JCheckBox chkUseMoraleModifierRest;
+    private JPanel turnoverAndRetentionMoraleTriggersPanel = new JPanel();
+    private JCheckBox chkUseMoraleTriggerFieldControl;
+    private JCheckBox chkUseMoraleTriggerMissionStatus;
+    private JCheckBox chkUseMoraleTriggerLeaderLoss;
+    private JCheckBox chkUseMoraleTriggerCombatLoss;
+    private JCheckBox chkUseMoraleTriggerDesertion;
+    private JCheckBox chkUseMoraleTriggerMutiny;
+    private JCheckBox chkUseMoraleTriggerMissedPayDay;
+    private JCheckBox chkUseMoraleTriggerFatigue;
     //endregion Turnover and Retention Tab
 
     //region Life Paths Tab
@@ -3246,7 +3251,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         turnoverAndRetentionPanel.add(createTurnoverAndRetentionMoraleModifiersPanel(), gbc);
 
         gbc.gridx++;
-        turnoverAndRetentionPanel.add(createTurnoverAndRetentionMoraleChangePanel(), gbc);
+        turnoverAndRetentionPanel.add(createTurnoverAndRetentionMoraleTriggersPanel(), gbc);
 
         final JScrollPane scrollPersonnel = new JScrollPane(turnoverAndRetentionPanel);
         scrollPersonnel.setPreferredSize(new Dimension(500, 400));
@@ -4280,7 +4285,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             administrativeStrainSubPanel.setEnabled(isEnabled);
 
-            chkUseMoraleModifierManagementSkill.setEnabled((isEnabled) && (chkUseMorale.isSelected()));
+            chkUseMoraleModifierCommanderSkill.setEnabled((isEnabled) && (chkUseMorale.isSelected()));
         });
 
         createAdministrativeStrainSubPanel(isUseTurnover);
@@ -4298,7 +4303,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             managementSkillSubPanel.setEnabled(isEnabled);
 
-            chkUseMoraleModifierManagementSkill.setEnabled((isEnabled) && (chkUseMorale.isSelected()));
+            chkUseMoraleModifierCommanderSkill.setEnabled((isEnabled) && (chkUseMorale.isSelected()));
         });
 
         createManagementSkillSubPanel(isUseTurnover);
@@ -4544,7 +4549,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             fatigueSubPanel.setEnabled(isEnabled);
 
             chkUseFatigueModifiers.setEnabled(isEnabled);
-            chkUseMoraleModifierFatigue.setEnabled((isEnabled) && (chkUseMorale.isSelected()));
+            chkUseMoraleTriggerFatigue.setEnabled((isEnabled) && (chkUseMorale.isSelected()));
         });
 
         createFatigueSubPanel();
@@ -4588,21 +4593,23 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 component.setEnabled(isEnabled);
             }
 
-            for (Component component : turnoverAndRetentionMoraleChangePanel.getComponents()) {
+            for (Component component : turnoverAndRetentionMoraleTriggersPanel.getComponents()) {
                 component.setEnabled(isEnabled);
             }
 
             // Border Handlers
             moraleSubPanel.setEnabled(isEnabled);
             turnoverAndRetentionMoraleModifiersPanel.setEnabled(isEnabled);
-            turnoverAndRetentionMoraleChangePanel.setEnabled(isEnabled);
+            turnoverAndRetentionMoraleTriggersPanel.setEnabled(isEnabled);
 
             // Special Case Handlers
-            chkUseMoraleModifierDesertion.setEnabled((isEnabled) && (chkUseDesertions.isSelected()));
-            chkUseMoraleModifierManagementSkill.setEnabled((isEnabled) && (chkUseManagementSkill.isSelected()));
+            chkUseMoraleTriggerDesertion.setEnabled((isEnabled) && (chkUseDesertions.isSelected()));
+            chkUseMoraleModifierCommanderSkill.setEnabled((isEnabled) && (chkUseManagementSkill.isSelected()));
 
-            chkUseMoraleModifierMutiny.setEnabled((isEnabled) && (chkUseMutinies.isSelected()));
-            chkUseMoraleModifierFatigue.setEnabled((isEnabled) && (chkUseFatigue.isSelected()));
+            chkUseMoraleTriggerMutiny.setEnabled((isEnabled) && (chkUseMutinies.isSelected()));
+            chkUseMoraleTriggerFatigue.setEnabled((isEnabled) && (chkUseFatigue.isSelected()));
+
+            chkUseTheft.setEnabled((isEnabled) && (chkUseDesertions.isSelected()));
         });
 
         createMoraleSubPanel();
@@ -4633,6 +4640,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private void createMoraleSubPanel() {
         boolean isUseMorale = campaign.getCampaignOptions().isUseMorale();
 
+        lblStepSize = new JLabel(resources.getString("lblStepSize.text"));
+        lblStepSize.setToolTipText(resources.getString("lblStepSize.toolTipText"));
+        lblStepSize.setName("lblStepSize");
+        lblStepSize.setEnabled(isUseMorale);
+
+        spnStepSize = new JSpinner(new SpinnerNumberModel(0.1, 0.1, 2, 0.1));
+        spnStepSize.setToolTipText(resources.getString("lblStepSize.toolTipText"));
+        spnStepSize.setName("spnStepSize");
+        spnStepSize.setEnabled(isUseMorale);
+
         lblForceReliabilityMethod = new JLabel(resources.getString("lblForceReliabilityMethod.text"));
         lblForceReliabilityMethod.setToolTipText(resources.getString("lblForceReliabilityMethod.toolTipText"));
         lblForceReliabilityMethod.setName("lblForceReliabilityMethod");
@@ -4661,7 +4678,18 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseDesertions.addActionListener(evt -> {
             final boolean isEnabled = chkUseDesertions.isSelected();
 
-            chkUseMoraleModifierDesertion.setEnabled(isEnabled);
+            chkUseMoraleTriggerDesertion.setEnabled(isEnabled);
+            chkUseTheft.setEnabled(isEnabled);
+        });
+
+        chkUseMutinies = new JCheckBox(resources.getString("chkUseMutinies.text"));
+        chkUseMutinies.setToolTipText(resources.getString("chkUseMutinies.toolTipText"));
+        chkUseMutinies.setName("chkUseMutinies");
+        chkUseMutinies.setEnabled(isUseMorale);
+        chkUseMutinies.addActionListener(evt -> {
+            final boolean isEnabled = chkUseMutinies.isSelected();
+
+            chkUseMoraleTriggerMutiny.setEnabled(isEnabled);
         });
 
         chkUseEmergencyBonuses = new JCheckBox(resources.getString("chkUseEmergencyBonuses.text"));
@@ -4674,15 +4702,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseSabotage.setName("chkUseSabotage");
         chkUseSabotage.setEnabled(isUseMorale);
 
-        chkUseMutinies = new JCheckBox(resources.getString("chkUseMutinies.text"));
-        chkUseMutinies.setToolTipText(resources.getString("chkUseMutinies.toolTipText"));
-        chkUseMutinies.setName("chkUseMutinies");
-        chkUseMutinies.setEnabled(isUseMorale);
-        chkUseMutinies.addActionListener(evt -> {
-            final boolean isEnabled = chkUseMutinies.isSelected();
-
-            chkUseMoraleModifierMutiny.setEnabled(isEnabled);
-        });
+        chkUseTheft = new JCheckBox(resources.getString("chkUseTheft.text"));
+        chkUseTheft.setToolTipText(resources.getString("chkUseTheft.toolTipText"));
+        chkUseTheft.setName("chkUseTheft");
+        chkUseTheft.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseDesertions()));
 
         moraleSubPanel.setName("moraleSubPanel");
         moraleSubPanel.setBorder(BorderFactory.createTitledBorder(""));
@@ -4695,24 +4718,32 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addComponent(chkUseDesertions)
+                        .addComponent(chkUseMutinies)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblStepSize)
+                                .addComponent(spnStepSize, Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblForceReliabilityMethod)
                                 .addComponent(comboForceReliabilityMethod, Alignment.LEADING))
-                        .addComponent(chkUseDesertions)
                         .addComponent(chkUseEmergencyBonuses)
                         .addComponent(chkUseSabotage)
-                        .addComponent(chkUseMutinies)
+                        .addComponent(chkUseTheft)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseDesertions)
+                        .addComponent(chkUseMutinies)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblStepSize)
+                                .addComponent(spnStepSize))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblForceReliabilityMethod)
                                 .addComponent(comboForceReliabilityMethod))
-                        .addComponent(chkUseDesertions)
                         .addComponent(chkUseEmergencyBonuses)
                         .addComponent(chkUseSabotage)
-                        .addComponent(chkUseMutinies)
+                        .addComponent(chkUseTheft)
         );
     }
 
@@ -4724,15 +4755,20 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblCustomMoraleModifier.setName("lblCustomMoraleModifier");
         lblCustomMoraleModifier.setEnabled(isUseMorale);
 
-        spnCustomMoraleModifier = new JSpinner(new SpinnerNumberModel(-2, -5, 5, 1));
+        spnCustomMoraleModifier = new JSpinner(new SpinnerNumberModel(2, -5, 5, 1));
         spnCustomMoraleModifier.setToolTipText(resources.getString("lblCustomMoraleModifier.toolTipText"));
         spnCustomMoraleModifier.setName("spnCustomMoraleModifier");
         spnCustomMoraleModifier.setEnabled(isUseMorale);
 
-        chkUseMoraleModifierFatigue = new JCheckBox(resources.getString("chkUseMoraleModifierFatigue.text"));
-        chkUseMoraleModifierFatigue.setToolTipText(resources.getString("chkUseMoraleModifierFatigue.toolTipText"));
-        chkUseMoraleModifierFatigue.setName("chkUseMoraleModifierFatigue");
-        chkUseMoraleModifierFatigue.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseFatigue()));
+        chkUseMoraleModifierExperienceLevel = new JCheckBox(resources.getString("chkUseMoraleModifierExperienceLevel.text"));
+        chkUseMoraleModifierExperienceLevel.setToolTipText(resources.getString("chkUseMoraleModifierExperienceLevel.toolTipText"));
+        chkUseMoraleModifierExperienceLevel.setName("chkUseMoraleModifierExperienceLevel");
+        chkUseMoraleModifierExperienceLevel.setEnabled(isUseMorale);
+
+        chkUseMoraleModifierFaction = new JCheckBox(resources.getString("chkUseMoraleModifierFaction.text"));
+        chkUseMoraleModifierFaction.setToolTipText(resources.getString("chkUseMoraleModifierFaction.toolTipText"));
+        chkUseMoraleModifierFaction.setName("chkUseMoraleModifierFaction");
+        chkUseMoraleModifierFaction.setEnabled(isUseMorale);
 
         chkUseMoraleModifierProfession = new JCheckBox(resources.getString("chkUseMoraleModifierProfession.text"));
         chkUseMoraleModifierProfession.setToolTipText(resources.getString("chkUseMoraleModifierProfession.toolTipText"));
@@ -4744,10 +4780,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMoraleModifierForceReliability.setName("chkUseMoraleModifierForceReliability");
         chkUseMoraleModifierForceReliability.setEnabled(isUseMorale);
 
-        chkUseMoraleModifierManagementSkill = new JCheckBox(resources.getString("chkUseMoraleModifierManagementSkill.text"));
-        chkUseMoraleModifierManagementSkill.setToolTipText(resources.getString("chkUseMoraleModifierManagementSkill.toolTipText"));
-        chkUseMoraleModifierManagementSkill.setName("chkUseMoraleModifierManagementSkill");
-        chkUseMoraleModifierManagementSkill.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseManagementSkill()));
+        chkUseMoraleModifierCommanderSkill = new JCheckBox(resources.getString("chkUseMoraleModifierCommanderSkill.text"));
+        chkUseMoraleModifierCommanderSkill.setToolTipText(resources.getString("chkUseMoraleModifierCommanderSkill.toolTipText"));
+        chkUseMoraleModifierCommanderSkill.setName("chkUseMoraleModifierCommanderSkill");
+        chkUseMoraleModifierCommanderSkill.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseManagementSkill()));
+
+        chkUseMoraleModifierLoyalty = new JCheckBox(resources.getString("chkUseMoraleModifierLoyalty.text"));
+        chkUseMoraleModifierLoyalty.setToolTipText(resources.getString("chkUseMoraleModifierLoyalty.toolTipText"));
+        chkUseMoraleModifierLoyalty.setName("chkUseMoraleModifierLoyalty");
+        chkUseMoraleModifierLoyalty.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseManagementSkill()));
 
         chkUseRuleWithIronFist = new JCheckBox(resources.getString("chkUseRuleWithIronFist.text"));
         chkUseRuleWithIronFist.setToolTipText(resources.getString("chkUseRuleWithIronFist.toolTipText"));
@@ -4768,10 +4809,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblCustomMoraleModifier)
                                 .addComponent(spnCustomMoraleModifier, Alignment.LEADING))
-                        .addComponent(chkUseMoraleModifierFatigue)
+                        .addComponent(chkUseMoraleModifierExperienceLevel)
+                        .addComponent(chkUseMoraleModifierFaction)
                         .addComponent(chkUseMoraleModifierProfession)
                         .addComponent(chkUseMoraleModifierForceReliability)
-                        .addComponent(chkUseMoraleModifierManagementSkill)
+                        .addComponent(chkUseMoraleModifierCommanderSkill)
+                        .addComponent(chkUseMoraleModifierLoyalty)
                         .addComponent(chkUseRuleWithIronFist)
         );
 
@@ -4780,93 +4823,95 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblCustomMoraleModifier)
                                 .addComponent(spnCustomMoraleModifier))
-                        .addComponent(chkUseMoraleModifierFatigue)
+                        .addComponent(chkUseMoraleModifierExperienceLevel)
+                        .addComponent(chkUseMoraleModifierFaction)
                         .addComponent(chkUseMoraleModifierProfession)
                         .addComponent(chkUseMoraleModifierForceReliability)
-                        .addComponent(chkUseMoraleModifierManagementSkill)
+                        .addComponent(chkUseMoraleModifierCommanderSkill)
+                        .addComponent(chkUseMoraleModifierLoyalty)
                         .addComponent(chkUseRuleWithIronFist)
         );
 
         return turnoverAndRetentionMoraleModifiersPanel;
     }
 
-    private JPanel createTurnoverAndRetentionMoraleChangePanel() {
+    private JPanel createTurnoverAndRetentionMoraleTriggersPanel() {
         boolean isUseMorale = campaign.getCampaignOptions().isUseMorale();
 
-        chkUseMoraleModifierFieldControl = new JCheckBox(resources.getString("chkUseMoraleModifierFieldControl.text"));
-        chkUseMoraleModifierFieldControl.setToolTipText(resources.getString("chkUseMoraleModifierFieldControl.toolTipText"));
-        chkUseMoraleModifierFieldControl.setName("chkUseMoraleModifierFieldControl");
-        chkUseMoraleModifierFieldControl.setEnabled(isUseMorale);
+        chkUseMoraleTriggerFieldControl = new JCheckBox(resources.getString("chkUseMoraleTriggerFieldControl.text"));
+        chkUseMoraleTriggerFieldControl.setToolTipText(resources.getString("chkUseMoraleTriggerFieldControl.toolTipText"));
+        chkUseMoraleTriggerFieldControl.setName("chkUseMoraleTriggerFieldControl");
+        chkUseMoraleTriggerFieldControl.setEnabled(isUseMorale);
 
-        chkUseMoraleModifierMissionStatus = new JCheckBox(resources.getString("chkUseMoraleModifierMissionStatus.text"));
-        chkUseMoraleModifierMissionStatus.setToolTipText(resources.getString("chkUseMoraleModifierMissionStatus.toolTipText"));
-        chkUseMoraleModifierMissionStatus.setName("chkUseMoraleModifierMissionStatus");
-        chkUseMoraleModifierMissionStatus.setEnabled(isUseMorale);
+        chkUseMoraleTriggerMissionStatus = new JCheckBox(resources.getString("chkUseMoraleTriggerMissionStatus.text"));
+        chkUseMoraleTriggerMissionStatus.setToolTipText(resources.getString("chkUseMoraleTriggerMissionStatus.toolTipText"));
+        chkUseMoraleTriggerMissionStatus.setName("chkUseMoraleTriggerMissionStatus");
+        chkUseMoraleTriggerMissionStatus.setEnabled(isUseMorale);
 
-        chkUseMoraleModifierLeaderLoss = new JCheckBox(resources.getString("chkUseMoraleModifierLeaderLoss.text"));
-        chkUseMoraleModifierLeaderLoss.setToolTipText(resources.getString("chkUseMoraleModifierLeaderLoss.toolTipText"));
-        chkUseMoraleModifierLeaderLoss.setName("chkUseMoraleModifierLeaderLoss");
-        chkUseMoraleModifierLeaderLoss.setEnabled(isUseMorale);
+        chkUseMoraleTriggerLeaderLoss = new JCheckBox(resources.getString("chkUseMoraleTriggerLeaderLoss.text"));
+        chkUseMoraleTriggerLeaderLoss.setToolTipText(resources.getString("chkUseMoraleTriggerLeaderLoss.toolTipText"));
+        chkUseMoraleTriggerLeaderLoss.setName("chkUseMoraleTriggerLeaderLoss");
+        chkUseMoraleTriggerLeaderLoss.setEnabled(isUseMorale);
 
-        chkUseMoraleModifierCombatLoss = new JCheckBox(resources.getString("chkUseMoraleModifierCombatLoss.text"));
-        chkUseMoraleModifierCombatLoss.setToolTipText(resources.getString("chkUseMoraleModifierCombatLoss.toolTipText"));
-        chkUseMoraleModifierCombatLoss.setName("chkUseMoraleModifierCombatLoss");
-        chkUseMoraleModifierCombatLoss.setEnabled(isUseMorale);
+        chkUseMoraleTriggerCombatLoss = new JCheckBox(resources.getString("chkUseMoraleTriggerCombatLoss.text"));
+        chkUseMoraleTriggerCombatLoss.setToolTipText(resources.getString("chkUseMoraleTriggerCombatLoss.toolTipText"));
+        chkUseMoraleTriggerCombatLoss.setName("chkUseMoraleTriggerCombatLoss");
+        chkUseMoraleTriggerCombatLoss.setEnabled(isUseMorale);
 
-        chkUseMoraleModifierDesertion = new JCheckBox(resources.getString("chkUseMoraleModifierDesertion.text"));
-        chkUseMoraleModifierDesertion.setToolTipText(resources.getString("chkUseMoraleModifierDesertion.toolTipText"));
-        chkUseMoraleModifierDesertion.setName("chkUseMoraleModifierDesertion");
-        chkUseMoraleModifierDesertion.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseDesertions()));
+        chkUseMoraleTriggerDesertion = new JCheckBox(resources.getString("chkUseMoraleTriggerDesertion.text"));
+        chkUseMoraleTriggerDesertion.setToolTipText(resources.getString("chkUseMoraleTriggerDesertion.toolTipText"));
+        chkUseMoraleTriggerDesertion.setName("chkUseMoraleTriggerDesertion");
+        chkUseMoraleTriggerDesertion.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseDesertions()));
 
-        chkUseMoraleModifierMutiny = new JCheckBox(resources.getString("chkUseMoraleModifierMutiny.text"));
-        chkUseMoraleModifierMutiny.setToolTipText(resources.getString("chkUseMoraleModifierMutiny.toolTipText"));
-        chkUseMoraleModifierMutiny.setName("chkUseMoraleModifierMutiny");
-        chkUseMoraleModifierMutiny.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseMutinies()));
+        chkUseMoraleTriggerMutiny = new JCheckBox(resources.getString("chkUseMoraleTriggerMutiny.text"));
+        chkUseMoraleTriggerMutiny.setToolTipText(resources.getString("chkUseMoraleTriggerMutiny.toolTipText"));
+        chkUseMoraleTriggerMutiny.setName("chkUseMoraleTriggerMutiny");
+        chkUseMoraleTriggerMutiny.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseMutinies()));
 
-        chkUseMoraleModifierRest = new JCheckBox(resources.getString("chkUseMoraleModifierRest.text"));
-        chkUseMoraleModifierRest.setToolTipText(resources.getString("chkUseMoraleModifierRest.toolTipText"));
-        chkUseMoraleModifierRest.setName("chkUseMoraleModifierRest");
-        chkUseMoraleModifierRest.setEnabled(isUseMorale);
+        chkUseMoraleTriggerMissedPayDay = new JCheckBox(resources.getString("chkUseMoraleTriggerMissedPayDay.text"));
+        chkUseMoraleTriggerMissedPayDay.setToolTipText(resources.getString("chkUseMoraleTriggerMissedPayDay.toolTipText"));
+        chkUseMoraleTriggerMissedPayDay.setName("chkUseMoraleTriggerMissedPayDay");
+        chkUseMoraleTriggerMissedPayDay.setEnabled(isUseMorale);
 
-        chkUseMoraleModifierMissedPayDay = new JCheckBox(resources.getString("chkUseMoraleModifierMissedPayDay.text"));
-        chkUseMoraleModifierMissedPayDay.setToolTipText(resources.getString("chkUseMoraleModifierMissedPayDay.toolTipText"));
-        chkUseMoraleModifierMissedPayDay.setName("chkUseMoraleModifierMissedPayDay");
-        chkUseMoraleModifierMissedPayDay.setEnabled(isUseMorale);
+        chkUseMoraleTriggerFatigue = new JCheckBox(resources.getString("chkUseMoraleTriggerFatigue.text"));
+        chkUseMoraleTriggerFatigue.setToolTipText(resources.getString("chkUseMoraleTriggerFatigue.toolTipText"));
+        chkUseMoraleTriggerFatigue.setName("chkUseMoraleTriggerFatigue");
+        chkUseMoraleTriggerFatigue.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseFatigue()));
 
-        turnoverAndRetentionMoraleChangePanel.setName("turnoverAndRetentionMoraleChangePanel");
-        turnoverAndRetentionMoraleChangePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionMoraleChangePanel.title")));
-        turnoverAndRetentionMoraleChangePanel.setEnabled(isUseMorale);
+        turnoverAndRetentionMoraleTriggersPanel.setName("turnoverAndRetentionMoraleTriggersPanel");
+        turnoverAndRetentionMoraleTriggersPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionMoraleTriggersPanel.title")));
+        turnoverAndRetentionMoraleTriggersPanel.setEnabled(isUseMorale);
 
-        final GroupLayout layout = new GroupLayout(turnoverAndRetentionMoraleChangePanel);
-        turnoverAndRetentionMoraleChangePanel.setLayout(layout);
+        final GroupLayout layout = new GroupLayout(turnoverAndRetentionMoraleTriggersPanel);
+        turnoverAndRetentionMoraleTriggersPanel.setLayout(layout);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chkUseMoraleModifierFieldControl)
-                        .addComponent(chkUseMoraleModifierMissionStatus)
-                        .addComponent(chkUseMoraleModifierLeaderLoss)
-                        .addComponent(chkUseMoraleModifierCombatLoss)
-                        .addComponent(chkUseMoraleModifierDesertion)
-                        .addComponent(chkUseMoraleModifierMutiny)
-                        .addComponent(chkUseMoraleModifierRest)
-                        .addComponent(chkUseMoraleModifierMissedPayDay)
+                        .addComponent(chkUseMoraleTriggerFatigue)
+                        .addComponent(chkUseMoraleTriggerFieldControl)
+                        .addComponent(chkUseMoraleTriggerMissionStatus)
+                        .addComponent(chkUseMoraleTriggerLeaderLoss)
+                        .addComponent(chkUseMoraleTriggerCombatLoss)
+                        .addComponent(chkUseMoraleTriggerDesertion)
+                        .addComponent(chkUseMoraleTriggerMutiny)
+                        .addComponent(chkUseMoraleTriggerMissedPayDay)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(chkUseMoraleModifierFieldControl)
-                        .addComponent(chkUseMoraleModifierMissionStatus)
-                        .addComponent(chkUseMoraleModifierLeaderLoss)
-                        .addComponent(chkUseMoraleModifierCombatLoss)
-                        .addComponent(chkUseMoraleModifierDesertion)
-                        .addComponent(chkUseMoraleModifierMutiny)
-                        .addComponent(chkUseMoraleModifierRest)
-                        .addComponent(chkUseMoraleModifierMissedPayDay)
+                        .addComponent(chkUseMoraleTriggerFatigue)
+                        .addComponent(chkUseMoraleTriggerFieldControl)
+                        .addComponent(chkUseMoraleTriggerMissionStatus)
+                        .addComponent(chkUseMoraleTriggerLeaderLoss)
+                        .addComponent(chkUseMoraleTriggerCombatLoss)
+                        .addComponent(chkUseMoraleTriggerDesertion)
+                        .addComponent(chkUseMoraleTriggerMutiny)
+                        .addComponent(chkUseMoraleTriggerMissedPayDay)
         );
 
-        return turnoverAndRetentionMoraleChangePanel;
+        return turnoverAndRetentionMoraleTriggersPanel;
     }
 
     private void createRandomDependentPanel() {
@@ -7936,26 +7981,31 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Morale
         chkUseMorale.setSelected(options.isUseMorale());
 
+        spnStepSize.setValue(options.getStepSize());
         comboForceReliabilityMethod.setSelectedItem(options.getForceReliabilityMethod());
         chkUseDesertions.setSelected(options.isUseDesertions());
         chkUseEmergencyBonuses.setSelected(options.isUseEmergencyBonuses());
         chkUseSabotage.setSelected(options.isUseSabotage());
+        chkUseTheft.setSelected(options.isUseTheft());
         chkUseMutinies.setSelected(options.isUseMutinies());
 
         // Morale Modifiers
         spnCustomMoraleModifier.setValue(options.getCustomMoraleModifier());
-        chkUseMoraleModifierFieldControl.setSelected(options.isUseMoraleModifierFieldControl());
-        chkUseMoraleModifierMissionStatus.setSelected(options.isUseMoraleModifierMissionStatus());
-        chkUseMoraleModifierLeaderLoss.setSelected(options.isUseMoraleModifierLeaderLoss());
-        chkUseMoraleModifierCombatLoss.setSelected(options.isUseMoraleModifierCombatLoss());
-        chkUseMoraleModifierDesertion.setSelected(options.isUseMoraleModifierDesertion());
-        chkUseMoraleModifierMutiny.setSelected(options.isUseMoraleModifierMutiny());
-        chkUseMoraleModifierRest.setSelected(options.isUseMoraleModifierRest());
-        chkUseMoraleModifierFatigue.setSelected(options.isUseMoraleModifierFatigue());
+        chkUseMoraleTriggerFieldControl.setSelected(options.isUseMoraleTriggerFieldControl());
+        chkUseMoraleTriggerMissionStatus.setSelected(options.isUseMoraleTriggerMissionStatus());
+        chkUseMoraleTriggerLeaderLoss.setSelected(options.isUseMoraleTriggerModifierLeaderLoss());
+        chkUseMoraleTriggerCombatLoss.setSelected(options.isUseMoraleTriggerCombatLoss());
+        chkUseMoraleTriggerDesertion.setSelected(options.isUseMoraleTriggerDesertion());
+        chkUseMoraleTriggerMutiny.setSelected(options.isUseMoraleTriggerMutiny());
+        chkUseMoraleTriggerFatigue.setSelected(options.isUseMoraleTriggerFatigue());
+        chkUseMoraleTriggerMissedPayDay.setSelected(options.isUseMoraleModifierMissedPayDay());
+
+        chkUseMoraleModifierExperienceLevel.setSelected(options.isUseMoraleModifierExperienceLevel());
+        chkUseMoraleModifierFaction.setSelected(options.isUseMoraleModifierFaction());
         chkUseMoraleModifierProfession.setSelected(options.isUseMoraleModifierProfession());
         chkUseMoraleModifierForceReliability.setSelected(options.isUseMoraleModifierForceReliability());
-        chkUseMoraleModifierManagementSkill.setSelected(options.isUseMoraleModifierManagementSkill());
-        chkUseMoraleModifierMissedPayDay.setSelected(options.isUseMoraleModifierMissedPayDay());
+        chkUseMoraleModifierCommanderSkill.setSelected(options.isUseMoraleModifierCommanderLeadership());
+        chkUseMoraleModifierLoyalty.setSelected(options.isUseMoraleModifierLoyalty());
         chkUseRuleWithIronFist.setSelected(options.isUseRuleWithIronFist());
         //endregion Turnover and Retention Tab
 
@@ -8609,26 +8659,31 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Morale
             options.setUseMorale(chkUseMorale.isSelected());
 
+            options.setStepSize((Double) spnStepSize.getValue());
             options.setForceReliabilityMethod(comboForceReliabilityMethod.getSelectedItem());
             options.setUseDesertions(chkUseDesertions.isSelected());
             options.setUseEmergencyBonuses(chkUseEmergencyBonuses.isSelected());
             options.setUseSabotage(chkUseSabotage.isSelected());
+            options.setUseTheft(chkUseTheft.isSelected());
             options.setUseMutinies(chkUseMutinies.isSelected());
 
             // Morale Modifiers
+            options.setUseMoraleTriggerFieldControl(chkUseMoraleTriggerFieldControl.isSelected());
+            options.setUseMoraleTriggerMissionStatus(chkUseMoraleTriggerMissionStatus.isSelected());
+            options.setUseMoraleTriggerModifierLeaderLoss(chkUseMoraleTriggerLeaderLoss.isSelected());
+            options.setUseMoraleTriggerCombatLoss(chkUseMoraleTriggerCombatLoss.isSelected());
+            options.setUseMoraleTriggerDesertion(chkUseMoraleTriggerDesertion.isSelected());
+            options.setUseMoraleTriggerMutiny(chkUseMoraleTriggerMutiny.isSelected());
+            options.setUseMoraleTriggerFatigue(chkUseMoraleTriggerFatigue.isSelected());
+            options.setUseMoraleModifierMissedPayDay(chkUseMoraleTriggerMissedPayDay.isSelected());
+
             options.setCustomMoraleModifier((Integer) spnCustomMoraleModifier.getValue());
-            options.setUseMoraleModifierFieldControl(chkUseMoraleModifierFieldControl.isSelected());
-            options.setUseMoraleModifierMissionStatus(chkUseMoraleModifierMissionStatus.isSelected());
-            options.setUseMoraleModifierLeaderLoss(chkUseMoraleModifierLeaderLoss.isSelected());
-            options.setUseMoraleModifierCombatLoss(chkUseMoraleModifierCombatLoss.isSelected());
-            options.setUseMoraleModifierDesertion(chkUseMoraleModifierDesertion.isSelected());
-            options.setUseMoraleModifierMutiny(chkUseMoraleModifierMutiny.isSelected());
-            options.setUseMoraleModifierRest(chkUseMoraleModifierRest.isSelected());
-            options.setUseMoraleModifierFatigue(chkUseMoraleModifierFatigue.isSelected());
+            options.setUseMoraleModifierExperienceLevel(chkUseMoraleModifierExperienceLevel.isSelected());
+            options.setUseMoraleModifierFaction(chkUseMoraleModifierFaction.isSelected());
             options.setUseMoraleModifierProfession(chkUseMoraleModifierProfession.isSelected());
             options.setUseMoraleModifierForceReliability(chkUseMoraleModifierForceReliability.isSelected());
-            options.setUseMoraleModifierManagementSkill(chkUseMoraleModifierManagementSkill.isSelected());
-            options.setUseMoraleModifierMissedPayDay(chkUseMoraleModifierMissedPayDay.isSelected());
+            options.setUseMoraleModifierCommanderLeadership(chkUseMoraleModifierCommanderSkill.isSelected());
+            options.setUseMoraleModifierLoyalty(chkUseMoraleModifierLoyalty.isSelected());
             options.setUseRuleWithIronFist(chkUseRuleWithIronFist.isSelected());
             //endregion Turnover and Retention
 
