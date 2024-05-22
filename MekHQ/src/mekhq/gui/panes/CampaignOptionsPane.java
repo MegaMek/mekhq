@@ -335,7 +335,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JLabel lblStepSize;
     private JSpinner spnStepSize;
     private JCheckBox chkUseDesertions;
-    private JCheckBox chkUseEmergencyBonuses;
     private JLabel lblForceReliabilityMethod;
     private MMComboBox<ForceReliabilityMethod> comboForceReliabilityMethod;
     private JCheckBox chkUseSabotage;
@@ -4948,11 +4947,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkUseMoraleTriggerMutiny.setEnabled(isEnabled);
         });
 
-        chkUseEmergencyBonuses = new JCheckBox(resources.getString("chkUseEmergencyBonuses.text"));
-        chkUseEmergencyBonuses.setToolTipText(resources.getString("chkUseEmergencyBonuses.toolTipText"));
-        chkUseEmergencyBonuses.setName("chkUseEmergencyBonuses");
-        chkUseEmergencyBonuses.setEnabled(isUseMorale);
-
         chkUseSabotage = new JCheckBox(resources.getString("chkUseSabotage.text"));
         chkUseSabotage.setToolTipText(resources.getString("chkUseSabotage.toolTipText"));
         chkUseSabotage.setName("chkUseSabotage");
@@ -4997,7 +4991,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblForceReliabilityMethod)
                                 .addComponent(comboForceReliabilityMethod, Alignment.LEADING))
-                        .addComponent(chkUseEmergencyBonuses)
                         .addComponent(chkUseSabotage)
                         .addComponent(chkUseTheftUnit)
                         .addComponent(chkUseTheftMoney)
@@ -5016,7 +5009,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblForceReliabilityMethod)
                                 .addComponent(comboForceReliabilityMethod))
-                        .addComponent(chkUseEmergencyBonuses)
                         .addComponent(chkUseSabotage)
                         .addComponent(chkUseTheftUnit)
                         .addComponent(chkUseTheftMoney)
@@ -8283,7 +8275,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMutinies.setSelected(options.isUseMutinies());
         spnStepSize.setValue(options.getStepSize());
         comboForceReliabilityMethod.setSelectedItem(options.getForceReliabilityMethod());
-        chkUseEmergencyBonuses.setSelected(options.isUseEmergencyBonuses());
         chkUseSabotage.setSelected(options.isUseSabotage());
         chkUseTheftUnit.setSelected(options.isUseTheftUnit());
         chkUseTheftMoney.setSelected(options.isUseTheftUnit());
@@ -8979,7 +8970,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseMutinies(chkUseMutinies.isSelected());
             options.setStepSize((Double) spnStepSize.getValue());
             options.setForceReliabilityMethod(comboForceReliabilityMethod.getSelectedItem());
-            options.setUseEmergencyBonuses(chkUseEmergencyBonuses.isSelected());
             options.setUseSabotage(chkUseSabotage.isSelected());
             options.setUseTheftUnit(chkUseTheftUnit.isSelected());
             options.setUseTheftUnit(chkUseTheftMoney.isSelected());

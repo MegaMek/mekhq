@@ -407,8 +407,6 @@ public class Morale {
 
             if (roll <= targetNumber) {
                 if (isDesertion) {
-                    // TODO emergency bonuses give reroll
-
                     if ((processDesertion(campaign, person, roll, targetNumber, morale, unitList, resources)) && (!someoneHasDeserted)) {
                         someoneHasDeserted = true;
                     }
@@ -429,7 +427,20 @@ public class Morale {
         }
     }
 
-    private static boolean processDesertion(Campaign campaign, Person person, int roll, double targetNumber, double morale, ArrayList<Unit> unitList, ResourceBundle resources) {
+    /**
+     * Processes desertion for a person.
+     *
+     * @param campaign       the current campaign
+     * @param person         the potential deserter
+     * @param roll           the desertion roll result
+     * @param targetNumber   the target number for desertion
+     * @param morale         the morale value
+     * @param unitList       the list of units
+     * @param resources      the resource bundle for localized messages
+     * @return true if desertion occurred, false otherwise
+     */
+    private static boolean processDesertion(Campaign campaign, Person person, int roll, double targetNumber,
+                                            double morale, ArrayList<Unit> unitList, ResourceBundle resources) {
         if (roll <= (targetNumber - 2)) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DESERTED);
 
@@ -482,7 +493,7 @@ public class Morale {
                     unitName.append(' ').append(desiredUnit.getFluffName());
                 }
 
-                campaign.addReport(String.format(resources.getString("desertionStolen.text"), unitName));
+                campaign.addReport(String.format(resources.getString("desertionTheftUnit.text"), unitName));
 
                 campaign.removeUnit(desiredUnit.getId());
                 unitList.remove(desiredUnit);
@@ -529,9 +540,9 @@ public class Morale {
         Money theft = campaign.getFunds().multipliedBy(MathUtility.clamp(theftPercentage, 1, 100) / 100).round();
 
         if (theft.isPositive()) {
-            campaign.getFinances().debit(TransactionType.THEFT, campaign.getLocalDate(), theft, resources.getString("desertionHeist.text"));
+            campaign.getFinances().debit(TransactionType.THEFT, campaign.getLocalDate(), theft, resources.getString("desertionTheftTransactionReport.text"));
 
-            campaign.addReport(String.format(resources.getString("desertionHeistReport.text"), theft.getAmount()));
+            campaign.addReport(String.format(resources.getString("desertionTheftMoney.text"), theft.getAmount()));
         } else {
             processPettyTheft(campaign, resources);
         }

@@ -316,7 +316,6 @@ public class CampaignOptions {
     private boolean useDesertions;
     private boolean useMutinies;
     private ForceReliabilityMethod forceReliabilityMethod;
-    private boolean useEmergencyBonuses;
     private boolean useSabotage;
     private boolean useTheftUnit;
     private boolean useTheftMoney;
@@ -1006,12 +1005,11 @@ public class CampaignOptions {
         setStepSize(0.1);
         setForceReliabilityMethod(ForceReliabilityMethod.LOYALTY);
         setUseDesertions(true);
-        setUseEmergencyBonuses(true);
         setUseSabotage(true);
         setUseMutinies(true);
         setUseTheftUnit(true);
         setUseTheftMoney(true);
-        setUseTheftValue(10);
+        setTheftValue(10);
 
         setCustomMoraleModifier(2);
         setUseMoraleTriggerFieldControl(true);
@@ -1593,14 +1591,6 @@ public class CampaignOptions {
 
     public void setUseDesertions(final boolean useDesertions) {
         this.useDesertions = useDesertions;
-    }
-
-    public boolean isUseEmergencyBonuses() {
-        return useEmergencyBonuses;
-    }
-
-    public void setUseEmergencyBonuses(final boolean useEmergencyBonuses) {
-        this.useEmergencyBonuses = useEmergencyBonuses;
     }
 
     public boolean isUseSabotage() {
@@ -4738,7 +4728,6 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stepSize", getStepSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceReliabilityMethod", getForceReliabilityMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDesertions", isUseDesertions());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEmergencyBonuses", isUseEmergencyBonuses());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSabotage", isUseSabotage());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMutinies", isUseMutinies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTheftUnit", isUseTheftUnit());
@@ -5756,8 +5745,6 @@ public class CampaignOptions {
                     retVal.setForceReliabilityMethod(ForceReliabilityMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDesertions")) {
                     retVal.setUseDesertions(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useEmergencyBonuses")) {
-                    retVal.setUseEmergencyBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useSabotage")) {
                     retVal.setUseSabotage(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTheftUnit")) {
@@ -5765,7 +5752,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTheftMoney")) {
                     retVal.setUseTheftMoney(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("theftValue")) {
-                    retVal.setTheftValue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    retVal.setTheftValue(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMutinies")) {
                     retVal.setUseMutinies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerFieldControl")) {
