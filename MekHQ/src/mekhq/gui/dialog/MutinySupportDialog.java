@@ -1,12 +1,15 @@
 package mekhq.gui.dialog;
 
 import megamek.common.Entity;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 import javax.swing.*;
-import java.util.HashMap;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class MutinySupportDialog {
     /**
@@ -21,45 +24,75 @@ public class MutinySupportDialog {
      *         - 0 if the user chooses to support the rebels,
      *         - -1 if the user cancels the dialog
      */
-    public static int SupportDialog(ResourceBundle resources, boolean isViolentRebellion,
-                                    Integer loyalistPersonnelCount, List<Unit> loyalistForces, Integer loyalistBv,
-                                    Integer rebelPersonnelCount, List<Unit> rebelForces, Integer rebelBv) {
+    public static int supportDialog(Campaign campaign, ResourceBundle resources, boolean isViolentRebellion,
+                                    Integer bystanderPersonnelCount,
+                                    Person loyalistLeader, Integer loyalistPersonnelCount, List<Unit> loyalistForces, Integer loyalistBv,
+                                    Person rebelLeader, Integer rebelPersonnelCount, List<Unit> rebelForces, Integer rebelBv) {
+        // Initialize a JOptionPane
+        AtomicInteger choice = new AtomicInteger(-1);
+        JOptionPane pane = new JOptionPane(buildMutinyDescription(
+                campaign, resources, isViolentRebellion,
+                bystanderPersonnelCount,
+                loyalistLeader, loyalistPersonnelCount, loyalistForces, loyalistBv,
+                rebelLeader, rebelPersonnelCount, rebelForces, rebelBv
+        ),
+                JOptionPane.QUESTION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}, null);
 
-        Object[] options = { resources.getString("dialogSupportLoyalists.text"), resources.getString("dialogSupportRebels.text") };
+        Object[] options = {
+                resources.getString("dialogSupportLoyalists.text"),
+                resources.getString("dialogSupportRebels.text")
+        };
 
-        int choice = JOptionPane.showOptionDialog(null,
-                buildSituationDescription(
-                        resources, isViolentRebellion,
-                        loyalistPersonnelCount, loyalistForces, loyalistBv,
-                        rebelPersonnelCount, rebelForces, rebelBv
-                ),
-                resources.getString("dialogTitle.text"),
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+        // buttonPanel.add(Box.createHorizontalGlue());
 
-                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+        for (Object option : options){
+            JButton button = new JButton(option.toString());
+            button.addActionListener(e -> {
+                choice.set(Arrays.asList(options).indexOf(option));
 
-                null,
+                Window window = SwingUtilities.getWindowAncestor(button);
 
-                options, options[1]);
+                if (window != null) {
+                    window.setVisible(false);
+                }
+            });
 
-        if (choice == JOptionPane.YES_OPTION) {
-            return 1;
-        } else if (choice == JOptionPane.NO_OPTION) {
-            return 0;
-        } else {
-            return -1;
+            buttonPanel.add(button);
+            buttonPanel.add(Box.createHorizontalStrut(15));
         }
+
+        pane.setOptions(new Object[]{buttonPanel});
+
+        JDialog dialog = pane.createDialog(null, resources.getString("dialogTitle.text"));
+        dialog.setVisible(true);
+
+        return choice.get();
     }
 
-    private static String buildSituationDescription(ResourceBundle resources, boolean isViolentRebellion,
-                                                    Integer loyalistPersonnelCount, List<Unit> loyalistForces, Integer loyalistBv,
-                                                    Integer rebelPersonnelCount, List<Unit> rebelForces, Integer rebelBv) {
+    private static String buildMutinyDescription(Campaign campaign,  ResourceBundle resources, boolean isViolentRebellion,
+                                                 Integer bystanderPersonnelCount,
+                                                 Person loyalistLeader, Integer loyalistPersonnelCount, List<Unit> loyalistForces, Integer loyalistBv,
+                                                 Person rebelLeader, Integer rebelPersonnelCount, List<Unit> rebelForces, Integer rebelBv) {
 
-        StringBuilder situationDescription = new StringBuilder(resources.getString("dialogDescriptionIntroduction.text"));
+        StringBuilder situationDescription = new StringBuilder(String.format(
+                resources.getString("dialogDescriptionIntroduction.text"),
+                loyalistLeader.getFullTitle(),
+                campaign.getName())
+        );
 
         if (isViolentRebellion) {
-            situationDescription.append(' ').append(resources.getString("dialogDescriptionViolentTakeover.text"));
+            situationDescription.append(' ').append(String.format(
+                    resources.getString("dialogDescriptionViolentTakeover.text"),
+                    rebelLeader.getFullTitle()
+            ));
         } else {
-            situationDescription.append(' ').append(resources.getString("dialogDescriptionRegimeChange.text"));
+            situationDescription.append(' ').append(String.format(
+                    resources.getString("dialogDescriptionRegimeChange.text"),
+                    rebelLeader.getFullTitle())
+            );
         }
 
         HashMap<String, Integer> unitMap = mapUnitCounts(loyalistForces);
@@ -67,6 +100,8 @@ public class MutinySupportDialog {
 
         unitMap = mapUnitCounts(rebelForces);
         situationDescription.append(getForceSummaryString(resources, unitMap, false, rebelBv, rebelPersonnelCount));
+
+        situationDescription.append(String.format(resources.getString("dialogDescriptionBystanders.text"), bystanderPersonnelCount));
 
         situationDescription.append(resources.getString("dialogDescriptionDecision.text"));
 
@@ -122,6 +157,7 @@ public class MutinySupportDialog {
         unitCounts.put("vehicle", vehicleCount);
         unitCounts.put("other", otherCount);
 
+
         return unitCounts;
     }
 
@@ -135,7 +171,7 @@ public class MutinySupportDialog {
      * @param personnelCount the number of personnel supporting the faction
      * @return the formatted summary string
      */
-    private static String getForceSummaryString(ResourceBundle resources, HashMap<String, Integer> unitMap, boolean isLoyalist, Integer bv, Integer personnelCount) {
+    private static String getForceSummaryString(ResourceBundle resources, HashMap<String, Integer> unitMap, boolean isLoyalist, Integer battleValue, Integer personnelCount) {
         String faction;
 
         if (isLoyalist) {
@@ -154,7 +190,7 @@ public class MutinySupportDialog {
                 unitMap.get("infantry"),
                 unitMap.get("vehicle"),
                 unitMap.get("other"),
-                bv,
-                personnelCount);
+                personnelCount,
+                battleValue);
     }
 }

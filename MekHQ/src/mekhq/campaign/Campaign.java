@@ -3564,16 +3564,37 @@ public class Campaign implements ITechManager {
         }
 
         if (getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
+            boolean desertionEvent = false;
+            boolean mutinyEvent = false;
+
+            // these are the morale checks and dictate whether personnel mutiny or desert
             if ((campaignOptions.isUseDesertions()) && (getLocation().isOnPlanet())) {
-                Morale.makeMoraleChecks(this, true);
+                desertionEvent = Morale.makeMoraleChecks(this, true);
             }
 
             if (campaignOptions.isUseMutinies()) {
-                Morale.makeMoraleChecks(this, false);
+                mutinyEvent = Morale.makeMoraleChecks(this, false);
             }
 
-            if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
-                Morale.processMoraleRecovery(this, 1);
+            // this processes morale recovery based on campaign location and the results of the prior checks
+            if (desertionEvent && mutinyEvent) {
+                if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
+                    Morale.processMoraleChange(this, -2.0);
+                } else {
+                    Morale.processMoraleChange(this, -3.0);
+                }
+            } else if (desertionEvent) {
+                if ((!getActiveContracts().isEmpty()) || (!getLocation().isOnPlanet())) {
+                    Morale.processMoraleChange(this, -1.0);
+                }
+            } else if (mutinyEvent) {
+                if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
+                    Morale.processMoraleChange(this, -1.0);
+                } else {
+                    Morale.processMoraleChange(this, -2.0);
+                }
+            } else {
+                Morale.processMoraleChange(this, 1.0);
             }
         }
     }
@@ -4505,6 +4526,33 @@ public class Campaign implements ITechManager {
 
     public void setRankSystemDirect(final RankSystem rankSystem) {
         this.rankSystem = rankSystem;
+    }
+
+    /**
+     * Returns the highest ranked person from the given list of personnel.
+     *
+     * @param personnel           the list of personnel from which to find the highest ranked person
+     * @param useSkillTiebreaker  determines whether to use a experience level tiebreaker when comparing ranks
+     *                            (true - use skill tiebreaker, false - do not use skill tiebreaker)
+     * @return the highest ranked person from the list, or null if the provided personnel list is empty
+     */
+    public Person getHighestRankedPerson(List<Person> personnel, boolean useSkillTiebreaker) {
+        Person highestRankedPerson = null;
+
+        if (!personnel.isEmpty()) {
+            for (Person person : personnel) {
+                if (useSkillTiebreaker) {
+                    if (person.outRanksUsingSkillTiebreaker(this, highestRankedPerson)) {
+                        highestRankedPerson = person;
+                    }
+                } else {
+                    if (person.outRanks(highestRankedPerson)) {
+                        highestRankedPerson = person;
+                    }
+                }
+            }
+        }
+        return highestRankedPerson;
     }
     //endregion Ranks
 

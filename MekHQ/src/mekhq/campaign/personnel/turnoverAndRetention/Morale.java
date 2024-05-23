@@ -20,6 +20,8 @@ import mekhq.gui.dialog.MutinySupportDialog;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static megamek.common.EntityWeightClass.WEIGHT_LARGE_WAR;
+
 public class Morale {
 
     /**
@@ -357,19 +359,19 @@ public class Morale {
         campaign.addReport(moraleReport.toString());
     }
 
-    public static void makeMoraleChecks(Campaign campaign, boolean isDesertion) {
+    public static boolean makeMoraleChecks(Campaign campaign, boolean isDesertion) {
         if ((isDesertion) && (!campaign.getCampaignOptions().isUseDesertions())) {
-            return;
+            return isDesertion;
         } else if ((isDesertion) && (!campaign.getLocation().isOnPlanet())) {
-            return;
+            return isDesertion;
         } else if ((!isDesertion) && (!campaign.getCampaignOptions().isUseMutinies())) {
-            return;
+            return isDesertion;
         }
 
         double targetNumber = getTargetNumber(campaign, isDesertion);
 
         if (targetNumber == 0) {
-            return;
+            return isDesertion;
         }
 
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Morale",
@@ -405,9 +407,23 @@ public class Morale {
         boolean someoneHasMutinied = false;
 
         List<Person> loyalists = new ArrayList<>();
+        Person loyalistLeader = campaign.getFlaggedCommander();
+
+        // if there is no Commander, we assume the highest ranked person is the loyalist leader
+        if (loyalistLeader == null) {
+            campaign.getHighestRankedPerson(filteredPersonnel, true);
+        }
+
+        Person rebelLeader;
         HashMap<Person, Integer> rebels = new HashMap<>();
 
         for (Person person : filteredPersonnel) {
+            // the loyalistLeader can't rebel against themselves
+            if (Objects.equals(person, loyalistLeader)) {
+                loyalists.add(person);
+                continue;
+            }
+
             int modifier = getMoraleCheckModifiers(campaign, person, isDesertion, loyalty);
 
             int firstRoll = Compute.d6(2) + modifier;
@@ -419,7 +435,7 @@ public class Morale {
 
             if ((firstRoll <= targetNumber) && (secondRoll <= targetNumber)) {
                 if (isDesertion) {
-                    if ((processDesertion(campaign, person, secondRoll, targetNumber, morale, theftTargets, resources))
+                    if ((processDesertion(campaign, person, secondRoll, targetNumber, theftTargets, resources))
                             && (!someoneHasDeserted)) {
                         someoneHasDeserted = true;
                     }
@@ -433,10 +449,10 @@ public class Morale {
         }
 
         if (someoneHasMutinied) {
-            processMoraleLoss(campaign, -2);
-            processMutiny(campaign, loyalists, rebels, theftTargets, resources);
-        } else if (someoneHasDeserted) {
-            processMoraleLoss(campaign, -1);
+            processMutiny(campaign, loyalistLeader, loyalists, rebels, theftTargets, resources);
+            return true;
+        } else {
+            return someoneHasDeserted;
         }
     }
 
@@ -446,37 +462,73 @@ public class Morale {
      * @param campaign       the current campaign
      * @param person         the potential deserter
      * @param roll           the desertion roll result
-     * @param targetNumber   the target number for desertion
-     * @param morale         the morale value
+     * @param targetNumber   the target number for desertion=
      * @param unitList       the list of units
      * @param resources      the resource bundle for localized messages
      * @return true if desertion occurred, false otherwise
      */
     private static boolean processDesertion(Campaign campaign, Person person, int roll, double targetNumber,
-                                            double morale, ArrayList<Unit> unitList, ResourceBundle resources) {
-        if (campaign.getCampaignOptions().isUseRuleWithIronFist()) {
-            morale -= 1;
-        }
+                                            ArrayList<Unit> unitList, ResourceBundle resources) {
+        double morale = campaign.getMorale();
 
         if (roll <= (targetNumber - 2)) {
-            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DESERTED);
-
-            if ((roll <= (morale - 4)) && (campaign.getCampaignOptions().isUseTheftUnit()) && (!unitList.isEmpty())) {
-                processUnitTheft(campaign, unitList, resources);
-            } else if ((roll <= (morale - 3)) && (campaign.getCampaignOptions().isUseTheftMoney())) {
-                processMoneyTheft(campaign, resources);
-            } else if (roll <= (morale - 2)) {
-                processPettyTheft(campaign, resources);
-            } else {
-
-                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.AWOL);
-                person.setAwolDays(Compute.d6(2));
+            if (campaign.getCampaignOptions().isUseRuleWithIronFist()) {
+                morale -= 1;
             }
 
-            return true;
-        } else {
+            if (roll <= (morale - 2)) {
+                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DESERTED);
 
-            return false;
+                // reclaim original unit (if available)
+                if (person.getOriginalUnitId() != null) {
+                    morale = reclaimOriginalUnit(campaign, person);
+                }
+
+                // check for theft
+                if ((roll <= (morale - 4)) && (campaign.getCampaignOptions().isUseTheftUnit()) && (!unitList.isEmpty())) {
+                    processUnitTheft(campaign, unitList, resources);
+                } else if ((roll <= (morale - 3)) && (campaign.getCampaignOptions().isUseTheftMoney())) {
+                    processMoneyTheft(campaign, resources);
+                } else if (roll <= (morale - 2)) {
+                    processPettyTheft(campaign, resources);
+                }
+
+                return true;
+            }
+        }
+
+        person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.AWOL);
+        person.setAwolDays(Compute.d6(2));
+
+        return false;
+    }
+
+    /**
+     * Reclaims the original unit for a person in a campaign.
+     * If the unit is no longer available, return an integer used to reduce effective morale.
+     *
+     * @param campaign The campaign the person is participating in
+     * @param person The person whose original unit is to be reclaimed
+     * @return 0 if the original unit is removed successfully, or an integer if removal fails
+     */
+    private static double reclaimOriginalUnit(Campaign campaign, Person person) {
+        UUID originalUnitId = person.getOriginalUnitId();
+        int originalUnitWeight = person.getOriginalUnitWeight();
+
+        // this stops support vehicles being over-valued
+        if (originalUnitWeight > WEIGHT_LARGE_WAR) {
+            originalUnitWeight -= WEIGHT_LARGE_WAR;
+        }
+
+        if (!campaign.getUnit(originalUnitId).isDeployed()) {
+            try {
+                campaign.getHangar().removeUnit(person.getOriginalUnitId());
+                return 0;
+            } catch (Exception e) {
+                return originalUnitWeight;
+            }
+        } else {
+            return originalUnitWeight;
         }
     }
 
@@ -500,9 +552,9 @@ public class Morale {
             campaign.getUnitMarket().addOffers(campaign, 1, UnitMarketType.BLACK_MARKET, desiredUnit.getEntity().getUnitType(),
                     campaign.getFaction(), desiredUnit.getQuality(), 6);
 
-            campaign.addReport(String.format(resources.getString("desertionTheftUnitBlackMarket.text"), unitName));
+            campaign.addReport(String.format(resources.getString("desertionTheftBlackMarket.text"), unitName));
         } else {
-            campaign.addReport(String.format(resources.getString("desertionTheftUnit.text"), unitName));
+            campaign.addReport(String.format(resources.getString("desertionTheft.text"), unitName));
         }
 
         campaign.removeUnit(desiredUnit.getId());
@@ -667,7 +719,7 @@ public class Morale {
                 "mug.text",
                 "toiletSeats.text");
 
-        campaign.addReport(String.format(resources.getString("desertionStolen.text"), new Random().nextInt(items.size())));
+        campaign.addReport(String.format(resources.getString("desertionTheft.text"), new Random().nextInt(items.size())));
     }
 
     /**
@@ -680,63 +732,57 @@ public class Morale {
      * @param person the person for whom AWOL days are being processed
      */
     public static void processAwolDays(Campaign campaign, Person person) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Morale",
+                MekHQ.getMHQOptions().getLocale());
+
         int awolDays = person.getAwolDays();
 
         if (awolDays == 0) {
             if (Compute.d6(1) <= 2) {
                 person.setAwolDays(awolDays + Compute.d6(1));
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("desertionAwolExtended.text"));
             } else {
                 person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
             }
+        } else if (awolDays > 0) {
+            person.setAwolDays(awolDays - 1);
         } else {
             person.setAwolDays(awolDays - 1);
         }
     }
 
     /**
-     * Process morale recovery for a campaign by decreasing the morale value based on the given number of steps.
-     * If the current morale value is not equal to 1, the morale value will be updated by subtracting the 'steps' value.
-     * The updated morale value will be clamped within the range of 1 to 7.
-     * After the morale value is updated, the morale report will be generated.
+     * The method processes the morale change in a campaign.
      *
-     * @param campaign the Campaign object representing the campaign to process morale loss for
-     * @param steps the Integer value representing the number of steps to decrease morale by
+     * @param campaign the campaign to process the morale change for
+     * @param steps the number of steps to change the morale by
      */
-    public static void processMoraleRecovery(Campaign campaign, Integer steps) {
+    public static void processMoraleChange(Campaign campaign, double steps) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Morale",
                 MekHQ.getMHQOptions().getLocale());
 
         double morale = campaign.getMorale();
+        double change = campaign.getCampaignOptions().getMoraleStepSize() * steps;
 
-        if (morale != 1) {
-            campaign.setMorale(MathUtility.clamp(morale - (steps * campaign.getCampaignOptions().getStepSize()), 1.0, 7.0));
+        if ((change > 0) && (morale != 1)) {
+            campaign.setMorale(MathUtility.clamp(morale - (steps * campaign.getCampaignOptions().getMoraleStepSize()), 1.0, 7.0));
             getMoraleReport(campaign);
 
             if ((morale >= 5) && ((morale + steps) < 5)) {
                 campaign.addReport(resources.getString("moraleReportRecovered.text"));
             }
-        }
-    }
-
-    /**
-     * Process morale loss for a campaign by increasing the morale value based on the given number of steps.
-     * If the current morale value is not equal to 7, the morale value will be updated by adding the 'steps' value.
-     * The updated morale value will be clamped within the range of 1 to 7.
-     * After the morale value is updated, the morale report will be generated.
-     *
-     * @param campaign the Campaign object representing the campaign to process morale loss for
-     * @param steps the Integer value representing the number of steps to increase morale by
-     */
-    public static void processMoraleLoss(Campaign campaign, Integer steps) {
-        double morale = campaign.getMorale();
-
-        if (morale != 7) {
-            campaign.setMorale(MathUtility.clamp(morale + (steps * campaign.getCampaignOptions().getStepSize()), 1.0, 7.0));
+        } else if ((change < 0) && (morale != 7)) {
+            campaign.setMorale(MathUtility.clamp(morale + change, 1.0, 7.0));
             getMoraleReport(campaign);
         }
     }
 
-    private static void processMutiny(Campaign campaign, List<Person> loyalists, HashMap<Person, Integer> rebels, ArrayList<Unit> unitList, ResourceBundle resources) {
+    private static void processMutiny(Campaign campaign,
+                                      Person loyalistLeader, List<Person> loyalists,
+                                      HashMap<Person, Integer> rebels,
+                                      ArrayList<Unit> unitList,
+                                      ResourceBundle resources) {
+
         // This prevents us from needing to do the full process for tiny mutinies that have no chance of success
         if ((loyalists.size() / 10) > rebels.size()) {
             if (rebels.size() > 1) {
@@ -746,22 +792,41 @@ public class Morale {
             }
 
             for (Person person : rebels.keySet()) {
-                processDesertion(campaign, person, rebels.get(person), getTargetNumber(campaign, true), campaign.getMorale(), unitList, resources);
+                processDesertion(campaign, person, rebels.get(person), getTargetNumber(campaign, true), unitList, resources);
             }
 
             return;
         }
 
         // A civil war breaks out.
-        // Everyone is forced to pick sides.
+        List<Person> bystanders = new ArrayList<>();
 
         // The rebels have already picked their side, so we only need to process the loyalists
-        for (Person person : loyalists) {
-            if (Compute.d6(1) < getCivilWarTargetNumber(campaign, person)) {
-                loyalists.remove(person);
+        Iterator<Person> iterator = loyalists.iterator();
+
+        while (iterator.hasNext()) {
+            Person person = iterator.next();
+
+            int roll = Compute.d6(1);
+            int civilWarTargetNumber = getCivilWarTargetNumber(campaign, person);
+
+            if ((roll >= (civilWarTargetNumber - 1)) &&
+                    (roll <= (civilWarTargetNumber + 1))) {
+
+                iterator.remove();
+                bystanders.add(person);
+            }
+            else if (roll < (civilWarTargetNumber - 1)) {
+
+                iterator.remove();
                 rebels.put(person, 0);
             }
         }
+
+        // We now need to determine the leader of the rebels.
+        // This might not always be someone who initially joined the mutiny,
+        // in which case we can assume they were persuaded into the role by the original mutineers
+        Person rebelLeader = getRebelLeader(campaign, new ArrayList<>(rebels.keySet()));
 
         // with the line drawn in the sand, we need to assess the forces available to each side
         HashMap<Unit, Integer> rebelUnits = getUnits(new ArrayList<>(rebels.keySet()), false);
@@ -778,88 +843,81 @@ public class Morale {
         int supportDecision = -1;
 
         while (supportDecision == -1) {
-            supportDecision = MutinySupportDialog.SupportDialog(
-                    resources, false,
-                    loyalists.size(), new ArrayList<>(loyalUnits.keySet()), loyalistBv,
-                    rebels.size(), new ArrayList<>(rebelUnits.keySet()), rebelBv
+            supportDecision = MutinySupportDialog.supportDialog(
+                    campaign, resources, false,
+                    bystanders.size(),
+                    loyalistLeader, loyalists.size(), new ArrayList<>(loyalUnits.keySet()), loyalistBv,
+                    rebelLeader, rebels.size(), new ArrayList<>(rebelUnits.keySet()), rebelBv
             );
         }
     }
 
-    private static void processMutinyBattle(Campaign campaign,
-                                               List<Person> loyalists, List<Unit> loyalistForces, Integer loyalistBv,
-                                               List<Person> rebels, List<Unit> rebelForces, Integer rebelBv,
-                                            ResourceBundle resources) {
+    /**
+     * This method is used to determine the rebel leader based on the given campaign and rebel information.
+     *
+     * @param campaign The current campaign.
+     * @param rebels   The list of rebels.
+     * @return The person object representing the rebel leader.
+     */
+    private static Person getRebelLeader(Campaign campaign, List<Person> rebels) {
+        Person rebelLeader = null;
 
-        // start by calculating combat statistics
-        HashMap<String, Integer> abstractBattleStatistics = getAbstractBattleStatistics(loyalists, loyalistForces.size(), loyalistBv);
-        int loyalistAttackDice = abstractBattleStatistics.get("attackDice");
-        int loyalistDefenceDice = abstractBattleStatistics.get("defenceDice");
-
-        abstractBattleStatistics = getAbstractBattleStatistics(rebels, rebelForces.size(), rebelBv);
-        int rebelAttackDice = abstractBattleStatistics.get("attackDice");
-        int rebelDefenceDice = abstractBattleStatistics.get("defenceDice");
-
-        // next we perform three-four rounds of combat: the opening engagement, the brawl, the bitter end.
-        int attrition = 0;
-        int loyalistVictoryPoints = 0;
-        int rebelVictoryPoints = 0;
-
-        // the opening engagement
-        HashMap<String, Integer> engagement = processEngagement(loyalistAttackDice, loyalistDefenceDice, rebelAttackDice, rebelDefenceDice);
-        attrition += engagement.get("attrition");
-
-        if (engagement.get("loyalistVictory") == 1) {
-            loyalistVictoryPoints++;
-        } else {
-            rebelVictoryPoints++;
-        }
-
-        // the brawl
-        engagement = processEngagement(loyalistAttackDice, loyalistDefenceDice, rebelAttackDice, rebelDefenceDice);
-        attrition += engagement.get("attrition");
-
-        if (engagement.get("loyalistVictory") == 1) {
-            loyalistVictoryPoints++;
-        } else {
-            rebelVictoryPoints++;
-        }
-
-        // the bitter end
-        engagement = processEngagement(loyalistAttackDice, loyalistDefenceDice, rebelAttackDice, rebelDefenceDice);
-        attrition += engagement.get("attrition");
-
-        if (engagement.get("loyalistVictory") == 1) {
-            loyalistVictoryPoints++;
-        } else {
-            rebelVictoryPoints++;
-        }
-
-        // results
-        HashMap<String, Integer> loyalistForceDamage = mapForceDamage(loyalistForces.size(), attrition, rebelAttackDice, loyalistDefenceDice);
-
-        for (int damagedUnit = 0; damagedUnit < loyalistForceDamage.get("damagedLight"); damagedUnit++) {}
-
-        // process attrition (units outright destroyed)
-        for (int destroyedUnit = 0; destroyedUnit < loyalistForceDamage.get("attrition"); destroyedUnit++) {
-            Unit unit = loyalistForces.get(new Random().nextInt(loyalistForces.size()));
-
-            campaign.addReport(unit.getName() + ' ' + String.format(resources.getString("battleUnitDestroyed.text")));
-
-            for (Person person : unit.getCrew()) {
-                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
-                loyalists.remove(person);
+        for (Person person : rebels) {
+            if (rebelLeader == null) {
+                rebelLeader = person;
+                continue;
             }
 
-            campaign.removeUnit(unit.getId());
-            loyalistForces.remove(unit);
+            int oldRankNumeric = getAdjustedRankNumeric(campaign, rebelLeader);
+            int newRankNumeric = getAdjustedRankNumeric(campaign, person);
+
+            if (newRankNumeric == oldRankNumeric) {
+                // in the case of a tie, we use the negotiation skill
+                if ((person.hasSkill(SkillType.S_NEG)) && (Objects.requireNonNull(rebelLeader).hasSkill(SkillType.S_NEG))) {
+                    if (person.getSkillLevel(SkillType.S_NEG) > rebelLeader.getSkillLevel(SkillType.S_NEG)) {
+                        rebelLeader = person;
+                    } else if (person.getSkillLevel(SkillType.S_NEG) == rebelLeader.getSkillLevel(SkillType.S_NEG)) {
+                        // if we still have a tie, we use overall experience level.
+                        // if this fails to break the tie, we give up and just use the new person
+                        if (person.getExperienceLevel(campaign, false) > rebelLeader.getExperienceLevel(campaign, false)) {
+                            rebelLeader = person;
+                        } else if (person.getExperienceLevel(campaign, false) == rebelLeader.getExperienceLevel(campaign, false)) {
+                            rebelLeader = person;
+                        }
+                    }
+                } else if (person.hasSkill(SkillType.S_NEG)) {
+                    rebelLeader = person;
+                }
+            } else if (newRankNumeric > oldRankNumeric) {
+                rebelLeader = person;
+            }
+        }
+        return rebelLeader;
+    }
+
+    /**
+     * Returns the adjusted rank numeric for a person.
+     *
+     * @param campaign the current campaign
+     * @param person the person whose rank numeric is being calculated
+     * @return the adjusted numeric rank of the person
+     */
+    private static Integer getAdjustedRankNumeric(Campaign campaign, Person person) {
+        int rankNumeric = person.getRankNumeric();
+
+        if (person.hasSkill(SkillType.S_LEADER)) {
+            rankNumeric = person.getSkillLevel(SkillType.S_LEADER);
+
+            if (campaign.getCampaignOptions().isUseManagementSkill()) {
+                rankNumeric += campaign.getCampaignOptions().getManagementSkillPenalty();
+            }
         }
 
-        // process ammo usage
-        getAmmoUsage(loyalistForces, attrition);
-        getAmmoUsage(rebelForces, attrition);
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            rankNumeric += person.getLoyalty();
+        }
 
-        // TODO damage
+        return rankNumeric;
     }
 
     /**

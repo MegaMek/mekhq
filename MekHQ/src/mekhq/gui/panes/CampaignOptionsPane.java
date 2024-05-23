@@ -4858,10 +4858,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkUseMoraleTriggerMutiny.setEnabled((isEnabled) && (chkUseMutinies.isSelected()));
             chkUseMoraleTriggerFatigue.setEnabled((isEnabled) && (chkUseFatigue.isSelected()));
 
-            chkUseTheftUnit.setEnabled((isEnabled) && (chkUseDesertions.isSelected()));
-            chkUseTheftMoney.setEnabled((isEnabled) && (chkUseDesertions.isSelected()));
-            lblTheftValue.setEnabled((isEnabled) && (chkUseDesertions.isSelected()));
-            spnTheftValue.setEnabled((isEnabled) && (chkUseDesertions.isSelected()));
+            chkUseTheftUnit.setEnabled((isEnabled) && ((chkUseDesertions.isSelected()) || (chkUseMutinies.isSelected())));
+            chkUseTheftMoney.setEnabled((isEnabled) && ((chkUseDesertions.isSelected()) || (chkUseMutinies.isSelected())));
+            lblTheftValue.setEnabled((isEnabled) && ((chkUseDesertions.isSelected()) || (chkUseMutinies.isSelected())));
+            spnTheftValue.setEnabled((isEnabled) && ((chkUseDesertions.isSelected()) || (chkUseMutinies.isSelected())));
         });
 
         createMoraleSubPanel();
@@ -4931,10 +4931,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final boolean isEnabled = chkUseDesertions.isSelected();
 
             chkUseMoraleTriggerDesertion.setEnabled(isEnabled);
-            chkUseTheftUnit.setEnabled(isEnabled);
-            chkUseTheftMoney.setEnabled(isEnabled);
-            lblTheftValue.setEnabled(isEnabled);
-            spnTheftValue.setEnabled(isEnabled);
         });
 
         chkUseMutinies = new JCheckBox(resources.getString("chkUseMutinies.text"));
@@ -4955,22 +4951,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseTheftUnit = new JCheckBox(resources.getString("chkUseTheftUnit.text"));
         chkUseTheftUnit.setToolTipText(resources.getString("chkUseTheftUnit.toolTipText"));
         chkUseTheftUnit.setName("chkUseTheftUnit");
-        chkUseTheftUnit.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseDesertions()));
+        chkUseTheftUnit.setEnabled(isUseMorale);
 
         chkUseTheftMoney = new JCheckBox(resources.getString("chkUseTheftMoney.text"));
         chkUseTheftMoney.setToolTipText(resources.getString("chkUseTheftMoney.toolTipText"));
         chkUseTheftMoney.setName("chkUseTheftMoney");
-        chkUseTheftMoney.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseDesertions()));
+        chkUseTheftMoney.setEnabled(isUseMorale);
 
         lblTheftValue = new JLabel(resources.getString("lblTheftValue.text"));
         lblTheftValue.setToolTipText(resources.getString("lblTheftValue.toolTipText"));
         lblTheftValue.setName("lblTheftValue");
-        lblTheftValue.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseDesertions()));
+        lblTheftValue.setEnabled(isUseMorale);
 
         spnTheftValue = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
         spnTheftValue.setToolTipText(resources.getString("lblTheftValue.toolTipText"));
         spnTheftValue.setName("spnTheftValue");
-        spnTheftValue.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseDesertions()));
+        spnTheftValue.setEnabled(isUseMorale);
 
         moraleSubPanel.setName("moraleSubPanel");
         moraleSubPanel.setBorder(BorderFactory.createTitledBorder(""));
