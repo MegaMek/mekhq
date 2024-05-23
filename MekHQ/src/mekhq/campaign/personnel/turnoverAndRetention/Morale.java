@@ -3,7 +3,6 @@ package mekhq.campaign.personnel.turnoverAndRetention;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
-import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -14,8 +13,8 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.ForceReliabilityMethod;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.MutinySupportDialog;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,28 +60,28 @@ public class Morale {
      * @return the base target number for morale
      * @throws IllegalStateException if the campaign morale level is unexpected
      */
-    private static Double getTargetNumber(Campaign campaign, boolean isDesertion) {
+    private static Integer getTargetNumber(Campaign campaign, boolean isDesertion) {
         double morale = campaign.getMorale();
 
         if ((morale >= 1) && (morale < 4)) {
-            return 0.0;
+            return 0;
         } else if (morale < 5) {
             if (isDesertion) {
-                return 2.0;
+                return 2;
             } else {
-                return 0.0;
+                return 0;
             }
         } else if (morale < 7) {
             if (isDesertion) {
-                return 5.0;
+                return 5;
             } else {
-                return 4.0;
+                return 4;
             }
         } else if (morale == 7) {
             if (isDesertion) {
-                return 8.0;
+                return 8;
             } else {
-                return 7.0;
+                return 7;
             }
         }
 
@@ -397,7 +396,7 @@ public class Morale {
 
         if (isDesertion) {
             theftTargets = campaign.getHangar().getUnits().stream()
-                    .filter(unit -> (!unit.isDamaged()) || (!unit.isDeployed()) || (!unit.getEntity().isLargeCraft()) || (!unit.getEntity().isWarShip()))
+                    .filter(unit -> (!unit.isDamaged()) && (!unit.isDeployed()) && (!unit.getEntity().isLargeCraft()) && (!unit.getEntity().isWarShip()))
                     .collect(Collectors.toCollection(ArrayList::new));
         }
 
@@ -405,20 +404,26 @@ public class Morale {
         boolean someoneHasMutinied = false;
 
         List<Person> loyalists = new ArrayList<>();
-        List<Person> rebels = new ArrayList<>();
+        HashMap<Person, Integer> rebels = new HashMap<>();
 
         for (Person person : filteredPersonnel) {
             int modifier = getMoraleCheckModifiers(campaign, person, isDesertion, loyalty);
-            int roll = Compute.d6(2) + modifier;
 
-            if (roll <= targetNumber) {
+            int firstRoll = Compute.d6(2) + modifier;
+            int secondRoll = 0;
+
+            if (isDesertion) {
+                secondRoll = Compute.d6(2) + modifier;
+            }
+
+            if ((firstRoll <= targetNumber) && (secondRoll <= targetNumber)) {
                 if (isDesertion) {
-                    if ((processDesertion(campaign, person, roll, targetNumber, morale, theftTargets, resources))
+                    if ((processDesertion(campaign, person, secondRoll, targetNumber, morale, theftTargets, resources))
                             && (!someoneHasDeserted)) {
                         someoneHasDeserted = true;
                     }
                 } else {
-                    rebels.add(person);
+                    rebels.put(person, firstRoll);
                     someoneHasMutinied = true;
                 }
             } else {
@@ -428,7 +433,7 @@ public class Morale {
 
         if (someoneHasMutinied) {
             processMoraleLoss(campaign, -2);
-            processMutiny(campaign, loyalists, rebels);
+            processMutiny(campaign, loyalists, rebels, theftTargets, resources);
         } else if (someoneHasDeserted) {
             processMoraleLoss(campaign, -1);
         }
@@ -448,6 +453,10 @@ public class Morale {
      */
     private static boolean processDesertion(Campaign campaign, Person person, int roll, double targetNumber,
                                             double morale, ArrayList<Unit> unitList, ResourceBundle resources) {
+        if (campaign.getCampaignOptions().isUseRuleWithIronFist()) {
+            morale -= 1;
+        }
+
         if (roll <= (targetNumber - 2)) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.DESERTED);
 
@@ -457,12 +466,14 @@ public class Morale {
                 processMoneyTheft(campaign, resources);
             } else if (roll <= (morale - 2)) {
                 processPettyTheft(campaign, resources);
+            } else {
+
+                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.AWOL);
+                person.setAwolDays(Compute.d6(2));
             }
 
             return true;
         } else {
-            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.AWOL);
-            person.setAwolDays(Compute.d6(2));
 
             return false;
         }
@@ -724,9 +735,143 @@ public class Morale {
         }
     }
 
-    private static void processMutiny(Campaign campaign, List<Person> loyalists, List<Person> rebels) {
-        // TODO process mutinies
-        // There should be three possible events: violent transfer of power, demand leader step down, or failed to garner enough support
-        // Player should have the option to join the rebels or stay with the loyalists
+    private static void processMutiny(Campaign campaign, List<Person> loyalists, HashMap<Person, Integer> rebels, ArrayList<Unit> unitList, ResourceBundle resources) {
+        // This prevents us from needing to do the full process for tiny mutinies that have no chance of success
+        if ((loyalists.size() / 10) > rebels.size()) {
+            if (rebels.size() > 1) {
+                campaign.addReport(String.format(resources.getString("mutinyThwartedPlural.text"), rebels.size()));
+            } else {
+                campaign.addReport(String.format(resources.getString("mutinyThwartedSingular.text"), rebels.size()));
+            }
+
+            for (Person person : rebels.keySet()) {
+                processDesertion(campaign, person, rebels.get(person), getTargetNumber(campaign, true), campaign.getMorale(), unitList, resources);
+            }
+
+            return;
+        }
+
+        // A civil war breaks out.
+        // Everyone is forced to pick sides.
+
+        // The rebels have already picked their side, so we only need to process the loyalists
+        for (Person person : loyalists) {
+            if (Compute.d6(1) < getCivilWarTargetNumber(campaign, person)) {
+                loyalists.remove(person);
+                rebels.put(person, 0);
+            }
+        }
+
+        // with the line drawn in the sand, we need to assess the forces available to each side
+        HashMap<Unit, Integer> rebelUnits = getUnits(new ArrayList<>(rebels.keySet()), false);
+        int rebelBv = rebelUnits.keySet().stream()
+                .mapToInt(unit -> unit.getEntity()
+                        .calculateBattleValue(true, false)).sum();
+
+        HashMap<Unit, Integer> loyalUnits = getUnits(loyalists, true);
+        int loyalistBv = loyalUnits.keySet().stream()
+                .mapToInt(unit -> unit.getEntity()
+                        .calculateBattleValue(true, false)).sum();
+
+        // we now need to present the player with a choice: join the rebels, or support the loyalists
+        int supportDecision = -1;
+
+        while (supportDecision == -1) {
+            supportDecision = MutinySupportDialog.SupportDialog(
+                    resources, false,
+                    loyalists.size(), new ArrayList<>(loyalUnits.keySet()), loyalistBv,
+                    rebels.size(), new ArrayList<>(rebelUnits.keySet()), rebelBv
+            );
+        }
+    }
+
+    /**
+     * Calculates the target number for civil war loyalty checks
+     *
+     * @param campaign the ongoing campaign
+     * @param person the person for which loyalty is being tested
+     * @return the target number for a civil war loyalty check
+     * @throws IllegalStateException if the loyalty value is unexpected
+     */
+    private static int getCivilWarTargetNumber(Campaign campaign, Person person) {
+        int modifier = 0;
+
+        if (campaign.getCampaignOptions().isUseRuleWithIronFist()) {
+            modifier++;
+        }
+
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            switch (person.getLoyalty()) {
+                case -3:
+                    return 6 + modifier;
+                case -2:
+                    return 5 + modifier;
+                case -1:
+                case 0:
+                    return 4 + modifier;
+                case 1:
+                    return 3 + modifier;
+                case 2:
+                    return 2 + modifier;
+                case 3:
+                    return 1 + modifier;
+                default:
+                    throw new IllegalStateException("Unexpected value in getCivilWarTargetNumber: " + person.getLoyalty());
+            }
+        }
+        return 4 + modifier;
+    }
+
+
+    /**
+     * Retrieves the units that are eligible to participate in the civil war based on the provided personnel.
+     * Multi-crewed units perform a vote to determine which side they join.
+     *
+     * @param personnel A list of personnel (should all belong to the same mutiny faction.
+     * @param isLoyalists A boolean value indicating whether to retrieve units for loyalists or rebels.
+     * @return A HashMap of units and their corresponding battle values.
+     */
+    private static HashMap<Unit, Integer> getUnits(List<Person> personnel, boolean isLoyalists) {
+        HashMap<Unit, Integer> forces = new HashMap<>();
+
+        for (Person person: personnel) {
+            if (person.getUnit() != null) {
+                Unit unit = person.getUnit();
+
+                if ((unit.getEntity().isJumpShip()) || (unit.getEntity().isWarShip()) || (unit.getEntity().isSupportVehicle())) {
+                    continue;
+                }
+
+                // We only care about the commander, as this allows us to ensure each Unit is only counted once.
+                // We also check to ensure the unit isn't already deployed, or too damaged to fight.
+                if ((unit.isCommander(person)) && (!unit.isDeployed()) && (!unit.getEntity().isCrippled()) && (!unit.getEntity().isDmgHeavy())) {
+                    int loyalVoteCount = 0;
+                    int rebelVoteCount = 0;
+
+                    for (Person crew : unit.getCrew()) {
+                        if (personnel.contains(crew)) {
+                            if (isLoyalists) {
+                                loyalVoteCount++;
+                            } else {
+                                rebelVoteCount++;
+                            }
+                        }
+                    }
+
+                    // if the votes are equal, the unit abstains from the conflict
+                    if (loyalVoteCount > rebelVoteCount) {
+                        if (isLoyalists) {
+                            forces.put(unit, unit.getEntity().calculateBattleValue(true, false));
+                        }
+                    } else if (loyalVoteCount < rebelVoteCount) {
+                        if (!isLoyalists) {
+                            forces.put(unit, unit.getEntity().calculateBattleValue(true, false));
+                        }
+                    }
+                }
+            }
+        }
+
+        return forces;
     }
 }
