@@ -481,11 +481,11 @@ public class Campaign implements ITechManager {
         this.procreation = procreation;
     }
 
-    public Double getMorale() {
+    public double getMorale() {
         return morale;
     }
 
-    public void setMorale(final Double morale) {
+    public void setMorale(final double morale) {
         this.morale = morale;
     }
     //endregion Personnel Modules
@@ -3564,14 +3564,17 @@ public class Campaign implements ITechManager {
         }
 
         if (getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-            Morale.makeMoraleChecks(this, true);
-            Morale.makeMoraleChecks(this, false);
+            if ((campaignOptions.isUseDesertions()) && (getLocation().isOnPlanet())) {
+                Morale.makeMoraleChecks(this, true);
+            }
+
+            if (campaignOptions.isUseMutinies()) {
+                Morale.makeMoraleChecks(this, false);
+            }
 
             if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
                 Morale.processMoraleRecovery(this, 1);
             }
-
-
         }
     }
 

@@ -312,7 +312,7 @@ public class CampaignOptions {
     private Integer fatigueLeaveThreshold;
 
     private boolean useMorale;
-    private Double stepSize;
+    private Double MoraleStepSize;
     private boolean useDesertions;
     private boolean useMutinies;
     private ForceReliabilityMethod forceReliabilityMethod;
@@ -1002,7 +1002,7 @@ public class CampaignOptions {
         setFatigueLeaveThreshold(13);
 
         setUseMorale(true);
-        setStepSize(0.1);
+        setMoraleStepSize(0.1);
         setForceReliabilityMethod(ForceReliabilityMethod.LOYALTY);
         setUseDesertions(true);
         setUseSabotage(true);
@@ -1569,12 +1569,12 @@ public class CampaignOptions {
         this.useMorale = useMorale;
     }
 
-    public double getStepSize() {
-        return stepSize;
+    public double getMoraleStepSize() {
+        return MoraleStepSize;
     }
 
-    public void setStepSize(final double stepSize) {
-        this.stepSize = stepSize;
+    public void setMoraleStepSize(final double moraleStepSize) {
+        this.MoraleStepSize = moraleStepSize;
     }
 
     public ForceReliabilityMethod getForceReliabilityMethod() {
@@ -4725,7 +4725,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLeaveThreshold", getFatigueLeaveThreshold());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMorale", isUseMorale());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stepSize", getStepSize());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleStepSize", getMoraleStepSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceReliabilityMethod", getForceReliabilityMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDesertions", isUseDesertions());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSabotage", isUseSabotage());
@@ -5739,8 +5739,8 @@ public class CampaignOptions {
                     retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMorale")) {
                     retVal.setUseMorale(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("stepSize")) {
-                    retVal.setStepSize(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("moraleStepSize")) {
+                    retVal.setMoraleStepSize(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceReliabilityMethod")) {
                     retVal.setForceReliabilityMethod(ForceReliabilityMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDesertions")) {

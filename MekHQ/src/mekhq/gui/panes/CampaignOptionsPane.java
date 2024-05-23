@@ -332,8 +332,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseMorale;
 
     private JPanel moraleSubPanel = new JPanel();
-    private JLabel lblStepSize;
-    private JSpinner spnStepSize;
+    private JLabel lblMoraleStepSize;
+    private JSpinner spnMoraleStepSize;
     private JCheckBox chkUseDesertions;
     private JLabel lblForceReliabilityMethod;
     private MMComboBox<ForceReliabilityMethod> comboForceReliabilityMethod;
@@ -4892,15 +4892,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private void createMoraleSubPanel() {
         boolean isUseMorale = campaign.getCampaignOptions().isUseMorale();
 
-        lblStepSize = new JLabel(resources.getString("lblStepSize.text"));
-        lblStepSize.setToolTipText(resources.getString("lblStepSize.toolTipText"));
-        lblStepSize.setName("lblStepSize");
-        lblStepSize.setEnabled(isUseMorale);
+        lblMoraleStepSize = new JLabel(resources.getString("lblMoraleStepSize.text"));
+        lblMoraleStepSize.setToolTipText(resources.getString("lblMoraleStepSize.toolTipText"));
+        lblMoraleStepSize.setName("lblMoraleStepSize");
+        lblMoraleStepSize.setEnabled(isUseMorale);
 
-        spnStepSize = new JSpinner(new SpinnerNumberModel(0.1, 0.1, 2, 0.1));
-        spnStepSize.setToolTipText(resources.getString("lblStepSize.toolTipText"));
-        spnStepSize.setName("spnStepSize");
-        spnStepSize.setEnabled(isUseMorale);
+        spnMoraleStepSize = new JSpinner(new SpinnerNumberModel(0.1, 0.1, 2, 0.1));
+        spnMoraleStepSize.setToolTipText(resources.getString("lblMoraleStepSize.toolTipText"));
+        spnMoraleStepSize.setName("spnMoraleStepSize");
+        spnMoraleStepSize.setEnabled(isUseMorale);
 
         lblForceReliabilityMethod = new JLabel(resources.getString("lblForceReliabilityMethod.text"));
         lblForceReliabilityMethod.setToolTipText(resources.getString("lblForceReliabilityMethod.toolTipText"));
@@ -4969,7 +4969,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         spnTheftValue = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
         spnTheftValue.setToolTipText(resources.getString("lblTheftValue.toolTipText"));
-        spnTheftValue.setName("spnStepSize");
+        spnTheftValue.setName("spnTheftValue");
         spnTheftValue.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseDesertions()));
 
         moraleSubPanel.setName("moraleSubPanel");
@@ -4986,8 +4986,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseDesertions)
                         .addComponent(chkUseMutinies)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblStepSize)
-                                .addComponent(spnStepSize, Alignment.LEADING))
+                                .addComponent(lblMoraleStepSize)
+                                .addComponent(spnMoraleStepSize, Alignment.LEADING))
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblForceReliabilityMethod)
                                 .addComponent(comboForceReliabilityMethod, Alignment.LEADING))
@@ -5004,8 +5004,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseDesertions)
                         .addComponent(chkUseMutinies)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblStepSize)
-                                .addComponent(spnStepSize))
+                                .addComponent(lblMoraleStepSize)
+                                .addComponent(spnMoraleStepSize))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblForceReliabilityMethod)
                                 .addComponent(comboForceReliabilityMethod))
@@ -8273,7 +8273,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         chkUseDesertions.setSelected(options.isUseDesertions());
         chkUseMutinies.setSelected(options.isUseMutinies());
-        spnStepSize.setValue(options.getStepSize());
+        spnMoraleStepSize.setValue(options.getMoraleStepSize());
         comboForceReliabilityMethod.setSelectedItem(options.getForceReliabilityMethod());
         chkUseSabotage.setSelected(options.isUseSabotage());
         chkUseTheftUnit.setSelected(options.isUseTheftUnit());
@@ -8968,7 +8968,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             options.setUseDesertions(chkUseDesertions.isSelected());
             options.setUseMutinies(chkUseMutinies.isSelected());
-            options.setStepSize((Double) spnStepSize.getValue());
+            options.setMoraleStepSize((Double) spnMoraleStepSize.getValue());
             options.setForceReliabilityMethod(comboForceReliabilityMethod.getSelectedItem());
             options.setUseSabotage(chkUseSabotage.isSelected());
             options.setUseTheftUnit(chkUseTheftUnit.isSelected());
