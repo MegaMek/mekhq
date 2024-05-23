@@ -3,6 +3,7 @@ package mekhq.campaign.personnel.turnoverAndRetention;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.Mounted;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -783,6 +784,233 @@ public class Morale {
                     rebels.size(), new ArrayList<>(rebelUnits.keySet()), rebelBv
             );
         }
+    }
+
+    private static void processMutinyBattle(Campaign campaign,
+                                               List<Person> loyalists, List<Unit> loyalistForces, Integer loyalistBv,
+                                               List<Person> rebels, List<Unit> rebelForces, Integer rebelBv,
+                                            ResourceBundle resources) {
+
+        // start by calculating combat statistics
+        HashMap<String, Integer> abstractBattleStatistics = getAbstractBattleStatistics(loyalists, loyalistForces.size(), loyalistBv);
+        int loyalistAttackDice = abstractBattleStatistics.get("attackDice");
+        int loyalistDefenceDice = abstractBattleStatistics.get("defenceDice");
+
+        abstractBattleStatistics = getAbstractBattleStatistics(rebels, rebelForces.size(), rebelBv);
+        int rebelAttackDice = abstractBattleStatistics.get("attackDice");
+        int rebelDefenceDice = abstractBattleStatistics.get("defenceDice");
+
+        // next we perform three-four rounds of combat: the opening engagement, the brawl, the bitter end.
+        int attrition = 0;
+        int loyalistVictoryPoints = 0;
+        int rebelVictoryPoints = 0;
+
+        // the opening engagement
+        HashMap<String, Integer> engagement = processEngagement(loyalistAttackDice, loyalistDefenceDice, rebelAttackDice, rebelDefenceDice);
+        attrition += engagement.get("attrition");
+
+        if (engagement.get("loyalistVictory") == 1) {
+            loyalistVictoryPoints++;
+        } else {
+            rebelVictoryPoints++;
+        }
+
+        // the brawl
+        engagement = processEngagement(loyalistAttackDice, loyalistDefenceDice, rebelAttackDice, rebelDefenceDice);
+        attrition += engagement.get("attrition");
+
+        if (engagement.get("loyalistVictory") == 1) {
+            loyalistVictoryPoints++;
+        } else {
+            rebelVictoryPoints++;
+        }
+
+        // the bitter end
+        engagement = processEngagement(loyalistAttackDice, loyalistDefenceDice, rebelAttackDice, rebelDefenceDice);
+        attrition += engagement.get("attrition");
+
+        if (engagement.get("loyalistVictory") == 1) {
+            loyalistVictoryPoints++;
+        } else {
+            rebelVictoryPoints++;
+        }
+
+        // results
+        HashMap<String, Integer> loyalistForceDamage = mapForceDamage(loyalistForces.size(), attrition, rebelAttackDice, loyalistDefenceDice);
+
+        for (int damagedUnit = 0; damagedUnit < loyalistForceDamage.get("damagedLight"); damagedUnit++) {}
+
+        // process attrition (units outright destroyed)
+        for (int destroyedUnit = 0; destroyedUnit < loyalistForceDamage.get("attrition"); destroyedUnit++) {
+            Unit unit = loyalistForces.get(new Random().nextInt(loyalistForces.size()));
+
+            campaign.addReport(unit.getName() + ' ' + String.format(resources.getString("battleUnitDestroyed.text")));
+
+            for (Person person : unit.getCrew()) {
+                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
+                loyalists.remove(person);
+            }
+
+            campaign.removeUnit(unit.getId());
+            loyalistForces.remove(unit);
+        }
+
+        // process ammo usage
+        getAmmoUsage(loyalistForces, attrition);
+        getAmmoUsage(rebelForces, attrition);
+
+        // TODO damage
+    }
+
+    /**
+     * Updates the ammo usage of each unit in the force, taking into account attrition.
+     *
+     * @param force the list of units in the force
+     * @param attrition the attrition value to apply to the ammo usage calculation
+     */
+    private static void getAmmoUsage(List<Unit> force, int attrition) {
+        for (Unit unit : force) {
+            for (Mounted bin : unit.getEntity().getAmmo()) {
+                int ammo = bin.getUsableShotsLeft();
+                int roll = Compute.randomInt((int) ((ammo * 0.33) + attrition));
+
+                bin.setShotsLeft(Math.max(0, ammo - roll));
+            }
+        }
+    }
+
+    /**
+     * Maps force damage based on the given parameters.
+     *
+     * @param forceSize           the size of the force
+     * @param attrition           the attrition value
+     * @param enemyAttackDice     the number of dice used for enemy attacks
+     * @param friendlyDefenceDice the number of dice used for friendly defenses
+     * @return a HashMap containing the force damage:
+     *         - "attrition": the attrition value after mapping
+     *         - "damagedLight": the number of units damaged lightly
+     *         - "damagedModerate": the number of units damaged moderately
+     *         - "damagedBadly": the number of units damaged badly
+     */
+    private static HashMap<String, Integer> mapForceDamage(int forceSize, int attrition, int enemyAttackDice, int friendlyDefenceDice) {
+        HashMap<String, Integer> forceDamage = new HashMap<>();
+
+        attrition = attrition * (forceSize / 12);
+
+        int damageDice = Math.max(0, enemyAttackDice - friendlyDefenceDice);
+
+        int damagedBadly = 0;
+        int damagedModerate = 0;
+        int damagedLight = 0;
+
+        for (int rollNumber = 0; rollNumber < damageDice; rollNumber++) {
+            switch (Compute.d6(1)) {
+                case 1:
+                    damagedBadly++;
+                    break;
+                case 2:
+                case 3:
+                    damagedModerate++;
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                default:
+                    damagedLight++;
+                    break;
+            }
+        }
+
+        while ((attrition + damagedBadly + damagedModerate + damagedLight) > forceSize) {
+            if (damagedLight > 0) {
+                damagedLight--;
+            } else if (damagedModerate > 0) {
+                damagedModerate--;
+            } else if (damagedBadly > 0) {
+                damagedBadly--;
+            } else {
+                attrition--;
+            }
+        }
+
+        forceDamage.put("attrition", attrition);
+        forceDamage.put("damagedLight", damagedLight);
+        forceDamage.put("damagedModerate", damagedModerate);
+        forceDamage.put("damagedBadly", damagedBadly);
+
+        return forceDamage;
+    }
+
+    private static HashMap<String, Integer> processEngagement(int loyalistAttackDice, int loyalistDefenceDice, int rebelAttackDice, int rebelDefenceDice) {
+        HashMap<String, Integer> combatResults = new HashMap<>();
+
+        boolean concludeEngagement = false;
+        int attrition = 0;
+        int loyalistVictory = 0;
+        int rebelVictory = 0;
+
+        while (!concludeEngagement) {
+            int loyalistAttack = Compute.d6(loyalistAttackDice);
+            int loyalistDefence = Compute.d6(loyalistDefenceDice);
+            int rebelAttack = Compute.d6(rebelAttackDice);
+            int rebelDefence = Compute.d6(rebelDefenceDice);
+
+            loyalistVictory = 0;
+            rebelVictory = 0;
+
+            if (loyalistAttack > rebelDefence) {
+                if (loyalistAttack < (rebelDefence * 1.25)) {
+                    attrition++;
+                }
+
+                loyalistVictory = 1;
+            }
+
+            if (rebelAttack > loyalistDefence) {
+                if (rebelAttack < (loyalistDefence * 1.25)) {
+                    attrition++;
+                }
+
+                rebelVictory = 1;
+            }
+
+            if (loyalistVictory == rebelVictory) {
+                attrition++;
+            } else {
+                concludeEngagement = true;
+            }
+        }
+
+        combatResults.put("attrition", attrition);
+        combatResults.put("loyalistVictory", loyalistVictory);
+
+        return combatResults;
+    }
+
+    /**
+     * Calculates a faction's abstract battle statistics based on the given combatants, force size, and battle value.
+     *
+     * @param combatants the list of combatants participating in the battle
+     * @param forceSize the size of the force
+     * @param battleValue the value of the battle
+     * @return a HashMap containing the statistics of the battle
+     */
+    private static HashMap<String, Integer> getAbstractBattleStatistics(List<Person> combatants, Integer forceSize, Integer battleValue) {
+        HashMap<String, Integer> statistics = new HashMap<>();
+
+        // TODO make the dividers Campaign Options
+        int loyalistLeadership = (int) combatants.stream().filter(person -> person.getRank().isOfficer()).count() / (forceSize / 12);
+        int loyalistMedical =  (int) combatants.stream().filter(person -> (person.getPrimaryRole().isDoctor())).count() / (forceSize / 12);
+        int loyalistAdministration = (int) combatants.stream().filter(person -> (person.getPrimaryRole().isAdministrator())).count() / (forceSize / 3);
+        int loyalistTech = (int) combatants.stream().filter(person -> (person.getPrimaryRole().isTech())).count() / (forceSize / 6);
+
+        int attackDice = (battleValue / 250) + loyalistLeadership + loyalistAdministration;
+        int defenceDice = (battleValue / 250) + loyalistTech + loyalistMedical;
+
+        statistics.put("attackDice", attackDice);
+        statistics.put("defenceDice", defenceDice);
+
+        return statistics;
     }
 
     /**
