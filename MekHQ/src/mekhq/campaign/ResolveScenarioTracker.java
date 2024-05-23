@@ -1486,7 +1486,7 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
