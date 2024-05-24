@@ -2,8 +2,10 @@ package mekhq.gui.dialog;
 
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Armor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +30,7 @@ public class MutinySupportDialog {
                                     Integer bystanderPersonnelCount,
                                     Person loyalistLeader, Integer loyalistPersonnelCount, List<Unit> loyalistForces, Integer loyalistBv,
                                     Person rebelLeader, Integer rebelPersonnelCount, List<Unit> rebelForces, Integer rebelBv) {
-        // Initialize a JOptionPane
+
         AtomicInteger choice = new AtomicInteger(-1);
         JOptionPane pane = new JOptionPane(buildMutinyDescription(
                 campaign, resources, isViolentRebellion,
@@ -46,7 +48,6 @@ public class MutinySupportDialog {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-        // buttonPanel.add(Box.createHorizontalGlue());
 
         for (Object option : options){
             JButton button = new JButton(option.toString());
@@ -157,7 +158,6 @@ public class MutinySupportDialog {
         unitCounts.put("vehicle", vehicleCount);
         unitCounts.put("other", otherCount);
 
-
         return unitCounts;
     }
 
@@ -167,11 +167,12 @@ public class MutinySupportDialog {
      * @param resources the ResourceBundle containing the necessary strings for formatting the summary string
      * @param unitMap   the HashMap containing the count of each unit type
      * @param isLoyalist the flag indicating if the forces are loyalist or rebel
-     * @param bv the force's estimated Battle Value
+     * @param battleValue the force's estimated Battle Value
      * @param personnelCount the number of personnel supporting the faction
      * @return the formatted summary string
      */
-    private static String getForceSummaryString(ResourceBundle resources, HashMap<String, Integer> unitMap, boolean isLoyalist, Integer battleValue, Integer personnelCount) {
+    private static String getForceSummaryString(ResourceBundle resources, HashMap<String, Integer> unitMap, boolean isLoyalist, int battleValue, int personnelCount) {
+        StringBuilder forceSummaryString = new StringBuilder();
         String faction;
 
         if (isLoyalist) {
@@ -180,17 +181,77 @@ public class MutinySupportDialog {
             faction = resources.getString("dialogDescriptionRebels.text");
         }
 
-        return String.format(resources.getString("dialogDescriptionForces.text"),
+        forceSummaryString.append(String.format(resources.getString("dialogDescriptionForces.text"),
                 faction,
-                unitMap.get("mek"),
-                unitMap.get("fighter"),
-                unitMap.get("protoMek"),
-                unitMap.get("battleArmor"),
-                unitMap.get("dropShip"),
-                unitMap.get("infantry"),
-                unitMap.get("vehicle"),
-                unitMap.get("other"),
-                personnelCount,
-                battleValue);
+                personnelCount));
+
+        if (unitMap.get("mek") > 0) {
+            forceSummaryString.append(String.format(resources.getString("dialogDescriptionForcesMeks.text"),
+                    unitMap.get("mek"),
+                    pluralizer(resources, unitMap.get("mek"))));
+        }
+
+        if (unitMap.get("fighter") > 0) {
+            forceSummaryString.append(String.format(resources.getString("dialogDescriptionForcesFighters.text"),
+                    unitMap.get("fighter"),
+                    pluralizer(resources, unitMap.get("fighter"))));
+        }
+
+        if (unitMap.get("protoMek") > 0) {
+            forceSummaryString.append(String.format(resources.getString("dialogDescriptionForcesProtoMechs.text"),
+                    unitMap.get("protoMek"),
+                    pluralizer(resources, unitMap.get("protoMek"))));
+        }
+
+        if (unitMap.get("battleArmor") > 0) {
+            forceSummaryString.append(String.format(resources.getString("dialogDescriptionForcesBattleArmor.text"),
+                    pluralizer(resources, unitMap.get("battleArmor")),
+                    unitMap.get("battleArmor")));
+        }
+
+        if (unitMap.get("vehicle") > 0) {
+            forceSummaryString.append(String.format(resources.getString("dialogDescriptionForcesVehicles.text"),
+                    unitMap.get("vehicle"),
+                    pluralizer(resources, unitMap.get("vehicle"))));
+        }
+
+        if (unitMap.get("infantry") > 0) {
+            forceSummaryString.append(String.format(resources.getString("dialogDescriptionForcesInfantry.text"),
+                    pluralizer(resources, unitMap.get("infantry")),
+                    unitMap.get("infantry")));
+        }
+
+        if (unitMap.get("dropShip") > 0) {
+            forceSummaryString.append(String.format(resources.getString("dialogDescriptionForcesDropShips.text"),
+                    unitMap.get("dropShip"),
+                    pluralizer(resources, unitMap.get("dropShip"))));
+        }
+
+        if (unitMap.get("other") > 0) {
+            forceSummaryString.append(String.format(resources.getString("dialogDescriptionForcesOther.text"),
+                    unitMap.get("other"),
+                    pluralizer(resources, unitMap.get("other"))));
+        }
+
+        forceSummaryString.append(' ').append(String.format(resources.getString("dialogDescriptionForcesBv.text"), battleValue));
+
+        return forceSummaryString.toString();
+    }
+
+    /**
+     * This method is used to determine whether a string should be plural based on the given unit count.
+     *
+     * @param resources The ResourceBundle object containing the string resource for pluralizer text.
+     * @param unitCount The number of units.
+     * @return The pluralizer text based on the unit count. Returns an empty string if the unit count is less than or equal to 1.
+     */
+    private static String pluralizer(ResourceBundle resources, int unitCount) {
+        String pluralizer = "";
+
+        if ((unitCount > 1) || (unitCount == 0)) {
+            pluralizer = resources.getString("dialogDescriptionPluralizer.text");
+        }
+
+        return pluralizer;
     }
 }

@@ -8,6 +8,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
@@ -16,6 +17,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.MutinySupportDialog;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +25,6 @@ import java.util.stream.Collectors;
 import static megamek.common.EntityWeightClass.WEIGHT_LARGE_WAR;
 
 public class Morale {
-
     /**
      * This method returns the Morale level as a string based on the value of the 'Morale' variable.
      *
@@ -36,19 +37,19 @@ public class Morale {
 
         double morale = campaign.getMorale();
 
-        if ((morale >= 1) && (morale < 2)) {
+        if ((morale >= 10) && (morale < 20)) {
             return resources.getString("moraleLevelUnbreakable.text");
-        } else if (morale < 3) {
+        } else if (morale < 30) {
             return resources.getString("moraleLevelVeryHigh.text");
-        } else if (morale < 4) {
+        } else if (morale < 40) {
             return resources.getString("moraleLevelHigh.text");
-        } else if (morale < 5) {
+        } else if (morale < 50) {
             return resources.getString("moraleLevelNormal.text");
-        } else if (morale < 6) {
+        } else if (morale < 60) {
             return resources.getString("moraleLevelLow.text");
-        } else if (morale < 7) {
+        } else if (morale < 70) {
             return resources.getString("moraleLevelVeryLow.text");
-        } else if (morale == 7) {
+        } else if (morale == 70) {
             return resources.getString("moraleLevelBroken.text");
         }
 
@@ -66,21 +67,21 @@ public class Morale {
     private static Integer getTargetNumber(Campaign campaign, boolean isDesertion) {
         double morale = campaign.getMorale();
 
-        if ((morale >= 1) && (morale < 4)) {
+        if ((morale >= 10) && (morale < 40)) {
             return 0;
-        } else if (morale < 5) {
+        } else if (morale < 50) {
             if (isDesertion) {
                 return 2;
             } else {
                 return 0;
             }
-        } else if (morale < 7) {
+        } else if (morale < 70) {
             if (isDesertion) {
                 return 5;
             } else {
                 return 4;
             }
-        } else if (morale == 7) {
+        } else if (morale == 70) {
             if (isDesertion) {
                 return 8;
             } else {
@@ -361,11 +362,11 @@ public class Morale {
 
     public static boolean makeMoraleChecks(Campaign campaign, boolean isDesertion) {
         if ((isDesertion) && (!campaign.getCampaignOptions().isUseDesertions())) {
-            return isDesertion;
+            return false;
         } else if ((isDesertion) && (!campaign.getLocation().isOnPlanet())) {
-            return isDesertion;
+            return false;
         } else if ((!isDesertion) && (!campaign.getCampaignOptions().isUseMutinies())) {
-            return isDesertion;
+            return false;
         }
 
         double targetNumber = getTargetNumber(campaign, isDesertion);
@@ -387,13 +388,11 @@ public class Morale {
             }
         }
 
-        if (campaign.getCampaignOptions().getForceReliabilityMethod().isLoyalty()) {
+        if ((!filteredPersonnel.isEmpty()) && (campaign.getCampaignOptions().getForceReliabilityMethod().isLoyalty())) {
             loyalty = MathUtility.clamp(loyalty / filteredPersonnel.size(), -3, 3);
         } else {
             loyalty = 0;
         }
-
-        double morale = campaign.getMorale();
 
         ArrayList<Unit> theftTargets = new ArrayList<>();
 
@@ -485,12 +484,13 @@ public class Morale {
                 }
 
                 // check for theft
-                if ((roll <= (morale - 4)) && (campaign.getCampaignOptions().isUseTheftUnit()) && (!unitList.isEmpty())) {
-                    processUnitTheft(campaign, unitList, resources);
-                } else if ((roll <= (morale - 3)) && (campaign.getCampaignOptions().isUseTheftMoney())) {
+                LogManager.getLogger().info(((roll + 3) < morale) && (campaign.getCampaignOptions().isUseTheftMoney()));
+                if (((roll + 5) < morale) && (campaign.getCampaignOptions().isUseTheftUnit())) {
+                    processUnitTheft(campaign, person, unitList, resources);
+                } else if (((roll + 4) < morale) && (campaign.getCampaignOptions().isUseTheftMoney())) {
                     processMoneyTheft(campaign, resources);
-                } else if (roll <= (morale - 2)) {
-                    processPettyTheft(campaign, resources);
+                } else if ((roll + 3) < morale) {
+                    processPettyTheft(campaign, person, resources);
                 }
 
                 return true;
@@ -533,13 +533,14 @@ public class Morale {
     }
 
     /**
-     * Process theft of units.
+     * Processes unit theft.
      *
-     * @param campaign   the campaign from which units or funds are stolen
-     * @param unitList   the list of available units
-     * @param resources  the resource bundle for retrieving localized strings
+     * @param campaign   the current campaign
+     * @param person     the person committing the theft
+     * @param unitList   the list of stealable units
+     * @param resources  the resource bundle for localization
      */
-    private static void processUnitTheft(Campaign campaign, ArrayList<Unit> unitList, ResourceBundle resources) {
+    private static void processUnitTheft(Campaign campaign, Person person, ArrayList<Unit> unitList, ResourceBundle resources) {
         Unit desiredUnit = unitList.get(new Random().nextInt(unitList.size()));
 
         StringBuilder unitName = new StringBuilder(desiredUnit.getName());
@@ -552,9 +553,9 @@ public class Morale {
             campaign.getUnitMarket().addOffers(campaign, 1, UnitMarketType.BLACK_MARKET, desiredUnit.getEntity().getUnitType(),
                     campaign.getFaction(), desiredUnit.getQuality(), 6);
 
-            campaign.addReport(String.format(resources.getString("desertionTheftBlackMarket.text"), unitName));
+            campaign.addReport(person.getFullName() + ' ' + String.format(resources.getString("desertionTheftBlackMarket.text"), unitName));
         } else {
-            campaign.addReport(String.format(resources.getString("desertionTheft.text"), unitName));
+            campaign.addReport(person.getFullName() + ' ' + String.format(resources.getString("desertionTheft.text"), unitName));
         }
 
         campaign.removeUnit(desiredUnit.getId());
@@ -564,8 +565,8 @@ public class Morale {
     /**
      * Processes money theft.
      *
-     * @param campaign the campaign for which the theft is being processed
-     * @param resources the ResourceBundle containing the necessary resources
+     * @param campaign   the campaign for which the theft is being processed
+     * @param resources  the ResourceBundle containing the necessary resources
      */
     private static void processMoneyTheft(Campaign campaign, ResourceBundle resources) {
         int theftPercentage = campaign.getCampaignOptions().getTheftValue();
@@ -595,14 +596,17 @@ public class Morale {
                 break;
         }
 
-        Money theft = campaign.getFunds().multipliedBy(MathUtility.clamp(theftPercentage, 1, 100) / 100).round();
+        Money theft = campaign.getFunds()
+                .multipliedBy(theftPercentage)
+                .dividedBy(100)
+                .round();
 
         if (theft.isPositive()) {
-            campaign.getFinances().debit(TransactionType.THEFT, campaign.getLocalDate(), theft, resources.getString("desertionTheftTransactionReport.text"));
+            campaign.getFinances().debit(TransactionType.THEFT, campaign.getLocalDate(), theft,
+                    String.format(resources.getString("desertionTheftTransactionReport.text"),
+                            FinancialInstitutions.randomFinancialInstitution(campaign.getLocalDate()).toString()));
 
-            campaign.addReport(String.format(resources.getString("desertionTheftMoney.text"), theft.getAmount()));
-        } else {
-            processPettyTheft(campaign, resources);
+            campaign.addReport(String.format(String.format(resources.getString("desertionTheftMoney.text"), theft.getAmount())));
         }
     }
 
@@ -611,10 +615,12 @@ public class Morale {
      * It randomly selects an item from a list of stolen items and adds the item to the campaign report.
      *
      * @param campaign   The campaign object to add the report to.
+     * @param person     The person committing the theft
      * @param resources  The ResourceBundle object to retrieve localized strings.
      */
-    private static void processPettyTheft(Campaign campaign, ResourceBundle resources) {
-        List<String> items = List.of("officeSupplies.text",
+    private static void processPettyTheft(Campaign campaign, Person person, ResourceBundle resources) {
+        List<String> items = List.of(
+                "stapler.text",
                 "mascot.text",
                 "phones.text",
                 "tablets.text",
@@ -717,9 +723,11 @@ public class Morale {
                 "fridge.text",
                 "coffeeMachine.text",
                 "mug.text",
-                "toiletSeats.text");
+                "toiletSeats.text",
+                "miniatures.text");
 
-        campaign.addReport(String.format(resources.getString("desertionTheft.text"), new Random().nextInt(items.size())));
+        campaign.addReport(person.getFullName() + ' ' + String.format(resources.getString("desertionTheft.text"),
+                resources.getString(items.get(new Random().nextInt(items.size())))));
     }
 
     /**
@@ -757,22 +765,22 @@ public class Morale {
      * @param campaign the campaign to process the morale change for
      * @param steps the number of steps to change the morale by
      */
-    public static void processMoraleChange(Campaign campaign, double steps) {
+    public static void processMoraleChange(Campaign campaign, int steps) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Morale",
                 MekHQ.getMHQOptions().getLocale());
 
-        double morale = campaign.getMorale();
-        double change = campaign.getCampaignOptions().getMoraleStepSize() * steps;
+        int morale = campaign.getMorale();
+        int change = campaign.getCampaignOptions().getMoraleStepSize() * steps;
 
         if ((change > 0) && (morale != 1)) {
-            campaign.setMorale(MathUtility.clamp(morale - (steps * campaign.getCampaignOptions().getMoraleStepSize()), 1.0, 7.0));
+            campaign.setMorale(MathUtility.clamp(morale - (steps * campaign.getCampaignOptions().getMoraleStepSize()), 1, 7));
             getMoraleReport(campaign);
 
             if ((morale >= 5) && ((morale + steps) < 5)) {
                 campaign.addReport(resources.getString("moraleReportRecovered.text"));
             }
         } else if ((change < 0) && (morale != 7)) {
-            campaign.setMorale(MathUtility.clamp(morale + change, 1.0, 7.0));
+            campaign.setMorale(MathUtility.clamp(morale + change, 1, 7));
             getMoraleReport(campaign);
         }
     }

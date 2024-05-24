@@ -4897,7 +4897,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblMoraleStepSize.setName("lblMoraleStepSize");
         lblMoraleStepSize.setEnabled(isUseMorale);
 
-        spnMoraleStepSize = new JSpinner(new SpinnerNumberModel(0.1, 0.1, 2, 0.1));
+        spnMoraleStepSize = new JSpinner(new SpinnerNumberModel(1, 1, 20, 1));
         spnMoraleStepSize.setToolTipText(resources.getString("lblMoraleStepSize.toolTipText"));
         spnMoraleStepSize.setName("spnMoraleStepSize");
         spnMoraleStepSize.setEnabled(isUseMorale);
@@ -8273,7 +8273,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         comboForceReliabilityMethod.setSelectedItem(options.getForceReliabilityMethod());
         chkUseSabotage.setSelected(options.isUseSabotage());
         chkUseTheftUnit.setSelected(options.isUseTheftUnit());
-        chkUseTheftMoney.setSelected(options.isUseTheftUnit());
+        chkUseTheftMoney.setSelected(options.isUseTheftMoney());
         spnTheftValue.setValue(options.getTheftValue());
 
         // Morale Modifiers
@@ -8964,11 +8964,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             options.setUseDesertions(chkUseDesertions.isSelected());
             options.setUseMutinies(chkUseMutinies.isSelected());
-            options.setMoraleStepSize((Double) spnMoraleStepSize.getValue());
+            options.setMoraleStepSize((int) spnMoraleStepSize.getValue());
             options.setForceReliabilityMethod(comboForceReliabilityMethod.getSelectedItem());
             options.setUseSabotage(chkUseSabotage.isSelected());
             options.setUseTheftUnit(chkUseTheftUnit.isSelected());
-            options.setUseTheftUnit(chkUseTheftMoney.isSelected());
+            options.setUseTheftMoney(chkUseTheftMoney.isSelected());
             options.setTheftValue((Integer) spnTheftValue.getValue());
 
             // Morale Modifiers

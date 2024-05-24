@@ -232,7 +232,7 @@ public class Campaign implements ITechManager {
     private transient AbstractProcreation procreation;
 
     private RetirementDefectionTracker retirementDefectionTracker;
-    private double morale;
+    private int morale;
 
     private AtBConfiguration atbConfig; //AtB
     private AtBEventProcessor atbEventProcessor; //AtB
@@ -295,7 +295,7 @@ public class Campaign implements ITechManager {
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
-        morale = 4.0;
+        morale = 40;
         atbConfig = null;
         autosaveService = new AutosaveService();
         hasActiveContract = false;
@@ -481,11 +481,11 @@ public class Campaign implements ITechManager {
         this.procreation = procreation;
     }
 
-    public double getMorale() {
+    public int getMorale() {
         return morale;
     }
 
-    public void setMorale(final double morale) {
+    public void setMorale(final int morale) {
         this.morale = morale;
     }
     //endregion Personnel Modules
@@ -3579,22 +3579,22 @@ public class Campaign implements ITechManager {
             // this processes morale recovery based on campaign location and the results of the prior checks
             if (desertionEvent && mutinyEvent) {
                 if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
-                    Morale.processMoraleChange(this, -2.0);
+                    Morale.processMoraleChange(this, -2);
                 } else {
-                    Morale.processMoraleChange(this, -3.0);
+                    Morale.processMoraleChange(this, -3);
                 }
             } else if (desertionEvent) {
                 if ((!getActiveContracts().isEmpty()) || (!getLocation().isOnPlanet())) {
-                    Morale.processMoraleChange(this, -1.0);
+                    Morale.processMoraleChange(this, -1);
                 }
             } else if (mutinyEvent) {
                 if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
-                    Morale.processMoraleChange(this, -1.0);
+                    Morale.processMoraleChange(this, -1);
                 } else {
-                    Morale.processMoraleChange(this, -2.0);
+                    Morale.processMoraleChange(this, -2);
                 }
             } else {
-                Morale.processMoraleChange(this, 1.0);
+                Morale.processMoraleChange(this, 1);
             }
         }
     }

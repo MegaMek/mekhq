@@ -274,13 +274,13 @@ public class CampaignOptions {
 
     private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
     private SkillLevel turnoverDifficulty;
-    private Integer turnoverFixedTargetNumber;
+    private int turnoverFixedTargetNumber;
     private boolean useYearEndRandomRetirement;
     private boolean useContractCompletionRandomRetirement;
     private boolean useRandomFounderRetirement;
     private boolean useSubContractSoldiers;
-    private Integer serviceContractDuration;
-    private Integer serviceContractModifier;
+    private int serviceContractDuration;
+    private int serviceContractModifier;
 
     private boolean useCustomRetirementModifiers;
     private boolean useFatigueModifiers;
@@ -292,34 +292,34 @@ public class CampaignOptions {
     private boolean useLoyaltyModifiers;
     private boolean useHideLoyalty;
 
-    private Integer payoutRateOfficer;
-    private Integer payoutRateEnlisted;
-    private Integer payoutRetirementMultiplier;
+    private int payoutRateOfficer;
+    private int payoutRateEnlisted;
+    private int payoutRetirementMultiplier;
     private boolean usePayoutServiceBonus;
-    private Integer payoutServiceBonusRate;
+    private int payoutServiceBonusRate;
 
     private boolean useAdministrativeStrain;
-    private Integer administrativeCapacity;
-    private Integer multiCrewStrainDivider;
+    private int administrativeCapacity;
+    private int multiCrewStrainDivider;
 
     private boolean useManagementSkill;
     private boolean useCommanderLeadershipOnly;
-    private Integer managementSkillPenalty;
+    private int managementSkillPenalty;
 
     private boolean useFatigue;
-    private Integer fatigueRate;
-    private Integer fieldKitchenCapacity;
-    private Integer fatigueLeaveThreshold;
+    private int fatigueRate;
+    private int fieldKitchenCapacity;
+    private int fatigueLeaveThreshold;
 
     private boolean useMorale;
-    private Double MoraleStepSize;
+    private int MoraleStepSize;
     private boolean useDesertions;
     private boolean useMutinies;
     private ForceReliabilityMethod forceReliabilityMethod;
     private boolean useSabotage;
     private boolean useTheftUnit;
     private boolean useTheftMoney;
-    private Integer theftValue;
+    private int theftValue;
 
     private boolean useMoraleTriggerFieldControl;
     private boolean useMoraleTriggerMissionStatus;
@@ -330,7 +330,7 @@ public class CampaignOptions {
     private boolean useMoraleTriggerFatigue;
     private boolean useMoraleModifierMissedPayDay;
 
-    private Integer customMoraleModifier;
+    private int customMoraleModifier;
     private boolean useMoraleModifierExperienceLevel;
     private boolean useMoraleModifierFaction;
     private boolean useMoraleModifierProfession;
@@ -1002,7 +1002,7 @@ public class CampaignOptions {
         setFatigueLeaveThreshold(13);
 
         setUseMorale(true);
-        setMoraleStepSize(0.1);
+        setMoraleStepSize(1);
         setForceReliabilityMethod(ForceReliabilityMethod.LOYALTY);
         setUseDesertions(true);
         setUseSabotage(true);
@@ -1569,11 +1569,11 @@ public class CampaignOptions {
         this.useMorale = useMorale;
     }
 
-    public double getMoraleStepSize() {
+    public int getMoraleStepSize() {
         return MoraleStepSize;
     }
 
-    public void setMoraleStepSize(final double moraleStepSize) {
+    public void setMoraleStepSize(final int moraleStepSize) {
         this.MoraleStepSize = moraleStepSize;
     }
 
@@ -5740,7 +5740,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMorale")) {
                     retVal.setUseMorale(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("moraleStepSize")) {
-                    retVal.setMoraleStepSize(Double.parseDouble(wn2.getTextContent().trim()));
+                    retVal.setMoraleStepSize(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("forceReliabilityMethod")) {
                     retVal.setForceReliabilityMethod(ForceReliabilityMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDesertions")) {

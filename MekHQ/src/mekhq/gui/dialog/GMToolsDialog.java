@@ -743,13 +743,13 @@ public class GMToolsDialog extends AbstractMHQDialog {
         lblMorale.setName("lblMorale");
         panel.add(lblMorale, gbc);
 
-        setSpnMorale(new JSpinner(new SpinnerNumberModel(gui.getCampaign().getMorale(), 1.0, 7.0, gui.getCampaign().getCampaignOptions().getMoraleStepSize())));
+        setSpnMorale(new JSpinner(new SpinnerNumberModel(gui.getCampaign().getMorale(), 10, 70, gui.getCampaign().getCampaignOptions().getMoraleStepSize())));
         gbc.gridx++;
         getSpnMorale().setName("spnMorale");
         panel.add(getSpnMorale(), gbc);
 
         final JButton btnMorale = new MMButton("btnMorale", resources, "btnMorale.text",
-                "btnMorale.toolTipText", evt -> gui.getCampaign().setMorale((double) spnMorale.getValue()));
+                "btnMorale.toolTipText", evt -> gui.getCampaign().setMorale((int) spnMorale.getValue()));
         gbc.gridx++;
         panel.add(btnMorale, gbc);
 
