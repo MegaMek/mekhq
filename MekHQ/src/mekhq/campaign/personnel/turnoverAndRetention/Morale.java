@@ -3,6 +3,7 @@ package mekhq.campaign.personnel.turnoverAndRetention;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
+import megamek.common.MechSummaryCache;
 import megamek.common.Mounted;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -413,7 +414,6 @@ public class Morale {
             campaign.getHighestRankedPerson(filteredPersonnel, true);
         }
 
-        Person rebelLeader;
         HashMap<Person, Integer> rebels = new HashMap<>();
 
         for (Person person : filteredPersonnel) {
@@ -549,9 +549,12 @@ public class Morale {
             unitName.append(' ').append(desiredUnit.getFluffName());
         }
 
-        if ((!campaign.getFaction().isClan()) && (Compute.d6(1) >= 3)) {
-            campaign.getUnitMarket().addOffers(campaign, 1, UnitMarketType.BLACK_MARKET, desiredUnit.getEntity().getUnitType(),
-                    campaign.getFaction(), desiredUnit.getQuality(), 6);
+        if ((campaign.getCampaignOptions().isUseAtB()) && (!campaign.getFaction().isClan()) && (Compute.d6(1) >= 3)) {
+            campaign.getUnitMarket().addSingleUnit(campaign,
+                    UnitMarketType.BLACK_MARKET,
+                    desiredUnit.getEntity().getUnitType(),
+                    MechSummaryCache.getInstance().getMech(desiredUnit.getEntity().getShortNameRaw()),
+                    50);
 
             campaign.addReport(person.getFullName() + ' ' + String.format(resources.getString("desertionTheftBlackMarket.text"), unitName));
         } else {

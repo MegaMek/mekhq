@@ -25,11 +25,11 @@ import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.universe.Faction;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -170,7 +170,7 @@ public abstract class AbstractUnitMarket {
      * @param percent the percentage of the original unit cost the unit will be offered at
      * @return the name of the unit that has been added to the market
      */
-    protected String addSingleUnit(final Campaign campaign, final UnitMarketType market,
+    public String addSingleUnit(final Campaign campaign, final UnitMarketType market,
                                    final int unitType, final MechSummary mechSummary,
                                    final int percent) {
         getOffers().add(new UnitMarketOffer(market, unitType, mechSummary, percent,

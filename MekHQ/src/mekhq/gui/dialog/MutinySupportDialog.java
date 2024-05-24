@@ -2,15 +2,15 @@ package mekhq.gui.dialog;
 
 import megamek.common.Entity;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.parts.Armor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MutinySupportDialog {
