@@ -1012,7 +1012,7 @@ public class Academy implements Comparable<Academy> {
                 return SkillType.S_GUN_BA;
             case "gunnery/protomech":
                 return SkillType.S_GUN_PROTO;
-            case "smallarms":
+            case "small arms":
                 return SkillType.S_SMALL_ARMS;
             case "anti-mech":
                 return SkillType.S_ANTI_MECH;
