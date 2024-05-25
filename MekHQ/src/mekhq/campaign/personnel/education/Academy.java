@@ -1032,7 +1032,7 @@ public class Academy implements Comparable<Academy> {
                 return SkillType.S_DOCTOR;
             case "medtech":
                 return SkillType.S_MEDTECH;
-            case "hyperspacenavigation":
+            case "hyperspace navigation":
                 return SkillType.S_NAV;
             case "administration":
                 return SkillType.S_ADMIN;
