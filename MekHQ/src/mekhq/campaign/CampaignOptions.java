@@ -318,8 +318,11 @@ public class CampaignOptions {
     private ForceReliabilityMethod forceReliabilityMethod;
     private boolean useSabotage;
     private boolean useTheftUnit;
+    private int theftResellValue;
     private boolean useTheftMoney;
     private int theftValue;
+    private boolean useTheftParts;
+    private int theftPartsDiceCount;
 
     private boolean useMoraleTriggerFieldControl;
     private boolean useMoraleTriggerMissionStatus;
@@ -1008,10 +1011,13 @@ public class CampaignOptions {
         setUseSabotage(true);
         setUseMutinies(true);
         setUseTheftUnit(true);
+        setTheftResellValue(50);
         setUseTheftMoney(true);
         setTheftValue(10);
+        setUseTheftParts(true);
+        setTheftPartsDiceCount(1);
 
-        setCustomMoraleModifier(2);
+        setCustomMoraleModifier(0);
         setUseMoraleTriggerFieldControl(true);
         setUseMoraleTriggerMissionStatus(true);
         setUseMoraleTriggerModifierLeaderLoss(true);
@@ -1609,6 +1615,14 @@ public class CampaignOptions {
         this.useTheftUnit = useTheftUnit;
     }
 
+    public int getTheftResellValue() {
+        return theftResellValue;
+    }
+
+    public void setTheftResellValue(final int theftResellValue) {
+        this.theftResellValue = theftResellValue;
+    }
+
     public boolean isUseTheftMoney() {
         return useTheftMoney;
     }
@@ -1617,12 +1631,28 @@ public class CampaignOptions {
         this.useTheftMoney = useTheftMoney;
     }
 
-    public Integer getTheftValue() {
+    public int getTheftValue() {
         return theftValue;
     }
 
     public void setTheftValue(final Integer theftValue) {
         this.theftValue = theftValue;
+    }
+
+    public boolean isUseTheftParts() {
+        return useTheftParts;
+    }
+
+    public void setUseTheftParts(final boolean useTheftParts) {
+        this.useTheftParts = useTheftParts;
+    }
+
+    public int getTheftPartsDiceCount() {
+        return theftPartsDiceCount;
+    }
+
+    public void setTheftPartsDiceCount(final int theftPartsDiceCount) {
+        this.theftPartsDiceCount = theftPartsDiceCount;
     }
 
     public boolean isUseMutinies() {
@@ -4731,8 +4761,11 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSabotage", isUseSabotage());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMutinies", isUseMutinies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTheftUnit", isUseTheftUnit());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "theftResellValue", getTheftResellValue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTheftMoney", isUseTheftMoney());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "theftValue", getTheftValue());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTheftParts", isUseTheftParts());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "theftPartsDiceCount", getTheftPartsDiceCount());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "customMoraleModifier", getCustomMoraleModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleTriggerFieldControl", isUseMoraleTriggerFieldControl());
@@ -5749,10 +5782,16 @@ public class CampaignOptions {
                     retVal.setUseSabotage(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTheftUnit")) {
                     retVal.setUseTheftUnit(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("theftResellValue")) {
+                    retVal.setTheftResellValue(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTheftMoney")) {
                     retVal.setUseTheftMoney(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("theftValue")) {
                     retVal.setTheftValue(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTheftParts")) {
+                    retVal.setUseTheftParts(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useThetheftPartsDiceCountftParts")) {
+                    retVal.setTheftPartsDiceCount(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMutinies")) {
                     retVal.setUseMutinies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerFieldControl")) {

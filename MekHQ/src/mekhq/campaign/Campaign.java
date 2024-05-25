@@ -3579,22 +3579,22 @@ public class Campaign implements ITechManager {
             // this processes morale recovery based on campaign location and the results of the prior checks
             if (desertionEvent && mutinyEvent) {
                 if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
-                    Morale.processMoraleChange(this, -2);
+                    Morale.processMoraleChange(this, 2);
                 } else {
-                    Morale.processMoraleChange(this, -3);
+                    Morale.processMoraleChange(this, 3);
                 }
             } else if (desertionEvent) {
                 if ((!getActiveContracts().isEmpty()) || (!getLocation().isOnPlanet())) {
-                    Morale.processMoraleChange(this, -1);
+                    Morale.processMoraleChange(this, 1);
                 }
             } else if (mutinyEvent) {
                 if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
-                    Morale.processMoraleChange(this, -1);
+                    Morale.processMoraleChange(this, 1);
                 } else {
-                    Morale.processMoraleChange(this, -2);
+                    Morale.processMoraleChange(this, 2);
                 }
             } else {
-                Morale.processMoraleChange(this, 1);
+                Morale.processMoraleChange(this, -1);
             }
         }
     }

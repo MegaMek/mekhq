@@ -8,6 +8,9 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.market.enums.UnitMarketType;
+import mekhq.campaign.parts.AmmoStorage;
+import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.ForceReliabilityMethod;
@@ -15,6 +18,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.MutinySupportDialog;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -66,6 +70,9 @@ public class Morale {
         int morale = campaign.getMorale() / 10;
 
         switch (morale) {
+            case 0:
+                LogManager.getLogger().error("IMPORTANT: Morale has weirdly reset");
+                return 0;
             case 1:
                 if (isDesertion) {
                     return 0;
@@ -368,13 +375,13 @@ public class Morale {
 
         StringBuilder moraleReport = new StringBuilder();
 
-        if (getTargetNumber(campaign, true) >= 2) {
+        if (getTargetNumber(campaign, true) > 2) {
             moraleReport.append(String.format(resources.getString("moraleReportLow.text"), getMoraleLevel(campaign)));
         } else {
             moraleReport.append(String.format(resources.getString("moraleReport.text"), getMoraleLevel(campaign)));
         }
 
-        if (getTargetNumber(campaign, false) >= 2) {
+        if (getTargetNumber(campaign, false) > 2) {
             moraleReport.append(' ').append(resources.getString("moraleReportMutiny.text"));
         }
 
@@ -448,7 +455,8 @@ public class Morale {
 
             if (isDesertion) {
                 if ((firstRoll < targetNumber) && (secondRoll < targetNumber)) {
-                    possibleTheftTargets = processDesertion(campaign, person, secondRoll, targetNumber, possibleTheftTargets, resources);
+                    campaign.addReport(person.getFullName() + " failed their morale check [TN" + targetNumber + "] [rA" + firstRoll +  "][rB" + secondRoll + ']');
+                    possibleTheftTargets.remove(processDesertion(campaign, person, secondRoll, targetNumber, possibleTheftTargets, resources));
                     someoneHasDeserted = true;
                 }
             } else {
@@ -527,7 +535,7 @@ public class Morale {
      * @param possibleTheftTargets       the list of units
      * @param resources      the resource bundle for localized messages
      */
-    private static List<Unit> processDesertion(Campaign campaign, Person person, int roll, int targetNumber,
+    private static Unit processDesertion(Campaign campaign, Person person, int roll, int targetNumber,
                                           List<Unit> possibleTheftTargets, ResourceBundle resources) {
         int morale = campaign.getMorale();
 
@@ -545,20 +553,25 @@ public class Morale {
                 }
 
                 // check for theft
-                if (((roll + 5) < morale) && (campaign.getCampaignOptions().isUseTheftUnit()) && (!possibleTheftTargets.isEmpty())) {
-                    possibleTheftTargets.remove(processUnitThefts(campaign, possibleTheftTargets, resources));
-                } else if (((roll + 4) < morale) && (campaign.getCampaignOptions().isUseTheftMoney())) {
+                if (((roll + 6) < (morale / 10)) && (campaign.getCampaignOptions().isUseTheftUnit()) && (!possibleTheftTargets.isEmpty())) {
+                    return processUnitTheft(campaign, possibleTheftTargets, resources);
+                } else if (((roll + 5) < (morale / 10)) && (campaign.getCampaignOptions().isUseTheftMoney())) {
                     processMoneyTheft(campaign, resources);
-                } else if ((roll + 3) < morale) {
+                    return null;
+                } else if (((roll + 4) < (morale / 10)) && (campaign.getCampaignOptions().isUseTheftParts())) {
+                    processPartTheft(campaign, resources);
+                    return null;
+                } else if ((roll + 3) < (morale / 10)) {
                     processPettyTheft(campaign, resources);
+                    return null;
                 }
             }
+        } else {
+            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.AWOL);
+            person.setAwolDays(Compute.d6(2));
         }
 
-        person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.AWOL);
-        person.setAwolDays(Compute.d6(2));
-
-        return possibleTheftTargets;
+        return null;
     }
 
     /**
@@ -598,11 +611,13 @@ public class Morale {
      * @param resources              The resource bundle for internationalization.
      * @return A list of stolen units.
      */
-    private static Unit processUnitThefts(Campaign campaign, List<Unit> possibleTheftTargets, ResourceBundle resources) {
+    private static Unit processUnitTheft(Campaign campaign, List<Unit> possibleTheftTargets, ResourceBundle resources) {
         // if there is nothing left to steal, downgrade the theft
         if (possibleTheftTargets.isEmpty()) {
             if (campaign.getCampaignOptions().isUseTheftMoney()) {
                 processMoneyTheft(campaign, resources);
+            } else if (campaign.getCampaignOptions().isUseTheftParts()) {
+                processPartTheft(campaign, resources);
             } else {
                 processPettyTheft(campaign, resources);
             }
@@ -612,8 +627,13 @@ public class Morale {
 
         // process the theft
         Unit stolenUnit = possibleTheftTargets.get(new Random().nextInt(possibleTheftTargets.size()));
+        String theftString = stolenUnit.getName();
 
-        if ((campaign.getCampaignOptions().isUseAtB()) && (!campaign.getFaction().isClan()) && (Compute.d6(1) >= 1)) {
+        if (!Objects.equals(stolenUnit.getFluffName(), "")) {
+            theftString += ' ' + stolenUnit.getFluffName();
+        }
+
+        if ((campaign.getCampaignOptions().isUseAtB()) && (!campaign.getFaction().isClan()) && (Compute.d6(1) >= 5)) {
             int stolenUnitType = stolenUnit.getEntity().getUnitType();
             String stolenUnitShortNameRaw = stolenUnit.getEntity().getShortNameRaw();
 
@@ -621,11 +641,12 @@ public class Morale {
                     UnitMarketType.BLACK_MARKET,
                     stolenUnitType,
                     MechSummaryCache.getInstance().getMech(stolenUnitShortNameRaw),
-                    50);
+                    campaign.getCampaignOptions().getTheftResellValue() + getPercentageModifier());
 
-            campaign.addReport(String.format(resources.getString("desertionTheftBlackMarket.text"), stolenUnit));
+            campaign.addReport(String.format(resources.getString("desertionTheft.text"), theftString));
+            campaign.addReport(String.format(resources.getString("desertionTheftBlackMarket.text"), theftString));
         } else {
-            campaign.addReport(String.format(resources.getString("desertionTheft.text"), stolenUnit));
+            campaign.addReport(String.format(resources.getString("desertionTheft.text"), theftString));
         }
 
         return stolenUnit;
@@ -653,6 +674,10 @@ public class Morale {
                             FinancialInstitutions.randomFinancialInstitution(campaign.getLocalDate()).toString()));
 
             campaign.addReport(String.format(String.format(resources.getString("desertionTheftMoney.text"), theft.getAmount())));
+        } else if (campaign.getCampaignOptions().isUseTheftParts()) {
+            processPartTheft(campaign, resources);
+        } else {
+            processPettyTheft(campaign, resources);
         }
     }
 
@@ -693,6 +718,116 @@ public class Morale {
                 return -3;
             default:
                 throw new IllegalStateException("Unexpected value in getPercentageModifier: " + roll);
+        }
+    }
+
+    private static void processPartTheft(Campaign campaign, ResourceBundle resources) {
+        List<Part> possibleTheftTargets = campaign.getWarehouse().getSpareParts();
+
+        // if there are no parts to steal, commit petty theft instead
+        if (possibleTheftTargets.isEmpty()) {
+            processPettyTheft(campaign, resources);
+
+            return;
+        }
+
+        // how many thefts should be rolled?
+        int originalTheftCount = 1;
+
+        if (campaign.getCampaignOptions().getTheftPartsDiceCount() != 0) {
+            originalTheftCount = Compute.d6(campaign.getCampaignOptions().getTheftPartsDiceCount());
+        }
+
+        boolean committingTheft = true;
+        int theftCount = originalTheftCount;
+        HashMap<String, Integer> stolenItems = new HashMap<>();
+
+        while (committingTheft) {
+            if (possibleTheftTargets.isEmpty()) {
+                if (stolenItems.isEmpty()) {
+                    processPettyTheft(campaign, resources);
+
+                    return;
+                }
+                committingTheft = false;
+                continue;
+            }
+
+            Part desiredPart = possibleTheftTargets.get(new Random().nextInt(possibleTheftTargets.size()));
+
+            boolean partStolen = false;
+
+            while (!partStolen) {
+                boolean hasParent = true;
+
+                while (hasParent) {
+                    if (desiredPart.getParentPart() != null) {
+                        possibleTheftTargets.remove(desiredPart);
+                        desiredPart = desiredPart.getParentPart();
+                    } else {
+                        hasParent = false;
+                    }
+                }
+
+                // if the part is in transit,
+                // we don't want to steal it, so we pick another item
+                if (desiredPart.getDaysToArrival() > 0) {
+                    possibleTheftTargets.remove(desiredPart);
+                    partStolen = true;
+                    continue;
+                } else if (desiredPart.getDaysToWait() > 0) {
+                    possibleTheftTargets.remove(desiredPart);
+                    partStolen = true;
+                    continue;
+                }
+
+                // if the part is being actively worked on,
+                // we don't want to steal it, so we pick another item
+                if (desiredPart.isBeingWorkedOn()) {
+                    possibleTheftTargets.remove(desiredPart);
+                    partStolen = true;
+                    continue;
+                }
+
+                // this is where we try to steal an item
+                if ((desiredPart instanceof AmmoStorage) || (desiredPart instanceof Armor)) {
+                    int roll = Compute.d6(3);
+
+                    if (campaign.getWarehouse().removePart(desiredPart, roll)) {
+                        theftCount--;
+                        possibleTheftTargets.remove(desiredPart);
+                        stolenItems.put(desiredPart.getName(), roll);
+                    } else {
+                        LogManager.getLogger().info("Part theft failed to steal ammo/armor ({})", desiredPart);
+                        partStolen = true;
+                        possibleTheftTargets.remove(desiredPart);
+                        continue;
+                    }
+                } else {
+                    if (campaign.getWarehouse().removePart(desiredPart, 1)) {
+                        theftCount--;
+                        possibleTheftTargets.remove(desiredPart);
+                        stolenItems.put(desiredPart.getName(), 1);
+                    } else {
+                        LogManager.getLogger().info("Part theft failed to steal part ({})", desiredPart);
+                        partStolen = true;
+                        possibleTheftTargets.remove(desiredPart);
+                        continue;
+                    }
+                }
+
+                partStolen = true;
+
+                if (theftCount == 0) {
+                    committingTheft = false;
+
+                    campaign.addReport(stolenItems.keySet().stream()
+                            .map(entry -> " [" + stolenItems.get(entry) + "x " + entry + ']')
+                            .collect(Collectors.joining(""
+                                    , resources.getString("desertionTheftParts.text")
+                                    , "")));
+                }
+            }
         }
     }
 
@@ -855,26 +990,25 @@ public class Morale {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Morale",
                 MekHQ.getMHQOptions().getLocale());
 
-        int morale = campaign.getMorale();
         int change = campaign.getCampaignOptions().getMoraleStepSize() * steps;
+        int oldMorale = campaign.getMorale();
+        int newMorale = MathUtility.clamp(campaign.getMorale() + change, 10, 70);
 
-        if ((change > 0) && (morale != 1)) {
-            campaign.setMorale(MathUtility.clamp(morale - (steps * campaign.getCampaignOptions().getMoraleStepSize()), 1, 7));
+        campaign.setMorale(newMorale);
+
+        if ((oldMorale / 10) != (newMorale / 10)) {
             getMoraleReport(campaign);
 
-            if ((morale >= 5) && ((morale + steps) < 5)) {
+            if ((oldMorale >= 50) && (newMorale < 50)) {
                 campaign.addReport(resources.getString("moraleReportRecovered.text"));
             }
-        } else if ((change < 0) && (morale != 7)) {
-            campaign.setMorale(MathUtility.clamp(morale + change, 1, 7));
-            getMoraleReport(campaign);
         }
     }
 
     private static void processMutiny(Campaign campaign,
                                       Person loyalistLeader, List<Person> loyalists,
                                       HashMap<Person, Integer> rebels,
-                                      List<Unit> unitList,
+                                      List<Unit> possibleTheftTargets,
                                       ResourceBundle resources) {
         // This prevents us from needing to do the full process for tiny mutinies that have no chance of success
         if ((loyalists.size() / 2) > rebels.size()) {
@@ -885,7 +1019,11 @@ public class Morale {
             }
 
             for (Person person : rebels.keySet()) {
-                processDesertion(campaign, person, rebels.get(person), getTargetNumber(campaign, true), unitList, resources);
+                possibleTheftTargets.remove(processDesertion(campaign,
+                        person,
+                        rebels.get(person),
+                        getTargetNumber(campaign, true),
+                        possibleTheftTargets, resources));
             }
 
             return;
