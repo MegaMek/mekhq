@@ -206,7 +206,11 @@ public class CustomizeScenarioDialog extends JDialog {
             setTitle(resourceMap.getString("title"));
         }
 
-        JPanel panMain = new JPanel(new GridBagLayout());
+        JTabbedPane panTabs = new JTabbedPane();
+
+        JPanel panBasic = new JPanel(new GridBagLayout());
+        JPanel panRewards = new JPanel(new GridLayout(2, 0));
+
         JPanel panInfo = new JPanel(new GridBagLayout());
         JPanel panWrite = new JPanel(new GridBagLayout());
         JPanel panBtn = new JPanel(new FlowLayout());
@@ -215,7 +219,7 @@ public class CustomizeScenarioDialog extends JDialog {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.WEST;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panInfo.add(new JLabel(resourceMap.getString("lblName.text")), gbc);
 
@@ -314,6 +318,7 @@ public class CustomizeScenarioDialog extends JDialog {
 
         initMapPanel(resourceMap);
         gbc.gridy++;
+        gbc.weighty = 1.0;
         panInfo.add(panMap, gbc);
 
         initObjectivesPanel(resourceMap);
@@ -331,11 +336,8 @@ public class CustomizeScenarioDialog extends JDialog {
                 BorderFactory.createEmptyBorder(5,5,5,5)));
 
         initOtherForcesPanel(resourceMap);
-        panOtherForces.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 0, 10, 0),
-                BorderFactory.createTitledBorder(resourceMap.getString("panOtherForces.title"))));
-        panOtherForces.setPreferredSize(new Dimension(600,250));
-        panOtherForces.setMinimumSize(new Dimension(600,250));
+        panOtherForces.setPreferredSize(new Dimension(600,300));
+        panOtherForces.setMinimumSize(new Dimension(600,300));
 
         txtDesc = new MarkdownEditorPanel(resourceMap.getString("txtDesc.title"));
         txtDesc.setText(scenario.getDescription());
@@ -396,43 +398,28 @@ public class CustomizeScenarioDialog extends JDialog {
         btnClose.addActionListener(this::btnCloseActionPerformed);
         panBtn.add(btnClose);
 
-        getContentPane().add(panMain, BorderLayout.CENTER);
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 0.0;
+        gbc.weighty = 1.0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.BOTH;
+        panBasic.add(panInfo, gbc);
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        panBasic.add(panWrite, gbc);
+
+        panRewards.add(panObjectives);
+        panRewards.add(panLoot);
+
+        panTabs.add(resourceMap.getString("panTab.basic"), panBasic);
+        panTabs.add(resourceMap.getString("panTab.rewards"), panRewards);
+        panTabs.add(resourceMap.getString("panTab.otherforces"), panOtherForces);
+
+        getContentPane().add(panTabs, BorderLayout.CENTER);
         getContentPane().add(panBtn, BorderLayout.PAGE_END);
-
-        JPanel panNW = new JPanel(new GridBagLayout());
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridheight = 2;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        panNW.add(panInfo, gbc);
-        gbc.gridx = 1;
-        gbc.gridheight = 1;
-        gbc.fill = GridBagConstraints.BOTH;
-        panNW.add(panObjectives, gbc);
-        gbc.gridy = 1;
-        panNW.add(panLoot, gbc);
-
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 0.0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.BOTH;
-        panMain.add(panNW, gbc);
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.gridheight = 2;
-        gbc.weighty = 1.0;
-        panMain.add(panWrite, gbc);
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridheight = 1;
-        panMain.add(panOtherForces, gbc);
 
         pack();
     }
