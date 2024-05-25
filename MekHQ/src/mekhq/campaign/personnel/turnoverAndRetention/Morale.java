@@ -1,10 +1,7 @@
 package mekhq.campaign.personnel.turnoverAndRetention;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.MechSummaryCache;
-import megamek.common.Mounted;
+import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -18,7 +15,6 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.MutinySupportDialog;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,7 +23,7 @@ import static megamek.common.EntityWeightClass.WEIGHT_LARGE_WAR;
 
 public class Morale {
     /**
-     * This method returns the Morale level as a string based on the value of the 'Morale' variable.
+     * This method returns the Morale level as a string based on the campaign's current morale.
      *
      * @return The Morale level as a string.
      * @throws IllegalStateException if the value of 'Morale' is unexpected.
@@ -36,61 +32,85 @@ public class Morale {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Morale",
                 MekHQ.getMHQOptions().getLocale());
 
-        double morale = campaign.getMorale();
+        int morale = campaign.getMorale() / 10;
 
-        if ((morale >= 10) && (morale < 20)) {
-            return resources.getString("moraleLevelUnbreakable.text");
-        } else if (morale < 30) {
-            return resources.getString("moraleLevelVeryHigh.text");
-        } else if (morale < 40) {
-            return resources.getString("moraleLevelHigh.text");
-        } else if (morale < 50) {
-            return resources.getString("moraleLevelNormal.text");
-        } else if (morale < 60) {
-            return resources.getString("moraleLevelLow.text");
-        } else if (morale < 70) {
-            return resources.getString("moraleLevelVeryLow.text");
-        } else if (morale == 70) {
-            return resources.getString("moraleLevelBroken.text");
+        switch (morale) {
+            case 1:
+                return resources.getString("moraleLevelUnbreakable.text");
+            case 2:
+                return resources.getString("moraleLevelVeryHigh.text");
+            case 3:
+                return resources.getString("moraleLevelHigh.text");
+            case 4:
+                return resources.getString("moraleLevelNormal.text");
+            case 5:
+                return resources.getString("moraleLevelLow.text");
+            case 6:
+                return resources.getString("moraleLevelVeryLow.text");
+            case 7:
+                return resources.getString("moraleLevelBroken.text");
+            default:
+                throw new IllegalStateException("Unexpected value in getMoraleLevel: " + morale);
         }
-
-        throw new IllegalStateException("Unexpected value in getMoraleLevel(): " + campaign.getMorale());
     }
 
     /**
-     * Returns the target number for a morale check based on the campaign morale level and desertion flag.
+     * Calculates the morale check target number based on the campaign's morale and the desertion flag.
      *
-     * @param campaign the current campaign
-     * @param isDesertion whether the target number is for a desertion check
-     * @return the base target number for morale
-     * @throws IllegalStateException if the campaign morale level is unexpected
+     * @param campaign    the current campaign
+     * @param isDesertion a flag indicating whether the target number is for desertion or not
+     * @return the calculated target number
+     * @throws IllegalStateException if the morale value is unexpected
      */
-    private static Integer getTargetNumber(Campaign campaign, boolean isDesertion) {
-        double morale = campaign.getMorale();
+    private static int getTargetNumber(Campaign campaign, boolean isDesertion) {
+        int morale = campaign.getMorale() / 10;
 
-        if ((morale >= 10) && (morale < 40)) {
-            return 0;
-        } else if (morale < 50) {
-            if (isDesertion) {
-                return 2;
-            } else {
-                return 0;
-            }
-        } else if (morale < 70) {
-            if (isDesertion) {
-                return 5;
-            } else {
-                return 4;
-            }
-        } else if (morale == 70) {
-            if (isDesertion) {
-                return 8;
-            } else {
-                return 7;
-            }
+        switch (morale) {
+            case 1:
+                if (isDesertion) {
+                    return 0;
+                } else {
+                    return -3;
+                }
+            case 2:
+                if (isDesertion) {
+                    return 1;
+                } else {
+                    return -2;
+                }
+            case 3:
+                if (isDesertion) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            case 4:
+                if (isDesertion) {
+                    return 2;
+                } else {
+                    return 0;
+                }
+            case 5:
+                if (isDesertion) {
+                    return 4;
+                } else {
+                    return 2;
+                }
+            case 6:
+                if (isDesertion) {
+                    return 5;
+                } else {
+                    return 4;
+                }
+            case 7:
+                if (isDesertion) {
+                    return 8;
+                } else {
+                    return 7;
+                }
+            default:
+                throw new IllegalStateException("Unexpected value in getTargetNumber: " + morale);
         }
-
-        throw new IllegalStateException("Unexpected value in getTargetNumber: " + campaign.getMorale());
     }
 
     /**
@@ -361,7 +381,15 @@ public class Morale {
         campaign.addReport(moraleReport.toString());
     }
 
+    /**
+     * Makes morale checks for personnel in a given campaign.
+     *
+     * @param campaign     the campaign in which to make the morale checks
+     * @param isDesertion  a boolean indicating if the checks are for desertion (true) or mutiny (false)
+     * @return true if someone has mutinied or deserted, false otherwise
+     */
     public static boolean makeMoraleChecks(Campaign campaign, boolean isDesertion) {
+        // we start with cases that cause not check to be needed
         if ((isDesertion) && (!campaign.getCampaignOptions().isUseDesertions())) {
             return false;
         } else if ((isDesertion) && (!campaign.getLocation().isOnPlanet())) {
@@ -370,88 +398,122 @@ public class Morale {
             return false;
         }
 
-        double targetNumber = getTargetNumber(campaign, isDesertion);
-
-        if (targetNumber == 0) {
-            return isDesertion;
-        }
+        // Next, we gather essential information, such as the target number,
+        // personnel list, unit list (if unit theft is enabled, and mean loyalty score
+        int targetNumber = getTargetNumber(campaign, isDesertion);
 
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Morale",
                 MekHQ.getMHQOptions().getLocale());
 
-        List<Person> filteredPersonnel = new ArrayList<>();
-        int loyalty = 0;
+        List<Person> filteredPersonnel = campaign.getActivePersonnel().stream()
+                .filter(person -> (person.getPrisonerStatus().isFree()) || (!isDesertion))
+                .filter(person -> !person.isChild(campaign.getLocalDate()))
+                .collect(Collectors.toList());
 
-        for (Person person : campaign.getActivePersonnel()) {
-            if ((person.getPrisonerStatus().isFree()) || (!isDesertion)) {
-                filteredPersonnel.add(person);
-                loyalty += person.getLoyalty();
-            }
-        }
+        int meanLoyalty = getMeanLoyalty(campaign, isDesertion);
 
-        if ((!filteredPersonnel.isEmpty()) && (campaign.getCampaignOptions().getForceReliabilityMethod().isLoyalty())) {
-            loyalty = MathUtility.clamp(loyalty / filteredPersonnel.size(), -3, 3);
-        } else {
-            loyalty = 0;
-        }
+        List<Unit> possibleTheftTargets = new ArrayList<>();
 
-        ArrayList<Unit> theftTargets = new ArrayList<>();
-
-        if (isDesertion) {
-            theftTargets = campaign.getHangar().getUnits().stream()
-                    .filter(unit -> (!unit.isDamaged()) && (!unit.isDeployed()) && (!unit.getEntity().isLargeCraft()) && (!unit.getEntity().isWarShip()))
+        if (campaign.getCampaignOptions().isUseTheftUnit()) {
+            possibleTheftTargets = campaign.getHangar().getUnits().stream()
+                    .filter(unit ->
+                            (!unit.isDamaged())
+                            && (!unit.isDeployed())
+                            && (!unit.getEntity().isLargeCraft())
+                            && (!unit.getEntity().isWarShip())
+                    )
                     .collect(Collectors.toCollection(ArrayList::new));
         }
 
-        boolean someoneHasDeserted = false;
-        boolean someoneHasMutinied = false;
-
-        List<Person> loyalists = new ArrayList<>();
+        // Here we identify who the loyalist commander is
         Person loyalistLeader = campaign.getFlaggedCommander();
 
         // if there is no Commander, we assume the highest ranked person is the loyalist leader
         if (loyalistLeader == null) {
-            campaign.getHighestRankedPerson(filteredPersonnel, true);
+            loyalistLeader = campaign.getHighestRankedPerson(filteredPersonnel, true);
         }
 
+        // Next we perform the actual checks, building a list of loyalists and rebels (if relevant)
+        List<Person> loyalists = new ArrayList<>();
         HashMap<Person, Integer> rebels = new HashMap<>();
 
-        for (Person person : filteredPersonnel) {
-            // the loyalistLeader can't rebel against themselves
-            if (Objects.equals(person, loyalistLeader)) {
-                loyalists.add(person);
-                continue;
-            }
+        boolean someoneHasDeserted = false;
+        boolean someoneHasMutinied = false;
 
-            int modifier = getMoraleCheckModifiers(campaign, person, isDesertion, loyalty);
+        for (Person person : filteredPersonnel) {
+            int modifier = getMoraleCheckModifiers(campaign, person, isDesertion, meanLoyalty);
 
             int firstRoll = Compute.d6(2) + modifier;
-            int secondRoll = 0;
+            int secondRoll = Compute.d6(2) + modifier;
 
             if (isDesertion) {
-                secondRoll = Compute.d6(2) + modifier;
-            }
-
-            if ((firstRoll <= targetNumber) && (secondRoll <= targetNumber)) {
-                if (isDesertion) {
-                    if ((processDesertion(campaign, person, secondRoll, targetNumber, theftTargets, resources))
-                            && (!someoneHasDeserted)) {
-                        someoneHasDeserted = true;
-                    }
-                } else {
-                    rebels.put(person, firstRoll);
-                    someoneHasMutinied = true;
+                if ((firstRoll < targetNumber) && (secondRoll < targetNumber)) {
+                    possibleTheftTargets = processDesertion(campaign, person, secondRoll, targetNumber, possibleTheftTargets, resources);
+                    someoneHasDeserted = true;
                 }
             } else {
-                loyalists.add(person);
+                if (firstRoll < targetNumber) {
+                    if (person.getUnit() != null) {
+                        if ((person.getUnit().getCrew().contains(loyalistLeader)) && (person.isCommander())) {
+                            loyalists.addAll(person.getUnit().getCrew());
+                        } else if (person.isCommander()) {
+                            for (Person crew : person.getUnit().getCrew()) {
+                                if (person.isCommander()) {
+                                    rebels.put(person, firstRoll);
+                                } else {
+                                    rebels.put(crew, targetNumber - Compute.d6(1));
+                                }
+                            }
+                        }
+                    } else {
+                        rebels.put(person, firstRoll);
+                    }
+
+                    someoneHasMutinied = true;
+                } else {
+                    if ((person.getUnit() != null) && (person.isCommander())) {
+                        loyalists.addAll(person.getUnit().getCrew());
+                    } else if (person.getUnit() == null) {
+                        loyalists.add(person);
+                    }
+                }
             }
         }
 
-        if (someoneHasMutinied) {
-            processMutiny(campaign, loyalistLeader, loyalists, rebels, theftTargets, resources);
+        // the rolls made, we check whether a mutiny or desertion has occurred and if so, process it
+        if (someoneHasDeserted) {
             return true;
+        } else if (someoneHasMutinied) {
+            processMutiny(campaign, loyalistLeader, loyalists, rebels, possibleTheftTargets, resources);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Calculates the mean loyalty of active personnel in a campaign.
+     *
+     * @param campaign the active personnel
+     * @param isDesertion true if desertions should be included in the calculation, false otherwise
+     * @return the mean loyalty of the active personnel in the campaign
+     */
+    private static int getMeanLoyalty(Campaign campaign, boolean isDesertion) {
+        int loyalty = campaign.getActivePersonnel().stream()
+                .filter(person -> (person.getPrisonerStatus().isFree()) || (!isDesertion))
+                .filter(person -> person.isChild(campaign.getLocalDate()))
+                .mapToInt(Person::getLoyalty)
+                .sum();
+
+        long personnel = campaign.getActivePersonnel().stream()
+                .filter(person -> (person.getPrisonerStatus().isFree()) || (!isDesertion))
+                .filter(person -> person.isChild(campaign.getLocalDate()))
+                .count();
+
+        if (personnel == 0) {
+            return 0;
         } else {
-            return someoneHasDeserted;
+            return (int) (loyalty / personnel);
         }
     }
 
@@ -462,13 +524,12 @@ public class Morale {
      * @param person         the potential deserter
      * @param roll           the desertion roll result
      * @param targetNumber   the target number for desertion=
-     * @param unitList       the list of units
+     * @param possibleTheftTargets       the list of units
      * @param resources      the resource bundle for localized messages
-     * @return true if desertion occurred, false otherwise
      */
-    private static boolean processDesertion(Campaign campaign, Person person, int roll, double targetNumber,
-                                            ArrayList<Unit> unitList, ResourceBundle resources) {
-        double morale = campaign.getMorale();
+    private static List<Unit> processDesertion(Campaign campaign, Person person, int roll, int targetNumber,
+                                          List<Unit> possibleTheftTargets, ResourceBundle resources) {
+        int morale = campaign.getMorale();
 
         if (roll <= (targetNumber - 2)) {
             if (campaign.getCampaignOptions().isUseRuleWithIronFist()) {
@@ -484,23 +545,20 @@ public class Morale {
                 }
 
                 // check for theft
-                LogManager.getLogger().info(((roll + 3) < morale) && (campaign.getCampaignOptions().isUseTheftMoney()));
-                if (((roll + 5) < morale) && (campaign.getCampaignOptions().isUseTheftUnit())) {
-                    processUnitTheft(campaign, person, unitList, resources);
+                if (((roll + 5) < morale) && (campaign.getCampaignOptions().isUseTheftUnit()) && (!possibleTheftTargets.isEmpty())) {
+                    possibleTheftTargets.remove(processUnitThefts(campaign, possibleTheftTargets, resources));
                 } else if (((roll + 4) < morale) && (campaign.getCampaignOptions().isUseTheftMoney())) {
                     processMoneyTheft(campaign, resources);
                 } else if ((roll + 3) < morale) {
-                    processPettyTheft(campaign, person, resources);
+                    processPettyTheft(campaign, resources);
                 }
-
-                return true;
             }
         }
 
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.AWOL);
         person.setAwolDays(Compute.d6(2));
 
-        return false;
+        return possibleTheftTargets;
     }
 
     /**
@@ -511,7 +569,7 @@ public class Morale {
      * @param person The person whose original unit is to be reclaimed
      * @return 0 if the original unit is removed successfully, or an integer if removal fails
      */
-    private static double reclaimOriginalUnit(Campaign campaign, Person person) {
+    private static int reclaimOriginalUnit(Campaign campaign, Person person) {
         UUID originalUnitId = person.getOriginalUnitId();
         int originalUnitWeight = person.getOriginalUnitWeight();
 
@@ -522,7 +580,7 @@ public class Morale {
 
         if (!campaign.getUnit(originalUnitId).isDeployed()) {
             try {
-                campaign.getHangar().removeUnit(person.getOriginalUnitId());
+                campaign.removeUnit(person.getOriginalUnitId());
                 return 0;
             } catch (Exception e) {
                 return originalUnitWeight;
@@ -533,36 +591,44 @@ public class Morale {
     }
 
     /**
-     * Processes unit theft.
+     * Processes unit thefts during a campaign.
      *
-     * @param campaign   the current campaign
-     * @param person     the person committing the theft
-     * @param unitList   the list of stealable units
-     * @param resources  the resource bundle for localization
+     * @param campaign               The campaign in which the unit thefts occur.
+     * @param possibleTheftTargets   The list of units that can be stolen.
+     * @param resources              The resource bundle for internationalization.
+     * @return A list of stolen units.
      */
-    private static void processUnitTheft(Campaign campaign, Person person, ArrayList<Unit> unitList, ResourceBundle resources) {
-        Unit desiredUnit = unitList.get(new Random().nextInt(unitList.size()));
+    private static Unit processUnitThefts(Campaign campaign, List<Unit> possibleTheftTargets, ResourceBundle resources) {
+        // if there is nothing left to steal, downgrade the theft
+        if (possibleTheftTargets.isEmpty()) {
+            if (campaign.getCampaignOptions().isUseTheftMoney()) {
+                processMoneyTheft(campaign, resources);
+            } else {
+                processPettyTheft(campaign, resources);
+            }
 
-        StringBuilder unitName = new StringBuilder(desiredUnit.getName());
-
-        if (!Objects.equals(desiredUnit.getFluffName(), "")) {
-            unitName.append(' ').append(desiredUnit.getFluffName());
+            return null;
         }
 
-        if ((campaign.getCampaignOptions().isUseAtB()) && (!campaign.getFaction().isClan()) && (Compute.d6(1) >= 3)) {
+        // process the theft
+        Unit stolenUnit = possibleTheftTargets.get(new Random().nextInt(possibleTheftTargets.size()));
+
+        if ((campaign.getCampaignOptions().isUseAtB()) && (!campaign.getFaction().isClan()) && (Compute.d6(1) >= 1)) {
+            int stolenUnitType = stolenUnit.getEntity().getUnitType();
+            String stolenUnitShortNameRaw = stolenUnit.getEntity().getShortNameRaw();
+
             campaign.getUnitMarket().addSingleUnit(campaign,
                     UnitMarketType.BLACK_MARKET,
-                    desiredUnit.getEntity().getUnitType(),
-                    MechSummaryCache.getInstance().getMech(desiredUnit.getEntity().getShortNameRaw()),
+                    stolenUnitType,
+                    MechSummaryCache.getInstance().getMech(stolenUnitShortNameRaw),
                     50);
 
-            campaign.addReport(person.getFullName() + ' ' + String.format(resources.getString("desertionTheftBlackMarket.text"), unitName));
+            campaign.addReport(String.format(resources.getString("desertionTheftBlackMarket.text"), stolenUnit));
         } else {
-            campaign.addReport(person.getFullName() + ' ' + String.format(resources.getString("desertionTheft.text"), unitName));
+            campaign.addReport(String.format(resources.getString("desertionTheft.text"), stolenUnit));
         }
 
-        campaign.removeUnit(desiredUnit.getId());
-        unitList.remove(desiredUnit);
+        return stolenUnit;
     }
 
     /**
@@ -574,30 +640,7 @@ public class Morale {
     private static void processMoneyTheft(Campaign campaign, ResourceBundle resources) {
         int theftPercentage = campaign.getCampaignOptions().getTheftValue();
 
-        switch(Compute.d6(2)) {
-            case 2:
-                theftPercentage += 3;
-                break;
-            case 3:
-                theftPercentage += 2;
-                break;
-            case 4:
-            case 5:
-                theftPercentage++;
-                break;
-            case 9:
-                theftPercentage--;
-                break;
-            case 10:
-            case 11:
-                theftPercentage -= 2;
-                break;
-            case 12:
-                theftPercentage -= 3;
-                break;
-            default:
-                break;
-        }
+        theftPercentage += getPercentageModifier();
 
         Money theft = campaign.getFunds()
                 .multipliedBy(theftPercentage)
@@ -614,14 +657,53 @@ public class Morale {
     }
 
     /**
+     * Gets the percentage modifier based on a roll of two six-sided dice.
+     *
+     * @return the percentage modifier based on the dice roll:
+     *         - 3 for a roll of 2
+     *         - 2 for a roll of 3
+     *         - 1 for a roll of 4 or 5
+     *         - 0 for a roll of 6, 7, or 8
+     *         - -1 for a roll of 9
+     *         - -2 for a roll of 10 or 11
+     *         - -3 for a roll of 12
+     * @throws IllegalStateException if the roll is unexpected
+     */
+    private static int getPercentageModifier() {
+        int roll = Compute.d6(2);
+
+        switch(roll) {
+            case 2:
+                return 3;
+            case 3:
+                return 2;
+            case 4:
+            case 5:
+                return 1;
+            case 6:
+            case 7:
+            case 8:
+                return 0;
+            case 9:
+                return -1;
+            case 10:
+            case 11:
+                return -2;
+            case 12:
+                return -3;
+            default:
+                throw new IllegalStateException("Unexpected value in getPercentageModifier: " + roll);
+        }
+    }
+
+    /**
      * This method is used to process a petty theft incident in a company.
      * It randomly selects an item from a list of stolen items and adds the item to the campaign report.
      *
      * @param campaign   The campaign object to add the report to.
-     * @param person     The person committing the theft
      * @param resources  The ResourceBundle object to retrieve localized strings.
      */
-    private static void processPettyTheft(Campaign campaign, Person person, ResourceBundle resources) {
+    private static void processPettyTheft(Campaign campaign, ResourceBundle resources) {
         List<String> items = List.of(
                 "stapler.text",
                 "mascot.text",
@@ -638,7 +720,7 @@ public class Morale {
                 "marketingMaterials.text",
                 "trainingPresentations.text",
                 "softwareLicenses.text",
-                "employeeBelongings.text",
+                "rifle.text",
                 "financialRecords.text",
                 "employeeRecords.text",
                 "proprietarySoftware.text",
@@ -727,9 +809,10 @@ public class Morale {
                 "coffeeMachine.text",
                 "mug.text",
                 "toiletSeats.text",
-                "miniatures.text");
+                "miniatures.text",
+                "dropShip.text");
 
-        campaign.addReport(person.getFullName() + ' ' + String.format(resources.getString("desertionTheft.text"),
+        campaign.addReport(String.format(resources.getString("desertionTheft.text"),
                 resources.getString(items.get(new Random().nextInt(items.size())))));
     }
 
@@ -791,11 +874,10 @@ public class Morale {
     private static void processMutiny(Campaign campaign,
                                       Person loyalistLeader, List<Person> loyalists,
                                       HashMap<Person, Integer> rebels,
-                                      ArrayList<Unit> unitList,
+                                      List<Unit> unitList,
                                       ResourceBundle resources) {
-
         // This prevents us from needing to do the full process for tiny mutinies that have no chance of success
-        if ((loyalists.size() / 10) > rebels.size()) {
+        if ((loyalists.size() / 2) > rebels.size()) {
             if (rebels.size() > 1) {
                 campaign.addReport(String.format(resources.getString("mutinyThwartedPlural.text"), rebels.size()));
             } else {
@@ -813,11 +895,19 @@ public class Morale {
         List<Person> bystanders = new ArrayList<>();
 
         // The rebels have already picked their side, so we only need to process the loyalists
+        // This represents the mutineers gathering support
         Iterator<Person> iterator = loyalists.iterator();
 
         while (iterator.hasNext()) {
             Person person = iterator.next();
 
+            // The loyalist leader isn't allowed to rebel against themselves
+            if (person.equals(loyalistLeader)) {
+                continue;
+            }
+
+
+            // we then process everyone else
             int roll = Compute.d6(1);
             int civilWarTargetNumber = getCivilWarTargetNumber(campaign, person);
 
@@ -826,9 +916,7 @@ public class Morale {
 
                 iterator.remove();
                 bystanders.add(person);
-            }
-            else if (roll < (civilWarTargetNumber - 1)) {
-
+            } else if (roll < (civilWarTargetNumber - 1)) {
                 iterator.remove();
                 rebels.put(person, 0);
             }
@@ -839,7 +927,6 @@ public class Morale {
         // in which case we can assume they were persuaded into the role by the original mutineers
         Person rebelLeader = getRebelLeader(campaign, new ArrayList<>(rebels.keySet()));
 
-        // with the line drawn in the sand, we need to assess the forces available to each side
         HashMap<Unit, Integer> rebelUnits = getUnits(new ArrayList<>(rebels.keySet()), false);
         int rebelBv = rebelUnits.keySet().stream()
                 .mapToInt(unit -> unit.getEntity()
@@ -1118,7 +1205,6 @@ public class Morale {
         }
         return 4 + modifier;
     }
-
 
     /**
      * Retrieves the units that are eligible to participate in the civil war based on the provided personnel.

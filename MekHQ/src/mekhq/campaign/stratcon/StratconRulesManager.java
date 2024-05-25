@@ -1364,15 +1364,16 @@ public class StratconRulesManager {
     public static int calculateScenarioOdds(StratconTrackState track, AtBContract contract,
             boolean playerDeployingForce) {
         // rules:
-        // rout morale: 0%
+        // broken morale: 0%
         // very low morale: -10% when deploying forces to track, 0% attack
         // low morale: -5%
         // high morale: +5%
-        // invincible: special case, let's do +10% for now
+        // very high morale: +10%
+        // unbreakable: special case, let's do +15% for now
         int moraleModifier = 0;
 
         switch (contract.getMoraleLevel()) {
-            case ROUT:
+            case BROKEN:
                 return 0;
             case VERY_LOW:
                 if (playerDeployingForce) {
@@ -1390,7 +1391,7 @@ public class StratconRulesManager {
             case VERY_HIGH:
                 moraleModifier = 10;
                 break;
-            case INVINCIBLE:
+            case UNBREAKABLE:
                 moraleModifier = 15;
                 break;
             default:
