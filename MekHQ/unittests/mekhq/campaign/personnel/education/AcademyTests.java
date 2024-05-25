@@ -138,7 +138,7 @@ class AcademyTests {
         assertEquals(SkillType.S_ARTILLERY, Academy.skillParser("artillery"));
         assertEquals(SkillType.S_GUN_BA, Academy.skillParser("gunnery/battlesuit"));
         assertEquals(SkillType.S_GUN_PROTO, Academy.skillParser("gunnery/protomech"));
-        assertEquals(SkillType.S_SMALL_ARMS, Academy.skillParser("smallarms"));
+        assertEquals(SkillType.S_SMALL_ARMS, Academy.skillParser("small arms"));
         assertEquals(SkillType.S_ANTI_MECH, Academy.skillParser("anti-mech"));
         assertEquals(SkillType.S_TECH_MECH, Academy.skillParser("tech/mech"));
         assertEquals(SkillType.S_TECH_MECHANIC, Academy.skillParser("tech/mechanic"));
@@ -148,7 +148,7 @@ class AcademyTests {
         assertEquals(SkillType.S_ASTECH, Academy.skillParser("astech"));
         assertEquals(SkillType.S_DOCTOR, Academy.skillParser("doctor"));
         assertEquals(SkillType.S_MEDTECH, Academy.skillParser("medtech"));
-        assertEquals(SkillType.S_NAV, Academy.skillParser("hyperspacenavigation"));
+        assertEquals(SkillType.S_NAV, Academy.skillParser("hyperspace navigation"));
         assertEquals(SkillType.S_ADMIN, Academy.skillParser("administration"));
         assertEquals(SkillType.S_TACTICS, Academy.skillParser("tactics"));
         assertEquals(SkillType.S_STRATEGY, Academy.skillParser("strategy"));
