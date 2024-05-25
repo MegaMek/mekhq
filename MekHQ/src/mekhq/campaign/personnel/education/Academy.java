@@ -990,7 +990,7 @@ public class Academy implements Comparable<Academy> {
                 return SkillType.S_PILOT_AERO;
             case "gunnery/aerospace":
                 return SkillType.S_GUN_AERO;
-            case "piloting/groundvehicle":
+            case "piloting/ground vehicle":
                 return SkillType.S_PILOT_GVEE;
             case "piloting/vtol":
                 return SkillType.S_PILOT_VTOL;
