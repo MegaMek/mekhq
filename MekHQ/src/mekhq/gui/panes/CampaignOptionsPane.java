@@ -358,7 +358,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseMoraleModifierForceReliability;
     private JCheckBox chkUseMoraleModifierCommanderSkill;
     private JCheckBox chkUseMoraleModifierLoyalty;
-    private JCheckBox chkUseRuleWithIronFist;
+    private JCheckBox chkUseMoraleModifierCabinFever;
+    private JLabel lblMoraleModifierLeadershipMethod;
+    private MMComboBox<LeadershipMethod> comboMoraleModifierLeadershipMethod;
 
     private JPanel turnoverAndRetentionMoraleTriggersPanel = new JPanel();
     private JCheckBox chkUseMoraleTriggerFieldControl;
@@ -5106,10 +5108,31 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMoraleModifierLoyalty.setName("chkUseMoraleModifierLoyalty");
         chkUseMoraleModifierLoyalty.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseManagementSkill()));
 
-        chkUseRuleWithIronFist = new JCheckBox(resources.getString("chkUseRuleWithIronFist.text"));
-        chkUseRuleWithIronFist.setToolTipText(resources.getString("chkUseRuleWithIronFist.toolTipText"));
-        chkUseRuleWithIronFist.setName("chkUseRuleWithIronFist");
-        chkUseRuleWithIronFist.setEnabled(isUseMorale);
+        chkUseMoraleModifierCabinFever = new JCheckBox(resources.getString("chkUseMoraleModifierCabinFever.text"));
+        chkUseMoraleModifierCabinFever.setToolTipText(resources.getString("chkUseMoraleModifierCabinFever.toolTipText"));
+        chkUseMoraleModifierCabinFever.setName("chkUseMoraleModifierCabinFever");
+        chkUseMoraleModifierCabinFever.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseManagementSkill()));
+
+        lblMoraleModifierLeadershipMethod = new JLabel(resources.getString("lblMoraleModifierLeadershipMethod.text"));
+        lblMoraleModifierLeadershipMethod.setToolTipText(resources.getString("lblMoraleModifierLeadershipMethod.toolTipText"));
+        lblMoraleModifierLeadershipMethod.setName("lblMoraleModifierLeadershipMethod");
+        lblMoraleModifierLeadershipMethod.setEnabled(isUseMorale);
+
+        comboMoraleModifierLeadershipMethod = new MMComboBox<>("comboMoraleModifierLeadershipMethod", LeadershipMethod.values());
+        comboMoraleModifierLeadershipMethod.setToolTipText(resources.getString("lblMoraleModifierLeadershipMethod.toolTipText"));
+        comboMoraleModifierLeadershipMethod.setEnabled(isUseMorale);
+        comboMoraleModifierLeadershipMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof LeadershipMethod) {
+                    list.setToolTipText(((LeadershipMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
 
         turnoverAndRetentionMoraleModifiersPanel.setName("turnoverAndRetentionMoraleModifiersPanel");
         turnoverAndRetentionMoraleModifiersPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionMoraleModifiersPanel.title")));
@@ -5131,7 +5154,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseMoraleModifierForceReliability)
                         .addComponent(chkUseMoraleModifierCommanderSkill)
                         .addComponent(chkUseMoraleModifierLoyalty)
-                        .addComponent(chkUseRuleWithIronFist)
+                        .addComponent(chkUseMoraleModifierCabinFever)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblMoraleModifierLeadershipMethod)
+                                .addComponent(comboMoraleModifierLeadershipMethod, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -5145,7 +5171,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseMoraleModifierForceReliability)
                         .addComponent(chkUseMoraleModifierCommanderSkill)
                         .addComponent(chkUseMoraleModifierLoyalty)
-                        .addComponent(chkUseRuleWithIronFist)
+                        .addComponent(chkUseMoraleModifierCabinFever)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMoraleModifierLeadershipMethod)
+                                .addComponent(comboMoraleModifierLeadershipMethod))
         );
 
         return turnoverAndRetentionMoraleModifiersPanel;
@@ -8337,7 +8366,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMoraleTriggerDesertion.setSelected(options.isUseMoraleTriggerDesertion());
         chkUseMoraleTriggerMutiny.setSelected(options.isUseMoraleTriggerMutiny());
         chkUseMoraleTriggerFatigue.setSelected(options.isUseMoraleTriggerFatigue());
-        chkUseMoraleTriggerMissedPayDay.setSelected(options.isUseMoraleModifierMissedPayDay());
+        chkUseMoraleTriggerMissedPayDay.setSelected(options.isUseMoraleTriggerMissedPayDay());
 
         chkUseMoraleModifierExperienceLevel.setSelected(options.isUseMoraleModifierExperienceLevel());
         chkUseMoraleModifierFaction.setSelected(options.isUseMoraleModifierFaction());
@@ -8345,7 +8374,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMoraleModifierForceReliability.setSelected(options.isUseMoraleModifierForceReliability());
         chkUseMoraleModifierCommanderSkill.setSelected(options.isUseMoraleModifierCommanderLeadership());
         chkUseMoraleModifierLoyalty.setSelected(options.isUseMoraleModifierLoyalty());
-        chkUseRuleWithIronFist.setSelected(options.isUseRuleWithIronFist());
+        chkUseMoraleModifierCabinFever.setSelected(options.isUseMoraleModifierCabinFever());
+        comboMoraleModifierLeadershipMethod.setSelectedItem(options.getCustomMoraleModifier());
         //endregion Turnover and Retention Tab
 
         //region Life Paths Tab
@@ -9034,7 +9064,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseMoraleTriggerDesertion(chkUseMoraleTriggerDesertion.isSelected());
             options.setUseMoraleTriggerMutiny(chkUseMoraleTriggerMutiny.isSelected());
             options.setUseMoraleTriggerFatigue(chkUseMoraleTriggerFatigue.isSelected());
-            options.setUseMoraleModifierMissedPayDay(chkUseMoraleTriggerMissedPayDay.isSelected());
+            options.setUseMoraleTriggerMissedPayDay(chkUseMoraleTriggerMissedPayDay.isSelected());
 
             options.setCustomMoraleModifier((Integer) spnCustomMoraleModifier.getValue());
             options.setUseMoraleModifierExperienceLevel(chkUseMoraleModifierExperienceLevel.isSelected());
@@ -9043,7 +9073,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseMoraleModifierForceReliability(chkUseMoraleModifierForceReliability.isSelected());
             options.setUseMoraleModifierCommanderLeadership(chkUseMoraleModifierCommanderSkill.isSelected());
             options.setUseMoraleModifierLoyalty(chkUseMoraleModifierLoyalty.isSelected());
-            options.setUseRuleWithIronFist(chkUseRuleWithIronFist.isSelected());
+            options.setUseMoraleModifierCabinFever(chkUseMoraleModifierCabinFever.isSelected());
+            options.setMoraleModifierLeadershipMethod(comboMoraleModifierLeadershipMethod.getSelectedItem());
             //endregion Turnover and Retention
 
             //region Life Paths Tab

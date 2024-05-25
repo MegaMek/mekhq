@@ -331,7 +331,7 @@ public class CampaignOptions {
     private boolean useMoraleTriggerDesertion;
     private boolean useMoraleTriggerMutiny;
     private boolean useMoraleTriggerFatigue;
-    private boolean useMoraleModifierMissedPayDay;
+    private boolean useMoraleTriggerMissedPayDay;
 
     private int customMoraleModifier;
     private boolean useMoraleModifierExperienceLevel;
@@ -340,7 +340,8 @@ public class CampaignOptions {
     private boolean useMoraleModifierForceReliability;
     private boolean useMoraleModifierCommanderLeadership;
     private boolean useMoraleModifierLoyalty;
-    private boolean useRuleWithIronFist;
+    private boolean useMoraleModifierCabinFever;
+    private LeadershipMethod moraleModifierLeadershipMethod;
 
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
@@ -1025,6 +1026,7 @@ public class CampaignOptions {
         setUseMoraleTriggerDesertion(true);
         setUseMoraleTriggerMutiny(true);
         setUseMoraleTriggerFatigue(true);
+        setUseMoraleTriggerMissedPayDay(true);
 
         setUseMoraleModifierExperienceLevel(true);
         setUseMoraleModifierFaction(true);
@@ -1032,8 +1034,8 @@ public class CampaignOptions {
         setUseMoraleModifierForceReliability(true);
         setUseMoraleModifierCommanderLeadership(true);
         setUseMoraleModifierLoyalty(true);
-        setUseMoraleModifierMissedPayDay(true);
-        setUseRuleWithIronFist(false);
+        setUseMoraleModifierCabinFever(true);
+        setMoraleModifierLeadershipMethod(LeadershipMethod.MERCENARY);
         //endregion Turnover and Retention
 
         //region Finances Tab
@@ -1663,14 +1665,6 @@ public class CampaignOptions {
         this.useMutinies = useMutinies;
     }
 
-    public boolean isUseRuleWithIronFist() {
-        return useRuleWithIronFist;
-    }
-
-    public void setUseRuleWithIronFist(final boolean useRuleWithIronFist) {
-        this.useRuleWithIronFist = useRuleWithIronFist;
-    }
-
     public Integer getCustomMoraleModifier() {
         return customMoraleModifier;
     }
@@ -1711,12 +1705,29 @@ public class CampaignOptions {
         this.useMoraleModifierLoyalty = useMoraleModifierLoyalty;
     }
 
-    public boolean isUseMoraleModifierMissedPayDay() {
-        return useMoraleModifierMissedPayDay;
+    public boolean isUseMoraleModifierCabinFever() {
+        return useMoraleModifierCabinFever;
     }
 
-    public void setUseMoraleModifierMissedPayDay(final boolean useMoraleModifierMissedPayDay) {
-        this.useMoraleModifierMissedPayDay = useMoraleModifierMissedPayDay;
+    public void setUseMoraleModifierCabinFever(final boolean useMoraleModifierCabinFever) {
+        this.useMoraleModifierCabinFever = useMoraleModifierCabinFever;
+    }
+
+    public LeadershipMethod getMoraleModifierLeadershipMethod() {
+        return moraleModifierLeadershipMethod;
+    }
+
+    public void setMoraleModifierLeadershipMethod(final LeadershipMethod moraleModifierLeadershipMethod) {
+        this.moraleModifierLeadershipMethod = moraleModifierLeadershipMethod;
+    }
+
+
+    public boolean isUseMoraleTriggerMissedPayDay() {
+        return useMoraleTriggerMissedPayDay;
+    }
+
+    public void setUseMoraleTriggerMissedPayDay(final boolean useMoraleTriggerMissedPayDay) {
+        this.useMoraleTriggerMissedPayDay = useMoraleTriggerMissedPayDay;
     }
 
     public boolean isUseMoraleTriggerFatigue() {
@@ -4775,7 +4786,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleTriggerDesertion", isUseMoraleTriggerDesertion());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleTriggerMutiny", isUseMoraleTriggerMutiny());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleTriggerFatigue", isUseMoraleTriggerFatigue());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chkUseMoraleTriggerMissedPayDay", isUseMoraleModifierMissedPayDay());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chkUseMoraleTriggerMissedPayDay", isUseMoraleTriggerMissedPayDay());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierExperienceLevel", isUseMoraleModifierExperienceLevel());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierFaction", isUseMoraleModifierFaction());
@@ -4783,7 +4794,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierForceReliability", isUseMoraleModifierForceReliability());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierCommanderLeadership", isUseMoraleModifierCommanderLeadership());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierLoyalty", isUseMoraleModifierLoyalty());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRuleWithIronFist", isUseRuleWithIronFist());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierCabinFever", isUseMoraleModifierCabinFever());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleModifierLeadershipMethod", getMoraleModifierLeadershipMethod().name());
         //endregion Retirement
 
         //region Family
@@ -5822,10 +5834,12 @@ public class CampaignOptions {
                     retVal.setUseMoraleModifierCommanderLeadership(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierLoyalty")) {
                     retVal.setUseMoraleModifierLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierCabinFever")) {
+                    retVal.setUseMoraleModifierCabinFever(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMissedPayDay")) {
-                    retVal.setUseMoraleModifierMissedPayDay(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRuleWithIronFist")) {
-                    retVal.setUseRuleWithIronFist(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    retVal.setUseMoraleTriggerMissedPayDay(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("moraleModifierLeadershipMethod")) {
+                    retVal.setMoraleModifierLeadershipMethod(LeadershipMethod.valueOf(wn2.getTextContent().trim()));
                 //endregion Turnover and Retention
 
                 //region Finances Tab

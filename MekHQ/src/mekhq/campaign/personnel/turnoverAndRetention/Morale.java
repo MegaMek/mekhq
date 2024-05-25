@@ -1,7 +1,10 @@
 package mekhq.campaign.personnel.turnoverAndRetention;
 
 import megamek.codeUtilities.MathUtility;
-import megamek.common.*;
+import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.MechSummaryCache;
+import megamek.common.Mounted;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -181,9 +184,26 @@ public class Morale {
             modifier += getLoyaltyModifier(isDesertion, person.getLoyalty());
         }
 
-        // Iron Fist Modifier
-        if (campaign.getCampaignOptions().isUseRuleWithIronFist()) {
-            modifier++;
+        // Leadership Method Modifier
+        switch (campaign.getCampaignOptions().getMoraleModifierLeadershipMethod()) {
+            case MERCENARY:
+                break;
+            case FAMILY:
+                if (isDesertion) {
+                    modifier--;
+                } else {
+                    modifier++;
+                }
+                break;
+            case GREEN:
+                if (isDesertion) {
+                    modifier--;
+                }
+                break;
+            case ELITE:
+            case IRON_FIST:
+                modifier++;
+                break;
         }
 
         return modifier;
@@ -540,8 +560,8 @@ public class Morale {
         int morale = campaign.getMorale();
 
         if (roll <= (targetNumber - 2)) {
-            if (campaign.getCampaignOptions().isUseRuleWithIronFist()) {
-                morale -= 1;
+            if (campaign.getCampaignOptions().getMoraleModifierLeadershipMethod().isIronFist()) {
+                morale -= 2;
             }
 
             if (roll <= (morale - 2)) {
@@ -1318,8 +1338,8 @@ public class Morale {
     private static int getCivilWarTargetNumber(Campaign campaign, Person person) {
         int modifier = 0;
 
-        if (campaign.getCampaignOptions().isUseRuleWithIronFist()) {
-            modifier++;
+        if (campaign.getCampaignOptions().getMoraleModifierLeadershipMethod().isIronFist()) {
+            modifier += 2;
         }
 
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
