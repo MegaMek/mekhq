@@ -341,8 +341,9 @@ public class PersonViewPanel extends JScrollablePanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
-                int awardTierCount = person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize();
-                // Due to how mhq handles awards, this is going to give us one long string that contains all the filenames
+                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
+                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
+
                 String ribbonFileName = award.getRibbonFileName(awardTierCount);
 
                 ribbon = (Image) MHQStaticDirectoryManager.getAwardIcons()
@@ -392,7 +393,9 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image medal;
             try {
-                int awardTierCount = person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize();
+                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
+                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
+
                 String medalFileName = award.getMedalFileName(awardTierCount);
 
                 medal = (Image) MHQStaticDirectoryManager.getAwardIcons()
@@ -439,7 +442,9 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image miscAward;
             try {
-                int awardTierCount = person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize();
+                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
+                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
+
                 String miscFileName = award.getMiscFileName(awardTierCount);
 
                 Image miscAwardBufferedImage = (Image) MHQStaticDirectoryManager.getAwardIcons()
