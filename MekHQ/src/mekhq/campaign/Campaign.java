@@ -72,6 +72,7 @@ import mekhq.campaign.personnel.death.AbstractDeath;
 import mekhq.campaign.personnel.death.DisabledRandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -86,11 +87,11 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -1612,6 +1613,16 @@ public class Campaign implements ITechManager {
     public List<Person> getActivePersonnel() {
         return getPersonnel().stream()
                 .filter(p -> p.getStatus().isActive())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Provides a filtered list of personnel including only Persons with the Student status.
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getStudents() {
+        return getPersonnel().stream()
+                .filter(p -> p.getStatus().isStudent())
                 .collect(Collectors.toList());
     }
     //endregion Other Personnel Methods
@@ -3507,6 +3518,10 @@ public class Campaign implements ITechManager {
 
         processNewDayPersonnel();
 
+        if (campaignOptions.isUseEducationModule()) {
+            EducationController.processNewDay(this);
+        }
+
         resetAstechMinutes();
 
         processNewDayUnits();
@@ -4859,6 +4874,23 @@ public class Campaign implements ITechManager {
         }
 
         return totalCost;
+    }
+
+    /**
+     * Calculates simplified travel time.
+     * Travel time is calculated by dividing distance (in LY) by 20 and multiplying the result by 7.
+     *
+     * @param destination the planetary system being traveled to
+     * @return the simplified travel time in days
+     */
+    public int getSimplifiedTravelTime(PlanetarySystem destination) {
+        if (Objects.equals(getCurrentSystem(), destination)) {
+            return 0;
+        } else {
+            // I came to the value of 20 by eyeballing the average distance between planets within the Inner Sphere.
+            // It looked to be around 15-20LY, so 20LY seemed a good gauge
+            return (int) ((getCurrentSystem().getDistanceTo(destination) / 20) * 7);
+        }
     }
 
     public void personUpdated(Person p) {

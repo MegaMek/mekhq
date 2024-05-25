@@ -28,6 +28,8 @@ import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -1223,6 +1225,16 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblEdgeAvail1 = new JLabel();
         JLabel lblEdgeAvail2 = new JLabel();
 
+        // education
+        JLabel lblEducationLevel1 = new JLabel();
+        JLabel lblEducationLevel2 = new JLabel();
+        JLabel lblEducationTravelTo1 = new JLabel();
+        JLabel lblEducationTravelTo2 = new JLabel();
+        JLabel lblEducationDays1 = new JLabel();
+        JLabel lblEducationDays2 = new JLabel();
+        JLabel lblEducationTravelFrom1 = new JLabel();
+        JLabel lblEducationTravelFrom2 = new JLabel();
+
         GridBagConstraints gridBagConstraints;
 
         JLabel lblName;
@@ -1394,6 +1406,112 @@ public class PersonViewPanel extends JScrollablePanel {
             gridBagConstraints.fill = GridBagConstraints.NONE;
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlSkills.add(lblTough2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            lblEducationLevel1.setName("lblEducationLevel1");
+            lblEducationLevel1.setText(resourceMap.getString("lblEducationLevel1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationLevel1, gridBagConstraints);
+
+            lblEducationLevel2.setName("lblEducationLevel2");
+            lblEducationLevel2.setText(String.valueOf(person.getEduHighestEducation()));
+            lblEducationLevel1.setLabelFor(lblEducationLevel2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationLevel2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if ((campaign.getCampaignOptions().isUseEducationModule()) && (person.getEduDaysOfTravelToAcademy() > 0)) {
+            lblEducationTravelTo1.setName("lblEducationTravelTo1");
+            lblEducationTravelTo1.setText(resourceMap.getString("lblEducationTravelTo1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationTravelTo1, gridBagConstraints);
+
+            lblEducationTravelTo2.setName("lblEducationTravelTo2");
+            lblEducationTravelTo2.setText(String.valueOf(person.getEduDaysOfTravelToAcademy()) + ' ' + resourceMap.getString("lblEducationDurationDays.text"));
+            lblEducationTravelTo2.setLabelFor(lblEducationTravelTo2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationTravelTo2, gridBagConstraints);
+        }
+
+        if ((campaign.getCampaignOptions().isUseEducationModule()) && (person.getEduDaysOfEducation() > 0) && (person.getEduDaysOfTravelToAcademy() == 0)) {
+            lblEducationDays1.setName("lblEducationDays1");
+            lblEducationDays1.setText(resourceMap.getString("lblEducationDays1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationDays1, gridBagConstraints);
+
+            Academy academy = EducationController.getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+            lblEducationDays2.setName("lblEducationDays2");
+            if (academy.isPrepSchool()) {
+                lblEducationDays2.setText(String.valueOf(academy.getAgeMax()) + ' ' + resourceMap.getString("lblEducationDurationAge.text"));
+            } else {
+                lblEducationDays2.setText(String.valueOf(person.getEduDaysOfEducation()) + ' ' + resourceMap.getString("lblEducationDurationDays.text"));
+            }
+            lblEducationDays2.setLabelFor(lblEducationLevel2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationDays2, gridBagConstraints);
+        }
+
+        if ((campaign.getCampaignOptions().isUseEducationModule()) && (person.getEduDaysOfTravelFromAcademy() > 0)) {
+            lblEducationTravelFrom1.setName("lblEducationTravelFrom1");
+            lblEducationTravelFrom1.setText(resourceMap.getString("lblEducationTravelFrom1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationTravelFrom1, gridBagConstraints);
+
+            lblEducationTravelFrom2.setName("lblEducationTravelFrom2");
+            lblEducationTravelFrom2.setText(String.valueOf(person.getEduDaysOfTravelFromAcademy()) + ' ' + resourceMap.getString("lblEducationDurationDays.text"));
+            lblEducationTravelFrom2.setLabelFor(lblEducationTravelFrom2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblEducationTravelFrom2, gridBagConstraints);
         }
 
         return pnlSkills;
