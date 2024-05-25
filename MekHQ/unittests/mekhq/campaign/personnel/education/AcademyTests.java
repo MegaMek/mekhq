@@ -127,7 +127,7 @@ class AcademyTests {
         assertEquals(SkillType.S_GUN_MECH, Academy.skillParser("gunnery/mech"));
         assertEquals(SkillType.S_PILOT_AERO, Academy.skillParser("piloting/aerospace"));
         assertEquals(SkillType.S_GUN_AERO, Academy.skillParser("gunnery/aerospace"));
-        assertEquals(SkillType.S_PILOT_GVEE, Academy.skillParser("piloting/groundvehicle"));
+        assertEquals(SkillType.S_PILOT_GVEE, Academy.skillParser("piloting/ground vehicle"));
         assertEquals(SkillType.S_PILOT_VTOL, Academy.skillParser("piloting/vtol"));
         assertEquals(SkillType.S_PILOT_NVEE, Academy.skillParser("piloting/naval"));
         assertEquals(SkillType.S_GUN_VEE, Academy.skillParser("gunnery/vehicle"));
