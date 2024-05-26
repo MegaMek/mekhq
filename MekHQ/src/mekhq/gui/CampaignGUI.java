@@ -23,14 +23,14 @@ package mekhq.gui;
 
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.ui.preferences.*;
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.GameOptionsDialog;
 import megamek.client.ui.swing.UnitLoadingDialog;
 import megamek.client.ui.swing.dialog.AbstractUnitSelectorDialog;
 import megamek.client.ui.swing.util.UIUtil;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.enums.SkillLevel;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.*;
@@ -49,6 +49,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.AgeRangeRandomDeath;
 import mekhq.campaign.personnel.death.ExponentialRandomDeath;
 import mekhq.campaign.personnel.death.PercentageRandomDeath;
@@ -121,6 +122,7 @@ public class CampaignGUI extends JPanel {
     private JMenuItem miUnitMarket;
     private JMenuItem miShipSearch;
     private JMenuItem miRetirementDefectionDialog;
+    private JMenuItem miAwardEligibilityDialog;
     private JMenuItem miCompanyGenerator;
 
     private EnumMap<MHQTabType, CampaignGuiTab> standardTabs;
@@ -927,6 +929,13 @@ public class CampaignGUI extends JPanel {
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
 
+        miAwardEligibilityDialog = new JMenuItem(resourceMap.getString("miAwardEligibilityDialog.text"));
+        miAwardEligibilityDialog.setMnemonic(KeyEvent.VK_R);
+        miAwardEligibilityDialog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
+        miAwardEligibilityDialog.setVisible(getCampaign().getCampaignOptions().isEnableAutoAwards());
+        miAwardEligibilityDialog.addActionListener(evt -> showAwardEligibilityDialog());
+        menuView.add(miAwardEligibilityDialog);
+
         menuBar.add(menuView);
         //endregion View Menu
 
@@ -1204,6 +1213,12 @@ public class CampaignGUI extends JPanel {
         if (!rdd.wasAborted()) {
             getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
         }
+    }
+
+    public void showAwardEligibilityDialog() {
+        AutoAwardsController autoAwardsController = new AutoAwardsController();
+
+        autoAwardsController.ManualController(getCampaign());
     }
 
     private static void enableFullScreenMode(Window window) {
@@ -2415,6 +2430,11 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
+        if (new CargoCapacityNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
         if (new InsufficientAstechsNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
@@ -2471,6 +2491,7 @@ public class CampaignGUI extends JPanel {
         refreshPartsAvailability();
 
         miRetirementDefectionDialog.setVisible(!evt.getOptions().getRandomRetirementMethod().isNone());
+        miAwardEligibilityDialog.setVisible((evt.getOptions().isEnableAutoAwards()));
         miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }
 

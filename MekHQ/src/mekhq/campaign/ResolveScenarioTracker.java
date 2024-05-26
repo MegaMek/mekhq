@@ -37,6 +37,7 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.TestUnit;
@@ -1413,6 +1414,7 @@ public class ResolveScenarioTracker {
             for (Kill k : status.getKills()) {
                 getCampaign().addKill(k);
             }
+
             if (status.isMissing()) {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
@@ -1430,6 +1432,28 @@ public class ResolveScenarioTracker {
             if (status.toRemove()) {
                 getCampaign().removePerson(person, false);
             }
+        }
+
+        if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+            HashMap<UUID, Integer> personnel = new HashMap<>();
+
+            for (UUID personId : peopleStatus.keySet()) {
+                Person person = campaign.getPerson(personId);
+                PersonStatus status = peopleStatus.get(personId);
+                int injuryCount = 0;
+
+                if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
+                    if (status.getHits() > person.getHits()) {
+                        injuryCount = status.getHits() - person.getHits();
+                    }
+                }
+
+                personnel.put(personId, injuryCount);
+            }
+
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+
+            autoAwardsController.PostScenarioController(campaign, scenario.getId(), personnel);
         }
 
         //region Prisoners
@@ -1470,7 +1494,7 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);

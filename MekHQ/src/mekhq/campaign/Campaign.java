@@ -30,6 +30,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
+import megamek.common.equipment.BombMounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
@@ -71,6 +72,7 @@ import mekhq.campaign.personnel.death.AbstractDeath;
 import mekhq.campaign.personnel.death.DisabledRandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -85,11 +87,11 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
-import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.rating.UnitRatingMethod;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.stratcon.StratconContractInitializer;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.stratcon.StratconTrackState;
@@ -1611,6 +1613,16 @@ public class Campaign implements ITechManager {
     public List<Person> getActivePersonnel() {
         return getPersonnel().stream()
                 .filter(p -> p.getStatus().isActive())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Provides a filtered list of personnel including only Persons with the Student status.
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getStudents() {
+        return getPersonnel().stream()
+                .filter(p -> p.getStatus().isStudent())
                 .collect(Collectors.toList());
     }
     //endregion Other Personnel Methods
@@ -3157,6 +3169,7 @@ public class Campaign implements ITechManager {
             fatigueLevel -= 2;
         }
         fatigueLevel = Math.max(fatigueLevel, 0);
+        addReport("Your fatigue level is: " + fatigueLevel);
     }
 
     private void processNewDayATB() {
@@ -3504,6 +3517,10 @@ public class Campaign implements ITechManager {
         }
 
         processNewDayPersonnel();
+
+        if (campaignOptions.isUseEducationModule()) {
+            EducationController.processNewDay(this);
+        }
 
         resetAstechMinutes();
 
@@ -4859,6 +4876,23 @@ public class Campaign implements ITechManager {
         return totalCost;
     }
 
+    /**
+     * Calculates simplified travel time.
+     * Travel time is calculated by dividing distance (in LY) by 20 and multiplying the result by 7.
+     *
+     * @param destination the planetary system being traveled to
+     * @return the simplified travel time in days
+     */
+    public int getSimplifiedTravelTime(PlanetarySystem destination) {
+        if (Objects.equals(getCurrentSystem(), destination)) {
+            return 0;
+        } else {
+            // I came to the value of 20 by eyeballing the average distance between planets within the Inner Sphere.
+            // It looked to be around 15-20LY, so 20LY seemed a good gauge
+            return (int) ((getCurrentSystem().getDistanceTo(destination) / 20) * 7);
+        }
+    }
+
     public void personUpdated(Person p) {
         Unit u = p.getUnit();
         if (null != u) {
@@ -5625,7 +5659,7 @@ public class Campaign implements ITechManager {
         }
         IUnitRating rating = getUnitRating();
         return getCampaignOptions().getUnitRatingMethod().isFMMR() ? rating.getUnitRatingAsInteger()
-                : MathUtility.clamp(rating.getModifier(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
+                : MathUtility.clamp((rating.getModifier() / 3), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
     }
 
     /**
@@ -5742,23 +5776,22 @@ public class Campaign implements ITechManager {
         entity.setShutDown(false);
         entity.setSearchlightState(false);
 
-        if (entity.hasBAP()) {
-            entity.setNextSensor(entity.getSensors().lastElement());
-        } else if (!entity.getSensors().isEmpty()) {
-            entity.setNextSensor(entity.getSensors().firstElement());
+        if (!entity.getSensors().isEmpty()) {
+            if (entity.hasBAP()) {
+                entity.setNextSensor(entity.getSensors().lastElement());
+            } else {
+                entity.setNextSensor(entity.getSensors().firstElement());
+            }
         }
 
         if (entity instanceof IBomber) {
             IBomber bomber = (IBomber) entity;
-            List<Mounted> mountedBombs = bomber.getBombs();
+            List<BombMounted> mountedBombs = bomber.getBombs();
             if (!mountedBombs.isEmpty()) {
                 // These should return an int[] filled with 0's
                 int[] intBombChoices = bomber.getIntBombChoices();
                 int[] extBombChoices = bomber.getExtBombChoices();
-                for (Mounted m : mountedBombs) {
-                    if (!(m.getType() instanceof BombType)) {
-                        continue;
-                    }
+                for (BombMounted m : mountedBombs) {
                     if (m.getBaseShotsLeft() == 1) {
                         if (m.isInternalBomb()) {
                             intBombChoices[BombType.getBombTypeFromInternalName(m.getType().getInternalName())] += 1;
@@ -6817,8 +6850,8 @@ public class Campaign implements ITechManager {
             // FIXME : Localize
             Object[] options = { "Show Retirement Dialog", "Not Now" };
             return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
-                    "It has been a year since the last retirement/defection roll, and it is time to do another.",
-                    "Retirement/Defection roll required", JOptionPane.OK_CANCEL_OPTION,
+                    "It has been a year since the last Employee Turnover roll, and it is time to do another.",
+                    "Employee Turnover roll required", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         }
         return false;

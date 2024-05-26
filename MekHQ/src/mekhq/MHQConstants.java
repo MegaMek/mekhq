@@ -114,6 +114,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
     public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
     public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
+    public static final String AUTO_AWARDS_FOREGROUND = "paidRetirementForeground";
+    public static final String AUTO_AWARDS_BACKGROUND = "paidRetirementBackground";
     //endregion Colours
 
     //region Fonts
@@ -170,6 +172,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_SHORT_DEPLOYMENT = "nagShortDeployment";
     public static final String NAG_UNRESOLVED_STRATCON_CONTACTS = "nagUnresolvedStratConContacts";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
+    public static final String NAG_CARGO_CAPACITY = "nagCargoCapacity";
     //endregion Nag Tab
 
     //region Miscellaneous Options
@@ -217,6 +220,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String LAYERED_FORCE_ICON_BATTLEMECH_CENTER_FILENAME = "BattleMech (Center).png";
     public static final String CUSTOM_MECHFILES_DIRECTORY_PATH = "data/mechfiles/customs/";
     public static final String AWARDS_DIRECTORY_PATH = "data/universe/awards/";
+    public static final String ACADEMY_DIRECTORY_PATH = "data/universe/academies/";
     public static final String RATINFO_DIR = "data/universe/ratdata/";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";

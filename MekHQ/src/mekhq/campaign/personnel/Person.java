@@ -31,7 +31,6 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
@@ -56,10 +55,12 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.work.IPartWork;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.io.migration.FactionMigrator;
 import mekhq.io.migration.PersonMigrator;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -186,6 +187,20 @@ public class Person {
     private int originalUnitTech;
     private UUID originalUnitId;
     //endregion Against the Bot
+
+    //region Education
+    private int eduHighestEducation;
+    private String eduAcademyName;
+    private String eduAcademySet;
+    private String eduAcademyNameInSet;
+    private String eduAcademyFaction;
+    private String eduAcademySystem;
+    private int eduCourseIndex;
+    private int eduDaysOfTravelToAcademy;
+    private int eduDaysOfEducation;
+    private int eduDaysOfTravelFromAcademy;
+    private int eduDaysOfTravel;
+    //endregion Education
 
     //region Flags
     private boolean clanPersonnel;
@@ -323,6 +338,17 @@ public class Person {
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
         acquisitions = 0;
+        eduHighestEducation = 0;
+        eduAcademyName = null;
+        eduAcademySystem = null;
+        eduCourseIndex = 0;
+        eduDaysOfTravelToAcademy = 0;
+        eduDaysOfEducation = 0;
+        eduDaysOfTravelFromAcademy = 0;
+        eduDaysOfTravel = 0;
+        eduAcademySet = null;
+        eduAcademyNameInSet = null;
+        eduAcademyFaction = null;
 
         //region Flags
         setClanPersonnel(originFaction.isClan());
@@ -936,6 +962,14 @@ public class Person {
                     campaign.addReport(String.format(resources.getString("returnedFromLeave.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+                } else if (getStatus().isStudent()) {
+                    campaign.addReport(String.format(resources.getString("returnedFromEducation.report"),
+                            getHyperlinkedFullTitle()));
+                    ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+                } else if (getStatus().isMissing()) {
+                    campaign.addReport(String.format(resources.getString("returnedFromMissing.report"),
+                            getHyperlinkedFullTitle()));
+                    ServiceLogger.returnedFromMissing(this, campaign.getLocalDate());
                 } else if (getStatus().isAWOL()) {
                     campaign.addReport(String.format(resources.getString("returnedFromAWOL.report"),
                             getHyperlinkedFullTitle()));
@@ -957,6 +991,9 @@ public class Person {
             case PREGNANCY_COMPLICATIONS:
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
                 // purposeful fall through
+            case STUDENT:
+                // log entries & reports are handled by the education package (mekhq/campaign/personnel/education)
+                break;
             default:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.changedStatus(this, campaign.getLocalDate(), status);
@@ -989,6 +1026,17 @@ public class Person {
             // Clear Tech Setup
             removeAllTechJobs(campaign);
         }
+
+        // clean up the save entry
+        this.setEduAcademyName(null);
+        this.setEduAcademySet(null);
+        this.setEduAcademyNameInSet(null);
+        this.setEduAcademySystem(null);
+        this.setEduCourseIndex(0);
+        this.setEduDaysOfTravelToAcademy(0);
+        this.setEduDaysOfTravelFromAcademy(0);
+        this.setEduDaysOfTravel(0);
+        this.setEduDaysOfEducation(0);
 
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }
@@ -1029,6 +1077,11 @@ public class Person {
         this.birthday = birthday;
     }
 
+    /**
+     * Returns the date a person was born.
+     *
+     * @return a LocalDate representing the person's date of birth
+     */
     public LocalDate getBirthday() {
         return birthday;
     }
@@ -1120,7 +1173,7 @@ public class Person {
     }
 
     public boolean isChild(final LocalDate today) {
-        return getAge(today) <= 13;
+        return getAge(today) < 18;
     }
 
     public Genealogy getGenealogy() {
@@ -1237,6 +1290,94 @@ public class Person {
 
     public void setBiography(final String biography) {
         this.biography = biography;
+    }
+
+    public int getEduHighestEducation() {
+        return eduHighestEducation;
+    }
+
+    public void setEduHighestEducation(final int eduHighestEducation) {
+        this.eduHighestEducation = eduHighestEducation;
+    }
+
+    public int getEduDaysOfTravelToAcademy() {
+        return eduDaysOfTravelToAcademy;
+    }
+
+    public void setEduDaysOfTravelToAcademy(final int eduDaysOfTravelToAcademy) {
+        this.eduDaysOfTravelToAcademy = eduDaysOfTravelToAcademy;
+    }
+
+    public int getEduDaysOfTravelFromAcademy() {
+        return eduDaysOfTravelFromAcademy;
+    }
+
+    public void setEduDaysOfTravelFromAcademy(final int eduDaysOfTravelFromAcademy) {
+        this.eduDaysOfTravelFromAcademy = eduDaysOfTravelFromAcademy;
+    }
+
+    public int getEduDaysOfTravel() {
+        return eduDaysOfTravel;
+    }
+
+    public void setEduDaysOfTravel(final int eduDaysOfTravel) {
+        this.eduDaysOfTravel = eduDaysOfTravel;
+    }
+
+    public int getEduDaysOfEducation() {
+        return eduDaysOfEducation;
+    }
+
+    public void setEduDaysOfEducation(final int eduDaysOfEducation) {
+        this.eduDaysOfEducation = eduDaysOfEducation;
+    }
+
+    public String getEduAcademySystem() {
+        return eduAcademySystem;
+    }
+
+    public void setEduAcademySystem(final String eduAcademySystem) {
+        this.eduAcademySystem = eduAcademySystem;
+    }
+
+    public String getEduAcademyNameInSet() {
+        return eduAcademyNameInSet;
+    }
+
+    public void setEduAcademyNameInSet(final String eduAcademyNameInSet) {
+        this.eduAcademyNameInSet = eduAcademyNameInSet;
+    }
+
+    public String getEduAcademyFaction() {
+        return eduAcademyFaction;
+    }
+
+    public void setEduAcademyFaction(final String eduAcademyFaction) {
+        this.eduAcademyFaction = eduAcademyFaction;
+    }
+
+    public Integer getEduCourseIndex() {
+        return eduCourseIndex;
+    }
+
+    public void setEduCourseIndex(final Integer eduCourseIndex) {
+        this.eduCourseIndex = eduCourseIndex;
+    }
+
+    public String getEduAcademyName() {
+        return eduAcademyName;
+    }
+
+    public void setEduAcademyName(final String eduAcademyName) {
+        this.eduAcademyName = eduAcademyName;
+    }
+
+    public void setEduAcademySet(final String eduAcademySet) {
+        this.eduAcademySet = eduAcademySet;
+    }
+
+    public String getEduAcademySet() {
+        return eduAcademySet;
     }
 
     //region Flags
@@ -1515,6 +1656,50 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitions", acquisitions);
             }
 
+            if (eduHighestEducation != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation);
+            }
+
+            if (eduDaysOfTravelToAcademy != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelToAcademy", eduDaysOfTravelToAcademy);
+            }
+
+            if (eduDaysOfTravelFromAcademy != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelFromAcademy", eduDaysOfTravelFromAcademy);
+            }
+
+            if (eduDaysOfTravel != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravel", eduDaysOfTravel);
+            }
+
+            if (eduAcademySystem != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySystem", eduAcademySystem);
+            }
+
+            if (eduAcademyNameInSet != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyNameInSet", eduAcademyNameInSet);
+            }
+
+            if (eduAcademyFaction != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyFaction", eduAcademyFaction);
+            }
+
+            if (eduAcademySet != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademySet", eduAcademySet);
+            }
+
+            if (eduAcademyName != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduAcademyName", eduAcademyName);
+            }
+
+            if (eduCourseIndex != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduCourseIndex", eduCourseIndex);
+            }
+
+            if (eduDaysOfEducation != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfEducation", eduDaysOfEducation);
+            }
+
             //region Flags
             // Always save whether they are clan personnel or not
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanPersonnel", isClanPersonnel());
@@ -1588,9 +1773,22 @@ public class Person {
                         retVal.setOriginFaction(Factions.getInstance().getFaction(wn2.getTextContent().trim()));
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("planetId")) {
-                    String systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
-                    String planetId = wn2.getTextContent().trim();
-                    retVal.originPlanet = c.getSystemById(systemId).getPlanetById(planetId);
+                    String systemId = "", planetId = "";
+                    try {
+                        systemId = wn2.getAttributes().getNamedItem("systemId").getTextContent().trim();
+                        planetId = wn2.getTextContent().trim();
+                        PlanetarySystem ps = c.getSystemById(systemId);
+                        Planet p = null;
+                        if (ps == null) {
+                            ps = c.getSystemByName(systemId);
+                        }
+                        if (ps != null) {
+                            p = ps.getPlanetById(planetId);
+                        }
+                        retVal.originPlanet = p;
+                    } catch (NullPointerException e) {
+                        LogManager.getLogger().error("Error loading originPlanet for " + systemId + ", " + planetId, e);
+                    }
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("bloodname")) {
@@ -1800,6 +1998,28 @@ public class Person {
                     retVal.originalUnitTech = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduHighestEducation")) {
+                    retVal.eduHighestEducation = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelToAcademy")) {
+                    retVal.eduDaysOfTravelToAcademy = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelFromAcademy")) {
+                    retVal.eduDaysOfTravelFromAcademy = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravel")) {
+                    retVal.eduDaysOfTravel = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
+                    retVal.eduAcademySystem = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyName")) {
+                    retVal.eduAcademyName = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySet")) {
+                    retVal.eduAcademySet = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyNameInSet")) {
+                    retVal.eduAcademyNameInSet = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademyFaction")) {
+                    retVal.eduAcademyFaction = String.valueOf(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduCourseIndex")) {
+                    retVal.eduCourseIndex = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfEducation")) {
+                    retVal.eduDaysOfEducation = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
                         || wn2.getNodeName().equalsIgnoreCase("clan")) { // Legacy - 0.49.9 removal
                     retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -1925,41 +2145,53 @@ public class Person {
         }
 
         // If the salary is negative, then use the standard amounts
-        // TODO : Figure out a way to allow negative salaries... could be used to simulate a Holovid
-        // TODO : star paying to be part of the company, for example
         Money primaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getPrimaryRole().ordinal()];
-        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, false)));
-        if (getPrimaryRole().isSoldierOrBattleArmour()) {
-            if (hasSkill(SkillType.S_ANTI_MECH)) {
-                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
-            }
 
+        // SpecInf is a special case, this needs to be applied first to bring base salary up to RAW.
+        if (getPrimaryRole().isSoldierOrBattleArmour()) {
             if ((getUnit() != null) && getUnit().isConventionalInfantry()
                     && ((Infantry) getUnit().getEntity()).hasSpecialization()) {
                 primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier());
             }
         }
 
+        // Experience multiplier
+        primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, false)));
+
+        // Specialization multiplier
+        if (getPrimaryRole().isSoldierOrBattleArmour()) {
+            if (hasSkill(SkillType.S_ANTI_MECH)) {
+                primaryBase = primaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+            }
+        }
+
+        // CamOps doesn't cover secondary roles, so we just half the base salary of the secondary role.
         Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
-        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
+
+        // SpecInf is a special case, this needs to be applied first to bring base salary up to RAW.
         if (getSecondaryRole().isSoldierOrBattleArmour()) {
             if (hasSkill(SkillType.S_ANTI_MECH)) {
                 secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
             }
+        }
 
-            if ((getUnit() != null) && getUnit().isConventionalInfantry()
-                    && ((Infantry) getUnit().getEntity()).hasSpecialization()) {
-                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalarySpecialistInfantryMultiplier());
+        // Experience modifier
+        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
+
+        // Specialization
+        if (getSecondaryRole().isSoldierOrBattleArmour()) {
+            if (hasSkill(SkillType.S_ANTI_MECH)) {
+                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
             }
         }
 
         // TODO: distinguish DropShip, JumpShip, and WarShip crew
         // TODO: Add era mod to salary calc..
-        return primaryBase.plus(secondaryBase)
-                .multipliedBy(getRank().isOfficer()
-                        ? campaign.getCampaignOptions().getSalaryCommissionMultiplier()
-                        : campaign.getCampaignOptions().getSalaryEnlistedMultiplier())
-                .multipliedBy(getRank().getPayMultiplier());
+        if (getRank().getPayMultiplier() > 0) {
+            return primaryBase.plus(secondaryBase).multipliedBy(getRank().getPayMultiplier());
+        } else {
+            return primaryBase.plus(secondaryBase);
+        }
     }
 
     /**
@@ -2314,7 +2546,55 @@ public class Person {
             case ADMINISTRATOR_LOGISTICS:
             case ADMINISTRATOR_TRANSPORT:
             case ADMINISTRATOR_HR:
-                return hasSkill(SkillType.S_ADMIN) ? getSkill(SkillType.S_ADMIN).getExperienceLevel() : SkillType.EXP_NONE;
+                if ((campaign.getCampaignOptions().isAdminExperienceLevelIncludeNegotiation())
+                        && (campaign.getCampaignOptions().isAdminExperienceLevelIncludeScrounge())) {
+
+                    if (Stream.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE).allMatch(this::hasSkill)) {
+                        if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                            int rawScore = (int) Math.floor(((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_NEG).getLevel()) + getSkill(SkillType.S_SCROUNGE).getLevel()) / 3.0);
+
+                            if ((getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_NEG).getType().getExperienceLevel(rawScore))
+                                && (getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_SCROUNGE).getType().getExperienceLevel(rawScore))) {
+
+                                return getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((Stream.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE).mapToInt(s -> getSkill(s).getLevel()).sum()) / 3.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else if (campaign.getCampaignOptions().isAdminExperienceLevelIncludeNegotiation()) {
+                    if ((hasSkill(SkillType.S_ADMIN)) && (hasSkill(SkillType.S_NEG))) {
+                        if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                            int rawScore = (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_NEG).getLevel()) / 2.0);
+
+                            if (getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_NEG).getType().getExperienceLevel(rawScore)) {
+                                return getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_NEG).getLevel()) / 2.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else if (campaign.getCampaignOptions().isAdminExperienceLevelIncludeScrounge()) {
+                    if ((hasSkill(SkillType.S_ADMIN)) && (hasSkill(SkillType.S_SCROUNGE))) {
+                        if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                            int rawScore = (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_SCROUNGE).getLevel()) / 2.0);
+
+                            if (getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_SCROUNGE).getType().getExperienceLevel(rawScore)) {
+                                return getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_SCROUNGE).getLevel()) / 2.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else {
+                    return hasSkill(SkillType.S_ADMIN) ? getSkill(SkillType.S_ADMIN).getExperienceLevel() : SkillType.EXP_NONE;
+                }
             case DEPENDENT:
             case NONE:
             default:
@@ -3186,7 +3466,7 @@ public class Person {
     }
     //endregion injuries
 
-    /* For use by Against the Bot retirement/defection rolls */
+    /* For use by Against the Bot Employee Turnover rolls */
     public int getOriginalUnitWeight() {
         return originalUnitWeight;
     }

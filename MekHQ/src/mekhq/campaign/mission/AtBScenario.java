@@ -33,6 +33,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.Atmosphere;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
@@ -178,11 +179,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
 
     private Map<Integer, Integer> numPlayerMinefields;
 
+    private String terrainType;
+
     protected final transient ResourceBundle defaultResourceBundle = ResourceBundle.getBundle("mekhq.resources.AtBScenarioBuiltIn",
             MekHQ.getMHQOptions().getLocale());
 
     private static TerrainConditionsOddsManifest TCO;
     private static StratconBiomeManifest SB;
+    private int modifiedTemperature;
     //endregion Variable Declarations
 
     public AtBScenario () {
@@ -252,6 +256,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         return getScenarioTypeDescription() + (isStandardScenario() ? (isAttacker() ? " (Attacker)" : " (Defender)") : "");
     }
 
+    public String getTerrainType() {
+        return terrainType;
+    }
+
+    public void setTerrainType(String terrainType) {
+        this.terrainType = terrainType;
+    }
+
     @Override
     public boolean isStandardScenario() {
         return !isSpecialScenario() && !isBigBattle();
@@ -279,15 +291,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     private void initBattle(Campaign campaign) {
         setTerrain();
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() &&
+                null != campaign.getMission(getMissionId())) {
+            setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
+        }
         if (campaign.getCampaignOptions().isUseLightConditions()) {
             setLightConditions();
         }
         if (campaign.getCampaignOptions().isUseWeatherConditions()) {
-            setWeather();
-        }
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions() &&
-                null != campaign.getMission(getMissionId())) {
-            setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
+            setWeatherConditions();
         }
         setMapSize();
         setMapFile();
@@ -305,6 +317,14 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         }
     }
 
+    public int getModifiedTemperature() {
+        return modifiedTemperature;
+    }
+
+    public void setModifiedTemperature(int modifiedTemperature) {
+        this.modifiedTemperature = modifiedTemperature;
+    }
+
     public void setTerrain() {
         Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
         List<String> keys = mapTypes.keySet().stream().sorted().collect(Collectors.toList());
@@ -315,7 +335,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setLight(TCO.rollLightCondition(getTerrainType()));
     }
 
-    public void setWeather() {
+    public void setWeatherConditions() {
         // weather is irrelevant in these situations.
         if (getBoardType() == AtBScenario.T_SPACE ||
                 getBoardType() == AtBScenario.T_ATMOSPHERE) {
@@ -420,13 +440,17 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     }
 
     public void setMapFile(String terrainType) {
-        Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
-        StratconBiomeManifest.MapTypeList value = mapTypes.get(terrainType);
-        if (value != null) {
-            List<String> mapTypeList = value.mapTypes;
-            setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+        if (terrainType.equals("Space")) {
+            setMap("Space");
         } else {
-            setMap("Savannah");
+            Map<String, StratconBiomeManifest.MapTypeList> mapTypes = SB.getBiomeMapTypes();
+            StratconBiomeManifest.MapTypeList value = mapTypes.get(terrainType);
+            if (value != null) {
+                List<String> mapTypeList = value.mapTypes;
+                setMap(mapTypeList.get(Compute.randomInt(mapTypeList.size())));
+            } else {
+                setMap("Savannah");
+            }
         }
     }
 
@@ -1478,7 +1502,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     @Override
     public void generateStub(Campaign c) {
         super.generateStub(c);
-        alliesPlayerStub = generateEntityStub(alliesPlayer);
+        alliesPlayerStub = Utilities.generateEntityStub(alliesPlayer);
 
         alliesPlayer.clear();
         if (null != bigBattleAllies) {
@@ -1501,6 +1525,8 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "deploymentDelay", deploymentDelay);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lanceCount", lanceCount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rerollsRemaining", rerollsRemaining);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "modifiedTemperature", modifiedTemperature);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "terrainType", terrainType);
 
         if (null != bigBattleAllies && !bigBattleAllies.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "bigBattleAllies");
@@ -1599,6 +1625,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                     lanceCount = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("rerollsRemaining")) {
                     rerollsRemaining = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("modifiedTemperature")) {
+                    modifiedTemperature = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("terrainType")) {
+                    terrainType = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("alliesPlayer")) {
                     NodeList nl2 = wn2.getChildNodes();
                     for (int i = 0; i < nl2.getLength(); i++) {

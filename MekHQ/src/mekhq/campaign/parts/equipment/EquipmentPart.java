@@ -23,6 +23,7 @@ package mekhq.campaign.parts.equipment;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.WeaponMounted;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
@@ -662,17 +663,17 @@ public class EquipmentPart extends Part {
             return;
         }
 
-        final Mounted weapon = unit.getEntity().getEquipment(equipmentNum);
+        final WeaponMounted weapon = (WeaponMounted) unit.getEntity().getEquipment(equipmentNum);
         if (weapon == null) {
             return;
         }
 
-        Mounted weaponBay = null;
-        for (Mounted m : unit.getEntity().getWeaponBayList()) {
+        WeaponMounted weaponBay = null;
+        for (WeaponMounted m : unit.getEntity().getWeaponBayList()) {
             if (m.getLocation() != weapon.getLocation()) {
                 continue;
             }
-            if ((m.getType() instanceof BayWeapon) && m.getBayWeapons().contains(equipmentNum)) {
+            if ((m.getType() instanceof BayWeapon) && m.getBayWeapons().contains(weapon)) {
                 weaponBay = m;
                 break;
             }
@@ -696,12 +697,7 @@ public class EquipmentPart extends Part {
         // if we are still here then we need to check the other weapons, if any of them
         // are usable then we should do the same thing. Otherwise all weapons are destroyed
         // and we should mark the bay as unusuable.
-        for (int wId : weaponBay.getBayWeapons()) {
-            final Mounted m = unit.getEntity().getEquipment(wId);
-            if (m == null) {
-                continue;
-            }
-
+        for (WeaponMounted m : weaponBay.getBayWeapons()) {
             if (!m.isDestroyed()) {
                 weaponBay.setHit(false);
                 weaponBay.setMissing(false);

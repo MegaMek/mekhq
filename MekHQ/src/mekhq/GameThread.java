@@ -24,6 +24,7 @@ import megamek.client.CloseClientListener;
 import megamek.client.bot.BotClient;
 import megamek.client.bot.princess.Princess;
 import megamek.client.ui.swing.ClientGUI;
+import megamek.client.ui.swing.MegaMekGUI;
 import megamek.client.ui.swing.util.MegaMekController;
 import megamek.common.*;
 import megamek.common.planetaryconditions.PlanetaryConditions;
@@ -174,22 +175,7 @@ class GameThread extends Thread implements CloseClientListener {
                 client.sendMapSettings(mapSettings);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
-                PlanetaryConditions planetaryConditions = new PlanetaryConditions();
-                planetaryConditions.setLight(scenario.getLight());
-                planetaryConditions.setWeather(scenario.getWeather());
-                planetaryConditions.setWind(scenario.getWind());
-                planetaryConditions.setFog(scenario.getFog());
-                planetaryConditions.setAtmosphere(scenario.getAtmosphere());
-                planetaryConditions.setTemperature(scenario.getModifiedTemperature());
-                planetaryConditions.setGravity(scenario.getGravity());
-                planetaryConditions.setEMI(scenario.getEMI());
-                planetaryConditions.setBlowingSand(scenario.getBlowingSand());
-                planetaryConditions.setShiftingWindDirection(scenario.canWindShiftDirection());
-                planetaryConditions.setShiftingWindStrength(scenario.canWindShiftStrength());
-                planetaryConditions.setWindMax(scenario.getMaxWindStrength());
-                planetaryConditions.setWindMin(scenario.getMinWindStrength());
-
-                client.sendPlanetaryConditions(planetaryConditions);
+                client.sendPlanetaryConditions(scenario.createPlanetaryConditions());
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 // set player deployment
@@ -356,10 +342,8 @@ class GameThread extends Thread implements CloseClientListener {
     }
 
     public void createController() {
-        controller = new MegaMekController();
-        KeyboardFocusManager kbfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        kbfm.addKeyEventDispatcher(controller);
-
-        KeyBindParser.parseKeyBindings(controller);
+        MegaMekGUI megaMekGUI = new MegaMekGUI();
+        megaMekGUI.createController();
+        controller = MegaMekGUI.getKeyDispatcher();
     }
 }

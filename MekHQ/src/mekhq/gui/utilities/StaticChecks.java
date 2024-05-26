@@ -25,10 +25,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.unit.Unit;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.StringJoiner;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class StaticChecks {
@@ -303,7 +300,11 @@ public class StaticChecks {
     }
 
     public static boolean areAllActive(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getStatus().isActive());
+        return Arrays.stream(people).allMatch(p -> p.getStatus().isActive());
+    }
+
+    public static boolean areAllStudents(Person... people) {
+        return Arrays.stream(people).allMatch(p -> p.getStatus().isStudent());
     }
 
     public static boolean areAllClanEligible(Person... people) {

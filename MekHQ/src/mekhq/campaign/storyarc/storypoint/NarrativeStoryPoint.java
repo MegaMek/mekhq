@@ -35,7 +35,7 @@ import java.text.ParseException;
 /**
  * This story point creates a {@link StoryNarrativeDialog StoryNarrativeDialog} with a simple narrative description.
  */
-public class NarrativeStoryPoint extends StoryPoint {
+public class NarrativeStoryPoint extends DialogStoryPoint {
 
     String title;
     String narrative;
@@ -76,7 +76,8 @@ public class NarrativeStoryPoint extends StoryPoint {
     }
 
     @Override
-    public void loadFieldsFromXmlNode(Node wn, Campaign c, Version version) throws ParseException {
+    protected void loadFieldsFromXmlNode(Node wn, Campaign c, Version version) throws ParseException {
+        super.loadFieldsFromXmlNode(wn, c, version);
         NodeList nl = wn.getChildNodes();
 
         for (int x = 0; x < nl.getLength(); x++) {

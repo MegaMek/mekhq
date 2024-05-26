@@ -286,7 +286,7 @@ public class Force {
     /**
      * Add a unit id to the units vector. In general, this
      * should not be called directly to add unid because they will
-     * not be assigned a force id. Use {@link Campaign#addUnitToForce(mekhq.campaign.unit.Unit, int)}
+     * not be assigned a force id. Use {@link Campaign#addUnitToForce(Unit, int)}
      * instead
      * @param uid
      */
@@ -311,12 +311,12 @@ public class Force {
                 }
             }
         }
-        
+
         updateCommander(campaign);
     }
 
     /**
-     * This should not be directly called except by {@link Campaign#removeUnitFromForce(mekhq.campaign.unit.Unit)}
+     * This should not be directly called except by {@link Campaign#removeUnitFromForce(Unit)}
      * instead
      * @param id
      */
@@ -341,7 +341,7 @@ public class Force {
                     }
                 }
             }
-            
+
             updateCommander(campaign);
         }
     }
@@ -384,27 +384,27 @@ public class Force {
     public void setId(int i) {
         this.id = i;
     }
-    
+
     public UUID getForceCommanderID() {
         return forceCommanderID;
     }
-    
+
     public void setForceCommanderID(UUID commanderID) {
         forceCommanderID = commanderID;
     }
-    
+
     public List<UUID> getEligibleCommanders(Campaign c) {
         List<UUID> people = new ArrayList<>();
         Person highestRankPerson = c.getPerson(getForceCommanderID());
-        
-        // safety check: if the person is no longer assigned to a unit or the force, 
+
+        // safety check: if the person is no longer assigned to a unit or the force,
         // then they're not really the highest ranked person in the force.
-        if ((highestRankPerson != null) && 
+        if ((highestRankPerson != null) &&
                 ((highestRankPerson.getUnit() == null) ||
                 (!getUnits().contains(highestRankPerson.getUnit().getId())))) {
             highestRankPerson = null;
         }
-        
+
         for (UUID uid : getUnits()) {
             Unit u = c.getUnit(uid);
             if (null != u) {
@@ -425,23 +425,23 @@ public class Force {
                 }
             }
         }
-        
+
         return people;
     }
-    
+
     /**
      * Automatically update the force's commander
      */
     public void updateCommander(Campaign c) {
         List<UUID> eligibleCommanders = getEligibleCommanders(c);
-        
+
         // logic: if we found someone eligible who is a higher rank, the first one of those becomes the new commander
         // otherwise, the existing commander remains the commander
         if (!eligibleCommanders.contains(getForceCommanderID()) && (eligibleCommanders.size() > 0)) {
             forceCommanderID = eligibleCommanders.get(0);
         }
     }
-    
+
     public void removeSubForce(int id) {
         int idx = 0;
         boolean found = false;
@@ -605,7 +605,7 @@ public class Force {
         } else if (version.isLowerThan("0.49.7")) {
             retVal.setForceIcon(ForceIconMigrator.migrateForceIcon0496To0497(retVal.getForceIcon()));
         }
-        
+
         retVal.updateCommander(c);
 
         return retVal;
@@ -712,5 +712,51 @@ public class Force {
         }
 
         return biggestBucketID;
+    }
+
+
+    /**
+     * Finds the distance (depth) from the origin force
+     * @param force the force to get depth for
+     */
+    public static int getDepth(Force force) {
+        int depth = 0;
+
+        Force parent = force.getParentForce();
+
+        while (parent != null) {
+            depth++;
+            force = parent;
+            parent = force.getParentForce();
+        }
+
+        return depth;
+    }
+
+    /**
+     * Uses a recursive search to find the maximum distance (depth) from the origin force
+     * @param force the current force. Should always equal campaign.getForce(0), if called remotely
+     * @param depth the current recursive depth. Can be left null, if called remotely
+     */
+    public static int getMaximumDepth(Force force, @Nullable Integer depth) {
+        if (depth == null) {
+            depth = 0;
+        }
+
+        int maximumDepth = depth;
+
+        Vector<Force> subForces = force.getSubForces();
+
+        if (!subForces.isEmpty()) {
+            for (Force subforce : subForces) {
+                int nextDepth = getMaximumDepth(subforce, depth + 1);
+
+                if (nextDepth > maximumDepth) {
+                    maximumDepth = nextDepth;
+                }
+            }
+        }
+
+        return maximumDepth;
     }
 }

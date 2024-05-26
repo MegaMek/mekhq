@@ -86,6 +86,62 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, status.getLogText()));
     }
 
+    public static void eduEnrolled(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduEnrolled.text"), institution)));
+    }
+
+    public static void eduGraduated(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduated.text"), institution)));
+    }
+
+    public static void eduGraduatedPlus(Person person, LocalDate date, String graduationType, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedPlus.text"), graduationType, institution)));
+    }
+
+    public static void eduGraduatedMasters(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedMasters.text"), institution)));
+    }
+
+    public static void eduGraduatedDoctorate(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedDoctorate.text"), institution)));
+    }
+
+    public static void eduFailed(Person person, LocalDate date, String institution) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduFailed.text"), institution)));
+    }
+
+    public static void eduClanWashout(Person person, LocalDate date, String originCaste) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanWashout.text"), originCaste)));
+    }
+
+    public static void eduClanFlee(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanFlee.text")));
+    }
+
+    public static void eduClanWarriorFailed(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanWarriorFailed.text")));
+    }
+
+    public static void eduClanWarrior(Person person, LocalDate date, String kills) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanWarrior.text"), kills)));
+    }
+
+    public static void eduClanFailed(Person person, LocalDate date, String caste) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanFailed.text"), caste)));
+    }
+
+    public static void eduClanPassed(Person person, LocalDate date, String degree, String caste) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanPassed.text"), degree, caste)));
+    }
+
+    public static void eduClanLabor(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanLabor.text")));
+    }
+
+    public static void eduClanCreche(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanCreche.text")));
+    }
+
     public static void recoveredMia(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredMia.text")));
     }
@@ -100,6 +156,10 @@ public class ServiceLogger {
 
     public static void returnedFromAWOL(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromAWOL.text")));
+    }
+
+    public static void returnedFromMissing(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromMissing.text")));
     }
 
     public static void resurrected(Person person, LocalDate date) {
@@ -128,6 +188,13 @@ public class ServiceLogger {
                                                            String scenarioName, String missionName) {
         String message = logEntriesResourceMap.getString("participatedInScenarioDuringMission.text");
         person.addScenarioLogEntry(new ServiceLogEntry(date,
+                MessageFormat.format(message, scenarioName, missionName)));
+    }
+
+    public static void capturedInScenarioDuringMission(Person person, LocalDate date,
+                                                           String scenarioName, String missionName) {
+        String message = logEntriesResourceMap.getString("capturedInScenarioDuringMission.text");
+        person.addLogEntry(new ServiceLogEntry(date,
                 MessageFormat.format(message, scenarioName, missionName)));
     }
 

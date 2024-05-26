@@ -124,7 +124,8 @@ public class AtBGameThread extends GameThread {
                 mapSettings.getBoardsSelectedVector().clear();
 
                 // if the scenario is taking place in space, do space settings instead
-                if (scenario.getBoardType() == Scenario.T_SPACE) {
+                if (scenario.getBoardType() == Scenario.T_SPACE
+                        || scenario.getTerrainType().equals("Space")) {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
@@ -157,15 +158,21 @@ public class AtBGameThread extends GameThread {
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
                 PlanetaryConditions planetaryConditions = new PlanetaryConditions();
-                planetaryConditions.setLight(scenario.getLight());
-                planetaryConditions.setWeather(scenario.getWeather());
-                planetaryConditions.setWind(scenario.getWind());
-                planetaryConditions.setFog(scenario.getFog());
-                planetaryConditions.setAtmosphere(scenario.getAtmosphere());
-                planetaryConditions.setGravity(scenario.getGravity());
-                planetaryConditions.setEMI(scenario.getEMI());
-                planetaryConditions.setBlowingSand(scenario.getBlowingSand());
-                planetaryConditions.setTemperature(scenario.getModifiedTemperature());
+                if (campaign.getCampaignOptions().isUseLightConditions()) {
+                    planetaryConditions.setLight(scenario.getLight());
+                }
+                if (campaign.getCampaignOptions().isUseWeatherConditions()) {
+                    planetaryConditions.setWeather(scenario.getWeather());
+                    planetaryConditions.setWind(scenario.getWind());
+                    planetaryConditions.setFog(scenario.getFog());
+                    planetaryConditions.setEMI(scenario.getEMI());
+                    planetaryConditions.setBlowingSand(scenario.getBlowingSand());
+                    planetaryConditions.setTemperature(scenario.getModifiedTemperature());
+                }
+                if (campaign.getCampaignOptions().isUsePlanetaryConditions()) {
+                    planetaryConditions.setAtmosphere(scenario.getAtmosphere());
+                    planetaryConditions.setGravity(scenario.getGravity());
+                }
                 client.sendPlanetaryConditions(planetaryConditions);
                 Thread.sleep(MekHQ.getMHQOptions().getStartGameDelay());
 
