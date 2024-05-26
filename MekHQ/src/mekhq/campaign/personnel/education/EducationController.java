@@ -1187,21 +1187,29 @@ public class EducationController {
         // [0]MechWarrior, [1]ProtoMech, [2]AreoSpace, [3]Space, [4]BA, [5]CI, [6]Vehicle
         if (person.getEduCourseIndex() <= 6) {
             graduateWarriorCaste(campaign, person, academy, resources);
+
+            return;
         }
 
         // [7]Scientist Caste
         if (person.getEduCourseIndex() == 7) {
             graduateScientistCaste(campaign, person, academy, resources);
+
+            return;
         }
 
         // [8]Merchant Caste
         if (person.getEduCourseIndex() == 8) {
             graduateMerchantCaste(campaign, person, academy, resources);
+
+            return;
         }
 
         // [9]Technician Caste
         if (person.getEduCourseIndex() == 9) {
             graduateTechnicianCaste(campaign, person, academy, resources);
+
+            return;
         }
 
         // [10]Laborer Caste
@@ -1305,6 +1313,7 @@ public class EducationController {
             graduateLaborCaste(campaign, person, academy, resources);
         }
     }
+
     /**
      * Graduates a person from the labor caste.
      * Updates the person's education level and adds a report to the campaign.
