@@ -2587,7 +2587,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                         buildEducationSubMenus(campaign, academy, person, academyOption, campus, campaign.getFaction().getShortName());
                     } else {
-                        if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)) / 7) <= campaign.getCampaignOptions().getMaximumJumpCount()) {
+                        if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)) / 7) > campaign.getCampaignOptions().getMaximumJumpCount()) {
                             if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowRangeConflict())) {
                                 JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
                                 educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
