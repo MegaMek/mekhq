@@ -2580,7 +2580,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     // Trueborn Clan Academies get a free pass, as applicants don't need to travel from the unit,
                     // they're just popped out of an Iron Womb
-                    if (academy.isTrueborn()) {
+                    if ((academy.isTrueborn()) && (campaign.getCampaignOptions().isUseTruebornTravelException())) {
                         JMenu academyOption = new JMenu(academy.getName());
 
                         educationJMenuAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);

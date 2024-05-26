@@ -248,7 +248,7 @@ public class CampaignOptions {
     private double salarySpecialistInfantryMultiplier;
     private Map<SkillLevel, Double> salaryXPMultipliers;
     private Money[] roleBaseSalaries;
-  
+
     // Awards
     private AwardBonus awardBonusStyle;
     private boolean enableAutoAwards;
@@ -337,6 +337,7 @@ public class CampaignOptions {
     private boolean useEducationModule;
     private boolean eduEnableAutoAwardsIntegration;
     private Integer maximumJumpCount;
+    private boolean useTruebornTravelException;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
     private boolean enableClanEducation;
@@ -740,7 +741,7 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
         setRoleBaseSalary(PersonnelRole.DEPENDENT, 0);
         setRoleBaseSalary(PersonnelRole.NONE, 0);
-      
+
         // Awards
         setAwardBonusStyle(AwardBonus.BOTH);
         setEnableAutoAwards(true);
@@ -846,6 +847,7 @@ public class CampaignOptions {
         setUseEducationModule(true);
         setEduEnableAutoAwardsIntegration(true);
         setMaximumJumpCount(5);
+        setUseTruebornTravelException(true);
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
         setEnableClanEducation(true);
@@ -2296,6 +2298,14 @@ public class CampaignOptions {
 
     public void setMaximumJumpCount(Integer maximumJumpCount) {
         this.maximumJumpCount = maximumJumpCount;
+    }
+
+    public boolean isUseTruebornTravelException() {
+        return useTruebornTravelException;
+    }
+
+    public void setUseTruebornTravelException(boolean useTruebornTravelException) {
+        this.useTruebornTravelException = useTruebornTravelException;
     }
 
     public boolean isEnableLocalAcademies() {
@@ -4160,7 +4170,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salaryXPMultipliers");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
-      
+
         //region Awards
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardBonusStyle", getAwardBonusStyle().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", isEnableAutoAwards());
@@ -4264,6 +4274,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEnableAutoAwardsIntegration", isEduEnableAutoAwardsIntegration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCount", getMaximumJumpCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTruebornTravelException", isUseTruebornTravelException());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableClanEducation", isEnableClanEducation());
@@ -4809,7 +4820,7 @@ public class CampaignOptions {
                         retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
                     }
                 //endregion Salary
-                  
+
                 //region Awards
                 } else if (wn2.getNodeName().equalsIgnoreCase("awardBonusStyle")) {
                     retVal.setAwardBonusStyle(AwardBonus.valueOf(wn2.getTextContent().trim()));
@@ -5014,6 +5025,8 @@ public class CampaignOptions {
                     retVal.setEduEnableAutoAwardsIntegration(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maximumJumpCount")) {
                     retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTruebornTravelException")) {
+                    retVal.setUseTruebornTravelException(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableLocalAcademies")) {
                     retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
