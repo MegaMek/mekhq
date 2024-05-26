@@ -343,7 +343,7 @@ public class PersonViewPanel extends JScrollablePanel {
             }
             try {
                 int awardTierCount = MathUtility.clamp(
-                        person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize(),
+                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
                         1,
                         award.getNumberOfRibbonFiles()
                 );
@@ -398,7 +398,7 @@ public class PersonViewPanel extends JScrollablePanel {
             Image medal;
             try {
                 int awardTierCount = MathUtility.clamp(
-                        person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize(),
+                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
                         1,
                         award.getNumberOfMedalFiles()
                 );
@@ -450,7 +450,7 @@ public class PersonViewPanel extends JScrollablePanel {
             Image miscAward;
             try {
                 int awardTierCount = MathUtility.clamp(
-                        person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize(),
+                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
                         1,
                         award.getNumberOfMiscFiles()
                 );
