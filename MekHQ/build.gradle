@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 plugins {
     id 'application'
     id 'maven-publish'
-    id 'edu.sc.seis.launch4j' version '2.5.4'
+    id 'edu.sc.seis.launch4j' version '3.0.5'
     id 'jacoco'
 }
 
@@ -33,32 +33,32 @@ dependencies {
     implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
         // We may want to specify different branches for MM and MML, so we need to exclude the
         // transitive MM dependency
-        exclude group: 'org.megamek', module: "megameklab${mmlBranchTag}"
+        exclude group: 'org.megamek', module: "megamek${mmBranchTag}"
         // We don't need the python and javascript engine taking up space
         exclude group: 'org.python', module: 'jython'
         exclude group: 'org.mozilla', module: 'rhino'
-        // Eclipse IDE Multiple Dependency errors. 
+        // Eclipse IDE Multiple Dependency errors.
         exclude group: 'xml-apis'
     }
 
-    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.2'
     implementation 'javax.vecmath:vecmath:1.5.2'
-    implementation 'joda-time:joda-time:2.12.5'
-    implementation 'org.apache.commons:commons-csv:1.10.0'
+    implementation 'joda-time:joda-time:2.12.7'
+    implementation 'org.apache.commons:commons-csv:1.11.0'
     implementation 'org.apache.commons:commons-math3:3.6.1'
-    implementation 'org.apache.commons:commons-text:1.10.0'
-    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
-    implementation 'org.commonmark:commonmark:0.21.0'
+    implementation 'org.apache.commons:commons-text:1.12.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.23.1'
+    implementation 'org.commonmark:commonmark:0.22.0'
     implementation 'org.jfree:jfreechart:1.5.4'
-    implementation 'org.joda:joda-money:1.0.3'
+    implementation 'org.joda:joda-money:1.0.4'
 
-    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.2'
+    runtimeOnly 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
     // Required for mml printing scaled vector graphics (SVG) - Eclipse IDE Compatability.
     runtimeOnly 'xml-apis:xml-apis-ext:1.3.04'
-    
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
-    testImplementation 'org.mockito:mockito-core:5.2.0'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
 }
 
 mainClassName = 'mekhq.MekHQ'
@@ -89,16 +89,9 @@ run {
     jvmArgs = mhqJvmOptions
 }
 
-task compileMM (type: GradleBuild) {
-    description = 'Compiles the MM directory for packaging in a Jar'
-
-    buildName = "mhq-compile-mm"
-    dir = "${mmDir}"
-    tasks = [ 'compileTestJava' ]
-}
-
-task mmJar (type: Jar, dependsOn: compileMM) {
+task mmJar (type: Jar) {
     description = 'Builds a MegaMek jar from the current source'
+    dependsOn gradle.includedBuild('megamek').task(':compileTestJava')
 
     archiveFileName = "MegaMek.jar"
     from "${mmDir}/megamek/build/classes/java/main"
@@ -117,10 +110,12 @@ task mmJar (type: Jar, dependsOn: compileMM) {
     outputs.file jarLocation
 }
 
-task mmJarLibDir (type: Jar, dependsOn: compileMM) {
+task mmJarLibDir (type: Jar) {
     description = 'Builds a MegaMek jar from the current source, with dependencies on the classpath in the same directory'
 
     archiveFileName = "MegaMek.jar"
+    dependsOn gradle.includedBuild('megameklab').task(':compileTestJava')
+
     from "${mmDir}/megamek/build/classes/java/main"
     from "${mmDir}/megamek/build/resources/main"
     manifest {
@@ -137,16 +132,9 @@ task mmJarLibDir (type: Jar, dependsOn: compileMM) {
     outputs.file jarLocation
 }
 
-task compileMML (type: GradleBuild) {
-    description = 'Compiles the MML directory for packaging in a Jar'
-
-    buildName = "mhq-compile-mml"
-    dir = "${mmlDir}"
-    tasks = [ 'compileTestJava' ]
-}
-
-task mmlJar (type: Jar, dependsOn: compileMML) {
+task mmlJar (type: Jar) {
     archiveFileName = "MegaMekLab.jar"
+    dependsOn gradle.includedBuild('megameklab').task(':compileTestJava')
     from "${mmlDir}/megameklab/build/classes/java/main"
     from "${mmlDir}/megameklab/build/resources/main"
     manifest {
@@ -348,83 +336,82 @@ distributions {
 createExe {
     description = 'Create Windows executable that wraps MekHQ jar'
     mainClassName = project.mainClassName
-    jar = "${project.tasks.getByName("jar").archiveFile.get()}"
+    jarTask = project.tasks.jar
     icon = "${projectDir}/${data}/images/misc/mekhq.ico"
     internalName = 'MekHQ'
+    downloadUrl = 'https://adoptium.net/temurin/releases/?os=windows&arch=x64'
+    supportUrl = 'https://megamek.org'
+    copyright = '2024 MegaMek Development Team'
+    companyName = "MegaMek Development Team"
+    jvmOptions = project.ext.mmlJvmOptions
+    jreMinVersion = '17'
+    messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
     classpath = ["lib/${mmJar.archiveFileName.get()}", "lib/${mmlJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
-    def iniFile = outfile.replace('.exe', '.l4j.ini')
     outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${iniFile}"
-    doLast {
-        new File("${buildDir}/${outputDir}/${iniFile}").text = """# Launch4j runtime config
-# you can add arguments here that will be processed by the JVM at runtime
-${project.ext.mhqJvmOptions.join('\n')}
-"""
-    }
 }
 
 task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
     description = 'Create Windows executable stub for MM jar'
     outfile = 'MegaMek.exe'
     mainClassName = 'megamek.MegaMek'
-    jar = "lib/${mmJar.archiveFileName.get()}"
+    jarTask = project.tasks.mmJar
     classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
     icon = "${mmDir}/megamek/${data}/images/misc/megamek.ico"
     internalName = 'MegaMek'
+    downloadUrl = 'https://adoptium.net/temurin/releases/?os=windows&arch=x64'
+    supportUrl = 'https://megamek.org'
+    copyright = '2024 MegaMek Development Team'
+    companyName = "MegaMek Development Team"
+    jvmOptions = project.ext.mmlJvmOptions
+    jreMinVersion = '17'
+    messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
     dontWrapJar = true
-    def iniFile = outfile.replace('.exe', '.l4j.ini')
     outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${iniFile}"
-    doLast {
-        new File("${buildDir}/${outputDir}/${iniFile}").text = """# Launch4j runtime config
-# you can add arguments here that will be processed by the JVM at runtime
-${project.ext.mmJvmOptions.join('\n')}
-"""
-    }
 }
 
 task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     description = 'Create Windows executable stub for MML jar'
     outfile = 'MegaMekLab.exe'
     mainClassName = 'megameklab.MegaMekLab'
-    jar = "lib/${mmlJar.archiveFileName.get()}"
+    jarTask = project.tasks.mmlJar
     classpath = ["lib/${mmJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
     icon = "${mmlDir}/megameklab/${data}/images/misc/megameklab.ico"
     internalName = 'MegaMekLab'
+    downloadUrl = 'https://adoptium.net/temurin/releases/?os=windows&arch=x64'
+    supportUrl = 'https://megamek.org'
+    copyright = '2024 MegaMek Development Team'
+    companyName = "MegaMek Development Team"
+    jvmOptions = project.ext.mmlJvmOptions
+    jreMinVersion = '17'
+    messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
     dontWrapJar = true
-    def iniFile = outfile.replace('.exe', '.l4j.ini')
     outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${iniFile}"
-    doLast {
-        new File("${buildDir}/${outputDir}/${iniFile}").text = """# Launch4j runtime config
-# you can add arguments here that will be processed by the JVM at runtime
-${project.ext.mmlJvmOptions.join('\n')}
-"""
-    }
 }
 
 task stageMM (type: GradleBuild) {
     description = 'Prepares files from the MegaMek project'
     group = 'distribution'
 
-    buildName = "mhq-stage-mm"
+    dependsOn gradle.includedBuild('megamek').task(':stageFiles')
+    dependsOn gradle.includedBuild('megamek').task(':createStartScripts')
+
     dir = "${mmDir}"
-    tasks = [ 'stageFiles', 'createStartScripts' ]
 }
 
 task stageMML (type: GradleBuild) {
     description = 'Prepares files from the MegaMekLab project'
     group = 'distribution'
 
-    buildName = "mhq-stage-mml"
+    dependsOn gradle.includedBuild('megameklab').task(':stageFiles')
+    dependsOn gradle.includedBuild('megameklab').task(':createStartScripts')
+
     dir = "${mmlDir}"
-    tasks = [ 'stageFiles', 'createStartScripts' ]
 }
 
 windowsDistZip {
@@ -445,6 +432,24 @@ unixDistTar {
     dependsOn startScripts
     archiveExtension = 'tar.gz'
     compression = Compression.GZIP
+}
+
+distTar {
+    description = 'Creates *nix distribution packaged as a tar ball'
+    dependsOn stageFiles
+    dependsOn stageMM
+    dependsOn stageMML
+    dependsOn startScripts
+    archiveExtension = 'tar.gz'
+    compression = Compression.GZIP
+}
+
+distZip {
+    description = 'Creates *nix distribution packaged as a tar ball'
+    dependsOn stageFiles
+    dependsOn stageMM
+    dependsOn stageMML
+    dependsOn startScripts
 }
 
 // The repository can only be cloned into an empty directory so we need to delete anything left over
