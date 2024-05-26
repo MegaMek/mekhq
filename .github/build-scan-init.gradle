@@ -46,7 +46,7 @@ void configureExtension(extension) {
     extension.buildScan.with {
         termsOfServiceUrl = "https://gradle.com/terms-of-service"
         termsOfServiceAgree = "yes"
-        
+
         //
         // After the build scan is published, put on STDOUT the special
         // GitHub Actions syntax to set an Output Variable for the job
