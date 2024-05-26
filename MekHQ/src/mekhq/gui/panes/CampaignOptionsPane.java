@@ -7055,7 +7055,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         for (int i = 0; i < spnBaseSalary.length; i++) {
             spnBaseSalary[i].setValue(options.getRoleBaseSalaries()[i].getAmount().doubleValue());
         }
-      
+
         // Awards
         comboAwardBonusStyle.setSelectedItem(options.getAwardBonusStyle());
         chkEnableAutoAwards.setSelected(options.isEnableAutoAwards());
@@ -7682,7 +7682,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             for (final PersonnelRole personnelRole : PersonnelRole.values()) {
                 options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
             }
-          
+
             // Awards
             options.setEnableAutoAwards(chkEnableAutoAwards.isSelected());
             options.setAwardBonusStyle(comboAwardBonusStyle.getSelectedItem());
@@ -7774,6 +7774,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Education
             options.setUseEducationModule(chkUseEducationModule.isSelected());
             options.setEduEnableAutoAwardsIntegration(chkEduEnableAutoAwardsIntegration.isSelected());
+            options.setMaximumJumpCount((Integer) spnMaximumJumpCount.getValue());
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
             options.setEnableClanEducation(chkEnableClanEducation.isSelected());
