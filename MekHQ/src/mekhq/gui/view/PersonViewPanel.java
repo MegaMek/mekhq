@@ -18,7 +18,6 @@
  */
 package mekhq.gui.view;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.common.options.IOption;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
@@ -342,7 +341,8 @@ public class PersonViewPanel extends JScrollablePanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
-                int awardTierCount = MathUtility.clamp(person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize(), 1, award.getNumberOfRibbonFiles());
+                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
+                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
 
                 String ribbonFileName = award.getRibbonFileName(awardTierCount);
 
@@ -393,7 +393,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image medal;
             try {
-                int awardTierCount = MathUtility.clamp(person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize(), 1, award.getNumberOfMedalFiles());
+                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
+                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
 
                 String medalFileName = award.getMedalFileName(awardTierCount);
 
@@ -441,7 +442,8 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image miscAward;
             try {
-                int awardTierCount = MathUtility.clamp(person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize(), 1, award.getNumberOfMiscFiles());
+                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
+                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
 
                 String miscFileName = award.getMiscFileName(awardTierCount);
 
