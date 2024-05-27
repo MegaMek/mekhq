@@ -3527,11 +3527,11 @@ public class Campaign implements ITechManager {
         }
 
         processNewDayPersonnel();
-
+      
         processFatigueNewDay();
 
         processMoraleNewDay();
-
+      
         if (campaignOptions.isUseEducationModule()) {
             EducationController.processNewDay(this);
         }

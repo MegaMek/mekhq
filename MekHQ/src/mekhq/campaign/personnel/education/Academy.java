@@ -889,7 +889,7 @@ public class Academy implements Comparable<Academy> {
         skills = Arrays.stream(skills)
                 .map(String::trim)
                 .toArray(String[]::new);
-
+      
         for (String skill : skills) {
             tooltip.append(skill).append(" (");
 

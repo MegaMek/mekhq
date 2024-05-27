@@ -501,7 +501,7 @@ public class EducationController {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("creche.text"));
             } else {
                 campaign.addReport(person.getHyperlinkedName() + ' '
-                        + String.format(resources.getString("returningFromSchool.text"), travelTime));
+                        + String.format(resources.getString("returningFromSchool.text"), travelTime
             }
 
             return null;
@@ -843,6 +843,7 @@ public class EducationController {
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                         resources.getString("graduatedScientist.text") + resources.getString("graduatedWarriorLabor.text")));
+            
                 person.setEduCourseIndex(10);
                 person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
 
@@ -852,6 +853,7 @@ public class EducationController {
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                         resources.getString("graduatedMerchant.text") + resources.getString("graduatedWarriorLabor.text")));
+            
                 person.setEduCourseIndex(10);
                 person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
 
@@ -861,12 +863,14 @@ public class EducationController {
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                         resources.getString("graduatedTechnician.text") + resources.getString("graduatedWarriorLabor.text")));
+
                 person.setEduCourseIndex(10);
                 person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
 
                 break;
             case 10:
                 ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedLabor.text"));
+
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                         resources.getString("graduatedLabor.text") + resources.getString("washoutLabor.text")));
@@ -965,8 +969,10 @@ public class EducationController {
         int roll = Compute.randomInt(fallbackLabour);
 
         if (roll < fallbackScientist) {
+
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                     resources.getString("graduatedWarrior.text") + resources.getString("graduatedWarriorScientist.text")));
+
             person.setEduCourseIndex(7);
             person.setEduAcademyName(generateClanEducationCode(campaign, person, 7, resources));
 
@@ -974,8 +980,10 @@ public class EducationController {
         }
 
         if (roll < fallbackMerchant) {
+
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                     resources.getString("graduatedWarrior.text") + resources.getString("graduatedWarriorMerchant.text")));
+
             person.setEduCourseIndex(8);
             person.setEduAcademyName(generateClanEducationCode(campaign, person, 8, resources));
 
@@ -983,8 +991,10 @@ public class EducationController {
         }
 
         if (roll < fallbackTechnician) {
+
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                     resources.getString("graduatedWarrior.text") + resources.getString("graduatedWarriorTechnician.text")));
+
             person.setEduCourseIndex(9);
             person.setEduAcademyName(generateClanEducationCode(campaign, person, 9, resources));
 
@@ -992,8 +1002,10 @@ public class EducationController {
         }
 
         // Labor
+
         campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                 resources.getString("graduatedWarrior.text") + resources.getString("graduatedWarriorLabor.text")));
+
         person.setEduCourseIndex(10);
         person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
     }
@@ -1058,6 +1070,7 @@ public class EducationController {
         // graduated with honors
         if (graduationRoll >= 90) {
             if (Compute.d6(1) > 5) {
+
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedHonors.text"),
                         ' ' + resources.getString(graduationEventPicker())));
             } else {
