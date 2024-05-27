@@ -399,7 +399,7 @@ public class CustomizeScenarioObjectiveDialog extends JDialog {
         panObjectiveEffect.add(btnAdd, gbcLeft);
 
         JLabel lblSuccessEffects = new JLabel(resourceMap.getString("lblSuccessEffects.text"));
-        JLabel lblFailureEffects = new JLabel(resourceMap.getString("lblSuccessEffects.text"));
+        JLabel lblFailureEffects = new JLabel(resourceMap.getString("lblFailureEffects.text"));
 
         successEffects = new JList<>(successEffectsModel);
         successEffects.addListSelectionListener(e -> btnRemoveSuccess.setEnabled(!successEffects.getSelectedValuesList().isEmpty()));

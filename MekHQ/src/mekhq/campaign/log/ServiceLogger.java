@@ -191,6 +191,13 @@ public class ServiceLogger {
                 MessageFormat.format(message, scenarioName, missionName)));
     }
 
+    public static void capturedInScenarioDuringMission(Person person, LocalDate date,
+                                                           String scenarioName, String missionName) {
+        String message = logEntriesResourceMap.getString("capturedInScenarioDuringMission.text");
+        person.addLogEntry(new ServiceLogEntry(date,
+                MessageFormat.format(message, scenarioName, missionName)));
+    }
+
     public static void gainedXpFromMedWork(Person doctor, LocalDate date, int taskXP) {
         String message = logEntriesResourceMap.getString("gainedXpFromMedWork.text");
         doctor.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, taskXP)));

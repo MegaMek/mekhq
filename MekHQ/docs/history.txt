@@ -23,7 +23,15 @@ MEKHQ VERSION HISTORY:
 + PR #4095: Restored ranks.xml
 + PR #4094: MegaMek code adaptation
 + PR #4008: Added the Automatic Tracking of Award Eligibility and Additional Award Enhancements
-            Very Important to read the documentation on this feature.
+            Very Important to read the documentation on this feature (See Docs folder)
++ PR #4106: Use tabs in customize scenario dialog
++ PR #4105: Updated Post-Scenario Logging for Prisoners
++ PR #4104: Fixed Post-Scenario Tracking System's Handling of Multiple Personnel in autoAwards
++ PR #4102: Fixed Award Tier Count Calculations in PersonViewPanel
++ PR #4093: Added Negotiation and Scrounge Skill Settings for Administrator Personnel
++ PR #4054: Added Life Paths Campaign Options Tab, Added Education Module
+            Very Important to read the documentation on this feature (See Docs folder)
+
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
 

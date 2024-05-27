@@ -1438,20 +1438,28 @@ public class ResolveScenarioTracker {
             if (status.toRemove()) {
                 getCampaign().removePerson(person, false);
             }
+        }
 
-            if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+        if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+            HashMap<UUID, Integer> personnel = new HashMap<>();
+
+            for (UUID personId : peopleStatus.keySet()) {
+                Person person = campaign.getPerson(personId);
+                PersonStatus status = peopleStatus.get(personId);
+                int injuryCount = 0;
+
                 if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
-                    int injuryCount = 0;
-
                     if (status.getHits() > person.getHits()) {
                         injuryCount = status.getHits() - person.getHits();
                     }
-
-                    AutoAwardsController autoAwardsController = new AutoAwardsController();
-
-                    autoAwardsController.PostScenarioController(campaign, scenario.getId(), person.getId(), injuryCount);
                 }
+
+                personnel.put(personId, injuryCount);
             }
+
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+
+            autoAwardsController.PostScenarioController(campaign, scenario.getId(), personnel);
         }
 
         //region Prisoners
@@ -1494,7 +1502,7 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);

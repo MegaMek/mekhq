@@ -30,6 +30,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -883,7 +884,12 @@ public class Academy implements Comparable<Academy> {
         }
 
         // here we display the skills
-        String[] skills = curriculums.get(courseIndex).replaceAll(", ", ",").split(",");
+        String[] skills = curriculums.get(courseIndex).split(",");
+
+        skills = Arrays.stream(skills)
+                .map(String::trim)
+                .toArray(String[]::new);
+
         for (String skill : skills) {
             tooltip.append(skill).append(" (");
 
@@ -909,8 +915,7 @@ public class Academy implements Comparable<Academy> {
         }
         if (isPrepSchool) {
             tooltip.append("<b>").append(resources.getString("duration.text"))
-                    .append("</b> ").append(' ').append(resources.getString("durationAge.text")
-                            .replaceAll("0", String.valueOf(ageMax))).append("<br>");
+                    .append("</b> ").append(' ').append(String.format(resources.getString("durationAge.text"), ageMax)).append("<br>");
         } else {
             tooltip.append("<b>").append(resources.getString("duration.text")).append("</b> ");
             if ((durationDays / 7) < 1) {
@@ -976,7 +981,7 @@ public class Academy implements Comparable<Academy> {
      * @throws IllegalStateException if the skill string is unexpected or invalid
      */
     static String skillParser(String skill) {
-        switch (skill.toLowerCase().replaceAll("\\s", "")) {
+        switch (skill.toLowerCase().trim()) {
             case "piloting/mech":
                 return SkillType.S_PILOT_MECH;
             case "gunnery/mech":
@@ -985,7 +990,7 @@ public class Academy implements Comparable<Academy> {
                 return SkillType.S_PILOT_AERO;
             case "gunnery/aerospace":
                 return SkillType.S_GUN_AERO;
-            case "piloting/groundvehicle":
+            case "piloting/ground vehicle":
                 return SkillType.S_PILOT_GVEE;
             case "piloting/vtol":
                 return SkillType.S_PILOT_VTOL;
@@ -1007,7 +1012,7 @@ public class Academy implements Comparable<Academy> {
                 return SkillType.S_GUN_BA;
             case "gunnery/protomech":
                 return SkillType.S_GUN_PROTO;
-            case "smallarms":
+            case "small arms":
                 return SkillType.S_SMALL_ARMS;
             case "anti-mech":
                 return SkillType.S_ANTI_MECH;
@@ -1027,7 +1032,7 @@ public class Academy implements Comparable<Academy> {
                 return SkillType.S_DOCTOR;
             case "medtech":
                 return SkillType.S_MEDTECH;
-            case "hyperspacenavigation":
+            case "hyperspace navigation":
                 return SkillType.S_NAV;
             case "administration":
                 return SkillType.S_ADMIN;

@@ -2649,7 +2649,55 @@ public class Person {
             case ADMINISTRATOR_LOGISTICS:
             case ADMINISTRATOR_TRANSPORT:
             case ADMINISTRATOR_HR:
-                return hasSkill(SkillType.S_ADMIN) ? getSkill(SkillType.S_ADMIN).getExperienceLevel() : SkillType.EXP_NONE;
+                if ((campaign.getCampaignOptions().isAdminExperienceLevelIncludeNegotiation())
+                        && (campaign.getCampaignOptions().isAdminExperienceLevelIncludeScrounge())) {
+
+                    if (Stream.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE).allMatch(this::hasSkill)) {
+                        if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                            int rawScore = (int) Math.floor(((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_NEG).getLevel()) + getSkill(SkillType.S_SCROUNGE).getLevel()) / 3.0);
+
+                            if ((getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_NEG).getType().getExperienceLevel(rawScore))
+                                && (getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_SCROUNGE).getType().getExperienceLevel(rawScore))) {
+
+                                return getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((Stream.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE).mapToInt(s -> getSkill(s).getLevel()).sum()) / 3.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else if (campaign.getCampaignOptions().isAdminExperienceLevelIncludeNegotiation()) {
+                    if ((hasSkill(SkillType.S_ADMIN)) && (hasSkill(SkillType.S_NEG))) {
+                        if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                            int rawScore = (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_NEG).getLevel()) / 2.0);
+
+                            if (getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_NEG).getType().getExperienceLevel(rawScore)) {
+                                return getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_NEG).getLevel()) / 2.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else if (campaign.getCampaignOptions().isAdminExperienceLevelIncludeScrounge()) {
+                    if ((hasSkill(SkillType.S_ADMIN)) && (hasSkill(SkillType.S_SCROUNGE))) {
+                        if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
+                            int rawScore = (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_SCROUNGE).getLevel()) / 2.0);
+
+                            if (getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_SCROUNGE).getType().getExperienceLevel(rawScore)) {
+                                return getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore);
+                            }
+                        }
+
+                        return (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_SCROUNGE).getLevel()) / 2.0);
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                } else {
+                    return hasSkill(SkillType.S_ADMIN) ? getSkill(SkillType.S_ADMIN).getExperienceLevel() : SkillType.EXP_NONE;
+                }
             case DEPENDENT:
             case NONE:
             default:
