@@ -55,9 +55,9 @@ public class TrainingAwards {
 
         // Then we process the individual awards
         for (Award award : awards) {
-            int requiredEducationLevel = 0;
-            int requiredType = 0;
-            String requiredAcademyName = "";
+            int requiredEducationLevel;
+            int requiredType;
+            String requiredAcademyName;
 
             try {
                 requiredEducationLevel = award.getQty();
