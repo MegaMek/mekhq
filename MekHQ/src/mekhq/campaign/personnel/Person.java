@@ -124,10 +124,10 @@ public class Person {
     private List<LogEntry> scenarioLog;
 
     private LocalDate retirement;
-    private Integer loyalty;
-    private Integer fatigue;
+    private int loyalty;
+    private int fatigue;
     private Boolean isRecoveringFromFatigue;
-    private Integer awolDays;
+    private int awolDays;
 
     private Skills skills;
     private PersonnelOptions options;
@@ -1208,27 +1208,27 @@ public class Person {
         this.retirement = retirement;
     }
 
-    public Integer getLoyalty() {
+    public int getLoyalty() {
         return loyalty;
     }
 
-    public void setLoyalty(final Integer loyalty) {
+    public void setLoyalty(final int loyalty) {
         this.loyalty = loyalty;
     }
 
-    public Integer getFatigue() {
+    public int getFatigue() {
         return fatigue;
     }
 
-    public void setFatigue(final Integer fatigue) {
+    public void setFatigue(final int fatigue) {
         this.fatigue = fatigue;
     }
 
-    public Integer getAwolDays() {
+    public int getAwolDays() {
         return awolDays;
     }
 
-    public void setAwolDays(final Integer awolDays) {
+    public void setAwolDays(final int awolDays) {
         this.awolDays = awolDays;
     }
 
@@ -1644,7 +1644,7 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());;
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awolDays", getAwolDays());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
