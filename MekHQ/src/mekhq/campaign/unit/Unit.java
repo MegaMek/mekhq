@@ -3573,7 +3573,7 @@ public class Unit implements ITechnology {
             entity.getCrew().setPortrait(commander.getPortrait().clone(), 0);
             entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
             entity.getCrew().setToughness(commander.getToughness(), 0);
-            entity.getCrew().setFatigue(commander.getFatigue(), 0);
+            entity.getCrew().setCrewFatigue(commander.getFatigue(), 0);
 
             if (entity instanceof Tank) {
                 ((Tank) entity).setCommanderHit(commander.getHits() > 0);
@@ -4007,9 +4007,9 @@ public class Unit implements ITechnology {
         entity.getCrew().setToughness(p.getToughness(), slot);
 
         if (campaign.getCampaignOptions().isUseFatigue()) {
-            entity.getCrew().setFatigue(p.getFatigue(), slot);
+            entity.getCrew().setCrewFatigue(p.getFatigue(), slot);
         } else {
-            entity.getCrew().setFatigue(0, slot);
+            entity.getCrew().setCrewFatigue(0, slot);
         }
 
         entity.getCrew().setExternalIdAsString(p.getId().toString(), slot);
