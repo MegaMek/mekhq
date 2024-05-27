@@ -1,6 +1,5 @@
 package mekhq.campaign.personnel.autoAwards;
 
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.mission.AtBContract;
@@ -92,18 +91,12 @@ public class AutoAwardsController {
      *
      * @param c           the campaign to be processed
      * @param scenarioId  id number for the Scenario just concluded
-     * @param person      the person to check award eligibility for
-     * @param injuryCount the number of Hits sustained in the Scenario just concluded
+     * @param personnel      the people to check award eligibility for and their injury counts
      */
-    public void PostScenarioController(Campaign c, int scenarioId, UUID person, int injuryCount) {
+    public void PostScenarioController(Campaign c, int scenarioId, HashMap<UUID, Integer> personnel) {
         LogManager.getLogger().info("autoAwards (Scenario Conclusion) has started");
 
         campaign = c;
-
-        // we convert a person into a Collection, as it allows us to use InjuryAwardsManager
-        // outside of this function
-        Collection<UUID> personnel = new ArrayList<>();
-        personnel.add(person);
 
         buildAwardLists(2);
 
@@ -112,8 +105,8 @@ public class AutoAwardsController {
         int allAwardDataKey = 0;
 
         // beginning the processing of Injury Awards
-        if ((injuryCount > 0) && (!injuryAwards.isEmpty())) {
-            processedData = InjuryAwardsManager(personnel, injuryCount);
+        if (!injuryAwards.isEmpty()) {
+            processedData = InjuryAwardsManager(personnel);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -122,11 +115,8 @@ public class AutoAwardsController {
         }
 
         // beginning the processing & filtering of Kill (Scenario) Awards
-        List<Kill> kills = campaign.getKillsFor(campaign.getPerson(person).getId());
-        kills.removeIf(kill -> kill.getScenarioId() != scenarioId);
-
-        if ((!kills.isEmpty()) && (!killAwards.isEmpty())) {
-            processedData = ScenarioKillAwardsManager(personnel, kills);
+        if (!killAwards.isEmpty()) {
+            processedData = ScenarioKillAwardsManager(new ArrayList<>(personnel.keySet()), scenarioId);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -134,8 +124,8 @@ public class AutoAwardsController {
         }
 
         // beginning the processing & filtering of Misc Awards
-        if ((injuryCount > 0) && (!kills.isEmpty()) && (!miscAwards.isEmpty())) {
-            processedData = MiscAwardsManager(personnel, false, kills.size(), injuryCount);
+        if (!miscAwards.isEmpty()) {
+            processedData = MiscAwardsManager(personnel, false, scenarioId);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -487,7 +477,15 @@ public class AutoAwardsController {
         }
 
         if (!miscAwards.isEmpty()) {
-            processedData = MiscAwardsManager(personnel, missionWasSuccessful, null, null);
+            // we need to use a map when accessing post-scenario,
+            // so we need to convert to a map here
+            HashMap<UUID, Integer> personnelMap = new HashMap<>();
+
+            for (UUID person : personnel) {
+                personnelMap.put(person, 0);
+            }
+
+            processedData = MiscAwardsManager(personnelMap, missionWasSuccessful, -1);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -627,15 +625,15 @@ public class AutoAwardsController {
      *
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> InjuryAwardsManager(Collection<UUID> personnel, int injuryCount) {
+    private Map<Integer, List<Object>> InjuryAwardsManager(HashMap<UUID, Integer> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (UUID person : personnel) {
+        for (UUID person : personnel.keySet()) {
             Map<Integer, List<Object>> data;
 
             try {
-                data = InjuryAwards.InjuryAwardsProcessor(campaign, person, injuryAwards, injuryCount);
+                data = InjuryAwards.InjuryAwardsProcessor(campaign, person, injuryAwards, personnel.get(person));
             } catch (Exception e) {
                 data = null;
                 LogManager.getLogger().info("{} is not eligible for any Injury Awards.", campaign.getPerson(person).getFullName());
@@ -696,13 +694,18 @@ public class AutoAwardsController {
      * This is the manager for this type of award, processing eligibility and preparing awardData
      *
      * @param personnel the personnel to be processed
+     * @param scenarioId the scenario just completed
      */
-    private Map<Integer, List<Object>> ScenarioKillAwardsManager(Collection<UUID> personnel, List<Kill> kills) {
+    private Map<Integer, List<Object>> ScenarioKillAwardsManager(List<UUID> personnel, int scenarioId) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
         for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
+
+            List<Kill> kills = campaign.getKillsFor(campaign.getPerson(person).getId());
+            kills.removeIf(kill -> kill.getScenarioId() != scenarioId);
+
             try {
                 data = ScenarioKillAwards.ScenarioKillAwardsProcessor(campaign, person, killAwards, kills);
             } catch (Exception e) {
@@ -732,19 +735,24 @@ public class AutoAwardsController {
      *
      * @param personnel             the collection of personnel to be processed for awards
      * @param missionWasSuccessful  a boolean indicating if the mission was successful
-     * @param killCount             an optional parameter specifying the kill count
-     * @param injuryCount           an optional parameter specifying the injury count
+     * @param scenarioId             the scenario just completed, or -1 if autoAwards was not triggered by scenario completion
      * @return a map containing the award data, or null if no awards are applicable
      */
-    private Map<Integer, List<Object>> MiscAwardsManager(Collection<UUID> personnel, boolean missionWasSuccessful,
-                                                         @Nullable Integer killCount, @Nullable Integer injuryCount) {
+    private Map<Integer, List<Object>> MiscAwardsManager(HashMap<UUID, Integer> personnel, boolean missionWasSuccessful, int scenarioId) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
-        for (UUID person : personnel) {
+        for (UUID person : personnel.keySet()) {
             Map<Integer, List<Object>> data;
+            List<Kill> kills = new ArrayList<>();
+
+            if (scenarioId != -1) {
+                kills = campaign.getKillsFor(campaign.getPerson(person).getId());
+                kills.removeIf(kill -> kill.getScenarioId() != scenarioId);
+            }
+
             try {
-                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful, killCount, injuryCount);
+                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful, kills.size(), personnel.get(person));
             } catch (Exception e) {
                 data = null;
                 LogManager.getLogger().info("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());

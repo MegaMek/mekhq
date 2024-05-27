@@ -1238,7 +1238,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(gui.getCampaign(), selected));
 
         if (oneSelected && person.getStatus().isActive()) {
-            if (gui.getCampaign().getCampaignOptions().isUseManualMarriages() && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign(), gui.getCampaign().getLocalDate(), person, false) == null)) {
+            if (gui.getCampaign().getCampaignOptions().isUseManualMarriages()
+                    && (gui.getCampaign().getMarriage().canMarry(gui.getCampaign(),
+                    gui.getCampaign().getLocalDate(), person, false) == null)) {
                 menu = new JMenu(resources.getString("chooseSpouse.text"));
                 JMenu maleMenu = new JMenu(resources.getString("spouseMenuMale.text"));
                 JMenu femaleMenu = new JMenu(resources.getString("spouseMenuFemale.text"));
@@ -1247,7 +1249,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 LocalDate today = gui.getCampaign().getLocalDate();
 
                 // Get all safe potential spouses sorted by age and then by surname
-                final List<Person> personnel = gui.getCampaign().getPersonnel().stream().filter(potentialSpouse -> gui.getCampaign().getMarriage().safeSpouse(gui.getCampaign(), gui.getCampaign().getLocalDate(), person, potentialSpouse, false)).sorted(Comparator.comparing((Person p) -> p.getAge(today)).thenComparing(Person::getSurname)).collect(Collectors.toList());
+                final List<Person> personnel = gui.getCampaign().getPersonnel().stream()
+                        .filter(potentialSpouse -> gui.getCampaign().getMarriage().safeSpouse(
+                                gui.getCampaign(), gui.getCampaign().getLocalDate(), person,
+                                potentialSpouse, false))
+                        .sorted(Comparator.comparing((Person p) -> p.getAge(today))
+                                .thenComparing(Person::getSurname)).collect(Collectors.toList());
 
                 for (final Person potentialSpouse : personnel) {
                     final String status;
@@ -2718,7 +2725,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     awardMenuItem.append(award.getEdgeReward()).append(" Edge");
                 }
 
-                awardMenuItem.append(")");
+                awardMenuItem.append(')');
             }
         } else if (gui.getCampaign().getCampaignOptions().getAwardBonusStyle().isXP()) {
             if (award.getXPReward() != 0) {
