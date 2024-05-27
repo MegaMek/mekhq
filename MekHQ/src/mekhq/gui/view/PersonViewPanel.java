@@ -1506,7 +1506,10 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblEducationTravelFrom1, gridBagConstraints);
 
             lblEducationTravelFrom2.setName("lblEducationTravelFrom2");
-            lblEducationTravelFrom2.setText(String.valueOf(person.getEduDaysOfTravelFromAcademy()) + ' ' + resourceMap.getString("lblEducationDurationDays.text"));
+            lblEducationTravelFrom2.setText(String.format(resourceMap.getString("lblEducationTravelDuration.text"),
+                    person.getEduDaysOfTravelFromAcademy() - person.getEduDaysOfTravel(),
+                    person.getEduDaysOfTravelFromAcademy(),
+                    campaign.getSystemById(person.getEduAcademySystem()).getName(campaign.getLocalDate())));
             lblEducationTravelFrom2.setLabelFor(lblEducationTravelFrom2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;

@@ -329,7 +329,7 @@ public class EducationController {
             }
 
             // if we reach this point it means Person is already in transit, so we continue their journey
-            processJourneyHome(campaign, person, daysOfEducation, daysOfTravelFrom);
+            processJourneyHome(campaign, person, daysOfTravelFrom);
         }
     }
 
@@ -465,48 +465,33 @@ public class EducationController {
      * previous travel days
      */
     private static Integer beginJourneyHome(Campaign campaign, Person person, Academy academy, Integer daysOfEducation, ResourceBundle resources) {
-        int daysOfTravelFrom = person.getEduDaysOfTravelFromAcademy();
+        int travelTime = 0;
 
-        int travelTime;
-
-        if ((daysOfEducation == 0) && (daysOfTravelFrom == 0)) {
+        if ((daysOfEducation == 0) && (person.getEduDaysOfTravelFromAcademy() == 0)) {
             if ((academy.isClan()) && (academy.isPrepSchool()) && (person.getAge(campaign.getLocalDate()) < 10)) {
                 // we do this to deliberately create an infinite loop, where the player is pestered
                 // daily until the student is assigned to a Sibko
-                travelTime = 0;
+                person.setEduDaysOfTravelFromAcademy(travelTime);
+
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("creche.text"));
+
+                return null;
             } else if ((academy.isClan()) && (!academy.isLocal())) {
                 try {
-                    travelTime = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
+                    travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate())));
                 } catch (Exception e) {
-                    travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById("Strana Mechty"));
-                }
-
-                // We use a minimum of 2 days travel to avoid awkward grammar in the report.
-                // This can be hand waved as being the time it takes for Person to get from campus and
-                // recover from their education.
-                if (travelTime < 2) {
-                    travelTime = 2;
+                    travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById("Strana Mechty")));
                 }
             } else {
-                travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem()));
-
-                if (travelTime < 2) {
-                    travelTime = 2;
-                }
+                travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
             }
 
-            person.setEduDaysOfTravelFromAcademy(travelTime);
-
-            if ((academy.isClan()) && (academy.isPrepSchool()) && (person.getAge(campaign.getLocalDate()) < 10)) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("creche.text"));
-            } else {
-                campaign.addReport(person.getHyperlinkedName() + ' '
+            campaign.addReport(person.getHyperlinkedName() + ' '
                         + String.format(resources.getString("returningFromSchool.text"), travelTime));
-            }
 
             return null;
         }
-        return daysOfTravelFrom;
+        return travelTime;
     }
 
     /**
@@ -514,38 +499,26 @@ public class EducationController {
      *
      * @param campaign         the campaign the person is in
      * @param person           the person whose journey home is being processed
-     * @param daysOfEducation  the number education days remaining
      * @param daysOfTravelFrom the number of days it takes for the person to travel from the campaign location to the unit
      */
-    private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfEducation, Integer daysOfTravelFrom) {
-        if ((daysOfEducation == 0) && (daysOfTravelFrom > 0)) {
-            int travelTime = 0;
-            boolean clanException = false;
+    private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfTravelFrom) {
+        int travelTime = 0;
+        boolean clanException = false;
 
-            try {
-                travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem()));
-            } catch (Exception e) {
-                clanException = true;
+        try {
+            travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
+
+            if (travelTime != daysOfTravelFrom) {
+                person.setEduDaysOfTravelFromAcademy(travelTime);
             }
 
-            if (clanException) {
-                person.setEduDaysOfTravelFromAcademy(daysOfTravelFrom - 1);
-                person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
-            } else {
-                if (travelTime > daysOfTravelFrom) {
-                    person.setEduDaysOfTravelFromAcademy(travelTime);
-                } else if (travelTime < daysOfTravelFrom) {
-                    person.setEduDaysOfTravelFromAcademy(travelTime / 2);
-                    person.setEduDaysOfTravel(0);
-                } else {
-                    person.setEduDaysOfTravelFromAcademy(daysOfTravelFrom - 1);
-                    person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
-                }
-            }
+            person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
+        } catch (Exception e) {
+            person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
+        }
 
-            if ((person.getEduDaysOfTravelFromAcademy()) == 0) {
-                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
-            }
+        if ((travelTime - person.getEduDaysOfTravel()) < 1) {
+            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
         }
     }
 
