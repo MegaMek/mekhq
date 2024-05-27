@@ -66,8 +66,14 @@ public class MutinySupportDialog {
         }
 
         pane.setOptions(new Object[]{buttonPanel});
+        JDialog dialog;
 
-        JDialog dialog = pane.createDialog(null, resources.getString("dialogTitle.text"));
+        if (isViolentRebellion) {
+            dialog = pane.createDialog(null, resources.getString("dialogTitleViolentUprising.text"));
+        } else {
+            dialog = pane.createDialog(null, resources.getString("dialogTitleRegimeChange.text"));
+        }
+
         dialog.setVisible(true);
 
         return choice.get();
@@ -86,7 +92,7 @@ public class MutinySupportDialog {
 
         if (isViolentRebellion) {
             situationDescription.append(' ').append(String.format(
-                    resources.getString("dialogDescriptionViolentTakeover.text"),
+                    resources.getString("dialogDescriptionViolentUprising.text"),
                     rebelLeader.getFullTitle()
             ));
         } else {

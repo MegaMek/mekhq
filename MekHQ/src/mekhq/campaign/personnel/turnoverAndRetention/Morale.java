@@ -474,29 +474,52 @@ public class Morale {
 
             if (isDesertion) {
                 if ((firstRoll < targetNumber) && (secondRoll < targetNumber)) {
-                    campaign.addReport(person.getFullName() + " failed their morale check [TN" + targetNumber + "] [rA" + firstRoll +  "][rB" + secondRoll + ']');
                     possibleTheftTargets.remove(processDesertion(campaign, person, secondRoll, targetNumber, possibleTheftTargets, resources));
                     someoneHasDeserted = true;
                 }
             } else {
+                if (person.equals(loyalistLeader)) {
+                    loyalists.add(person);
+                }
+
                 if (firstRoll < targetNumber) {
-                    if (person.getUnit() != null) {
-                        if ((person.getUnit().getCrew().contains(loyalistLeader)) && (person.isCommander())) {
-                            loyalists.addAll(person.getUnit().getCrew());
-                        } else if (person.isCommander()) {
-                            for (Person crew : person.getUnit().getCrew()) {
-                                if (person.isCommander()) {
-                                    rebels.put(person, firstRoll);
-                                } else {
-                                    rebels.put(crew, targetNumber - Compute.d6(1));
-                                }
-                            }
-                        }
-                    } else {
+                    if (person.getUnit() == null) {
                         rebels.put(person, firstRoll);
+
+                        someoneHasMutinied = true;
+
+                        continue;
                     }
 
-                    someoneHasMutinied = true;
+                    if (person.getUnit().getCrew().size() == 1) {
+                        rebels.put(person, firstRoll);
+
+                        someoneHasMutinied = true;
+
+                        continue;
+                    }
+
+                    if (person.getUnit().getCrew().contains(loyalistLeader)) {
+                        if (person.getUnit().getEntity().isCommander()) {
+                            loyalists.addAll(person.getUnit().getCrew());
+                        }
+                    }
+
+                    if (person.getUnit().getEntity().isCommander()) {
+                        for (Person crew : person.getUnit().getCrew()) {
+                            if (!person.getUnit().getEntity().isCommander()) {
+                                rebels.put(crew, targetNumber - 2);
+                            } else {
+                                rebels.put(person, firstRoll);
+                            }
+                        }
+                    }
+
+                    LogManager.getLogger().info(rebels.toString());
+
+                    if (!rebels.isEmpty()) {
+                        someoneHasMutinied = true;
+                    }
                 } else {
                     if ((person.getUnit() != null) && (person.isCommander())) {
                         loyalists.addAll(person.getUnit().getCrew());
@@ -1038,11 +1061,13 @@ public class Morale {
                 campaign.addReport(String.format(resources.getString("mutinyThwartedSingular.text"), rebels.size()));
             }
 
+            int targetNumber = getTargetNumber(campaign, true);
+
             for (Person person : rebels.keySet()) {
                 possibleTheftTargets.remove(processDesertion(campaign,
                         person,
-                        rebels.get(person),
-                        getTargetNumber(campaign, true),
+                        Math.min(rebels.get(person), targetNumber - 2),
+                        targetNumber,
                         possibleTheftTargets, resources));
             }
 
@@ -1054,8 +1079,8 @@ public class Morale {
 
         // The rebels have already picked their side, so we only need to process the loyalists
         // This represents the mutineers gathering support
-        Iterator<Person> iterator = loyalists.iterator();
 
+        Iterator<Person> iterator = loyalists.iterator();
         while (iterator.hasNext()) {
             Person person = iterator.next();
 
@@ -1064,14 +1089,11 @@ public class Morale {
                 continue;
             }
 
-
             // we then process everyone else
             int roll = Compute.d6(1);
             int civilWarTargetNumber = getCivilWarTargetNumber(campaign, person);
 
-            if ((roll >= (civilWarTargetNumber - 1)) &&
-                    (roll <= (civilWarTargetNumber + 1))) {
-
+            if ((roll >= (civilWarTargetNumber - 1)) && (roll <= (civilWarTargetNumber + 1))) {
                 iterator.remove();
                 bystanders.add(person);
             } else if (roll < (civilWarTargetNumber - 1)) {
@@ -1085,91 +1107,88 @@ public class Morale {
         // in which case we can assume they were persuaded into the role by the original mutineers
         Person rebelLeader = getRebelLeader(campaign, new ArrayList<>(rebels.keySet()));
 
-        HashMap<Unit, Integer> rebelUnits = getUnits(new ArrayList<>(rebels.keySet()), false);
+        HashMap<Unit, Integer> rebelUnits = getUnits(new ArrayList<>(rebels.keySet()));
         int rebelBv = rebelUnits.keySet().stream()
                 .mapToInt(unit -> unit.getEntity()
                         .calculateBattleValue(true, false)).sum();
 
-        HashMap<Unit, Integer> loyalUnits = getUnits(loyalists, true);
-        int loyalistBv = loyalUnits.keySet().stream()
+        HashMap<Unit, Integer> loyalistUnits = getUnits(loyalists);
+        int loyalistBv = loyalistUnits.keySet().stream()
                 .mapToInt(unit -> unit.getEntity()
                         .calculateBattleValue(true, false)).sum();
-
-        // The rebels now decide whether they want to overthrow the Loyalist leader, or just depose them
-        int deposeVoteCount = 0;
-        int voteModifier = 0;
-
-        // The larger the rebel force, the more confident they feel and the less prone to drastic measures
-        if (rebels.keySet().size() > loyalists.size()) {
-            voteModifier--;
-        } else if (rebels.keySet().size() < loyalists.size()) {
-            voteModifier++;
-        }
-
-        // the more loyal the rebel leader, the more they call for a peaceful resolution
-        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-            voteModifier -= rebelLeader.getLoyalty();
-        }
-
-        for (Person ignored : rebels.keySet()) {
-            if ((Compute.d6(1) + voteModifier) >= 4) {
-                deposeVoteCount++;
-            }
-        }
-
-        boolean isViolentRebellion = deposeVoteCount > (rebels.keySet().size() / 2);
 
         // we now need to present the player with a choice: join the rebels, or support the loyalists
         int supportDecision = -1;
 
         while (supportDecision == -1) {
             supportDecision = MutinySupportDialog.supportDialog(
-                    campaign, resources, isViolentRebellion,
+                    campaign, resources, getDeposeVoteCount(campaign, loyalists.size(), rebels, rebelLeader),
                     bystanders.size(),
-                    loyalistLeader, loyalists.size(), new ArrayList<>(loyalUnits.keySet()), loyalistBv,
+                    loyalistLeader, loyalists.size(), new ArrayList<>(loyalistUnits.keySet()), loyalistBv,
                     rebelLeader, rebels.size(), new ArrayList<>(rebelUnits.keySet()), rebelBv
             );
         }
     }
 
     /**
-     * This method is used to determine the rebel leader based on the given campaign and rebel information.
+     * Calculates the vote count for deposing the Loyalist leader in a campaign.
      *
-     * @param campaign The current campaign.
-     * @param rebels   The list of rebels.
-     * @return The person object representing the rebel leader.
+     * @param campaign      the campaign object
+     * @param loyalistsCount the number of loyalists
+     * @param rebels        a map containing rebels and their votes
+     * @param rebelLeader   the leader of the rebels
+     * @return true if the vote count for deposing the Loyalist leader is higher than the vote count for an uprising, false otherwise.
+     */
+    private static boolean getDeposeVoteCount(Campaign campaign, int loyalistsCount, HashMap<Person, Integer> rebels, Person rebelLeader) {
+        // The rebels now decide whether they want to overthrow the Loyalist leader, or just depose them
+        int deposeVoteCount = 0;
+        int uprisingVoteCount = 0;
+        int voteModifier = 0;
+
+        // The larger the rebel force, the more confident they feel and the less prone to drastic measures
+        if (rebels.keySet().size() > (loyalistsCount * 1.25)) {
+            voteModifier++;
+        } else if (rebels.keySet().size() < (loyalistsCount * 0.75)) {
+            voteModifier--;
+        }
+
+        // the more loyal the rebel leader, the more they call for a peaceful resolution
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            voteModifier += rebelLeader.getLoyalty();
+        }
+
+        for (Person ignored : rebels.keySet()) {
+            if ((Compute.d6(1) + voteModifier) >= 4) {
+                deposeVoteCount++;
+            } else {
+                uprisingVoteCount++;
+            }
+        }
+
+        return deposeVoteCount > uprisingVoteCount;
+    }
+
+
+    /**
+     * Returns the rebel leader from the given list of rebels based on their rank.
+     *
+     * @param campaign The campaign containing the rank data.
+     * @param rebels   The list of rebels to choose the leader from.
+     * @return The rebel leader with the highest rank in the campaign.
      */
     private static Person getRebelLeader(Campaign campaign, List<Person> rebels) {
-        Person rebelLeader = null;
+        Person rebelLeader = rebels.get(1);
+
+        int incumbantRankNumeric = getAdjustedRankNumeric(campaign, rebelLeader);
+        int newRankNumeric;
 
         for (Person person : rebels) {
-            if (rebelLeader == null) {
-                rebelLeader = person;
-                continue;
-            }
+            newRankNumeric = getAdjustedRankNumeric(campaign, person);
 
-            int oldRankNumeric = getAdjustedRankNumeric(campaign, rebelLeader);
-            int newRankNumeric = getAdjustedRankNumeric(campaign, person);
-
-            if (newRankNumeric == oldRankNumeric) {
-                // in the case of a tie, we use the negotiation skill
-                if ((person.hasSkill(SkillType.S_NEG)) && (Objects.requireNonNull(rebelLeader).hasSkill(SkillType.S_NEG))) {
-                    if (person.getSkillLevel(SkillType.S_NEG) > rebelLeader.getSkillLevel(SkillType.S_NEG)) {
-                        rebelLeader = person;
-                    } else if (person.getSkillLevel(SkillType.S_NEG) == rebelLeader.getSkillLevel(SkillType.S_NEG)) {
-                        // if we still have a tie, we use overall experience level.
-                        // if this fails to break the tie, we give up and just use the new person
-                        if (person.getExperienceLevel(campaign, false) > rebelLeader.getExperienceLevel(campaign, false)) {
-                            rebelLeader = person;
-                        } else if (person.getExperienceLevel(campaign, false) == rebelLeader.getExperienceLevel(campaign, false)) {
-                            rebelLeader = person;
-                        }
-                    }
-                } else if (person.hasSkill(SkillType.S_NEG)) {
-                    rebelLeader = person;
-                }
-            } else if (newRankNumeric > oldRankNumeric) {
+            // The incumbent wins, in the event of a draw
+            if (incumbantRankNumeric < newRankNumeric) {
                 rebelLeader = person;
+                incumbantRankNumeric = newRankNumeric;
             }
         }
         return rebelLeader;
@@ -1185,16 +1204,18 @@ public class Morale {
     private static Integer getAdjustedRankNumeric(Campaign campaign, Person person) {
         int rankNumeric = person.getRankNumeric();
 
-        if (person.hasSkill(SkillType.S_LEADER)) {
-            rankNumeric = person.getSkillLevel(SkillType.S_LEADER);
-
-            if (campaign.getCampaignOptions().isUseManagementSkill()) {
+        // if management skill is enabled, it influences adjusted rank numeric
+        if (campaign.getCampaignOptions().isUseManagementSkill()) {
+            if (person.hasSkill(SkillType.S_LEADER)) {
+                rankNumeric += person.getSkillLevel(SkillType.S_LEADER) + campaign.getCampaignOptions().getManagementSkillPenalty();
+            } else {
                 rankNumeric += campaign.getCampaignOptions().getManagementSkillPenalty();
             }
         }
 
+        // We use inverse loyalty here, with the less loyal pushing themselves into positions of power within the rebellion
         if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
-            rankNumeric += person.getLoyalty();
+            rankNumeric -= person.getLoyalty();
         }
 
         return rankNumeric;
@@ -1239,13 +1260,12 @@ public class Morale {
 
     /**
      * Retrieves the units that are eligible to participate in the civil war based on the provided personnel.
-     * Multi-crewed units perform a vote to determine which side they join.
+     * Multi-crewed units follow their commander.
      *
      * @param personnel A list of personnel (should all belong to the same mutiny faction).
-     * @param isLoyalists A boolean value indicating whether to retrieve units for loyalists or rebels.
      * @return A HashMap of units and their corresponding battle values.
      */
-    private static HashMap<Unit, Integer> getUnits(List<Person> personnel, boolean isLoyalists) {
+    private static HashMap<Unit, Integer> getUnits(List<Person> personnel) {
         HashMap<Unit, Integer> forces = new HashMap<>();
 
         for (Person person: personnel) {
@@ -1259,33 +1279,10 @@ public class Morale {
                 // We only care about the commander, as this allows us to ensure each Unit is only counted once.
                 // We also check to ensure the unit isn't already deployed, or too damaged to fight.
                 if ((unit.isCommander(person)) && (!unit.isDeployed()) && (!unit.getEntity().isCrippled()) && (!unit.getEntity().isDmgHeavy())) {
-                    int loyalVoteCount = 0;
-                    int rebelVoteCount = 0;
-
-                    for (Person crew : unit.getCrew()) {
-                        if (personnel.contains(crew)) {
-                            if (isLoyalists) {
-                                loyalVoteCount++;
-                            } else {
-                                rebelVoteCount++;
-                            }
-                        }
-                    }
-
-                    // if the votes are equal, the unit abstains from the conflict
-                    if (loyalVoteCount > rebelVoteCount) {
-                        if (isLoyalists) {
-                            forces.put(unit, unit.getEntity().calculateBattleValue(true, false));
-                        }
-                    } else if (loyalVoteCount < rebelVoteCount) {
-                        if (!isLoyalists) {
-                            forces.put(unit, unit.getEntity().calculateBattleValue(true, false));
-                        }
-                    }
+                    forces.put(unit, unit.getEntity().calculateBattleValue(true, false));
                 }
             }
         }
-
         return forces;
     }
 }
