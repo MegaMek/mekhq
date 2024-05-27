@@ -1047,7 +1047,7 @@ public class CampaignOptions {
         setUseMoraleModifierCommanderLeadership(true);
         setUseMoraleModifierLoyalty(true);
         setUseMoraleModifierCabinFever(true);
-        setMoraleModifierLeadershipMethod(LeadershipMethod.MERCENARY);
+        setMoraleModifierLeadershipMethod(LeadershipMethod.REGULAR);
         //endregion Turnover and Retention
 
         //region Finances Tab

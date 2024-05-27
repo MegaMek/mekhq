@@ -23,10 +23,10 @@ import mekhq.MekHQ;
 import java.util.ResourceBundle;
 
 public enum LeadershipMethod {
-    MERCENARY("LeadershipMethod.MERCENARY.text", "LeadershipMethod.MERCENARY.toolTipText"),
-    FAMILY("LeadershipMethod.FAMILY.text", "LeadershipMethod.FAMILY.toolTipText"),
-    ELITE("LeadershipMethod.ELITE.text", "LeadershipMethod.ELITE.toolTipText"),
+    REGULAR("LeadershipMethod.REGULAR.text", "LeadershipMethod.REGULAR.toolTipText"),
     GREEN("LeadershipMethod.GREEN.text", "LeadershipMethod.GREEN.toolTipText"),
+    ELITE("LeadershipMethod.ELITE.text", "LeadershipMethod.ELITE.toolTipText"),
+    FAMILY("LeadershipMethod.FAMILY.text", "LeadershipMethod.FAMILY.toolTipText"),
     IRON_FIST("LeadershipMethod.IRON_FIST.text", "LeadershipMethod.IRON_FIST.toolTipText");
 
     private final String name;
@@ -43,8 +43,8 @@ public enum LeadershipMethod {
         return toolTipText;
     }
 
-    public boolean isMercenary() {
-        return this == MERCENARY;
+    public boolean isRegular() {
+        return this == REGULAR;
     }
 
     public boolean isElite() {

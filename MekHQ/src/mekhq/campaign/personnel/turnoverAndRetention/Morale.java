@@ -186,7 +186,7 @@ public class Morale {
 
         // Leadership Method Modifier
         switch (campaign.getCampaignOptions().getMoraleModifierLeadershipMethod()) {
-            case MERCENARY:
+            case REGULAR:
                 break;
             case FAMILY:
                 if (isDesertion) {
