@@ -1612,7 +1612,7 @@ public class EducationController {
                 .collect(Collectors.toList());
 
         for (int i = 0; i < bonusCount; i++) {
-            int roll = Compute.randomInt(curriculum.size() - 1);
+            int roll = Compute.randomInt(curriculum.size());
 
             try {
                 String skillParsed = Academy.skillParser(curriculum.get(roll));
