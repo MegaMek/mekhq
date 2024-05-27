@@ -175,7 +175,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     public static void connect(CampaignGUI gui, JTable personnelTable,
-            PersonnelTableModel personnelModel, JSplitPane splitPersonnel) {
+                               PersonnelTableModel personnelModel, JSplitPane splitPersonnel) {
         new PersonnelTableMouseAdapter(gui, personnelTable, personnelModel) {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -304,7 +304,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             gui.getCampaign().getProcreation().addPregnancy(
                                     gui.getCampaign(), gui.getCampaign().getLocalDate(), person);
                             MekHQ.triggerEvent(new PersonChangedEvent(person));
-                });
+                        });
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
@@ -2539,7 +2539,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
                 }
-            // is the applicant qualified?
+                // is the applicant qualified?
             } else if (!academy.isQualified(person)) {
                 if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowUnqualified())) {
                     JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduUnqualified.text")
@@ -2580,14 +2580,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     // Trueborn Clan Academies get a free pass, as applicants don't need to travel from the unit,
                     // they're just popped out of an Iron Womb
-                    if (academy.isTrueborn()) {
+                    if ((academy.isTrueborn()) && (campaign.getCampaignOptions().isUseTruebornTravelException())) {
                         JMenu academyOption = new JMenu(academy.getName());
 
                         educationJMenuAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
 
                         buildEducationSubMenus(campaign, academy, person, academyOption, campus, campaign.getFaction().getShortName());
                     } else {
-                        if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)) / 7) <= campaign.getCampaignOptions().getMaximumJumpCount()) {
+                        if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)) / 7) > campaign.getCampaignOptions().getMaximumJumpCount()) {
                             if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowRangeConflict())) {
                                 JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
                                 educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
@@ -2610,7 +2610,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduFactionConflict.text"));
                             educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
                         }
-                    // which is the nearest campus and is it in range?
+                        // which is the nearest campus and is it in range?
                     } else {
                         String nearestCampus = Academy.getNearestCampus(campaign, campuses);
 

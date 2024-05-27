@@ -834,7 +834,7 @@ public class Academy implements Comparable<Academy> {
         if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
                 Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate())) {
             return true;
-        // is there a conflict between academy faction & campaign faction?
+            // is there a conflict between academy faction & campaign faction?
         } else {
             return RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
                     Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate());

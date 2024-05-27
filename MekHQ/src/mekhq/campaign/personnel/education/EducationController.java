@@ -67,8 +67,8 @@ public class EducationController {
 
         if (academy.isClan()) {
             campaign.addReport(String.format(resources.getString("offToSchoolClan.text"),
-                            person.getFullName(),
-                            person.getEduAcademyName(),
+                    person.getFullName(),
+                    person.getEduAcademyName(),
                     person.getEduDaysOfTravelToAcademy()));
         } else {
             campaign.addReport(String.format(resources.getString("offToSchool.text"),
@@ -487,7 +487,7 @@ public class EducationController {
             }
 
             campaign.addReport(person.getHyperlinkedName() + ' '
-                        + String.format(resources.getString("returningFromSchool.text"), travelTime));
+                    + String.format(resources.getString("returningFromSchool.text"), travelTime));
 
             person.setEduDaysOfTravelFromAcademy(travelTime);
 
@@ -771,7 +771,7 @@ public class EducationController {
                         } else {
                             processClanWashout(campaign, person, person.getEduCourseIndex(), resources);
                         }
-                    // if it isn't a Sibko, we assume it was a reeducation camp, so they flee.
+                        // if it isn't a Sibko, we assume it was a reeducation camp, so they flee.
                     } else if (academy.isClan()) {
                         ServiceLogger.eduClanFlee(person, campaign.getLocalDate());
                         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MIA);
@@ -1228,7 +1228,7 @@ public class EducationController {
             processGraduation(campaign, person, academy, 0, resources);
 
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedRankClan.text"),
-                            resources.getString("graduatedRankClanWarrior.text"), resources.getString("graduatedWeightLight.text")));
+                    resources.getString("graduatedRankClanWarrior.text"), resources.getString("graduatedWeightLight.text")));
             return;
         }
 
@@ -1251,7 +1251,7 @@ public class EducationController {
         processGraduation(campaign, person, academy, 2, resources);
 
         campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedRankClan.text"),
-                        resources.getString("graduatedRankStarCaptain.text"), resources.getString("graduatedWeightHeavy.text")));
+                resources.getString("graduatedRankStarCaptain.text"), resources.getString("graduatedWeightHeavy.text")));
     }
 
     /**
@@ -1357,7 +1357,7 @@ public class EducationController {
         }
 
         campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTrialPassed.text"),
-                        resources.getString("graduatedEffortlessly.text"), resources.getString("graduatedTechnician.text")));
+                resources.getString("graduatedEffortlessly.text"), resources.getString("graduatedTechnician.text")));
 
         ServiceLogger.eduClanPassed(person, campaign.getLocalDate(),
                 resources.getString("graduatedEffortlessly.text"),
@@ -1393,7 +1393,7 @@ public class EducationController {
 
         if (graduationRoll < 90) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTrialPassed.text"),
-                            resources.getString("graduatedClanBarely.text"), resources.getString("graduatedMerchant.text"));
+                    resources.getString("graduatedClanBarely.text"), resources.getString("graduatedMerchant.text"));
 
             ServiceLogger.eduClanPassed(person, campaign.getLocalDate(),
                     resources.getString("graduatedClanBarely.text"),
@@ -1418,7 +1418,7 @@ public class EducationController {
         }
 
         campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTrialPassed.text"),
-                        resources.getString("graduatedEffortlessly.text"), resources.getString("graduatedMerchant.text")));
+                resources.getString("graduatedEffortlessly.text"), resources.getString("graduatedMerchant.text")));
 
         ServiceLogger.eduClanPassed(person, campaign.getLocalDate(),
                 resources.getString("graduatedEffortlessly.text"),
@@ -1454,7 +1454,7 @@ public class EducationController {
 
         if (graduationRoll < 90) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTrialPassed.text"),
-                            resources.getString("graduatedClanBarely.text"),
+                    resources.getString("graduatedClanBarely.text"),
                     resources.getString("graduatedScientist.text")));
 
             ServiceLogger.eduClanPassed(person, campaign.getLocalDate(),
@@ -1468,7 +1468,7 @@ public class EducationController {
 
         if (graduationRoll < 99) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTrialPassed.text"),
-                            resources.getString("graduatedEasily.text"), resources.getString("graduatedScientist.text")));
+                    resources.getString("graduatedEasily.text"), resources.getString("graduatedScientist.text")));
 
             ServiceLogger.eduClanPassed(person, campaign.getLocalDate(),
                     resources.getString("graduatedEasily.text"),
@@ -1480,7 +1480,7 @@ public class EducationController {
         }
 
         campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTrialPassed.text"),
-                        resources.getString("graduatedEffortlessly.text"), resources.getString("graduatedScientist.text")));
+                resources.getString("graduatedEffortlessly.text"), resources.getString("graduatedScientist.text")));
 
         ServiceLogger.eduClanPassed(person, campaign.getLocalDate(),
                 resources.getString("graduatedEffortlessly.text"),
@@ -1605,7 +1605,7 @@ public class EducationController {
                     person.awardXP(campaign, roll);
 
                     campaign.addReport(String.format(resources.getString("bonusXp.text"),
-                                    person.getFirstName(), roll));
+                            person.getFirstName(), roll));
                 }
             } catch (Exception e) {
                 // if we get this, it means the 'skill' was Bonus XP
