@@ -4,7 +4,6 @@ import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
 import megamek.common.Entity;
 import megamek.common.MechSummaryCache;
-import megamek.common.Mounted;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -1031,6 +1030,7 @@ public class Morale {
                                       List<Unit> possibleTheftTargets,
                                       ResourceBundle resources) {
         // This prevents us from needing to do the full process for tiny mutinies that have no chance of success
+        // In these cases we alert the player that a mutiny was thwarted and then treat it as a Desertion
         if ((loyalists.size() / 2) > rebels.size()) {
             if (rebels.size() > 1) {
                 campaign.addReport(String.format(resources.getString("mutinyThwartedPlural.text"), rebels.size()));
@@ -1095,12 +1095,36 @@ public class Morale {
                 .mapToInt(unit -> unit.getEntity()
                         .calculateBattleValue(true, false)).sum();
 
+        // The rebels now decide whether they want to overthrow the Loyalist leader, or just depose them
+        int deposeVoteCount = 0;
+        int voteModifier = 0;
+
+        // The larger the rebel force, the more confident they feel and the less prone to drastic measures
+        if (rebels.keySet().size() > loyalists.size()) {
+            voteModifier--;
+        } else if (rebels.keySet().size() < loyalists.size()) {
+            voteModifier++;
+        }
+
+        // the more loyal the rebel leader, the more they call for a peaceful resolution
+        if (campaign.getCampaignOptions().isUseLoyaltyModifiers()) {
+            voteModifier -= rebelLeader.getLoyalty();
+        }
+
+        for (Person ignored : rebels.keySet()) {
+            if ((Compute.d6(1) + voteModifier) >= 4) {
+                deposeVoteCount++;
+            }
+        }
+
+        boolean isViolentRebellion = deposeVoteCount > (rebels.keySet().size() / 2);
+
         // we now need to present the player with a choice: join the rebels, or support the loyalists
         int supportDecision = -1;
 
         while (supportDecision == -1) {
             supportDecision = MutinySupportDialog.supportDialog(
-                    campaign, resources, false,
+                    campaign, resources, isViolentRebellion,
                     bystanders.size(),
                     loyalistLeader, loyalists.size(), new ArrayList<>(loyalUnits.keySet()), loyalistBv,
                     rebelLeader, rebels.size(), new ArrayList<>(rebelUnits.keySet()), rebelBv
@@ -1177,157 +1201,6 @@ public class Morale {
     }
 
     /**
-     * Updates the ammo usage of each unit in the force, taking into account attrition.
-     *
-     * @param force the list of units in the force
-     * @param attrition the attrition value to apply to the ammo usage calculation
-     */
-    private static void getAmmoUsage(List<Unit> force, int attrition) {
-        for (Unit unit : force) {
-            for (Mounted bin : unit.getEntity().getAmmo()) {
-                int ammo = bin.getUsableShotsLeft();
-                int roll = Compute.randomInt((int) ((ammo * 0.33) + attrition));
-
-                bin.setShotsLeft(Math.max(0, ammo - roll));
-            }
-        }
-    }
-
-    /**
-     * Maps force damage based on the given parameters.
-     *
-     * @param forceSize           the size of the force
-     * @param attrition           the attrition value
-     * @param enemyAttackDice     the number of dice used for enemy attacks
-     * @param friendlyDefenceDice the number of dice used for friendly defenses
-     * @return a HashMap containing the force damage:
-     *         - "attrition": the attrition value after mapping
-     *         - "damagedLight": the number of units damaged lightly
-     *         - "damagedModerate": the number of units damaged moderately
-     *         - "damagedBadly": the number of units damaged badly
-     */
-    private static HashMap<String, Integer> mapForceDamage(int forceSize, int attrition, int enemyAttackDice, int friendlyDefenceDice) {
-        HashMap<String, Integer> forceDamage = new HashMap<>();
-
-        attrition = attrition * (forceSize / 12);
-
-        int damageDice = Math.max(0, enemyAttackDice - friendlyDefenceDice);
-
-        int damagedBadly = 0;
-        int damagedModerate = 0;
-        int damagedLight = 0;
-
-        for (int rollNumber = 0; rollNumber < damageDice; rollNumber++) {
-            switch (Compute.d6(1)) {
-                case 1:
-                    damagedBadly++;
-                    break;
-                case 2:
-                case 3:
-                    damagedModerate++;
-                    break;
-                case 4:
-                case 5:
-                case 6:
-                default:
-                    damagedLight++;
-                    break;
-            }
-        }
-
-        while ((attrition + damagedBadly + damagedModerate + damagedLight) > forceSize) {
-            if (damagedLight > 0) {
-                damagedLight--;
-            } else if (damagedModerate > 0) {
-                damagedModerate--;
-            } else if (damagedBadly > 0) {
-                damagedBadly--;
-            } else {
-                attrition--;
-            }
-        }
-
-        forceDamage.put("attrition", attrition);
-        forceDamage.put("damagedLight", damagedLight);
-        forceDamage.put("damagedModerate", damagedModerate);
-        forceDamage.put("damagedBadly", damagedBadly);
-
-        return forceDamage;
-    }
-
-    private static HashMap<String, Integer> processEngagement(int loyalistAttackDice, int loyalistDefenceDice, int rebelAttackDice, int rebelDefenceDice) {
-        HashMap<String, Integer> combatResults = new HashMap<>();
-
-        boolean concludeEngagement = false;
-        int attrition = 0;
-        int loyalistVictory = 0;
-        int rebelVictory = 0;
-
-        while (!concludeEngagement) {
-            int loyalistAttack = Compute.d6(loyalistAttackDice);
-            int loyalistDefence = Compute.d6(loyalistDefenceDice);
-            int rebelAttack = Compute.d6(rebelAttackDice);
-            int rebelDefence = Compute.d6(rebelDefenceDice);
-
-            loyalistVictory = 0;
-            rebelVictory = 0;
-
-            if (loyalistAttack > rebelDefence) {
-                if (loyalistAttack < (rebelDefence * 1.25)) {
-                    attrition++;
-                }
-
-                loyalistVictory = 1;
-            }
-
-            if (rebelAttack > loyalistDefence) {
-                if (rebelAttack < (loyalistDefence * 1.25)) {
-                    attrition++;
-                }
-
-                rebelVictory = 1;
-            }
-
-            if (loyalistVictory == rebelVictory) {
-                attrition++;
-            } else {
-                concludeEngagement = true;
-            }
-        }
-
-        combatResults.put("attrition", attrition);
-        combatResults.put("loyalistVictory", loyalistVictory);
-
-        return combatResults;
-    }
-
-    /**
-     * Calculates a faction's abstract battle statistics based on the given combatants, force size, and battle value.
-     *
-     * @param combatants the list of combatants participating in the battle
-     * @param forceSize the size of the force
-     * @param battleValue the value of the battle
-     * @return a HashMap containing the statistics of the battle
-     */
-    private static HashMap<String, Integer> getAbstractBattleStatistics(List<Person> combatants, Integer forceSize, Integer battleValue) {
-        HashMap<String, Integer> statistics = new HashMap<>();
-
-        // TODO make the dividers Campaign Options
-        int loyalistLeadership = (int) combatants.stream().filter(person -> person.getRank().isOfficer()).count() / (forceSize / 12);
-        int loyalistMedical =  (int) combatants.stream().filter(person -> (person.getPrimaryRole().isDoctor())).count() / (forceSize / 12);
-        int loyalistAdministration = (int) combatants.stream().filter(person -> (person.getPrimaryRole().isAdministrator())).count() / (forceSize / 3);
-        int loyalistTech = (int) combatants.stream().filter(person -> (person.getPrimaryRole().isTech())).count() / (forceSize / 6);
-
-        int attackDice = (battleValue / 250) + loyalistLeadership + loyalistAdministration;
-        int defenceDice = (battleValue / 250) + loyalistTech + loyalistMedical;
-
-        statistics.put("attackDice", attackDice);
-        statistics.put("defenceDice", defenceDice);
-
-        return statistics;
-    }
-
-    /**
      * Calculates the target number for civil war loyalty checks
      *
      * @param campaign the ongoing campaign
@@ -1368,7 +1241,7 @@ public class Morale {
      * Retrieves the units that are eligible to participate in the civil war based on the provided personnel.
      * Multi-crewed units perform a vote to determine which side they join.
      *
-     * @param personnel A list of personnel (should all belong to the same mutiny faction.
+     * @param personnel A list of personnel (should all belong to the same mutiny faction).
      * @param isLoyalists A boolean value indicating whether to retrieve units for loyalists or rebels.
      * @return A HashMap of units and their corresponding battle values.
      */
