@@ -599,15 +599,16 @@ public class EducationController {
 
                 // has the academy been moved alongside the faction capital?
                 if ((academy.isClan()) && (!academy.isLocal())) {
-                    String location;
+                    PlanetarySystem location;
 
                     try {
-                        location = campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()).getId();
+                        location = campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate());
 
-                        if (!person.getEduAcademySystem().equalsIgnoreCase(location)) {
-                            person.setEduAcademySystem(location);
+                        if (!person.getEduAcademySystem().equalsIgnoreCase(location.getId())) {
+                            person.setEduAcademySystem(location.getId());
 
-                            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventAcademyMoved.text"));
+                            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("eventAcademyMoved.text"),
+                                    location.getName(campaign.getLocalDate())));
                         }
                     } catch (Exception e) {
                         // it'll only throw an exception if there isn't a starting planet for the faction,
@@ -1024,8 +1025,7 @@ public class EducationController {
         // class resits required
         if (graduationRoll < 20) {
             roll = Compute.d6(3);
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedClassNeeded.text")
-                    .replace("0", String.valueOf(roll)));
+            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedClassNeeded.text"), roll));
 
             person.setEduDaysOfEducation(roll);
 
@@ -1034,8 +1034,8 @@ public class EducationController {
 
         if (graduationRoll == 99) {
             if (Compute.d6(1) > 5) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text")
-                        .replace("0", ' ' + resources.getString(graduationEventPicker())));
+                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTop.text"),
+                        ' ' + resources.getString(graduationEventPicker())));
             } else {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text"));
             }
@@ -1084,8 +1084,7 @@ public class EducationController {
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"),
                     ' ' + resources.getString(graduationEventPicker())));
         } else {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
-                    .replace("0", ""));
+            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"), ""));
         }
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
@@ -1144,8 +1143,7 @@ public class EducationController {
         }
 
         // default graduation
-        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
-                .replace("0", ""));
+        campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"), ""));
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
 
