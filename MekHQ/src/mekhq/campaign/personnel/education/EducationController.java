@@ -489,6 +489,8 @@ public class EducationController {
             campaign.addReport(person.getHyperlinkedName() + ' '
                         + String.format(resources.getString("returningFromSchool.text"), travelTime));
 
+            person.setEduDaysOfTravelFromAcademy(travelTime);
+
             return null;
         }
         return travelTime;
@@ -503,7 +505,6 @@ public class EducationController {
      */
     private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfTravelFrom) {
         int travelTime = 0;
-        boolean clanException = false;
 
         try {
             travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));

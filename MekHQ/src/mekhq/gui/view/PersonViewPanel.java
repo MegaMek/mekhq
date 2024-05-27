@@ -1507,7 +1507,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             lblEducationTravelFrom2.setName("lblEducationTravelFrom2");
             lblEducationTravelFrom2.setText(String.format(resourceMap.getString("lblEducationTravelDuration.text"),
-                    person.getEduDaysOfTravelFromAcademy() - person.getEduDaysOfTravel(),
+                    person.getEduDaysOfTravel(),
                     person.getEduDaysOfTravelFromAcademy(),
                     campaign.getSystemById(person.getEduAcademySystem()).getName(campaign.getLocalDate())));
             lblEducationTravelFrom2.setLabelFor(lblEducationTravelFrom2);
