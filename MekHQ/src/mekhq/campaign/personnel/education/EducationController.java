@@ -501,7 +501,7 @@ public class EducationController {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("creche.text"));
             } else {
                 campaign.addReport(person.getHyperlinkedName() + ' '
-                        + String.format(resources.getString("returningFromSchool.text"), travelTime
+                        + String.format(resources.getString("returningFromSchool.text"), travelTime));
             }
 
             return null;
@@ -843,7 +843,7 @@ public class EducationController {
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                         resources.getString("graduatedScientist.text") + resources.getString("graduatedWarriorLabor.text")));
-            
+
                 person.setEduCourseIndex(10);
                 person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
 
@@ -853,7 +853,7 @@ public class EducationController {
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                         resources.getString("graduatedMerchant.text") + resources.getString("graduatedWarriorLabor.text")));
-            
+
                 person.setEduCourseIndex(10);
                 person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
 
