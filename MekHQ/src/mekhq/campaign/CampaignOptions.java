@@ -266,6 +266,7 @@ public class CampaignOptions {
     private boolean enableSkillAwards;
     private boolean enableTheatreOfWarAwards;
     private boolean enableTimeAwards;
+    private boolean enableTrainingAwards;
     private boolean enableMiscAwards;
     //endregion Personnel Tab
 
@@ -335,7 +336,6 @@ public class CampaignOptions {
 
     // Education
     private boolean useEducationModule;
-    private boolean eduEnableAutoAwardsIntegration;
     private Integer maximumJumpCount;
     private boolean useTruebornTravelException;
     private boolean enableLocalAcademies;
@@ -759,6 +759,7 @@ public class CampaignOptions {
         setEnableSkillAwards(true);
         setEnableTheatreOfWarAwards(true);
         setEnableTimeAwards(true);
+        setEnableTrainingAwards(true);
         setEnableMiscAwards(true);
         //endregion Personnel Tab
 
@@ -845,7 +846,6 @@ public class CampaignOptions {
 
         // Education
         setUseEducationModule(true);
-        setEduEnableAutoAwardsIntegration(true);
         setMaximumJumpCount(5);
         setUseTruebornTravelException(true);
         setEnableLocalAcademies(true);
@@ -2281,16 +2281,6 @@ public class CampaignOptions {
         this.useEducationModule = useEducationModule;
     }
 
-
-    public boolean isEduEnableAutoAwardsIntegration() {
-        return eduEnableAutoAwardsIntegration;
-    }
-
-
-    public void setEduEnableAutoAwardsIntegration(boolean eduEnableAutoAwardsIntegration) {
-        this.eduEnableAutoAwardsIntegration = eduEnableAutoAwardsIntegration;
-    }
-
     public Integer getMaximumJumpCount() {
         return maximumJumpCount;
     }
@@ -2714,6 +2704,14 @@ public class CampaignOptions {
 
     public void setEnableTimeAwards(final boolean enableTimeAwards) {
         this.enableTimeAwards = enableTimeAwards;
+    }
+
+    public boolean isEnableTrainingAwards() {
+        return enableTrainingAwards;
+    }
+
+    public void setEnableTrainingAwards(final boolean enableTrainingAwards) {
+        this.enableTrainingAwards = enableTrainingAwards;
     }
 
     public boolean isEnableMiscAwards() {
@@ -4188,6 +4186,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableSkillAwards", isEnableSkillAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTheatreOfWarAwards", isEnableTheatreOfWarAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTimeAwards", isEnableTimeAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTrainingAwards", isEnableTrainingAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableMiscAwards", isEnableMiscAwards());
         //endregion Awards
         //endregion Personnel Tab
@@ -4272,7 +4271,6 @@ public class CampaignOptions {
 
         //region Education
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEnableAutoAwardsIntegration", isEduEnableAutoAwardsIntegration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCount", getMaximumJumpCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTruebornTravelException", isUseTruebornTravelException());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
@@ -4854,6 +4852,8 @@ public class CampaignOptions {
                     retVal.setEnableTheatreOfWarAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableTimeAwards")) {
                     retVal.setEnableTimeAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableTrainingAwards")) {
+                    retVal.setEnableTrainingAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableMiscAwards")) {
                     retVal.setEnableMiscAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Awards
@@ -5021,8 +5021,6 @@ public class CampaignOptions {
                     //region Education
                 } else if (wn2.getNodeName().equalsIgnoreCase("useEducationModule")) {
                     retVal.setUseEducationModule(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduEnableAutoAwardsIntegration")) {
-                    retVal.setEduEnableAutoAwardsIntegration(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maximumJumpCount")) {
                     retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTruebornTravelException")) {

@@ -299,38 +299,34 @@ public class EducationController {
     }
 
     /**
-     * Process a new day in the campaign, updating the education status of each student.
+     * Process a new day in the campaign, updating the education status of the student.
      *
-     * @param campaign the campaign object containing the students
      */
-    public static void processNewDay(Campaign campaign) {
+    public static boolean processNewDay(Campaign campaign, Person person) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
+        Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
-        for (Person person : campaign.getStudents()) {
-            Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
-
-            // is person in transit to the institution?
-            if (journeyToAcademy(campaign, person, resources)) {
-                continue;
-            }
-
-            // is person on campus and undergoing education?
-            Integer daysOfEducation = ongoingEducation(campaign, person, academy, resources);
-
-            if (daysOfEducation == null) {
-                continue;
-            }
-
-            // if education has concluded and the journey home hasn't started, we begin the journey
-            Integer daysOfTravelFrom = beginJourneyHome(campaign, person, academy, daysOfEducation, resources);
-
-            if (daysOfTravelFrom == null) {
-                continue;
-            }
-
-            // if we reach this point it means Person is already in transit, so we continue their journey
-            processJourneyHome(campaign, person, daysOfTravelFrom);
+        // is person in transit to the institution?
+        if (journeyToAcademy(campaign, person, resources)) {
+            return false;
         }
+
+        // is person on campus and undergoing education?
+        Integer daysOfEducation = ongoingEducation(campaign, person, academy, resources);
+
+        if (daysOfEducation == null) {
+            return false;
+        }
+
+        // if education has concluded and the journey home hasn't started, we begin the journey
+        Integer daysOfTravelFrom = beginJourneyHome(campaign, person, academy, daysOfEducation, resources);
+
+        if (daysOfTravelFrom == null) {
+            return false;
+        }
+
+        // if we reach this point it means Person is already in transit, so we continue their journey
+        return processJourneyHome(campaign, person, daysOfTravelFrom);
     }
 
     /**
@@ -503,7 +499,7 @@ public class EducationController {
      * @param person           the person whose journey home is being processed
      * @param daysOfTravelFrom the number of days it takes for the person to travel from the campaign location to the unit
      */
-    private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfTravelFrom) {
+    private static boolean processJourneyHome(Campaign campaign, Person person, Integer daysOfTravelFrom) {
         int travelTime = 0;
 
         try {
@@ -518,9 +514,7 @@ public class EducationController {
             person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
         }
 
-        if ((travelTime - person.getEduDaysOfTravel()) < 1) {
-            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
-        }
+        return (travelTime - person.getEduDaysOfTravel()) < 1;
     }
 
     /**
