@@ -13,6 +13,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,7 +72,7 @@ public class Desertion {
             }
 
             // if the margin of failure is 1-2 person goes AWOL instead of deserting
-            if ((targetNumber - roll) >= 2) {
+            if ((targetNumber - roll) <= 2) {
                 person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.AWOL);
                 person.setAwolDays(Compute.d6(2));
 
@@ -198,6 +199,8 @@ public class Desertion {
      * @param resources The ResourceBundle containing game resources
      */
     static void theftController(Campaign campaign, List<Person> thieves, List<Part> theftTargetsParts, ArrayList<Unit> theftTargetsUnits, ResourceBundle resources) {
+        Random random = new Random();
+
         for (Person ignored : thieves) {
             boolean theftComplete = false;
 
@@ -209,7 +212,7 @@ public class Desertion {
                     case 0:
                         // unit theft
                         if ((campaign.getCampaignOptions().isUseTheftUnit()) && (!theftTargetsUnits.isEmpty())) {
-                            theftTargetsUnits.remove(processUnitTheft(campaign, theftTargetsUnits, resources));
+                            theftTargetsUnits.remove(processUnitTheft(campaign, theftTargetsUnits, random, resources));
                             theftComplete = true;
                         }
                         break;
@@ -226,7 +229,7 @@ public class Desertion {
                     case 6:
                         // part theft
                         if ((campaign.getCampaignOptions().isUseTheftParts()) && (!theftTargetsParts.isEmpty())) {
-                            theftTargetsParts = processPartTheft(campaign, theftTargetsParts, resources);
+                            theftTargetsParts = processPartTheft(campaign, theftTargetsParts, random, resources);
                             theftComplete = true;
                         }
                         break;
@@ -239,7 +242,7 @@ public class Desertion {
                     case 13:
                     case 14:
                         // petty theft
-                        processPettyTheft(campaign, resources);
+                        processPettyTheft(campaign, random, resources);
                         theftComplete = true;
                         break;
                     default:
@@ -250,15 +253,21 @@ public class Desertion {
     }
 
     /**
-     * Processes unit thefts during a campaign.
+     * Processes the theft of a unit in a campaign.
+     * This method selects a random unit from a list of possible theft targets
+     * and performs the theft operation.
+     * If the campaign options allow, and the faction is not a clan, the stolen unit may be
+     * resold on the black market with a specified resale value.
+     * Otherwise, the theft is reported in the campaign report.
      *
-     * @param campaign               The campaign in which the unit thefts occur.
-     * @param possibleTheftTargets   The list of units that can be stolen.
-     * @param resources              The resource bundle for internationalization.
-     * @return A list of stolen units.
+     * @param campaign               The current campaign.
+     * @param possibleTheftTargets   The list of possible units that can be stolen.
+     * @param random                 The random number generator.
+     * @param resources              The ResourceBundle containing game resources.
+     * @return The stolen unit.
      */
-    static Unit processUnitTheft(Campaign campaign, List<Unit> possibleTheftTargets, ResourceBundle resources) {
-        Unit stolenUnit = possibleTheftTargets.get(new Random().nextInt(possibleTheftTargets.size()));
+    static Unit processUnitTheft(Campaign campaign, List<Unit> possibleTheftTargets, Random random, ResourceBundle resources) {
+        Unit stolenUnit = possibleTheftTargets.get(random.nextInt(possibleTheftTargets.size()));
         String theftString = stolenUnit.getName();
 
         if (!Objects.equals(stolenUnit.getFluffName(), "")) {
@@ -294,6 +303,10 @@ public class Desertion {
     static boolean processMoneyTheft(Campaign campaign, ResourceBundle resources) {
         int theftPercentage = campaign.getCampaignOptions().getTheftValue() + getPercentageModifier();
 
+        if (theftPercentage < 1) {
+            theftPercentage = 1;
+        }
+
         Money theft = campaign.getFunds()
                 .multipliedBy(theftPercentage)
                 .dividedBy(100)
@@ -315,12 +328,13 @@ public class Desertion {
     /**
      * Processes the theft of parts.
      *
-     * @param campaign           the current campaign
-     * @param theftTargetsParts  the list of parts targeted for theft
-     * @param resources          the ResourceBundle containing game resources
-     * @return a list of parts that have been stolen
+     * @param campaign           The current campaign.
+     * @param theftTargetsParts  The list of parts targeted for theft.
+     * @param random             The random number generator.
+     * @param resources          The ResourceBundle containing game resources.
+     * @return The updated list of parts after the theft.
      */
-    static List<Part> processPartTheft(Campaign campaign, List<Part> theftTargetsParts, ResourceBundle resources) {
+    static List<Part> processPartTheft(Campaign campaign, List<Part> theftTargetsParts, Random random, ResourceBundle resources) {
         // how many parts should be stolen?
         int theftCount = 1;
 
@@ -331,40 +345,46 @@ public class Desertion {
                     .sum();
         }
 
-        HashMap<Part, Integer> stolenItems = new HashMap<>();
+        LogManager.getLogger().info(theftCount);
+
+        HashMap<String, Integer> stolenItems = new HashMap<>();
 
         for (int theft = 0; theft < theftCount; theft++) {
             int itemCount;
 
-            // if everything has been stolen the would-be thief will leave empty-handed
+            // if everything has been stolen, the would-be thief will leave empty-handed
             if (!theftTargetsParts.isEmpty()) {
                 // pick the part to be stolen
-                Part stolenPart = theftTargetsParts.get(new Random().nextInt(theftTargetsParts.size()));
+                Part stolenPart = theftTargetsParts.get(random.nextInt(theftTargetsParts.size()));
 
                 // how many parts should be stolen?
-                if ((stolenPart instanceof AmmoStorage) || (stolenPart instanceof Armor)) {
+                if (stolenPart instanceof AmmoStorage) {
                     itemCount = Compute.d6(2);
 
-                    if (itemCount > stolenPart.getQuantity()) {
+                    if (itemCount > (stolenPart.getQuantity())) {
                         itemCount = stolenPart.getQuantity();
+                    }
+                } else if (stolenPart instanceof Armor) {
+                    itemCount = Compute.d6(2);
+
+                    if (itemCount > ((Armor) stolenPart).getAmount()) {
+                        itemCount = ((Armor) stolenPart).getAmount();
                     }
                 } else {
                     itemCount = 1;
                 }
 
-                // steal the part
-                if (stolenPart instanceof AmmoStorage) {
-                    campaign.getWarehouse().removeAmmo((AmmoStorage) stolenPart, itemCount);
-                } else if (stolenPart instanceof Armor) {
-                    campaign.getWarehouse().removeArmor((Armor) stolenPart, itemCount);
-                } else {
-                    campaign.getWarehouse().getPart(stolenPart.getId());
-                }
+                // steal the part/s
+                campaign.getWarehouse().removePart(stolenPart, itemCount);
 
                 // add the item and count to our list of stolen items
-                stolenItems.put(stolenPart, itemCount);
+                if (stolenItems.containsKey(stolenPart.getName())) {
+                    stolenItems.put(stolenPart.getName(), stolenItems.get(stolenPart.getName()) + itemCount);
+                } else {
+                    stolenItems.put(stolenPart.getName(), itemCount);
+                }
 
-                // after each theft we need to rebuild our list of spare parts
+                // after each theft, we need to rebuild our list of spare parts
                 theftTargetsParts = campaign.getWarehouse().getSpareParts().stream()
                         .filter(part -> part.getDaysToArrival() == 0)
                         .filter(part -> part.getDaysToWait() == 0)
@@ -375,26 +395,28 @@ public class Desertion {
             }
         }
 
-        campaign.addReport(stolenItems.keySet().stream()
-                .map(part -> ' ' + part.getName() + 'x' + stolenItems.get(part))
-                .collect(Collectors.joining("", resources.getString("desertionTheftParts.text"), "")));
+        String theftReport = stolenItems.keySet().stream()
+                .map(stolenItem -> "<li>" + stolenItem + " x" + stolenItems.get(stolenItem) + "</li>")
+                .collect(Collectors.joining("", resources.getString("desertionTheftParts.text"), "</ul></html>"));
+
+        campaign.addReport(theftReport);
 
         return theftTargetsParts;
     }
 
     /**
-     * This method is used to process a petty theft incident in a company.
-     * It randomly selects an item from a list of stolen items and adds the item to the campaign report.
+     * Processes the theft of petty objects during a campaign.
      *
-     * @param campaign   The campaign object to add the report to.
-     * @param resources  The ResourceBundle object to retrieve localized strings.
+     * @param campaign   The current campaign.
+     * @param random     The random number generator.
+     * @param resources  The ResourceBundle containing game resources.
      */
-    static void processPettyTheft(Campaign campaign, ResourceBundle resources) {
+    static void processPettyTheft(Campaign campaign, Random random, ResourceBundle resources) {
         List<String> items = List.of(
                 "stapler.text",
                 "mascot.text",
                 "phones.text",
-                "tablets.text",
+                "interface.text",
                 "hardDrives.text",
                 "flashDrive.text",
                 "companyCreditCard.text",
@@ -499,6 +521,6 @@ public class Desertion {
                 "dropShip.text");
 
         campaign.addReport(String.format(resources.getString("desertionTheft.text"),
-                resources.getString(items.get(new Random().nextInt(items.size())))));
+                resources.getString(items.get(random.nextInt(items.size())))));
     }
 }
