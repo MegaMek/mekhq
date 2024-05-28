@@ -17,6 +17,8 @@ import java.util.ResourceBundle;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.Morale.Desertion.processDesertion;
+
 public class MoraleController {
     /**
      * This method returns the Morale level as a string based on the campaign's current morale.
@@ -159,7 +161,7 @@ public class MoraleController {
 
         // Marriage
         if ((campaign.getCampaignOptions().isUseMoraleModifierMarriage()) && (isDesertion)) {
-            modifier--;
+            modifier += 2;
         }
 
         // Management Skill Modifier
@@ -409,6 +411,9 @@ public class MoraleController {
      * @return true if someone has mutinied or deserted, false otherwise
      */
     public static boolean makeMoraleChecks(Campaign campaign, boolean isDesertion) {
+        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Morale",
+                MekHQ.getMHQOptions().getLocale());
+
         // we start with cases that cause not check to be needed
         if ((isDesertion) && (!campaign.getCampaignOptions().isUseDesertions())) {
             return false;
@@ -429,7 +434,7 @@ public class MoraleController {
 
         int meanLoyalty = getMeanLoyalty(campaign, isDesertion);
 
-        // Next we perform the actual checks, building a list of deserters and mutineers
+        // finally, we perform the actual checks, building a list of deserters and mutineers
         HashMap<Person, Integer> deserters = new HashMap<>();
         HashMap<Person, Integer> mutineers = new HashMap<>();
 
@@ -452,8 +457,15 @@ public class MoraleController {
         }
 
         // the rolls made, we check whether a mutiny or desertion has occurred and if so, process it
+
         if (isDesertion) {
-            return !deserters.isEmpty();
+            if (!deserters.isEmpty()) {
+                processDesertion(campaign, deserters, targetNumber, resources);
+
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return !mutineers.isEmpty();
         }

@@ -18,23 +18,24 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static mekhq.campaign.personnel.enums.PersonnelStatus.DESERTED;
 import static mekhq.campaign.personnel.turnoverAndRetention.Morale.MoraleController.getPercentageModifier;
 import static mekhq.campaign.personnel.turnoverAndRetention.Morale.MoraleController.reclaimOriginalUnit;
 
 public class Desertion {
     /**
-     * Processes desertion for a person.
+     * Processes a desertion event in a campaign.
      *
-     * @param campaign       the current campaign
-     * @param deserters      the potential deserters and their desertion rolls
-     * @param targetNumber   the target number for desertion
-     * @param resources      the resource bundle for localized messages
+     * @param campaign   The current campaign.
+     * @param deserters  A map of deserters and their corresponding desertion rolls.
+     * @param targetNumber The target number for determining the severity of the desertion.
+     * @param resources  The ResourceBundle containing game resources.
      */
-    private static void processDesertion(Campaign campaign, HashMap<Person, Integer> deserters, int targetNumber,
-                                         List<Unit> possibleTheftTargets, ResourceBundle resources) {
+    static void processDesertion(Campaign campaign, HashMap<Person, Integer> deserters, int targetNumber, ResourceBundle resources) {
         // morale is used to determine whether a theft occurs
         int morale = campaign.getMorale() / 10;
 
+        // we start by building our theft target lists.
         // if a theft occurs, it will take an item from one of these lists
 
         // we assume units with a crew size > 5 cannot be stolen by one person,
@@ -43,8 +44,7 @@ public class Desertion {
                 .filter(unit -> (!unit.isAvailable()) && (unit.getFullCrewSize() < 6))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-
-        // here we collect a list of parts that are available to be stolen
+        // here we collect a list of parts that can be stolen
         ArrayList<Part> theftTargetsParts = campaign.getWarehouse().getSpareParts().stream()
                 .filter(part -> part.getDaysToArrival() == 0)
                 .filter(part -> part.getDaysToWait() == 0)
@@ -53,11 +53,16 @@ public class Desertion {
                 .filter(part -> !part.isOmniPodded())
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        // we make a list of thieves, so they can be processed at the same time
+        // we're going to make a list of thieves, so they can be processed at the same time
         List<Person> thieves = new ArrayList<>();
 
-        // next we check what type of desertion is occurring: going AWOL, deserting, or deserting with theft
+        // next, we check what type of desertion is occurring: going AWOL, deserting, or deserting with theft
         for (Person person : deserters.keySet()) {
+            // this allows us to avoid double-handling spouses
+            if (person.getStatus() == DESERTED) {
+                continue;
+            }
+
             int roll = deserters.get(person);
 
             // the Iron Fist leadership style makes desertions worse
@@ -65,38 +70,122 @@ public class Desertion {
                 roll -= 1;
             }
 
-            // if margin of failure is 1-2 person goes AWOL instead of deserting
+            // if the margin of failure is 1-2 person goes AWOL instead of deserting
             if ((targetNumber - roll) >= 2) {
                 person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.AWOL);
                 person.setAwolDays(Compute.d6(2));
 
-                return;
+                continue;
             }
 
-            // otherwise, reclaim original unit
+            // At this point we know the person is going to desert, so we run with that assumption
+
+            // reclaim the original unit
             if (person.getOriginalUnitId() != null) {
                 if (reclaimOriginalUnit(campaign, person)) {
-                    campaign.addReport(person.getHyperlinkedFullTitle() + ' '
-                            + String.format(resources.getString("reclaimSuccessful.text"),
-                            campaign.getUnit(person.getOriginalUnitId())));
+                    campaign.addReport(person.getHyperlinkedFullTitle() + ' ' + String.format(resources.getString("reclaimSuccessful.text"), campaign.getUnit(person.getOriginalUnitId())));
                 } else {
-                    campaign.addReport(person.getHyperlinkedFullTitle() + ' '
-                            + resources.getString("reclaimFailed.text"));
+                    campaign.addReport(person.getHyperlinkedFullTitle() + ' ' + resources.getString("reclaimFailed.text"));
 
-                    // if we're unable to reclaim original unit, roll is set to 0 to force a theft
+                    // if we're unable to reclaim the original unit, roll is set to 0 to force a theft
                     roll = 0;
                 }
             }
 
-            // if margin of failure is 4+ a theft occurs
+            // if the margin of failure is a 4+, theft occurs
             if ((morale - roll) >= 4) {
                 thieves.add(person);
+            }
+
+            person.changeStatus(campaign, campaign.getLocalDate(), DESERTED);
+
+            if (person.getGenealogy().getChildren() != null) {
+                processChildDesertion(campaign, person, resources);
+            }
+
+            if ((person.getGenealogy().hasSpouse()) && (campaign.getCampaignOptions().isUseMoraleModifierMarriage())) {
+                Person spouse = person.getGenealogy().getSpouse();
+
+                campaign.addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("desertionSpouse.text"));
+
+                spouse.changeStatus(campaign, campaign.getLocalDate(), DESERTED);
             }
         }
 
         if (!thieves.isEmpty()) {
             theftController(campaign, thieves, theftTargetsParts, theftTargetsUnits, resources);
         }
+    }
+
+    /**
+     * Processes child desertion for a given person in the campaign.
+     *
+     * @param campaign   the current campaign
+     * @param person     the person whose children are being processed for desertion
+     * @param resources  the ResourceBundle containing string resources
+     */
+    private static void processChildDesertion(Campaign campaign, Person person, ResourceBundle resources) {
+        for (Person child : person.getGenealogy().getChildren()) {
+            if (!child.isChild(campaign.getLocalDate())) {
+                continue;
+            } else if (isAbsentChild(child)) {
+                continue;
+            }
+
+            List<Person> parents = child.getGenealogy().getParents();
+
+            boolean singleAbsentParent = false;
+            boolean bothAbsentParents = false;
+
+            // orphans do not desert
+            if (parents.size() == 1) {
+                child.changeStatus(campaign, campaign.getLocalDate(), DESERTED);
+            } else if (parents.size() == 2) {
+                for (Person parent : parents) {
+                    if (isAbsentAdult(parent)) {
+                        if (singleAbsentParent) {
+                            bothAbsentParents = true;
+                        } else {
+                            singleAbsentParent = true;
+                        }
+                    }
+                }
+            }
+
+            if (bothAbsentParents) {
+                child.changeStatus(campaign, campaign.getLocalDate(), DESERTED);
+                campaign.addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("desertionChild.text"));
+            } else if (singleAbsentParent) {
+                if (Compute.d6(1) >= 4) {
+                    child.changeStatus(campaign, campaign.getLocalDate(), DESERTED);
+                    campaign.addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("desertionChild.text"));
+                }
+            }
+        }
+    }
+
+    /**
+     * Determines if an adult person is absent based on their status.
+     *
+     * @param adult The adult person to check for absence.
+     * @return True if the adult is absent, otherwise false.
+     */
+    public static boolean isAbsentAdult(Person adult) {
+        PersonnelStatus status = adult.getStatus();
+
+        return status.isMIA() || status.isPoW() || status.isOnLeave() || status.isAWOL() || status.isStudent() || status.isMissing() || status.isDead() || status.isRetired() || status.isDeserted();
+    }
+
+    /**
+     * Checks if the child person is considered an absent child.
+     *
+     * @param child The child to check for absence.
+     * @return True if the child is considered absent, otherwise false.
+     */
+    public static boolean isAbsentChild(Person child) {
+        PersonnelStatus status = child.getStatus();
+
+        return status.isMIA() || status.isPoW() || status.isMissing() || status.isDead() || status.isRetired() || status.isDeserted();
     }
 
     /**
@@ -113,7 +202,7 @@ public class Desertion {
             boolean theftComplete = false;
 
             // we want to keep rolling for a theft until a successful one occurs.
-            while (theftComplete) {
+            while (!theftComplete) {
                 int roll = Compute.randomInt(15);
 
                 switch (roll) {

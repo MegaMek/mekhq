@@ -5169,7 +5169,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMoraleModifierCabinFever.setName("chkUseMoraleModifierCabinFever");
         chkUseMoraleModifierCabinFever.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseManagementSkill()));
 
-        chkUseMoraleModifierMarriage = new JCheckBox(resources.getString("chkUseMoraleModifierMarriage .text"));
+        chkUseMoraleModifierMarriage = new JCheckBox(resources.getString("chkUseMoraleModifierMarriage.text"));
         chkUseMoraleModifierMarriage.setToolTipText(resources.getString("chkUseMoraleModifierMarriage.toolTipText"));
         chkUseMoraleModifierMarriage.setName("chkUseMoraleModifierMarriage");
         chkUseMoraleModifierMarriage.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseManagementSkill()));
