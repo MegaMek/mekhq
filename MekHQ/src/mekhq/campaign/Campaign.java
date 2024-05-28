@@ -5627,7 +5627,7 @@ public class Campaign implements ITechManager {
         }
         IUnitRating rating = getUnitRating();
         return getCampaignOptions().getUnitRatingMethod().isFMMR() ? rating.getUnitRatingAsInteger()
-                : MathUtility.clamp(rating.getModifier(), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
+                : MathUtility.clamp((rating.getModifier() / 3), IUnitRating.DRAGOON_F, IUnitRating.DRAGOON_ASTAR);
     }
 
     /**
@@ -5744,10 +5744,12 @@ public class Campaign implements ITechManager {
         entity.setShutDown(false);
         entity.setSearchlightState(false);
 
-        if (entity.hasBAP()) {
-            entity.setNextSensor(entity.getSensors().lastElement());
-        } else if (!entity.getSensors().isEmpty()) {
-            entity.setNextSensor(entity.getSensors().firstElement());
+        if (!entity.getSensors().isEmpty()) {
+            if (entity.hasBAP()) {
+                entity.setNextSensor(entity.getSensors().lastElement());
+            } else {
+                entity.setNextSensor(entity.getSensors().firstElement());
+            }
         }
 
         if (entity instanceof IBomber) {

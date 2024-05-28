@@ -33,6 +33,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryconditions.Atmosphere;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.againstTheBot.AtBStaticWeightGenerator;
@@ -290,15 +291,15 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     private void initBattle(Campaign campaign) {
         setTerrain();
+        if (campaign.getCampaignOptions().isUsePlanetaryConditions() &&
+                null != campaign.getMission(getMissionId())) {
+            setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
+        }
         if (campaign.getCampaignOptions().isUseLightConditions()) {
             setLightConditions();
         }
         if (campaign.getCampaignOptions().isUseWeatherConditions()) {
-            setWeather();
-        }
-        if (campaign.getCampaignOptions().isUsePlanetaryConditions() &&
-                null != campaign.getMission(getMissionId())) {
-            setPlanetaryConditions(campaign.getMission(getMissionId()), campaign);
+            setWeatherConditions();
         }
         setMapSize();
         setMapFile();
@@ -334,7 +335,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         setLight(TCO.rollLightCondition(getTerrainType()));
     }
 
-    public void setWeather() {
+    public void setWeatherConditions() {
         // weather is irrelevant in these situations.
         if (getBoardType() == AtBScenario.T_SPACE ||
                 getBoardType() == AtBScenario.T_ATMOSPHERE) {
@@ -1501,7 +1502,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     @Override
     public void generateStub(Campaign c) {
         super.generateStub(c);
-        alliesPlayerStub = generateEntityStub(alliesPlayer);
+        alliesPlayerStub = Utilities.generateEntityStub(alliesPlayer);
 
         alliesPlayer.clear();
         if (null != bigBattleAllies) {

@@ -23,10 +23,7 @@ package mekhq.campaign.mission;
 
 import megamek.Version;
 import megamek.client.ui.swing.lobby.LobbyUtility;
-import megamek.common.Board;
-import megamek.common.Entity;
-import megamek.common.IStartingPositions;
-import megamek.common.MapSettings;
+import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.planetaryconditions.*;
 import mekhq.MekHQ;
@@ -52,7 +49,7 @@ import java.util.*;
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
-public class Scenario {
+public class Scenario implements IPlayerSettings {
     //region Variable Declarations
     public static final int S_DEFAULT_ID = -1;
 
@@ -238,54 +235,67 @@ public class Scenario {
         return startingPos;
     }
 
+    @Override
     public void setStartingPos(int start) {
         this.startingPos = start;
     }
 
+    @Override
     public int getStartOffset() {
         return startOffset;
     }
 
+    @Override
     public void setStartOffset(int startOffset) {
         this.startOffset = startOffset;
     }
 
+    @Override
     public int getStartWidth() {
         return startWidth;
     }
 
+    @Override
     public void setStartWidth(int startWidth) {
         this.startWidth = startWidth;
     }
 
+    @Override
     public int getStartingAnyNWx() {
         return startingAnyNWx;
     }
 
+    @Override
     public void setStartingAnyNWx(int startingAnyNWx) {
         this.startingAnyNWx = startingAnyNWx;
     }
 
+    @Override
     public int getStartingAnyNWy() {
         return startingAnyNWy;
     }
 
+    @Override
     public void setStartingAnyNWy(int startingAnyNWy) {
         this.startingAnyNWy = startingAnyNWy;
     }
 
+    @Override
     public int getStartingAnySEx() {
         return startingAnySEx;
     }
 
+    @Override
     public void setStartingAnySEx(int startingAnySEx) {
         this.startingAnySEx = startingAnySEx;
     }
 
+    @Override
     public int getStartingAnySEy() {
         return startingAnySEy;
     }
 
+    @Override
     public void setStartingAnySEy(int startingAnySEy) {
         this.startingAnySEy = startingAnySEy;
     }
@@ -427,8 +437,56 @@ public class Scenario {
 
     public void setMinWindStrength(Wind strength) { this.minWindStrength = strength; }
 
+    /**
+     * Create a PlanetaryConditions object from variables
+     * @return PlanetaryConditions object
+     */
+    public PlanetaryConditions createPlanetaryConditions() {
+        PlanetaryConditions planetaryConditions = new PlanetaryConditions();
+        planetaryConditions.setLight(getLight());
+        planetaryConditions.setWeather(getWeather());
+        planetaryConditions.setWind(getWind());
+        planetaryConditions.setFog(getFog());
+        planetaryConditions.setAtmosphere(getAtmosphere());
+        planetaryConditions.setTemperature(getTemperature());
+        planetaryConditions.setGravity(getGravity());
+        planetaryConditions.setEMI(getEMI());
+        planetaryConditions.setBlowingSand(getBlowingSand());
+        planetaryConditions.setShiftingWindDirection(canWindShiftDirection());
+        planetaryConditions.setShiftingWindStrength(canWindShiftStrength());
+        planetaryConditions.setWindMax(getMaxWindStrength());
+        planetaryConditions.setWindMin(getMinWindStrength());
+
+        return planetaryConditions;
+    }
+
+    /**
+     * Read the values from a PlanetaryConditions object into the Scenario variables for planetary conditions.
+     * This is necessary because MekHQ has XML and MegaMek doesn't.
+     * @param planetaryConditions A PlanetaryConditions object
+     */
+    public void readPlanetaryConditions(PlanetaryConditions planetaryConditions) {
+        this.setLight(planetaryConditions.getLight());
+        this.setWeather(planetaryConditions.getWeather());
+        this.setWind(planetaryConditions.getWind());
+        this.setFog(planetaryConditions.getFog());
+        this.setAtmosphere(planetaryConditions.getAtmosphere());
+        this.setTemperature(planetaryConditions.getTemperature());
+        this.setGravity(planetaryConditions.getGravity());
+        this.setEMI(planetaryConditions.getEMI());
+        this.setBlowingSand(planetaryConditions.getBlowingSand());
+        this.setShiftWindDirection(planetaryConditions.shiftingWindDirection());
+        this.setShiftWindStrength(planetaryConditions.shiftingWindStrength());
+        this.setMaxWindStrength(planetaryConditions.getWindMax());
+        this.setMinWindStrength(planetaryConditions.getWindMin());
+    }
+
     public ScenarioDeploymentLimit getDeploymentLimit() {
         return deploymentLimit;
+    }
+
+    public void setDeploymentLimit(ScenarioDeploymentLimit limit) {
+        this.deploymentLimit = limit;
     }
 
     public Map<UUID, List<UUID>> getPlayerTransportLinkages() {
@@ -551,39 +609,12 @@ public class Scenario {
     public void generateStub(Campaign c) {
         stub = new ForceStub(getForces(c), c);
         for (BotForce bf : botForces) {
-            botForcesStubs.add(generateBotStub(bf, c));
+            botForcesStubs.add(bf.generateStub(c));
         }
         botForces.clear();
     }
 
     public ForceStub getForceStub() {
-        return stub;
-    }
-
-    public BotForceStub generateBotStub(BotForce bf, Campaign c) {
-        List<String> stubs = generateEntityStub(bf.getFullEntityList(c));
-        return new BotForceStub("<html>" +
-                bf.getName() + " <i>" +
-                ((bf.getTeam() == 1) ? "Allied" : "Enemy") + "</i>" +
-                " Start: " + IStartingPositions.START_LOCATION_NAMES[bf.getStartingPos()] +
-                " Fixed BV: " + bf.getTotalBV(c) +
-                ((null == bf.getBotForceRandomizer()) ? "" : "<br>Random: " + bf.getBotForceRandomizer().getDescription()) +
-                "</html>", stubs);
-    }
-
-    public List<String> generateEntityStub(List<Entity> entities) {
-        List<String> stub = new ArrayList<>();
-        for (Entity en : entities) {
-            if (null == en) {
-                stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
-            } else {
-                stub.add("<html>" + en.getCrew().getName() + " (" +
-                        en.getCrew().getGunnery() + "/" +
-                        en.getCrew().getPiloting() + "), " +
-                        "<i>" + en.getShortName() + "</i>" +
-                        "</html>");
-            }
-        }
         return stub;
     }
 
@@ -598,6 +629,10 @@ public class Scenario {
 
     public List<BotForce> getBotForces() {
         return botForces;
+    }
+
+    public void setBotForces(List<BotForce> bf) {
+        botForces = bf;
     }
 
     public void addBotForce(BotForce botForce, Campaign c) {
@@ -1093,4 +1128,9 @@ public class Scenario {
     public void setHasTrack(boolean b) {
         hasTrack = b;
     }
+
+    public static String getBoardTypeName(int i) {
+        return typeNames[i];
+    }
+
 }

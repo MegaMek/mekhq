@@ -32,6 +32,7 @@ import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.mission.IPlayerSettings;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -1284,5 +1285,91 @@ public class Utilities {
         }
 
         return summary;
+    }
+
+    public static List<String> generateEntityStub(List<Entity> entities) {
+        List<String> stub = new ArrayList<>();
+        for (Entity en : entities) {
+            if (null == en) {
+                stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
+            } else {
+                stub.add("<html>" + en.getCrew().getName() + " (" +
+                        en.getCrew().getGunnery() + "/" +
+                        en.getCrew().getPiloting() + "), " +
+                        "<i>" + en.getShortName() + "</i>" +
+                        "</html>");
+            }
+        }
+        return stub;
+    }
+
+    /**
+     * Display a descriptive character string for the deployment parameters in an object that implements IPlayerSettings
+     * @param player object that implements IPlayerSettings
+     * @return A character string
+     */
+    public static String getDeploymentString(Player player) {
+        StringBuilder result = new StringBuilder("");
+
+        if(player.getStartingPos() >=0
+                && player.getStartingPos() <= IStartingPositions.START_LOCATION_NAMES.length) {
+            result.append(IStartingPositions.START_LOCATION_NAMES[player.getStartingPos()]);
+        }
+
+        if (player.getStartingPos() == 0) {
+            int NWx = player.getStartingAnyNWx() + 1;
+            int NWy = player.getStartingAnyNWy() + 1;
+            int SEx = player.getStartingAnySEx() + 1;
+            int SEy = player.getStartingAnySEy() + 1;
+            if ((NWx + NWy + SEx + SEy) > 0) {
+                result.append(" (" + NWx + ", " + NWy + ")-(" + SEx + ", " + SEy + ")");
+            }
+        }
+        int so = player.getStartOffset();
+        int sw = player.getStartWidth();
+        if ((so != 0) || (sw != 3)) {
+            result.append(", " + so);
+            result.append(", " + sw);
+        }
+
+        return result.toString();
+    }
+
+    public static String getDeploymentString(IPlayerSettings settings) {
+        return getDeploymentString(createPlayer(settings));
+    }
+
+    /**
+     * Create a Player object from IPlayerSettings parameters. Useful for tracking these variables in dialogs.
+     * @param settings an object that implements IPlayerSettings
+     * @return A Player object
+     */
+    public static Player createPlayer(IPlayerSettings settings) {
+        Player p = new Player(1, "fake");
+        p.setStartingPos(settings.getStartingPos());
+        p.setStartWidth(settings.getStartWidth());
+        p.setStartOffset(settings.getStartOffset());
+        p.setStartingAnyNWx(settings.getStartingAnyNWx());
+        p.setStartingAnyNWy(settings.getStartingAnyNWy());
+        p.setStartingAnySEx(settings.getStartingAnySEx());
+        p.setStartingAnySEy(settings.getStartingAnySEy());
+
+        return p;
+    }
+
+    /**
+     * Update values of an object that implements IPlayerSettings from a player object
+     * @param settings An object that implements IPlayerSettings
+     * @param player A Player object from which to read values
+     */
+    public static void updatePlayerSettings(IPlayerSettings settings, Player player) {
+        settings.setStartingPos(player.getStartingPos());
+        settings.setStartWidth(player.getStartWidth());
+        settings.setStartOffset(player.getStartOffset());
+        settings.setStartingAnyNWx(player.getStartingAnyNWx());
+        settings.setStartingAnyNWy(player.getStartingAnyNWy());
+        settings.setStartingAnySEx(player.getStartingAnySEx());
+        settings.setStartingAnySEy(player.getStartingAnySEy());
+
     }
 }

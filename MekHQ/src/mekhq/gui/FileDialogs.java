@@ -226,6 +226,23 @@ public class FileDialogs {
     }
 
     /**
+     * Displays a dialog window from which the user can select a <code>.mul</code> file to save to.
+     *
+     * @return the file selected, if any
+     */
+    public static Optional<File> saveUnits(JFrame frame, String name) {
+        Optional<File> value = GUI.fileDialogSave(
+                frame,
+                "Save Units",
+                FileType.MUL,
+                MekHQ.getUnitsDirectory().getValue(),
+                name + ".mul");
+
+        value.ifPresent(x -> MekHQ.getUnitsDirectory().setValue(x.getParent()));
+        return value;
+    }
+
+    /**
      * Displays a dialog window from which the user can select a campaign file to open.
      *
      * @return the file selected, if any
