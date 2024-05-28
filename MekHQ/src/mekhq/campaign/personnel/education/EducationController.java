@@ -1544,7 +1544,7 @@ public class EducationController {
 
         for (String skill : curriculum) {
             if (skill.equalsIgnoreCase("bonus xp")) {
-                person.awardXP(campaign, Compute.d6(educationLevel));
+                person.awardXP(campaign, Compute.d6(Math.max(1, educationLevel)));
             } else {
                 String skillParsed = Academy.skillParser(skill);
                 int bonus;
