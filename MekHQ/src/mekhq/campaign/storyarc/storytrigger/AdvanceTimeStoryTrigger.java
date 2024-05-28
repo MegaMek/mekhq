@@ -23,6 +23,7 @@ package mekhq.campaign.storyarc.storytrigger;
 import megamek.Version;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.gui.panels.storytriggerpanels.AdvanceTimeStoryTriggerPanel;
 import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
 import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import mekhq.utilities.MHQXMLUtility;
@@ -50,6 +51,14 @@ public class AdvanceTimeStoryTrigger extends StoryTrigger {
         }
     }
 
+    public int getDays() {
+        return days;
+    }
+
+    public void setDays(int days) {
+        this.days = days;
+    }
+
     @Override
     public String getDescription() {
         return "Advance time (" + days + " days)";
@@ -57,7 +66,7 @@ public class AdvanceTimeStoryTrigger extends StoryTrigger {
 
     @Override
     public StoryTriggerPanel getPanel(JFrame frame) {
-        return new FakeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
+        return new AdvanceTimeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override
