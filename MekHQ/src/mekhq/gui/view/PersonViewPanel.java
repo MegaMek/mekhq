@@ -1495,7 +1495,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblEducationDays2, gridBagConstraints);
         }
 
-        if ((campaign.getCampaignOptions().isUseEducationModule()) && (person.getEduDaysOfTravelFromAcademy() > 0)) {
+        if ((campaign.getCampaignOptions().isUseEducationModule()) && (person.getEduDaysOfEducation() == 0) &&(person.getEduDaysOfTravelFromAcademy() > 0)) {
             lblEducationTravelFrom1.setName("lblEducationTravelFrom1");
             lblEducationTravelFrom1.setText(resourceMap.getString("lblEducationTravelFrom1.text"));
             gridBagConstraints = new GridBagConstraints();
