@@ -4,6 +4,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.storyarc.StoryPoint;
+import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.storyarc.storytrigger.*;
 import mekhq.gui.model.StoryPointTableModel;
 import mekhq.gui.panels.StoryPointEditorPanel;
 import org.apache.logging.log4j.LogManager;
@@ -14,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -23,6 +26,8 @@ public class StoryArcEditorGUI extends JPanel {
     //region Variable Declarations
     public static final int MAX_START_WIDTH = 1400;
     public static final int MAX_START_HEIGHT = 900;
+
+    public static HashMap<String, String> availableTriggers;
     private JFrame frame;
     private MekHQ app;
     private StoryPointHyperLinkListener storyPointHLL;
@@ -46,6 +51,7 @@ public class StoryArcEditorGUI extends JPanel {
         this.app = app;
         this.storyArc = arc;
         storyPointHLL = new StoryPointHyperLinkListener(storyArc, this);
+        initializeAvailableTriggers();
         initComponents();
     }
     //endregion Constructors
@@ -200,5 +206,24 @@ public class StoryArcEditorGUI extends JPanel {
         StoryPoint selectedStoryPoint = storyPointTableModel.getStoryPointAt(storyPointTable.convertRowIndexToModel(row));
         scrollStoryPointEditor.setViewportView(new StoryPointEditorPanel(frame, "story point editor", selectedStoryPoint, this));
         SwingUtilities.invokeLater(() -> scrollStoryPointEditor.getVerticalScrollBar().setValue(0));
+    }
+
+    private void initializeAvailableTriggers() {
+        availableTriggers = new HashMap<>();
+        StoryTrigger trigger;
+        trigger = new AdvanceTimeStoryTrigger();
+        availableTriggers.put(trigger.getClass().getSimpleName(), trigger.getClass().getName());
+        trigger = new ChangeStringVariableStoryTrigger();
+        availableTriggers.put(trigger.getClass().getSimpleName(), trigger.getClass().getName());
+        trigger = new CompleteMissionStoryTrigger();
+        availableTriggers.put(trigger.getClass().getSimpleName(), trigger.getClass().getName());
+        trigger = new EndArcStoryTrigger();
+        availableTriggers.put(trigger.getClass().getSimpleName(), trigger.getClass().getName());
+        trigger = new GameOverStoryTrigger();
+        availableTriggers.put(trigger.getClass().getSimpleName(), trigger.getClass().getName());
+        trigger = new SetDateStoryTrigger();
+        availableTriggers.put(trigger.getClass().getSimpleName(), trigger.getClass().getName());
+        trigger = new SwitchTabStoryTrigger();
+        availableTriggers.put(trigger.getClass().getSimpleName(), trigger.getClass().getName());
     }
 }

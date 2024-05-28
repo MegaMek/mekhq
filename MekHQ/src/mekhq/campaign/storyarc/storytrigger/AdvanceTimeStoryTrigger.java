@@ -40,7 +40,7 @@ import java.text.ParseException;
  */
 public class AdvanceTimeStoryTrigger extends StoryTrigger {
 
-    int days;
+    int days = 1;
 
     @Override
     protected void execute() {

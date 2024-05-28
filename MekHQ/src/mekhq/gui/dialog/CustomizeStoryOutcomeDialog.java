@@ -3,12 +3,15 @@ package mekhq.gui.dialog;
 import mekhq.campaign.storyarc.StoryOutcome;
 import mekhq.campaign.storyarc.StoryPoint;
 import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.storyarc.storytrigger.GameOverStoryTrigger;
+import mekhq.gui.StoryArcEditorGUI;
 import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import mekhq.gui.utilities.JSuggestField;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -17,11 +20,14 @@ import java.util.Vector;
 public class CustomizeStoryOutcomeDialog extends JDialog {
 
     JFrame frame;
-    StoryOutcome outcome;
-    StoryPoint storyPoint;
-    String result;
+    private StoryOutcome outcome;
+    private StoryPoint storyPoint;
+    private String result;
     boolean isNewOutcome;
     private JSuggestField suggestNext;
+
+    JComboBox<String> choiceAddTrigger;
+
     private ArrayList<StoryTriggerPanel> triggerPanels;
     private JPanel panTriggers;
     private JScrollPane scrTriggers;
@@ -92,6 +98,23 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
         gbc.gridy++;
         panMain.add(suggestNext, gbc);
 
+        choiceAddTrigger = new JComboBox<>();
+        for(String s : StoryArcEditorGUI.availableTriggers.keySet()) {
+            choiceAddTrigger.addItem(s);
+        }
+        JButton btnAddTrigger = new JButton("Add Story Trigger");
+        btnAddTrigger.addActionListener(evt -> addTrigger());
+        JPanel panAddTrigger = new JPanel(new BorderLayout());
+        panAddTrigger.add(choiceAddTrigger, BorderLayout.CENTER);
+        panAddTrigger.add(btnAddTrigger, BorderLayout.LINE_END);
+        gbc.gridy++;
+        gbc.gridx = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.weightx = 1.0;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        panMain.add(panAddTrigger, gbc);
+
         panTriggers = new JPanel();
         panTriggers.setLayout(new BoxLayout(panTriggers, BoxLayout.Y_AXIS));
 
@@ -105,14 +128,14 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
 
         scrTriggers = new JScrollPane(panTriggers);
         scrTriggers.setMinimumSize(new Dimension(400, 200));
-        scrTriggers.setPreferredSize(new Dimension(400, 200));
+        //scrTriggers.setPreferredSize(new Dimension(400, 200));
         gbc.gridy++;
         gbc.gridx = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.fill = GridBagConstraints.BOTH;
         panMain.add(scrTriggers, gbc);
     }
 
@@ -161,5 +184,37 @@ public class CustomizeStoryOutcomeDialog extends JDialog {
 
     private void cancel(ActionEvent evt) {
         setVisible(false);
+    }
+
+    private JFrame getFrame() {
+        return frame;
+    }
+
+    private void addTrigger() {
+        String triggerName = (String) choiceAddTrigger.getSelectedItem();
+        String className = StoryArcEditorGUI.availableTriggers.get(triggerName);
+        StoryTrigger trigger = null;
+        if(className != null) {
+            try {
+                trigger = (StoryTrigger) Class.forName(className).getDeclaredConstructor().newInstance();
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        if(trigger != null) {
+            trigger.setStoryArc(storyPoint.getStoryArc());
+            StoryTriggerPanel panTrigger = trigger.getPanel(getFrame());
+            panTrigger.getDeleteButton().addActionListener(evt -> removePanel(panTrigger));
+            triggerPanels.add(panTrigger);
+            refreshTriggerPanels();
+        }
     }
 }
