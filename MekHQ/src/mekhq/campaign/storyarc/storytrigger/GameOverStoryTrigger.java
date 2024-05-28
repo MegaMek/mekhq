@@ -25,6 +25,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
 import mekhq.gui.panels.storytriggerpanels.FakeStoryTriggerPanel;
+import mekhq.gui.panels.storytriggerpanels.GameOverStoryTriggerPanel;
 import mekhq.gui.panels.storytriggerpanels.StoryTriggerPanel;
 import org.w3c.dom.Node;
 
@@ -51,7 +52,7 @@ public class GameOverStoryTrigger extends StoryTrigger {
 
     @Override
     public StoryTriggerPanel getPanel(JFrame frame) {
-        return new FakeStoryTriggerPanel(frame, "StoryTriggerPanel", this);
+        return new GameOverStoryTriggerPanel(frame, "StoryTriggerPanel", this);
     }
 
     @Override
