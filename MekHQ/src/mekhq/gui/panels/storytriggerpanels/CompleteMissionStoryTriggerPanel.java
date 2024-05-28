@@ -46,9 +46,18 @@ public class CompleteMissionStoryTriggerPanel extends StoryTriggerPanel {
         comboStatus = new MMComboBox<>("comboStatus", MissionStatus.values());
         comboStatus.setSelectedItem(((CompleteMissionStoryTrigger) getStoryTrigger()).getMissionStatus());
 
-        getMainPanel().setLayout(new GridLayout(0, 2));
-        getMainPanel().add(comboMission);
-        getMainPanel().add(comboStatus);
+        getMainPanel().setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 0.5;
+        gbc.weighty = 1.0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        getMainPanel().add(comboMission, gbc);
+        gbc.gridx = 1;
+        getMainPanel().add(comboStatus, gbc);
 
     }
 
