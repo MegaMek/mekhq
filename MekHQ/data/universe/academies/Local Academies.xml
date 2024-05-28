@@ -313,6 +313,7 @@
         <qualification>Reeducation &amp; Social Encouragement</qualification>
         <curriculum>Bonus XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Boot Camp</name>
