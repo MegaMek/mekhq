@@ -320,6 +320,8 @@ public class EducationController {
 
         if (daysOfEducation == null) {
             return false;
+        } else if (daysOfEducation == -1) {
+            return true;
         }
 
         // if education has concluded and the journey home hasn't started, we begin the journey
@@ -359,19 +361,6 @@ public class EducationController {
     }
 
     /**
-     * This method completes the journey to the campaign's academy for the given person.
-     *
-     * @param campaign The current campaign.
-     * @param person   The individual traveling to the academy.
-     */
-    public static void completeJourneyTo(Campaign campaign, Person person) {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
-
-        person.setEduDaysOfTravelToAcademy(0);
-        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("arrived.text"));
-    }
-
-    /**
      * Processes a person's ongoing education.
      *
      * @param campaign  The campaign the person is part of.
@@ -405,7 +394,7 @@ public class EducationController {
             if ((daysOfEducation - 1) < 1) {
                 graduationPicker(campaign, person, academy, resources);
 
-                return null;
+                return -1;
             } else {
                 return daysOfEducation - 1;
             }
@@ -440,22 +429,6 @@ public class EducationController {
         } else {
             graduateAdult(campaign, person, academy, resources);
         }
-    }
-
-    /**
-     * Completes the education process for a person.
-     *
-     * @param campaign the campaign in which the education is taking place
-     * @param person the person whose education is being completed
-     */
-    public static void completeEducation(Campaign campaign, Person person) {
-        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
-
-        Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
-
-        person.setEduDaysOfEducation(0);
-
-        graduationPicker(campaign, person, academy, resources);
     }
 
     /**
