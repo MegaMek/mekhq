@@ -45,11 +45,11 @@ public class Academy implements Comparable<Academy> {
     // 1: high school
     // 2: college
     // 3: university
-    // 5: military academy
-    // 4: basic training
-    // 5: nco academy
-    // 6: warrant officer academy
-    // 7: officer academy
+    // 4: military academy
+    // 5: basic training
+    // 6: nco academy
+    // 7: warrant officer academy
+    // 8: officer academy
     @XmlElement(name = "type")
     private int type = 0;
 

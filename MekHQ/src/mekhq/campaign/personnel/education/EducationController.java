@@ -299,10 +299,14 @@ public class EducationController {
     }
 
     /**
-     * Process a new day in the campaign, updating the education status of the student.
+     * Processes a new day for a person in a campaign.
      *
+     * @param campaign   the campaign in which the person is participating
+     * @param person     the person for whom the new day is being processed
+     * @param ageBypass  a flag indicating whether graduation age restrictions should be bypassed
+     * @return true if the new day was successfully processed, false otherwise
      */
-    public static boolean processNewDay(Campaign campaign, Person person) {
+    public static boolean processNewDay(Campaign campaign, Person person, boolean ageBypass) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
         Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
@@ -312,7 +316,7 @@ public class EducationController {
         }
 
         // is person on campus and undergoing education?
-        Integer daysOfEducation = ongoingEducation(campaign, person, academy, resources);
+        Integer daysOfEducation = ongoingEducation(campaign, person, academy, ageBypass, resources);
 
         if (daysOfEducation == null) {
             return false;
@@ -326,7 +330,8 @@ public class EducationController {
         }
 
         // if we reach this point it means Person is already in transit, so we continue their journey
-        return processJourneyHome(campaign, person, daysOfTravelFrom);
+        processJourneyHome(campaign, person, daysOfTravelFrom);
+        return false;
     }
 
     /**
@@ -375,11 +380,11 @@ public class EducationController {
      * @param resources The resource bundle containing localized strings.
      * @return The remaining days of education for the person.
      */
-    private static Integer ongoingEducation(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+    private static Integer ongoingEducation(Campaign campaign, Person person, Academy academy, boolean ageBypass, ResourceBundle resources) {
         int daysOfEducation = person.getEduDaysOfEducation();
 
         if ((academy.isPrepSchool()) && (person.getEduDaysOfEducation() > 0)) {
-            if (person.getAge(campaign.getLocalDate()) >= academy.getAgeMax()) {
+            if ((person.getAge(campaign.getLocalDate()) >= academy.getAgeMax()) || (ageBypass)) {
                 graduationPicker(campaign, person, academy, resources);
 
                 person.setEduDaysOfEducation(0);
@@ -393,14 +398,17 @@ public class EducationController {
         } else if (daysOfEducation > 0) {
             person.setEduDaysOfEducation(daysOfEducation - 1);
 
-            if ((daysOfEducation - 1) < 1) {
-                graduationPicker(campaign, person, academy, resources);
-            }
-
             if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
                 processNewWeekChecks(campaign, academy, person, daysOfEducation, resources);
             }
-            return null;
+
+            if ((daysOfEducation - 1) < 1) {
+                graduationPicker(campaign, person, academy, resources);
+
+                return null;
+            } else {
+                return daysOfEducation - 1;
+            }
         }
 
         return daysOfEducation;
@@ -499,7 +507,7 @@ public class EducationController {
      * @param person           the person whose journey home is being processed
      * @param daysOfTravelFrom the number of days it takes for the person to travel from the campaign location to the unit
      */
-    private static boolean processJourneyHome(Campaign campaign, Person person, Integer daysOfTravelFrom) {
+    private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfTravelFrom) {
         int travelTime = 0;
 
         try {
@@ -514,7 +522,9 @@ public class EducationController {
             person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
         }
 
-        return (travelTime - person.getEduDaysOfTravel()) < 1;
+        if ((travelTime - person.getEduDaysOfTravel()) < 1) {
+            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+        }
     }
 
     /**

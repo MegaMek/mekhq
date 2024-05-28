@@ -3554,7 +3554,7 @@ public class Campaign implements ITechManager {
         for (Person person : getStudents()) {
             List<Object> individualAcademyAttributes = new ArrayList<>();
 
-            if (EducationController.processNewDay(this, person)) {
+            if (EducationController.processNewDay(this, person, false)) {
                 Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
                 graduatingPersonnel.add(person.getId());
