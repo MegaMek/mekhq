@@ -115,7 +115,8 @@
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Reeducation Camp [Local]</name>
+        <name>Clan Reeducation Camp [Local]</name>
+        <isReeducationCamp>true</isReeducationCamp>
         <isClan>true</isClan>
         <description>After a year of education, training, and encouragement, newly acquired Bondsmen can be readied for their place in Clan society</description>
         <factionDiscount>0</factionDiscount>

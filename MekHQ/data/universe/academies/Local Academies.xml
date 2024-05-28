@@ -3,7 +3,7 @@
     <academy>
         <name>Boarding School</name>
         <isPrepSchool>true</isPrepSchool>
-        <description>In a home away from home, privileged students learn the basics of life and undergo their earliest education.</description>
+        <description>A prestigious, well-guarded institution where children of nobility and influential families receive a comprehensive education in subjects ranging from advanced sciences and history to political strategy. The curriculum is designed to groom future leaders and warriors, incorporating rigorous academic coursework, physical training, and simulated combat exercises to prepare students for future leadership roles.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -20,7 +20,7 @@
         <name>High School</name>
         <type>1</type>
         <isPrepSchool>true</isPrepSchool>
-        <description>A typical academic life for teenagers across the Inner Sphere</description>
+        <description>A technologically advanced facility where students balance traditional academic subjects with a basic education in technical fields such as modern electronics, and computer science. The school fosters a competitive environment to prepare students for potential military service.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -36,7 +36,7 @@
         <name>Preparatory School</name>
         <type>1</type>
         <isPrepSchool>true</isPrepSchool>
-        <description>A boarding school for the privileged teenagers of the Inner Sphere.</description>
+        <description>A prestigious institution catering to the elite of the Inner Sphere. Nestled within secure compounds, these schools provide a comprehensive education emphasizing not only academic excellence but also etiquette, and political maneuvering. Students, typically from noble or affluent families, are groomed for leadership roles, learning the intricacies of diplomacy. The curriculum is rigorous, preparing graduates to navigate the complex power dynamics of the Inner Sphere with grace and skill.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -54,7 +54,7 @@
         <type>1</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Whether as punishment, or a matter of familial pride, an education here prepares students for a life of military discipline.</description>
+        <description>A disciplined institution focused on cultivating the skills necessary for future soldiers and officers. Cadets undergo rigorous physical training, tactical simulations, and academic studies in subjects like military history, strategy, and technology.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -68,7 +68,7 @@
     <academy>
         <name>Tech Apprenticeship</name>
         <isPrepSchool>true</isPrepSchool>
-        <description>A few years spent training under a willing master will prepare a student for the life of a Technician. Although this provides little learning beyond the subject area.</description>
+        <description>A tech apprenticeship involves hands-on training under the guidance of experienced technicians and engineers. Apprentices learn the intricacies of repairing, maintaining, and upgrading advanced military technology. They gain practical experience in workshops and repair bays, mastering skills in diagnostics, fabrication, and the integration of cutting-edge weaponry and equipment.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -97,7 +97,7 @@
     <academy>
         <name>Adult High School</name>
         <type>1</type>
-        <description>A option for those students who never graduated high school, or who never had the chance to attend.</description>
+        <description>An institution that caters to individuals who, for various reasons, didn't complete their high school education. These institutions offer flexible schedules and tailored programs to accommodate the diverse backgrounds and goals of adult learners. The environment encourages personal growth and provides opportunities for individuals to acquire the skills necessary for advancement in both civilian and military careers.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -112,7 +112,7 @@
     <academy>
         <name>Technical College</name>
         <type>2</type>
-        <description>Technical Colleges are places where the technicians of the future hone their craft.</description>
+        <description>A technical college serves as a hub for specialized education in fields crucial to the advancement of technology and warfare. Students enrolled in technical colleges undergo rigorous training in disciplines such as aerospace engineering, robotics, computer science, and weapon systems development. The curriculum combines theoretical knowledge with practical hands-on experience, utilizing state-of-the-art laboratories and workshops to foster innovation and skill acquisition.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -139,7 +139,7 @@
     </academy>
     <academy>
         <name>Trade School</name>
-        <description>Here, students learn the art of administration and applied economics</description>
+        <description>A trade school provides specialized training in practical skills essential for supporting the military-industrial complex. These schools offer courses in areas such as medicine, administration, electronics, metallurgy, and logistics.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -161,7 +161,7 @@
     <academy>
         <name>University (Bachelor's)</name>
         <type>3</type>
-        <description>The upper crust of higher education, universities offer a wide range of courses and post-graduate options</description>
+        <description>A university stands as a beacon of knowledge and innovation amidst the turmoil of interstellar conflict. These institutions offer a wide array of academic disciplines, ranging from the humanities and social sciences to advanced engineering and military strategy. Professors and researchers engage in cutting-edge studies, pushing the boundaries of technology and exploring the depths of history and culture.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -202,7 +202,7 @@
     <academy>
         <name>University (Master's)</name>
         <type>3</type>
-        <description>The upper crust of higher education, universities offer a wide range of courses and post-graduate options</description>
+        <description>A university stands as a beacon of knowledge and innovation amidst the turmoil of interstellar conflict. These institutions offer a wide array of academic disciplines, ranging from the humanities and social sciences to advanced engineering and military strategy. Professors and researchers engage in cutting-edge studies, pushing the boundaries of technology and exploring the depths of history and culture.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -243,7 +243,7 @@
     <academy>
         <name>University (Doctorate)</name>
         <type>3</type>
-        <description>The upper crust of higher education, universities offer a wide range of courses and post-graduate options</description>
+        <description>A university stands as a beacon of knowledge and innovation amidst the turmoil of interstellar conflict. These institutions offer a wide array of academic disciplines, ranging from the humanities and social sciences to advanced engineering and military strategy. Professors and researchers engage in cutting-edge studies, pushing the boundaries of technology and exploring the depths of history and culture.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -283,7 +283,7 @@
     </academy>
     <academy>
         <name>Police Academy</name>
-        <description>Police academies are open to students from any social strata and offer a rewarding career in law enforcement.</description>
+        <description>A fortified urban complex where cadets undergo rigorous training in urban warfare, crowd control, and investigative techniques. Cadets train with advanced surveillance equipment, non-lethal and lethal weaponry, and are educated in interstellar law, and faction-specific protocols.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -300,11 +300,26 @@
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
     <academy>
+        <name>Reeducation Camp</name>
+        <description>A secluded, heavily guarded facility where students undergo intense psychological conditioning and reprogramming to erase loyalty to their original faction and instill unwavering allegiance to their new home. Students are subjected to a regimen of sensory deprivation, propaganda broadcasts, and neural reconditioning to ensure their complete mental and emotional transformation.</description>
+        <isReeducationCamp>true</isReeducationCamp>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>1750</tuition>
+        <durationDays>150</durationDays>
+        <educationLevelMin>0</educationLevelMin>
+        <educationLevelMax>0</educationLevelMax>
+        <qualification>Reeducation &amp; Social Encouragement</qualification>
+        <curriculum>Bonus XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
         <name>Boot Camp</name>
         <type>5</type>
         <isMilitary>true</isMilitary>
         <promotion>Private</promotion>
-        <description>After a couple of months' hard training students are ready to serve on the line.</description>
+        <description>A sprawling, high-security installation where recruits endure intense physical conditioning, drills, and live-fire exercises with both personal and vehicle-scale weaponry. The training regimen emphasizes discipline, loyalty to one's faction, and the strategic use of cutting-edge technology in combined arms warfare.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -335,7 +350,7 @@
         <type>4</type>
         <isMilitary>true</isMilitary>
         <promotion>Corporal</promotion>
-        <description>Local Military Academies claim to offer the finest tuition for career-minded students. However, there is no replacement for in-the-field experience.</description>
+        <description>A prestigious institution dedicated to training the warriors of the Inner Sphere. Situated within heavily fortified compounds, these academies offer a comprehensive education that blends rigorous physical training, tactical instruction, and academic study. Cadets undergo intensive combat simulations, and study military history, strategy, and ethics.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -374,7 +389,7 @@
         <type>6</type>
         <isMilitary>true</isMilitary>
         <promotion>Corporal</promotion>
-        <description>Here, candidates are trained locally in the skills required to lead men.</description>
+        <description>A specialized training program designed to prepare enlisted personnel for leadership roles within their respective military units. Held within secure facilities, the bootcamp emphasizes the development of tactical proficiency, effective communication, and leadership skills essential for leading personnel in combat. Cadets undergo intensive physical conditioning, weapons training, and tactical simulations, with a focus on fostering teamwork and initiative.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -393,7 +408,7 @@
         <type>7</type>
         <isMilitary>true</isMilitary>
         <promotion>Warrant Officer</promotion>
-        <description>In those forces that use them, Warrant Officers are essential military administrators and act as a go-between NCOs and Officers. Here they learn the skills needed to succeed.</description>
+        <description>A specialized institution tasked with training promising enlisted personnel for positions of leadership and technical expertise as Warrant Officers. Held in secure military installations, these schools combine intensive academic study with practical training in areas such as engineering, logistics, and advanced tactics. Candidates undergo rigorous evaluations and assessments to demonstrate their aptitude for assuming roles of responsibility within their units.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
@@ -411,7 +426,7 @@
         <type>8</type>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
-        <description>Only the most qualified personnel are fit to become Officers. This is where they gain essential training and education.</description>
+        <description>A prestigious institution dedicated to training and grooming promising individuals for leadership roles within the military. Held in secure and strategically located facilities, these schools provide a comprehensive curriculum that encompasses both theoretical and practical aspects of warfare, leadership, and strategy. Candidates undergo rigorous physical training, tactical simulations, and academic studies in subjects such as military history, and tactics. The program is designed to identify and cultivate individuals with the potential to command units effectively and uphold the honor and integrity of their respective factions.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>

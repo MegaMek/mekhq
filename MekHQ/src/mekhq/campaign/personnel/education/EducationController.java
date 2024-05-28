@@ -1484,6 +1484,12 @@ public class EducationController {
         if (person.getEduHighestEducation() < educationLevel) {
             person.setEduHighestEducation(educationLevel);
         }
+
+        if ((academy.isReeducationCamp()) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
+            if (!Objects.equals(person.getOriginFaction(), campaign.getFaction())) {
+                person.setOriginFaction(campaign.getFaction());
+            }
+        }
     }
 
     /**
