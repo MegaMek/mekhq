@@ -366,6 +366,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseMoraleModifierCommanderSkill;
     private JCheckBox chkUseMoraleModifierLoyalty;
     private JCheckBox chkUseMoraleModifierCabinFever;
+    private JCheckBox chkUseMoraleModifierMarriage;
     private JLabel lblMoraleModifierLeadershipMethod;
     private MMComboBox<LeadershipMethod> comboMoraleModifierLeadershipMethod;
 
@@ -5168,6 +5169,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMoraleModifierCabinFever.setName("chkUseMoraleModifierCabinFever");
         chkUseMoraleModifierCabinFever.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseManagementSkill()));
 
+        chkUseMoraleModifierMarriage = new JCheckBox(resources.getString("chkUseMoraleModifierMarriage .text"));
+        chkUseMoraleModifierMarriage.setToolTipText(resources.getString("chkUseMoraleModifierMarriage.toolTipText"));
+        chkUseMoraleModifierMarriage.setName("chkUseMoraleModifierMarriage");
+        chkUseMoraleModifierMarriage.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseManagementSkill()));
+
         lblMoraleModifierLeadershipMethod = new JLabel(resources.getString("lblMoraleModifierLeadershipMethod.text"));
         lblMoraleModifierLeadershipMethod.setToolTipText(resources.getString("lblMoraleModifierLeadershipMethod.toolTipText"));
         lblMoraleModifierLeadershipMethod.setName("lblMoraleModifierLeadershipMethod");
@@ -5210,6 +5216,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseMoraleModifierCommanderSkill)
                         .addComponent(chkUseMoraleModifierLoyalty)
                         .addComponent(chkUseMoraleModifierCabinFever)
+                        .addComponent(chkUseMoraleModifierMarriage)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblMoraleModifierLeadershipMethod)
                                 .addComponent(comboMoraleModifierLeadershipMethod, Alignment.LEADING))
@@ -5227,6 +5234,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseMoraleModifierCommanderSkill)
                         .addComponent(chkUseMoraleModifierLoyalty)
                         .addComponent(chkUseMoraleModifierCabinFever)
+                        .addComponent(chkUseMoraleModifierMarriage)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblMoraleModifierLeadershipMethod)
                                 .addComponent(comboMoraleModifierLeadershipMethod))
@@ -8436,6 +8444,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMoraleModifierCommanderSkill.setSelected(options.isUseMoraleModifierCommanderLeadership());
         chkUseMoraleModifierLoyalty.setSelected(options.isUseMoraleModifierLoyalty());
         chkUseMoraleModifierCabinFever.setSelected(options.isUseMoraleModifierCabinFever());
+        chkUseMoraleModifierMarriage.setSelected(options.isUseMoraleModifierMarriage());
         comboMoraleModifierLeadershipMethod.setSelectedItem(options.getCustomMoraleModifier());
         //endregion Turnover and Retention Tab
 
@@ -9141,6 +9150,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseMoraleModifierCommanderLeadership(chkUseMoraleModifierCommanderSkill.isSelected());
             options.setUseMoraleModifierLoyalty(chkUseMoraleModifierLoyalty.isSelected());
             options.setUseMoraleModifierCabinFever(chkUseMoraleModifierCabinFever.isSelected());
+            options.setUseMoraleModifierMarriage(chkUseMoraleModifierMarriage.isSelected());
             options.setMoraleModifierLeadershipMethod(comboMoraleModifierLeadershipMethod.getSelectedItem());
             //endregion Turnover and Retention
 

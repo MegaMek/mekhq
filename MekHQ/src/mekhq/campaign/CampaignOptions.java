@@ -347,6 +347,7 @@ public class CampaignOptions {
     private boolean useMoraleModifierCommanderLeadership;
     private boolean useMoraleModifierLoyalty;
     private boolean useMoraleModifierCabinFever;
+    private boolean useMoraleModifierMarriage;
     private LeadershipMethod moraleModifierLeadershipMethod;
 
     // Family
@@ -1047,6 +1048,7 @@ public class CampaignOptions {
         setUseMoraleModifierCommanderLeadership(true);
         setUseMoraleModifierLoyalty(true);
         setUseMoraleModifierCabinFever(true);
+        setUseMoraleModifierMarriage(true);
         setMoraleModifierLeadershipMethod(LeadershipMethod.REGULAR);
         //endregion Turnover and Retention
 
@@ -1725,6 +1727,13 @@ public class CampaignOptions {
         this.useMoraleModifierCabinFever = useMoraleModifierCabinFever;
     }
 
+    public boolean isUseMoraleModifierMarriage() {
+        return useMoraleModifierMarriage;
+    }
+
+    public void setUseMoraleModifierMarriage(final boolean useMoraleModifierMarriage) {
+        this.useMoraleModifierMarriage = useMoraleModifierMarriage;
+    }
     public LeadershipMethod getMoraleModifierLeadershipMethod() {
         return moraleModifierLeadershipMethod;
     }
@@ -4846,6 +4855,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierCommanderLeadership", isUseMoraleModifierCommanderLeadership());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierLoyalty", isUseMoraleModifierLoyalty());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierCabinFever", isUseMoraleModifierCabinFever());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleModifierMarriage", isUseMoraleModifierMarriage());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleModifierLeadershipMethod", getMoraleModifierLeadershipMethod().name());
         //endregion Retirement
 
@@ -5879,6 +5889,8 @@ public class CampaignOptions {
                     retVal.setUseMoraleTriggerMutiny(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerFatigue")) {
                     retVal.setUseMoraleTriggerFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMissedPayDay")) {
+                    retVal.setUseMoraleTriggerMissedPayDay(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("customMoraleModifier")) {
                     retVal.setCustomMoraleModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierExperienceLevel")) {
@@ -5895,8 +5907,8 @@ public class CampaignOptions {
                     retVal.setUseMoraleModifierLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierCabinFever")) {
                     retVal.setUseMoraleModifierCabinFever(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMissedPayDay")) {
-                    retVal.setUseMoraleTriggerMissedPayDay(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleModifierMarriage")) {
+                    retVal.setUseMoraleModifierMarriage(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("moraleModifierLeadershipMethod")) {
                     retVal.setMoraleModifierLeadershipMethod(LeadershipMethod.valueOf(wn2.getTextContent().trim()));
                 //endregion Turnover and Retention

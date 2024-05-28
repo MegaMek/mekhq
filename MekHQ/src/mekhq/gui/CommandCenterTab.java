@@ -25,7 +25,7 @@ import megamek.common.event.Subscribe;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
-import mekhq.campaign.personnel.turnoverAndRetention.Morale;
+import mekhq.campaign.personnel.turnoverAndRetention.Morale.MoraleController;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -273,7 +273,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             gridBagConstraints.insets = new Insets(1, 5, 1, 5);
             panInfo.add(lblMoraleHead, gridBagConstraints);
-            lblMorale = new JLabel(getCampaign().getMorale() + " (" + Morale.getMoraleLevel(getCampaign()) + ')');
+            lblMorale = new JLabel(getCampaign().getMorale() + " (" + MoraleController.getMoraleLevel(getCampaign()) + ')');
             lblMoraleHead.setLabelFor(lblMorale);
             gridBagConstraints.gridx = 1;
             gridBagConstraints.weightx = 1.0;
@@ -569,7 +569,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         if (getCampaign().getCampaignOptions().isUseMorale()) {
             try {
-                lblMorale.setText(getCampaign().getMorale() + " (" + Morale.getMoraleLevel(getCampaign()) + ')');
+                lblMorale.setText(getCampaign().getMorale() + " (" + MoraleController.getMoraleLevel(getCampaign()) + ')');
             } catch (Exception ignored) {}
         }
 

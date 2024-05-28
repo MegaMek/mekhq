@@ -92,7 +92,7 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
-import mekhq.campaign.personnel.turnoverAndRetention.Morale;
+import mekhq.campaign.personnel.turnoverAndRetention.Morale.MoraleController;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
@@ -3527,11 +3527,11 @@ public class Campaign implements ITechManager {
         }
 
         processNewDayPersonnel();
-      
+
         processFatigueNewDay();
 
         processMoraleNewDay();
-      
+
         if (campaignOptions.isUseEducationModule()) {
             EducationController.processNewDay(this);
         }
@@ -3555,7 +3555,7 @@ public class Campaign implements ITechManager {
         // we still process awol personnel, even if Morale is disabled, to ensure they're not frozen in this state.
         for (Person person : getAwolPersonnel()) {
             if (person.getAwolDays() != -1) {
-                Morale.processAwolDays(this, person);
+                MoraleController.processAwolDays(this, person);
             }
         }
 
@@ -3569,32 +3569,32 @@ public class Campaign implements ITechManager {
 
             // these are the morale checks and dictate whether personnel mutiny or desert
             if ((campaignOptions.isUseDesertions()) && (getLocation().isOnPlanet())) {
-                desertionEvent = Morale.makeMoraleChecks(this, true);
+                desertionEvent = MoraleController.makeMoraleChecks(this, true);
             }
 
             if (campaignOptions.isUseMutinies()) {
-                mutinyEvent = Morale.makeMoraleChecks(this, false);
+                mutinyEvent = MoraleController.makeMoraleChecks(this, false);
             }
 
             // this processes morale recovery based on campaign location and the results of the prior checks
             if (desertionEvent && mutinyEvent) {
                 if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
-                    Morale.processMoraleChange(this, 2);
+                    MoraleController.processMoraleChange(this, 2);
                 } else {
-                    Morale.processMoraleChange(this, 3);
+                    MoraleController.processMoraleChange(this, 3);
                 }
             } else if (desertionEvent) {
                 if ((!getActiveContracts().isEmpty()) || (!getLocation().isOnPlanet())) {
-                    Morale.processMoraleChange(this, 1);
+                    MoraleController.processMoraleChange(this, 1);
                 }
             } else if (mutinyEvent) {
                 if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
-                    Morale.processMoraleChange(this, 1);
+                    MoraleController.processMoraleChange(this, 1);
                 } else {
-                    Morale.processMoraleChange(this, 2);
+                    MoraleController.processMoraleChange(this, 2);
                 }
             } else {
-                Morale.processMoraleChange(this, -1);
+                MoraleController.processMoraleChange(this, -1);
             }
         }
     }
