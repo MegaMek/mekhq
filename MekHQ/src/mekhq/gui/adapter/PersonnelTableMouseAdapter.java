@@ -2583,14 +2583,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     // Trueborn Clan Academies get a free pass, as applicants don't need to travel from the unit,
                     // they're just popped out of an Iron Womb
-                    if (academy.isTrueborn()) {
+                    if ((academy.isTrueborn()) && (campaign.getCampaignOptions().isUseTruebornTravelException())) {
                         JMenu academyOption = new JMenu(academy.getName());
 
                         educationJMenuAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
 
                         buildEducationSubMenus(campaign, academy, person, academyOption, campus, campaign.getFaction().getShortName());
                     } else {
-                        if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)) / 7) <= campaign.getCampaignOptions().getMaximumJumpCount()) {
+                        if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)) / 7) > campaign.getCampaignOptions().getMaximumJumpCount()) {
                             if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowRangeConflict())) {
                                 JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
                                 educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);

@@ -99,6 +99,7 @@ public class EducationController {
         person.setEduAcademyNameInSet(academy.getName());
         person.setEduDaysOfEducation(academy.getDurationDays());
         person.setEduAcademyFaction(faction);
+        person.setEduCourseIndex(courseIndex);
 
         if (academy.isLocal()) {
             person.setEduDaysOfTravelToAcademy(2);
@@ -106,13 +107,7 @@ public class EducationController {
         } else if (academy.isTrueborn()) {
             person.setEduDaysOfTravelToAcademy(2);
 
-            PlanetarySystem location = campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate());
-
-            try {
-                person.setEduAcademySystem(location.getId());
-            } catch (Exception e) {
-                person.setEduAcademySystem("Strana Mechty");
-            }
+            person.setEduAcademySystem(campaign.getSystemByName(campus).getId());
         } else {
             person.setEduDaysOfTravelToAcademy(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
             person.setEduAcademySystem(campaign.getSystemById(campus).getName(campaign.getLocalDate()));
@@ -329,7 +324,7 @@ public class EducationController {
             }
 
             // if we reach this point it means Person is already in transit, so we continue their journey
-            processJourneyHome(campaign, person, daysOfEducation, daysOfTravelFrom);
+            processJourneyHome(campaign, person, daysOfTravelFrom);
         }
     }
 
@@ -465,48 +460,35 @@ public class EducationController {
      * previous travel days
      */
     private static Integer beginJourneyHome(Campaign campaign, Person person, Academy academy, Integer daysOfEducation, ResourceBundle resources) {
-        int daysOfTravelFrom = person.getEduDaysOfTravelFromAcademy();
+        int travelTime = 0;
 
-        int travelTime;
-
-        if ((daysOfEducation == 0) && (daysOfTravelFrom == 0)) {
+        if ((daysOfEducation == 0) && (person.getEduDaysOfTravelFromAcademy() == 0)) {
             if ((academy.isClan()) && (academy.isPrepSchool()) && (person.getAge(campaign.getLocalDate()) < 10)) {
                 // we do this to deliberately create an infinite loop, where the player is pestered
                 // daily until the student is assigned to a Sibko
-                travelTime = 0;
+                person.setEduDaysOfTravelFromAcademy(travelTime);
+
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("creche.text"));
+
+                return null;
             } else if ((academy.isClan()) && (!academy.isLocal())) {
                 try {
-                    travelTime = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
+                    travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate())));
                 } catch (Exception e) {
-                    travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById("Strana Mechty"));
-                }
-
-                // We use a minimum of 2 days travel to avoid awkward grammar in the report.
-                // This can be hand waved as being the time it takes for Person to get from campus and
-                // recover from their education.
-                if (travelTime < 2) {
-                    travelTime = 2;
+                    travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById("Strana Mechty")));
                 }
             } else {
-                travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem()));
-
-                if (travelTime < 2) {
-                    travelTime = 2;
-                }
+                travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
             }
+
+            campaign.addReport(person.getHyperlinkedName() + ' '
+                        + String.format(resources.getString("returningFromSchool.text"), travelTime));
 
             person.setEduDaysOfTravelFromAcademy(travelTime);
 
-            if ((academy.isClan()) && (academy.isPrepSchool()) && (person.getAge(campaign.getLocalDate()) < 10)) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("creche.text"));
-            } else {
-                campaign.addReport(person.getHyperlinkedName() + ' '
-                        + String.format(resources.getString("returningFromSchool.text"), travelTime));
-            }
-
             return null;
         }
-        return daysOfTravelFrom;
+        return travelTime;
     }
 
     /**
@@ -514,38 +496,25 @@ public class EducationController {
      *
      * @param campaign         the campaign the person is in
      * @param person           the person whose journey home is being processed
-     * @param daysOfEducation  the number education days remaining
      * @param daysOfTravelFrom the number of days it takes for the person to travel from the campaign location to the unit
      */
-    private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfEducation, Integer daysOfTravelFrom) {
-        if ((daysOfEducation == 0) && (daysOfTravelFrom > 0)) {
-            int travelTime = 0;
-            boolean clanException = false;
+    private static void processJourneyHome(Campaign campaign, Person person, Integer daysOfTravelFrom) {
+        int travelTime = 0;
 
-            try {
-                travelTime = campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem()));
-            } catch (Exception e) {
-                clanException = true;
+        try {
+            travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
+
+            if (travelTime != daysOfTravelFrom) {
+                person.setEduDaysOfTravelFromAcademy(travelTime);
             }
 
-            if (clanException) {
-                person.setEduDaysOfTravelFromAcademy(daysOfTravelFrom - 1);
-                person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
-            } else {
-                if (travelTime > daysOfTravelFrom) {
-                    person.setEduDaysOfTravelFromAcademy(travelTime);
-                } else if (travelTime < daysOfTravelFrom) {
-                    person.setEduDaysOfTravelFromAcademy(travelTime / 2);
-                    person.setEduDaysOfTravel(0);
-                } else {
-                    person.setEduDaysOfTravelFromAcademy(daysOfTravelFrom - 1);
-                    person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
-                }
-            }
+            person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
+        } catch (Exception e) {
+            person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
+        }
 
-            if ((person.getEduDaysOfTravelFromAcademy()) == 0) {
-                person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
-            }
+        if ((travelTime - person.getEduDaysOfTravel()) < 1) {
+            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
         }
     }
 
@@ -599,15 +568,16 @@ public class EducationController {
 
                 // has the academy been moved alongside the faction capital?
                 if ((academy.isClan()) && (!academy.isLocal())) {
-                    String location;
+                    PlanetarySystem location;
 
                     try {
-                        location = campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()).getId();
+                        location = campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate());
 
-                        if (!person.getEduAcademySystem().equalsIgnoreCase(location)) {
-                            person.setEduAcademySystem(location);
+                        if (!person.getEduAcademySystem().equalsIgnoreCase(location.getId())) {
+                            person.setEduAcademySystem(location.getId());
 
-                            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventAcademyMoved.text"));
+                            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("eventAcademyMoved.text"),
+                                    location.getName(campaign.getLocalDate())));
                         }
                     } catch (Exception e) {
                         // it'll only throw an exception if there isn't a starting planet for the faction,
@@ -843,7 +813,8 @@ public class EducationController {
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                         resources.getString("graduatedScientist.text") + resources.getString("graduatedWarriorLabor.text")));
-
+                        resources.getString("graduatedScientist.text"),
+                        resources.getString("graduatedWarriorLabor.text")));
                 person.setEduCourseIndex(10);
                 person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
 
@@ -852,8 +823,8 @@ public class EducationController {
                 ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedMerchant.text"));
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                        resources.getString("graduatedMerchant.text") + resources.getString("graduatedWarriorLabor.text")));
-
+                        resources.getString("graduatedMerchant.text"),
+                        resources.getString("graduatedWarriorLabor.text")));
                 person.setEduCourseIndex(10);
                 person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
 
@@ -862,8 +833,8 @@ public class EducationController {
                 ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedTechnician.text"));
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                        resources.getString("graduatedTechnician.text") + resources.getString("graduatedWarriorLabor.text")));
-
+                        resources.getString("graduatedTechnician.text"),
+                        resources.getString("graduatedWarriorLabor.text")));
                 person.setEduCourseIndex(10);
                 person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
 
@@ -873,7 +844,8 @@ public class EducationController {
 
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                        resources.getString("graduatedLabor.text") + resources.getString("washoutLabor.text")));
+                        resources.getString("graduatedLabor.text"),
+                        resources.getString("washoutLabor.text")));
 
                 person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
                 person.setEduDaysOfEducation(0);
@@ -971,8 +943,8 @@ public class EducationController {
         if (roll < fallbackScientist) {
 
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                    resources.getString("graduatedWarrior.text") + resources.getString("graduatedWarriorScientist.text")));
-
+                    resources.getString("graduatedWarrior.text"),
+                    resources.getString("graduatedWarriorScientist.text")));
             person.setEduCourseIndex(7);
             person.setEduAcademyName(generateClanEducationCode(campaign, person, 7, resources));
 
@@ -982,8 +954,8 @@ public class EducationController {
         if (roll < fallbackMerchant) {
 
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                    resources.getString("graduatedWarrior.text") + resources.getString("graduatedWarriorMerchant.text")));
-
+                    resources.getString("graduatedWarrior.text"),
+                    resources.getString("graduatedWarriorMerchant.text")));
             person.setEduCourseIndex(8);
             person.setEduAcademyName(generateClanEducationCode(campaign, person, 8, resources));
 
@@ -993,8 +965,8 @@ public class EducationController {
         if (roll < fallbackTechnician) {
 
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                    resources.getString("graduatedWarrior.text") + resources.getString("graduatedWarriorTechnician.text")));
-
+                    resources.getString("graduatedWarrior.text"),
+                    resources.getString("graduatedWarriorTechnician.text")));
             person.setEduCourseIndex(9);
             person.setEduAcademyName(generateClanEducationCode(campaign, person, 9, resources));
 
@@ -1004,8 +976,8 @@ public class EducationController {
         // Labor
 
         campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                resources.getString("graduatedWarrior.text") + resources.getString("graduatedWarriorLabor.text")));
-
+                resources.getString("graduatedWarrior.text"),
+                resources.getString("graduatedWarriorLabor.text")));
         person.setEduCourseIndex(10);
         person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
     }
@@ -1036,8 +1008,7 @@ public class EducationController {
         // class resits required
         if (graduationRoll < 20) {
             roll = Compute.d6(3);
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedClassNeeded.text")
-                    .replace("0", String.valueOf(roll)));
+            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedClassNeeded.text"), roll));
 
             person.setEduDaysOfEducation(roll);
 
@@ -1046,8 +1017,8 @@ public class EducationController {
 
         if (graduationRoll == 99) {
             if (Compute.d6(1) > 5) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text")
-                        .replace("0", ' ' + resources.getString(graduationEventPicker())));
+                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTop.text"),
+                        ' ' + resources.getString(graduationEventPicker())));
             } else {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text"));
             }
@@ -1097,8 +1068,7 @@ public class EducationController {
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"),
                     ' ' + resources.getString(graduationEventPicker())));
         } else {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
-                    .replace("0", ""));
+            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"), ""));
         }
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
@@ -1157,8 +1127,7 @@ public class EducationController {
         }
 
         // default graduation
-        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduated.text")
-                .replace("0", ""));
+        campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"), ""));
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
 
@@ -1254,6 +1223,7 @@ public class EducationController {
         // process washout into fallback Caste.
         if (graduationRoll < 50) {
             ServiceLogger.eduClanWarriorFailed(person, campaign.getLocalDate());
+            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedWarriorFailed.text"));
 
             processClanWashout(campaign, person, person.getEduCourseIndex(), resources);
             graduateClanSibko(campaign, person, academy, resources);
@@ -1585,7 +1555,7 @@ public class EducationController {
 
         for (String skill : curriculum) {
             if (skill.equalsIgnoreCase("bonus xp")) {
-                person.awardXP(campaign, Compute.d6(educationLevel));
+                person.awardXP(campaign, Compute.d6(Math.max(1, educationLevel)));
             } else {
                 String skillParsed = Academy.skillParser(skill);
                 int bonus;
@@ -1627,7 +1597,7 @@ public class EducationController {
                 .collect(Collectors.toList());
 
         for (int i = 0; i < bonusCount; i++) {
-            int roll = Compute.randomInt(curriculum.size() - 1);
+            int roll = Compute.randomInt(curriculum.size());
 
             try {
                 String skillParsed = Academy.skillParser(curriculum.get(roll));
