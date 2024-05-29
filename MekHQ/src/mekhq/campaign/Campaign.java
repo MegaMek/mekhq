@@ -1237,6 +1237,12 @@ public class Campaign implements ITechManager {
         return getHangar().getUnits();
     }
 
+    public Collection<Unit> getLargeCraftAndWarShips() {
+        return getHangar().getUnits().stream()
+                .filter(unit -> (unit.getEntity().isLargeCraft()) || (unit.getEntity().isWarShip()))
+                .collect(Collectors.toList());
+    }
+
     public List<Entity> getEntities() {
         return getUnits().stream()
                 .map(Unit::getEntity)

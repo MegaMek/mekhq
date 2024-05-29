@@ -2,13 +2,22 @@ package mekhq.campaign.personnel.turnoverAndRetention.Morale;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.Compute;
+import megamek.common.Entity;
+import megamek.common.HitData;
+import megamek.common.ToHitData;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.moraleDialogs.TransitMutinyOnsetDialog;
 import mekhq.gui.dialog.moraleDialogs.TransitMutinyToe;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -65,22 +74,95 @@ public class Mutiny {
     private static void processAbstractBattle(Campaign campaign, Random random, ResourceBundle resources,
                                               Person loyalistLeader, List<Person> loyalists,
                                               Person mutineerLeader, HashMap<Person, Integer> mutineers) {
+        // Start by gathering the battle powers for each side
         HashMap<String, Integer> loyalistBattlePower = getAbstractBattlePower(loyalistLeader, loyalists);
         HashMap<String, Integer> mutinyBattlePower = getAbstractBattlePower(mutineerLeader, new ArrayList<>(mutineers.keySet()));
 
-
+        // inform the player of the measure of power among each side
         int support = TransitMutinyToe.transitMutinyToeDialog(resources,
                 loyalistLeader, loyalists.size(), loyalistBattlePower.get("attack"), loyalistBattlePower.get("defense"),
                 mutineerLeader, mutineers.keySet().size(), mutinyBattlePower.get("attack"), mutinyBattlePower.get("defense"));
 
+        // show some flavor text, to make the battle seem more dramatic
         transitMutinyBattleConditionDialog(resources, random);
 
+        // process the battle
         int victor = processAbstractBattleRound(campaign, random, loyalists, loyalistBattlePower, new ArrayList<>(mutineers.keySet()), mutinyBattlePower);
 
+        // broadcast the conclusion
         transitMutinyConclusionDialog(resources, victor);
 
-        if (victor != support) {
+        // if the player supported the wrong side (and didn't pick 'victor') end their campaign
+        if ((victor != support) && (support != 2)) {
             transitMutinyCampaignOverDialog(campaign, resources);
+
+            campaign.getWarehouse().getParts().clear();
+            campaign.getPersonnel().clear();
+            campaign.getUnits().clear();
+            campaign.getFinances().getTransactions().clear();
+        }
+
+        if (victor == 0) {
+            for (Person person : mutineers.keySet()) {
+                person.setPrisonerStatus(campaign, PrisonerStatus.PRISONER, true);
+            }
+        } else {
+            for (Person person : loyalists) {
+                person.setPrisonerStatus(campaign, PrisonerStatus.PRISONER, true);
+            }
+        }
+
+        // damage any vessels the unit was traveling in
+        if (!campaign.getLargeCraftAndWarShips().isEmpty()) {
+            damageShips(campaign, resources);
+        }
+
+        // issue a fine based on damage issued to any hired transports
+        if (new FieldManualMercRevDragoonsRating(campaign).getTransportPercent().doubleValue() != 100) {
+            LogManager.getLogger().info(new FieldManualMercRevDragoonsRating(campaign).getTransportPercent().doubleValue());
+            abstractDamageShips(campaign, resources);
+        }
+    }
+
+    private static void abstractDamageShips(Campaign campaign, ResourceBundle resources) {
+        int clusters = Compute.d6(10);
+
+        int damage = IntStream.range(0, clusters)
+                .map(clusterCount -> Compute.d6(2))
+                .sum();
+
+        int fine = (damage / 80) * 100000;
+        campaign.getFinances().debit(TransactionType.FINE, campaign.getLocalDate(), Money.of(fine), resources.getString("mutinyDropShipDamageFine.text"));
+        campaign.addReport(String.format(resources.getString("mutinyDropShipDamage.text"), fine));
+    }
+
+
+    private static void damageShips(Campaign campaign, ResourceBundle resources) {
+        // this reflects internal damage sustained during the mutiny
+        for (Unit unit : campaign.getLargeCraftAndWarShips()) {
+            Entity entity = unit.getEntity();
+            boolean isDestroyed = false;
+
+            int numClusters = Compute.d6(10);
+
+            for (int clusterCount = 0; clusterCount < numClusters; clusterCount++) {
+                int location = Compute.randomInt(4);
+
+                HitData HitData = entity.rollHitLocation(ToHitData.HIT_NORMAL, location);
+                int resultingArmor = Math.max(0, entity.getArmor(HitData) - Compute.d6(2));
+                entity.setArmor(resultingArmor, location);
+
+                if (entity.getArmor(location) == 0) {
+                    isDestroyed = true;
+                }
+            }
+
+            if (isDestroyed) {
+                campaign.getHangar().removeUnit(unit.getId());
+                campaign.addReport(String.format(resources.getString("mutinyUnitDestroyed.text"), unit.getName()));
+            } else {
+                unit.runDiagnostic(true);
+            }
         }
     }
 
@@ -139,14 +221,6 @@ public class Mutiny {
 
         distributeHits(campaign, mutineers, hits, random);
 
-        List<Person> mutineerGraveyard = fillGraveyard(campaign, mutineers);
-
-        for (Person person : mutineerGraveyard) {
-            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
-        }
-
-        mutineers.removeAll(mutineerGraveyard);
-
         // the mutineer side of the battle (ten rounds of combat)
         hits = 0;
         combatRound = 0;
@@ -158,12 +232,19 @@ public class Mutiny {
 
         distributeHits(campaign, loyalists, hits, random);
 
+        // post-battle clean up
+        List<Person> mutineerGraveyard = fillGraveyard(campaign, mutineers);
         List<Person> loyalistsGraveyard = fillGraveyard(campaign, loyalists);
+
+        for (Person person : mutineerGraveyard) {
+            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
+        }
 
         for (Person person : loyalistsGraveyard) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
         }
 
+        mutineers.removeAll(mutineerGraveyard);
         loyalists.removeAll(loyalistsGraveyard);
 
         // calculate results
@@ -177,7 +258,7 @@ public class Mutiny {
             return processAbstractBattleRound(campaign, random,
                     loyalists, loyalistBattlePower,
                     mutineers, mutinyBattlePower);
-        } else if (loyalistsGraveyard.size() > mutineerGraveyard.size()) {
+        } else if (mutineerGraveyard.size() > loyalistsGraveyard.size()) {
             // loyalist victory
             return 0;
         } else {

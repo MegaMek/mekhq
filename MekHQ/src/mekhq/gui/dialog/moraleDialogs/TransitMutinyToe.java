@@ -26,14 +26,16 @@ public class TransitMutinyToe extends JDialog {
                 resources.getString("abstractBattleFactionLoyalists.text"),
                 loyalistCount,
                 loyalistAttackPower,
-                loyalistDefensePower));
+                loyalistDefensePower,
+                loyalistAttackPower - (mutineerDefensePower / 6)));
 
         toeDescription.append(String.format(resources.getString("abstractBattleToe.text"),
                 mutineerLeader.getFullTitle(),
                 resources.getString("abstractBattleFactionMutineers.text"),
                 mutineerCount,
                 mutineerAttackPower,
-                mutineerDefensePower));
+                mutineerDefensePower,
+                mutineerAttackPower - (loyalistDefensePower / 6)));
 
         toeDescription.append("</html>");
 
@@ -54,13 +56,23 @@ public class TransitMutinyToe extends JDialog {
                 resources.getString("abstractBattleFactionSupportVictor.text"),
         };
 
+        String[] tooltips = {
+                resources.getString("abstractBattleFactionSupportLoyalists.toolTip"),
+                resources.getString("abstractBattleFactionSupportMutineers.toolTip"),
+                resources.getString("abstractBattleFactionSupportVictor.toolTip"),
+        };
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
-        for (Object option : options){
-            JButton button = new JButton(option.toString());
+        for (int index = 0; index < options.length; index++) {
+            JButton button = new JButton(options[index].toString());
+            button.setToolTipText(tooltips[index]);
+            int finalI = index;
             button.addActionListener(e -> {
+                choice.set(finalI);
+
                 Window window = SwingUtilities.getWindowAncestor(button);
                 if (window != null) {
                     window.setVisible(false);
