@@ -2308,6 +2308,14 @@ public class CampaignOptions {
         this.useTruebornTravelException = useTruebornTravelException;
     }
 
+    public boolean isUseTruebornTravelException() {
+        return useTruebornTravelException;
+    }
+
+    public void setUseTruebornTravelException(boolean useTruebornTravelException) {
+        this.useTruebornTravelException = useTruebornTravelException;
+    }
+
     public boolean isEnableLocalAcademies() {
         return enableLocalAcademies;
     }
@@ -4828,9 +4836,9 @@ public class CampaignOptions {
                     } else {
                         retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
                     }
-                    //endregion Salary
+                //endregion Salary
 
-                    //region Awards
+                //region Awards
                 } else if (wn2.getNodeName().equalsIgnoreCase("awardBonusStyle")) {
                     retVal.setAwardBonusStyle(AwardBonus.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableAutoAwards")) {
