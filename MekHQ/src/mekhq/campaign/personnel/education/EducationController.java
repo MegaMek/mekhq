@@ -354,7 +354,7 @@ public class EducationController {
         person.setEduDaysOfTravelToAcademy(daysOfTravelTo - 1);
 
         // has Person just arrived?
-        if ((daysOfTravelTo - 1) == 0) {
+        if ((daysOfTravelTo - 1) < 1) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("arrived.text"));
             person.setEduEducationStage(2);
         }
@@ -478,7 +478,7 @@ public class EducationController {
      * @param person           the person whose journey home is being processed
      */
     private static void processJourneyHome(Campaign campaign, Person person) {
-        int travelTime = 0;
+        int travelTime;
 
         try {
             travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
@@ -486,9 +486,7 @@ public class EducationController {
             if (travelTime != person.getEduDaysOfTravel()) {
                 person.setEduDaysOfTravelFromAcademy(travelTime);
             }
-
-            person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
-        } catch (Exception e) {
+        } finally {
             person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
         }
 
