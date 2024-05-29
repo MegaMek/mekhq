@@ -812,7 +812,6 @@ public class EducationController {
                 ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedScientist.text"));
 
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                        resources.getString("graduatedScientist.text") + resources.getString("graduatedWarriorLabor.text")));
                         resources.getString("graduatedScientist.text"),
                         resources.getString("graduatedWarriorLabor.text")));
                 person.setEduCourseIndex(10);
