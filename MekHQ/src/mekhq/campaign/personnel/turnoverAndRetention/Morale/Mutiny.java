@@ -7,7 +7,7 @@ import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.gui.dialog.moraleDialogs.TransitMutinyDialog;
+import mekhq.gui.dialog.moraleDialogs.TransitMutinyOnsetDialog;
 import mekhq.gui.dialog.moraleDialogs.TransitMutinyToe;
 
 import java.util.*;
@@ -16,6 +16,8 @@ import java.util.stream.IntStream;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.Morale.Desertion.processDesertion;
 import static mekhq.gui.dialog.moraleDialogs.TransitMutinyBattleDialog.transitMutinyBattleConditionDialog;
+import static mekhq.gui.dialog.moraleDialogs.TransitMutinyCampaignOverDialog.transitMutinyCampaignOverDialog;
+import static mekhq.gui.dialog.moraleDialogs.TransitMutinyConclusionDialog.transitMutinyConclusionDialog;
 
 public class Mutiny {
     static void processMutiny(Campaign campaign, List<Person> loyalists, HashMap<Person, Integer> mutineers, int targetNumber, ResourceBundle resources) {
@@ -49,7 +51,7 @@ public class Mutiny {
         Person loyalistLeader = campaign.getHighestRankedPerson(loyalists, true);
 
         // this dialog alerts the player to the mutiny
-        TransitMutinyDialog.transitMutinyOnsetDialog(resources);
+        TransitMutinyOnsetDialog.transitMutinyOnsetDialog(resources);
 
         // this dialog tells the player about the array of forces and gives them the option to support the mutineers or loyalists
 
@@ -71,9 +73,15 @@ public class Mutiny {
                 loyalistLeader, loyalists.size(), loyalistBattlePower.get("attack"), loyalistBattlePower.get("defense"),
                 mutineerLeader, mutineers.keySet().size(), mutinyBattlePower.get("attack"), mutinyBattlePower.get("defense"));
 
+        transitMutinyBattleConditionDialog(resources, random);
+
         int victor = processAbstractBattleRound(campaign, random, loyalists, loyalistBattlePower, new ArrayList<>(mutineers.keySet()), mutinyBattlePower);
 
-        transitMutinyBattleConditionDialog(resources, random);
+        transitMutinyConclusionDialog(resources, victor);
+
+        if (victor != support) {
+            transitMutinyCampaignOverDialog(campaign, resources);
+        }
     }
 
     private static HashMap<String, Integer> getAbstractBattlePower(Person loyalistLeader, List<Person> loyalists) {

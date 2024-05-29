@@ -6,7 +6,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ResourceBundle;
 
-public class TransitMutinyDialog extends JDialog {
+public class TransitMutinyOnsetDialog extends JDialog {
     /**
      * Displays a dialog for the onset of a mutiny while in transit.
      *
