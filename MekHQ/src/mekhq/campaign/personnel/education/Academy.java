@@ -30,10 +30,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * The Academy class represents an academy with various properties and methods.
@@ -740,7 +737,15 @@ public class Academy implements Comparable<Academy> {
      * @return the faction discount as a double value, between 0.00 and 1.00
      */
     public Double getFactionDiscountAdjusted(Campaign campaign, Person person) {
-        if (locationSystems.stream()
+        List<String> locations;
+
+        if (isLocal) {
+            locations = Collections.singletonList(campaign.getCurrentSystem().getId());
+        } else {
+            locations = locationSystems;
+        }
+
+        if (locations.stream()
                 .flatMap(campus -> campaign.getSystemById(campus)
                         .getFactions(campaign.getLocalDate())
                         .stream())

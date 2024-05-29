@@ -342,8 +342,11 @@ public class PersonViewPanel extends JScrollablePanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
-                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
-                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
+                int awardTierCount = MathUtility.clamp(
+                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
+                        1,
+                        award.getNumberOfRibbonFiles()
+                );
 
                 String ribbonFileName = award.getRibbonFileName(awardTierCount);
 
@@ -394,8 +397,11 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image medal;
             try {
-                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
-                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
+                int awardTierCount = MathUtility.clamp(
+                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
+                        1,
+                        award.getNumberOfMedalFiles()
+                );
 
                 String medalFileName = award.getMedalFileName(awardTierCount);
 
@@ -443,8 +449,11 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image miscAward;
             try {
-                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
-                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
+                int awardTierCount = MathUtility.clamp(
+                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
+                        1,
+                        award.getNumberOfMiscFiles()
+                );
 
                 String miscFileName = award.getMiscFileName(awardTierCount);
 
@@ -1582,7 +1591,10 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblEducationTravelFrom1, gridBagConstraints);
 
             lblEducationTravelFrom2.setName("lblEducationTravelFrom2");
-            lblEducationTravelFrom2.setText(String.valueOf(person.getEduDaysOfTravelFromAcademy()) + ' ' + resourceMap.getString("lblEducationDurationDays.text"));
+            lblEducationTravelFrom2.setText(String.format(resourceMap.getString("lblEducationTravelDuration.text"),
+                    person.getEduDaysOfTravel(),
+                    person.getEduDaysOfTravelFromAcademy(),
+                    campaign.getSystemById(person.getEduAcademySystem()).getName(campaign.getLocalDate())));
             lblEducationTravelFrom2.setLabelFor(lblEducationTravelFrom2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
