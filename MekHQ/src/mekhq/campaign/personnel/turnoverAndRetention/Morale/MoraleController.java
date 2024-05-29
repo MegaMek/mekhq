@@ -18,6 +18,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.Morale.Desertion.processDesertion;
+import static mekhq.campaign.personnel.turnoverAndRetention.Morale.Mutiny.processMutiny;
 
 public class MoraleController {
     /**
@@ -428,7 +429,7 @@ public class MoraleController {
         int targetNumber = getTargetNumber(campaign, isDesertion);
 
         List<Person> filteredPersonnel = campaign.getActivePersonnel().stream()
-                .filter(person -> (person.getPrisonerStatus().isFree()) || (!isDesertion))
+                .filter(person -> (person.getPrisonerStatus().isFreeOrBondsman()) || (!isDesertion))
                 .filter(person -> !person.isChild(campaign.getLocalDate()))
                 .collect(Collectors.toList());
 
@@ -445,13 +446,18 @@ public class MoraleController {
             int secondRoll = Compute.d6(2) + modifier;
 
             if (isDesertion) {
+                // Bondsmen can mutiny, but they cannot desert
+                if (person.getPrisonerStatus().isBondsman()) {
+                    continue;
+                }
+
                 if ((firstRoll < targetNumber) && (secondRoll < targetNumber)) {
                     deserters.put(person, secondRoll);
                 }
             } else {
-                if ((firstRoll < targetNumber) && (secondRoll < targetNumber)) {
+                if (firstRoll < targetNumber) {
+                    // we record secondRoll in case the mutiny turns into desertion
                     mutineers.put(person, secondRoll);
-                    // TODO add mutiny call here
                 }
             }
         }
@@ -467,7 +473,17 @@ public class MoraleController {
                 return false;
             }
         } else {
-            return !mutineers.isEmpty();
+            if (!mutineers.isEmpty()) {
+                List<Person> loyalists = filteredPersonnel.stream()
+                        .filter(person -> !mutineers.containsKey(person))
+                        .collect(Collectors.toList());
+
+                processMutiny(campaign, loyalists, mutineers, targetNumber, resources);
+
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 

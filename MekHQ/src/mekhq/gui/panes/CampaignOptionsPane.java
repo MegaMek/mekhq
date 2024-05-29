@@ -344,6 +344,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseDesertions;
     private JLabel lblForceReliabilityMethod;
     private MMComboBox<ForceReliabilityMethod> comboForceReliabilityMethod;
+    private JLabel lblMutinyMethod;
+    private MMComboBox<MutinyMethod> comboMutinyMethod;
     private JCheckBox chkUseSabotage;
     private JCheckBox chkUseMutinies;
     private JCheckBox chkUseTheftUnit;
@@ -4915,6 +4917,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             turnoverAndRetentionMoraleTriggersPanel.setEnabled(isEnabled);
 
             // Special Case Handlers
+            lblMutinyMethod.setEnabled((isEnabled) && (campaign.getCampaignOptions().isUseMutinies()));
+            comboMutinyMethod.setEnabled((isEnabled) && (campaign.getCampaignOptions().isUseMutinies()));
+
             chkUseMoraleTriggerDesertion.setEnabled((isEnabled) && (chkUseDesertions.isSelected()));
             chkUseMoraleModifierCommanderSkill.setEnabled((isEnabled) && (chkUseManagementSkill.isSelected()));
 
@@ -4991,6 +4996,27 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
         });
 
+        lblMutinyMethod = new JLabel(resources.getString("lblMutinyMethod.text"));
+        lblMutinyMethod.setToolTipText(resources.getString("lblMutinyMethod.toolTipText"));
+        lblMutinyMethod.setName("lblMutinyMethod");
+        lblMutinyMethod.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseMutinies()));
+
+        comboMutinyMethod = new MMComboBox<>("comboMutinyMethod", MutinyMethod.values());
+        comboMutinyMethod.setToolTipText(resources.getString("lblMutinyMethod.toolTipText"));
+        comboMutinyMethod.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseMutinies()));
+        comboMutinyMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof MutinyMethod) {
+                    list.setToolTipText(((MutinyMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
         chkUseDesertions = new JCheckBox(resources.getString("chkUseDesertions.text"));
         chkUseDesertions.setToolTipText(resources.getString("chkUseDesertions.toolTipText"));
         chkUseDesertions.setName("chkUseDesertions");
@@ -5009,6 +5035,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final boolean isEnabled = chkUseMutinies.isSelected();
 
             chkUseMoraleTriggerMutiny.setEnabled(isEnabled);
+            lblMutinyMethod.setEnabled(isEnabled);
+            comboMutinyMethod.setEnabled(isEnabled);
         });
 
         chkUseSabotage = new JCheckBox(resources.getString("chkUseSabotage.text"));
@@ -5080,6 +5108,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblForceReliabilityMethod)
                                 .addComponent(comboForceReliabilityMethod, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblMutinyMethod)
+                                .addComponent(comboMutinyMethod, Alignment.LEADING))
                         .addComponent(chkUseSabotage)
                         .addComponent(chkUseTheftUnit)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -5105,6 +5136,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblForceReliabilityMethod)
                                 .addComponent(comboForceReliabilityMethod))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMutinyMethod)
+                                .addComponent(comboMutinyMethod))
                         .addComponent(chkUseSabotage)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblTheftResellValue)
@@ -8418,6 +8452,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMutinies.setSelected(options.isUseMutinies());
         spnMoraleStepSize.setValue(options.getMoraleStepSize());
         comboForceReliabilityMethod.setSelectedItem(options.getForceReliabilityMethod());
+        comboMutinyMethod.setSelectedItem(options.getMutinyMethod());
         chkUseSabotage.setSelected(options.isUseSabotage());
         chkUseTheftUnit.setSelected(options.isUseTheftUnit());
         spnTheftResellValue.setValue(options.getTheftResellValue());
@@ -9124,6 +9159,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseMutinies(chkUseMutinies.isSelected());
             options.setMoraleStepSize((Integer) spnMoraleStepSize.getValue());
             options.setForceReliabilityMethod(comboForceReliabilityMethod.getSelectedItem());
+            options.setMutinyMethod(comboMutinyMethod.getSelectedItem());
             options.setUseSabotage(chkUseSabotage.isSelected());
             options.setUseTheftUnit(chkUseTheftUnit.isSelected());
             options.setTheftResellValue((Integer) spnTheftResellValue.getValue());
