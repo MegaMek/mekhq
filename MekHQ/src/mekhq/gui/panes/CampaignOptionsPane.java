@@ -5316,7 +5316,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMoraleTriggerCombatLoss.setName("chkUseMoraleTriggerCombatLoss");
         chkUseMoraleTriggerCombatLoss.setEnabled(isUseMorale);
 
-        chkUseMoraleTriggerDesertion = new JCheckBox(resources.getString("chkUseReverseTriggerDesertion.text"));
+        chkUseMoraleTriggerDesertion = new JCheckBox(resources.getString("chkUseMoraleTriggerDesertion.text"));
         chkUseMoraleTriggerDesertion.setToolTipText(resources.getString("chkUseMoraleTriggerDesertion.toolTipText"));
         chkUseMoraleTriggerDesertion.setName("chkUseMoraleTriggerDesertion");
         chkUseMoraleTriggerDesertion.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseDesertions()));
