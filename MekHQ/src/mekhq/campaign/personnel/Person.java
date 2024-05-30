@@ -979,7 +979,7 @@ public class Person {
                     campaign.addReport(String.format(resources.getString("returnedFromMissing.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromMissing(this, campaign.getLocalDate());
-                } else if (getStatus().isAWOL()) {
+                } else if (getStatus().isAwol()) {
                     campaign.addReport(String.format(resources.getString("returnedFromAWOL.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());

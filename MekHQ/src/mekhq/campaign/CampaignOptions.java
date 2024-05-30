@@ -1095,7 +1095,7 @@ public class CampaignOptions {
         setCancelledOrderRefundMultiplier(0.5);
 
         // Shares
-        setUseShareSystem(true);
+        setUseShareSystem(false);
         setSharesExcludeLargeCraft(true);
         setSharesForAll(true);
         //endregion Finances Tab

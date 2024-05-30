@@ -779,8 +779,6 @@ public class RetirementDefectionTracker {
 
                 Person p = campaign.getPerson(id);
 
-                // TODO differentiate between retirement and defection, here.
-                //  This behavior only makes sense for defection.
                 // if the retiree is the commander of an infantry platoon, all non-founders in the platoon follow them into retirement
                 if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
                     if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (p.getUnit().isCommander(p))) {
@@ -937,11 +935,8 @@ public class RetirementDefectionTracker {
      */
     public static class Payout {
         private int weightClass = 0;
-        private int dependents = 0;
         private Money payoutAmount = Money.zero();
-        private boolean recruit = false;
         private PersonnelRole recruitRole = PersonnelRole.NONE;
-        private boolean heir = false;
         private boolean stolenUnit = false;
         private UUID stolenUnitId = null;
 
@@ -954,27 +949,6 @@ public class RetirementDefectionTracker {
 
             if ((shareValue.isPositive()) && (campaign.getCampaignOptions().isUseShareSystem())) {
                 payoutAmount = payoutAmount.plus(shareValue.multipliedBy(person.getNumShares(campaign, sharesForAll)));
-            }
-
-            // TODO investigate if these actually do anything
-            if (killed) {
-                switch (Compute.d6()) {
-                    case 2:
-                        dependents = 1;
-                        break;
-                    case 3:
-                        dependents = Compute.d6();
-                        break;
-                    case 4:
-                    case 5:
-                        recruit = true;
-                        break;
-                    case 6:
-                        heir = true;
-                        break;
-                    default:
-                        break;
-                }
             }
         }
 
@@ -995,8 +969,16 @@ public class RetirementDefectionTracker {
             } else {
                 final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
 
-                // TODO when we differentiate between types of retirement we'll need to edit this.
-                payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
+                // person is defecting
+                if (ChronoUnit.MONTHS.between(person.getRecruitment(), campaign.getLocalDate()) < campaign.getCampaignOptions().getServiceContractDuration()) {
+                    payoutAmount = Money.of(0);
+                // person is retiring
+                } else if (person.getAge(campaign.getLocalDate()) >= 50) {
+                    payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
+                // person is resigning
+                } else {
+                    payoutAmount = getPayoutOrBonusValue(campaign, person);
+                }
 
                 if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
                         && (person.getOriginalUnitWeight() > 0)) {
@@ -1018,14 +1000,6 @@ public class RetirementDefectionTracker {
             weightClass = weight;
         }
 
-        public int getDependents() {
-            return dependents;
-        }
-
-        public void setDependents(int d) {
-            dependents = d;
-        }
-
         public Money getPayoutAmount() {
             return payoutAmount;
         }
@@ -1034,28 +1008,12 @@ public class RetirementDefectionTracker {
             this.payoutAmount = payoutAmount;
         }
 
-        public boolean hasRecruit() {
-            return recruit;
-        }
-
-        public void setRecruit(boolean r) {
-            recruit = r;
-        }
-
         public PersonnelRole getRecruitRole() {
             return recruitRole;
         }
 
         public void setRecruitRole(PersonnelRole role) {
             recruitRole = role;
-        }
-
-        public boolean hasHeir() {
-            return heir;
-        }
-
-        public void setHeir(boolean h) {
-            heir = h;
         }
 
         public boolean hasStolenUnit() {
@@ -1092,10 +1050,7 @@ public class RetirementDefectionTracker {
         for (UUID pid : payouts.keySet()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "payout", "id", pid);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weightClass", payouts.get(pid).getWeightClass());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dependents", payouts.get(pid).getDependents());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cbills", payouts.get(pid).getPayoutAmount());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruit", payouts.get(pid).hasRecruit());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "heir", payouts.get(pid).hasHeir());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stolenUnit", payouts.get(pid).hasStolenUnit());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stolenUnitId", payouts.get(pid).getStolenUnitId());
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payout");
@@ -1167,14 +1122,8 @@ public class RetirementDefectionTracker {
                                 }
                                 if (wn4.getNodeName().equalsIgnoreCase("weightClass")) {
                                     payout.setWeightClass(Integer.parseInt(wn4.getTextContent()));
-                                } else if (wn4.getNodeName().equalsIgnoreCase("dependents")) {
-                                    payout.setDependents(Integer.parseInt(wn4.getTextContent()));
                                 } else if (wn4.getNodeName().equalsIgnoreCase("c-bills")) {
                                     payout.setPayoutAmount(Money.fromXmlString(wn4.getTextContent().trim()));
-                                } else if (wn4.getNodeName().equalsIgnoreCase("recruit")) {
-                                    payout.setRecruit(Boolean.parseBoolean(wn4.getTextContent()));
-                                } else if (wn4.getNodeName().equalsIgnoreCase("heir")) {
-                                    payout.setHeir(Boolean.parseBoolean(wn4.getTextContent()));
                                 } else if (wn4.getNodeName().equalsIgnoreCase("stolenUnit")) {
                                     payout.setStolenUnit(Boolean.parseBoolean(wn4.getTextContent()));
                                 } else if (wn4.getNodeName().equalsIgnoreCase("stolenUnitId")) {

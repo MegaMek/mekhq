@@ -695,57 +695,37 @@ public class Campaign implements ITechManager {
      * @return False if there were payments AND they were unable to be processed, true otherwise.
      */
     public boolean applyRetirement(Money totalPayout, Map<UUID, UUID> unitAssignments) {
-        if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
-            if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
-                for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
-                    if (getPerson(pid).getStatus().isActive()) {
-                        getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
+        if ((totalPayout.isPositive()) || (getRetirementDefectionTracker().getRetirees() != null)) {
+            if (getFunds().isGreaterOrEqualThan(totalPayout)) {
+                for (UUID personId : getRetirementDefectionTracker().getRetirees()) {
+                    if (ChronoUnit.MONTHS.between(getPerson(personId).getRecruitment(), getLocalDate()) < getCampaignOptions().getServiceContractDuration()) {
+                        getPerson(personId).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+                        continue;
                     }
 
-                    if (getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isCivilian()) {
-                        LogManager.getLogger().error(String.format(
-                                "Attempted to process a payout for %s, who has a civilian role.",
-                                getRetirementDefectionTracker().getPayout(pid).getRecruitRole().name()));
-                    } else {
-                        getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitRole()));
-                    }
-
-                    if (getRetirementDefectionTracker().getPayout(pid).hasHeir()) {
-                        Person p = newPerson(getPerson(pid).getPrimaryRole());
-                        p.setOriginalUnitWeight(getPerson(pid).getOriginalUnitWeight());
-                        p.setOriginalUnitTech(getPerson(pid).getOriginalUnitTech());
-                        p.setOriginalUnitId(getPerson(pid).getOriginalUnitId());
-                        if (unitAssignments.containsKey(pid)) {
-                            getPersonnelMarket().addPerson(p, getHangar().getUnit(unitAssignments.get(pid)).getEntity());
-                        } else {
-                            getPersonnelMarket().addPerson(p);
+                    if (getPerson(personId).getAge(getLocalDate()) >= 50) {
+                        if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Retirement Pay")) {
+                            getPerson(personId).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         }
+                        continue;
                     }
 
-                    if (getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
-                            && getCampaignOptions().isUseRandomDependentAddition()) {
-                        int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
-                        while (dependents > 0) {
-                            Person person = newDependent(false);
-                            if (recruitPerson(person)) {
-                                dependents--;
-                            } else {
-                                dependents = 0;
-                            }
-                        }
+                    if (getFinances().debit(TransactionType.RESIGNATION, getLocalDate(), totalPayout, "Final Payout")) {
+                        getPerson(personId).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                     }
 
-                    if (unitAssignments.containsKey(pid)) {
-                        removeUnit(unitAssignments.get(pid));
+                    if (unitAssignments.containsKey(personId)) {
+                        removeUnit(unitAssignments.get(personId));
                     }
                 }
+
                 getRetirementDefectionTracker().resolveAllContracts();
                 return true;
+                }
             } else {
                 addReport("<font color='red'>You cannot afford to make the final payments.</font>");
                 return false;
             }
-        }
 
         return true;
     }
@@ -1647,7 +1627,7 @@ public class Campaign implements ITechManager {
      */
     public List<Person> getAwolPersonnel() {
         return getPersonnel().stream()
-                .filter(p -> p.getStatus().isAWOL())
+                .filter(p -> p.getStatus().isAwol())
                 .collect(Collectors.toList());
     }
 

@@ -44,6 +44,7 @@ public enum TransactionType {
     RENT("TransactionType.RENT.text", "TransactionType.RENT.toolTipText"),
     REPAIRS("TransactionType.REPAIRS.text", "TransactionType.REPAIRS.toolTipText"),
     RETIREMENT("TransactionType.RETIREMENT.text", "TransactionType.RETIREMENT.toolTipText"),
+    RESIGNATION("TransactionType.RESIGNATION.text", "TransactionType.RESIGNATION.toolTipText"),
     SALARIES("TransactionType.SALARIES.text", "TransactionType.SALARIES.toolTipText"),
     SALVAGE("TransactionType.SALVAGE.text", "TransactionType.SALVAGE.toolTipText"),
     SALVAGE_EXCHANGE("TransactionType.SALVAGE_EXCHANGE.text", "TransactionType.SALVAGE_EXCHANGE.toolTipText"),
@@ -150,6 +151,10 @@ public enum TransactionType {
 
     public boolean isRetirement() {
         return this == RETIREMENT;
+    }
+
+    public boolean isResignation() {
+        return this == RESIGNATION;
     }
 
     public boolean isSalaries() {

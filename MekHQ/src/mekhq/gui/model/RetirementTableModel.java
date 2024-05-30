@@ -7,7 +7,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
@@ -32,14 +31,13 @@ public class RetirementTableModel extends AbstractTableModel {
     public final static int COL_PAY_BONUS = 6;
     public final static int COL_MISC_MOD = 7;
     public final static int COL_PAYOUT = 8;
-    public final static int COL_RECRUIT = 9;
-    public final static int COL_UNIT = 10;
-    public final static int N_COL = 11;
+    public final static int COL_UNIT = 9;
+    public final static int N_COL = 10;
 
     private final static String[] colNames = {
         "Person", "Assignment", "Force", "Target",
         "Shares", "Bonus Cost", "Pay Bonus", "Misc Modifier",
-        "Payout", "Recruit", "Unit"
+        "Payout", "Unit"
     };
 
     private final Campaign campaign;
@@ -101,8 +99,6 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_ASSIGN:
             case COL_FORCE:
             case COL_UNIT:
-            case COL_RECRUIT:
-                return 125;
             case COL_BONUS_COST:
             case COL_PAYOUT:
                 return 70;
@@ -122,8 +118,6 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_ASSIGN:
             case COL_FORCE:
             case COL_UNIT:
-            case COL_RECRUIT:
-                return SwingConstants.LEFT;
             case COL_BONUS_COST:
             case COL_PAYOUT:
                 return SwingConstants.RIGHT;
@@ -144,8 +138,6 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_PAY_BONUS:
             case COL_MISC_MOD:
                 return true;
-            case COL_RECRUIT:
-                return campaign.getRetirementDefectionTracker().getPayout(data.get(row)).hasRecruit();
             default:
                 return false;
         }
@@ -276,20 +268,6 @@ public class RetirementTableModel extends AbstractTableModel {
                 } else {
                     return "Class " + campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass();
                 }
-            case COL_RECRUIT:
-                RetirementDefectionTracker.Payout pay =
-                    campaign.getRetirementDefectionTracker().getPayout(data.get(row));
-                if (null == pay) {
-                    return "";
-                } else if (pay.getDependents() > 0) {
-                    return pay.getDependents() + " Dependents";
-                } else if (pay.hasRecruit()) {
-                    return pay.getRecruitRole().getName(campaign.getFaction().isClan());
-                } else if (pay.hasHeir()) {
-                    return "Heir";
-                } else {
-                    return "";
-                }
             default:
                 return "?";
         }
@@ -315,13 +293,6 @@ public class RetirementTableModel extends AbstractTableModel {
         } else if (col == COL_UNIT) {
             if (null != value) {
                 unitAssignments.put(getPerson(row).getId(), (UUID) value);
-            }
-        } else if (col == COL_RECRUIT) {
-            for (PersonnelRole role : PersonnelRole.values()) {
-                if (role.getName(campaign.getFaction().isClan()).equals(value)) {
-                    campaign.getRetirementDefectionTracker().getPayout(data.get(row)).setRecruitRole(role);
-                    break;
-                }
             }
         }
         fireTableDataChanged();

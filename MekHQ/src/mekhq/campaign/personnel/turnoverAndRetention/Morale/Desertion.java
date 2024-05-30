@@ -174,7 +174,7 @@ public class Desertion {
     public static boolean isAbsentAdult(Person adult) {
         PersonnelStatus status = adult.getStatus();
 
-        return status.isMIA() || status.isPoW() || status.isOnLeave() || status.isAWOL() || status.isStudent() || status.isMissing() || status.isDead() || status.isRetired() || status.isDeserted();
+        return status.isMIA() || status.isPoW() || status.isOnLeave() || status.isAwol() || status.isStudent() || status.isMissing() || status.isDead() || status.isRetired() || status.isDeserted();
     }
 
     /**

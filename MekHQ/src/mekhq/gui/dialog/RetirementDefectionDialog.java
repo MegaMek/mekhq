@@ -23,16 +23,12 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.TargetRoll;
-import megamek.common.UnitType;
+import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -45,6 +41,8 @@ import mekhq.gui.sorter.WeightClassSorter;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.JSpinner.DefaultEditor;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
@@ -205,8 +203,8 @@ public class RetirementDefectionDialog extends JDialog {
             personnelSorter.setComparator(RetirementTableModel.COL_PAYOUT, new FormattedNumberSorter());
             personnelSorter.setComparator(RetirementTableModel.COL_BONUS_COST, new FormattedNumberSorter());
             personnelTable.setRowSorter(personnelSorter);
-            ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
-            sortKeys.add(new RowSorter.SortKey(RetirementTableModel.COL_PERSON, SortOrder.DESCENDING));
+            ArrayList<SortKey> sortKeys = new ArrayList<>();
+            sortKeys.add(new SortKey(RetirementTableModel.COL_PERSON, SortOrder.DESCENDING));
             personnelSorter.setSortKeys(sortKeys);
 
             cbGroupOverview.addActionListener(evt -> filterPersonnel(personnelSorter, cbGroupOverview, false));
@@ -227,7 +225,6 @@ public class RetirementDefectionDialog extends JDialog {
             XTableColumnModel columnModel = (XTableColumnModel) personnelTable.getColumnModel();
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_PAYOUT)), false);
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_UNIT)), false);
-            columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_RECRUIT)), false);
             if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
                 columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_BONUS_COST)), false);
                 columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS)), false);
@@ -308,8 +305,8 @@ public class RetirementDefectionDialog extends JDialog {
         retireeSorter = new TableRowSorter<>(model);
         retireeSorter.setComparator(RetirementTableModel.COL_PERSON, new PersonRankStringSorter(hqView.getCampaign()));
         retireeTable.setRowSorter(retireeSorter);
-        ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
-        sortKeys.add(new RowSorter.SortKey(RetirementTableModel.COL_PERSON, SortOrder.DESCENDING));
+        ArrayList<SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new SortKey(RetirementTableModel.COL_PERSON, SortOrder.DESCENDING));
         retireeSorter.setSortKeys(sortKeys);
         cbGroupResults.addActionListener(evt -> filterPersonnel(retireeSorter, cbGroupResults, true));
 
@@ -338,9 +335,9 @@ public class RetirementDefectionDialog extends JDialog {
         unitSorter = new TableRowSorter<>(unitModel);
         unitSorter.setComparator(UnitAssignmentTableModel.COL_UNIT, new WeightClassSorter());
         unitAssignmentTable.setRowSorter(unitSorter);
-        ArrayList<RowSorter.SortKey> unitSortKeys = new ArrayList<>();
-        unitSortKeys.add(new RowSorter.SortKey(UnitAssignmentTableModel.COL_UNIT, SortOrder.DESCENDING));
-        sortKeys.add(new RowSorter.SortKey(UnitAssignmentTableModel.COL_UNIT, SortOrder.DESCENDING));
+        ArrayList<SortKey> unitSortKeys = new ArrayList<>();
+        unitSortKeys.add(new SortKey(UnitAssignmentTableModel.COL_UNIT, SortOrder.DESCENDING));
+        sortKeys.add(new SortKey(UnitAssignmentTableModel.COL_UNIT, SortOrder.DESCENDING));
         unitSorter.setSortKeys(unitSortKeys);
         TableColumn column;
         for (int i = 0; i < UnitAssignmentTableModel.N_COL; i++) {
@@ -424,7 +421,7 @@ public class RetirementDefectionDialog extends JDialog {
         }
     }
 
-    public ActionListener buttonListener = new ActionListener() {
+    private ActionListener buttonListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent ev) {
             if (ev.getSource().equals(btnRoll)) {
@@ -562,17 +559,7 @@ public class RetirementDefectionDialog extends JDialog {
             ((UnitAssignmentTableModel) unitAssignmentTable.getModel()).setData(availableUnits);
         }
 
-        ArrayList<UUID> retireeList = new ArrayList<>();
-        boolean showRecruitColumn = false;
-        for (UUID pid : rdTracker.getRetirees(contract)) {
-            retireeList.add(pid);
-            if ((hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).getDependents() > 0)
-                    || hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).hasHeir()
-                    || hqView.getCampaign().getRetirementDefectionTracker().getPayout(pid).hasRecruit()) {
-                showRecruitColumn = true;
-            }
-        }
-        ((XTableColumnModel) retireeTable.getColumnModel()).setColumnVisible(retireeTable.getColumnModel().getColumn(retireeTable.convertColumnIndexToView(RetirementTableModel.COL_RECRUIT)), !showRecruitColumn);
+        ArrayList<UUID> retireeList = new ArrayList<>(rdTracker.getRetirees(contract));
         ((RetirementTableModel) retireeTable.getModel()).setData(retireeList, unitAssignments);
         filterPersonnel(retireeSorter, cbGroupResults, true);
         lblPayment.setText(totalPayout().toAmountAndSymbolString());
@@ -638,7 +625,7 @@ public class RetirementDefectionDialog extends JDialog {
 
     public static int weightClassIndex(Unit u) {
         int retVal = u.getEntity().getWeightClass();
-        if (u.getEntity().isClan() || (u.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET)) {
+        if (u.getEntity().isClan() || (u.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
             retVal++;
         }
         if (!u.isFunctional()) {
@@ -704,7 +691,7 @@ public class RetirementDefectionDialog extends JDialog {
                 payout = Money.zero();
             }
 
-            // If the payout is negative just set it to zero
+            // If the payout is negative, set it to zero
             if (payout.isNegative()) {
                 payout = Money.zero();
             }
@@ -878,7 +865,7 @@ class RetirementTable extends JTable {
 
         public SpinnerEditor() {
             spinner = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
-            ((JSpinner.DefaultEditor) spinner.getEditor()).getTextField().setEditable(false);
+            ((DefaultEditor) spinner.getEditor()).getTextField().setEditable(false);
         }
 
         @Override
@@ -919,10 +906,6 @@ class RetirementTable extends JTable {
 
         getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD))
                 .setCellEditor(new SpinnerEditor());
-
-        JComboBox<PersonnelRole> cbRecruitRole = new JComboBox<>(PersonnelRole.values());
-        getColumnModel().getColumn(convertColumnIndexToView(RetirementTableModel.COL_RECRUIT))
-                .setCellEditor(new DefaultCellEditor(cbRecruitRole));
     }
 
     public void setGeneralMod(int mod) {
