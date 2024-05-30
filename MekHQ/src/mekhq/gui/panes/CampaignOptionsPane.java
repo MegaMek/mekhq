@@ -7780,7 +7780,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Education
             options.setUseEducationModule(chkUseEducationModule.isSelected());
-            options.setEduEnableAutoAwardsIntegration(chkEduEnableAutoAwardsIntegration.isSelected());
             options.setMaximumJumpCount((Integer) spnMaximumJumpCount.getValue());
             options.setUseTruebornTravelException(chkUseTruebornTravelException.isSelected());
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
