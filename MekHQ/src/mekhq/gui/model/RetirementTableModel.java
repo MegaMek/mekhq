@@ -237,21 +237,27 @@ public class RetirementTableModel extends AbstractTableModel {
                 if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() == 0 &&
                         null != unitAssignments.get(p.getId())) ||
                         (campaign.getCampaignOptions().isUseShareSystem() &&
-                                campaign.getCampaignOptions().isTrackOriginalUnit() &&
-                                p.getOriginalUnitId() == unitAssignments.get(p.getId()) &&
+                                campaign.getCampaignOptions().isTrackOriginalUnit()
+                                && Objects.equals(p.getOriginalUnitId(), unitAssignments.get(p.getId())) &&
                                         null != campaign.getUnit(unitAssignments.get(p.getId())))) {
                     payout = payout.minus(campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost());
                 }
+
+                // if the person requires a unit, check to ensure there isn't a shortfall
                 if (null != unitAssignments.get(p.getId())) {
-                    payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
-                            RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId())))));
+                    payout = payout.plus(RetirementDefectionDialog
+                            .getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
+                                    RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId())))));
                 }
-                /* No payout if the pilot stole a unit */
-                if (campaign.getRetirementDefectionTracker().getPayout(p.getId()).hasStolenUnit() &&
-                        null != unitAssignments.get(p.getId())) {
-                    payout = Money.zero();
+
+                // if the person requires a unit, but doesn't have one...
+                if ((unitAssignments.get(p.getId()) == null) && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
+                    payout = payout.plus(RetirementDefectionDialog
+                            .getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
+                                    0));
                 }
-                // If payout is negative then just make it zero
+
+                // If payout is negative then make it zero
                 if (payout.isNegative()) {
                     payout = Money.zero();
                 }

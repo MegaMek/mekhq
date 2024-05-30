@@ -23,7 +23,9 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.*;
+import megamek.common.Entity;
+import megamek.common.TargetRoll;
+import megamek.common.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -473,7 +475,6 @@ public class RetirementDefectionDialog extends JDialog {
     };
 
     private void initResults() {
-        /* Find unassigned units that can be stolen */
         List<UUID> unassignedMechs = new ArrayList<>();
         List<UUID> unassignedASF = new ArrayList<>();
         ArrayList<UUID> availableUnits = new ArrayList<>();
@@ -494,47 +495,10 @@ public class RetirementDefectionDialog extends JDialog {
             }
         });
 
-        /* Defectors who steal a unit will take either the one they were
-         * piloting or one of the unassigned units (50/50, unless there
-         * is only one choice)
-         */
         for (UUID id : rdTracker.getRetirees(contract)) {
             Person p = hqView.getCampaign().getPerson(id);
-            if (rdTracker.getPayout(id).hasStolenUnit()) {
-                boolean unassignedAvailable =
-                        (!unassignedMechs.isEmpty() && p.getPrimaryRole().isMechWarrior())
-                        || (!unassignedASF.isEmpty() && p.getPrimaryRole().isAerospacePilot());
-                /*
-                 * If a unit has previously been assigned, check that it is still available
-                 * and either assigned to the current player or unassigned. If so, keep
-                 * the previous value.
-                 */
-                if ((null != rdTracker.getPayout(id).getStolenUnitId())
-                        && (null != hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()))
-                        && p.equals(hqView.getCampaign().getUnit(rdTracker.getPayout(id).getStolenUnitId()).getCommander())) {
-                    continue;
-                }
-
-                if ((p.getUnit() != null) && ((Compute.d6() < 4) || !unassignedAvailable)) {
-                    unitAssignments.put(id, p.getUnit().getId());
-                } else if (unassignedAvailable) {
-                    if (p.getPrimaryRole().isMechWarrior()) {
-                        int roll = Compute.randomInt(unassignedMechs.size());
-                        unitAssignments.put(id, unassignedMechs.get(roll));
-                        rdTracker.getPayout(id).setStolenUnitId(unassignedMechs.get(roll));
-                        availableUnits.remove(unassignedMechs.get(roll));
-                        unassignedMechs.remove(roll);
-                    } else if (p.getPrimaryRole().isAerospacePilot()) {
-                        int roll = Compute.randomInt(unassignedASF.size());
-                        unitAssignments.put(id, unassignedASF.get(roll));
-                        rdTracker.getPayout(id).setStolenUnitId(unassignedASF.get(roll));
-                        availableUnits.remove(unassignedASF.get(roll));
-                        unassignedASF.remove(roll);
-                    }
-                }
-            }
             /* Retirees who brought a unit will take the same unit when
-             * they go if it is still around and has not been stolen.
+             * they go if it is still around
              */
             if (hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit()
                     && (null != p.getOriginalUnitId())
@@ -552,10 +516,7 @@ public class RetirementDefectionDialog extends JDialog {
                     rdTracker.getPayout(id).setPayoutAmount(temp);
                 }
             }
-            /*
-             * For infantry, the unit commander makes a retirement roll on behalf of the
-             * entire unit. Unassigned infantry can retire individually.
-             */
+
             if ((p.getUnit() != null) && p.getPrimaryRole().isSoldierOrBattleArmour()) {
                 unitAssignments.put(id, p.getUnit().getId());
             }
@@ -628,9 +589,11 @@ public class RetirementDefectionDialog extends JDialog {
 
     public static int weightClassIndex(Unit u) {
         int retVal = u.getEntity().getWeightClass();
-        if (u.getEntity().isClan() || (u.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
+
+        if (u.getEntity().isClan()) {
             retVal++;
         }
+
         if (!u.isFunctional()) {
             retVal--;
         }
@@ -687,11 +650,6 @@ public class RetirementDefectionDialog extends JDialog {
                 payout = payout.plus(getShortfallAdjustment(
                         rdTracker.getPayout(id).getWeightClass(),
                         RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id)))));
-            }
-
-            /* If the pilot has stolen a unit, there is no payout */
-            if (rdTracker.getPayout(id).hasStolenUnit() && (null != unitAssignments.get(id))) {
-                payout = Money.zero();
             }
 
             // If the payout is negative, set it to zero
@@ -754,8 +712,12 @@ public class RetirementDefectionDialog extends JDialog {
     }
 
     private boolean unitAssignmentsComplete() {
-        return rdTracker.getRetirees(contract).stream()
-                .noneMatch(id -> (rdTracker.getPayout(id).getWeightClass() > 0) && !unitAssignments.containsKey(id));
+        if (rdTracker.getRetirees(contract).stream()
+                .anyMatch(id -> (rdTracker.getPayout(id).getWeightClass() > 0) && !unitAssignments.containsKey(id))) {
+            return unitAssignmentTable.getModel().getRowCount() <= 0;
+        } else {
+            return true;
+        }
     }
 
     private void enableAddRemoveButtons() {
@@ -765,12 +727,7 @@ public class RetirementDefectionDialog extends JDialog {
         } else {
             int retireeRow = retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow());
             UUID pid = ((RetirementTableModel)(retireeTable.getModel())).getPerson(retireeRow).getId();
-            if (null != rdTracker.getPayout(pid) &&
-                    rdTracker.getPayout(pid).hasStolenUnit() &&
-                    !btnEdit.isSelected()) {
-                btnAddUnit.setEnabled(false);
-                btnRemoveUnit.setEnabled(false);
-            } else if (hqView.getCampaign().getPerson(pid).getPrimaryRole().isSoldierOrBattleArmour()) {
+            if (hqView.getCampaign().getPerson(pid).getPrimaryRole().isSoldierOrBattleArmour()) {
                 btnAddUnit.setEnabled(false);
                 btnRemoveUnit.setEnabled(false);
             } else if (unitAssignments.containsKey(pid)) {

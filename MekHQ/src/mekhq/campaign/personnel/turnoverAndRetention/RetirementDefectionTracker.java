@@ -989,11 +989,6 @@ public class RetirementDefectionTracker {
                 if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
                         && (person.getOriginalUnitWeight() > 0)) {
                     weightClass = person.getOriginalUnitWeight() + person.getOriginalUnitTech();
-                    if (roll <= 1) {
-                        weightClass--;
-                    } else if (roll >= 5) {
-                        weightClass++;
-                    }
                 }
             }
         }
@@ -1005,6 +1000,7 @@ public class RetirementDefectionTracker {
         public void setWeightClass(int weight) {
             weightClass = weight;
         }
+
 
         public Money getPayoutAmount() {
             return payoutAmount;
