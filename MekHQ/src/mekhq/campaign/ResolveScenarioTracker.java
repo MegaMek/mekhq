@@ -1411,6 +1411,7 @@ public class ResolveScenarioTracker {
                 ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(),
                         scenario.getName(), mission.getName());
             }
+
             for (Kill k : status.getKills()) {
                 getCampaign().addKill(k);
             }
@@ -1494,7 +1495,12 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            if (status.isCaptured()) {
+                ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            } else {
+                ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            }
+
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
