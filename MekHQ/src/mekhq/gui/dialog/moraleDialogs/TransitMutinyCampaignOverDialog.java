@@ -1,8 +1,9 @@
 package mekhq.gui.dialog.moraleDialogs;
 
-import mekhq.campaign.Campaign;
-
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ResourceBundle;
 
 public class TransitMutinyCampaignOverDialog extends JDialog {
@@ -11,9 +12,9 @@ public class TransitMutinyCampaignOverDialog extends JDialog {
      *
      * @param resources the resource bundle containing the dialog text and options
      */
-    public static void transitMutinyCampaignOverDialog(Campaign campaign, ResourceBundle resources) {
+    public static void transitMutinyCampaignOverDialog(String campaignName, ResourceBundle resources) {
         JOptionPane pane = new JOptionPane(
-                String.format(resources.getString("abstractMutinyCampaignEnd.text"), campaign.getName()),
+                String.format(resources.getString("abstractMutinyCampaignEnd.text"), campaignName),
                 JOptionPane.INFORMATION_MESSAGE,
                 JOptionPane.YES_NO_OPTION,
                 null,
@@ -21,13 +22,41 @@ public class TransitMutinyCampaignOverDialog extends JDialog {
                 null
         );
 
+        Object[] options = {
+                resources.getString("abstractMutinyButtonConfirm.text")
+        };
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 
+        for (Object option : options){
+            JButton button = new JButton(option.toString());
+            button.addActionListener(e -> {
+                Window window = SwingUtilities.getWindowAncestor(button);
+                if (window != null) {
+                    window.setVisible(false);
+                }
+            });
+
+            buttonPanel.add(button);
+            buttonPanel.add(Box.createHorizontalStrut(15));
+        }
+
+        pane.setOptions(new Object[]{buttonPanel});
+
         JDialog dialog = pane.createDialog(null, resources.getString("abstractMutingCampaignEndTitle.title"));
 
+        dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         dialog.setResizable(false);
+
+        dialog.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                // Do nothing
+            }
+        });
+
         dialog.setVisible(true);
     }
 }

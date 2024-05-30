@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.Morale.Desertion.processDesertion;
-import static mekhq.gui.dialog.moraleDialogs.TransitMutinyBattleDialog.transitMutinyBattleConditionDialog;
+import static mekhq.gui.dialog.moraleDialogs.TransitMutinyBattleConditionDialog.transitMutinyBattleConditionDialog;
 import static mekhq.gui.dialog.moraleDialogs.TransitMutinyCampaignOverDialog.transitMutinyCampaignOverDialog;
 import static mekhq.gui.dialog.moraleDialogs.TransitMutinyConclusionDialog.transitMutinyConclusionDialog;
 
@@ -83,23 +83,22 @@ public class Mutiny {
                 loyalistLeader, loyalists.size(), loyalistBattlePower.get("attack"), loyalistBattlePower.get("defense"),
                 mutineerLeader, mutineers.keySet().size(), mutinyBattlePower.get("attack"), mutinyBattlePower.get("defense"));
 
-        // show some flavor text, to make the battle seem more dramatic
-        transitMutinyBattleConditionDialog(resources, random);
-
         // process the battle
-        int victor = processAbstractBattleRound(campaign, random, loyalists, loyalistBattlePower, new ArrayList<>(mutineers.keySet()), mutinyBattlePower);
+        int victor = processAbstractBattleRound(campaign, random, resources, loyalists, loyalistBattlePower, new ArrayList<>(mutineers.keySet()), mutinyBattlePower);
 
         // broadcast the conclusion
         transitMutinyConclusionDialog(resources, victor);
 
         // if the player supported the wrong side (and didn't pick 'victor') end their campaign
         if ((victor != support) && (support != 2)) {
-            transitMutinyCampaignOverDialog(campaign, resources);
+            transitMutinyCampaignOverDialog(campaign.getName(), resources);
 
             campaign.getWarehouse().getParts().clear();
             campaign.getPersonnel().clear();
             campaign.getUnits().clear();
             campaign.getFinances().getTransactions().clear();
+
+            return;
         }
 
         if (victor == 0) {
@@ -115,11 +114,10 @@ public class Mutiny {
         // damage any vessels the unit was traveling in
         if (!campaign.getLargeCraftAndWarShips().isEmpty()) {
             damageShips(campaign, resources);
-        }
-
-        // issue a fine based on damage issued to any hired transports
-        if (new FieldManualMercRevDragoonsRating(campaign).getTransportPercent().doubleValue() != 100) {
-            LogManager.getLogger().info(new FieldManualMercRevDragoonsRating(campaign).getTransportPercent().doubleValue());
+        } else {
+            // issue a fine based on damage issued to any hired transports
+            // I did want this to check whether the company was needing additional transports,
+            // but I couldn't get that to work
             abstractDamageShips(campaign, resources);
         }
     }
@@ -206,7 +204,7 @@ public class Mutiny {
         return battlePower;
     }
 
-    public static int processAbstractBattleRound(Campaign campaign, Random random,
+    public static int processAbstractBattleRound(Campaign campaign, Random random, ResourceBundle resources,
                                                  List<Person> loyalists, HashMap<String, Integer> loyalistBattlePower,
                                                  List<Person> mutineers, HashMap<String, Integer> mutinyBattlePower) {
 
@@ -253,11 +251,28 @@ public class Mutiny {
             return -1;
         }
 
+        // show some flavor text, to make the battle seem more dramatic
+        transitMutinyBattleConditionDialog(resources, random, loyalistsGraveyard.size(), mutineerGraveyard.size());
+
         if (mutineerGraveyard.size() == loyalistsGraveyard.size()) {
-            // if the battle is drawn, we open another instance of the fight
-            return processAbstractBattleRound(campaign, random,
-                    loyalists, loyalistBattlePower,
-                    mutineers, mutinyBattlePower);
+            // if the battle is drawn, roll a d6
+            int tieBreaker = (Compute.d6(1));
+
+            switch (tieBreaker) {
+                case 1:
+                case 2:
+                case 3:
+                    // loyalist victory
+                    return 0;
+                case 4:
+                case 5:
+                case 6:
+                    // mutineer victory
+                    return 1;
+                default:
+                    throw new IllegalStateException("Unexpected value in processAbstractBattleRound: " + tieBreaker);
+            }
+
         } else if (mutineerGraveyard.size() > loyalistsGraveyard.size()) {
             // loyalist victory
             return 0;
