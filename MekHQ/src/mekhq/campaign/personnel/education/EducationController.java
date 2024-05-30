@@ -9,6 +9,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.universe.PlanetarySystem;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
