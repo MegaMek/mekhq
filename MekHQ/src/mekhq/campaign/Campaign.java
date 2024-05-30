@@ -92,7 +92,6 @@ import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
-import mekhq.campaign.personnel.turnoverAndRetention.Morale.MoraleController;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
@@ -232,7 +231,6 @@ public class Campaign implements ITechManager {
     private transient AbstractProcreation procreation;
 
     private RetirementDefectionTracker retirementDefectionTracker;
-    private int morale;
 
     private AtBConfiguration atbConfig; //AtB
     private AtBEventProcessor atbEventProcessor; //AtB
@@ -295,7 +293,6 @@ public class Campaign implements ITechManager {
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
-        morale = 40;
         atbConfig = null;
         autosaveService = new AutosaveService();
         hasActiveContract = false;
@@ -479,14 +476,6 @@ public class Campaign implements ITechManager {
 
     public void setProcreation(final AbstractProcreation procreation) {
         this.procreation = procreation;
-    }
-
-    public int getMorale() {
-        return morale;
-    }
-
-    public void setMorale(final int morale) {
-        this.morale = morale;
     }
     //endregion Personnel Modules
 
@@ -3516,8 +3505,6 @@ public class Campaign implements ITechManager {
 
         processFatigueNewDay();
 
-        processMoraleNewDay();
-
         if (campaignOptions.isUseEducationModule()) {
             EducationController.processNewDay(this);
         }
@@ -3535,54 +3522,6 @@ public class Campaign implements ITechManager {
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
-    }
-
-    private void processMoraleNewDay() {
-        // we still process awol personnel, even if Morale is disabled, to ensure they're not frozen in this state.
-        for (Person person : getAwolPersonnel()) {
-            if (person.getAwolDays() != -1) {
-                MoraleController.processAwolDays(this, person);
-            }
-        }
-
-        if (!campaignOptions.isUseMorale()) {
-            return;
-        }
-
-        if (getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-            boolean desertionEvent = false;
-            boolean mutinyEvent = false;
-
-            // these are the morale checks and dictate whether personnel mutiny or desert
-            if ((campaignOptions.isUseDesertions()) && (getLocation().isOnPlanet())) {
-                desertionEvent = MoraleController.makeMoraleChecks(this, true);
-            }
-
-            if (campaignOptions.isUseMutinies()) {
-                mutinyEvent = MoraleController.makeMoraleChecks(this, false);
-            }
-
-            // this processes morale recovery based on campaign location and the results of the prior checks
-            if (desertionEvent && mutinyEvent) {
-                if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
-                    MoraleController.processMoraleChange(this, 2);
-                } else {
-                    MoraleController.processMoraleChange(this, 3);
-                }
-            } else if (desertionEvent) {
-                if ((!getActiveContracts().isEmpty()) || (!getLocation().isOnPlanet())) {
-                    MoraleController.processMoraleChange(this, 1);
-                }
-            } else if (mutinyEvent) {
-                if ((getActiveContracts().isEmpty()) && (getLocation().isOnPlanet())) {
-                    MoraleController.processMoraleChange(this, 1);
-                } else {
-                    MoraleController.processMoraleChange(this, 2);
-                }
-            } else {
-                MoraleController.processMoraleChange(this, -1);
-            }
-        }
     }
 
     /**
@@ -3604,12 +3543,10 @@ public class Campaign implements ITechManager {
     }
 
     public @Nullable Person getFlaggedCommander() {
-        for (Person p : getPersonnel()) {
-            if (p.isCommander()) {
-                return p;
-            }
-        }
-        return null;
+        return getPersonnel().stream()
+                .filter(Person::isCommander)
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -4264,8 +4201,6 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "currentReport");
 
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "info");
-
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "Morale", morale);
         //endregion Basic Campaign Info
 
         //region Campaign Options

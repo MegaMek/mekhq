@@ -498,8 +498,6 @@ public class GMToolsDialog extends AbstractMHQDialog {
     //region General Tab
     private JScrollPane createGeneralTab() {
         // Create Panel Components
-        final JPanel generalToolsPanel = createGeneralToolsPanel();
-
         final JPanel dicePanel = createDicePanel();
 
         final JPanel ratPanel = createRATPanel();
@@ -514,14 +512,12 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(generalToolsPanel)
                         .addComponent(dicePanel)
                         .addComponent(ratPanel)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(generalToolsPanel)
                         .addComponent(dicePanel)
                         .addComponent(ratPanel)
         );
@@ -718,40 +714,6 @@ public class GMToolsDialog extends AbstractMHQDialog {
             gbc.gridx++;
             panel.add(btnAddUnit, gbc);
         }
-
-        return panel;
-    }
-
-    private JPanel createGeneralToolsPanel() {
-        // Create the Panel
-        final JPanel panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createTitledBorder("generalTools.title"));
-        panel.setName("generalToolsPanel");
-
-        // Create the Constraints
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(0, 3, 0, 3);
-
-        final int maxGridX;
-
-        // Create the Components and Layout
-        final JLabel lblMorale = new JLabel(resources.getString("lblMorale.text"));
-        lblMorale.setName("lblMorale");
-        panel.add(lblMorale, gbc);
-
-        setSpnMorale(new JSpinner(new SpinnerNumberModel(gui.getCampaign().getMorale(), 10, 70, gui.getCampaign().getCampaignOptions().getMoraleStepSize())));
-        gbc.gridx++;
-        getSpnMorale().setName("spnMorale");
-        panel.add(getSpnMorale(), gbc);
-
-        final JButton btnMorale = new MMButton("btnMorale", resources, "btnMorale.text",
-                "btnMorale.toolTipText", evt -> gui.getCampaign().setMorale((int) spnMorale.getValue()));
-        gbc.gridx++;
-        panel.add(btnMorale, gbc);
 
         return panel;
     }

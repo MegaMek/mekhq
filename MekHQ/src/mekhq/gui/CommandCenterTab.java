@@ -25,7 +25,6 @@ import megamek.common.event.Subscribe;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MekHQ;
 import mekhq.campaign.event.*;
-import mekhq.campaign.personnel.turnoverAndRetention.Morale.MoraleController;
 import mekhq.campaign.report.CargoReport;
 import mekhq.campaign.report.HangarReport;
 import mekhq.campaign.report.PersonnelReport;
@@ -262,22 +261,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
             gridBagConstraints.gridx = 1;
             gridBagConstraints.weightx = 1.0;
             panInfo.add(lblAdminstrativeCapacity, gridBagConstraints);
-        }
-
-        if (getCampaign().getCampaignOptions().isUseMorale()) {
-            JLabel lblMoraleHead = new JLabel(resourceMap.getString("lblMorale.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y++;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            gridBagConstraints.insets = new Insets(1, 5, 1, 5);
-            panInfo.add(lblMoraleHead, gridBagConstraints);
-            lblMorale = new JLabel(getCampaign().getMorale() + " (" + MoraleController.getMoraleLevel(getCampaign()) + ')');
-            lblMoraleHead.setLabelFor(lblMorale);
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.weightx = 1.0;
-            panInfo.add(lblMorale, gridBagConstraints);
         }
 
         JLabel lblCompositionHead = new JLabel(resourceMap.getString("lblComposition.text"));
@@ -566,12 +549,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport());
         lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());
         lblTransportCapacity.setText(getCampaign().getCampaignSummary().getTransportCapacity());
-
-        if (getCampaign().getCampaignOptions().isUseMorale()) {
-            try {
-                lblMorale.setText(getCampaign().getMorale() + " (" + MoraleController.getMoraleLevel(getCampaign()) + ')');
-            } catch (Exception ignored) {}
-        }
 
         if (getCampaign().getCampaignOptions().isUseAdministrativeStrain()) {
             try {
