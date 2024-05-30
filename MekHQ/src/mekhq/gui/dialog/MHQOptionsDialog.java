@@ -1144,8 +1144,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setHealedInjuriesBackground(optionHealedInjuriesBackground.getColour());
         MekHQ.getMHQOptions().setPregnantForeground(optionPregnantForeground.getColour());
         MekHQ.getMHQOptions().setPregnantBackground(optionPregnantBackground.getColour());
-        MekHQ.getMHQOptions().setPaidRetirementForeground(optionPaidRetirementForeground.getColour());
-        MekHQ.getMHQOptions().setPaidRetirementBackground(optionPaidRetirementBackground.getColour());
         MekHQ.getMHQOptions().setStratConHexCoordForeground(optionStratConHexCoordForeground.getColour());
         MekHQ.getMHQOptions().setMedicalViewDialogHandwritingFont(comboMedicalViewDialogHandwritingFont.getFont().getFamily());
 
@@ -1253,8 +1251,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionHealedInjuriesBackground.setColour(MekHQ.getMHQOptions().getHealedInjuriesBackground());
         optionPregnantForeground.setColour(MekHQ.getMHQOptions().getPregnantForeground());
         optionPregnantBackground.setColour(MekHQ.getMHQOptions().getPregnantBackground());
-        optionPaidRetirementForeground.setColour(MekHQ.getMHQOptions().getPaidRetirementForeground());
-        optionPaidRetirementBackground.setColour(MekHQ.getMHQOptions().getPaidRetirementBackground());
         optionStratConHexCoordForeground.setColour(MekHQ.getMHQOptions().getStratConHexCoordForeground());
 
         comboMedicalViewDialogHandwritingFont.setSelectedItem(new FontDisplay(MekHQ.getMHQOptions().getMedicalViewDialogHandwritingFont()));

@@ -2,7 +2,6 @@ package mekhq.gui.model;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
@@ -35,8 +34,8 @@ public class RetirementTableModel extends AbstractTableModel {
     public final static int N_COL = 10;
 
     private final static String[] colNames = {
-        "Person", "Assignment", "Force", "Target",
-        "Shares", "Bonus Cost", "Pay Bonus", "Misc Modifier",
+        "Person", "Assignment", "Force", "Target Number",
+        "Shares", "Retention Bonus", "Pay Bonus", "Custom Modifier",
         "Payout", "Unit"
     };
 
@@ -341,13 +340,7 @@ public class RetirementTableModel extends AbstractTableModel {
             int actualCol = table.convertColumnIndexToModel(column);
             Person p = getPerson(actualRow);
             setHorizontalAlignment(getAlignment(actualCol));
-            if (!isSelected) {
-                if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
-                    campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
-                    setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
-                }
-            }
+
             return this;
         }
     }
@@ -416,13 +409,6 @@ public class RetirementTableModel extends AbstractTableModel {
             }
 
             MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
-            if (!isSelected) {
-                if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()) != null)
-                        && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
-                    setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
-                    setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
-                }
-            }
 
             return this;
         }

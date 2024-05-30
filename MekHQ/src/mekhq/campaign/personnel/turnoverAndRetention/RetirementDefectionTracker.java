@@ -294,11 +294,6 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            // Founder Modifier
-            if (person.isFounder()) {
-                targetNumber.addModifier(2, resources.getString("founder.text"));
-            }
-
             targets.put(person.getId(), targetNumber);
         }
         return targets;
