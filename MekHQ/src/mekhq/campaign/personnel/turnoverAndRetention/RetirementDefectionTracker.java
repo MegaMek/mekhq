@@ -126,7 +126,7 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            if ((person.isFounder()) && (!campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
+            if ((person.isFounder()) && (!campaign.getCampaignOptions().isUseRandomFounderTurnover())) {
                 continue;
             }
 
@@ -144,7 +144,7 @@ public class RetirementDefectionTracker {
             }
 
             // Desirability modifier
-            if (campaign.getCampaignOptions().isUseSkillModifiers()) {
+            if ((campaign.getCampaignOptions().isUseSkillModifiers()) && (person.getAge(campaign.getLocalDate()) < 50)) {
                 targetNumber.addModifier(person.getExperienceLevel(campaign, false), resources.getString("desirability.text"));
             }
 
@@ -738,17 +738,17 @@ public class RetirementDefectionTracker {
         if (age <= 20) {
             ageMod = -1;
         } else if ((age >= 50) && (age < 65)) {
-            ageMod = 1;
-        } else if ((age >= 65) && (age < 75)) {
-            ageMod = 2;
-        } else if ((age >= 75) && (age < 85)) {
             ageMod = 3;
-        } else if ((age >= 85) && (age < 95)) {
+        } else if ((age >= 65) && (age < 75)) {
             ageMod = 4;
-        } else if ((age >= 95) && (age < 105)) {
+        } else if ((age >= 75) && (age < 85)) {
             ageMod = 5;
-        } else if (age >= 105) {
+        } else if ((age >= 85) && (age < 95)) {
             ageMod = 6;
+        } else if ((age >= 95) && (age < 105)) {
+            ageMod = 7;
+        } else if (age >= 105) {
+            ageMod = 8;
         }
 
         return ageMod;
@@ -782,7 +782,7 @@ public class RetirementDefectionTracker {
                 if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
                     if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (p.getUnit().isCommander(p))) {
                         for (Person person : p.getUnit().getSoldiers()) {
-                            if ((!person.isFounder()) || (campaign.getCampaignOptions().isUseRandomFounderRetirement())) {
+                            if ((!person.isFounder()) || (campaign.getCampaignOptions().isUseRandomFounderTurnover())) {
                                 payouts.put(person.getId(), new Payout(campaign, campaign.getPerson(person.getId()),
                                         shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
                             }

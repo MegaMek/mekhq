@@ -1227,14 +1227,6 @@ public class Person {
         this.fatigue = fatigue;
     }
 
-    public int getAwolDays() {
-        return awolDays;
-    }
-
-    public void setAwolDays(final int awolDays) {
-        this.awolDays = awolDays;
-    }
-
     public boolean getIsRecoveringFromFatigue() {
         return isRecoveringFromFatigue;
     }
@@ -1648,7 +1640,6 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awolDays", getAwolDays());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
             }

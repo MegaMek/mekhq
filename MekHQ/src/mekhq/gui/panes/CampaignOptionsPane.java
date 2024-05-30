@@ -270,7 +270,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnTurnoverFixedTargetNumber;
     private JCheckBox chkUseYearEndRandomRetirement;
     private JCheckBox chkUseContractCompletionRandomRetirement;
-    private JCheckBox chkUseRandomFounderRetirement;
+    private JCheckBox chkUseRandomFounderTurnover;
+    private JCheckBox chkUseFounderRetirement;
     private JCheckBox chkUseSubContractSoldiers;
     private JLabel lblServiceContractDuration;
     private JSpinner spnServiceContractDuration;
@@ -4190,10 +4191,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseContractCompletionRandomRetirement.setName("chkUseContractCompletionRandomRetirement");
         chkUseContractCompletionRandomRetirement.setEnabled(isUseTurnover);
 
-        chkUseRandomFounderRetirement = new JCheckBox(resources.getString("chkUseRandomFounderRetirement.text"));
-        chkUseRandomFounderRetirement.setToolTipText(resources.getString("chkUseRandomFounderRetirement.toolTipText"));
-        chkUseRandomFounderRetirement.setName("chkUseRandomFounderRetirement");
-        chkUseRandomFounderRetirement.setEnabled(isUseTurnover);
+        chkUseRandomFounderTurnover = new JCheckBox(resources.getString("chkUseRandomFounderTurnover.text"));
+        chkUseRandomFounderTurnover.setToolTipText(resources.getString("chkUseRandomFounderTurnover.toolTipText"));
+        chkUseRandomFounderTurnover.setName("chkUseRandomFounderTurnover");
+        chkUseRandomFounderTurnover.setEnabled(isUseTurnover);
+
+        chkUseFounderRetirement = new JCheckBox(resources.getString("chkUseFounderRetirement.text"));
+        chkUseFounderRetirement.setToolTipText(resources.getString("chkUseFounderRetirement.toolTipText"));
+        chkUseFounderRetirement.setName("chkUseFounderRetirement");
+        chkUseFounderRetirement.setEnabled(isUseTurnover);
 
         chkUseSubContractSoldiers = new JCheckBox(resources.getString("chkUseSubContractSoldiers.text"));
         chkUseSubContractSoldiers.setToolTipText(resources.getString("chkUseSubContractSoldiers.toolTipText"));
@@ -4242,7 +4248,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnTurnoverFixedTargetNumber, Alignment.LEADING))
                         .addComponent(chkUseYearEndRandomRetirement)
                         .addComponent(chkUseContractCompletionRandomRetirement)
-                        .addComponent(chkUseRandomFounderRetirement)
+                        .addComponent(chkUseRandomFounderTurnover)
+                        .addComponent(chkUseFounderRetirement)
                         .addComponent(chkUseSubContractSoldiers)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblServiceContractDuration)
@@ -4265,7 +4272,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnTurnoverFixedTargetNumber))
                         .addComponent(chkUseYearEndRandomRetirement)
                         .addComponent(chkUseContractCompletionRandomRetirement)
-                        .addComponent(chkUseRandomFounderRetirement)
+                        .addComponent(chkUseRandomFounderTurnover)
+                        .addComponent(chkUseFounderRetirement)
                         .addComponent(chkUseSubContractSoldiers)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblServiceContractDuration)
@@ -7887,7 +7895,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnTurnoverFixedTargetNumber.setValue(options.getTurnoverFixedTargetNumber());
         chkUseYearEndRandomRetirement.setSelected(options.isUseYearEndRandomRetirement());
         chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
-        chkUseRandomFounderRetirement.setSelected(options.isUseRandomFounderRetirement());
+        chkUseRandomFounderTurnover.setSelected(options.isUseRandomFounderTurnover());
+        chkUseFounderRetirement.setSelected(options.isUseFounderRetirement());
         chkUseSubContractSoldiers.setSelected(options.isUseSubContractSoldiers());
         spnServiceContractDuration.setValue(options.getServiceContractDuration());
         spnServiceContractModifier.setValue(options.getServiceContractModifier());
@@ -8558,7 +8567,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setTurnoverFixedTargetNumber((Integer) spnTurnoverFixedTargetNumber.getValue());
             options.setUseYearEndRandomRetirement(chkUseYearEndRandomRetirement.isSelected());
             options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
-            options.setUseRandomFounderRetirement(chkUseRandomFounderRetirement.isSelected());
+            options.setUseRandomFounderTurnover(chkUseRandomFounderTurnover.isSelected());
+            options.setUseFounderRetirement(chkUseFounderRetirement.isSelected());
             options.setUseSubContractSoldiers(chkUseSubContractSoldiers.isSelected());
             options.setServiceContractDuration((Integer) spnServiceContractDuration.getValue());
             options.setServiceContractModifier((Integer) spnServiceContractModifier.getValue());

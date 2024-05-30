@@ -283,7 +283,8 @@ public class CampaignOptions {
     private int turnoverFixedTargetNumber;
     private boolean useYearEndRandomRetirement;
     private boolean useContractCompletionRandomRetirement;
-    private boolean useRandomFounderRetirement;
+    private boolean useRandomFounderTurnover;
+    private boolean useFounderRetirement;
     private boolean useSubContractSoldiers;
     private int serviceContractDuration;
     private int serviceContractModifier;
@@ -952,7 +953,8 @@ public class CampaignOptions {
         setTurnoverFixedTargetNumber(3);
         setUseYearEndRandomRetirement(true);
         setUseContractCompletionRandomRetirement(true);
-        setUseRandomFounderRetirement(true);
+        setUseRandomFounderTurnover(true);
+        setUseFounderRetirement(true);
         setUseSubContractSoldiers(false);
         setServiceContractDuration(36);
         setServiceContractModifier(5);
@@ -1853,12 +1855,20 @@ public class CampaignOptions {
         this.useHideLoyalty = useHideLoyalty;
     }
 
-    public boolean isUseRandomFounderRetirement() {
-        return useRandomFounderRetirement;
+    public boolean isUseRandomFounderTurnover() {
+        return useRandomFounderTurnover;
     }
 
-    public void setUseRandomFounderRetirement(final boolean useRandomFounderRetirement) {
-        this.useRandomFounderRetirement = useRandomFounderRetirement;
+    public void setUseRandomFounderTurnover(final boolean useRandomFounderTurnover) {
+        this.useRandomFounderTurnover = useRandomFounderTurnover;
+    }
+
+    public boolean isUseFounderRetirement() {
+        return useFounderRetirement;
+    }
+
+    public void setUseFounderRetirement(final boolean useFounderRetirement) {
+        this.useFounderRetirement = useFounderRetirement;
     }
 
     public boolean isUseSubContractSoldiers() {
@@ -4494,7 +4504,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverBaseTn", getTurnoverFixedTargetNumber());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderRetirement", isUseRandomFounderRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderTurnover", isUseRandomFounderTurnover());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFounderRetirement", isUseFounderRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSubContractSoldiers", isUseSubContractSoldiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractDuration", getServiceContractDuration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractModifier", getServiceContractModifier());
@@ -5469,8 +5480,10 @@ public class CampaignOptions {
                     retVal.setUseYearEndRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useContractCompletionRandomRetirement")) {
                     retVal.setUseContractCompletionRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomFounderRetirement")) {
-                    retVal.setUseRandomFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomFounderTurnover")) {
+                    retVal.setUseRandomFounderTurnover(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useFounderRetirement")) {
+                    retVal.setUseFounderRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useSubContractSoldiers")) {
                     retVal.setUseSubContractSoldiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("serviceContractDuration")) {
