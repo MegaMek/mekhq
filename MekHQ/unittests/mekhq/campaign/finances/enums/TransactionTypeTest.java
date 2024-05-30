@@ -245,12 +245,12 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsRetirement() {
+    public void testIsPayout() {
         for (final TransactionType transactionType : types) {
-            if (transactionType == TransactionType.RETIREMENT) {
-                assertTrue(transactionType.isRetirement());
+            if (transactionType == TransactionType.PAYOUT) {
+                assertTrue(transactionType.isPayout());
             } else {
-                assertFalse(transactionType.isRetirement());
+                assertFalse(transactionType.isPayout());
             }
         }
     }
@@ -344,17 +344,6 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsResignation() {
-        for (final TransactionType transactionType : types) {
-            if (transactionType == TransactionType.RESIGNATION) {
-                assertTrue(transactionType.isResignation());
-            } else {
-                assertFalse(transactionType.isResignation());
-            }
-        }
-    }
-
-    @Test
     public void testIsTheft() {
         for (final TransactionType transactionType : types) {
             if (transactionType == TransactionType.THEFT) {
@@ -395,7 +384,8 @@ public class TransactionTypeTest {
         assertEquals(TransactionType.RANSOM, TransactionType.parseFromString("16"));
         assertEquals(TransactionType.EDUCATION, TransactionType.parseFromString("17"));
         assertEquals(TransactionType.THEFT, TransactionType.parseFromString("18"));
-        assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("19"));
+        assertEquals(TransactionType.PAYOUT, TransactionType.parseFromString("19"));
+        assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("20"));
 
         // Failure Testing
         assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("failureFailsFake"));

@@ -684,41 +684,36 @@ public class Campaign implements ITechManager {
      * @return False if there were payments AND they were unable to be processed, true otherwise.
      */
     public boolean applyRetirement(Money totalPayout, Map<UUID, UUID> unitAssignments) {
-        if ((totalPayout.isPositive()) || (getRetirementDefectionTracker().getRetirees() != null)) {
-            if (getFunds().isGreaterOrEqualThan(totalPayout)) {
-                for (UUID personId : getRetirementDefectionTracker().getRetirees()) {
-                    if (ChronoUnit.MONTHS.between(getPerson(personId).getRecruitment(), getLocalDate()) < getCampaignOptions().getServiceContractDuration()) {
-                        if (Compute.d6(1) == 6) {
-                            getPerson(personId).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+        if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
+            if (getFinances().debit(TransactionType.PAYOUT, getLocalDate(), totalPayout, "Final Payout")) {
+                for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
+                    Person person = getPerson(pid);
+
+                    if (!person.getStatus().isDead()) {
+                        if (ChronoUnit.MONTHS.between(person.getRecruitment(), getLocalDate()) < getCampaignOptions().getServiceContractDuration()) {
+                            if (Compute.d6(1) == 6) {
+                                getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+                            } else {
+                                getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DESERTED);
+                            }
+                        } else if (person.getAge(getLocalDate()) >= 50) {
+                            getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         } else {
-                            getPerson(personId).changeStatus(this, getLocalDate(), PersonnelStatus.DESERTED);
+                            getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                         }
-                        continue;
                     }
 
-                    if (getPerson(personId).getAge(getLocalDate()) >= 50) {
-                        if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Retirement Pay")) {
-                            getPerson(personId).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
-                        }
-                        continue;
-                    }
-
-                    if (getFinances().debit(TransactionType.RESIGNATION, getLocalDate(), totalPayout, "Final Payout")) {
-                        getPerson(personId).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                    }
-
-                    if (unitAssignments.containsKey(personId)) {
-                        removeUnit(unitAssignments.get(personId));
+                    if (unitAssignments.containsKey(pid)) {
+                        removeUnit(unitAssignments.get(pid));
                     }
                 }
-
                 getRetirementDefectionTracker().resolveAllContracts();
                 return true;
-                }
-            } else {
-                addReport("<font color='red'>You cannot afford to make the final payments.</font>");
-                return false;
             }
+        } else {
+            addReport("<font color='red'>You cannot afford to make the final payments.</font>");
+            return false;
+        }
 
         return true;
     }

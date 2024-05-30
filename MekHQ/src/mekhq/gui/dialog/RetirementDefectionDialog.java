@@ -436,7 +436,7 @@ public class RetirementDefectionDialog extends JDialog {
                     }
 
                     if (miscModifier(id) != 0) {
-                        targetRolls.get(id).addModifier(miscModifier(id), "Misc");
+                        targetRolls.get(id).addModifier(miscModifier(id), "Custom");
                     }
                 }
                 rdTracker.rollRetirement(contract, targetRolls,
@@ -650,6 +650,13 @@ public class RetirementDefectionDialog extends JDialog {
                 payout = payout.plus(getShortfallAdjustment(
                         rdTracker.getPayout(id).getWeightClass(),
                         RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id)))));
+            }
+
+            // if a unit is required, but none given, pay an additional 3M c-bills per class
+            if (unitAssignments.get(id) == null) {
+                payout = payout.plus(getShortfallAdjustment(
+                        rdTracker.getPayout(id).getWeightClass(),
+                        0));
             }
 
             // If the payout is negative, set it to zero

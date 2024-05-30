@@ -43,8 +43,7 @@ public enum TransactionType {
     RECRUITMENT("TransactionType.RECRUITMENT.text", "TransactionType.RECRUITMENT.toolTipText"),
     RENT("TransactionType.RENT.text", "TransactionType.RENT.toolTipText"),
     REPAIRS("TransactionType.REPAIRS.text", "TransactionType.REPAIRS.toolTipText"),
-    RETIREMENT("TransactionType.RETIREMENT.text", "TransactionType.RETIREMENT.toolTipText"),
-    RESIGNATION("TransactionType.RESIGNATION.text", "TransactionType.RESIGNATION.toolTipText"),
+    PAYOUT("TransactionType.PAYOUT.text", "TransactionType.PAYOUT.toolTipText"),
     SALARIES("TransactionType.SALARIES.text", "TransactionType.SALARIES.toolTipText"),
     SALVAGE("TransactionType.SALVAGE.text", "TransactionType.SALVAGE.toolTipText"),
     SALVAGE_EXCHANGE("TransactionType.SALVAGE_EXCHANGE.text", "TransactionType.SALVAGE_EXCHANGE.toolTipText"),
@@ -149,12 +148,8 @@ public enum TransactionType {
         return this == REPAIRS;
     }
 
-    public boolean isRetirement() {
-        return this == RETIREMENT;
-    }
-
-    public boolean isResignation() {
-        return this == RESIGNATION;
+    public boolean isPayout() {
+        return this == PAYOUT;
     }
 
     public boolean isSalaries() {
@@ -247,6 +242,8 @@ public enum TransactionType {
                     return EDUCATION;
                 case 18:
                     return THEFT;
+                case 19:
+                    return PAYOUT;
                 default:
                     break;
             }
