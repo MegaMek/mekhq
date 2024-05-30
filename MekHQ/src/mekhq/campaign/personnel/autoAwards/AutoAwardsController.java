@@ -120,6 +120,7 @@ public class AutoAwardsController {
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
             }
         }
 
