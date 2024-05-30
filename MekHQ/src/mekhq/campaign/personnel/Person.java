@@ -991,6 +991,9 @@ public class Person {
                 setRetirement(null);
                 break;
             case RETIRED:
+            case RESIGNED:
+            case DESERTED:
+            case DEFECTED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.retired(this, today);
                 if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
