@@ -62,12 +62,12 @@ public class RetirementDefectionDialog extends JDialog {
 
     private String currentPanel;
 
-    private CampaignGUI hqView;
-    private Mission contract;
-    private RetirementDefectionTracker rdTracker;
+    final private CampaignGUI hqView;
+    final private Mission contract;
+    final private RetirementDefectionTracker rdTracker;
 
     private Map<UUID, TargetRoll> targetRolls;
-    private Map<UUID, UUID> unitAssignments;
+    final private Map<UUID, UUID> unitAssignments;
 
     private JPanel panMain;
     private JTextArea txtInstructions;
@@ -424,7 +424,7 @@ public class RetirementDefectionDialog extends JDialog {
         }
     }
 
-    private ActionListener buttonListener = new ActionListener() {
+    final private ActionListener buttonListener = new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent ev) {
             if (ev.getSource().equals(btnRoll)) {
@@ -860,7 +860,7 @@ public class RetirementDefectionDialog extends JDialog {
 
 class RetirementTable extends JTable {
     private static class SpinnerEditor extends AbstractCellEditor implements TableCellEditor {
-        private JSpinner spinner;
+        final private JSpinner spinner;
 
         public SpinnerEditor() {
             spinner = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));

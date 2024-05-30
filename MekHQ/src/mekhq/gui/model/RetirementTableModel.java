@@ -197,7 +197,7 @@ public class RetirementTableModel extends AbstractTableModel {
                             return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
                         }
                     } else {
-                        return "" + p.getTechUnits().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
+                        return p.getTechUnits().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
                     }
                 }
                 return "-";
@@ -379,7 +379,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     if (!((u.getEntity() instanceof SmallCraft) || (u.getEntity() instanceof Jumpship))) {
                         desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
-                    desc += "<br>" + u.getStatus() + "";
+                    desc += "<br>" + u.getStatus();
                     setText(desc);
                     Image mekImage = u.getImage(this);
                     if (null != mekImage) {
@@ -393,17 +393,17 @@ public class RetirementTableModel extends AbstractTableModel {
             } else if (actualCol == COL_FORCE) {
                 Force force = campaign.getForceFor(p);
                 if (null != force) {
-                    String desc = "<html><b>" + force.getName() + "</b>";
+                    StringBuilder desc = new StringBuilder("<html><b>" + force.getName() + "</b>");
                     Force parent = force.getParentForce();
                     //cut off after three lines and don't include the top level
                     int lines = 1;
                     while ((parent != null) && (null != parent.getParentForce()) && (lines < 4)) {
-                        desc += "<br>" + parent.getName();
+                        desc.append("<br>").append(parent.getName());
                         lines++;
                         parent = parent.getParentForce();
                     }
-                    desc += "</html>";
-                    setHtmlText(desc);
+                    desc.append("</html>");
+                    setHtmlText(desc.toString());
                     final Image forceImage = force.getForceIcon().getImage(54);
                     if (null != forceImage) {
                         setImage(forceImage);
