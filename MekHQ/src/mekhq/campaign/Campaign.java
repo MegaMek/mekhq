@@ -688,7 +688,11 @@ public class Campaign implements ITechManager {
             if (getFunds().isGreaterOrEqualThan(totalPayout)) {
                 for (UUID personId : getRetirementDefectionTracker().getRetirees()) {
                     if (ChronoUnit.MONTHS.between(getPerson(personId).getRecruitment(), getLocalDate()) < getCampaignOptions().getServiceContractDuration()) {
-                        getPerson(personId).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+                        if (Compute.d6(1) == 6) {
+                            getPerson(personId).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+                        } else {
+                            getPerson(personId).changeStatus(this, getLocalDate(), PersonnelStatus.DESERTED);
+                        }
                         continue;
                     }
 
