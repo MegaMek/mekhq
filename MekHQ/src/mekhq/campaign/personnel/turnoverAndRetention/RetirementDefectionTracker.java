@@ -27,7 +27,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -199,7 +198,7 @@ public class RetirementDefectionTracker {
                 }
 
                 if (contract != null) {
-                    targetNumber.addModifier(- (contract.getSharesPct() / 10), resources.getString("shares.text"));
+                    targetNumber.addModifier(- Math.max(0, ((contract.getSharesPct() / 10) - 2)), resources.getString("shares.text"));
                 }
             }
 
@@ -710,12 +709,12 @@ public class RetirementDefectionTracker {
             return Money.zero();
         }
 
-        FinancialReport r = FinancialReport.calculate(campaign);
-
-        Money netWorth = r.getNetWorth();
-        if (campaign.getCampaignOptions().isSharesExcludeLargeCraft()) {
-            netWorth = netWorth.minus(r.getLargeCraftValue());
-        }
+//        FinancialReport r = FinancialReport.calculate(campaign);
+//
+//        Money netWorth = r.getNetWorth();
+//        if (campaign.getCampaignOptions().isSharesExcludeLargeCraft()) {
+//            netWorth = netWorth.minus(r.getLargeCraftValue());
+//        }
 
         int totalShares = campaign.getActivePersonnel()
                 .stream()
@@ -726,7 +725,7 @@ public class RetirementDefectionTracker {
             return Money.zero();
         }
 
-        return netWorth.dividedBy(totalShares);
+        return campaign.getFunds().dividedBy(totalShares);
     }
 
     /**
@@ -936,7 +935,6 @@ public class RetirementDefectionTracker {
     public static class Payout {
         private int weightClass = 0;
         private Money payoutAmount = Money.zero();
-        private PersonnelRole recruitRole = PersonnelRole.NONE;
         private boolean stolenUnit = false;
         private UUID stolenUnitId = null;
 
@@ -1006,14 +1004,6 @@ public class RetirementDefectionTracker {
 
         public void setPayoutAmount(Money payoutAmount) {
             this.payoutAmount = payoutAmount;
-        }
-
-        public PersonnelRole getRecruitRole() {
-            return recruitRole;
-        }
-
-        public void setRecruitRole(PersonnelRole role) {
-            recruitRole = role;
         }
 
         public boolean hasStolenUnit() {

@@ -128,6 +128,9 @@ public class RetirementDefectionDialog extends JDialog {
     private void initComponents(boolean doRetirement) {
         setTitle(resourceMap.getString("title.text"));
 
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setSize(screenSize);
+
         setLayout(new BorderLayout());
         cardLayout = new CardLayout();
         panMain = new JPanel(cardLayout);
@@ -346,7 +349,7 @@ public class RetirementDefectionDialog extends JDialog {
             column.setCellRenderer(unitModel.getRenderer(i));
         }
 
-        unitAssignmentTable.setRowHeight(80);
+        unitAssignmentTable.setRowHeight(50);
         unitAssignmentTable.setIntercellSpacing(new Dimension(0, 0));
         unitAssignmentTable.setShowGrid(false);
         unitAssignmentTable.getSelectionModel().addListSelectionListener(ev -> enableAddRemoveButtons());
@@ -742,10 +745,6 @@ public class RetirementDefectionDialog extends JDialog {
         }
     }
 
-    public UUID getUnitId(UUID pid) {
-        return unitAssignments.get(pid);
-    }
-
     public Map<UUID, UUID> getUnitAssignments() {
         return unitAssignments;
     }
@@ -897,7 +896,7 @@ class RetirementTable extends JTable {
             }
         }
 
-        setRowHeight(80);
+        setRowHeight(50);
         setIntercellSpacing(new Dimension(0, 0));
         setShowGrid(false);
 

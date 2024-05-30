@@ -342,6 +342,28 @@ public class TransactionTypeTest {
             }
         }
     }
+
+    @Test
+    public void testIsResignation() {
+        for (final TransactionType transactionType : types) {
+            if (transactionType == TransactionType.RESIGNATION) {
+                assertTrue(transactionType.isResignation());
+            } else {
+                assertFalse(transactionType.isResignation());
+            }
+        }
+    }
+
+    @Test
+    public void testIsTheft() {
+        for (final TransactionType transactionType : types) {
+            if (transactionType == TransactionType.THEFT) {
+                assertTrue(transactionType.isTheft());
+            } else {
+                assertFalse(transactionType.isTheft());
+            }
+        }
+    }
     //endregion Boolean Comparison Methods
 
     //region File I/O

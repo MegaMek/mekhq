@@ -304,20 +304,12 @@ public enum PersonnelFilter {
         return this == INACTIVE;
     }
 
-    public boolean isOnLeave() {
-        return this == ON_LEAVE;
-    }
-
     public boolean isMIA() {
         return this == MIA;
     }
 
     public boolean isRetired() {
         return this == RETIRED;
-    }
-
-    public boolean isResigned() {
-        return this == RESIGNED;
     }
 
     public boolean isDeserted() {
