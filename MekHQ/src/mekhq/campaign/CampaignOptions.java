@@ -323,6 +323,7 @@ public class CampaignOptions {
     private boolean useMutinies;
     private ForceReliabilityMethod forceReliabilityMethod;
     private MutinyMethod mutinyMethod;
+    private boolean useMutinyFactionChange;
     private boolean useSabotage;
     private boolean useTheftUnit;
     private int theftResellValue;
@@ -1025,6 +1026,7 @@ public class CampaignOptions {
         setMoraleStepSize(1);
         setForceReliabilityMethod(ForceReliabilityMethod.LOYALTY);
         setMutinyMethod(MutinyMethod.ADVANCED_MUTINIES);
+        setUseMutinyFactionChange(true);
         setUseDesertions(true);
         setUseSabotage(true);
         setUseMutinies(true);
@@ -1617,6 +1619,14 @@ public class CampaignOptions {
 
     public void setMutinyMethod(final MutinyMethod mutinyMethod) {
         this.mutinyMethod = mutinyMethod;
+    }
+
+    public boolean isUseMutinyFactionChange() {
+        return useMutinyFactionChange;
+    }
+
+    public void setUseMutinyFactionChange(final boolean useMutinyFactionChange) {
+        this.useMutinyFactionChange = useMutinyFactionChange;
     }
 
     public boolean isUseDesertions() {
@@ -4849,6 +4859,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleStepSize", getMoraleStepSize());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "forceReliabilityMethod", getForceReliabilityMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mutinyMethod", getMutinyMethod().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMutinyFactionChange", isUseMutinyFactionChange());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDesertions", isUseDesertions());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSabotage", isUseSabotage());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMutinies", isUseMutinies());
@@ -5883,6 +5894,8 @@ public class CampaignOptions {
                     retVal.setForceReliabilityMethod(ForceReliabilityMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("mutinyMethod")) {
                     retVal.setMutinyMethod(MutinyMethod.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useMutinyFactionChange")) {
+                    retVal.setUseMutinyFactionChange(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDesertions")) {
                     retVal.setUseDesertions(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useSabotage")) {

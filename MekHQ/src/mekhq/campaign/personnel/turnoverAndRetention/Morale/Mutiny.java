@@ -14,6 +14,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.moraleDialogs.TransitMutinyOnsetDialog;
 import mekhq.gui.dialog.moraleDialogs.TransitMutinyToe;
 
@@ -68,6 +69,17 @@ public class Mutiny {
 
     }
 
+    /**
+     * Process an abstract battle between loyalists and mutineers in a campaign.
+     *
+     * @param campaign The campaign where the battle takes place.
+     * @param random The random number generator used for randomness in the battle.
+     * @param resources The resource bundle containing the text resources for the battle dialog.
+     * @param loyalistLeader The leader of the loyalist side.
+     * @param loyalists The list of loyalist people participating in the battle.
+     * @param mutineerLeader The leader of the mutineer side.
+     * @param mutineers The map of mutineer people and their corresponding battle power values.
+     */
     private static void processAbstractBattle(Campaign campaign, Random random, ResourceBundle resources,
                                               Person loyalistLeader, List<Person> loyalists,
                                               Person mutineerLeader, HashMap<Person, Integer> mutineers) {
@@ -116,6 +128,16 @@ public class Mutiny {
             // I did want this to check whether the company was needing additional transports,
             // but I couldn't get that to work
             abstractDamageShips(campaign, resources);
+        }
+
+        // if Campaign Options are set to have campaign faction change on mutiny,
+        // and the faction isn't mercenary, change the faction
+        if (victor == 1) {
+            if ((!Objects.equals(campaign.getFaction().getShortName(), "MERC"))
+                    && (campaign.getCampaignOptions().isUseMutinyFactionChange())) {
+                campaign.setFaction(Factions.getInstance().getFaction("MERC"));
+                campaign.addReport(resources.getString("mutinyCampaignFactionChange.text"));
+            }
         }
     }
 
