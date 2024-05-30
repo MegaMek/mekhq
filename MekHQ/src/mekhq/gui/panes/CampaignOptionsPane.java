@@ -272,6 +272,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseContractCompletionRandomRetirement;
     private JCheckBox chkUseRandomFounderTurnover;
     private JCheckBox chkUseFounderRetirement;
+    private JCheckBox chkAeroRecruitsHaveUnits;
+    private JCheckBox chkTrackOriginalUnit;
     private JCheckBox chkUseSubContractSoldiers;
     private JLabel lblServiceContractDuration;
     private JSpinner spnServiceContractDuration;
@@ -623,8 +625,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private MMComboBox<SkillLevel> comboSkillLevel;
 
     // unit administration
-    private JCheckBox chkAeroRecruitsHaveUnits;
-    private JCheckBox chkTrackOriginalUnit;
     private JCheckBox chkUseAero;
     private JCheckBox chkUseVehicles;
     private JCheckBox chkClanVehicles;
@@ -2807,19 +2807,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panAtB.add(chkUseStratCon, gridBagConstraints);
 
         // AtB options: "Unit Administration" frame controls
-        chkAeroRecruitsHaveUnits = new JCheckBox(resources.getString("chkAeroRecruitsHaveUnits.text"));
-        chkAeroRecruitsHaveUnits.setToolTipText(resources.getString("chkAeroRecruitsHaveUnits.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkAeroRecruitsHaveUnits, gridBagConstraints);
-
-        chkTrackOriginalUnit = new JCheckBox(resources.getString("chkTrackOriginalUnit.text"));
-        chkTrackOriginalUnit.setToolTipText(resources.getString("chkTrackOriginalUnit.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkTrackOriginalUnit, gridBagConstraints);
-
         chkUseAero = new JCheckBox(resources.getString("chkUseAero.text"));
         chkUseAero.setToolTipText(resources.getString("chkUseAero.toolTipText"));
-        gridBagConstraints.gridy++;
+        gridBagConstraints.gridy = 0;
         panSubAtBAdmin.add(chkUseAero, gridBagConstraints);
 
         chkUseVehicles = new JCheckBox(resources.getString("chkUseVehicles.text"));
@@ -4201,6 +4191,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseFounderRetirement.setName("chkUseFounderRetirement");
         chkUseFounderRetirement.setEnabled(isUseTurnover);
 
+        chkTrackOriginalUnit = new JCheckBox(resources.getString("chkTrackOriginalUnit.text"));
+        chkTrackOriginalUnit.setToolTipText(resources.getString("chkTrackOriginalUnit.toolTipText"));
+        chkTrackOriginalUnit.setName("chkTrackOriginalUnit");
+        chkTrackOriginalUnit.setEnabled(isUseTurnover);
+
+        chkAeroRecruitsHaveUnits = new JCheckBox(resources.getString("chkAeroRecruitsHaveUnits.text"));
+        chkAeroRecruitsHaveUnits.setToolTipText(resources.getString("chkAeroRecruitsHaveUnits.toolTipText"));
+        chkAeroRecruitsHaveUnits.setName("chkAeroRecruitsHaveUnits");
+        chkAeroRecruitsHaveUnits.setEnabled(isUseTurnover);
+
         chkUseSubContractSoldiers = new JCheckBox(resources.getString("chkUseSubContractSoldiers.text"));
         chkUseSubContractSoldiers.setToolTipText(resources.getString("chkUseSubContractSoldiers.toolTipText"));
         chkUseSubContractSoldiers.setName("chkUseSubContractSoldiers");
@@ -4250,6 +4250,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseContractCompletionRandomRetirement)
                         .addComponent(chkUseRandomFounderTurnover)
                         .addComponent(chkUseFounderRetirement)
+                        .addComponent(chkTrackOriginalUnit)
+                        .addComponent(chkAeroRecruitsHaveUnits)
                         .addComponent(chkUseSubContractSoldiers)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblServiceContractDuration)
@@ -4274,6 +4276,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseContractCompletionRandomRetirement)
                         .addComponent(chkUseRandomFounderTurnover)
                         .addComponent(chkUseFounderRetirement)
+                        .addComponent(chkTrackOriginalUnit)
+                        .addComponent(chkAeroRecruitsHaveUnits)
                         .addComponent(chkUseSubContractSoldiers)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblServiceContractDuration)
@@ -7897,6 +7901,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
         chkUseRandomFounderTurnover.setSelected(options.isUseRandomFounderTurnover());
         chkUseFounderRetirement.setSelected(options.isUseFounderRetirement());
+        chkTrackOriginalUnit.setSelected(options.isTrackOriginalUnit());
+        chkAeroRecruitsHaveUnits.setSelected(options.isAeroRecruitsHaveUnits());
         chkUseSubContractSoldiers.setSelected(options.isUseSubContractSoldiers());
         spnServiceContractDuration.setValue(options.getServiceContractDuration());
         spnServiceContractModifier.setValue(options.getServiceContractModifier());
@@ -8258,8 +8264,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
         chkUseStratCon.setSelected(options.isUseStratCon());
         comboSkillLevel.setSelectedItem(options.getSkillLevel());
-        chkAeroRecruitsHaveUnits.setSelected(options.isAeroRecruitsHaveUnits());
-        chkTrackOriginalUnit.setSelected(options.isTrackOriginalUnit());
         chkUseAero.setSelected(options.isUseAero());
         chkUseVehicles.setSelected(options.isUseVehicles());
         chkClanVehicles.setSelected(options.isClanVehicles());
@@ -8569,6 +8573,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
             options.setUseRandomFounderTurnover(chkUseRandomFounderTurnover.isSelected());
             options.setUseFounderRetirement(chkUseFounderRetirement.isSelected());
+            options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
             options.setUseSubContractSoldiers(chkUseSubContractSoldiers.isSelected());
             options.setServiceContractDuration((Integer) spnServiceContractDuration.getValue());
             options.setServiceContractModifier((Integer) spnServiceContractModifier.getValue());
@@ -8776,7 +8781,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseAtB(chkUseAtB.isSelected());
             options.setUseStratCon(chkUseStratCon.isSelected());
             options.setSkillLevel(comboSkillLevel.getSelectedItem());
-            options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
             options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
             options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
             options.setUseStrategy(chkUseStrategy.isSelected());
@@ -8813,7 +8817,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
             options.setUseLightConditions(chkUseLightConditions.isSelected());
             options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
-            options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
             //endregion Against the Bot
 
             campaign.setCampaignOptions(options);
