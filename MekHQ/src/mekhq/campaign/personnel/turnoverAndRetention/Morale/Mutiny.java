@@ -16,7 +16,7 @@ import mekhq.campaign.personnel.enums.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.moraleDialogs.TransitMutinyOnsetDialog;
-import mekhq.gui.dialog.moraleDialogs.TransitMutinyToe;
+import mekhq.gui.dialog.moraleDialogs.TransitMutinyToeDialog;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -88,15 +88,58 @@ public class Mutiny {
         HashMap<String, Integer> mutinyBattlePower = getAbstractBattlePower(mutineerLeader, new ArrayList<>(mutineers.keySet()));
 
         // inform the player of the measure of power among each side
-        int support = TransitMutinyToe.transitMutinyToeDialog(resources,
+        int support = TransitMutinyToeDialog.transitMutinyToeDialog(resources,
                 loyalistLeader, loyalists.size(), loyalistBattlePower.get("attack"), loyalistBattlePower.get("defense"),
                 mutineerLeader, mutineers.keySet().size(), mutinyBattlePower.get("attack"), mutinyBattlePower.get("defense"));
 
         // process the battle
-        int victor = processAbstractBattleRound(campaign, random, resources, loyalists, loyalistBattlePower, new ArrayList<>(mutineers.keySet()), mutinyBattlePower);
+        HashMap<String, List<Person>> battleOutcome = processAbstractBattleRound(campaign, random, resources,
+                loyalists, loyalistBattlePower,
+                new ArrayList<>(mutineers.keySet()), mutinyBattlePower);
+
+        // refresh lists and re-calculate battle power
+        loyalists.clear();
+        if (battleOutcome.get("loyalists").isEmpty()) {
+            loyalistBattlePower.put("attack", 0);
+            loyalistBattlePower.put("defense", 0);
+        } else {
+            loyalists.addAll(battleOutcome.get("loyalists"));
+            loyalistBattlePower = getAbstractBattlePower(loyalistLeader, loyalists);
+        }
+
+        mutineers.clear();
+        if (battleOutcome.get("mutineers").isEmpty()) {
+            mutinyBattlePower.put("attack", 0);
+            mutinyBattlePower.put("defense", 0);
+        } else {
+            for (Person mutineer : battleOutcome.get("mutineers")) {
+                mutineers.put(mutineer, 0);
+            }
+            mutinyBattlePower = getAbstractBattlePower(mutineerLeader, new ArrayList<>(mutineers.keySet()));
+        }
+
+        int loyalistAdjustedBattlePower = loyalistBattlePower.get("attack") - (mutinyBattlePower.get("defense") / 6);
+        int mutineerAdjustedBattlePower = mutinyBattlePower.get("attack") - (loyalistBattlePower.get("defense") / 6);
+
+        int victor;
+
+        // mutual destruction
+        if ((loyalistAdjustedBattlePower == 0) && (mutineerAdjustedBattlePower == 0)) {
+            victor = -1;
+        // loyalist victory
+        } else if (loyalistAdjustedBattlePower >= mutineerAdjustedBattlePower) {
+            victor = 0;
+        // mutineer victory
+        } else {
+            victor = 1;
+        }
 
         // broadcast the conclusion
         transitMutinyConclusionDialog(resources, victor);
+
+        if (victor == -1) {
+            return;
+        }
 
         // if the player supported the wrong side (and didn't pick 'victor') end their campaign
         if ((victor != support) && (support != 2)) {
@@ -137,6 +180,32 @@ public class Mutiny {
                     && (campaign.getCampaignOptions().isUseMutinyFactionChange())) {
                 campaign.setFaction(Factions.getInstance().getFaction("MERC"));
                 campaign.addReport(resources.getString("mutinyCampaignFactionChange.text"));
+            }
+
+            if (mutineerLeader.getStatus().isDead()) {
+                Person oldLeader = mutineerLeader;
+                mutineerLeader = campaign.getHighestRankedPerson(battleOutcome.get("mutineers"), true);
+                campaign.addReport(String.format(resources.getString("mutinyLeaderKilled.text"),
+                        oldLeader.getHyperlinkedFullTitle(),
+                        mutineerLeader.getHyperlinkedFullTitle()));
+            }
+
+            mutineerLeader.setCommander(true);
+            campaign.addReport(String.format(resources.getString("mutinyChangeOfLeadership.text"),
+                    mutineerLeader.getHyperlinkedFullTitle(),
+                    campaign.getName()));
+        } else {
+            if (loyalistLeader.getStatus().isDead()) {
+                Person oldLeader = loyalistLeader;
+                loyalistLeader = campaign.getHighestRankedPerson(battleOutcome.get("loyalists"), true);
+                campaign.addReport(String.format(resources.getString("mutinyLeaderKilled.text"),
+                        oldLeader.getHyperlinkedFullTitle(),
+                        loyalistLeader.getHyperlinkedFullTitle()));
+                loyalistLeader.setCommander(true);
+
+                campaign.addReport(String.format(resources.getString("mutinyChangeOfLeadership.text"),
+                        loyalistLeader.getHyperlinkedFullTitle(),
+                        campaign.getName()));
             }
         }
     }
@@ -223,7 +292,7 @@ public class Mutiny {
         return battlePower;
     }
 
-    public static int processAbstractBattleRound(Campaign campaign, Random random, ResourceBundle resources,
+    public static HashMap<String, List<Person>> processAbstractBattleRound(Campaign campaign, Random random, ResourceBundle resources,
                                                  List<Person> loyalists, HashMap<String, Integer> loyalistBattlePower,
                                                  List<Person> mutineers, HashMap<String, Integer> mutinyBattlePower) {
 
@@ -250,52 +319,27 @@ public class Mutiny {
         List<Person> loyalistsGraveyard = distributeHits(campaign, loyalists, mutineerHits, random);
 
         // post-battle clean up
-        for (Person person : mutineerGraveyard) {
-            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
-        }
-
         for (Person person : loyalistsGraveyard) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
         }
 
-        mutineers.removeAll(mutineerGraveyard);
-        loyalists.removeAll(loyalistsGraveyard);
-
-        // calculate results
-        if ((mutineers.isEmpty()) && (loyalists.isEmpty())) {
-            // they wiped each other out
-            return -1;
+        for (Person person : mutineerGraveyard) {
+            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
         }
+
+        loyalists.removeAll(loyalistsGraveyard);
+        mutineers.removeAll(mutineerGraveyard);
 
         // show some flavor text, to make the battle seem more dramatic
         transitMutinyBattleConditionDialog(resources, random, loyalistsGraveyard.size(), mutineerGraveyard.size());
 
         // resolve the battle
-        if (mutineerGraveyard.size() == loyalistsGraveyard.size()) {
-            // if the battle is drawn, roll a d6
-            int tieBreaker = (Compute.d6(1));
+        HashMap<String, List<Person>> personLists = new HashMap<>();
 
-            switch (tieBreaker) {
-                case 1:
-                case 2:
-                case 3:
-                    // loyalist victory
-                    return 0;
-                case 4:
-                case 5:
-                case 6:
-                    // mutineer victory
-                    return 1;
-                default:
-                    throw new IllegalStateException("Unexpected value in processAbstractBattleRound: " + tieBreaker);
-            }
-        } else if (mutineerGraveyard.size() > loyalistsGraveyard.size()) {
-            // loyalist victory
-            return 0;
-        } else {
-            // mutineer victory
-            return 1;
-        }
+        personLists.put("loyalists", loyalists);
+        personLists.put("mutineers", mutineers);
+
+        return personLists;
     }
 
     private static List<Person> distributeHits(Campaign campaign, List<Person> combatants, int hits, Random random) {

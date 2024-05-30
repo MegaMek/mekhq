@@ -379,7 +379,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseMoraleTriggerLeaderLoss;
     private JCheckBox chkUseMoraleTriggerCombatLoss;
     private JCheckBox chkUseMoraleTriggerDesertion;
+    private JCheckBox chkUseReverseTriggerDesertion;
     private JCheckBox chkUseMoraleTriggerMutiny;
+    private JCheckBox chkUseReverseTriggerMutiny;
     private JCheckBox chkUseMoraleTriggerMissedPayDay;
     private JCheckBox chkUseMoraleTriggerFatigue;
     //endregion Turnover and Retention Tab
@@ -4924,9 +4926,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkUseMutinyFactionChange.setEnabled((isEnabled) && (campaign.getCampaignOptions().isUseMutinies()));
 
             chkUseMoraleTriggerDesertion.setEnabled((isEnabled) && (chkUseDesertions.isSelected()));
+            chkUseReverseTriggerDesertion.setEnabled((isEnabled) && (chkUseDesertions.isSelected()));
             chkUseMoraleModifierCommanderSkill.setEnabled((isEnabled) && (chkUseManagementSkill.isSelected()));
 
             chkUseMoraleTriggerMutiny.setEnabled((isEnabled) && (chkUseMutinies.isSelected()));
+            chkUseReverseTriggerMutiny.setEnabled((isEnabled) && (chkUseMutinies.isSelected()) && (chkUseMoraleTriggerMutiny.isSelected()));
             chkUseMoraleTriggerFatigue.setEnabled((isEnabled) && (chkUseFatigue.isSelected()));
 
             chkUseTheftUnit.setEnabled((isEnabled) && ((chkUseDesertions.isSelected()) || (chkUseMutinies.isSelected())));
@@ -5033,6 +5037,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final boolean isEnabled = chkUseDesertions.isSelected();
 
             chkUseMoraleTriggerDesertion.setEnabled(isEnabled);
+            chkUseReverseTriggerDesertion.setEnabled((isEnabled) && (chkUseMoraleTriggerDesertion.isSelected()));
         });
 
         chkUseMutinies = new JCheckBox(resources.getString("chkUseMutinies.text"));
@@ -5043,6 +5048,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final boolean isEnabled = chkUseMutinies.isSelected();
 
             chkUseMoraleTriggerMutiny.setEnabled(isEnabled);
+            chkUseReverseTriggerMutiny.setEnabled((isEnabled) && (chkUseMoraleTriggerMutiny.isSelected()));
             lblMutinyMethod.setEnabled(isEnabled);
             comboMutinyMethod.setEnabled(isEnabled);
         });
@@ -5310,15 +5316,39 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMoraleTriggerCombatLoss.setName("chkUseMoraleTriggerCombatLoss");
         chkUseMoraleTriggerCombatLoss.setEnabled(isUseMorale);
 
-        chkUseMoraleTriggerDesertion = new JCheckBox(resources.getString("chkUseMoraleTriggerDesertion.text"));
+        chkUseMoraleTriggerDesertion = new JCheckBox(resources.getString("chkUseReverseTriggerDesertion.text"));
         chkUseMoraleTriggerDesertion.setToolTipText(resources.getString("chkUseMoraleTriggerDesertion.toolTipText"));
         chkUseMoraleTriggerDesertion.setName("chkUseMoraleTriggerDesertion");
         chkUseMoraleTriggerDesertion.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseDesertions()));
+        chkUseMoraleTriggerDesertion.addActionListener(evt -> {
+            final boolean isEnabled = chkUseMoraleTriggerDesertion.isSelected();
+
+            chkUseReverseTriggerDesertion.setEnabled(isEnabled);
+        });
+
+        chkUseReverseTriggerDesertion = new JCheckBox(resources.getString("chkUseReverseTriggerDesertion.text"));
+        chkUseReverseTriggerDesertion.setToolTipText(resources.getString("chkUseReverseTriggerDesertion.toolTipText"));
+        chkUseReverseTriggerDesertion.setName("chkUseReverseTriggerDesertion");
+        chkUseReverseTriggerDesertion.setEnabled((isUseMorale)
+                && (campaign.getCampaignOptions().isUseDesertions())
+                && (campaign.getCampaignOptions().isUseMoraleTriggerDesertion()));
 
         chkUseMoraleTriggerMutiny = new JCheckBox(resources.getString("chkUseMoraleTriggerMutiny.text"));
         chkUseMoraleTriggerMutiny.setToolTipText(resources.getString("chkUseMoraleTriggerMutiny.toolTipText"));
         chkUseMoraleTriggerMutiny.setName("chkUseMoraleTriggerMutiny");
         chkUseMoraleTriggerMutiny.setEnabled((isUseMorale) && (campaign.getCampaignOptions().isUseMutinies()));
+        chkUseMoraleTriggerMutiny.addActionListener(evt -> {
+            final boolean isEnabled = chkUseMoraleTriggerMutiny.isSelected();
+
+            chkUseReverseTriggerMutiny.setEnabled(isEnabled);
+        });
+
+        chkUseReverseTriggerMutiny = new JCheckBox(resources.getString("chkUseReverseTriggerMutiny.text"));
+        chkUseReverseTriggerMutiny.setToolTipText(resources.getString("chkUseReverseTriggerMutiny.toolTipText"));
+        chkUseReverseTriggerMutiny.setName("chkUseReverseTriggerMutiny");
+        chkUseReverseTriggerMutiny.setEnabled((isUseMorale)
+                && (campaign.getCampaignOptions().isUseMutinies())
+                && (campaign.getCampaignOptions().isUseMoraleTriggerMutiny()));
 
         chkUseMoraleTriggerMissedPayDay = new JCheckBox(resources.getString("chkUseMoraleTriggerMissedPayDay.text"));
         chkUseMoraleTriggerMissedPayDay.setToolTipText(resources.getString("chkUseMoraleTriggerMissedPayDay.toolTipText"));
@@ -5347,7 +5377,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseMoraleTriggerLeaderLoss)
                         .addComponent(chkUseMoraleTriggerCombatLoss)
                         .addComponent(chkUseMoraleTriggerDesertion)
+                        .addComponent(chkUseReverseTriggerDesertion)
                         .addComponent(chkUseMoraleTriggerMutiny)
+                        .addComponent(chkUseReverseTriggerMutiny)
                         .addComponent(chkUseMoraleTriggerMissedPayDay)
         );
 
@@ -5359,7 +5391,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseMoraleTriggerLeaderLoss)
                         .addComponent(chkUseMoraleTriggerCombatLoss)
                         .addComponent(chkUseMoraleTriggerDesertion)
+                        .addComponent(chkUseReverseTriggerDesertion)
                         .addComponent(chkUseMoraleTriggerMutiny)
+                        .addComponent(chkUseReverseTriggerMutiny)
                         .addComponent(chkUseMoraleTriggerMissedPayDay)
         );
 
@@ -8487,7 +8521,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMoraleTriggerLeaderLoss.setSelected(options.isUseMoraleTriggerModifierLeaderLoss());
         chkUseMoraleTriggerCombatLoss.setSelected(options.isUseMoraleTriggerCombatLoss());
         chkUseMoraleTriggerDesertion.setSelected(options.isUseMoraleTriggerDesertion());
+        chkUseReverseTriggerDesertion.setSelected(options.isUseReverseTriggerDesertion());
         chkUseMoraleTriggerMutiny.setSelected(options.isUseMoraleTriggerMutiny());
+        chkUseReverseTriggerMutiny.setSelected(options.isUseReverseTriggerMutiny());
         chkUseMoraleTriggerFatigue.setSelected(options.isUseMoraleTriggerFatigue());
         chkUseMoraleTriggerMissedPayDay.setSelected(options.isUseMoraleTriggerMissedPayDay());
 
@@ -9195,7 +9231,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseMoraleTriggerModifierLeaderLoss(chkUseMoraleTriggerLeaderLoss.isSelected());
             options.setUseMoraleTriggerCombatLoss(chkUseMoraleTriggerCombatLoss.isSelected());
             options.setUseMoraleTriggerDesertion(chkUseMoraleTriggerDesertion.isSelected());
+            options.setUseReverseTriggerDesertion(chkUseReverseTriggerDesertion.isSelected());
             options.setUseMoraleTriggerMutiny(chkUseMoraleTriggerMutiny.isSelected());
+            options.setUseReverseTriggerMutiny(chkUseReverseTriggerMutiny.isSelected());
             options.setUseMoraleTriggerFatigue(chkUseMoraleTriggerFatigue.isSelected());
             options.setUseMoraleTriggerMissedPayDay(chkUseMoraleTriggerMissedPayDay.isSelected());
 

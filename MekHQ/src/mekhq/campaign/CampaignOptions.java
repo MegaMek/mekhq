@@ -337,7 +337,9 @@ public class CampaignOptions {
     private boolean useMoraleTriggerModifierLeaderLoss;
     private boolean useMoraleTriggerCombatLoss;
     private boolean useMoraleTriggerDesertion;
+    private boolean useReverseTriggerDesertion;
     private boolean useMoraleTriggerMutiny;
+    private boolean useReverseTriggerMutiny;
     private boolean useMoraleTriggerFatigue;
     private boolean useMoraleTriggerMissedPayDay;
 
@@ -1043,7 +1045,9 @@ public class CampaignOptions {
         setUseMoraleTriggerModifierLeaderLoss(true);
         setUseMoraleTriggerCombatLoss(true);
         setUseMoraleTriggerDesertion(true);
+        setUseReverseTriggerDesertion(true);
         setUseMoraleTriggerMutiny(true);
+        setUseReverseTriggerMutiny(true);
         setUseMoraleTriggerFatigue(true);
         setUseMoraleTriggerMissedPayDay(true);
 
@@ -1837,12 +1841,28 @@ public class CampaignOptions {
         this.useMoraleTriggerDesertion = useMoraleTriggerDesertion;
     }
 
+    public boolean isUseReverseTriggerDesertion() {
+        return useReverseTriggerDesertion;
+    }
+
+    public void setUseReverseTriggerDesertion(final boolean useReverseTriggerDesertion) {
+        this.useReverseTriggerDesertion = useReverseTriggerDesertion;
+    }
+
     public boolean isUseMoraleTriggerMutiny() {
         return useMoraleTriggerMutiny;
     }
 
     public void setUseMoraleTriggerMutiny(final boolean useMoraleTriggerMutiny) {
         this.useMoraleTriggerMutiny = useMoraleTriggerMutiny;
+    }
+
+    public boolean isUseReverseTriggerMutiny() {
+        return useReverseTriggerMutiny;
+    }
+
+    public void setUseReverseTriggerMutiny(final boolean useReverseTriggerMutiny) {
+        this.useReverseTriggerMutiny = useReverseTriggerMutiny;
     }
 
     //endregion General Personnel
@@ -4876,7 +4896,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleTriggerLeaderLoss", isUseMoraleTriggerModifierLeaderLoss());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleTriggerCombatLoss", isUseMoraleTriggerCombatLoss());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleTriggerDesertion", isUseMoraleTriggerDesertion());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReverseTriggerDesertion", isUseReverseTriggerDesertion());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleTriggerMutiny", isUseMoraleTriggerMutiny());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReverseTriggerMutiny", isUseReverseTriggerMutiny());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMoraleTriggerFatigue", isUseMoraleTriggerFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chkUseMoraleTriggerMissedPayDay", isUseMoraleTriggerMissedPayDay());
 
@@ -5924,8 +5946,12 @@ public class CampaignOptions {
                     retVal.setUseMoraleTriggerCombatLoss(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerDesertion")) {
                     retVal.setUseMoraleTriggerDesertion(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useReverseTriggerDesertion")) {
+                    retVal.setUseReverseTriggerDesertion(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMutiny")) {
                     retVal.setUseMoraleTriggerMutiny(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useReverseTriggerMutiny")) {
+                    retVal.setUseReverseTriggerMutiny(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerFatigue")) {
                     retVal.setUseMoraleTriggerFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMoraleTriggerMissedPayDay")) {

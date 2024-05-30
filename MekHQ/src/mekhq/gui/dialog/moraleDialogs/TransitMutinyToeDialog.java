@@ -9,7 +9,7 @@ import java.awt.event.WindowEvent;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TransitMutinyToe extends JDialog {
+public class TransitMutinyToeDialog extends JDialog {
     /**
      * Displays a dialog for the onset of a mutiny while in transit.
      *
