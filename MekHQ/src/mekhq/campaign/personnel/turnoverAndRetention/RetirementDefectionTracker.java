@@ -126,8 +126,16 @@ public class RetirementDefectionTracker {
                 continue;
             }
 
-            if ((person.isFounder()) && (!campaign.getCampaignOptions().isUseRandomFounderTurnover())) {
-                continue;
+            if (person.isFounder()) {
+                if (person.getAge(campaign.getLocalDate()) < 50) {
+                    if (!campaign.getCampaignOptions().isUseRandomFounderTurnover()) {
+                        continue;
+                    }
+                } else {
+                    if (!campaign.getCampaignOptions().isUseFounderRetirement()) {
+                        continue;
+                    }
+                }
             }
 
             if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
@@ -137,6 +145,11 @@ public class RetirementDefectionTracker {
             }
 
             TargetRoll targetNumber = new TargetRoll(getBaseTargetNumber(campaign, person), resources.getString("base.text"));
+
+            // Founder Modifier
+            if (person.isFounder()) {
+                targetNumber.addModifier(-2, resources.getString("founder.text"));
+            }
 
             // Service Contract
             if (ChronoUnit.MONTHS.between(person.getRecruitment(), campaign.getLocalDate()) < campaign.getCampaignOptions().getServiceContractDuration()) {
