@@ -13,14 +13,11 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
-import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.dialog.moraleDialogs.TransitMutinyOnsetDialog;
 import mekhq.gui.dialog.moraleDialogs.TransitMutinyToe;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.Morale.Desertion.processDesertion;
@@ -209,31 +206,28 @@ public class Mutiny {
                                                  List<Person> mutineers, HashMap<String, Integer> mutinyBattlePower) {
 
         // the loyalist side of the battle (ten rounds of combat)
-        int hits = 0;
+        int loyalistHits = 0;
         int combatRound = 0;
 
         while (combatRound < 10) {
-            hits += combatRound(loyalistBattlePower.get("attack"), mutinyBattlePower.get("defense"));
+            loyalistHits += combatRound(loyalistBattlePower.get("attack"), mutinyBattlePower.get("defense"));
             combatRound++;
         }
 
-        distributeHits(campaign, mutineers, hits, random);
-
         // the mutineer side of the battle (ten rounds of combat)
-        hits = 0;
+        int mutineerHits = 0;
         combatRound = 0;
 
         while (combatRound < 10) {
-            hits += combatRound(mutinyBattlePower.get("attack"), loyalistBattlePower.get("defense"));
+            mutineerHits += combatRound(mutinyBattlePower.get("attack"), loyalistBattlePower.get("defense"));
             combatRound++;
         }
 
-        distributeHits(campaign, loyalists, hits, random);
+        // count the dead
+        List<Person> mutineerGraveyard = distributeHits(campaign, mutineers, loyalistHits, random);
+        List<Person> loyalistsGraveyard = distributeHits(campaign, loyalists, mutineerHits, random);
 
         // post-battle clean up
-        List<Person> mutineerGraveyard = fillGraveyard(campaign, mutineers);
-        List<Person> loyalistsGraveyard = fillGraveyard(campaign, loyalists);
-
         for (Person person : mutineerGraveyard) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.KIA);
         }
@@ -254,6 +248,7 @@ public class Mutiny {
         // show some flavor text, to make the battle seem more dramatic
         transitMutinyBattleConditionDialog(resources, random, loyalistsGraveyard.size(), mutineerGraveyard.size());
 
+        // resolve the battle
         if (mutineerGraveyard.size() == loyalistsGraveyard.size()) {
             // if the battle is drawn, roll a d6
             int tieBreaker = (Compute.d6(1));
@@ -272,7 +267,6 @@ public class Mutiny {
                 default:
                     throw new IllegalStateException("Unexpected value in processAbstractBattleRound: " + tieBreaker);
             }
-
         } else if (mutineerGraveyard.size() > loyalistsGraveyard.size()) {
             // loyalist victory
             return 0;
@@ -282,50 +276,39 @@ public class Mutiny {
         }
     }
 
-    private static List<Person> fillGraveyard(Campaign campaign, List<Person> personnel) {
-        List<Person> graveyard;
+    private static List<Person> distributeHits(Campaign campaign, List<Person> combatants, int hits, Random random) {
+        List<Person> graveyard = new ArrayList<>();
 
-        if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
-            graveyard = personnel.stream()
-                    .filter(person -> person.getInjuries().size() > 5)
-                    .collect(Collectors.toList());
-        } else {
-            graveyard = personnel.stream()
-                    .filter(person -> person.getHits() > 5)
-                    .collect(Collectors.toList());
+        if (hits == 0) {
+            return graveyard;
         }
-        return graveyard;
-    }
 
-    private static void distributeHits(Campaign campaign, List<Person> potentialVictims, int hits, Random random) {
         for (int hit = 0; hit < hits; hit++) {
-            boolean victimFound = false;
-            int maxAttempts = 3;
+            Person casualty = combatants.get(random.nextInt(combatants.size()));
 
-            Person victim = null;
+            // 2d4 (with a max roll of 6)
+            int injuryCount = MathUtility.clamp(Compute.randomInt(4) + Compute.randomInt(4) + 2, 2, 6);
 
-            while ((!victimFound) || (maxAttempts == 0)) {
-                victim = potentialVictims.get(random.nextInt(potentialVictims.size()));
-
-                if ((campaign.getCampaignOptions().isUseAdvancedMedical()) && (victim.getInjuries().size() < 6)) {
-                    victimFound = true;
-                } else if (victim.getHits() < 6) {
-                    victimFound = true;
-                }
-
-                // this prevents an infinite loop from occurring when all combatants are dead
-                maxAttempts--;
-            }
-
-            int injuryCount = MathUtility.clamp(Compute.randomInt(4) + Compute.randomInt(4) + 2, 2, 5);
-
+            // issue injuries
             if (campaign.getCampaignOptions().isUseAdvancedMedical()) {
-                InjuryUtil.resolveCombatDamage(campaign, victim, injuryCount);
-                victim.setHits(victim.getHits() + injuryCount);
+                InjuryUtil.resolveCombatDamage(campaign, casualty, injuryCount);
+                casualty.setHits(casualty.getHits() + injuryCount);
+
+                if (casualty.getInjuries().size() > 5) {
+                    graveyard.add(casualty);
+                    combatants.remove(casualty);
+                }
             } else {
-                victim.setHits(victim.getHits() + injuryCount);
+                casualty.setHits(casualty.getHits() + injuryCount);
+
+                if (casualty.getHits() > 5) {
+                    graveyard.add(casualty);
+                    combatants.remove(casualty);
+                }
             }
         }
+
+        return graveyard;
     }
 
     private static int combatRound(int attackerAttackPower, int defenderDefensePower) {
