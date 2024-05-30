@@ -5047,15 +5047,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblMaximumJumpCount = new JLabel(resources.getString("lblMaximumJumpCount.text"));
         lblMaximumJumpCount.setToolTipText(resources.getString("lblMaximumJumpCount.toolTip"));
         lblMaximumJumpCount.setName("lblMaximumJumpCount");
-      
+
         spnMaximumJumpCount = new JSpinner(new SpinnerNumberModel(5, 1, 200, 1));
         spnMaximumJumpCount.setToolTipText(resources.getString("lblMaximumJumpCount.toolTip"));
         spnMaximumJumpCount.setName("spnMaximumJumpCount");
-      
+
         chkUseReeducationCamps = new JCheckBox(resources.getString("chkUseReeducationCamps.text"));
         chkUseReeducationCamps.setToolTipText(resources.getString("chkUseReeducationCamps.toolTip"));
         chkUseReeducationCamps.setName("chkUseReeducationCamps");
-      
+
         chkUseTruebornTravelException = new JCheckBox(resources.getString("chkUseTruebornTravelException.text"));
         chkUseTruebornTravelException.setToolTipText(resources.getString("chkUseTruebornTravelException.toolTip"));
         chkUseTruebornTravelException.setName("chkUseTruebornTravelException");
@@ -7792,7 +7792,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Education
             options.setUseEducationModule(chkUseEducationModule.isSelected());
             options.setMaximumJumpCount((Integer) spnMaximumJumpCount.getValue());
-            options.setEduEnableAutoAwardsIntegration(chkEduEnableAutoAwardsIntegration.isSelected());
             options.setUseReeducationCamps(chkUseReeducationCamps.isSelected());
             options.setUseTruebornTravelException(chkUseTruebornTravelException.isSelected());
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());

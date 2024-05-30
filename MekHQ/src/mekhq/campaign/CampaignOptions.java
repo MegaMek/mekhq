@@ -2308,14 +2308,6 @@ public class CampaignOptions {
         this.useTruebornTravelException = useTruebornTravelException;
     }
 
-    public boolean isUseTruebornTravelException() {
-        return useTruebornTravelException;
-    }
-
-    public void setUseTruebornTravelException(boolean useTruebornTravelException) {
-        this.useTruebornTravelException = useTruebornTravelException;
-    }
-
     public boolean isEnableLocalAcademies() {
         return enableLocalAcademies;
     }
