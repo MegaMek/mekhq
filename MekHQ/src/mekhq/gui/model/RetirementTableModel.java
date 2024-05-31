@@ -347,9 +347,7 @@ public class RetirementTableModel extends AbstractTableModel {
                                                        boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
                     hasFocus, row, column);
-            int actualRow = table.convertRowIndexToModel(row);
             int actualCol = table.convertColumnIndexToModel(column);
-            Person p = getPerson(actualRow);
             setHorizontalAlignment(getAlignment(actualCol));
 
             return this;
