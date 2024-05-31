@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc;
 
 import megamek.Version;
+import mekhq.gui.StoryPointHyperLinkListener;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import org.apache.logging.log4j.LogManager;
@@ -60,6 +61,8 @@ import java.util.Map.Entry;
  * StoryTriggers specified will be replaced by those from the StoryOutcome.
  */
 public abstract class StoryPoint {
+
+    public final static String DEFAULT_OUTCOME = "DEFAULT";
 
     /** The story arc that this story point is a part of **/
     private StoryArc storyArc;
@@ -103,7 +106,7 @@ public abstract class StoryPoint {
         }
     }
 
-    protected StoryArc getStoryArc() {
+    public StoryArc getStoryArc() {
         return storyArc;
     }
 
@@ -111,7 +114,7 @@ public abstract class StoryPoint {
         this.id = id;
     }
 
-    protected UUID getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -123,6 +126,30 @@ public abstract class StoryPoint {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String s) {
+        name = s;
+    }
+
+    public UUID getNextStoryPointId() {
+        return nextStoryPointId;
+    }
+
+    public void setNextStoryPointId(UUID nextStoryPointId) {
+        this.nextStoryPointId = nextStoryPointId;
+    }
+
+    public List<StoryOutcome> getStoryOutcomes() {
+        return new ArrayList<StoryOutcome>(storyOutcomes.values());
+    }
+
+    public List<StoryTrigger> getStoryTriggers() {
+        return storyTriggers;
+    }
+
+    public void setStoryTriggers(List<StoryTrigger> storyTriggers) {
+        this.storyTriggers = storyTriggers;
     }
 
     /**
@@ -204,6 +231,53 @@ public abstract class StoryPoint {
 
     public Campaign getCampaign() {
         return getStoryArc().getCampaign();
+    }
+
+    public List<String> getAllPossibleResults() {
+        ArrayList<String> results = new ArrayList<>();
+        results.add(DEFAULT_OUTCOME);
+        return results;
+    }
+
+    public List<StoryPoint> getLinkingStoryPoints() {
+        List previous = new ArrayList<StoryPoint>();
+        UUID nextId;
+        for (StoryPoint otherStoryPoint : storyArc.getStoryPoints()) {
+            nextId = otherStoryPoint.getNextStoryPointId();
+            if ((nextId != null) && (nextId.equals(getId()))) {
+                previous.add(otherStoryPoint);
+                continue;
+            }
+            for( StoryOutcome outcome : otherStoryPoint.getStoryOutcomes()) {
+                nextId = outcome.getNextStoryPointId();
+                if ((nextId != null) && (nextId.equals(getId()))) {
+                    previous.add(otherStoryPoint);
+                    continue;
+                }
+            }
+        }
+        return previous;
+    }
+
+    public String getHyperlinkedName() {
+        return String.format("<a href='%s:%s'>%s</a>", StoryPointHyperLinkListener.STORYPOINT, getId(), getName());
+    }
+
+    public StoryOutcome getStoryOutcome(String result) {
+        return storyOutcomes.get(result);
+    }
+
+    public void addStoryOutcome(String result, StoryOutcome outcome) {
+        storyOutcomes.put(result, outcome);
+    }
+
+    public void removeStoryOutcome(String result) {
+        storyOutcomes.remove(result);
+    }
+
+    public void removeDefaultOutcome() {
+        nextStoryPointId = null;
+        storyTriggers = new ArrayList<>();
     }
 
     //region I/O
@@ -294,5 +368,4 @@ public abstract class StoryPoint {
 
         return retVal;
     }
-
 }

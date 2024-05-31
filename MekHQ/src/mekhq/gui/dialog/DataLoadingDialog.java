@@ -65,6 +65,7 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
     private JLabel splash;
     private JProgressBar progressBar;
     private StoryArcStub storyArcStub;
+    private boolean storyArcEditor;
 
     //endregion Variable Declarations
 
@@ -76,10 +77,17 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
 
     public DataLoadingDialog(final JFrame frame, final MekHQ application,
                              final @Nullable File campaignFile, StoryArcStub stub) {
+        this(frame, application, campaignFile, stub, false);
+    }
+
+    public DataLoadingDialog(final JFrame frame, final MekHQ application,
+                             final @Nullable File campaignFile, StoryArcStub stub,
+                             boolean storyArcEditor) {
         super(frame, "DataLoadingDialog", "DataLoadingDialog.title");
         this.application = application;
         this.campaignFile = campaignFile;
         this.storyArcStub = stub;
+        this.storyArcEditor = storyArcEditor;
         this.task = new Task(this);
         getTask().addPropertyChangeListener(this);
         initialize();
@@ -396,9 +404,13 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
             if (campaign != null) {
                 getApplication().setCampaign(campaign);
                 getApplication().getCampaignController().setHost(campaign.getId());
-                getApplication().showNewView();
+                if(storyArcEditor) {
+                    getApplication().showNewStoryArcEditor(storyArcStub.loadStoryArc(campaign));
+                } else {
+                    getApplication().showNewView();
+                }
                 getFrame().dispose();
-                if (null != storyArcStub) {
+                if (null != storyArcStub && !storyArcEditor) {
                     StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
                     if (null != storyArc) {
                         campaign.useStoryArc(storyArc, true);

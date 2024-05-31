@@ -20,6 +20,7 @@ package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
 import megamek.common.Compute;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -29,6 +30,8 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This StoryPoint rolls some dice and returns the result. It can be used when some randomization is required.
@@ -51,6 +54,7 @@ public class RollDiceStoryPoint extends StoryPoint {
     @Override
     public void start() {
         super.start();
+        //index zero should contain the summed result
         value = Compute.individualDice(ndice, sides).get(0);
         complete();
     }
@@ -60,6 +64,16 @@ public class RollDiceStoryPoint extends StoryPoint {
         return Integer.toString(value);
     }
 
+    public List<String> getAllPossibleResults() {
+        int min = ndice;
+        int max = ndice * sides;
+        List<String> results = new ArrayList<>();
+        for(int i = min; i <= max; i++) {
+            results.add(Integer.toString(i));
+        }
+        results.add(DEFAULT_OUTCOME);
+        return results;
+    }
     @Override
     public void writeToXml(PrintWriter pw1, int indent) {
         writeToXmlBegin(pw1, indent++);

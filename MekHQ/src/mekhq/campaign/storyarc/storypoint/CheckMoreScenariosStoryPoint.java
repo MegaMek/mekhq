@@ -19,6 +19,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -29,6 +30,8 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -59,6 +62,15 @@ public class CheckMoreScenariosStoryPoint extends StoryPoint {
             }
         }
         return "true";
+    }
+
+    @Override
+    public List<String> getAllPossibleResults() {
+        ArrayList<String> results = new ArrayList<>();
+        results.add("true");
+        results.add("false");
+        results.add(DEFAULT_OUTCOME);
+        return results;
     }
 
     @Override

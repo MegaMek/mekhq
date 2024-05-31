@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.Mission;
@@ -126,6 +127,15 @@ public class MissionStoryPoint extends StoryPoint {
     @Override
     public String getObjective() {
         return "Complete " + mission.getName() + " mission";
+    }
+
+    @Override
+    public List<String> getAllPossibleResults() {
+        ArrayList<String> results = new ArrayList<>();
+        results.add(MissionStatus.FAILED.name());
+        results.add(MissionStatus.SUCCESS.name());
+        results.add(DEFAULT_OUTCOME);
+        return results;
     }
 
     @Override

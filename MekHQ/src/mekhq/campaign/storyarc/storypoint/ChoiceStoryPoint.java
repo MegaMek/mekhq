@@ -21,6 +21,7 @@
 package mekhq.campaign.storyarc.storypoint;
 
 import megamek.Version;
+import mekhq.campaign.storyarc.StoryArc;
 import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryPoint;
@@ -31,7 +32,9 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -64,6 +67,13 @@ public class ChoiceStoryPoint extends DialogStoryPoint {
 
     public Map<String, String> getChoices() {
         return choices;
+    }
+
+    @Override
+    public List<String> getAllPossibleResults() {
+        List<String> results = new ArrayList<String>(choices.keySet());
+        results.add(DEFAULT_OUTCOME);
+        return results;
     }
 
     @Override
