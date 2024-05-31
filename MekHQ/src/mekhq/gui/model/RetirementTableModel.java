@@ -17,6 +17,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.*;
 
@@ -98,9 +99,9 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_ASSIGN:
             case COL_FORCE:
             case COL_UNIT:
+                return 70;
             case COL_BONUS_COST:
             case COL_PAYOUT:
-                return 70;
             case COL_TARGET:
             case COL_SHARES:
             case COL_MISC_MOD:
@@ -114,12 +115,12 @@ public class RetirementTableModel extends AbstractTableModel {
     public int getAlignment(int col) {
         switch (col) {
             case COL_PERSON:
+                return SwingConstants.LEFT;
             case COL_ASSIGN:
             case COL_FORCE:
             case COL_UNIT:
             case COL_BONUS_COST:
             case COL_PAYOUT:
-                return SwingConstants.RIGHT;
             case COL_TARGET:
             case COL_PAY_BONUS:
             case COL_SHARES:
@@ -243,18 +244,22 @@ public class RetirementTableModel extends AbstractTableModel {
                     payout = payout.minus(campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost());
                 }
 
-                // if the person requires a unit, check to ensure there isn't a shortfall
-                if (null != unitAssignments.get(p.getId())) {
-                    payout = payout.plus(RetirementDefectionDialog
-                            .getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
-                                    RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId())))));
-                }
+                // if the person is under contract we don't check whether they need a unit or are owed a shortfall
+                if (ChronoUnit.MONTHS.between(p.getRecruitment(), campaign.getLocalDate())
+                        >= campaign.getCampaignOptions().getServiceContractDuration()) {
+                    // if the person requires a unit, check to ensure there isn't a shortfall
+                    if (null != unitAssignments.get(p.getId())) {
+                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
+                                RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId())))));
+                    }
 
-                // if the person requires a unit, but doesn't have one...
-                if ((unitAssignments.get(p.getId()) == null) && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
-                    payout = payout.plus(RetirementDefectionDialog
-                            .getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
-                                    0));
+                    // if the person requires a unit, but doesn't have one...
+                    if ((unitAssignments.get(p.getId()) == null) && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
+                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(
+                                campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
+                                0)
+                        );
+                    }
                 }
 
                 // If payout is negative then make it zero
@@ -365,7 +370,7 @@ public class RetirementTableModel extends AbstractTableModel {
             setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_PERSON) {
                 setText(p.getFullDesc(campaign));
-                setImage(p.getPortrait().getImage(54));
+                setImage(p.getPortrait().getImage(40));
             } else if (actualCol == COL_ASSIGN) {
                 Unit u = p.getUnit();
                 if (!p.getTechUnits().isEmpty()) {
@@ -376,7 +381,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     String desc = "<b>" + u.getName() + "</b><br>";
                     desc += u.getEntity().getWeightClassName();
                     if (!((u.getEntity() instanceof SmallCraft) || (u.getEntity() instanceof Jumpship))) {
-                        desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
+                        desc += ' ' + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
                     desc += "<br>" + u.getStatus();
                     setText(desc);
@@ -403,7 +408,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     }
                     desc.append("</html>");
                     setHtmlText(desc.toString());
-                    final Image forceImage = force.getForceIcon().getImage(54);
+                    final Image forceImage = force.getForceIcon().getImage(40);
                     if (null != forceImage) {
                         setImage(forceImage);
                     } else {

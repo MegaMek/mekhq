@@ -691,10 +691,25 @@ public class Campaign implements ITechManager {
 
                     if (!person.getStatus().isDead()) {
                         if (ChronoUnit.MONTHS.between(person.getRecruitment(), getLocalDate()) < getCampaignOptions().getServiceContractDuration()) {
-                            if (Compute.d6(1) == 6) {
-                                getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
-                            } else {
-                                getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DESERTED);
+                            int roll = Compute.d6(1);
+
+                            switch (roll) {
+                                case 1:
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+                                    break;
+                                case 2:
+                                case 3:
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DESERTED);
+                                    addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverPoached.text"));
+                                    break;
+                                case 4:
+                                case 5:
+                                case 6:
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DESERTED);
+                                    addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverBurnedOut.text"));
+                                    break;
+                                default:
+                                    throw new IllegalStateException("Unexpected value in applyRetirement: " + roll);
                             }
                         } else if (person.getAge(getLocalDate()) >= 50) {
                             getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);

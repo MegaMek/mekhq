@@ -25,8 +25,10 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Entity;
 import megamek.common.TargetRoll;
+import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Mission;
@@ -120,7 +122,7 @@ public class RetirementDefectionDialog extends JDialog {
         initComponents(doRetirement);
         if (!doRetirement) {
             initResults();
-            btnDone.setEnabled(unitAssignmentsComplete());
+            btnDone.setEnabled(unitAssignmentsComplete(gui.getCampaign()));
         }
 
         setLocationRelativeTo(gui.getFrame());
@@ -390,7 +392,7 @@ public class RetirementDefectionDialog extends JDialog {
         btnEdit.setVisible(currentPanel.equals(PAN_RESULTS));
         btnEdit.setEnabled(hqView.getCampaign().isGM());
         btnEdit.addActionListener(evt -> {
-            btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
+            btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete(hqView.getCampaign()));
             ((RetirementTableModel) retireeTable.getModel()).setEditPayout(btnEdit.isSelected());
         });
         btnRoll = new JButton(resourceMap.getString("btnRoll.text"));
@@ -447,7 +449,7 @@ public class RetirementDefectionDialog extends JDialog {
                 btnEdit.setVisible(true);
                 btnRoll.setVisible(false);
                 btnDone.setVisible(true);
-                btnDone.setEnabled(unitAssignmentsComplete());
+                btnDone.setEnabled(unitAssignmentsComplete(hqView.getCampaign()));
 
                 currentPanel = PAN_RESULTS;
                 cardLayout.show(panMain, currentPanel);
@@ -594,6 +596,10 @@ public class RetirementDefectionDialog extends JDialog {
             retVal++;
         }
 
+        if ((u.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET)) {
+            retVal++;
+        }
+
         if (!u.isFunctional()) {
             retVal--;
         }
@@ -643,20 +649,21 @@ public class RetirementDefectionDialog extends JDialog {
                 payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
             }
 
-            /* If the unit given in payment is of lower quality than required, pay
-             * an additional 3M C-bills per class.
-             */
-            if (null != unitAssignments.get(id)) {
-                payout = payout.plus(getShortfallAdjustment(
-                        rdTracker.getPayout(id).getWeightClass(),
-                        RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id)))));
-            }
+            // If the person is still under contract, we don't care that they're owed a unit
+            if (ChronoUnit.MONTHS.between(hqView.getCampaign().getPerson(id).getRecruitment(), hqView.getCampaign().getLocalDate())
+                    >= hqView.getCampaign().getCampaignOptions().getServiceContractDuration()) {
+                /* If the unit given in payment is of lower quality than required, pay
+                 * an additional 3M C-bills per class.
+                 */
+                if (null != unitAssignments.get(id)) {
+                    payout = payout.plus(getShortfallAdjustment(rdTracker.getPayout(id).getWeightClass(),
+                            RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id)))));
+                }
 
-            // if a unit is required, but none given, pay an additional 3M c-bills per class
-            if (unitAssignments.get(id) == null) {
-                payout = payout.plus(getShortfallAdjustment(
-                        rdTracker.getPayout(id).getWeightClass(),
-                        0));
+                // if a unit is required, but none given, pay an additional 3M c-bills per class
+                if (unitAssignments.get(id) == null) {
+                    payout = payout.plus(getShortfallAdjustment(rdTracker.getPayout(id).getWeightClass(), 0));
+                }
             }
 
             // If the payout is negative, set it to zero
@@ -718,13 +725,17 @@ public class RetirementDefectionDialog extends JDialog {
         return aborted;
     }
 
-    private boolean unitAssignmentsComplete() {
-        if (rdTracker.getRetirees(contract).stream()
-                .anyMatch(id -> (rdTracker.getPayout(id).getWeightClass() > 0) && !unitAssignments.containsKey(id))) {
-            return unitAssignmentTable.getModel().getRowCount() <= 0;
-        } else {
+    private boolean unitAssignmentsComplete(Campaign campaign) {
+        if (unitAssignmentTable.getModel().getRowCount() <= 0) {
             return true;
         }
+
+        return rdTracker.getRetirees().stream()
+                .filter(uuid -> ChronoUnit.MONTHS.between(campaign.getPerson(uuid).getRecruitment(), campaign.getLocalDate())
+                        > campaign.getCampaignOptions().getServiceContractDuration())
+                .findFirst()
+                .map(uuid -> (!unitAssignments.containsKey(uuid)))
+                .orElse(true);
     }
 
     private void enableAddRemoveButtons() {
@@ -734,7 +745,11 @@ public class RetirementDefectionDialog extends JDialog {
         } else {
             int retireeRow = retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow());
             UUID pid = ((RetirementTableModel)(retireeTable.getModel())).getPerson(retireeRow).getId();
-            if (hqView.getCampaign().getPerson(pid).getPrimaryRole().isSoldierOrBattleArmour()) {
+            if (ChronoUnit.MONTHS.between(hqView.getCampaign().getPerson(pid).getRecruitment(), hqView.getCampaign().getLocalDate())
+                    >= hqView.getCampaign().getCampaignOptions().getServiceContractDuration()) {
+                btnAddUnit.setEnabled(false);
+                btnRemoveUnit.setEnabled(false);
+            } else if (hqView.getCampaign().getPerson(pid).getPrimaryRole().isSoldierOrBattleArmour()) {
                 btnAddUnit.setEnabled(false);
                 btnRemoveUnit.setEnabled(false);
             } else if (unitAssignments.containsKey(pid)) {
@@ -767,7 +782,7 @@ public class RetirementDefectionDialog extends JDialog {
         Unit unit = ((UnitAssignmentTableModel) unitAssignmentTable.getModel())
                 .getUnit(unitAssignmentTable.convertRowIndexToModel(unitAssignmentTable.getSelectedRow()));
         unitAssignments.put(person.getId(), unit.getId());
-        btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
+        btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete(hqView.getCampaign()));
         ((RetirementTableModel) retireeTable.getModel()).fireTableDataChanged();
         filterUnits();
     }
@@ -776,7 +791,7 @@ public class RetirementDefectionDialog extends JDialog {
         Person person = ((RetirementTableModel) retireeTable.getModel())
                 .getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
         unitAssignments.remove(person.getId());
-        btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
+        btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete(hqView.getCampaign()));
         ((RetirementTableModel) retireeTable.getModel()).fireTableDataChanged();
         filterUnits();
     }

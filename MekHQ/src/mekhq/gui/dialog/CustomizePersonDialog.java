@@ -26,6 +26,7 @@ import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
+import megamek.common.TechConstants;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -44,8 +45,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.control.EditKillLogControl;
-import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
+import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import org.apache.logging.log4j.LogManager;
 
@@ -715,14 +716,14 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
         choiceOriginalUnit.addActionListener(ev -> {
             if (null == choiceOriginalUnit.getSelectedItem()) {
-                choiceUnitWeight.setSelectedIndex(0);
-                choiceUnitTech.setSelectedIndex(0);
+                choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
+                choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
             } else {
                 Unit unit = (Unit) choiceOriginalUnit.getSelectedItem();
                 choiceUnitWeight.setSelectedIndex(unit.getEntity().getWeightClass());
                 if (unit.getEntity().isClan()) {
                     choiceUnitTech.setSelectedIndex(2);
-                } else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
+                } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
                     choiceUnitTech.setSelectedIndex(1);
                 } else {
                     choiceUnitTech.setSelectedIndex(0);
@@ -998,7 +999,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         try {
             person.setFatigue(Integer.parseInt(textFatigue.getText()));
         } catch (NumberFormatException ignored) { }
-        if (null == choiceOriginalUnit.getSelectedItem()) {
+        if (choiceOriginalUnit.getSelectedItem() == null) {
+            person.setOriginalUnit(null);
             person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
             person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
         } else {

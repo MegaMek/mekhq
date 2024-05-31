@@ -3585,7 +3585,16 @@ public class Person {
     }
 
     public void setOriginalUnit(final Unit unit) {
+        if (unit == null) {
+            originalUnitId = null;
+            originalUnitTech = 0;
+            originalUnitWeight = 0;
+
+            return;
+        }
+
         originalUnitId = unit.getId();
+
         if (unit.getEntity().isClan()) {
             originalUnitTech = TECH_CLAN;
         } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
