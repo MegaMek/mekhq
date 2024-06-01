@@ -1236,8 +1236,6 @@ public class EducationController {
      * @param resources  the resource bundle for localized messages
      */
     private static void graduateReeducationCamp(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
-
         // [0]Scientist Caste
         if (person.getEduCourseIndex() == 0) {
             graduateScientistCaste(campaign, person, academy, resources);
