@@ -49,6 +49,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+
 /**
  * @author Neoancient
  *
@@ -152,7 +154,7 @@ public class RetirementDefectionTracker {
             }
 
             // Service Contract
-            if (ChronoUnit.MONTHS.between(person.getRecruitment(), campaign.getLocalDate()) < campaign.getCampaignOptions().getServiceContractDuration()) {
+            if (isBreakingContract(person, campaign.getLocalDate(), campaign.getCampaignOptions().getServiceContractDuration())) {
                 targetNumber.addModifier(-campaign.getCampaignOptions().getServiceContractModifier(), resources.getString("contract.text"));
             }
 
@@ -260,13 +262,23 @@ public class RetirementDefectionTracker {
                 }
             }
 
-            // Age modifiers
+            // Age Modifiers
             if (campaign.getCampaignOptions().isUseAgeModifiers()) {
-                int age = person.getAge(campaign.getLocalDate());
-                int ageMod = getAgeMod(age);
+                int ageMod = getAgeMod(person.getAge(campaign.getLocalDate()));
 
-                if (ageMod != 0) {
-                    targetNumber.addModifier(ageMod, resources.getString("age.text"));
+                if (ageMod < 0) {
+                    targetNumber.addModifier(ageMod, resources.getString("ageYoung.text"));
+                } else if (ageMod > 0) {
+                    targetNumber.addModifier(ageMod, resources.getString("ageRetirement.text"));
+                }
+            }
+
+            // Marriage Modifier
+            if (campaign.getCampaignOptions().isUseMarriageModifiers()) {
+                Person spouse = person.getGenealogy().getSpouse();
+
+                if ((spouse != null) && (!spouse.getPrimaryRole().isCivilian())) {
+                    targetNumber.addModifier(-2, resources.getString("marriage.text"));
                 }
             }
 
@@ -976,7 +988,7 @@ public class RetirementDefectionTracker {
                 final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
 
                 // person is defecting
-                if (ChronoUnit.MONTHS.between(person.getRecruitment(), campaign.getLocalDate()) < campaign.getCampaignOptions().getServiceContractDuration()) {
+                if (isBreakingContract(person, campaign.getLocalDate(), campaign.getCampaignOptions().getServiceContractDuration())) {
                     payoutAmount = Money.of(0);
                 // person is retiring
                 } else if (person.getAge(campaign.getLocalDate()) >= 50) {
@@ -1024,6 +1036,10 @@ public class RetirementDefectionTracker {
 
         public void setStolenUnitId(UUID id) {
             stolenUnitId = id;
+        }
+
+        public static boolean isBreakingContract(Person person, LocalDate localDate, int ContractDuration) {
+            return ChronoUnit.MONTHS.between(person.getRecruitment(), localDate) < ContractDuration;
         }
     }
 

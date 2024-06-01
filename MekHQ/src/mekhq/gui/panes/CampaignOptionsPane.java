@@ -289,6 +289,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseUnitRatingModifiers;
     private JCheckBox chkUseFactionModifiers;
     private JCheckBox chkUseMissionStatusModifiers;
+    private JCheckBox chkUseMarriageModifiers;
     private JCheckBox chkUseLoyaltyModifiers;
 
     private JPanel loyaltySubPanel = new JPanel();
@@ -4328,6 +4329,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMissionStatusModifiers.setName("chkUseMissionStatusModifiers");
         chkUseMissionStatusModifiers.setEnabled(isUseTurnover);
 
+        chkUseMarriageModifiers = new JCheckBox(resources.getString("chkUseMarriageModifiers.text"));
+        chkUseMarriageModifiers.setToolTipText(resources.getString("chkUseMarriageModifiers.toolTipText"));
+        chkUseMarriageModifiers.setName("chkUseMarriageModifiers");
+        chkUseMarriageModifiers.setEnabled(isUseTurnover);
+
         chkUseLoyaltyModifiers = new JCheckBox(resources.getString("chkUseLoyaltyModifiers.text"));
         chkUseLoyaltyModifiers.setToolTipText(resources.getString("chkUseLoyaltyModifiers.toolTipText"));
         chkUseLoyaltyModifiers.setName("chkUseLoyaltyModifiers");
@@ -4346,7 +4352,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         turnoverAndRetentionModifiersPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionModifiersPanel.title")));
         turnoverAndRetentionModifiersPanel.setName("turnoverAndRetentionModifiersPanel");
-        chkUseMissionStatusModifiers.setEnabled(isUseTurnover);
+        turnoverAndRetentionModifiersPanel.setEnabled(isUseTurnover);
 
         final GroupLayout layout = new GroupLayout(turnoverAndRetentionModifiersPanel);
         layout.setAutoCreateGaps(true);
@@ -4362,6 +4368,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
+                        .addComponent(chkUseMarriageModifiers)
                         .addGap(15)
                         .addComponent(chkUseLoyaltyModifiers)
                         .addComponent(loyaltySubPanel)
@@ -4376,6 +4383,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
+                        .addComponent(chkUseMarriageModifiers)
                         .addComponent(chkUseLoyaltyModifiers)
                         .addComponent(loyaltySubPanel)
         );
@@ -7915,6 +7923,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseUnitRatingModifiers.setSelected(options.isUseUnitRatingModifiers());
         chkUseFactionModifiers.setSelected(options.isUseFactionModifiers());
         chkUseMissionStatusModifiers.setSelected(options.isUseMissionStatusModifiers());
+        chkUseMarriageModifiers.setSelected(options.isUseMarriageModifiers());
         chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
         chkUseHideLoyalty.setSelected(options.isUseHideLoyalty());
 
@@ -8586,6 +8595,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseUnitRatingModifiers(chkUseUnitRatingModifiers.isSelected());
             options.setUseFactionModifiers(chkUseFactionModifiers.isSelected());
             options.setUseMissionStatusModifiers(chkUseMissionStatusModifiers.isSelected());
+            options.setUseMarriageModifiers(chkUseMarriageModifiers.isSelected());
             options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
             options.setUseHideLoyalty(chkUseHideLoyalty.isSelected());
 

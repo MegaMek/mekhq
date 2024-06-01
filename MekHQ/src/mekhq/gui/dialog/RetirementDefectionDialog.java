@@ -57,6 +57,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.*;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+
 /**
  * @author Neoancient
  */
@@ -650,8 +652,7 @@ public class RetirementDefectionDialog extends JDialog {
             }
 
             // If the person is still under contract, we don't care that they're owed a unit
-            if (ChronoUnit.MONTHS.between(hqView.getCampaign().getPerson(id).getRecruitment(), hqView.getCampaign().getLocalDate())
-                    >= hqView.getCampaign().getCampaignOptions().getServiceContractDuration()) {
+            if (isBreakingContract(hqView.getCampaign().getPerson(id), hqView.getCampaign().getLocalDate(), hqView.getCampaign().getCampaignOptions().getServiceContractDuration())) {
                 /* If the unit given in payment is of lower quality than required, pay
                  * an additional 3M C-bills per class.
                  */
@@ -731,8 +732,9 @@ public class RetirementDefectionDialog extends JDialog {
         }
 
         return rdTracker.getRetirees().stream()
-                .filter(uuid -> ChronoUnit.MONTHS.between(campaign.getPerson(uuid).getRecruitment(), campaign.getLocalDate())
-                        > campaign.getCampaignOptions().getServiceContractDuration())
+                .filter(uuid -> isBreakingContract(hqView.getCampaign().getPerson(uuid),
+                        hqView.getCampaign().getLocalDate(),
+                        hqView.getCampaign().getCampaignOptions().getServiceContractDuration()))
                 .findFirst()
                 .map(uuid -> (!unitAssignments.containsKey(uuid)))
                 .orElse(true);
@@ -745,8 +747,9 @@ public class RetirementDefectionDialog extends JDialog {
         } else {
             int retireeRow = retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow());
             UUID pid = ((RetirementTableModel)(retireeTable.getModel())).getPerson(retireeRow).getId();
-            if (ChronoUnit.MONTHS.between(hqView.getCampaign().getPerson(pid).getRecruitment(), hqView.getCampaign().getLocalDate())
-                    >= hqView.getCampaign().getCampaignOptions().getServiceContractDuration()) {
+            if (isBreakingContract(hqView.getCampaign().getPerson(pid),
+                    hqView.getCampaign().getLocalDate(),
+                    hqView.getCampaign().getCampaignOptions().getServiceContractDuration())) {
                 btnAddUnit.setEnabled(false);
                 btnRemoveUnit.setEnabled(false);
             } else if (hqView.getCampaign().getPerson(pid).getPrimaryRole().isSoldierOrBattleArmour()) {

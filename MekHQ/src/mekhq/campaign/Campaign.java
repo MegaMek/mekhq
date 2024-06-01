@@ -133,6 +133,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
+
 /**
  * The main campaign class, keeps track of teams and units
  * @author Taharqa
@@ -690,7 +692,7 @@ public class Campaign implements ITechManager {
                     Person person = getPerson(pid);
 
                     if (!person.getStatus().isDead()) {
-                        if (ChronoUnit.MONTHS.between(person.getRecruitment(), getLocalDate()) < getCampaignOptions().getServiceContractDuration()) {
+                        if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
                             int roll = Compute.d6(1);
 
                             switch (roll) {
@@ -699,14 +701,14 @@ public class Campaign implements ITechManager {
                                     break;
                                 case 2:
                                 case 3:
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DESERTED);
                                     addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverPoached.text"));
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                                     break;
                                 case 4:
                                 case 5:
                                 case 6:
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DESERTED);
                                     addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverBurnedOut.text"));
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                                     break;
                                 default:
                                     throw new IllegalStateException("Unexpected value in applyRetirement: " + roll);
@@ -716,6 +718,36 @@ public class Campaign implements ITechManager {
                         } else {
                             getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                         }
+
+                        // if marriage modifier is enabled couples leave together
+                        if (campaignOptions.isUseMarriageModifiers()) {
+                            Person spouse = person.getGenealogy().getSpouse();
+
+                            if ((spouse != null) && (!getRetirementDefectionTracker().getRetirees().contains(spouse.getId()))) {
+                                if ((!spouse.getStatus().isDepartedUnit()) && (!spouse.getStatus().isAbsent())) {
+                                    addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
+                                    spouse.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                                }
+                            }
+                        }
+
+//                        // This ensures children have a chance of following their parent into depature
+//                        for (Person child : person.getGenealogy().getChildren()) {
+//                            if (child.isChild(getLocalDate())) {
+//                                if (campaignOptions.isUseMarriageModifiers()) {
+//                                    addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
+//                                    child.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+//                                } else {
+//                                    boolean remainingParent = child.getGenealogy().getParents().stream()
+//                                            .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
+//
+//                                    if ((!remainingParent) || (Compute.randomInt(2) == 0)) {
+//                                        addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
+//                                        child.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+//                                    }
+//                                }
+//                            }
+//                        }
                     }
 
                     if (unitAssignments.containsKey(pid)) {
