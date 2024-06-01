@@ -38,6 +38,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.PersonalLogger;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.education.EducationController;
@@ -70,6 +71,8 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     //region Variable Declarations
@@ -177,7 +180,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     public static void connect(CampaignGUI gui, JTable personnelTable,
-            PersonnelTableModel personnelModel, JSplitPane splitPersonnel) {
+                               PersonnelTableModel personnelModel, JSplitPane splitPersonnel) {
         new PersonnelTableMouseAdapter(gui, personnelTable, personnelModel) {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -306,7 +309,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             gui.getCampaign().getProcreation().addPregnancy(
                                     gui.getCampaign(), gui.getCampaign().getLocalDate(), person);
                             MekHQ.triggerEvent(new PersonChangedEvent(person));
-                });
+                        });
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
@@ -360,14 +363,32 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_COMPLETE_STAGE: {
+                List<UUID> graduatingPersonnel = new ArrayList<>();
+                HashMap<UUID, List<Object>> academyAttributesMap = new HashMap<>();
+
                 for (Person person : people) {
-                    if (person.getEduDaysOfTravelToAcademy() > 0) {
-                        EducationController.completeJourneyTo(gui.getCampaign(), person);
-                    } else if (person.getEduDaysOfEducation() > 0) {
-                        EducationController.completeEducation(gui.getCampaign(), person);
-                    } else {
+                    person.setEduDaysOfEducation(1);
+
+                    Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                    List<Object> individualAcademyAttributes = new ArrayList<>();
+
+                    if (EducationController.processNewDay(gui.getCampaign(), person, true)) {
+                        graduatingPersonnel.add(person.getId());
+
+                        individualAcademyAttributes.add(academy.getEducationLevel(person));
+                        individualAcademyAttributes.add(academy.getType());
+                        individualAcademyAttributes.add(academy.getName());
+
+                        academyAttributesMap.put(person.getId(), individualAcademyAttributes);
+
                         person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), PersonnelStatus.ACTIVE);
                     }
+                }
+
+                if (!graduatingPersonnel.isEmpty()) {
+                    AutoAwardsController autoAwardsController = new AutoAwardsController();
+                    autoAwardsController.PostGraduationController(gui.getCampaign(), graduatingPersonnel, academyAttributesMap);
                 }
                 break;
             }
@@ -1336,6 +1357,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if ("group".equalsIgnoreCase(award.getItem())) {
                     awardGroups.add(award.getName());
                     awardGroupDescriptions.add(award.getDescription());
+                } else if ("group".equalsIgnoreCase(award.getItem())) {
+                    awardGroups.add(award.getName());
+                    awardGroupDescriptions.add(award.getDescription());
                 }
             }
 
@@ -1366,7 +1390,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             awardGroupMenu.add(menuItem);
                         } else if ((!awardGroups.contains(award.getGroup())) && (index == 0)) {
                             menuItem = getAwardMenuItem(award);
-                            awardGroupMenu.add(menuItem);
+                            awardMenu.add(menuItem);
                         }
                     }
                 }
@@ -2542,7 +2566,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
                 }
-            // is the applicant qualified?
+                // is the applicant qualified?
             } else if (!academy.isQualified(person)) {
                 if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowUnqualified())) {
                     JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduUnqualified.text")
@@ -2613,7 +2637,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduFactionConflict.text"));
                             educationJMenuItemAdder(academy, clanMenu, militaryMenu, civilianMenu, academyOption);
                         }
-                    // which is the nearest campus and is it in range?
+                        // which is the nearest campus and is it in range?
                     } else {
                         String nearestCampus = Academy.getNearestCampus(campaign, campuses);
 

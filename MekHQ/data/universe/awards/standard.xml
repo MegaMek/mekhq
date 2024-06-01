@@ -53,11 +53,8 @@
         <description>Graduate of basic training.</description>
         <group>Education Awards</group>
         <ribbon>4-08-1-BasicTraining.png</ribbon>
-        <xp>1</xp>
-        <qty>1</qty>
         <item>Training</item>
-        <size>Individual</size>
-        <range>Career</range>
+        <size>5</size>
     </award>
     <award>
         <name>NCO Academy Graduate</name>
@@ -65,10 +62,8 @@
         <group>Education Awards</group>
         <ribbon>4-07-1-NCOGraduate.png</ribbon>
         <xp>2</xp>
-        <qty>1</qty>
         <item>Training</item>
-        <size>Individual</size>
-        <range>Career</range>
+        <size>6</size>
     </award>
     <award>
         <name>Warrant Officer Graduate</name>
@@ -76,10 +71,8 @@
         <group>Education Awards</group>
         <ribbon>4-06-2-WarrantGraduate.png</ribbon>
         <xp>3</xp>
-        <qty>21</qty>
         <item>Training</item>
-        <size>Individual</size>
-        <range>Career</range>
+        <size>7</size>
     </award>
     <award>
         <name>Officer Graduate</name>
@@ -88,10 +81,8 @@
         <ribbon>4-06-1-OfficerGraduate.png</ribbon>
         <xp>4</xp>
         <edge>1</edge>
-        <qty>31</qty>
         <item>Training</item>
-        <size>Individual</size>
-        <range>Career</range>
+        <size>8</size>
     </award>
     <award>
         <name>Personal Awards</name>

@@ -72,10 +72,12 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.AbstractDeath;
 import mekhq.campaign.personnel.death.DisabledRandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
+import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -132,6 +134,8 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
@@ -402,13 +406,9 @@ public class Campaign implements ITechManager {
     }
 
     public ArrayList<Lance> getLanceList() {
-        ArrayList<Lance> retVal = new ArrayList<>();
-        for (Lance l : lances.values()) {
-            if (forceIds.containsKey(l.getForceId())) {
-                retVal.add(l);
-            }
-        }
-        return retVal;
+        return lances.values().stream()
+        .filter(l -> forceIds.containsKey(l.getForceId()))
+        .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void setShoppingList(ShoppingList sl) {
@@ -719,7 +719,7 @@ public class Campaign implements ITechManager {
                             getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                         }
 
-                        // if marriage modifier is enabled couples leave together
+                        // if marriage modifier is enabled, couples leave together
                         if (campaignOptions.isUseMarriageModifiers()) {
                             Person spouse = person.getGenealogy().getSpouse();
 
@@ -1872,7 +1872,7 @@ public class Campaign implements ITechManager {
             if (piu.equals(newPiu)) {
                 piu.setPlannedCount(piu.getPlannedCount()
                         + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart()
-                                : (Part) maybePart) * maybePart.getQuantity());
+                        : (Part) maybePart) * maybePart.getQuantity());
             }
         }
     }
@@ -1907,7 +1907,7 @@ public class Campaign implements ITechManager {
             }
             piu.setPlannedCount(piu.getPlannedCount()
                     + getQuantity((maybePart instanceof MissingPart) ? ((MissingPart) maybePart).getNewPart()
-                            : (Part) maybePart) * maybePart.getQuantity());
+                    : (Part) maybePart) * maybePart.getQuantity());
 
         }
         return inUse.keySet();
@@ -1966,15 +1966,15 @@ public class Campaign implements ITechManager {
                     retVal = p;
                     highest = p.getSkill(primary).getLevel();
                 } else if (secondary != null && p.getSkill(primary).getLevel() == highest &&
-                /*
-                 * If the skill level of the current person is the same as the previous highest,
-                 * select the current instead under the following conditions:
-                 */
+                        /*
+                         * If the skill level of the current person is the same as the previous highest,
+                         * select the current instead under the following conditions:
+                         */
                         (retVal == null || // None has been selected yet (current has level 0)
                                 retVal.getSkill(secondary) == null || // Previous selection does not have secondary
-                                                                      // skill
+                                // skill
                                 (p.getSkill(secondary) != null // Current has secondary skill and it is higher than the
-                                                               // previous.
+                                        // previous.
                                         && p.getSkill(secondary).getLevel() > retVal.getSkill(secondary).getLevel()))) {
                     retVal = p;
                 }
@@ -2053,7 +2053,7 @@ public class Campaign implements ITechManager {
         Objects.requireNonNull(p);
 
         Unit unit = getHangar().findUnit(u ->
-            u.isRefitting() && p.equals(u.getRefit().getTech()));
+                u.isRefitting() && p.equals(u.getRefit().getTech()));
         return unit != null;
     }
 
@@ -2466,7 +2466,7 @@ public class Campaign implements ITechManager {
         }
         int maxAcquisitions = getCampaignOptions().getMaxAcquisitions();
         return maxAcquisitions <= 0
-            || person.getAcquisitions() < maxAcquisitions;
+                || person.getAcquisitions() < maxAcquisitions;
     }
 
     /***
@@ -2927,7 +2927,7 @@ public class Campaign implements ITechManager {
                         getAvailableAstechs(minutesUsed, usedOvertime), false);
                 if ((null != partWork.getUnit())
                         && ((partWork.getUnit().getEntity() instanceof Dropship)
-                                || (partWork.getUnit().getEntity() instanceof Jumpship))) {
+                        || (partWork.getUnit().getEntity() instanceof Jumpship))) {
                     helpMod = 0;
                 }
                 if (partWork.getShorthandedMod() < helpMod) {
@@ -2984,9 +2984,9 @@ public class Campaign implements ITechManager {
             if ((getCampaignOptions().isDestroyByMargin()
                     && (getCampaignOptions().getDestroyMargin() <= (target.getValue() - roll)))
                     || (!getCampaignOptions().isDestroyByMargin()
-                            // if an elite, primary tech and destroy by margin is NOT on
-                            && ((tech.getExperienceLevel(this, false) == SkillType.EXP_ELITE)
-                                    || tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
+                    // if an elite, primary tech and destroy by margin is NOT on
+                    && ((tech.getExperienceLevel(this, false) == SkillType.EXP_ELITE)
+                    || tech.getPrimaryRole().isVehicleCrew())) // For vessel crews
                     && (roll < target.getValue())) {
                 tech.changeCurrentEdge(-1);
                 roll = tech.isRightTechTypeFor(partWork) ? Compute.d6(2) : Utilities.roll3d6();
@@ -3154,7 +3154,7 @@ public class Campaign implements ITechManager {
                         contract.addPlayerMinorBreach();
 
                         addReport("Failure to deploy for " + scenario.getName()
-                            + " resulted in defeat and a minor contract breach.");
+                                + " resulted in defeat and a minor contract breach.");
                     }
                 }
             }
@@ -3556,7 +3556,7 @@ public class Campaign implements ITechManager {
         processFatigueNewDay();
 
         if (campaignOptions.isUseEducationModule()) {
-            EducationController.processNewDay(this);
+            processEducationNewDay();
         }
 
         resetAstechMinutes();
@@ -3572,6 +3572,40 @@ public class Campaign implements ITechManager {
 
         MekHQ.triggerEvent(new NewDayEvent(this));
         return true;
+    }
+
+    /**
+     * This method checks if any students in the academy should graduate,
+     * and updates their attributes and status accordingly.
+     * If any students do graduate, it sends the graduation information to autoAwards.
+     */
+    private void processEducationNewDay() {
+        List<UUID> graduatingPersonnel = new ArrayList<>();
+        HashMap<UUID, List<Object>> academyAttributesMap = new HashMap<>();
+
+
+        for (Person person : getStudents()) {
+            List<Object> individualAcademyAttributes = new ArrayList<>();
+
+            if (EducationController.processNewDay(this, person, false)) {
+                Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                graduatingPersonnel.add(person.getId());
+
+                individualAcademyAttributes.add(academy.getEducationLevel(person));
+                individualAcademyAttributes.add(academy.getType());
+                individualAcademyAttributes.add(academy.getName());
+
+                academyAttributesMap.put(person.getId(), individualAcademyAttributes);
+
+                person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
+            }
+        }
+
+        if (!graduatingPersonnel.isEmpty()) {
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+            autoAwardsController.PostGraduationController(this, graduatingPersonnel, academyAttributesMap);
+        }
     }
 
     /**
@@ -4161,7 +4195,7 @@ public class Campaign implements ITechManager {
     }
 
     public void removeFunds(final TransactionType type, final Money quantity,
-                         @Nullable String description) {
+                            @Nullable String description) {
         if ((description == null) || description.isEmpty()) {
             description = "Rich Uncle";
         }
@@ -5216,7 +5250,7 @@ public class Campaign implements ITechManager {
 
             StringBuilder partAvailabilityLog = new StringBuilder();
             partAvailabilityLog.append("Part Rating Level: " + partAvailability)
-                                .append("(" + EquipmentType.ratingNames[partAvailability] + ")");
+                    .append("(" + EquipmentType.ratingNames[partAvailability] + ")");
 
             /*
              * Even if we can acquire Clan parts, they have a minimum availability of F for
@@ -5280,7 +5314,7 @@ public class Campaign implements ITechManager {
 
             int AtBPartsAvailability = findAtBPartsAvailabilityLevel(acquisition, null);
             partAvailabilityLog.append("; Total part availability: " + partAvailability)
-                            .append("; Current campaign availability: " + AtBPartsAvailability);
+                    .append("; Current campaign availability: " + AtBPartsAvailability);
             if (partAvailability > AtBPartsAvailability) {
                 return new TargetRoll(TargetRoll.IMPOSSIBLE, partAvailabilityLog.toString());
             }
@@ -5570,9 +5604,9 @@ public class Campaign implements ITechManager {
     public int getNumberMedics() {
         return getMedicPool()
                 + Math.toIntExact(getActivePersonnel().stream()
-                        .filter(p -> (p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic())
-                                && !p.isDeployed())
-                        .count());
+                .filter(p -> (p.getPrimaryRole().isMedic() || p.getSecondaryRole().isMedic())
+                        && !p.isDeployed())
+                .count());
     }
 
     public boolean requiresAdditionalMedics() {
@@ -6813,8 +6847,8 @@ public class Campaign implements ITechManager {
 
         if (!newCampaign) {
             /*
-            * Switch all contracts to AtBContract's
-            */
+             * Switch all contracts to AtBContract's
+             */
             for (Map.Entry<Integer, Mission> me : missions.entrySet()) {
                 Mission m = me.getValue();
                 if (m instanceof Contract && !(m instanceof AtBContract)) {
@@ -6823,9 +6857,9 @@ public class Campaign implements ITechManager {
             }
 
             /*
-            * Go through all the personnel records and assume the earliest date is the date
-            * the unit was founded.
-            */
+             * Go through all the personnel records and assume the earliest date is the date
+             * the unit was founded.
+             */
             LocalDate founding = null;
             for (Person p : getPersonnel()) {
                 for (LogEntry e : p.getPersonnelLog()) {
@@ -6835,19 +6869,17 @@ public class Campaign implements ITechManager {
                 }
             }
             /*
-            * Go through the personnel records again and assume that any person who joined
-            * the unit on the founding date is one of the founding members. Also assume
-            * that MWs assigned to a non-Assault 'Mech on the date they joined came with
-            * that 'Mech (which is a less certain assumption)
-            */
+             * Go through the personnel records again and assume that any person who joined
+             * the unit on the founding date is one of the founding members. Also assume
+             * that MWs assigned to a non-Assault 'Mech on the date they joined came with
+             * that 'Mech (which is a less certain assumption)
+             */
             for (Person p : getPersonnel()) {
-                LocalDate join = null;
-                for (LogEntry e : p.getPersonnelLog()) {
-                    if (e.getDesc().startsWith("Joined ")) {
-                        join = e.getDate();
-                        break;
-                    }
-                }
+                LocalDate join = p.getPersonnelLog().stream()
+                .filter(e -> e.getDesc().startsWith("Joined "))
+                .findFirst()
+                .map(LogEntry::getDate)
+                .orElse(null);
                 if ((join != null) && join.equals(founding)) {
                     p.setFounder(true);
                 }
@@ -6906,8 +6938,8 @@ public class Campaign implements ITechManager {
                     "You have overdue loan payments totaling "
                             + overdueAmount.toAmountAndSymbolString()
                             + "\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay off the collateral on the loan.\n  - Default on the loan.\n  - Just cheat and remove the loan via GM mode.",
-                            "Overdue Loan Payments",
-                            JOptionPane.WARNING_MESSAGE);
+                    "Overdue Loan Payments",
+                    JOptionPane.WARNING_MESSAGE);
             return true;
         }
         return false;
