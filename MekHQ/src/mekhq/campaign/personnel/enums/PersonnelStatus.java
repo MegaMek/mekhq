@@ -38,7 +38,7 @@ public enum PersonnelStatus {
     AWOL("PersonnelStatus.AWOL.text", "PersonnelStatus.AWOL.toolTipText", "PersonnelStatus.AWOL.reportText", "PersonnelStatus.AWOL.logText"),
     RETIRED("PersonnelStatus.RETIRED.text", "PersonnelStatus.RETIRED.toolTipText", "PersonnelStatus.RETIRED.reportText", "PersonnelStatus.RETIRED.logText"),
     RESIGNED("PersonnelStatus.RESIGNED.text", "PersonnelStatus.RESIGNED.toolTipText", "PersonnelStatus.RESIGNED.reportText", "PersonnelStatus.RESIGNED.logText"),
-    LEFT("PersonnelStatus.HAS_DEPARTED.text", "PersonnelStatus.HAS_DEPARTED.toolTipText", "PersonnelStatus.HAS_DEPARTED.reportText", "PersonnelStatus.HAS_DEPARTED.logText"),
+    LEFT("PersonnelStatus.LEFT.text", "PersonnelStatus.LEFT.toolTipText", "PersonnelStatus.LEFT.reportText", "PersonnelStatus.LEFT.logText"),
     DESERTED("PersonnelStatus.DESERTED.text", "PersonnelStatus.DESERTED.toolTipText", "PersonnelStatus.DESERTED.reportText", "PersonnelStatus.DESERTED.logText"),
     DEFECTED("PersonnelStatus.DEFECTED.text", "PersonnelStatus.DEFECTED.toolTipText", "PersonnelStatus.DEFECTED.reportText", "PersonnelStatus.DEFECTED.logText"),
     STUDENT("PersonnelStatus.STUDENT.text", "PersonnelStatus.STUDENT.toolTipText", "PersonnelStatus.STUDENT.reportText", "PersonnelStatus.STUDENT.logText"),

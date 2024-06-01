@@ -1574,6 +1574,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
+        getCampaign().initTurnover();
+
         if (staticRATs != newOptions.isUseStaticRATs()) {
             getCampaign().initUnitGenerator();
         }
@@ -2398,10 +2400,12 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (getCampaign().checkYearlyRetirements()) {
-            showRetirementDefectionDialog();
-            evt.cancel();
-            return;
+        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
+            if (getCampaign().checkTurnoverPrompt()) {
+                showRetirementDefectionDialog();
+                evt.cancel();
+                return;
+            }
         }
 
         if(getCampaign().checkScenariosDue()) {

@@ -268,7 +268,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private MMComboBox<SkillLevel> comboTurnoverDifficulty;
     private JLabel lblTurnoverFixedTargetNumber;
     private JSpinner spnTurnoverFixedTargetNumber;
-    private JCheckBox chkUseYearEndRandomRetirement;
+    private JLabel lblTurnoverFrequency;
+    private MMComboBox<TurnoverFrequency> comboTurnoverFrequency;
     private JCheckBox chkUseContractCompletionRandomRetirement;
     private JCheckBox chkUseRandomFounderTurnover;
     private JCheckBox chkUseFounderRetirement;
@@ -4172,10 +4173,31 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnTurnoverFixedTargetNumber.setName("spnTurnoverFixedTargetNumber");
         spnTurnoverFixedTargetNumber.setEnabled((isUseTurnover) && (isUseFixedTargetNumber));
 
-        chkUseYearEndRandomRetirement = new JCheckBox(resources.getString("chkUseYearEndRandomRetirement.text"));
-        chkUseYearEndRandomRetirement.setToolTipText(resources.getString("chkUseYearEndRandomRetirement.toolTipText"));
-        chkUseYearEndRandomRetirement.setName("chkUseYearEndRandomRetirement");
-        chkUseYearEndRandomRetirement.setEnabled(isUseTurnover);
+        lblTurnoverFixedTargetNumber = new JLabel(resources.getString("lblTurnoverFixedTargetNumber.text"));
+        lblTurnoverFixedTargetNumber.setToolTipText(resources.getString("lblTurnoverFixedTargetNumber.toolTipText"));
+        lblTurnoverFixedTargetNumber.setName("lblTurnoverFixedTargetNumber");
+        lblTurnoverFixedTargetNumber.setEnabled(isUseTurnover);
+
+        lblTurnoverFrequency = new JLabel(resources.getString("lblTurnoverFrequency.text"));
+        lblTurnoverFrequency.setToolTipText(resources.getString("lblTurnoverFrequency.toolTipText"));
+        lblTurnoverFrequency.setName("lblTurnoverFrequency");
+        lblTurnoverFrequency.setEnabled(isUseTurnover);
+
+        comboTurnoverFrequency = new MMComboBox<>("comboTurnoverFrequency", TurnoverFrequency.values());
+        comboTurnoverFrequency.setToolTipText(resources.getString("lblTurnoverFrequency.toolTipText"));
+        comboTurnoverFrequency.setEnabled(isUseTurnover);
+        comboTurnoverFrequency.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof TurnoverFrequency) {
+                    list.setToolTipText(((TurnoverFrequency) value).getToolTipText());
+                }
+                return this;
+            }
+        });
 
         chkUseContractCompletionRandomRetirement = new JCheckBox(resources.getString("chkUseContractCompletionRandomRetirement.text"));
         chkUseContractCompletionRandomRetirement.setToolTipText(resources.getString("chkUseContractCompletionRandomRetirement.toolTipText"));
@@ -4247,7 +4269,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblTurnoverFixedTargetNumber)
                                 .addComponent(spnTurnoverFixedTargetNumber, Alignment.LEADING))
-                        .addComponent(chkUseYearEndRandomRetirement)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblTurnoverFrequency)
+                                .addComponent(comboTurnoverFrequency, Alignment.LEADING))
                         .addComponent(chkUseContractCompletionRandomRetirement)
                         .addComponent(chkUseRandomFounderTurnover)
                         .addComponent(chkUseFounderRetirement)
@@ -4273,7 +4297,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblTurnoverFixedTargetNumber)
                                 .addComponent(spnTurnoverFixedTargetNumber))
-                        .addComponent(chkUseYearEndRandomRetirement)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblTurnoverFrequency)
+                                .addComponent(comboTurnoverFrequency))
                         .addComponent(chkUseContractCompletionRandomRetirement)
                         .addComponent(chkUseRandomFounderTurnover)
                         .addComponent(chkUseFounderRetirement)
@@ -7905,7 +7931,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         comboTurnoverTargetNumberMethod.setSelectedItem(options.getTurnoverTargetNumberMethod());
         comboTurnoverDifficulty.setSelectedItem(options.getTurnoverDifficulty());
         spnTurnoverFixedTargetNumber.setValue(options.getTurnoverFixedTargetNumber());
-        chkUseYearEndRandomRetirement.setSelected(options.isUseYearEndRandomRetirement());
+        comboTurnoverFrequency.setSelectedItem(options.getTurnoverFrequency());
         chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
         chkUseRandomFounderTurnover.setSelected(options.isUseRandomFounderTurnover());
         chkUseFounderRetirement.setSelected(options.isUseFounderRetirement());
@@ -8578,7 +8604,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setTurnoverTargetNumberMethod(comboTurnoverTargetNumberMethod.getSelectedItem());
             options.setTurnoverDifficulty(comboTurnoverDifficulty.getSelectedItem());
             options.setTurnoverFixedTargetNumber((Integer) spnTurnoverFixedTargetNumber.getValue());
-            options.setUseYearEndRandomRetirement(chkUseYearEndRandomRetirement.isSelected());
+            options.setTurnoverFrequency(comboTurnoverFrequency.getSelectedItem());
             options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
             options.setUseRandomFounderTurnover(chkUseRandomFounderTurnover.isSelected());
             options.setUseFounderRetirement(chkUseFounderRetirement.isSelected());

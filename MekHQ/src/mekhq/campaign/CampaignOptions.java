@@ -281,7 +281,9 @@ public class CampaignOptions {
     private TurnoverTargetNumberMethod turnoverTargetNumberMethod;
     private SkillLevel turnoverDifficulty;
     private int turnoverFixedTargetNumber;
-    private boolean useYearEndRandomRetirement;
+    private boolean aeroRecruitsHaveUnits;
+    private boolean trackOriginalUnit;
+    private TurnoverFrequency turnoverFrequency;
     private boolean useContractCompletionRandomRetirement;
     private boolean useRandomFounderTurnover;
     private boolean useFounderRetirement;
@@ -531,8 +533,6 @@ public class CampaignOptions {
     private SkillLevel skillLevel;
 
     // Unit Administration
-    private boolean aeroRecruitsHaveUnits;
-    private boolean trackOriginalUnit;
     private boolean useAero;
     private boolean useVehicles;
     private boolean clanVehicles;
@@ -951,8 +951,9 @@ public class CampaignOptions {
         setUseRandomRetirement(true);
         setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.NEGOTIATION);
         setTurnoverDifficulty(SkillLevel.REGULAR);
+        setTurnoverFrequency(TurnoverFrequency.MONTHLY);
         setTurnoverFixedTargetNumber(3);
-        setUseYearEndRandomRetirement(true);
+        setAeroRecruitsHaveUnits(false);
         setUseContractCompletionRandomRetirement(true);
         setUseRandomFounderTurnover(true);
         setUseFounderRetirement(true);
@@ -1126,8 +1127,6 @@ public class CampaignOptions {
         setSkillLevel(SkillLevel.REGULAR);
 
         // Unit Administration
-        aeroRecruitsHaveUnits = false;
-        trackOriginalUnit = false;
         useAero = false;
         useVehicles = true;
         clanVehicles = false;
@@ -1809,12 +1808,12 @@ public class CampaignOptions {
         this.turnoverDifficulty = turnoverDifficulty;
     }
 
-    public boolean isUseYearEndRandomRetirement() {
-        return useYearEndRandomRetirement;
+    public TurnoverFrequency getTurnoverFrequency() {
+        return turnoverFrequency;
     }
 
-    public void setUseYearEndRandomRetirement(final boolean useYearEndRandomRetirement) {
-        this.useYearEndRandomRetirement = useYearEndRandomRetirement;
+    public void setTurnoverFrequency (final TurnoverFrequency turnoverFrequency) {
+        this.turnoverFrequency = turnoverFrequency;
     }
 
     public boolean isUseContractCompletionRandomRetirement() {
@@ -4512,7 +4511,9 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverTargetNumberMethod", getTurnoverTargetNumberMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverDifficulty", getTurnoverDifficulty().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverBaseTn", getTurnoverFixedTargetNumber());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useYearEndRandomRetirement", isUseYearEndRandomRetirement());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "turnoverFrequency", getTurnoverFrequency().name());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aeroRecruitsHaveUnits", isAeroRecruitsHaveUnits());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackOriginalUnit", isTrackOriginalUnit());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useContractCompletionRandomRetirement", isUseContractCompletionRandomRetirement());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomFounderTurnover", isUseRandomFounderTurnover());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFounderRetirement", isUseFounderRetirement());
@@ -4762,9 +4763,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeVehicles", getOpForLanceTypeVehicles());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForUsesVTOLs", isOpForUsesVTOLs());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useDropShips", useDropShips);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "aeroRecruitsHaveUnits", aeroRecruitsHaveUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "mercSizeLimited", mercSizeLimited);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "trackOriginalUnit", trackOriginalUnit);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "regionalMechVariations", regionalMechVariations);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "attachedPlayerCamouflage", attachedPlayerCamouflage);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "playerControlsAttachedUnits", playerControlsAttachedUnits);
@@ -5487,8 +5486,12 @@ public class CampaignOptions {
                     retVal.setTurnoverDifficulty(SkillLevel.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("turnoverBaseTn")) {
                     retVal.setTurnoverFixedTargetNumber(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useYearEndRandomRetirement")) {
-                    retVal.setUseYearEndRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("turnoverFrequency")) {
+                    retVal.setTurnoverFrequency(TurnoverFrequency.valueOf(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {
+                    retVal.setTrackOriginalUnit(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("aeroRecruitsHaveUnits")) {
+                    retVal.setAeroRecruitsHaveUnits(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useContractCompletionRandomRetirement")) {
                     retVal.setUseContractCompletionRandomRetirement(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomFounderTurnover")) {
@@ -5725,10 +5728,6 @@ public class CampaignOptions {
                     retVal.setOpForUsesVTOLs(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDropShips")) {
                     retVal.useDropShips = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("aeroRecruitsHaveUnits")) {
-                    retVal.aeroRecruitsHaveUnits = Boolean.parseBoolean(wn2.getTextContent().trim());
-                } else if (wn2.getNodeName().equalsIgnoreCase("trackOriginalUnit")) {
-                    retVal.trackOriginalUnit = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("mercSizeLimited")) {
                     retVal.mercSizeLimited = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("regionalMechVariations")) {

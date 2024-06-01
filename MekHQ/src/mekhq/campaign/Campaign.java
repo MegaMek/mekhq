@@ -6804,6 +6804,10 @@ public class Campaign implements ITechManager {
         }
     }
 
+    public void initTurnover() {
+        getRetirementDefectionTracker().setLastRetirementRoll(getLocalDate());
+    }
+
     public void initAtB(boolean newCampaign) {
         getRetirementDefectionTracker().setLastRetirementRoll(getLocalDate());
 
@@ -6911,42 +6915,72 @@ public class Campaign implements ITechManager {
 
     public boolean checkRetirementDefections() {
         if (!getRetirementDefectionTracker().getRetirees().isEmpty()) {
-            // FIXME : Localize
-            Object[] options = { "Show Payout Dialog", "Cancel" };
-            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
-                    "You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
-                    "Unresolved Final Payments", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+            Object[] options = {
+                    resources.getString("turnoverPayoutDialog.text"),
+                    resources.getString("turnoverCancel.text")
+            };
+
+            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(
+                    null,
+                    resources.getString("turnoverPersonnelKilled.text"),
+                    resources.getString("turnoverFinalPayments.text"),
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
         }
         return false;
     }
 
-    public boolean checkYearlyRetirements() {
-        if (getCampaignOptions().isUseRandomRetirement()
-                && getCampaignOptions().isUseYearEndRandomRetirement()
-                && (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate())
-                        == getRetirementDefectionTracker().getLastRetirementRoll().lengthOfYear())) {
-            // FIXME : Localize
-            Object[] options = { "Show Retirement Dialog", "Not Now" };
-            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
-                    "It has been a year since the last Employee Turnover roll, and it is time to do another.",
-                    "Employee Turnover roll required", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+    public boolean checkTurnoverPrompt() {
+        int days = 0;
+        String period = "";
+
+        switch (campaignOptions.getTurnoverFrequency()) {
+            case NEVER:
+                return false;
+            case WEEKLY:
+                days = 7;
+                period = resources.getString("turnoverWeekly.text");
+                break;
+            case MONTHLY:
+                days = 28;
+                period = resources.getString("turnoverMonthly.text");
+                break;
+            case ANNUALLY:
+                days = 365;
+                period = resources.getString("turnoverAnnually.text");
+                break;
+        }
+
+        if (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate()) >= days) {
+
+            Object[] options = {
+                    resources.getString("turnoverEmployeeTurnoverDialog.text"),
+                    resources.getString("turnoverNotNow.text")
+            };
+
+            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(
+                    null,
+                    String.format(resources.getString("turnoverDialogDescription.text"),
+                            period),
+                    resources.getString("turnoverRollRequired.text"),
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
         }
         return false;
     }
 
     public boolean checkScenariosDue() {
-        for(Mission m : getActiveMissions(true)) {
-            for(Scenario s : m.getCurrentScenarios()) {
-                if((s.getDate() != null)
-                        && !(s instanceof AtBScenario)
-                        && !getLocalDate().isBefore(s.getDate())) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return getActiveMissions(true).stream()
+                .flatMap(m -> m.getCurrentScenarios().stream())
+                .anyMatch(s -> (s.getDate() != null) && !(s instanceof AtBScenario) && !getLocalDate().isBefore(s.getDate()));
     }
 
     /**
