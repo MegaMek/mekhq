@@ -41,6 +41,18 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "name")
     private String name = "Error: Name Missing";
 
+    // 0: none
+    // 1: high school
+    // 2: college
+    // 3: university
+    // 4: military academy
+    // 5: basic training
+    // 6: nco academy
+    // 7: warrant officer academy
+    // 8: officer academy
+    @XmlElement(name = "type")
+    private int type = 0;
+
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary = false;
 
@@ -137,6 +149,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param set                     the set name of the academy
      * @param name                    the name of the academy
+     * @param type                    the type of academy (used by autoAwards)
      * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
      * @param promotion               indicates the promotion rank earned for completing an academic course
      * @param isClan                  indicates if the academy is a Clan Sibko or Crèche (true) or not (false)
@@ -163,7 +176,7 @@ public class Academy implements Comparable<Academy> {
      * @param baseAcademicSkillLevel  the base skill level provided by the academy
      * @param id                      the id number of the academy, used for sorting academies in mhq
      */
-    public Academy(String set, String name, Boolean isMilitary, String promotion, Boolean isClan, Boolean isTrueborn,
+    public Academy(String set, String name, int type, Boolean isMilitary, String promotion, Boolean isClan, Boolean isTrueborn,
                    Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
                    String faction, List<String> locationSystems, Boolean isLocal, Integer constructionYear,
                    Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
@@ -172,6 +185,7 @@ public class Academy implements Comparable<Academy> {
                    Integer baseAcademicSkillLevel, Integer id) {
         this.set = set;
         this.name = name;
+        this.type = type;
         this.isMilitary = isMilitary;
         this.promotion = promotion;
         this.isClan = isClan;
@@ -235,6 +249,24 @@ public class Academy implements Comparable<Academy> {
      */
     public void setName(final String name) {
         this.name = name;
+    }
+
+    /**
+     * Gets the type of academy.
+     *
+     * @return The type of academy.
+     */
+    public int getType() {
+        return type;
+    }
+
+    /**
+     * Sets the type of academy.
+     *
+     * @param type the type to be set.
+     */
+    public void setType(final int type) {
+        this.type = type;
     }
 
     /**
@@ -802,7 +834,7 @@ public class Academy implements Comparable<Academy> {
      * @param person  The person whose education level needs to be determined.
      * @return The education level of the qualification.
      */
-    int getEducationLevel(Person person) {
+    public int getEducationLevel(Person person) {
         int educationLevel;
 
         if ((person.getEduHighestEducation() + educationLevelMin) >= educationLevelMax) {
@@ -834,7 +866,7 @@ public class Academy implements Comparable<Academy> {
         if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
                 Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate())) {
             return true;
-        // is there a conflict between academy faction & campaign faction?
+            // is there a conflict between academy faction & campaign faction?
         } else {
             return RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
                     Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate());

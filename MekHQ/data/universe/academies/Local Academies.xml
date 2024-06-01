@@ -18,6 +18,7 @@
     </academy>
     <academy>
         <name>High School</name>
+        <type>1</type>
         <isPrepSchool>true</isPrepSchool>
         <description>A typical academic life for teenagers across the Inner Sphere</description>
         <isLocal>true</isLocal>
@@ -33,6 +34,7 @@
     </academy>
     <academy>
         <name>Preparatory School</name>
+        <type>1</type>
         <isPrepSchool>true</isPrepSchool>
         <description>A boarding school for the privileged teenagers of the Inner Sphere.</description>
         <isLocal>true</isLocal>
@@ -49,6 +51,7 @@
     </academy>
     <academy>
         <name>Military School</name>
+        <type>1</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
         <description>Whether as punishment, or a matter of familial pride, an education here prepares students for a life of military discipline.</description>
@@ -93,6 +96,7 @@
     </academy>
     <academy>
         <name>Adult High School</name>
+        <type>1</type>
         <description>A option for those students who never graduated high school, or who never had the chance to attend.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -107,6 +111,7 @@
     </academy>
     <academy>
         <name>Technical College</name>
+        <type>2</type>
         <description>Technical Colleges are places where the technicians of the future hone their craft.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -155,6 +160,7 @@
     </academy>
     <academy>
         <name>University (Bachelor's)</name>
+        <type>3</type>
         <description>The upper crust of higher education, universities offer a wide range of courses and post-graduate options</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -195,6 +201,7 @@
     </academy>
     <academy>
         <name>University (Master's)</name>
+        <type>3</type>
         <description>The upper crust of higher education, universities offer a wide range of courses and post-graduate options</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -235,6 +242,7 @@
     </academy>
     <academy>
         <name>University (Doctorate)</name>
+        <type>3</type>
         <description>The upper crust of higher education, universities offer a wide range of courses and post-graduate options</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -293,6 +301,7 @@
     </academy>
     <academy>
         <name>Boot Camp</name>
+        <type>5</type>
         <isMilitary>true</isMilitary>
         <promotion>Private</promotion>
         <description>After a couple of months' hard training students are ready to serve on the line.</description>
@@ -323,6 +332,7 @@
     </academy>
     <academy>
         <name>Military Academy</name>
+        <type>4</type>
         <isMilitary>true</isMilitary>
         <promotion>Corporal</promotion>
         <description>Local Military Academies claim to offer the finest tuition for career-minded students. However, there is no replacement for in-the-field experience.</description>
@@ -361,6 +371,7 @@
     </academy>
     <academy>
         <name>NCO Candidate Bootcamp</name>
+        <type>6</type>
         <isMilitary>true</isMilitary>
         <promotion>Corporal</promotion>
         <description>Here, candidates are trained locally in the skills required to lead men.</description>
@@ -379,6 +390,7 @@
     </academy>
     <academy>
         <name>Warrant Officer Candidate School</name>
+        <type>7</type>
         <isMilitary>true</isMilitary>
         <promotion>Warrant Officer</promotion>
         <description>In those forces that use them, Warrant Officers are essential military administrators and act as a go-between NCOs and Officers. Here they learn the skills needed to succeed.</description>
@@ -396,6 +408,7 @@
     </academy>
     <academy>
         <name>Officer Candidate School</name>
+        <type>8</type>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
         <description>Only the most qualified personnel are fit to become Officers. This is where they gain essential training and education.</description>
