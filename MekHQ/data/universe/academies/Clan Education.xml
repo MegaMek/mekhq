@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <academies>
     <academy>
-        <name>Trueborn Crèche</name>
+        <name>Trueborn Creche</name>
         <isPrepSchool>true</isPrepSchool>
         <isClan>true</isClan>
         <isTrueborn>true</isTrueborn>
-        <description>Alongside their sibkin, Trueborn Clansmen begin their life in the crèche.</description>
+        <description>A specialized facility where Trueborn warriors are raised from birth. These creches are highly secretive and heavily guarded, serving as the birthplaces of Clan society's most elite warriors. Trueborns are raised in a regimented environment where they undergo rigorous physical and mental training, indoctrination in Clan ideology, and specialized education in tactics, strategy, and combat skills.</description>
         <factionDiscount>0</factionDiscount>
         <isLocal>false</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -24,8 +24,8 @@
         <isPrepSchool>true</isPrepSchool>
         <isClan>true</isClan>
         <isTrueborn>true</isTrueborn>
-        <description>In their Sibko Trueborn aspirants undergo years of intense training with the goal of producing the ultimate warrior.</description>
         <factionDiscount>0</factionDiscount>
+        <description>Trueborn sibkos and apprenticeships are integral components of Clan society's structured training and social hierarchy. Sibkos consist of genetically engineered warriors-in-training who undergo rigorous combat training, ideological indoctrination, and trials to prove their worthiness as warriors. Apprenticeships, on the other hand, cater to individuals aspiring to become skilled technicians, warriors, or merchants within Clan society, offering hands-on experience under experienced mentors. Whether through combat drills in sibkos or practical training in apprenticeships, Trueborn are meticulously prepared to uphold the honor, discipline, and martial superiority of their society.</description>
         <isLocal>false</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2807</constructionYear>
@@ -71,7 +71,7 @@
         <name>Freeborn Education</name>
         <isPrepSchool>true</isPrepSchool>
         <isClan>true</isClan>
-        <description>While not as sophisticated as the education received by Trueborn, a Freeborn's education is no less as intensive.</description>
+        <description>Freeborn sibkos and apprenticeships represent pathways for individuals outside elite Clan lineage to gain status and contribute to Clan society. Freeborn sibkos consist of individuals born outside the genetically engineered Creches, often from lower castes or captured in battles, who undergo rigorous combat training, ideological indoctrination, and simulated trials against Trueborns to prove their worthiness as warriors. Apprenticeships, on the other hand, provide hands-on training and mentorship for individuals aspiring to become skilled technicians, warriors, or merchants within Clan society.</description>
         <factionDiscount>0</factionDiscount>
         <isLocal>false</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -115,9 +115,10 @@
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Reeducation Camp [Local]</name>
+        <name>Clan Reeducation Camp [Local]</name>
+        <isReeducationCamp>true</isReeducationCamp>
         <isClan>true</isClan>
-        <description>After a year of education, training, and encouragement, newly acquired Bondsmen can be readied for their place in Clan society</description>
+        <description>A clandestine facility designed to indoctrinate and "reeducate" individuals who originate from outside a particular Clan. These camps are heavily fortified and isolated, often located in remote or harsh environments to prevent escape. Within these camps, inmates undergo intensive psychological conditioning, ideological reprogramming, and physical labor under strict supervision. The goal is to break down individuality, instill unwavering loyalty to the Clan, and reshape behavior to align with Clan values and objectives.</description>
         <factionDiscount>0</factionDiscount>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -141,7 +142,7 @@
     <academy>
         <name>Reeducation Camp</name>
         <isClan>true</isClan>
-        <description>After a year of education, training, and encouragement, newly acquired Bondsmen can be readied for their place in Clan society</description>
+        <description>A clandestine facility designed to indoctrinate and "reeducate" individuals who originate from outside a particular Clan. These camps are heavily fortified and isolated, often located in remote or harsh environments to prevent escape. Within these camps, inmates undergo intensive psychological conditioning, ideological reprogramming, and physical labor under strict supervision. The goal is to break down individuality, instill unwavering loyalty to the Clan, and reshape behavior to align with Clan values and objectives.</description>
         <factionDiscount>0</factionDiscount>
         <isLocal>false</isLocal>
         <locationSystem>Terra</locationSystem>

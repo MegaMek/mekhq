@@ -56,6 +56,9 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary = false;
 
+    @XmlElement(name = "isReeducationCamp")
+    private Boolean isReeducationCamp = false;
+
     @XmlElement(name = "promotion")
     private String promotion = "None";
 
@@ -151,6 +154,7 @@ public class Academy implements Comparable<Academy> {
      * @param name                    the name of the academy
      * @param type                    the type of academy (used by autoAwards)
      * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
+     * @param isReeducationCamp       indicates if the academy is a reeducation camp (true) or not (false)
      * @param promotion               indicates the promotion rank earned for completing an academic course
      * @param isClan                  indicates if the academy is a Clan Sibko or Crèche (true) or not (false)
      * @param isTrueborn              indicates if the Sibko is intended for Trueborn (true) or not (false)
@@ -176,17 +180,18 @@ public class Academy implements Comparable<Academy> {
      * @param baseAcademicSkillLevel  the base skill level provided by the academy
      * @param id                      the id number of the academy, used for sorting academies in mhq
      */
-    public Academy(String set, String name, int type, Boolean isMilitary, String promotion, Boolean isClan, Boolean isTrueborn,
-                   Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
-                   String faction, List<String> locationSystems, Boolean isLocal, Integer constructionYear,
-                   Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
-                   Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax, Integer ageMin,
-                   Integer ageMax, List<String> qualifications, List<String> curriculums, List<Integer> qualificationStartYears,
-                   Integer baseAcademicSkillLevel, Integer id) {
+    public Academy(String set, String name, int type, Boolean isMilitary, Boolean isReeducationCamp, String promotion,
+                   Boolean isClan, Boolean isTrueborn, Boolean isPrepSchool, String description, Integer factionDiscount,
+                   Boolean isFactionRestricted, String faction, List<String> locationSystems, Boolean isLocal,
+                   Integer constructionYear, Integer destructionYear, Integer closureYear, Integer tuition,
+                   Integer durationDays, Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax,
+                   Integer ageMin, Integer ageMax, List<String> qualifications, List<String> curriculums,
+                   List<Integer> qualificationStartYears, Integer baseAcademicSkillLevel, Integer id) {
         this.set = set;
         this.name = name;
         this.type = type;
         this.isMilitary = isMilitary;
+        this.isReeducationCamp = isReeducationCamp;
         this.promotion = promotion;
         this.isClan = isClan;
         this.isTrueborn = isTrueborn;
@@ -285,6 +290,24 @@ public class Academy implements Comparable<Academy> {
      */
     public void setIsMilitary(final boolean isMilitary) {
         this.isMilitary = isMilitary;
+    }
+
+    /**
+     * Determines if the academy is a reeducation camp.
+     *
+     * @return true, if the academy is a reeducation camp; otherwise, false.
+     */
+    public boolean isReeducationCamp() {
+        return isReeducationCamp;
+    }
+
+    /**
+     * Sets the value of the isReeducationCamp property.
+     *
+     * @param isReeducationCamp the new value for the isReeducationCamp property
+     */
+    public void setIsReeducationCamp(final boolean isReeducationCamp) {
+        this.isReeducationCamp = isReeducationCamp;
     }
 
     /**
@@ -997,11 +1020,24 @@ public class Academy implements Comparable<Academy> {
             tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
         }
 
-        // we travel time out the way; all that's left is to add the last couple of entries
+        // with travel time out the way; all that's left is to add the last couple of entries
         if ((isMilitary) && (!Objects.equals(promotion, "None"))) {
             tooltip.append("<b>").append(resources.getString("promotion.text")).append("</b> ")
                     .append(promotion).append("<br>");
         }
+
+        if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
+            tooltip.append("<b>").append(resources.getString("reeducation.text")).append("</b> ");
+
+            if (!Objects.equals(person.getOriginFaction().getShortName(), campaign.getFaction().getShortName())) {
+                tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
+            } else {
+                tooltip.append(resources.getString("reeducationNoChange.text")).append("<br>");
+            }
+
+            tooltip.append("<br>");
+        }
+
         tooltip.append("<b>").append(resources.getString("facultySkill.text")).append("</b> ")
                 .append(facultySkill).append ('+').append("<br>");
         tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")
