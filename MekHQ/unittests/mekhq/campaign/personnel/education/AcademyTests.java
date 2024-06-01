@@ -40,14 +40,14 @@ class AcademyTests {
 
     @Test
     void testAcademyCreationAllFields() {
-        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", 0,true, "Colonel", true,
-                true, true, "Top level MechWarrior Training",
-                20, true, "FWL",
-                Arrays.asList("Sol", "Terra"), false,
-                3045, 3089, 3099, 2000, 365,
-                10, 1, 4, 18, 35,
-                Arrays.asList("MechWarrior", "Leadership"), Arrays.asList("Combat", "Strategy"),
-                Arrays.asList(3050, 3055), 5, 101);
+        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", 0, true,
+                false, "Colonel", true, true, true,
+                "Top level MechWarrior Training", 20, true,
+                "FWL", Arrays.asList("Sol", "Terra"), false, 3045,
+                3089, 3099, 2000, 365, 10,
+                1, 4, 18, 35, Arrays.asList("MechWarrior", "Leadership"),
+                Arrays.asList("Combat", "Strategy"), Arrays.asList(3050, 3055), 5, 101);
+
         assertEquals("MekWarrior Academy", academy.getName());
         assertEquals(0, academy.getType());
         assertTrue(academy.isMilitary());
