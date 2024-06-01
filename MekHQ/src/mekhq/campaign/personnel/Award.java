@@ -38,13 +38,13 @@ import java.util.List;
 @XmlAccessorType(value = XmlAccessType.FIELD)
 public class Award implements Comparable<Award> {
     @XmlElement(name = "name")
-    private String name;
+    private String name = "ERROR: NO NAME";
 
     @XmlElement(name = "description")
-    private String description;
+    private String description = "";
 
     @XmlElement(name = "group")
-    private String group = "null";
+    private String group = "";
 
     @XmlElement(name = "medal")
     private List<String> medals;
@@ -62,16 +62,16 @@ public class Award implements Comparable<Award> {
     private int edge = 0;
 
     @XmlElement(name = "qty")
-    private int qty;
+    private int qty = 0;
 
     @XmlElement(name = "item")
-    private String item;
+    private String item = "";
 
     @XmlElement(name = "size")
-    private String size;
+    private String size = "";
 
     @XmlElement(name = "range")
-    private String range;
+    private String range = "";
 
     @XmlElement(name = "stackable")
     private boolean stackable = false;
