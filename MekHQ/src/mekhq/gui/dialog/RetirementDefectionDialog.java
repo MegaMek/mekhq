@@ -225,7 +225,7 @@ public class RetirementDefectionDialog extends JDialog {
                 int row = personnelTable.convertRowIndexToModel(personnelTable.getSelectedRow());
                 UUID id = ((RetirementTableModel)(personnelTable.getModel())).getPerson(row).getId();
                 txtTargetDetails.setText(targetRolls.get(id).getDesc() +
-                        (payBonus(id)?" -2 (Bonus)":"") +
+                        (payBonus(id)?" -2 (Bonus)":" ") +
                         ((miscModifier(id) != 0)?miscModifier(id) + " (Misc)":""));
             });
 

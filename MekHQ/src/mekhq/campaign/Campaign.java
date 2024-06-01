@@ -6956,7 +6956,6 @@ public class Campaign implements ITechManager {
         }
 
         if (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate()) >= days) {
-
             Object[] options = {
                     resources.getString("turnoverEmployeeTurnoverDialog.text"),
                     resources.getString("turnoverNotNow.text")

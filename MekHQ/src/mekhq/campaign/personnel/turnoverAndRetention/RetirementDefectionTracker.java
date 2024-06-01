@@ -640,28 +640,28 @@ public class RetirementDefectionTracker {
     private void getDifficultyModifier(Campaign campaign) {
         switch (campaign.getCampaignOptions().getTurnoverDifficulty()) {
             case NONE:
-                difficulty = -6;
-                break;
-            case ULTRA_GREEN:
-                difficulty = -5;
-                break;
-            case GREEN:
-                difficulty = -4;
-                break;
-            case REGULAR:
                 difficulty = -3;
                 break;
-            case VETERAN:
+            case ULTRA_GREEN:
                 difficulty = -2;
                 break;
-            case ELITE:
+            case GREEN:
                 difficulty = -1;
                 break;
-            case HEROIC:
+            case REGULAR:
                 difficulty = 0;
                 break;
-            case LEGENDARY:
+            case VETERAN:
                 difficulty = 1;
+                break;
+            case ELITE:
+                difficulty = 2;
+                break;
+            case HEROIC:
+                difficulty = 3;
+                break;
+            case LEGENDARY:
+                difficulty = 4;
                 break;
         }
     }
@@ -685,6 +685,10 @@ public class RetirementDefectionTracker {
             } else {
                 shellPerson.addSkill(SkillType.S_ADMIN, 1, 0);
                 targetNumber = shellPerson.getSkills().getSkill(SkillType.S_ADMIN).getType().getTarget();
+            }
+
+            if (campaign.getCampaignOptions().getServiceContractDuration() == 0) {
+                targetNumber -= campaign.getCampaignOptions().getServiceContractModifier();
             }
 
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
