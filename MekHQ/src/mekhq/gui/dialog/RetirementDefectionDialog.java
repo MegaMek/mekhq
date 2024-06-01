@@ -28,7 +28,6 @@ import megamek.common.TargetRoll;
 import megamek.common.TechConstants;
 import megamek.common.UnitType;
 import mekhq.MekHQ;
-import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.Mission;
@@ -124,7 +123,7 @@ public class RetirementDefectionDialog extends JDialog {
         initComponents(doRetirement);
         if (!doRetirement) {
             initResults();
-            btnDone.setEnabled(unitAssignmentsComplete(gui.getCampaign()));
+            btnDone.setEnabled(unitAssignmentsComplete());
         }
 
         setLocationRelativeTo(gui.getFrame());
@@ -394,7 +393,7 @@ public class RetirementDefectionDialog extends JDialog {
         btnEdit.setVisible(currentPanel.equals(PAN_RESULTS));
         btnEdit.setEnabled(hqView.getCampaign().isGM());
         btnEdit.addActionListener(evt -> {
-            btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete(hqView.getCampaign()));
+            btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
             ((RetirementTableModel) retireeTable.getModel()).setEditPayout(btnEdit.isSelected());
         });
         btnRoll = new JButton(resourceMap.getString("btnRoll.text"));
@@ -451,7 +450,7 @@ public class RetirementDefectionDialog extends JDialog {
                 btnEdit.setVisible(true);
                 btnRoll.setVisible(false);
                 btnDone.setVisible(true);
-                btnDone.setEnabled(unitAssignmentsComplete(hqView.getCampaign()));
+                btnDone.setEnabled(unitAssignmentsComplete());
 
                 currentPanel = PAN_RESULTS;
                 cardLayout.show(panMain, currentPanel);
@@ -726,7 +725,7 @@ public class RetirementDefectionDialog extends JDialog {
         return aborted;
     }
 
-    private boolean unitAssignmentsComplete(Campaign campaign) {
+    private boolean unitAssignmentsComplete() {
         if (unitAssignmentTable.getModel().getRowCount() <= 0) {
             return true;
         }
@@ -785,7 +784,7 @@ public class RetirementDefectionDialog extends JDialog {
         Unit unit = ((UnitAssignmentTableModel) unitAssignmentTable.getModel())
                 .getUnit(unitAssignmentTable.convertRowIndexToModel(unitAssignmentTable.getSelectedRow()));
         unitAssignments.put(person.getId(), unit.getId());
-        btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete(hqView.getCampaign()));
+        btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
         ((RetirementTableModel) retireeTable.getModel()).fireTableDataChanged();
         filterUnits();
     }
@@ -794,7 +793,7 @@ public class RetirementDefectionDialog extends JDialog {
         Person person = ((RetirementTableModel) retireeTable.getModel())
                 .getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
         unitAssignments.remove(person.getId());
-        btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete(hqView.getCampaign()));
+        btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
         ((RetirementTableModel) retireeTable.getModel()).fireTableDataChanged();
         filterUnits();
     }
