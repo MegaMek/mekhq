@@ -1,5 +1,6 @@
 package mekhq.campaign.personnel.autoAwards;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.mission.AtBContract;
@@ -45,12 +46,12 @@ public class AutoAwardsController {
 
         buildAwardLists(0);
 
-        Collection<UUID> personnel = getPersonnel();
+        List<UUID> personnel = getPersonnel();
 
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, false);
+            ProcessAwards(personnel, false, null);
         } else {
             LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
@@ -73,12 +74,12 @@ public class AutoAwardsController {
 
         buildAwardLists(1);
 
-        Collection<UUID> personnel = getPersonnel();
+        List<UUID> personnel = getPersonnel();
 
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, missionWasSuccessful);
+            ProcessAwards(personnel, missionWasSuccessful, null);
         } else {
             LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
@@ -144,17 +145,40 @@ public class AutoAwardsController {
     }
 
     /**
+     * The primary controller for the automatic processing of Training Awards
+     *
+     * @param c                    the campaign to be processed
+     */
+    public void PostGraduationController(Campaign c, List<UUID> personnel, HashMap<UUID, List<Object>> academyAttributes) {
+        LogManager.getLogger().info("autoAwards (Mission Conclusion) has started");
+
+        campaign = c;
+
+        buildAwardLists(3);
+
+        // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
+        if (!personnel.isEmpty()) {
+            // This is the main workhorse function
+            ProcessAwards(personnel, false, academyAttributes);
+        } else {
+            LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
+        }
+
+        LogManager.getLogger().info("autoAwards (Mission Conclusion) has finished");
+    }
+
+    /**
      * Builds a list of personnel autoAwards should process
      */
-    private Collection<UUID> getPersonnel() {
-        Collection<UUID> personnel = campaign.getActivePersonnel()
+    private List<UUID> getPersonnel() {
+        List<UUID> personnel = campaign.getActivePersonnel()
                 .stream()
                 .map(Person::getId)
                 .collect(Collectors.toList());
 
         // if posthumous Awards are enabled, we add the relevant dead people
         if (campaign.getCampaignOptions().isIssuePosthumousAwards()) {
-            Collection<UUID> deadPeople = campaign.getPersonnel()
+            List<UUID> deadPeople = campaign.getPersonnel()
                     .stream().filter(person -> person.getStatus().isDead())
                     .map(Person::getId)
                     .collect(Collectors.toList());
@@ -178,7 +202,7 @@ public class AutoAwardsController {
      *
      * @param personnel personnel to process
      */
-    private void removeDependentsAndPrisoners(Collection<UUID> personnel) {
+    private void removeDependentsAndPrisoners(List<UUID> personnel) {
         if (!personnel.isEmpty()) {
             personnel.removeIf(person -> (campaign.getPerson(person).hasRole(PersonnelRole.DEPENDENT))
                     || (campaign.getPerson(person).getPrisonerStatus().isCurrentPrisoner()));
@@ -271,8 +295,6 @@ public class AutoAwardsController {
                                             ignoredAwards.add(award);
                                         }
                                         break;
-                                    // trainingAwards are not currently supported.
-                                    // We include them here for tracking purposes
                                     case "training":
                                         trainingAwards.add(award);
                                         break;
@@ -283,12 +305,12 @@ public class AutoAwardsController {
                             }
                             // These logs help users double-check that the number of awards found matches their records
                             LogManager.getLogger().info("autoAwards found {} Kill Awards (excluding Mission & Scenario Kill Awards)", killAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Rank Awards", rankAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Scenario Awards", scenarioAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Skill Awards", skillAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Time Awards", timeAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
                             LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;
@@ -374,8 +396,6 @@ public class AutoAwardsController {
                                             ignoredAwards.add(award);
                                         }
                                         break;
-                                    // trainingAwards are not currently supported.
-                                    // We include them here for tracking purposes
                                     case "training":
                                         trainingAwards.add(award);
                                         break;
@@ -386,14 +406,13 @@ public class AutoAwardsController {
                             }
                             // These logs help users double-check that the number of awards found matches their records
                             LogManager.getLogger().info("autoAwards found {} Kill Awards (excluding Scenario Kill Awards)", killAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Contract Awards", contractAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Rank Awards", rankAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Scenario Awards", scenarioAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Skill Awards", skillAwards.size());
                             LogManager.getLogger().info("autoAwards found {} TheatreOfWar Awards", theatreOfWarAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Time Awards", timeAwards.size());
-                            LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
                             LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;
@@ -415,6 +434,13 @@ public class AutoAwardsController {
                                             injuryAwards.add(award);
                                         }
                                         break;
+                                    case "misc":
+                                        if (campaign.getCampaignOptions().isEnableMiscAwards()) {
+                                            miscAwards.add(award);
+                                        } else {
+                                            ignoredAwards.add(award);
+                                        }
+                                        break;
                                     default:
                                         ignoredAwards.add(award);
                                 }
@@ -422,6 +448,29 @@ public class AutoAwardsController {
 
                             LogManager.getLogger().info("autoAwards found {} Scenario Kill Awards (excluding Mission & Lifetime Kill Awards)", killAwards.size());
                             LogManager.getLogger().info("autoAwards found {} Injury Awards", injuryAwards.size());
+                            LogManager.getLogger().info("autoAwards found {} Misc Awards", miscAwards.size());
+                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
+
+                            break;
+                        // post-graduation
+                        case 3:
+                            for (Award award : awards) {
+                                switch (award.getItem().toLowerCase().replaceAll("\\s", "")) {
+                                    case "divider":
+                                        break;
+                                    case "training":
+                                        if (campaign.getCampaignOptions().isEnableTrainingAwards()) {
+
+                                            trainingAwards.add(award);
+                                        }
+                                        break;
+                                    default:
+                                        ignoredAwards.add(award);
+                                }
+                            }
+
+                            LogManager.getLogger().info("autoAwards found {} Training Awards", trainingAwards.size());
+                            LogManager.getLogger().info("autoAwards is ignoring {} Awards", ignoredAwards.size());
 
                             break;
                         default:
@@ -439,10 +488,11 @@ public class AutoAwardsController {
     /**
      * Process the awards for the given personnel.
      *
-     * @param personnel               the collection of personnel to process awards for
+     * @param personnel               the List of personnel to process awards for
      * @param missionWasSuccessful    true if the mission was successful, false otherwise
+     * @param academyAttributes       a map of academy attributes, null if not processing graduation awards
      */
-    private void ProcessAwards(Collection<UUID> personnel, Boolean missionWasSuccessful) {
+    private void ProcessAwards(List<UUID> personnel, Boolean missionWasSuccessful, @Nullable HashMap<UUID, List<Object>> academyAttributes) {
         Map<Integer, Map<Integer, List<Object>>> allAwardData = new HashMap<>();
         Map<Integer, List<Object>> processedData;
         int allAwardDataKey = 0;
@@ -538,6 +588,14 @@ public class AutoAwardsController {
             }
         }
 
+        if ((!trainingAwards.isEmpty()) && (academyAttributes != null)) {
+            processedData = TrainingAwardsManager(personnel, academyAttributes);
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
+            }
+        }
+
         if (!allAwardData.isEmpty()) {
             AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
             autoAwardsDialog.setVisible(true);
@@ -551,7 +609,7 @@ public class AutoAwardsController {
      *
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> ContractAwardsManager(Collection<UUID> personnel) {
+    private Map<Integer, List<Object>> ContractAwardsManager(List<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -590,7 +648,7 @@ public class AutoAwardsController {
      *
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> FactionHunterAwardsManager(Collection<UUID> personnel) {
+    private Map<Integer, List<Object>> FactionHunterAwardsManager(List<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -661,7 +719,7 @@ public class AutoAwardsController {
      *
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> KillAwardsManager(Collection<UUID> personnel) {
+    private Map<Integer, List<Object>> KillAwardsManager(List<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -734,7 +792,7 @@ public class AutoAwardsController {
     /**
      * This method is the manager for processing miscellaneous awards.
      *
-     * @param personnel             the collection of personnel to be processed for awards
+     * @param personnel             the List of personnel to be processed for awards
      * @param missionWasSuccessful  a boolean indicating if the mission was successful
      * @param scenarioId             the scenario just completed, or -1 if autoAwards was not triggered by scenario completion
      * @return a map containing the award data, or null if no awards are applicable
@@ -780,7 +838,7 @@ public class AutoAwardsController {
      *
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> RankAwardsManager(Collection<UUID> personnel) {
+    private Map<Integer, List<Object>> RankAwardsManager(List<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -814,7 +872,7 @@ public class AutoAwardsController {
      *
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> ScenarioAwardsManager(Collection<UUID> personnel) {
+    private Map<Integer, List<Object>> ScenarioAwardsManager(List<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -848,7 +906,7 @@ public class AutoAwardsController {
      *
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> SkillAwardsManager(Collection<UUID> personnel) {
+    private Map<Integer, List<Object>> SkillAwardsManager(List<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -882,7 +940,7 @@ public class AutoAwardsController {
      *
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> TheatreOfWarAwardsManager(Collection<UUID> personnel) {
+    private Map<Integer, List<Object>> TheatreOfWarAwardsManager(List<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -916,7 +974,7 @@ public class AutoAwardsController {
      *
      * @param personnel the personnel to be processed
      */
-    private Map<Integer, List<Object>> TimeAwardsManager(Collection<UUID> personnel) {
+    private Map<Integer, List<Object>> TimeAwardsManager(List<UUID> personnel) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
@@ -941,7 +999,41 @@ public class AutoAwardsController {
         if (!awardData.isEmpty()) {
             return awardData;
         } else {
-            LogManager.getLogger().info("Returning: null");
+            return null;
+        }
+    }
+
+    /**
+     * This is the manager for this type of award, processing eligibility and preparing awardData
+     *
+     * @param personnel the personnel to be processed
+     * @param academyAttributes the academy attributes mapped to the personnel being processed
+     */
+    private Map<Integer, List<Object>> TrainingAwardsManager(List<UUID> personnel, HashMap<UUID, List<Object>> academyAttributes) {
+        Map<Integer, List<Object>> awardData = new HashMap<>();
+        int awardDataKey = 0;
+
+        for (UUID person : personnel) {
+            Map<Integer, List<Object>> data;
+            try {
+                data = TrainingAwards.TrainingAwardsProcessor(campaign, person, academyAttributes.get(person), trainingAwards);
+            } catch (Exception e) {
+                data = null;
+                LogManager.getLogger().info("{} is not eligible for any Training Awards.", campaign.getPerson(person).getFullName());
+            }
+
+            if (data != null) {
+                for (Integer dataKey : data.keySet()) {
+                    awardData.put(awardDataKey, data.get(dataKey));
+
+                    awardDataKey++;
+                }
+            }
+        }
+
+        if (!awardData.isEmpty()) {
+            return awardData;
+        } else {
             return null;
         }
     }
