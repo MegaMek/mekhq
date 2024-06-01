@@ -78,7 +78,6 @@ public enum PersonnelFilter {
     PRISONER("PersonnelFilter.PRISONER.text", "PersonnelFilter.PRISONER.toolTipText", false, false),
     INACTIVE("PersonnelFilter.INACTIVE.text", "PersonnelFilter.INACTIVE.toolTipText", false, false),
     ON_LEAVE("PersonnelFilter.ON_LEAVE.text", "PersonnelFilter.ON_LEAVE.toolTipText", false, false),
-
     MIA("PersonnelFilter.MIA.text", "PersonnelFilter.MIA.toolTipText", false, false),
     RETIRED("PersonnelFilter.RETIRED.text", "PersonnelFilter.RETIRED.toolTipText", false, false),
     RESIGNED("PersonnelFilter.RESIGNED.text", "PersonnelFilter.RESIGNED.toolTipText", false, false),
@@ -485,19 +484,19 @@ public enum PersonnelFilter {
             case FOUNDER:
                 return person.isFounder();
             case KIDS:
-                return person.isChild(currentDate);
+                return ((person.isChild(currentDate)) && (!person.getStatus().isLeft()));
             case PRISONER:
-                return person.getPrisonerStatus().isCurrentPrisoner() || person.getPrisonerStatus().isBondsman();
+                return ((person.getPrisonerStatus().isCurrentPrisoner()) || (person.getPrisonerStatus().isBondsman()));
             case INACTIVE:
                 return !person.getStatus().isActive();
             case ON_LEAVE:
-                return !person.getStatus().isOnLeave();
+                return person.getStatus().isOnLeave();
             case MIA:
                 return person.getStatus().isMIA();
             case RETIRED:
                 return person.getStatus().isRetired();
             case RESIGNED:
-                return person.getStatus().isResigned();
+                return ((person.getStatus().isResigned()) || (person.getStatus().isLeft()));
             case AWOL:
                 return person.getStatus().isAwol();
             case DESERTED:

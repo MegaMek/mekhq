@@ -697,7 +697,7 @@ public class Campaign implements ITechManager {
 
                             switch (roll) {
                                 case 1:
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                                     break;
                                 case 2:
                                 case 3:
@@ -726,28 +726,32 @@ public class Campaign implements ITechManager {
                             if ((spouse != null) && (!getRetirementDefectionTracker().getRetirees().contains(spouse.getId()))) {
                                 if ((!spouse.getStatus().isDepartedUnit()) && (!spouse.getStatus().isAbsent())) {
                                     addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
-                                    spouse.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                                    if (spouse.getPrimaryRole().isCivilian()) {
+                                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                                    } else {
+                                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                                    }
                                 }
                             }
                         }
 
-//                        // This ensures children have a chance of following their parent into depature
-//                        for (Person child : person.getGenealogy().getChildren()) {
-//                            if (child.isChild(getLocalDate())) {
-//                                if (campaignOptions.isUseMarriageModifiers()) {
-//                                    addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
-//                                    child.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-//                                } else {
-//                                    boolean remainingParent = child.getGenealogy().getParents().stream()
-//                                            .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
-//
-//                                    if ((!remainingParent) || (Compute.randomInt(2) == 0)) {
-//                                        addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
-//                                        child.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-//                                    }
-//                                }
-//                            }
-//                        }
+                        // This ensures children have a chance of following their parent into departure
+                        for (Person child : person.getGenealogy().getChildren()) {
+                            if ((child.isChild(getLocalDate())) && (!child.getStatus().isDepartedUnit())) {
+                                if (campaignOptions.isUseMarriageModifiers()) {
+                                    addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
+                                    child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                                } else {
+                                    boolean remainingParent = child.getGenealogy().getParents().stream()
+                                            .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
+
+                                    if ((!remainingParent) || (Compute.randomInt(2) == 0)) {
+                                        addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
+                                        child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                                    }
+                                }
+                            }
+                        }
                     }
 
                     if (unitAssignments.containsKey(pid)) {
