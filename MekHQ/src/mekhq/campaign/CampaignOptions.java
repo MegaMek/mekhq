@@ -337,6 +337,7 @@ public class CampaignOptions {
     // Education
     private boolean useEducationModule;
     private Integer maximumJumpCount;
+    private boolean useReeducationCamps;
     private boolean useTruebornTravelException;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
@@ -847,6 +848,7 @@ public class CampaignOptions {
         // Education
         setUseEducationModule(true);
         setMaximumJumpCount(5);
+        setUseReeducationCamps(true);
         setUseTruebornTravelException(true);
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
@@ -2288,6 +2290,14 @@ public class CampaignOptions {
 
     public void setMaximumJumpCount(Integer maximumJumpCount) {
         this.maximumJumpCount = maximumJumpCount;
+    }
+
+    public boolean isUseReeducationCamps() {
+        return useReeducationCamps;
+    }
+
+    public void setUseReeducationCamps(boolean useReeducationCamps) {
+        this.useReeducationCamps = useReeducationCamps;
     }
 
     public boolean isUseTruebornTravelException() {
@@ -4272,6 +4282,7 @@ public class CampaignOptions {
         //region Education
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCount", getMaximumJumpCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReeducationCamps", isUseReeducationCamps());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTruebornTravelException", isUseTruebornTravelException());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
@@ -5023,6 +5034,8 @@ public class CampaignOptions {
                     retVal.setUseEducationModule(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maximumJumpCount")) {
                     retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useReeducationCamps")) {
+                    retVal.setUseReeducationCamps(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTruebornTravelException")) {
                     retVal.setUseTruebornTravelException(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableLocalAcademies")) {

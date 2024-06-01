@@ -35,6 +35,8 @@ MEKHQ VERSION HISTORY:
 + PR #4115: Fixed Award Image Display in Person View
 + PR #4116: Added ability to Pass CamOps Fatigue to MegaMek
 + PR #4117: Even More Education Module Bug Fixes
++ PR #4118: Added autoAwards Support for the Education Module
++ PR #4119: Added Reeducation Camps to Education Module, Replaced Placeholder Academy Descriptions
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
