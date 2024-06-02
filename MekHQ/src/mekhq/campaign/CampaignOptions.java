@@ -319,6 +319,7 @@ public class CampaignOptions {
 
     private boolean useFatigue;
     private int fatigueRate;
+    private boolean useInjuryFatigue;
     private int fieldKitchenCapacity;
     private int fatigueLeaveThreshold;
 
@@ -991,6 +992,7 @@ public class CampaignOptions {
 
         setUseFatigue(true);
         setFatigueRate(1);
+        setUseInjuryFatigue(true);
         setFieldKitchenCapacity(150);
         setFatigueLeaveThreshold(13);
         //endregion Turnover and Retention
@@ -1506,6 +1508,14 @@ public class CampaignOptions {
 
     public void setFatigueRate(final Integer fatigueRate) {
         this.fatigueRate = fatigueRate;
+    }
+
+    public boolean isUseInjuryFatigue() {
+        return useInjuryFatigue;
+    }
+
+    public void setUseInjuryFatigue(final boolean useInjuryFatigue) {
+        this.useInjuryFatigue = useInjuryFatigue;
     }
 
     public Integer getFieldKitchenCapacity() {
@@ -4558,6 +4568,7 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigue", isUseFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueRate", getFatigueRate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInjuryFatigue", isUseInjuryFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLeaveThreshold", getFatigueLeaveThreshold());
         //endregion Retirement
@@ -5562,6 +5573,8 @@ public class CampaignOptions {
                     retVal.setUseFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fatigueRate")) {
                     retVal.setFatigueRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useInjuryFatigue")) {
+                    retVal.setUseInjuryFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
                     retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {

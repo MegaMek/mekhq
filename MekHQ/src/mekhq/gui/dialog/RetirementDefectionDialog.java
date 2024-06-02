@@ -602,8 +602,9 @@ public class RetirementDefectionDialog extends JDialog {
         }
 
         if (!u.isFunctional()) {
-            retVal--;
+            retVal = retVal / 2;
         }
+
         return Math.max(0, retVal);
     }
 
@@ -651,13 +652,15 @@ public class RetirementDefectionDialog extends JDialog {
             }
 
             // If the person is still under contract, we don't care that they're owed a unit
-            if (isBreakingContract(hqView.getCampaign().getPerson(id), hqView.getCampaign().getLocalDate(), hqView.getCampaign().getCampaignOptions().getServiceContractDuration())) {
-                /* If the unit given in payment is of lower quality than required, pay
-                 * an additional 3M C-bills per class.
-                 */
+            if (!isBreakingContract(
+                    hqView.getCampaign().getPerson(id),
+                    hqView.getCampaign().getLocalDate(),
+                    hqView.getCampaign().getCampaignOptions().getServiceContractDuration())) {
+                // If the unit given in payment is of lower quality than required, pay an additional 3M C-bills per class.
+                // If the person is breaking contract, they waive this compensation
                 if (null != unitAssignments.get(id)) {
                     payout = payout.plus(getShortfallAdjustment(rdTracker.getPayout(id).getWeightClass(),
-                            RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id)))));
+                                RetirementDefectionDialog.weightClassIndex(hqView.getCampaign().getUnit(unitAssignments.get(id)))));
                 }
 
                 // if a unit is required, but none given, pay an additional 3M c-bills per class

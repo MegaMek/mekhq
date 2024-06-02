@@ -119,7 +119,7 @@ public class Fatigue {
                         fatigueAdjustment++;
                     }
 
-                    person.setFatigue(person.getFatigue() - fatigueAdjustment);
+                    person.increaseFatigue(- fatigueAdjustment);
 
                     if (person.getFatigue() < 0) {
                         person.setFatigue(0);

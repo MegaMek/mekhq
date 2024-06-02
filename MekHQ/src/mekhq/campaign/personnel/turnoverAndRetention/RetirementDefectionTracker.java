@@ -27,6 +27,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -258,7 +259,7 @@ public class RetirementDefectionTracker {
                 }
 
                 if (FactionHints.defaultFactionHints().isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
-                    targetNumber.addModifier(1, resources.getString("factionEnemy.text"));
+                    targetNumber.addModifier(2, resources.getString("factionEnemy.text"));
                 }
             }
 
@@ -268,12 +269,12 @@ public class RetirementDefectionTracker {
 
                 if (ageMod < 0) {
                     targetNumber.addModifier(ageMod, resources.getString("ageYoung.text"));
-                } else if (ageMod > 0) {
+                } else if ((ageMod > 0) && (!isBreakingContract(person, campaign.getLocalDate(), campaign.getCampaignOptions().getServiceContractDuration()))) {
                     targetNumber.addModifier(ageMod, resources.getString("ageRetirement.text"));
                 }
             }
 
-            // Marriage Modifier
+            // Family Modifier
             if (campaign.getCampaignOptions().isUseMarriageModifiers()) {
                 Person spouse = person.getGenealogy().getSpouse();
 
@@ -572,18 +573,18 @@ public class RetirementDefectionTracker {
     public static int getAdministrativeStrain(Campaign campaign) {
         int personnel = 0;
         int proto = 0;
+        int multiCrew = 0;
+        int other = 0;
 
         for (Person person : campaign.getActivePersonnel()) {
             if ((person.getPrimaryRole().isCivilian()) || (person.getPrisonerStatus().isPrisoner()) || (person.getPrisonerStatus().isPrisonerDefector())) {
-                continue;
-            }
-
-            if (person.getUnit() != null) {
+                other++;
+            } else if (person.getUnit() != null) {
                 if (person.getUnit().isCommander(person)) {
                     if (person.getUnit().getEntity().isProtoMek()) {
                         proto++;
                     } else {
-                        personnel += Math.max(1, person.getUnit().getCrew().size() / campaign.getCampaignOptions().getMultiCrewStrainDivider());
+                        multiCrew++;
                     }
                 }
             } else {
@@ -601,7 +602,10 @@ public class RetirementDefectionTracker {
             }
         }
 
-        personnel += proto / campaign.getCampaignOptions().getMultiCrewStrainDivider();
+        personnel += proto / 5;
+        personnel += multiCrew / campaign.getCampaignOptions().getMultiCrewStrainDivider();
+        personnel += other / (campaign.getCampaignOptions().getMultiCrewStrainDivider() * 2);
+
         return personnel;
     }
 
@@ -733,12 +737,12 @@ public class RetirementDefectionTracker {
             return Money.zero();
         }
 
-//        FinancialReport r = FinancialReport.calculate(campaign);
-//
-//        Money netWorth = r.getNetWorth();
-//        if (campaign.getCampaignOptions().isSharesExcludeLargeCraft()) {
-//            netWorth = netWorth.minus(r.getLargeCraftValue());
-//        }
+        FinancialReport r = FinancialReport.calculate(campaign);
+
+        Money netWorth = r.getNetWorth();
+        if (campaign.getCampaignOptions().isSharesExcludeLargeCraft()) {
+            netWorth = netWorth.minus(r.getLargeCraftValue());
+        }
 
         int totalShares = campaign.getActivePersonnel()
                 .stream()
@@ -749,7 +753,7 @@ public class RetirementDefectionTracker {
             return Money.zero();
         }
 
-        return campaign.getFunds().dividedBy(totalShares);
+        return netWorth.dividedBy(totalShares);
     }
 
     /**

@@ -1228,6 +1228,10 @@ public class Person {
         this.fatigue = fatigue;
     }
 
+    public void increaseFatigue(final int fatigue) {
+        this.fatigue = this.fatigue + fatigue;
+    }
+
     public boolean getIsRecoveringFromFatigue() {
         return isRecoveringFromFatigue;
     }

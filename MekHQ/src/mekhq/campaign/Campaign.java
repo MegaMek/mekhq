@@ -136,7 +136,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
-
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 /**
@@ -3292,7 +3291,7 @@ public class Campaign implements ITechManager {
 
     public void processNewDayPersonnel() {
         // This MUST use getActivePersonnel as we only want to process active personnel, and
-        // furthermore this allows us to add and remove personnel without issue
+        //  furthermore, this allows us to add and remove personnel without issue
         for (Person p : getActivePersonnel()) {
             // Death
             if (getDeath().processNewDay(this, getLocalDate(), p)) {

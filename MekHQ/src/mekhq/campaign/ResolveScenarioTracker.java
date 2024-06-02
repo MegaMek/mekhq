@@ -1404,6 +1404,11 @@ public class ResolveScenarioTracker {
 
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if (status.getHits() > person.getHits()) {
+                if ((campaign.getCampaignOptions().isUseFatigue())
+                        && (campaign.getCampaignOptions().isUseInjuryFatigue())) {
+                    person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate() * (status.getHits() - person.getHits()));
+                }
+
                 person.setHits(status.getHits());
             }
 
@@ -1412,6 +1417,7 @@ public class ResolveScenarioTracker {
                 ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(),
                         scenario.getName(), mission.getName());
             }
+
             for (Kill k : status.getKills()) {
                 getCampaign().addKill(k);
             }
@@ -1427,7 +1433,7 @@ public class ResolveScenarioTracker {
             }
 
             if (!status.isDead()) {
-                person.setFatigue(person.getFatigue() + campaign.getCampaignOptions().getFatigueRate());
+                person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
                 Fatigue.processFatigueActions(campaign, person);
             }
 
