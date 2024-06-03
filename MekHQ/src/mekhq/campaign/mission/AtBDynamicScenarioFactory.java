@@ -82,7 +82,7 @@ public class AtBDynamicScenarioFactory {
             BombType.B_LG, BombType.B_ARROW, BombType.B_HOMING, BombType.B_TAG };
     private static final int[] validBotAABombs = { BombType.B_RL, BombType.B_LAA, BombType.B_AAA };
 
-    private static final int[] minimumBVPercentage = { 50, 55, 60, 70, 75, 80 };
+    private static final int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
     // target number for 2d6 roll of infantry being upgraded to battle armor, indexed by dragoons rating
     private static final int[] infantryToBAUpgradeTNs = { 12, 10, 8, 6, 4, 2 };
 
@@ -315,7 +315,7 @@ public class AtBDynamicScenarioFactory {
      * @param weightClass        The maximum weight class of the units to generate (ignored )
      * @param forceTemplate      The force template to use to generate the force
      * @param isScenarioModifier true if the source of generateForce() was a scenario modifier
-     * @return How many "lances" or other individual units were generated.
+     * @return How many "lances" or other individual units were generated?
      */
     public static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
                                     int effectiveBV, int effectiveUnitCount, int weightClass,
@@ -513,20 +513,8 @@ public class AtBDynamicScenarioFactory {
         }
 
         // chop out random units until we drop down to our unit count budget
-        while ((forceUnitBudget > 0) && (generatedEntities.size() > forceUnitBudget)) {
+        while (forceUnitBudget > 0 && generatedEntities.size() > forceUnitBudget) {
             generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
-        }
-
-        if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-            // remove random units until forceBV is below 125% of forceBVBudget
-            while ((generatedEntities.size() > 1) && (((double) forceBV / forceBVBudget)) > 1.25) {
-                generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
-
-                // update forceBV
-                forceBV += generatedEntities.stream()
-                        .mapToInt(Entity::calculateBattleValue)
-                        .sum();
-            }
         }
 
         // "flavor" feature - fill up APCs with infantry
