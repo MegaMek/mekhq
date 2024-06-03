@@ -1040,6 +1040,7 @@ public class Person {
         this.setEduDaysOfTravelFromAcademy(0);
         this.setEduDaysOfTravel(0);
         this.setEduDaysOfEducation(0);
+        this.setEduEducationStage(0);
 
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }

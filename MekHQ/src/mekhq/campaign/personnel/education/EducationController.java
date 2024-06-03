@@ -314,19 +314,19 @@ public class EducationController {
             return false;
         }
 
-        // is person on campus and undergoing education?
-        if (educationStage == 2) {
+        // is person on campus and undergoing education, or awaiting assignment to a sibko?
+        if ((educationStage == 2) || (educationStage == 3)) {
             return ongoingEducation(campaign, person, academy, ageBypass, resources);
         }
 
         // if education has concluded and the journey home hasn't started, we begin the journey
-        if (educationStage == 3) {
+        if (educationStage == 4) {
             beginJourneyHome(campaign, person, academy, resources);
             return false;
         }
 
         // if we reach this point it means Person is already in transit, so we continue their journey
-        if (educationStage == 4) {
+        if (educationStage == 5) {
             processJourneyHome(campaign, person);
             return false;
         }
@@ -370,16 +370,17 @@ public class EducationController {
 
         if (academy.isPrepSchool()) {
             if ((person.getAge(campaign.getLocalDate()) >= academy.getAgeMax()) || (ageBypass)) {
-                graduationPicker(campaign, person, academy, resources);
+                if (person.getEduEducationStage() == 2) {
+                    graduationPicker(campaign, person, academy, resources);
 
-                person.setEduDaysOfEducation(0);
-
-                graduation = true;
+                    person.setEduDaysOfEducation(0);
+                    person.setEduEducationStage(3);
+                } else {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedCreche.text"));
+                }
             }
 
-            if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                processNewWeekChecks(campaign, academy, person, daysOfEducation, resources);
-            }
+            graduation = true;
         } else {
             person.setEduDaysOfEducation(daysOfEducation - 1);
 
@@ -392,10 +393,12 @@ public class EducationController {
 
                 graduation = true;
             }
+
+            person.setEduEducationStage(4);
         }
 
-        if (graduation) {
-            person.setEduDaysOfEducation(3);
+        if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+            processNewWeekChecks(campaign, academy, person, daysOfEducation, resources);
         }
 
         return graduation;
@@ -463,7 +466,7 @@ public class EducationController {
 
         person.setEduDaysOfTravelFromAcademy(travelTime);
         person.setEduDaysOfTravel(0);
-        person.setEduEducationStage(4);
+        person.setEduEducationStage(5);
     }
 
     /**
@@ -959,7 +962,6 @@ public class EducationController {
     private static void graduateAdult(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         int graduationRoll = Compute.randomInt(100);
         int roll;
-        // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
 
         // qualification failed
         if (graduationRoll < 5) {
@@ -1079,7 +1081,6 @@ public class EducationController {
      */
     private static void graduateChild(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         int graduationRoll = Compute.randomInt(100);
-        // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
 
         // qualification failed
         if (graduationRoll < 30) {
@@ -1111,8 +1112,6 @@ public class EducationController {
      * @param resources  the ResourceBundle containing localized text
      */
     private static void graduateClanCreche(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
-
         campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedCreche.text"));
 
         ServiceLogger.eduClanCreche(person, campaign.getLocalDate());
@@ -1128,8 +1127,6 @@ public class EducationController {
      * @param academy the Sibko from which the person is being graduated
      */
     private static void graduateClanSibko(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
-
         // Warrior Caste
         // [0]MechWarrior, [1]ProtoMech, [2]AreoSpace, [3]Space, [4]BA, [5]CI, [6]Vehicle
         if (person.getEduCourseIndex() <= 6) {
@@ -1239,8 +1236,6 @@ public class EducationController {
      * @param resources  the resource bundle for localized messages
      */
     private static void graduateReeducationCamp(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        // TODO link graduation to autoAwards (this can't be done till autoAwards have been merged)
-
         // [0]Scientist Caste
         if (person.getEduCourseIndex() == 0) {
             graduateScientistCaste(campaign, person, academy, resources);
