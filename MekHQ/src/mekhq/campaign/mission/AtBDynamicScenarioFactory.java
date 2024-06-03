@@ -523,10 +523,9 @@ public class AtBDynamicScenarioFactory {
                 generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
 
                 // update forceBV
-                for (Entity entity : generatedEntities) {
-                    forceBV += entity.calculateBattleValue();
-                    ;
-                }
+                forceBV += generatedEntities.stream()
+                        .mapToInt(Entity::calculateBattleValue)
+                        .sum();
             }
         }
 
