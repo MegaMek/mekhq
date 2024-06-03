@@ -715,10 +715,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             choiceOriginalUnit.setSelectedItem(campaign.getUnit(person.getOriginalUnitId()));
         }
         choiceOriginalUnit.addActionListener(ev -> {
-            if (null == choiceOriginalUnit.getSelectedItem()) {
-                choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
-                choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
-            } else {
+            try {
                 Unit unit = (Unit) choiceOriginalUnit.getSelectedItem();
                 choiceUnitWeight.setSelectedIndex(unit.getEntity().getWeightClass());
                 if (unit.getEntity().isClan()) {
@@ -728,6 +725,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 } else {
                     choiceUnitTech.setSelectedIndex(0);
                 }
+            } catch (Exception e) {
+                choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
+                choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
             }
         });
 

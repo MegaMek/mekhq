@@ -101,12 +101,11 @@ public class Fatigue {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Fatigue",
                 MekHQ.getMHQOptions().getLocale());
 
-        List<Person> filteredPersonnel = campaign.getPersonnel().stream()
+        List<Person> undepartedPersonnel = campaign.getPersonnel().stream()
                 .filter(person -> !person.getStatus().isDepartedUnit())
                 .collect(Collectors.toList());
 
-
-        for (Person person : filteredPersonnel) {
+        for (Person person : undepartedPersonnel) {
             if (campaign.getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY)) {
                 if (person.getFatigue() > 0) {
                     int fatigueAdjustment = 1;
