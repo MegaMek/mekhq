@@ -166,6 +166,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_PREGNANT_COMBATANT = "nagPregnantCombatant";
     public static final String NAG_PRISONERS = "nagPrisoners";
     public static final String NAG_UNTREATED_PERSONNEL = "nagUntreatedPersonnel";
+    public static final String NAG_NO_COMMANDER = "nagNoCommander";
     public static final String NAG_INSUFFICIENT_ASTECHS = "nagInsufficientAstechs";
     public static final String NAG_INSUFFICIENT_ASTECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";

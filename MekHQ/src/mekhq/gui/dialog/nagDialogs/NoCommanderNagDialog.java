@@ -25,23 +25,19 @@ import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 
-public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
-    private static boolean isUntreatedInjury (Campaign campaign) {
-        return campaign.getActivePersonnel().stream()
-                .filter(p -> (p.needsFixing()) && (p.getDoctorId() == null))
-                .anyMatch(p -> !p.getPrisonerStatus().isPrisoner());
+public class NoCommanderNagDialog extends AbstractMHQNagDialog {
+    private static boolean isCommanderMissing (Campaign campaign) {
+        return (campaign.getFlaggedCommander() == null);
     }
 
-    //region Constructors
-    public UntreatedPersonnelNagDialog(final JFrame frame, final Campaign campaign) {
-        super(frame, "UntreatedPersonnelNagDialog", "UntreatedPersonnelNagDialog.title",
-                "UntreatedPersonnelNagDialog.text", campaign, MHQConstants.NAG_UNTREATED_PERSONNEL);
+    public NoCommanderNagDialog(final JFrame frame, final Campaign campaign) {
+        super(frame, "NoCommanderNagDialog", "NoCommanderNagDialog.title",
+                "NoCommanderNagDialog.text", campaign, MHQConstants.NAG_NO_COMMANDER);
     }
-    //endregion Constructors
 
     @Override
     protected boolean checkNag() {
         return !MekHQ.getMHQOptions().getNagDialogIgnore(getKey())
-                && isUntreatedInjury(getCampaign());
+                && isCommanderMissing(getCampaign());
     }
 }

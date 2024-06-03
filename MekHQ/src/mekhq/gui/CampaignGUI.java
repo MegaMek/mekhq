@@ -2430,6 +2430,11 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
+        if (new NoCommanderNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
         if (new CargoCapacityNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
