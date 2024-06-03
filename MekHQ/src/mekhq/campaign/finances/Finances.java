@@ -63,7 +63,6 @@ public class Finances {
     private List<Asset> assets;
     private int loanDefaults;
     private int failedCollateral;
-    private Money previousTermFiscalBalance;
     private LocalDate wentIntoDebt;
 
     public Finances() {
@@ -72,7 +71,6 @@ public class Finances {
         assets = new ArrayList<>();
         loanDefaults = 0;
         failedCollateral = 0;
-        previousTermFiscalBalance = null;
         wentIntoDebt = null;
     }
 
@@ -114,14 +112,6 @@ public class Finances {
 
     public void setFailedCollateral(final int failedCollateral) {
         this.failedCollateral = failedCollateral;
-    }
-
-    public @Nullable Money getPreviousTermFiscalBalance() {
-        return previousTermFiscalBalance;
-    }
-
-    public void setPreviousTermFiscalBalance(@Nullable final Money previousTermFiscalBalance) {
-        this.previousTermFiscalBalance = previousTermFiscalBalance;
     }
 
     public @Nullable LocalDate getWentIntoDebt() {
@@ -220,18 +210,17 @@ public class Finances {
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
         // check for a new fiscal year
         if (campaign.getCampaignOptions().getFinancialYearDuration().isEndOfFinancialYear(campaign.getLocalDate())) {
+            // calculate profits
+            Money profits = getProfits();
+            campaign.addReport(String.format(resourceMap.getString("Profits.finances"), profits.toAmountAndSymbolString()));
+
             // clear the ledger
             newFiscalYear(campaign);
 
-            // calculate and store profits
-            Money profits = getProfits();
-
             // pay taxes
-            if (campaign.getCampaignOptions().isUseTaxes()) {
+            if ((campaign.getCampaignOptions().isUseTaxes()) && (!profits.isZero())) {
                 payTaxes(campaign, profits);
             }
-
-            // store profits
         }
 
         // Handle contract payments
@@ -369,26 +358,32 @@ public class Finances {
         loans = newLoans;
     }
 
+
     /**
-     * Calculates the profits for the current fiscal term.
+     * Calculates the profits made by the campaign based on the transactions recorded.
      *
-     * @return The profits for the current fiscal term.
+     * @return The profits made by the campaign, or zero if no profits were made.
      */
     private Money getProfits() {
-        Money profits;
+        Money profits = Money.zero();
 
-        if (getPreviousTermFiscalBalance() == null) {
-            setPreviousTermFiscalBalance(getBalance());
-
-            return Money.zero();
-        } else {
-            profits = getBalance().minus(getPreviousTermFiscalBalance());
-
-            if (profits.isPositive()) {
-                return profits;
-            } else {
-                return Money.zero();
+        for (Transaction transaction : getTransactions()) {
+            if ((transaction.getType() == TransactionType.STARTING_CAPITAL)
+                    || (transaction.getType() == TransactionType.FINANCIAL_TERM_END_CARRYOVER)) {
+                continue;
             }
+
+            if (transaction.getAmount().isPositive()) {
+                profits = profits.plus(transaction.getAmount());
+            } else {
+                profits = profits.minus(transaction.getAmount());
+            }
+        }
+
+        if (profits.isPositive()) {
+            return profits;
+        } else {
+            return Money.zero();
         }
     }
 
