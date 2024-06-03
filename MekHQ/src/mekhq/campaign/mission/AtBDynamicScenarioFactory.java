@@ -30,10 +30,10 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
+import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.utilities.BoardClassifier;
 import mekhq.MHQConstants;
@@ -518,8 +518,8 @@ public class AtBDynamicScenarioFactory {
         }
 
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-            // remove random units until forceBV is below 110% of forceBVBudget
-            while ((generatedEntities.size() > 1) && (((double) forceBV / forceBVBudget)) > 1.1) {
+            // remove random units until forceBV is below 125% of forceBVBudget
+            while ((generatedEntities.size() > 1) && (((double) forceBV / forceBVBudget)) > 1.25) {
                 generatedEntities.remove(Compute.randomInt(generatedEntities.size()));
 
                 // update forceBV
