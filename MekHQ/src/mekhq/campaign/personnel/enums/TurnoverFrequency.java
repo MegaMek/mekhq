@@ -23,10 +23,10 @@ import mekhq.MekHQ;
 import java.util.ResourceBundle;
 
 public enum TurnoverFrequency {
-    NEVER("TurnoverTargetNumberMethod.NEVER.text", "TurnoverTargetNumberMethod.NEVER.toolTipText"),
-    WEEKLY("TurnoverTargetNumberMethod.WEEKLY.text", "TurnoverTargetNumberMethod.WEEKLY.toolTipText"),
-    MONTHLY("TurnoverTargetNumberMethod.MONTHLY.text", "TurnoverTargetNumberMethod.MONTHLY.toolTipText"),
-    ANNUALLY("TurnoverTargetNumberMethod.ANNUALLY.text", "TurnoverTargetNumberMethod.ANNUALLY.toolTipText");
+    NEVER("TurnoverFrequency.NEVER.text", "TurnoverFrequency.NEVER.toolTipText"),
+    WEEKLY("TurnoverFrequency.WEEKLY.text", "TurnoverFrequency.WEEKLY.toolTipText"),
+    MONTHLY("TurnoverFrequency.MONTHLY.text", "TurnoverFrequency.MONTHLY.toolTipText"),
+    ANNUALLY("TurnoverFrequency.ANNUALLY.text", "TurnoverFrequency.ANNUALLY.toolTipText");
 
     private final String name;
     private final String toolTipText;
