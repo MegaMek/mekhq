@@ -235,6 +235,8 @@ public enum TransactionType {
                     return RANSOM;
                 case 17:
                     return EDUCATION;
+                case 18:
+                    return TAXES;
                 default:
                     break;
             }
