@@ -391,6 +391,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JLabel lblOtherCasteAccidents;
     private JSpinner spnOtherCasteAccidents;
     private JCheckBox chkLiveFireBlooding;
+    private JLabel lblSecondChanceCaste;
+    private MMComboBox<SecondChanceCaste> comboSecondChanceCaste;
     private JLabel lblFallbackScientist;
     private JSpinner spnFallbackScientist;
     private JLabel lblFallbackMerchant;
@@ -5133,6 +5135,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             accidentsAndEventsPanel.setEnabled(isEnabled);
             chkAllAges.setEnabled(isEnabled);
             chkLiveFireBlooding.setEnabled(isEnabled);
+            lblSecondChanceCaste.setEnabled(isEnabled);
+            comboSecondChanceCaste.setEnabled(isEnabled);
             lblMilitaryAcademyAccidents.setEnabled(isEnabled);
             spnMilitaryAcademyAccidents.setEnabled(isEnabled);
             lblWarriorCasteAccidents.setEnabled(isEnabled);
@@ -5550,6 +5554,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createWarriorCasteFallbackPanel() {
+        lblSecondChanceCaste = new JLabel(resources.getString("lblSecondChanceCaste.text"));
+        lblSecondChanceCaste.setToolTipText(resources.getString("lblSecondChanceCaste.toolTip"));
+        lblSecondChanceCaste.setName("lblSecondChanceCaste");
+
+        comboSecondChanceCaste = new MMComboBox<>("comboSecondChanceCaste", SecondChanceCaste.values());
+        comboSecondChanceCaste.setToolTipText(resources.getString("lblSecondChanceCaste.toolTip"));
+        comboSecondChanceCaste.setName("comboSecondChanceCaste");
+
         lblFallbackScientist = new JLabel(resources.getString("lblFallbackScientist.text"));
         lblFallbackScientist.setToolTipText(resources.getString("lblFallbackScientist.toolTip"));
         lblFallbackScientist.setName("lblFallbackScientist");
@@ -5580,6 +5592,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // These prevent a really annoying bug where disabled options don't stay disabled when
         // reloading Campaign Options
+        lblSecondChanceCaste.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        comboSecondChanceCaste.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnFallbackScientist.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         lblFallbackScientist.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnFallbackMerchant.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
@@ -5602,6 +5616,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblSecondChanceCaste)
+                                .addComponent(comboSecondChanceCaste, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblFallbackScientist)
                                 .addComponent(spnFallbackScientist, Alignment.LEADING)
                                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -5617,6 +5634,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblSecondChanceCaste)
+                                .addComponent(comboSecondChanceCaste))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFallbackScientist)
                                 .addComponent(spnFallbackScientist)
@@ -7210,6 +7230,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnOtherCasteAccidents.setValue(options.getOtherCasteAccidents());
         chkLiveFireBlooding.setSelected(options.isLiveFireBlooding());
         spnFallbackScientist.setValue(options.getFallbackScientist());
+        comboSecondChanceCaste.setSelectedItem(options.getSecondChanceCaste());
         spnFallbackMerchant.setValue(options.getFallbackMerchant());
         spnFallbackTechnician.setValue(options.getFallbackTechnician());
         spnFallbackLabor.setValue(options.getFallbackLabor());
@@ -7813,6 +7834,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setWarriorCasteAccidents((Integer) spnWarriorCasteAccidents.getValue());
             options.setOtherCasteAccidents((Integer) spnOtherCasteAccidents.getValue());
             options.setLiveFireBlooding(chkLiveFireBlooding.isSelected());
+            options.setSecondChanceCaste(comboSecondChanceCaste.getSelectedItem());
             options.setFallbackScientist((Integer) spnFallbackScientist.getValue());
             options.setFallbackMerchant((Integer) spnFallbackMerchant.getValue());
             options.setFallbackTechnician((Integer) spnFallbackTechnician.getValue());
