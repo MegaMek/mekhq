@@ -488,6 +488,7 @@ public class MHQXMLUtility extends MMXMLUtility {
             if (tgtEnt.getCrew().getToughness(pos) != 0) {
                 crew.append("\" " + MULParser.ATTR_TOUGH + "=\"").append(tgtEnt.getCrew().getToughness(pos));
             }
+
             if (tgtEnt.getCrew().isDead(pos) || tgtEnt.getCrew().getHits(pos) >= Crew.DEATH) {
                 crew.append("\" " + MULParser.ATTR_HITS + "=\"" + MULParser.VALUE_DEAD + "");
             } else if (tgtEnt.getCrew().getHits(pos) > 0) {

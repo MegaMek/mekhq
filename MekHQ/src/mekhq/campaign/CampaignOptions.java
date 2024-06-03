@@ -248,7 +248,7 @@ public class CampaignOptions {
     private double salarySpecialistInfantryMultiplier;
     private Map<SkillLevel, Double> salaryXPMultipliers;
     private Money[] roleBaseSalaries;
-  
+
     // Awards
     private AwardBonus awardBonusStyle;
     private boolean enableAutoAwards;
@@ -266,6 +266,7 @@ public class CampaignOptions {
     private boolean enableSkillAwards;
     private boolean enableTheatreOfWarAwards;
     private boolean enableTimeAwards;
+    private boolean enableTrainingAwards;
     private boolean enableMiscAwards;
     //endregion Personnel Tab
 
@@ -335,8 +336,9 @@ public class CampaignOptions {
 
     // Education
     private boolean useEducationModule;
-    private boolean eduEnableAutoAwardsIntegration;
     private Integer maximumJumpCount;
+    private boolean useReeducationCamps;
+    private boolean useTruebornTravelException;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
     private boolean enableClanEducation;
@@ -743,7 +745,7 @@ public class CampaignOptions {
         setRoleBaseSalary(PersonnelRole.ADMINISTRATOR_HR, 500);
         setRoleBaseSalary(PersonnelRole.DEPENDENT, 0);
         setRoleBaseSalary(PersonnelRole.NONE, 0);
-      
+
         // Awards
         setAwardBonusStyle(AwardBonus.BOTH);
         setEnableAutoAwards(true);
@@ -761,6 +763,7 @@ public class CampaignOptions {
         setEnableSkillAwards(true);
         setEnableTheatreOfWarAwards(true);
         setEnableTimeAwards(true);
+        setEnableTrainingAwards(true);
         setEnableMiscAwards(true);
         //endregion Personnel Tab
 
@@ -847,8 +850,9 @@ public class CampaignOptions {
 
         // Education
         setUseEducationModule(true);
-        setEduEnableAutoAwardsIntegration(true);
         setMaximumJumpCount(5);
+        setUseReeducationCamps(true);
+        setUseTruebornTravelException(true);
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
         setEnableClanEducation(true);
@@ -2285,16 +2289,6 @@ public class CampaignOptions {
         this.useEducationModule = useEducationModule;
     }
 
-
-    public boolean isEduEnableAutoAwardsIntegration() {
-        return eduEnableAutoAwardsIntegration;
-    }
-
-
-    public void setEduEnableAutoAwardsIntegration(boolean eduEnableAutoAwardsIntegration) {
-        this.eduEnableAutoAwardsIntegration = eduEnableAutoAwardsIntegration;
-    }
-
     public Integer getMaximumJumpCount() {
         return maximumJumpCount;
     }
@@ -2302,6 +2296,22 @@ public class CampaignOptions {
 
     public void setMaximumJumpCount(Integer maximumJumpCount) {
         this.maximumJumpCount = maximumJumpCount;
+    }
+
+    public boolean isUseReeducationCamps() {
+        return useReeducationCamps;
+    }
+
+    public void setUseReeducationCamps(boolean useReeducationCamps) {
+        this.useReeducationCamps = useReeducationCamps;
+    }
+
+    public boolean isUseTruebornTravelException() {
+        return useTruebornTravelException;
+    }
+
+    public void setUseTruebornTravelException(boolean useTruebornTravelException) {
+        this.useTruebornTravelException = useTruebornTravelException;
     }
 
     public boolean isEnableLocalAcademies() {
@@ -2710,6 +2720,14 @@ public class CampaignOptions {
 
     public void setEnableTimeAwards(final boolean enableTimeAwards) {
         this.enableTimeAwards = enableTimeAwards;
+    }
+
+    public boolean isEnableTrainingAwards() {
+        return enableTrainingAwards;
+    }
+
+    public void setEnableTrainingAwards(final boolean enableTrainingAwards) {
+        this.enableTrainingAwards = enableTrainingAwards;
     }
 
     public boolean isEnableMiscAwards() {
@@ -4190,7 +4208,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "salaryXPMultipliers");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryTypeBase", Utilities.printMoneyArray(getRoleBaseSalaries()));
         //endregion Salary
-      
+
         //region Awards
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "awardBonusStyle", getAwardBonusStyle().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableAutoAwards", isEnableAutoAwards());
@@ -4208,6 +4226,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableSkillAwards", isEnableSkillAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTheatreOfWarAwards", isEnableTheatreOfWarAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTimeAwards", isEnableTimeAwards());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableTrainingAwards", isEnableTrainingAwards());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableMiscAwards", isEnableMiscAwards());
         //endregion Awards
         //endregion Personnel Tab
@@ -4292,8 +4311,9 @@ public class CampaignOptions {
 
         //region Education
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEnableAutoAwardsIntegration", isEduEnableAutoAwardsIntegration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCount", getMaximumJumpCount());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReeducationCamps", isUseReeducationCamps());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTruebornTravelException", isUseTruebornTravelException());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableClanEducation", isEnableClanEducation());
@@ -4509,7 +4529,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("logMaintenance")) {
                     retVal.logMaintenance = Boolean.parseBoolean(wn2.getTextContent());
 
-                //region Mass Repair / Mass Salvage
+                    //region Mass Repair / Mass Salvage
                 } else if (wn2.getNodeName().equalsIgnoreCase("mrmsUseRepair")
                         || wn2.getNodeName().equalsIgnoreCase("massRepairUseRepair")) { // Legacy, 0.49.12 removal
                     retVal.setMRMSUseRepair(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -4540,8 +4560,8 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("mrmsOptions")
                         || wn2.getNodeName().equalsIgnoreCase("massRepairOptions")) { // Legacy, 0.49.12 removal
                     retVal.setMRMSOptions(MRMSOption.parseListFromXML(wn2, version));
-                //endregion Mass Repair / Mass Salvage
-                //endregion Repair and Maintenance Tab
+                    //endregion Mass Repair / Mass Salvage
+                    //endregion Repair and Maintenance Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFactionForNames")) {
                     retVal.setUseOriginFactionForNames(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -4700,8 +4720,8 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("maxAcquisitions")) {
                     retVal.maxAcquisitions = Integer.parseInt(wn2.getTextContent().trim());
 
-                //region Personnel Tab
-                //region General Personnel
+                    //region Personnel Tab
+                    //region General Personnel
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTactics")) {
                     retVal.setUseTactics(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useInitBonus") // Legacy - 0.49.1 Removal
@@ -4738,9 +4758,9 @@ public class CampaignOptions {
                     retVal.setDisplayScenarioLog(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("displayKillRecord")) {
                     retVal.setDisplayKillRecord(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                //endregion General Personnel
+                    //endregion General Personnel
 
-                //region Expanded Personnel Information
+                    //region Expanded Personnel Information
                 } else if (wn2.getNodeName().equalsIgnoreCase("useTimeInService")) {
                     retVal.setUseTimeInService(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("timeInServiceDisplayFormat")) {
@@ -4763,9 +4783,9 @@ public class CampaignOptions {
                     retVal.setAdminExperienceLevelIncludeNegotiation(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("adminExperienceLevelIncludeScrounge")) {
                     retVal.setAdminExperienceLevelIncludeScrounge(Boolean.parseBoolean(wn2.getTextContent()));
-                //endregion Expanded Personnel Information
+                    //endregion Expanded Personnel Information
 
-                //region Medical
+                    //region Medical
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAdvancedMedical")) {
                     retVal.setUseAdvancedMedical(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("healWaitingPeriod")) {
@@ -4780,9 +4800,9 @@ public class CampaignOptions {
                     retVal.setUseRandomHitsForVehicles(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("tougherHealing")) {
                     retVal.setTougherHealing(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                //endregion Medical
+                    //endregion Medical
 
-                //region Prisoners
+                    //region Prisoners
                 } else if (wn2.getNodeName().equalsIgnoreCase("prisonerCaptureStyle")) {
                     retVal.setPrisonerCaptureStyle(PrisonerCaptureStyle.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("defaultPrisonerStatus")) {
@@ -4802,18 +4822,18 @@ public class CampaignOptions {
                     retVal.setUseAtBPrisonerDefection(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAtBPrisonerRansom")) {
                     retVal.setUseAtBPrisonerRansom(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                //endregion Prisoners
+                    //endregion Prisoners
 
-                //region Dependent
+                    //region Dependent
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomDependentMethod")) {
                     retVal.setRandomDependentMethod(RandomDependentMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDependentAddition")) {
                     retVal.setUseRandomDependentAddition(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useRandomDependentRemoval")) {
                     retVal.setUseRandomDependentRemoval(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                //endregion Dependent
+                    //endregion Dependent
 
-                //region Salary
+                    //region Salary
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                     retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salarySpecialistInfantryMultiplier")) {
@@ -4842,7 +4862,7 @@ public class CampaignOptions {
                         retVal.setRoleBaseSalaries(Utilities.readMoneyArray(wn2, retVal.getRoleBaseSalaries().length));
                     }
                 //endregion Salary
-                  
+
                 //region Awards
                 } else if (wn2.getNodeName().equalsIgnoreCase("awardBonusStyle")) {
                     retVal.setAwardBonusStyle(AwardBonus.valueOf(wn2.getTextContent().trim()));
@@ -4876,12 +4896,14 @@ public class CampaignOptions {
                     retVal.setEnableTheatreOfWarAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableTimeAwards")) {
                     retVal.setEnableTimeAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableTrainingAwards")) {
+                    retVal.setEnableTrainingAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableMiscAwards")) {
                     retVal.setEnableMiscAwards(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                //endregion Awards
-                //endregion Personnel Tab
+                    //endregion Awards
+                    //endregion Personnel Tab
 
-                //region Life Paths Tab
+                    //region Life Paths Tab
                     //region Personnel Randomization
                 } else if (wn2.getNodeName().equalsIgnoreCase("useDylansRandomXP")) {
                     retVal.setUseDylansRandomXP(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -5043,10 +5065,12 @@ public class CampaignOptions {
                     //region Education
                 } else if (wn2.getNodeName().equalsIgnoreCase("useEducationModule")) {
                     retVal.setUseEducationModule(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduEnableAutoAwardsIntegration")) {
-                    retVal.setEduEnableAutoAwardsIntegration(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maximumJumpCount")) {
                     retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useReeducationCamps")) {
+                    retVal.setUseReeducationCamps(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTruebornTravelException")) {
+                    retVal.setUseTruebornTravelException(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableLocalAcademies")) {
                     retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
@@ -5166,9 +5190,9 @@ public class CampaignOptions {
                         }
                     }
                     //endregion Death
-                //endregion Life Paths Tab
+                    //endregion Life Paths Tab
 
-                //region Finances Tab
+                    //region Finances Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("payForParts")) {
                     retVal.payForParts = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("payForRepairs")) {
@@ -5206,7 +5230,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("newFinancialYearFinancesToCSVExport")) {
                     retVal.newFinancialYearFinancesToCSVExport = Boolean.parseBoolean(wn2.getTextContent().trim());
 
-                //region Price Multipliers
+                    //region Price Multipliers
                 } else if (wn2.getNodeName().equalsIgnoreCase("commonPartPriceMultiplier")) {
                     retVal.setCommonPartPriceMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("innerSphereUnitPriceMultiplier")) {
@@ -5234,11 +5258,11 @@ public class CampaignOptions {
                     retVal.setUnrepairablePartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("cancelledOrderRefundMultiplier")) {
                     retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
-                //endregion Price Multipliers
-                //endregion Finances Tab
+                    //endregion Price Multipliers
+                    //endregion Finances Tab
 
-                //region Markets Tab
-                //region Personnel Market
+                    //region Markets Tab
+                    //region Personnel Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketName")) {
                     retVal.setPersonnelMarketName(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketReportRefresh")) {
@@ -5259,9 +5283,9 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
                     retVal.setPersonnelMarketDylansWeight(Double.parseDouble(wn2.getTextContent().trim()));
-                //endregion Personnel Market
+                    //endregion Personnel Market
 
-                //region Unit Market
+                    //region Unit Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketMethod")) {
                     retVal.setUnitMarketMethod(UnitMarketMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketRegionalMechVariations")) {
@@ -5270,9 +5294,9 @@ public class CampaignOptions {
                     retVal.setInstantUnitMarketDelivery(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
                     retVal.setUnitMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                //endregion Unit Market
+                    //endregion Unit Market
 
-                //region Contract Market
+                    //region Contract Market
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMarketMethod")) {
                     retVal.setContractMarketMethod(ContractMarketMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractSearchRadius")
@@ -5284,24 +5308,24 @@ public class CampaignOptions {
                     retVal.setContractMarketReportRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("contractMaxSalvagePercentage")) {
                     retVal.setContractMaxSalvagePercentage(Integer.parseInt(wn2.getTextContent().trim()));
-                //endregion Contract Market
-                //endregion Markets Tab
+                    //endregion Contract Market
+                    //endregion Markets Tab
 
-                //region RATs Tab
+                    //region RATs Tab
                 } else if (wn2.getNodeName().equals("useStaticRATs")) {
                     retVal.setUseStaticRATs(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("rats")) {
                     retVal.setRATs(MHQXMLUtility.unEscape(wn2.getTextContent().trim()).split(","));
                 } else if (wn2.getNodeName().equals("ignoreRATEra")) {
                     retVal.setIgnoreRATEra(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                //endregion RATs Tab
+                    //endregion RATs Tab
 
-                //region AtB Tab
+                    //region AtB Tab
                 } else if (wn2.getNodeName().equalsIgnoreCase("skillLevel")) {
                     retVal.setSkillLevel(version.isLowerThan("0.49.12")
                             ? Skills.SKILL_LEVELS[Integer.parseInt(wn2.getTextContent().trim()) + 1]
                             : SkillLevel.valueOf(wn2.getTextContent().trim()));
-                //endregion AtB Tab
+                    //endregion AtB Tab
 
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotypeProbabilities")) {
                     String[] values = wn2.getTextContent().split(",");
@@ -5405,8 +5429,8 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioModBV")) {
                     retVal.setScenarioModBV(Integer.parseInt(wn2.getTextContent().trim()));
 
-                //region Legacy
-                // Removed in 0.49.*
+                    //region Legacy
+                    // Removed in 0.49.*
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryXPMultiplier")) { // Legacy, 0.49.12 removal
                     String[] values = wn2.getTextContent().split(",");
                     for (int i = 0; i < values.length; i++) {
@@ -5508,7 +5532,7 @@ public class CampaignOptions {
                 } else if (wn2.getNodeName().equalsIgnoreCase("canceledOrderReimbursement")) { // Legacy - 0.49.3 Removal
                     retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
 
-                // Removed in 0.47.*
+                    // Removed in 0.47.*
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketType")) { // Legacy
                     retVal.setPersonnelMarketName(PersonnelMarket.getTypeName(Integer.parseInt(wn2.getTextContent().trim())));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useAtBCapture")) { // Legacy

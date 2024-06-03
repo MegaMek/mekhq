@@ -36,7 +36,9 @@ import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.*;
+import mekhq.MHQStaticDirectoryManager;
+import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
@@ -62,6 +64,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.PrintWriter;
 import java.math.BigInteger;
@@ -69,8 +72,6 @@ import java.util.List;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import javax.swing.UIManager;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to it
@@ -4003,6 +4004,7 @@ public class Unit implements ITechnology {
         entity.getCrew().setGunneryB(Math.min(Math.max(gunnery, 0), 7), slot);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 7), slot);
         entity.getCrew().setToughness(p.getToughness(), slot);
+
         entity.getCrew().setExternalIdAsString(p.getId().toString(), slot);
         entity.getCrew().setMissing(false, slot);
     }

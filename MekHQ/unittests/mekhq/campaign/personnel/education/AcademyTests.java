@@ -7,9 +7,14 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 class AcademyTests {
     @Test
@@ -35,15 +40,16 @@ class AcademyTests {
 
     @Test
     void testAcademyCreationAllFields() {
-        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", true, "Colonel", true,
-                true, true, "Top level MechWarrior Training",
-                20, true, "FWL",
-                Arrays.asList("Sol", "Terra"), false,
-                3045, 3089, 3099, 2000, 365,
-                10, 1, 4, 18, 35,
-                Arrays.asList("MechWarrior", "Leadership"), Arrays.asList("Combat", "Strategy"),
-                Arrays.asList(3050, 3055), 5, 101);
+        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", 0, true,
+                false, "Colonel", true, true, true,
+                "Top level MechWarrior Training", 20, true,
+                "FWL", Arrays.asList("Sol", "Terra"), false, 3045,
+                3089, 3099, 2000, 365, 10,
+                1, 4, 18, 35, Arrays.asList("MechWarrior", "Leadership"),
+                Arrays.asList("Combat", "Strategy"), Arrays.asList(3050, 3055), 5, 101);
+
         assertEquals("MekWarrior Academy", academy.getName());
+        assertEquals(0, academy.getType());
         assertTrue(academy.isMilitary());
         assertEquals("Colonel", academy.getPromotion());
         assertTrue(academy.isClan());
