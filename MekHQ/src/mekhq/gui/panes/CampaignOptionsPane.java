@@ -357,6 +357,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // Family
     private MMComboBox<FamilialRelationshipDisplayLevel> comboFamilyDisplayLevel;
 
+    // Anniversaries
+    private JPanel anniversaryPanel = new JPanel();
+    private JCheckBox chkAnnounceBirthdays;
+    private JCheckBox chkAnnounceOfficersOnly;
+
     // Education
     private JCheckBox chkUseEducationModule;
     private JLabel lblMaximumJumpCount;
@@ -3184,11 +3189,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = 2;
         lifePathsPanel.add(createFamilyPanel(), gbc);
 
+        gbc.gridx++;
+        lifePathsPanel.add(createAnniversaryPanel(), gbc);
+
+        gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = 1;
         lifePathsPanel.add(createMarriagePanel(), gbc);
 
         gbc.gridx++;
@@ -4088,6 +4095,38 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         );
 
         return panel;
+    }
+
+    private JPanel createAnniversaryPanel() {
+        chkAnnounceBirthdays = new JCheckBox(resources.getString("chkAnnounceBirthdays.text"));
+        chkAnnounceBirthdays.setToolTipText(resources.getString("chkAnnounceBirthdays.toolTipText"));
+        chkAnnounceBirthdays.setName("chkAnnounceBirthdays");
+
+        chkAnnounceOfficersOnly = new JCheckBox(resources.getString("chkAnnounceOfficersOnly.text"));
+        chkAnnounceOfficersOnly.setToolTipText(resources.getString("chkAnnounceOfficersOnly.toolTipText"));
+        chkAnnounceOfficersOnly.setName("chkAnnounceOfficersOnly");
+
+        anniversaryPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("anniversaryPanel.title")));
+        anniversaryPanel.setName("anniversaryPanel");
+
+        final GroupLayout layout = new GroupLayout(anniversaryPanel);
+        anniversaryPanel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkAnnounceBirthdays)
+                        .addComponent(chkAnnounceOfficersOnly)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkAnnounceBirthdays)
+                        .addComponent(chkAnnounceOfficersOnly)
+        );
+
+        return anniversaryPanel;
     }
 
     private JPanel createDependentPanel() {
@@ -7109,6 +7148,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Family
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
 
+        // Anniversaries
+        chkAnnounceBirthdays.setSelected(options.isAnnounceBirthdays());
+        chkAnnounceOfficersOnly.setSelected(options.isAnnounceOfficersOnly());
+
         // Marriage
         chkUseManualMarriages.setSelected(options.isUseManualMarriages());
         chkUseClanPersonnelMarriages.setSelected(options.isUseClanPersonnelMarriages());
@@ -7737,6 +7780,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Family
             options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
+
+            // Anniversaries
+            options.setAnnounceBirthdays(chkAnnounceBirthdays.isSelected());
+            options.setAnnounceBirthdays(chkAnnounceOfficersOnly.isSelected());
 
             // Marriage
             options.setUseManualMarriages(chkUseManualMarriages.isSelected());

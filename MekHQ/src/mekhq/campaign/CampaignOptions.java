@@ -287,6 +287,10 @@ public class CampaignOptions {
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
 
+    // Anniversaries
+    private boolean announceBirthdays;
+    private boolean announceOfficersOnly;
+
     // Marriage
     private boolean useManualMarriages;
     private boolean useClanPersonnelMarriages;
@@ -780,6 +784,10 @@ public class CampaignOptions {
 
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
+
+        // Anniversaries
+        setAnnounceBirthdays(true);
+        setAnnounceOfficersOnly(true);
 
         // Marriage
         setUseManualMarriages(true);
@@ -1742,6 +1750,24 @@ public class CampaignOptions {
         this.familyDisplayLevel = familyDisplayLevel;
     }
     //endregion Family
+
+    //region anniversaries
+    public boolean isAnnounceBirthdays() {
+        return announceBirthdays;
+    }
+
+    public void setAnnounceBirthdays(final boolean announceBirthdays) {
+        this.announceBirthdays = announceBirthdays;
+    }
+
+    public boolean isAnnounceOfficersOnly() {
+        return announceOfficersOnly;
+    }
+
+    public void setAnnounceOfficersOnly(final boolean announceOfficersOnly) {
+        this.announceOfficersOnly = announceOfficersOnly;
+    }
+    //endregion anniversaries
 
     //region Dependent
     public RandomDependentMethod getRandomDependentMethod() {
@@ -4221,6 +4247,11 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "familyDisplayLevel", getFamilyDisplayLevel().name());
         //endregion Family
 
+        //region Announcements
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceBirthdays", isAnnounceBirthdays());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceOfficersOnly", isAnnounceOfficersOnly());
+        //endregion Announcements
+
         //region Marriage
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualMarriages", isUseManualMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelMarriages", isUseClanPersonnelMarriages());
@@ -4907,6 +4938,13 @@ public class CampaignOptions {
                         || wn2.getNodeName().equalsIgnoreCase("displayFamilyLevel")) { // Legacy, 0.49.12 removal
                     retVal.setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
                     //endregion Family
+
+                    //region anniversaries
+                } else if (wn2.getNodeName().equalsIgnoreCase("announceBirthdays")) {
+                    retVal.setAnnounceBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("announceOfficersOnly")) {
+                    retVal.setAnnounceOfficersOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    //endregion anniversaries
 
                     //region Marriage
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {

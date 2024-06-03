@@ -3261,7 +3261,7 @@ public class Campaign implements ITechManager {
 
     public void processNewDayPersonnel() {
         // This MUST use getActivePersonnel as we only want to process active personnel, and
-        // furthermore this allows us to add and remove personnel without issue
+        //  furthermore, this allows us to add and remove personnel without issue
         for (Person p : getActivePersonnel()) {
             // Death
             if (getDeath().processNewDay(this, getLocalDate(), p)) {
@@ -3326,6 +3326,15 @@ public class Campaign implements ITechManager {
 
             // Procreation
             getProcreation().processNewDay(this, getLocalDate(), p);
+
+            // Anniversaries
+            if (getCampaignOptions().isAnnounceBirthdays()) {
+                if ((p.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
+                    if (p.getBirthday().isEqual(getLocalDate())) {
+                        addReport(String.format(resources.getString("anniversaryBirthday.text"), p.getHyperlinkedFullTitle()));
+                    }
+                }
+            }
         }
     }
 
