@@ -18,7 +18,7 @@
 		<deployOffboard>false</deployOffboard>
         <deploymentZones/>
 		<destinationZone>5</destinationZone>
-		<fixedUnitCount>-1</fixedUnitCount>
+		<fixedUnitCount>0</fixedUnitCount>
 		<forceAlignment>2</forceAlignment>
 		<forceName>Enemy Mech Ace</forceName>
 		<generationMethod>5</generationMethod>

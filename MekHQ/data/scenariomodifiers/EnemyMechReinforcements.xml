@@ -13,7 +13,7 @@
 		<arrivalTurn>-3</arrivalTurn>
 		<canReinforceLinked>true</canReinforceLinked>
 		<contributesToBV>false</contributesToBV>
-		<contributesToMapSize>true</contributesToMapSize>
+		<contributesToMapSize>false</contributesToMapSize>
 		<contributesToUnitCount>false</contributesToUnitCount>
 		<deploymentZones>
 			<deploymentZone>1</deploymentZone>

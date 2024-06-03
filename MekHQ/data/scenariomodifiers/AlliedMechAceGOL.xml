@@ -12,15 +12,16 @@
 		<allowedUnitType>-2</allowedUnitType>
 		<arrivalTurn>2</arrivalTurn>
 		<canReinforceLinked>false</canReinforceLinked>
-		<contributesToBV>false</contributesToBV>
+		<contributesToBV>true</contributesToBV>
 		<contributesToMapSize>true</contributesToMapSize>
-		<contributesToUnitCount>false</contributesToUnitCount>
+		<contributesToUnitCount>true</contributesToUnitCount>
 		<deployOffboard>false</deployOffboard>
 		<deploymentZones/>
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
 		<forceAlignment>1</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
+		<fixedUnitCount>4</fixedUnitCount>
 		<forceName>Allied Mech Ace</forceName>
 		<generationMethod>5</generationMethod>
 			<fixedMul>AlliedGOLAce.mul</fixedMul>
