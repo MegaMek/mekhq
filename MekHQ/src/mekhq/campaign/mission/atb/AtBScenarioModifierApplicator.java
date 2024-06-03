@@ -21,10 +21,10 @@ package mekhq.campaign.mission.atb;
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.enums.SkillLevel;
 import megamek.common.options.OptionsConstants;
-import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.*;
@@ -64,7 +64,7 @@ public class AtBScenarioModifierApplicator {
         int deploymentZone = AtBDynamicScenarioFactory.calculateDeploymentZone(templateToApply, scenario, templateToApply.getForceName());
 
         AtBDynamicScenarioFactory.generateForce(scenario, scenario.getContract(campaign), campaign,
-                effectiveBV, effectiveUnitCount, EntityWeightClass.WEIGHT_ASSAULT, templateToApply, true);
+                effectiveBV, effectiveUnitCount, EntityWeightClass.WEIGHT_ASSAULT, templateToApply);
 
         // the most recently added bot force is the one we just generated
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);
