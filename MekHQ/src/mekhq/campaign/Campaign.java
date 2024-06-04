@@ -648,7 +648,7 @@ public class Campaign implements ITechManager {
     public void purchaseShipSearchResult() {
         MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            LogManager.getLogger().error("Cannot find entry for " + getShipSearchResult());
+            LogManager.getLogger().error("Cannot find entry for {}", getShipSearchResult());
             return;
         }
 
@@ -660,19 +660,21 @@ public class Campaign implements ITechManager {
         }
 
         MechFileParser mechFileParser;
+
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
-            LogManager.getLogger().error("Unable to load unit: " + ms.getEntryName(), ex);
+            LogManager.getLogger().error("Unable to load unit: {}", ms.getEntryName(), ex);
             return;
         }
+
         Entity en = mechFileParser.getEntity();
 
         int transitDays = getCampaignOptions().isInstantUnitMarketDelivery() ? 0
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        addNewUnit(en, true, transitDays);
+        addNewUnit(en, true, transitDays, 3);
         if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
         }
@@ -1155,11 +1157,16 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add a new unit to the campaign.
+     * Add a new unit to the campaign, assigning a quality rating to the new unit.
+     * In most cases, quality should equal 3 (D).
      *
      * @param en An <code>Entity</code> object that the new unit will be wrapped around
      */
-    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days) {
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, int quality) {
+        if ((quality < 0) || (quality > 5)) {
+            throw new IllegalArgumentException("Quality must be between 0 and 5");
+        }
+
         Unit unit = new Unit(en, this);
         getHangar().addUnit(unit);
 
@@ -1182,6 +1189,7 @@ public class Campaign implements ITechManager {
         if (!unit.isRepairable()) {
             unit.setSalvage(true);
         }
+
         unit.setDaysToArrival(days);
 
         if (allowNewPilots) {
@@ -1190,7 +1198,10 @@ public class Campaign implements ITechManager {
             newCrew.forEach((type, personnel) ->
                     personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
+
         unit.resetPilotAndEntity();
+
+        unit.setQuality(quality);
 
         // Assign an entity ID to our new unit
         if (Entity.NONE == en.getId()) {

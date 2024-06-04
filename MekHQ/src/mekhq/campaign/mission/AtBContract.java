@@ -28,7 +28,6 @@ import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MissionChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -46,6 +45,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -526,7 +526,7 @@ public class AtBContract extends Contract {
             }
 
             if (null != en) {
-                c.addNewUnit(en, false, 0);
+                c.addNewUnit(en, false, 0, 3);
             } else {
                 c.addReport("<html><font color='red'>Could not load unit</font></html>");
             }
