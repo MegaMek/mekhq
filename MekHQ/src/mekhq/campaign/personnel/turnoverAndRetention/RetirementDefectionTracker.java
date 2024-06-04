@@ -809,7 +809,7 @@ public class RetirementDefectionTracker {
                 // if the retiree is the commander of an infantry platoon, all non-founders in the platoon follow them into retirement
                 if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
                     if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (p.getUnit().isCommander(p))) {
-                        for (Person person : p.getUnit().getSoldiers()) {
+                        for (Person person : p.getUnit().getAllInfantry()) {
                             if ((!person.isFounder()) || (campaign.getCampaignOptions().isUseRandomFounderTurnover())) {
                                 payouts.put(person.getId(), new Payout(campaign, campaign.getPerson(person.getId()),
                                         shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
