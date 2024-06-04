@@ -672,7 +672,7 @@ public class Campaign implements ITechManager {
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        addNewUnit(en, true, transitDays);
+        addNewUnit(en, true, transitDays, 3);
         if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
         }
@@ -1155,11 +1155,21 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add a new unit to the campaign.
+     * Add a new unit to the campaign and set its quality.
+     * Quality 3 (D) is suitable for most uses.
      *
-     * @param en An <code>Entity</code> object that the new unit will be wrapped around
+     * @param en              An <code>Entity</code> object that the new unit will be wrapped around
+     * @param allowNewPilots  A boolean indicating whether to add new pilots for the unit
+     * @param days            The number of days for the new unit to arrive
+     * @param quality         The quality of the new unit (0-5)
+     * @return The newly added unit
+     * @throws IllegalArgumentException If the quality is not within the valid range (0-5)
      */
-    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days) {
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, int quality) {
+        if ((quality < 0) || (quality > 5)) {
+            throw new IllegalArgumentException("Invalid quality in mekhq/campaign/Campaign.java/addNewUnit: " + quality);
+        }
+
         Unit unit = new Unit(en, this);
         getHangar().addUnit(unit);
 
@@ -1191,6 +1201,8 @@ public class Campaign implements ITechManager {
                     personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
         unit.resetPilotAndEntity();
+
+        unit.setQuality(quality);
 
         // Assign an entity ID to our new unit
         if (Entity.NONE == en.getId()) {

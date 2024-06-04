@@ -47,7 +47,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.*;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AtBRandomMechParameters;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
@@ -947,7 +947,7 @@ public abstract class AbstractCompanyGenerator {
                 continue;
             }
 
-            final Unit unit = campaign.addNewUnit(tracker.getEntity(), false, 0);
+            final Unit unit = campaign.addNewUnit(tracker.getEntity(), false, 0, 3);
             unit.addPilotOrSoldier(tracker.getPerson());
             if (getOptions().isGenerateUnitsAsAttached()) {
                 tracker.getPerson().setOriginalUnit(unit);
@@ -1287,7 +1287,7 @@ public abstract class AbstractCompanyGenerator {
     private List<Unit> createMothballedSpareUnits(final Campaign campaign,
                                                   final List<Entity> mothballedEntities) {
         final List<Unit> mothballedUnits = mothballedEntities.stream()
-                .map(entity -> campaign.addNewUnit(entity, false, 0))
+                .map(entity -> campaign.addNewUnit(entity, false, 0, 3))
                 .collect(Collectors.toList());
         mothballedUnits.forEach(Unit::completeMothball);
         return mothballedUnits;

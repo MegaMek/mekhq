@@ -1893,7 +1893,7 @@ public class CampaignGUI extends JPanel {
         if (unitFile != null) {
             try {
                 for (Entity entity : new MULParser(unitFile, getCampaign().getGameOptions()).getEntities()) {
-                    getCampaign().addNewUnit(entity, allowNewPilots, 0);
+                    getCampaign().addNewUnit(entity, allowNewPilots, 0, 3);
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);

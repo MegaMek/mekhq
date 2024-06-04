@@ -22,11 +22,7 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.Mech;
-import megamek.common.Tank;
+import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -378,7 +374,7 @@ public class PersonnelMarketDialog extends JDialog {
                 unitCost, "Purchased " + en.getShortName())) {
             return;
         }
-        Unit unit = campaign.addNewUnit(en, false, 0);
+        Unit unit = campaign.addNewUnit(en, false, 0, 3);
         if (unit == null) {
             // No such unit matching the entity.
             return;

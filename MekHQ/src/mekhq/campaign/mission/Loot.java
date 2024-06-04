@@ -26,11 +26,11 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -148,7 +148,7 @@ public class Loot {
         }
 
         for (Entity e : units) {
-            campaign.addNewUnit(e, false, 0);
+            campaign.addNewUnit(e, false, 0, 3);
         }
 
         for (Part p : parts) {
