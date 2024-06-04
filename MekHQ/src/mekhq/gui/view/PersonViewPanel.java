@@ -1537,6 +1537,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillLog() {
         List<LogEntry> logs = person.getPersonnelLog();
+        Collections.reverse(logs);
 
         JPanel pnlLog = new JPanel(new GridBagLayout());
 
@@ -1575,6 +1576,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillScenarioLog() {
         List<LogEntry> scenarioLog = person.getScenarioLog();
+        Collections.reverse(scenarioLog);
 
         JPanel pnlScenariosLog = new JPanel(new GridBagLayout());
 
@@ -1747,6 +1749,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillKillRecord() {
         List<Kill> kills = campaign.getKillsFor(person.getId());
+        Collections.reverse(kills);
 
         JPanel pnlKills = new JPanel(new GridBagLayout());
 
