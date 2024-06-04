@@ -291,6 +291,7 @@ public class CampaignOptions {
     private boolean useSubContractSoldiers;
     private int serviceContractDuration;
     private int serviceContractModifier;
+    private boolean payBonusDefault;
 
     private boolean useCustomRetirementModifiers;
     private boolean useFatigueModifiers;
@@ -963,6 +964,7 @@ public class CampaignOptions {
         setUseSubContractSoldiers(false);
         setServiceContractDuration(36);
         setServiceContractModifier(5);
+        setPayBonusDefault(true);
 
         setUseCustomRetirementModifiers(true);
         setUseFatigueModifiers(true);
@@ -2050,6 +2052,14 @@ public class CampaignOptions {
 
     public void setServiceContractModifier(final Integer serviceContractModifier) {
         this.serviceContractModifier = serviceContractModifier;
+    }
+
+    public boolean isPayBonusDefault() {
+        return payBonusDefault;
+    }
+
+    public void setPayBonusDefault(final boolean payBonusDefault) {
+        this.payBonusDefault = payBonusDefault;
     }
     //endregion Retirement
 
@@ -4539,6 +4549,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useSubContractSoldiers", isUseSubContractSoldiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractDuration", getServiceContractDuration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractModifier", getServiceContractModifier());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payBonusDefault", isPayBonusDefault());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigueModifiers", isUseFatigueModifiers());
@@ -5527,6 +5538,8 @@ public class CampaignOptions {
                     retVal.setServiceContractDuration(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("serviceContractModifier")) {
                     retVal.setServiceContractModifier(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payBonusDefault")) {
+                    retVal.setPayBonusDefault(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
                     retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFatigueModifiers")) {

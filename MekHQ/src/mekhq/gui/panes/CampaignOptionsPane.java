@@ -280,6 +280,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnServiceContractDuration;
     private JLabel lblServiceContractModifier;
     private JSpinner spnServiceContractModifier;
+    private JCheckBox chkPayBonusDefault;
 
     // Modifiers
     private JPanel turnoverAndRetentionModifiersPanel = new JPanel();
@@ -4265,6 +4266,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnServiceContractModifier.setName("spnServiceContractModifier");
         spnServiceContractModifier.setEnabled(isUseTurnover);
 
+        chkPayBonusDefault = new JCheckBox(resources.getString("chkPayBonusDefault.text"));
+        chkPayBonusDefault.setToolTipText(resources.getString("chkPayBonusDefault.toolTipText"));
+        chkPayBonusDefault.setName("chkPayBonusDefault");
+        chkPayBonusDefault.setEnabled(isUseTurnover);
+
         turnoverAndRetentionSettingsPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionSettingsPanel.title")));
         turnoverAndRetentionSettingsPanel.setName("turnoverAndRetentionSettingsPanel");
         turnoverAndRetentionSettingsPanel.setEnabled(isUseTurnover);
@@ -4300,6 +4306,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblServiceContractModifier)
                                 .addComponent(spnServiceContractModifier, Alignment.LEADING))
+                        .addComponent(chkPayBonusDefault)
         );
 
         layout.setHorizontalGroup(
@@ -4328,6 +4335,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblServiceContractModifier)
                                 .addComponent(spnServiceContractModifier))
+                        .addComponent(chkPayBonusDefault)
         );
 
         return turnoverAndRetentionSettingsPanel;
@@ -7954,6 +7962,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseSubContractSoldiers.setSelected(options.isUseSubContractSoldiers());
         spnServiceContractDuration.setValue(options.getServiceContractDuration());
         spnServiceContractModifier.setValue(options.getServiceContractModifier());
+        chkPayBonusDefault.setSelected(options.isPayBonusDefault());
 
         // Modifiers
         chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
@@ -8628,6 +8637,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseSubContractSoldiers(chkUseSubContractSoldiers.isSelected());
             options.setServiceContractDuration((Integer) spnServiceContractDuration.getValue());
             options.setServiceContractModifier((Integer) spnServiceContractModifier.getValue());
+            options.setPayBonusDefault(chkPayBonusDefault.isSelected());
 
             // Modifiers
             options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());

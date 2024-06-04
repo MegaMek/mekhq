@@ -72,7 +72,7 @@ public class RetirementTableModel extends AbstractTableModel {
         data.clear();
         for (UUID id : targets.keySet()) {
             data.add(id);
-            payBonus.put(id, false);
+            payBonus.put(id, campaign.getCampaignOptions().isPayBonusDefault());
             miscMods.put(id, 0);
         }
         fireTableDataChanged();
