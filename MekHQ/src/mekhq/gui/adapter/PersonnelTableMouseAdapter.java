@@ -22,6 +22,7 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.dialogs.PortraitChooserDialog;
 import megamek.common.Crew;
+import megamek.common.EntityWeightClass;
 import megamek.common.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
@@ -157,6 +158,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RANDOM_ORIGIN_FACTION = "RANDOM_ORIGIN_FACTION";
     private static final String CMD_RANDOM_ORIGIN_PLANET = "RANDOM_ORIGIN_PLANET";
     //endregion Randomization Menu
+
+    //region Original Unit
+    private static final String CMD_ORIGINAL_TO_CURRENT = "ORIGINAL_TO_CURRENT";
+    private static final String CMD_WIPE_ORIGINAL = "WIPE_ORIGINAL";
+
+    //endregion Original Unit
 
     private static final String SEPARATOR = "@";
     private static final String TRUE = String.valueOf(true);
@@ -1027,6 +1034,26 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     if (planet != null) {
                         person.setOriginPlanet(planet);
                         MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    }
+                }
+                break;
+            }
+            case CMD_ORIGINAL_TO_CURRENT: {
+                for (final Person person : people) {
+                    Unit unit = person.getUnit();
+
+                    if (unit != null) {
+                        person.setOriginalUnit(person.getUnit());
+                    }
+                }
+                break;
+            }
+            case CMD_WIPE_ORIGINAL: {
+                for (final Person person : people) {
+                    if (person.getOriginalUnitId() != null) {
+                        person.setOriginalUnitId(null);
+                        person.setOriginalUnitTech(Person.TECH_IS1);
+                        person.setOriginalUnitWeight(EntityWeightClass.WEIGHT_ULTRA_LIGHT);
                     }
                 }
                 break;
@@ -2413,6 +2440,24 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         //endregion Randomization Menu
+
+        //region Original Unit
+        menu = new JMenu(resources.getString("originalUnitMenu.text"));
+
+        menuItem = new JMenuItem(resources.getString("originalUnitToCurrent.text"));
+        menuItem.setName("originalUnitToCurrent");
+        menuItem.setActionCommand(CMD_ORIGINAL_TO_CURRENT);
+        menuItem.addActionListener(this);
+        menu.add(menuItem);
+
+        menuItem = new JMenuItem(resources.getString("removeOriginalUnit.text"));
+        menuItem.setName("removeOriginalUnit");
+        menuItem.setActionCommand(CMD_WIPE_ORIGINAL);
+        menuItem.addActionListener(this);
+        menu.add(menuItem);
+
+        JMenuHelpers.addMenuIfNonEmpty(popup, menu);
+        //endregion Original Unit
 
         //region GM Menu
         if (gui.getCampaign().isGM()) {
