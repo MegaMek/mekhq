@@ -29,6 +29,8 @@ import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.*;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -398,6 +400,8 @@ public final class BriefingTab extends CampaignGuiTab {
             ((AtBContract) mission).checkForFollowup(getCampaign());
         }
 
+        bonusPartExchange((AtBContract) mission);
+
         if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
 
@@ -408,6 +412,36 @@ public final class BriefingTab extends CampaignGuiTab {
 
         final List<Mission> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+    }
+
+    /**
+     * Credits the campaign finances with additional funds based on campaign settings and remaining Bonus Parts.
+     *
+     * @param mission the mission just concluded
+     */
+    private void bonusPartExchange(AtBContract mission) {
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+                MekHQ.getMHQOptions().getLocale());
+
+        double bonusPartExchangeValue = getCampaign().getCampaignOptions().getBonusPartExchangeValue();
+
+        if (bonusPartExchangeValue != 0.0) {
+            int bonusPartMaxExchangeCount = getCampaign().getCampaignOptions().getBonusPartMaxExchangeCount();
+
+            int spareBonusParts = mission.getNumBonusParts();
+
+            if (bonusPartMaxExchangeCount != 0) {
+                spareBonusParts = Math.min(bonusPartMaxExchangeCount, spareBonusParts);
+            }
+
+            bonusPartExchangeValue *= spareBonusParts;
+
+            getCampaign().getFinances().credit(
+                    TransactionType.BONUS_EXCHANGE,
+                    getCampaign().getLocalDate(),
+                    Money.of(bonusPartExchangeValue),
+                    resourceMap.getString("spareBonusPartExchange.text"));
+        }
     }
 
     private void deleteMission() {

@@ -51,7 +51,8 @@ public enum TransactionType {
     TAXES("TransactionType.TAXES.text", "TransactionType.TAXES.toolTipText"),
     TRANSPORTATION("TransactionType.TRANSPORTATION.text", "TransactionType.TRANSPORTATION.toolTipText"),
     UNIT_PURCHASE("TransactionType.UNIT_PURCHASE.text", "TransactionType.UNIT_PURCHASE.toolTipText"),
-    UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText");
+    UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText"),
+    BONUS_EXCHANGE("TransactionType.BONUS_EXCHANGE.text", "TransactionType.BONUS_EXCHANGE.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -182,6 +183,10 @@ public enum TransactionType {
     public boolean isUnitSale() {
         return this == UNIT_SALE;
     }
+
+    public boolean isBonusExchange() {
+        return this == BONUS_EXCHANGE;
+    }
     //endregion Boolean Comparison Methods
 
     //region File I/O
@@ -235,6 +240,8 @@ public enum TransactionType {
                     return RANSOM;
                 case 17:
                     return EDUCATION;
+                case 18:
+                    return BONUS_EXCHANGE;
                 default:
                     break;
             }
