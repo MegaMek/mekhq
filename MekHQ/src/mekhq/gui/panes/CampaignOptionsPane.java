@@ -361,6 +361,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel anniversaryPanel = new JPanel();
     private JCheckBox chkAnnounceBirthdays;
     private JCheckBox chkAnnounceOfficersOnly;
+    private JCheckBox chkAnnounceChildBirthdays;
 
     // Education
     private JCheckBox chkUseEducationModule;
@@ -4101,10 +4102,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAnnounceBirthdays = new JCheckBox(resources.getString("chkAnnounceBirthdays.text"));
         chkAnnounceBirthdays.setToolTipText(resources.getString("chkAnnounceBirthdays.toolTipText"));
         chkAnnounceBirthdays.setName("chkAnnounceBirthdays");
+        chkAnnounceBirthdays.addActionListener(evt -> {
+            final boolean isEnabled = chkAnnounceBirthdays.isSelected();
+
+            chkAnnounceOfficersOnly.setEnabled(isEnabled);
+            chkAnnounceChildBirthdays.setEnabled(isEnabled);
+        });
 
         chkAnnounceOfficersOnly = new JCheckBox(resources.getString("chkAnnounceOfficersOnly.text"));
         chkAnnounceOfficersOnly.setToolTipText(resources.getString("chkAnnounceOfficersOnly.toolTipText"));
         chkAnnounceOfficersOnly.setName("chkAnnounceOfficersOnly");
+        chkAnnounceOfficersOnly.setEnabled(campaign.getCampaignOptions().isAnnounceBirthdays());
+
+        chkAnnounceChildBirthdays = new JCheckBox(resources.getString("chkAnnounceChildBirthdays.text"));
+        chkAnnounceChildBirthdays.setToolTipText(resources.getString("chkAnnounceChildBirthdays.toolTipText"));
+        chkAnnounceChildBirthdays.setName("chkAnnounceChildBirthdays");
+        chkAnnounceChildBirthdays.setEnabled(campaign.getCampaignOptions().isAnnounceBirthdays());
 
         anniversaryPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("anniversaryPanel.title")));
         anniversaryPanel.setName("anniversaryPanel");
@@ -4118,12 +4131,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createSequentialGroup()
                         .addComponent(chkAnnounceBirthdays)
                         .addComponent(chkAnnounceOfficersOnly)
+                        .addComponent(chkAnnounceChildBirthdays)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkAnnounceBirthdays)
                         .addComponent(chkAnnounceOfficersOnly)
+                        .addComponent(chkAnnounceChildBirthdays)
         );
 
         return anniversaryPanel;
@@ -7151,6 +7166,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Anniversaries
         chkAnnounceBirthdays.setSelected(options.isAnnounceBirthdays());
         chkAnnounceOfficersOnly.setSelected(options.isAnnounceOfficersOnly());
+        chkAnnounceChildBirthdays.setSelected(options.isAnnounceChildBirthdays());
 
         // Marriage
         chkUseManualMarriages.setSelected(options.isUseManualMarriages());
@@ -7783,7 +7799,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Anniversaries
             options.setAnnounceBirthdays(chkAnnounceBirthdays.isSelected());
-            options.setAnnounceBirthdays(chkAnnounceOfficersOnly.isSelected());
+            options.setAnnounceOfficersOnly(chkAnnounceOfficersOnly.isSelected());
+            options.setAnnounceChildBirthdays(chkAnnounceChildBirthdays.isSelected());
 
             // Marriage
             options.setUseManualMarriages(chkUseManualMarriages.isSelected());

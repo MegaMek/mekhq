@@ -3328,11 +3328,17 @@ public class Campaign implements ITechManager {
             getProcreation().processNewDay(this, getLocalDate(), p);
 
             // Anniversaries
-            if (getCampaignOptions().isAnnounceBirthdays()) {
-                if ((p.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
-                    if (p.getBirthday().isEqual(getLocalDate())) {
-                        addReport(String.format(resources.getString("anniversaryBirthday.text"), p.getHyperlinkedFullTitle()));
-                    }
+            if ((p.getRank().isOfficer()) || (!getCampaignOptions().isAnnounceOfficersOnly())) {
+                if ((p.getBirthday().isEqual(getLocalDate())) && (campaignOptions.isAnnounceBirthdays())) {
+                    addReport(String.format(resources.getString("anniversaryBirthday.text"),
+                            p.getHyperlinkedFullTitle(),
+                            p.getAge(getLocalDate())));
+                }
+            } else if ((p.getAge(getLocalDate()) == 18) && (campaignOptions.isAnnounceChildBirthdays()) ){
+                if (p.getBirthday().isEqual(getLocalDate())) {
+                    addReport(String.format(resources.getString("anniversaryBirthday.text"),
+                            p.getHyperlinkedFullTitle(),
+                            18));
                 }
             }
         }

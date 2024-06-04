@@ -290,6 +290,7 @@ public class CampaignOptions {
     // Anniversaries
     private boolean announceBirthdays;
     private boolean announceOfficersOnly;
+    private boolean announceChildBirthdays;
 
     // Marriage
     private boolean useManualMarriages;
@@ -788,6 +789,7 @@ public class CampaignOptions {
         // Anniversaries
         setAnnounceBirthdays(true);
         setAnnounceOfficersOnly(true);
+        setAnnounceChildBirthdays(true);
 
         // Marriage
         setUseManualMarriages(true);
@@ -1766,6 +1768,14 @@ public class CampaignOptions {
 
     public void setAnnounceOfficersOnly(final boolean announceOfficersOnly) {
         this.announceOfficersOnly = announceOfficersOnly;
+    }
+
+    public boolean isAnnounceChildBirthdays() {
+        return announceChildBirthdays;
+    }
+
+    public void setAnnounceChildBirthdays(final boolean announceChildBirthdays) {
+        this.announceChildBirthdays = announceChildBirthdays;
     }
     //endregion anniversaries
 
@@ -4250,6 +4260,7 @@ public class CampaignOptions {
         //region Announcements
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceBirthdays", isAnnounceBirthdays());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceOfficersOnly", isAnnounceOfficersOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceChildBirthdays", isAnnounceChildBirthdays());
         //endregion Announcements
 
         //region Marriage
@@ -4944,6 +4955,8 @@ public class CampaignOptions {
                     retVal.setAnnounceBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("announceOfficersOnly")) {
                     retVal.setAnnounceOfficersOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("announceChildBirthdays")) {
+                    retVal.setAnnounceChildBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion anniversaries
 
                     //region Marriage
