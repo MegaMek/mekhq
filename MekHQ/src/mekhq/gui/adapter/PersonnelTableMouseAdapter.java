@@ -1038,17 +1038,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
-            case CMD_ORIGINAL_TO_CURRENT: {
+            case CMD_ORIGINAL_TO_CURRENT:
                 for (final Person person : people) {
                     Unit unit = person.getUnit();
 
                     if (unit != null) {
-                        person.setOriginalUnit(person.getUnit());
+                        person.setOriginalUnit(unit);
                     }
                 }
                 break;
-            }
-            case CMD_WIPE_ORIGINAL: {
+            case CMD_WIPE_ORIGINAL:
                 for (final Person person : people) {
                     if (person.getOriginalUnitId() != null) {
                         person.setOriginalUnitId(null);
@@ -1057,7 +1056,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
                 break;
-            }
             //endregion Randomization Menu
 
             default: {
