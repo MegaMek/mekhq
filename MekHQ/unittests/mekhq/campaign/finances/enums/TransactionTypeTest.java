@@ -342,6 +342,17 @@ public class TransactionTypeTest {
             }
         }
     }
+
+    @Test
+    public void testIsBonusPartExchange() {
+        for (final TransactionType transactionType : types) {
+            if (transactionType == TransactionType.BONUS_EXCHANGE) {
+                assertTrue(transactionType.isBonusExchange());
+            } else {
+                assertFalse(transactionType.isBonusExchange());
+            }
+        }
+    }
     //endregion Boolean Comparison Methods
 
     //region File I/O
@@ -372,7 +383,8 @@ public class TransactionTypeTest {
         assertEquals(TransactionType.REPAIRS, TransactionType.parseFromString("15"));
         assertEquals(TransactionType.RANSOM, TransactionType.parseFromString("16"));
         assertEquals(TransactionType.EDUCATION, TransactionType.parseFromString("17"));
-        assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("18"));
+        assertEquals(TransactionType.BONUS_EXCHANGE, TransactionType.parseFromString("18"));
+        assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("19"));
 
         // Failure Testing
         assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("failureFailsFake"));
