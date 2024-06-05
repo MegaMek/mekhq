@@ -240,7 +240,7 @@ public class RetirementDefectionDialog extends JDialog {
                 if (!hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
                     Money bonus = getTotalBonus();
                     if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
-                        lblTotal.setText("<html><font color='red'>"
+                        lblTotal.setText("<html><font color='Orange'>"
                                 + getTotalBonus().toAmountAndSymbolString() + "</font></html>");
                         btnRoll.setEnabled(false);
                     } else {

@@ -167,10 +167,10 @@ public class ForceViewPanel extends JScrollablePanel {
         String lanceTech = "";
         String assigned = "";
         String type = null;
-        
+
         Person commanderPerson = campaign.getPerson(force.getForceCommanderID());
         commander = commanderPerson != null ? commanderPerson.getFullTitle() : "";
-        
+
         for (UUID uid : force.getAllUnits(false)) {
             Unit u = campaign.getUnit(uid);
             if (null != u) {
@@ -450,7 +450,7 @@ public class ForceViewPanel extends JScrollablePanel {
         toReturn += person.getSkillLevel(campaign, false) + " " + person.getRoleDesc();
         if (null != unit && null != unit.getEntity()
                 && null != unit.getEntity().getCrew() && unit.getEntity().getCrew().getHits() > 0) {
-            toReturn += "<br><font color='red' size='2'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
+            toReturn += "<br><font color='Orange' size='2'>" + unit.getEntity().getCrew().getHits() + " hit(s)";
         }
         toReturn += "</font></html>";
         return toReturn;

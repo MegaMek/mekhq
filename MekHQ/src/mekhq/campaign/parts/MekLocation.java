@@ -25,7 +25,6 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.verifier.Structure;
 import megamek.common.verifier.TestEntity.Ceil;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -34,7 +33,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTime;
-
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -155,14 +154,14 @@ public class MekLocation extends Part {
         // use MegaMek's implementation of internal structure weight calculation
         // assume rounding to nearest half-ton
         // superheavy flag is set if weight is more than 100
-        // assume movement mode is biped or tripod (technically mechs can have other movement modes but 
-        // that doesn't affect structure weight); currently impossible to tell whether a "loose" left leg is for a biped or tripod.        
-        EntityMovementMode movementMode = (getLoc() == Mech.LOC_CLEG) ? EntityMovementMode.TRIPOD : EntityMovementMode.BIPED;                
-        
-        double tonnage = Structure.getWeightStructure(structureType, getUnitTonnage(), Ceil.HALFTON, 
+        // assume movement mode is biped or tripod (technically mechs can have other movement modes but
+        // that doesn't affect structure weight); currently impossible to tell whether a "loose" left leg is for a biped or tripod.
+        EntityMovementMode movementMode = (getLoc() == Mech.LOC_CLEG) ? EntityMovementMode.TRIPOD : EntityMovementMode.BIPED;
+
+        double tonnage = Structure.getWeightStructure(structureType, getUnitTonnage(), Ceil.HALFTON,
                 (getUnitTonnage() > 100), movementMode);
-        
-        // determine the weight of the location; 
+
+        // determine the weight of the location;
         // if it's a "strange" location, then the rest of this is pointless.
         switch (loc) {
         case Mech.LOC_HEAD:
@@ -185,7 +184,7 @@ public class MekLocation extends Part {
         default:
             return 0;
         }
-        
+
         return tonnage;
     }
 
@@ -858,7 +857,7 @@ public class MekLocation extends Part {
         }
         toReturn += getDetails() + "<br/>";
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='red'>Impossible</font>";
+            toReturn += "<font color='Orange'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
             if (isBlownOff()) {

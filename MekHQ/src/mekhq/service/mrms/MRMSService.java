@@ -167,10 +167,10 @@ public class MRMSService {
 
             if (!parts.isEmpty()) {
                 if (parts.size() == 1) {
-                    campaign.addReport("<font color='red'>There in still 1 part that is not being worked on.</font>");
+                    campaign.addReport("<font color='Orange'>There in still 1 part that is not being worked on.</font>");
                 } else {
                     campaign.addReport(String.format(
-                            "<font color='red'>There are still %s parts that are not being worked on.</font>",
+                            "<font color='Orange'>There are still %s parts that are not being worked on.</font>",
                             parts.size()));
                 }
             }
@@ -309,10 +309,10 @@ public class MRMSService {
 
                 if (count > 0) {
                     if (count == 1) {
-                        campaign.addReport("<font color='red'>There in still 1 part that is not being worked on.</font>");
+                        campaign.addReport("<font color='Orange'>There in still 1 part that is not being worked on.</font>");
                     } else {
                         campaign.addReport(String.format(
-                                "<font color='red'>There are still %s parts that are not being worked on %s unit%s.</font>",
+                                "<font color='Orange'>There are still %s parts that are not being worked on %s unit%s.</font>",
                                 count, unitCount, (unitCount == 1) ? "" : "s"));
                     }
                 }

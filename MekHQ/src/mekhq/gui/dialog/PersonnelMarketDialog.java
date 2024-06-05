@@ -22,11 +22,7 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.Mech;
-import megamek.common.Tank;
+import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -334,7 +330,7 @@ public class PersonnelMarketDialog extends JDialog {
             if (campaign.getFunds().isLessThan((campaign.getCampaignOptions().isPayForRecruitment()
                             ? selectedPerson.getSalary(campaign).multipliedBy(2)
                             : Money.zero()).plus(unitCost))) {
-                 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
+                 campaign.addReport("<font color='Orange'><b>Insufficient funds. Transaction cancelled</b>.</font>");
             } else {
                 /* Adding person to campaign changes pid; grab the old one to
                  * use as a key to any attached entity

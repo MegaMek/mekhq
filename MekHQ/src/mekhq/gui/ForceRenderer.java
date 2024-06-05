@@ -46,7 +46,7 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         setOpaque(false);
 
         if (value instanceof Unit) {
-            String name = "<font color='red'>No Crew</font>";
+            String name = "<font color='Orange'>No Crew</font>";
             if (((Unit) value).getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
@@ -60,12 +60,12 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
                 name += " (" + u.getEntity().getCrew().getGunnery() + "/"
                         + u.getEntity().getCrew().getPiloting() + ")";
                 if (person.needsFixing() || (u.getEntity().getCrew().getHits() > 0)) {
-                    name = "<font color='red'>" + name + "</font>";
+                    name = "<font color='Orange'>" + name + "</font>";
                 }
             }
             uname = "<i>" + u.getName() + "</i>";
             if (u.isDamaged()) {
-                uname = "<font color='red'>" + uname + "</font>";
+                uname = "<font color='Orange'>" + uname + "</font>";
             }
 
             Entity entity = u.getEntity();

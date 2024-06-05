@@ -22,12 +22,12 @@ package mekhq.campaign.unit;
 
 import megamek.common.*;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -184,13 +184,13 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
         if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
             return "<font color='green'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
+            return "<font color='Orange'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
-        return "<font color='red'><b> unit not found</b>.</font>";
+        return "<font color='Orange'><b> unit not found</b>.</font>";
     }
 
     @Override

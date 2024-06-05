@@ -23,7 +23,6 @@ package mekhq.campaign.parts.equipment;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
@@ -34,6 +33,7 @@ import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -324,12 +324,12 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String find(int transitDays) {
-        return "<font color='red'> You shouldn't be here (AmmoBin.find()).</font>";
+        return "<font color='Orange'> You shouldn't be here (AmmoBin.find()).</font>";
     }
 
     @Override
     public String failToFind() {
-        return "<font color='red'> You shouldn't be here (AmmoBin.failToFind()).</font>";
+        return "<font color='Orange'> You shouldn't be here (AmmoBin.failToFind()).</font>";
     }
 
     public void unload() {
@@ -507,9 +507,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             String orderTransitString = getOrderTransitStringForDetails(inventories);
 
             if (shotsAvailable == 0) {
-                availability = "<br><font color='red'>No ammo " + orderTransitString + "</font>";
+                availability = "<br><font color='Orange'>No ammo " + orderTransitString + "</font>";
             } else if (shotsAvailable < getShotsNeeded()) {
-                availability = "<br><font color='red'>Only " + shotsAvailable + " available" + orderTransitString + "</font>";
+                availability = "<br><font color='Orange'>Only " + shotsAvailable + " available" + orderTransitString + "</font>";
             } else {
                 availability = "<br><font color='green'>" + shotsAvailable + " available " + orderTransitString + "</font>";
             }

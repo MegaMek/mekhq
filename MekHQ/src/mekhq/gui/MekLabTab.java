@@ -32,13 +32,13 @@ import megameklab.ui.battleArmor.BAStructureTab;
 import megameklab.ui.combatVehicle.CVBuildTab;
 import megameklab.ui.combatVehicle.CVEquipmentTab;
 import megameklab.ui.combatVehicle.CVStructureTab;
-import megameklab.ui.infantry.CIStructureTab;
 import megameklab.ui.fighterAero.ASBuildTab;
 import megameklab.ui.fighterAero.ASEquipmentTab;
 import megameklab.ui.fighterAero.ASStructureTab;
 import megameklab.ui.generalUnit.FluffTab;
 import megameklab.ui.generalUnit.PreviewTab;
 import megameklab.ui.generalUnit.TransportTab;
+import megameklab.ui.infantry.CIStructureTab;
 import megameklab.ui.largeAero.DSStructureTab;
 import megameklab.ui.largeAero.LABuildTab;
 import megameklab.ui.largeAero.LAEquipmentTab;
@@ -343,7 +343,7 @@ public class MekLabTab extends CampaignGuiTab {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='green'>+"
                     + bvDiff + "</font>)</html>");
         } else if (bvDiff < 0) {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='red'>" + bvDiff
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='Orange'>" + bvDiff
                     + "</font>)</html>");
         } else {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (+" + bvDiff + ")</html>");
@@ -351,12 +351,12 @@ public class MekLabTab extends CampaignGuiTab {
 
         if (currentTonnage != tonnage) {
             lblTons.setText(
-                    "<html>Tonnage: <font color='red'>" + currentTonnage + "/" + tonnage + "</font></html>");
+                    "<html>Tonnage: <font color='Orange'>" + currentTonnage + "/" + tonnage + "</font></html>");
         } else {
             lblTons.setText("Tonnage: " + currentTonnage + "/" + tonnage);
         }
         if (totalHeat > heat) {
-            lblHeat.setText("<html>Heat: <font color='red'>" + totalHeat + "/" + heat + "</font></html>");
+            lblHeat.setText("<html>Heat: <font color='Orange'>" + totalHeat + "/" + heat + "</font></html>");
         } else {
             lblHeat.setText("<html>Heat: " + totalHeat + "/" + heat + "</html>");
         }

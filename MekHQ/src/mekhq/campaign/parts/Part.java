@@ -26,7 +26,6 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -39,6 +38,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.WorkTime;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.NamedNodeMap;
@@ -424,7 +424,7 @@ public abstract class Part implements IPartWork, ITechnology {
         toReturn += "<b>" + action + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='red'>Impossible</font>";
+            toReturn += "<font color='Orange'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
             if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
@@ -1051,7 +1051,7 @@ public abstract class Part implements IPartWork, ITechnology {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        return " <font color='red'><b> failed.</b></font>";
+        return " <font color='Orange'><b> failed.</b></font>";
     }
 
     @Override

@@ -24,7 +24,6 @@ import megamek.Version;
 import megamek.common.Entity;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
@@ -32,6 +31,7 @@ import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -142,7 +142,7 @@ public class ShoppingList {
             if ((newWork.getQuantity() == origQuantity)
                     && campaign.getCampaignOptions().isUsePlanetaryAcquisition()
                     && !campaign.getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                campaign.addReport("<font color='red'><b>You failed to find " + newWork.getAcquisitionName()
+                campaign.addReport("<font color='Orange'><b>You failed to find " + newWork.getAcquisitionName()
                         + " within " + campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition()
                         + " jumps</b></font>");
             }

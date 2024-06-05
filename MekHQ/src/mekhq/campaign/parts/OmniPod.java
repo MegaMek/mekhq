@@ -20,7 +20,6 @@ package mekhq.campaign.parts;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -28,6 +27,7 @@ import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -234,11 +234,11 @@ public class OmniPod extends Part {
         timeSpent = 0;
         shorthandedMod = 0;
         if (skillMin > SkillType.EXP_ELITE) {
-            return " <font color='red'><b> failed and part destroyed.</b></font>";
+            return " <font color='Orange'><b> failed and part destroyed.</b></font>";
         } else {
             //OmniPod is only added back to warehouse if repair fails without destroying part.
             campaign.getQuartermaster().addPart(this, 0);
-            return " <font color='red'><b> failed.</b></font>";
+            return " <font color='Orange'><b> failed.</b></font>";
         }
     }
 
