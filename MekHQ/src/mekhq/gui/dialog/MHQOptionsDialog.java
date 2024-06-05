@@ -112,6 +112,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private ColourSelectorButton optionPaidRetirementForeground;
     private ColourSelectorButton optionPaidRetirementBackground;
     private ColourSelectorButton optionStratConHexCoordForeground;
+    private ColourSelectorButton optionFontColorNegative;
+    private ColourSelectorButton optionFontColorWarning;
+    private ColourSelectorButton optionFontColorPositive;
     //endregion Colors
 
     //region Fonts
@@ -485,6 +488,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPaidRetirementBackground = new ColourSelectorButton(resources.getString("optionPaidRetirementBackground.text"));
 
         optionStratConHexCoordForeground = new ColourSelectorButton(resources.getString("optionStratConHexCoordForeground.text"));
+
+        optionFontColorNegative = new ColourSelectorButton(resources.getString("optionFontColorNegative.text"));
+
+        optionFontColorWarning = new ColourSelectorButton(resources.getString("optionFontColorWarning.text"));
+
+        optionFontColorPositive = new ColourSelectorButton(resources.getString("optionFontColorPositive.text"));
         //endregion Create Graphical Components
 
         //region Layout
@@ -498,56 +507,61 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionDeployedForeground)
-                                .addComponent(optionDeployedBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionDeployedBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionBelowContractMinimumForeground)
-                                .addComponent(optionBelowContractMinimumBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionBelowContractMinimumBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionInTransitForeground)
-                                .addComponent(optionInTransitBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionInTransitBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionRefittingForeground)
-                                .addComponent(optionRefittingBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionRefittingBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionMothballingForeground)
-                                .addComponent(optionMothballingBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionMothballingBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionMothballedForeground)
-                                .addComponent(optionMothballedBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionMothballedBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionNotRepairableForeground)
-                                .addComponent(optionNotRepairableBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionNotRepairableBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionNonFunctionalForeground)
-                                .addComponent(optionNonFunctionalBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionNonFunctionalBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionNeedsPartsFixedForeground)
-                                .addComponent(optionNeedsPartsFixedBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionNeedsPartsFixedBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionUnmaintainedForeground)
-                                .addComponent(optionUnmaintainedBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionUnmaintainedBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionUncrewedForeground)
-                                .addComponent(optionUncrewedBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionUncrewedBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionLoanOverdueForeground)
-                                .addComponent(optionLoanOverdueBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionLoanOverdueBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionInjuredForeground)
-                                .addComponent(optionInjuredBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionInjuredBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionHealedInjuriesForeground)
-                                .addComponent(optionHealedInjuriesBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionHealedInjuriesBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionPregnantForeground)
-                                .addComponent(optionPregnantBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionPregnantBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionPaidRetirementForeground)
-                                .addComponent(optionPaidRetirementBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionPaidRetirementBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionStratConHexCoordForeground))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(optionFontColorNegative)
+                                .addComponent(optionFontColorPositive, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(optionFontColorWarning))
         );
 
         layout.setHorizontalGroup(
@@ -602,6 +616,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(optionPaidRetirementBackground))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionStratConHexCoordForeground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionFontColorNegative)
+                                .addComponent(optionFontColorPositive))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionFontColorWarning))
         );
         //endregion Layout
 
@@ -1147,6 +1166,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setPaidRetirementForeground(optionPaidRetirementForeground.getColour());
         MekHQ.getMHQOptions().setPaidRetirementBackground(optionPaidRetirementBackground.getColour());
         MekHQ.getMHQOptions().setStratConHexCoordForeground(optionStratConHexCoordForeground.getColour());
+        MekHQ.getMHQOptions().setFontColorNegative(optionFontColorNegative.getColour());
+        MekHQ.getMHQOptions().setFontColorWarning(optionFontColorWarning.getColour());
+        MekHQ.getMHQOptions().setFontColorPositive(optionFontColorPositive.getColour());
+
         MekHQ.getMHQOptions().setMedicalViewDialogHandwritingFont(comboMedicalViewDialogHandwritingFont.getFont().getFamily());
 
         MekHQ.getMHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
@@ -1256,6 +1279,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPaidRetirementForeground.setColour(MekHQ.getMHQOptions().getPaidRetirementForeground());
         optionPaidRetirementBackground.setColour(MekHQ.getMHQOptions().getPaidRetirementBackground());
         optionStratConHexCoordForeground.setColour(MekHQ.getMHQOptions().getStratConHexCoordForeground());
+        optionFontColorNegative.setColour(MekHQ.getMHQOptions().getFontColorNegative());
+        optionFontColorWarning.setColour(MekHQ.getMHQOptions().getFontColorWarning());
+        optionFontColorPositive.setColour(MekHQ.getMHQOptions().getFontColorPositive());
 
         comboMedicalViewDialogHandwritingFont.setSelectedItem(new FontDisplay(MekHQ.getMHQOptions().getMedicalViewDialogHandwritingFont()));
 

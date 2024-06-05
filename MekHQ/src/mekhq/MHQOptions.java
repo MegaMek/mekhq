@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -457,6 +457,30 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setStratConHexCoordForeground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, value.getRGB());
+    }
+
+    public Color getFontColorNegative() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_NEGATIVE, Color.RED.getRGB()));
+    }
+
+    public void setFontColorNegative(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_NEGATIVE, value.getRGB());
+    }
+
+    public Color getFontColorPositive() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_POSITIVE, Color.GREEN.getRGB()));
+    }
+
+    public void setFontColorPositive(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_POSITIVE, value.getRGB());
+    }
+
+    public Color getFontColorWarning() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_WARNING, Color.ORANGE.getRGB()));
+    }
+
+    public void setFontColorWarning(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_WARNING, value.getRGB());
     }
     //endregion Colours
 
