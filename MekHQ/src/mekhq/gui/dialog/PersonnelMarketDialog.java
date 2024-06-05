@@ -374,7 +374,7 @@ public class PersonnelMarketDialog extends JDialog {
                 unitCost, "Purchased " + en.getShortName())) {
             return;
         }
-        Unit unit = campaign.addNewUnit(en, false, 0, 3);
+        Unit unit = campaign.addNewUnit(en, false, 0);
         if (unit == null) {
             // No such unit matching the entity.
             return;

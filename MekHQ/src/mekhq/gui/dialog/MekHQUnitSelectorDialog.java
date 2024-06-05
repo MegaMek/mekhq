@@ -124,7 +124,7 @@ public class MekHQUnitSelectorDialog extends AbstractUnitSelectorDialog {
     protected void select(boolean isGM) {
         if (getSelectedEntity() != null) {
             if (isGM) {
-                campaign.addNewUnit(selectedUnit.getEntity(), false, 0, 3);
+                campaign.addNewUnit(selectedUnit.getEntity(), false, 0);
             } else {
                 campaign.getShoppingList().addShoppingItem(selectedUnit, 1, campaign);
             }

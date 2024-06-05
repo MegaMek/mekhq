@@ -196,7 +196,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         if (equipment instanceof Part) {
             gui.getCampaign().getQuartermaster().addPart((Part) equipment, 0);
         } else if (equipment instanceof Entity) {
-            gui.getCampaign().addNewUnit((Entity) equipment, false, 0, 3);
+            gui.getCampaign().addNewUnit((Entity) equipment, false, 0);
         } else {
             LogManager.getLogger().error("Attempted to add unknown equipment of " + acquisition.getAcquisitionName());
             return;

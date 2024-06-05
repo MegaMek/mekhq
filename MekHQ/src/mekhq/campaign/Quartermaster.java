@@ -470,13 +470,13 @@ public class Quartermaster {
             Money cost = new Unit(en, getCampaign()).getBuyCost();
             if (getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
                     cost, "Purchased " + en.getShortName())) {
-                getCampaign().addNewUnit(en, false, days, 3);
+                getCampaign().addNewUnit(en, false, days);
                 return true;
             } else {
                 return false;
             }
         } else {
-            getCampaign().addNewUnit(en, false, days, 3);
+            getCampaign().addNewUnit(en, false, days);
             return true;
         }
     }

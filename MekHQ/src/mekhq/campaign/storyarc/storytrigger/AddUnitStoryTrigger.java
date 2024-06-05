@@ -58,7 +58,7 @@ public class AddUnitStoryTrigger extends StoryTrigger {
             return;
         }
         Entity en = mechFileParser.getEntity();
-        getCampaign().addNewUnit(en, false, 0, 3);
+        getCampaign().addNewUnit(en, false, 0);
     }
 
     @Override

@@ -947,7 +947,7 @@ public abstract class AbstractCompanyGenerator {
                 continue;
             }
 
-            final Unit unit = campaign.addNewUnit(tracker.getEntity(), false, 0, 3);
+            final Unit unit = campaign.addNewUnit(tracker.getEntity(), false, 0);
             unit.addPilotOrSoldier(tracker.getPerson());
             if (getOptions().isGenerateUnitsAsAttached()) {
                 tracker.getPerson().setOriginalUnit(unit);
@@ -1287,7 +1287,7 @@ public abstract class AbstractCompanyGenerator {
     private List<Unit> createMothballedSpareUnits(final Campaign campaign,
                                                   final List<Entity> mothballedEntities) {
         final List<Unit> mothballedUnits = mothballedEntities.stream()
-                .map(entity -> campaign.addNewUnit(entity, false, 0, 3))
+                .map(entity -> campaign.addNewUnit(entity, false, 0))
                 .collect(Collectors.toList());
         mothballedUnits.forEach(Unit::completeMothball);
         return mothballedUnits;
