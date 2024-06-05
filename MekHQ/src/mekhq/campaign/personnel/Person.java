@@ -2479,7 +2479,19 @@ public class Person {
             case VTOL_PILOT:
                 return hasSkill(SkillType.S_PILOT_VTOL) ? getSkill(SkillType.S_PILOT_VTOL).getExperienceLevel() : SkillType.EXP_NONE;
             case VEHICLE_GUNNER:
-                return hasSkill(SkillType.S_GUN_VEE) ? getSkill(SkillType.S_GUN_VEE).getExperienceLevel() : SkillType.EXP_NONE;
+                if (!campaign.getCampaignOptions().isUseArtillery()) {
+                    return hasSkill(SkillType.S_GUN_VEE) ? getSkill(SkillType.S_GUN_VEE).getExperienceLevel() : SkillType.EXP_NONE;
+                } else {
+                    if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
+                        return Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel()), (getSkill(SkillType.S_ARTILLERY).getExperienceLevel()));
+                    } else if (hasSkill(SkillType.S_GUN_VEE)) {
+                        return getSkill(SkillType.S_GUN_VEE).getExperienceLevel();
+                    } else if (hasSkill(SkillType.S_ARTILLERY)) {
+                        return getSkill(SkillType.S_ARTILLERY).getExperienceLevel();
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                }
             case VEHICLE_CREW:
                 return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() : SkillType.EXP_NONE;
             case AEROSPACE_PILOT:
