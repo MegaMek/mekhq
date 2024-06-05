@@ -329,7 +329,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='Orange'> You shouldn't be here (AmmoBin.failToFind()).</font>";
+        return "<font color='red'> You shouldn't be here (AmmoBin.failToFind()).</font>";
     }
 
     public void unload() {
