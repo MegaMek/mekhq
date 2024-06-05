@@ -2439,19 +2439,19 @@ public class AtBDynamicScenarioFactory {
     );
 
     private static final Map<Integer, Integer> normalBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_RL,15),
             Map.entry(BombType.B_HE,45),
-            Map.entry(BombType.B_CLUSTER,20),
-            Map.entry(BombType.B_INFERNO,10),
-            Map.entry(BombType.B_THUNDER, 5),
-            Map.entry(BombType.B_LG,5)
+            Map.entry(BombType.B_LG,5),
+            Map.entry(BombType.B_CLUSTER,25),
+            Map.entry(BombType.B_INFERNO,15),
+            Map.entry(BombType.B_THUNDER, 10)
     );
 
     private static final Map<Integer,Integer> antiMekBombLoad = Map.ofEntries(
             Map.entry(BombType.B_HE,55),
-            Map.entry(BombType.B_RL,25),
-            Map.entry(BombType.B_THUNDER,5),
-            Map.entry(BombType.B_LG,15)
+            Map.entry(BombType.B_LG,15),
+            Map.entry(BombType.B_INFERNO, 10),
+            Map.entry(BombType.B_THUNDER,10),
+            Map.entry(BombType.B_HOMING, 10)
     );
 
     private static final Map<Integer,Integer> antiConvBombLoad = Map.ofEntries(
@@ -2493,6 +2493,12 @@ public class AtBDynamicScenarioFactory {
             Map.entry(BombType.B_ASEW, 1)
     );
 
+    private static final Map<Integer, Integer> antiShipBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_AAA, 50),
+            Map.entry(BombType.B_AS, 35),
+            Map.entry(BombType.B_ASEW, 15)
+    );
+
     private static final Map<Integer,Integer> pirateAirBombLoad = Map.ofEntries(
             Map.entry(BombType.B_RL, 60),
             Map.entry(BombType.B_LAA, 30),
@@ -2502,101 +2508,115 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Helper function to load bombs onto a random portion of units that can carry them
-     * TODO: needs extra parameter for unit rating
+     * TODO: needs extra parameters for flagging pirates and what rating/quality to use
      * @param entityList   The list of entities to process
      * @param campaign     Campaign object
      * @param groundTargets    true if there are valid ground targets
      */
     public static void populateAeroBombs(List<Entity> entityList, Campaign campaign, boolean groundTargets) {
-        int maxBombers = Compute.randomInt(entityList.size()) + 1;
-        int numBombers = 0;
 
-        // For each entity that can carry bombs
-        int modifiedLoad;
-        int safeThrust;
+        // Get all valid bomber
+        List<Entity> bomberList = entityList.stream().filter(Targetable::isBomber).collect(Collectors.toList());
+        if (bomberList.isEmpty()) {
+            return;
+        }
+
+        int minThrust;
         int maxLoad;
+        int numBombers = 0;
         List<Integer> generatedBombs;
-        boolean isGuided = false;
+        Map<Entity, List<Integer>> bombsByCarrier = new HashMap<>();
+        int maxBombers = (int) Math.ceil(((Compute.randomInt(60) + 40) / 100.0) * bomberList.size());
+        boolean hasGuided = false;
         for (Entity curBomber : entityList) {
             if (numBombers >= maxBombers) {
                 break;
             }
-            if (curBomber.isBomber()) {
 
-                boolean isUnarmed = curBomber.getIndividualWeaponList().isEmpty();
+            boolean isUnarmed = curBomber.getIndividualWeaponList().isEmpty();
 
-                // If there will be valid ground targets, randomly determine if this is 'combat air
-                // patrol' with air to air weapons
-                boolean isCAP = !groundTargets || (Compute.d6() <= 2);
+            // If there will be valid ground targets, randomly determine if this is 'combat air
+            // patrol' with air to air weapons
+            boolean isCAP = !groundTargets || (Compute.d6() <= 2);
 
-                // Set minimum thrust values, with lower minimums for unarmed entities and
-                // ground attack, and use that to limit maximum load
-                safeThrust = curBomber.getWalkMP();
-                if (isCAP) {
-                    safeThrust -= isUnarmed ? 2 : (int) Math.floor(safeThrust / 2.0);
-                } else {
-                    safeThrust -= isUnarmed ? 0 : 2;
+            // Set minimum thrust values, with lower minimums for unarmed and ground attack,
+            // and use remaining thrust to limit hardpoints
+            if (isCAP) {
+                minThrust = isUnarmed ? 2 : ((int) Math.ceil(curBomber.getWalkMP() / 2.0));
+            } else {
+                minThrust = isUnarmed ? 2 : 3;
+            }
+            maxLoad = Math.min((int) Math.floor(curBomber.getWeight() / 5.0), (curBomber.getWalkMP() - minThrust) * 5);
+
+            // Get a random percentage (40 - 90) of the maximum bomb load for armed entities
+            if (!isUnarmed) {
+                maxLoad = (int) Math.ceil((Compute.randomInt(50) + 40) * maxLoad / 100.0);
+            }
+
+            if (maxLoad == 0) {
+                continue;
+            }
+
+            // Generate bomb load
+            // TODO: update isPirate and rating arguments with parameters passed to this method
+            generatedBombs = generateExternalOrdnance(
+                    maxLoad,
+                    isCAP,
+                    false,
+                    IUnitRating.DRAGOON_D,
+                    campaign.getGameYear());
+            // Whoops, go yell at the technician
+            if (null == generatedBombs) {
+                continue;
+            }
+
+            // Set a flag if any of the ordnance guided by TAG
+            hasGuided = !hasGuided &&
+                    generatedBombs.stream().anyMatch(curBomb -> curBomb == BombType.B_LG ||
+                            curBomb == BombType.B_HOMING);
+
+            // Store the bomb selections as we might need to add in TAG later
+            bombsByCarrier.put(curBomber, generatedBombs);
+
+            // Do not increment bomber count for unarmed entities
+            if (!isUnarmed) {
+                numBombers++;
+            }
+
+        }
+
+        // Load bombs onto entities. If there is guided ordnance present then randomly add some TAG
+        // pods to those without the guided ordnance
+        int tagCount = Compute.randomInt(3);
+        for (Entity curBomber : bomberList) {
+
+            if (bombsByCarrier.containsKey(curBomber)) {
+                generatedBombs = bombsByCarrier.get(curBomber);
+
+                if (hasGuided &&
+                        tagCount > 0 &&
+                        (generatedBombs.stream().mapToInt(BombType::getBombCost).sum() <
+                                (Math.floor(curBomber.getWeight() / 5))) &&
+                        generatedBombs.stream().noneMatch(curBomb -> curBomb == BombType.B_LG ||
+                                        curBomb == BombType.B_HOMING)) {
+                    generatedBombs.add(BombType.B_TAG);
+                    tagCount--;
                 }
-                maxLoad = Math.min((int) Math.floor(curBomber.getWeight() / 5.0), safeThrust * 5);
-
-                // Get a random percentage (40 - 90) of the maximum bomb load, with unarmed elements
-                // always set to maximum load
-                if (!isUnarmed) {
-                    maxLoad = (int) Math.ceil((Compute.randomInt(50) + 40) * maxLoad / 100.0);
-                }
-
-                if (maxLoad == 0) {
-                    continue;
-                }
-
-                // Generate bomb load
-                generatedBombs = generateExternalOrdnance(
-                        maxLoad,
-                        isCAP,
-                        false,
-                        IUnitRating.DRAGOON_D,
-                        campaign.getGameYear());
-                // Whoops,
-                if (null == generatedBombs) {
-                    continue;
-                }
-                isGuided = false;
-
-                // Set a flag if any of the ordnance guided by TAG
-                isGuided = generatedBombs.stream().anyMatch(curBomb -> curBomb == BombType.B_LG || curBomb == BombType.B_HOMING);
-
-                // Load the entity with a selection of bombs
                 ((IBomber) curBomber).setBombChoices(generatedBombs.stream().mapToInt(i->i).toArray());
 
-                // Do not increment bomber count for unarmed entities
-                if (!isUnarmed) {
-                    numBombers++;
+            } else {
+
+                if (hasGuided && tagCount > 0) {
+                    generatedBombs = new ArrayList<>();
+                    generatedBombs.add(BombType.B_TAG);
+                    tagCount--;
+                    ((IBomber) curBomber).setBombChoices(generatedBombs.stream().mapToInt(i->i).toArray());
                 }
 
             }
 
-            // Next entity
-
         }
 
-        // If any of the ordnance is TAG guided and TAG is valid for this era, randomly
-        // add TAG to a number of entities
-        numBombers = 0;
-        if (isGuided &&
-                BombType.get(BombType.getBombInternalName(BombType.B_TAG)).isAvailableIn(campaign.getGameYear(),false)) {
-
-            for (numBombers = 0; numBombers < (Math.min(entityList.size() / 5.0, 1)); numBombers++) {
-                Entity curBomber = entityList.get(Compute.randomInt(entityList.size()));
-                if (curBomber.isBomber()) {
-                    generatedBombs = Arrays.stream(((IBomber) curBomber).getBombChoices()).boxed().collect(Collectors.toList());
-                    if (!generatedBombs.contains(BombType.B_TAG) &&
-                            generatedBombs.stream().mapToInt(BombType::getBombCost).sum() < Math.floor(curBomber.getWeight() / 5.0)) {
-                        generatedBombs.add(BombType.B_TAG);
-                    }
-                }
-            }
-
-        }
     }
 
     /**
@@ -2619,10 +2639,11 @@ public class AtBDynamicScenarioFactory {
             return null;
         }
 
-        // Randomly get a loadout
+        // Get a random predefined loadout
         String mapName = "";
         double completeWeight;
         double countWeight = 0.0;
+
         completeWeight = bombMapSpread.values().stream().mapToDouble(curWeight -> Math.max(curWeight, 1.0)).sum();
         double randomThreshold = (Compute.randomInt(100) / 100.0) * completeWeight;
         for (String curMap : bombMapSpread.keySet()) {
@@ -2655,32 +2676,47 @@ public class AtBDynamicScenarioFactory {
                     default:
                         bombMap = lowTechBombLoad;
                         break;
-                };
+                }
             } else {
-                bombMap = antiAirBombLoad;
+                if (Compute.randomInt(100) >20) {
+                    bombMap = antiAirBombLoad;
+                } else {
+                    bombMap = antiShipBombLoad;
+                }
             }
         } else {
             bombMap = airOnly ? pirateAirBombLoad : pirateBombLoad;
         }
 
-        // Replace all unavailable ordnance with either rocket launchers or HE bombs
+        // Generate a working map with all the unavailable ordnance replaced with rockets or HE
         Map<Integer, Integer> workingBombMap = new HashMap<>();
         for (int curBombType : bombMap.keySet()) {
             String typeName = BombType.getBombInternalName(curBombType);
-            if (curBombType == BombType.B_RL || BombType.get(typeName).isAvailableIn(year, false)) {
+            if (curBombType == BombType.B_RL ||
+                    curBombType == BombType.B_HE ||
+                    BombType.get(typeName).isAvailableIn(year, false)) {
                 workingBombMap.put(curBombType, bombMap.get(curBombType));
             } else {
-                workingBombMap.put(Compute.randomInt(2) == 0 ? BombType.B_RL : BombType.B_HE,
-                        bombMap.get(curBombType));
+
+                int replacementBomb = airOnly ? BombType.B_RL :
+                        Compute.randomInt(2) == 0 ? BombType.B_RL : BombType.B_HE;
+
+                if (workingBombMap.containsKey(replacementBomb)) {
+                    workingBombMap.put(replacementBomb, bombMap.get(curBombType) +
+                            workingBombMap.get(replacementBomb));
+                } else {
+                    workingBombMap.put(replacementBomb, bombMap.get(curBombType));
+                }
+
             }
         }
 
         // Generate enough bombs to meet the desired count
-        List<Integer> selectedBombs = new ArrayList<Integer>();
+        List<Integer> selectedBombs = new ArrayList<>();
         int selectedBombType = -1;
         int loopSafety = 0;
         int curLoad;
-        for (curLoad = 0; curLoad <= bombCount && loopSafety < 10;) {
+        for (curLoad = 0; curLoad < bombCount && loopSafety < 10;) {
 
             // Randomly get the ordnance type
             completeWeight = workingBombMap.values().stream().mapToDouble(curWeight -> Math.max(curWeight, 1.0)).sum();
@@ -2707,14 +2743,20 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Oops, nothing left - rocket launchers are always popular
-        if (selectedBombs.isEmpty() || curLoad < bombCount) {
+        if (selectedBombs.isEmpty()) {
             selectedBombs = new ArrayList<>(bombCount);
-            for (int i = 0; i < bombCount; i++){
-                selectedBombs.set(i, BombType.B_RL);
+            for (int i = 0; i < bombCount; i++) {
+                if (airOnly) {
+                    selectedBombs.set(i, BombType.B_RL);
+                } else {
+                    selectedBombs.set(i, Compute.randomInt(2) == 2 ? BombType.B_RL : BombType.B_HE);
+                }
             }
+            return selectedBombs;
         }
 
-        // Randomly replace higher rated bomb types with rockets or HE, depending on force rating
+        // Randomly replace advanced ordnance with rockets or HE, depending on force rating and
+        // air-air/ground preference
         List<Integer> advancedOrdnance = Arrays.asList(
                 BombType.B_LG,
                 BombType.B_ARROW,
@@ -2733,7 +2775,7 @@ public class AtBDynamicScenarioFactory {
                 switch (quality) {
                     case IUnitRating.DRAGOON_ASTAR:
                     case IUnitRating.DRAGOON_A:
-                        randomThreshold = 0;
+                        randomThreshold = 5;
                         break;
                     case IUnitRating.DRAGOON_B:
                         randomThreshold = 10;
@@ -2745,13 +2787,17 @@ public class AtBDynamicScenarioFactory {
                         randomThreshold = 40;
                         break;
                     case IUnitRating.DRAGOON_F:
-                        randomThreshold = 90;
+                        randomThreshold = 80;
                         break;
                     default:
                         randomThreshold = 99;
                 }
                 if (Compute.randomInt(100) < randomThreshold) {
-                    selectedBombs.set(i, Compute.randomInt(2) == 0 ? BombType.B_RL : BombType.B_HE);
+                    if (airOnly) {
+                        selectedBombs.set(i, BombType.B_RL);
+                    } else {
+                        selectedBombs.set(i, Compute.randomInt(2) == 0 ? BombType.B_RL : BombType.B_HE);
+                    }
                 }
             }
         }
