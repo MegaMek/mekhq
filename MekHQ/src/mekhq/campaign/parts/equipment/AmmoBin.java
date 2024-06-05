@@ -324,7 +324,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String find(int transitDays) {
-        return "<font color='Orange'> You shouldn't be here (AmmoBin.find()).</font>";
+        return "<font color='red'> You shouldn't be here (AmmoBin.find()).</font>";
     }
 
     @Override
@@ -507,9 +507,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             String orderTransitString = getOrderTransitStringForDetails(inventories);
 
             if (shotsAvailable == 0) {
-                availability = "<br><font color='Orange'>No ammo " + orderTransitString + "</font>";
+                availability = "<br><font color='red'>No ammo " + orderTransitString + "</font>";
             } else if (shotsAvailable < getShotsNeeded()) {
-                availability = "<br><font color='Orange'>Only " + shotsAvailable + " available" + orderTransitString + "</font>";
+                availability = "<br><font color='red'>Only " + shotsAvailable + " available" + orderTransitString + "</font>";
             } else {
                 availability = "<br><font color='green'>" + shotsAvailable + " available " + orderTransitString + "</font>";
             }

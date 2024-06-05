@@ -161,9 +161,9 @@ public class Armor extends Part implements IAcquisitionWork {
                 String orderTransitString = getOrderTransitStringForDetails(inventories);
 
                 if (amountAvailable == 0) {
-                    availability = "<br><font color='Orange'>No armor " + orderTransitString + "</font>";
+                    availability = "<br><font color='red'>No armor " + orderTransitString + "</font>";
                 } else if (amountAvailable < amountNeeded) {
-                    availability = "<br><font color='Orange'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
+                    availability = "<br><font color='red'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
                 } else {
                     availability = "<br><font color='green'>" + amountAvailable + " available " + orderTransitString + "</font>";
                 }
@@ -321,7 +321,7 @@ public class Armor extends Part implements IAcquisitionWork {
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='Orange'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+            return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
 
@@ -332,7 +332,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='Orange'><b> part not found</b>.</font>";
+        return "<font color='red'><b> part not found</b>.</font>";
     }
 
     @Override
@@ -561,7 +561,7 @@ public class Armor extends Part implements IAcquisitionWork {
                 changeAmountAvailable(-1 * Math.min((unit.getEntity().isCapitalScale() ? (amountNeeded * 10) : amountNeeded), getAmountAvailable()));
             }
         }
-        return " <font color='Orange'><b> failed." + scrap + "</b></font>";
+        return " <font color='red'><b> failed." + scrap + "</b></font>";
     }
 
     @Override

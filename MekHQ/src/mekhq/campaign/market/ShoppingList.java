@@ -142,7 +142,7 @@ public class ShoppingList {
             if ((newWork.getQuantity() == origQuantity)
                     && campaign.getCampaignOptions().isUsePlanetaryAcquisition()
                     && !campaign.getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                campaign.addReport("<font color='Orange'><b>You failed to find " + newWork.getAcquisitionName()
+                campaign.addReport("<font color='red'><b>You failed to find " + newWork.getAcquisitionName()
                         + " within " + campaign.getCampaignOptions().getMaxJumpsPlanetaryAcquisition()
                         + " jumps</b></font>");
             }

@@ -2690,7 +2690,7 @@ public class Person {
     }
 
     public String fail() {
-        return " <font color='Orange'><b>Failed to heal.</b></font>";
+        return " <font color='red'><b>Failed to heal.</b></font>";
     }
 
     //region skill

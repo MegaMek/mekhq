@@ -374,7 +374,7 @@ public class StratconScenarioWizard extends JDialog {
         }
 
         if (injuryCount > 0) {
-            sb.append(String.format(", <span color='Orange'>%d/%d injured crew</span>", injuryCount, u.getCrew().size()));
+            sb.append(String.format(", <span color='red'>%d/%d injured crew</span>", injuryCount, u.getCrew().size()));
         }
 
         sb.append("<br/>");

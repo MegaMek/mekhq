@@ -514,7 +514,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
             String lead = "<html><font>";
             if (currentSalvagePct > maxSalvagePct) {
-                lead = "<html><font color='Orange'>";
+                lead = "<html><font color='red'>";
             }
             lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
         }

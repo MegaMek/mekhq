@@ -2163,13 +2163,13 @@ public class Refit extends Part implements IAcquisitionWork {
         if (campaign.getQuartermaster().buyPart(this, transitDays)) {
             return "<font color='green'><b> refit kit found.</b> Kit will arrive in " + transitDays + " days.</font>";
         } else {
-            return "<font color='Orange'><b> You cannot afford this refit kit. Transaction cancelled</b>.</font>";
+            return "<font color='red'><b> You cannot afford this refit kit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
-        return "<font color='Orange'> refit kit not found.</font>";
+        return "<font color='red'> refit kit not found.</font>";
     }
 
     @Override

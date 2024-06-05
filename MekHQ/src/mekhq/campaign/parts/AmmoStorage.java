@@ -253,7 +253,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='Orange'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+            return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
 
@@ -264,7 +264,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='Orange'><b> part not found</b>.</font>";
+        return "<font color='red'><b> part not found</b>.</font>";
     }
 
     @Override

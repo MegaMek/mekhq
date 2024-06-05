@@ -395,9 +395,9 @@ public class LargeCraftAmmoBin extends AmmoBin {
             int shotsAvailable = getAmountAvailable();
             PartInventory inventories = campaign.getPartInventory(getNewPart());
             if (shotsAvailable == 0) {
-                availability = "<br><font color='Orange'>No ammo ("+ inventories.getTransitOrderedDetails() + ")</font>";
+                availability = "<br><font color='red'>No ammo ("+ inventories.getTransitOrderedDetails() + ")</font>";
             } else if (shotsAvailable < shotsNeeded) {
-                availability = "<br><font color='Orange'>Only " + shotsAvailable + " available ("+ inventories.getTransitOrderedDetails() + ")</font>";
+                availability = "<br><font color='red'>Only " + shotsAvailable + " available ("+ inventories.getTransitOrderedDetails() + ")</font>";
             }
             return getType().getDesc() + ", " + shotsNeeded + " shots needed" + availability;
         } else {

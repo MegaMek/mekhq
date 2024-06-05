@@ -253,9 +253,9 @@ public class PodSpace implements IPartWork {
             }
         }
         if (rating >= SkillType.EXP_ELITE && replacing) {
-                return " <font color='Orange'><b> failed and part(s) destroyed.</b></font>";
+                return " <font color='red'><b> failed and part(s) destroyed.</b></font>";
         } else {
-            return " <font color='Orange'><b> failed.</b></font>";
+            return " <font color='red'><b> failed.</b></font>";
         }
     }
 
@@ -383,7 +383,7 @@ public class PodSpace implements IPartWork {
         toReturn += "<b>" + action + getPartName() + " Equipment</b><br/>";
         toReturn += getDetails() + "<br/>";
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='Orange'>Impossible</font>";
+            toReturn += "<font color='red'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
             if (!campaign.getCampaignOptions().isDestroyByMargin()) {

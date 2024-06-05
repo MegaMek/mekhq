@@ -566,7 +566,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.weightx = 0.0;
             pnlSalvageValue.add(lblSalvagePct1, gridBagConstraints);
 
-            String lead = "<html><font" + ((currentSalvagePct > maxSalvagePct) ? " color='Orange'" : "") + ">";
+            String lead = "<html><font" + ((currentSalvagePct > maxSalvagePct) ? " color='red'" : "") + ">";
             lblSalvagePct2 = new JLabel(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
             gridBagConstraints.gridx = gridx--;
             gridBagConstraints.weightx = 1.0;
@@ -1575,7 +1575,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         lblSalvageValueUnit2.setText(salvageUnit.toAmountAndSymbolString());
         lblSalvageValueEmployer2.setText(salvageEmployer.toAmountAndSymbolString());
 
-        String lead = (currentSalvagePct <= maxSalvagePct) ? "<html><font>" : "<html><font color='Orange'>";
+        String lead = (currentSalvagePct <= maxSalvagePct) ? "<html><font>" : "<html><font color='red'>";
 
         lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
     }

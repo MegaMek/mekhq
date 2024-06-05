@@ -857,7 +857,7 @@ public class MekLocation extends Part {
         }
         toReturn += getDetails() + "<br/>";
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='Orange'>Impossible</font>";
+            toReturn += "<font color='red'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
             if (isBlownOff()) {

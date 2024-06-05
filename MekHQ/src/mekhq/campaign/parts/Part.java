@@ -424,7 +424,7 @@ public abstract class Part implements IPartWork, ITechnology {
         toReturn += "<b>" + action + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='Orange'>Impossible</font>";
+            toReturn += "<font color='red'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
             if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
@@ -1051,7 +1051,7 @@ public abstract class Part implements IPartWork, ITechnology {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        return " <font color='Orange'><b> failed.</b></font>";
+        return " <font color='red'><b> failed.</b></font>";
     }
 
     @Override

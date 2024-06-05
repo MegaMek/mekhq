@@ -70,18 +70,18 @@ public class UnitStub {
     //endregion Getters/Setters
 
     private String getUnitDescription(Unit u) {
-        String name = "<font color='Orange'>No Crew</font>";
+        String name = "<font color='red'>No Crew</font>";
         Person pp = u.getCommander();
         if (null != pp) {
             name = pp.getFullTitle();
             name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
             if (pp.needsFixing()) {
-                name = "<font color='Orange'>" + name + "</font>";
+                name = "<font color='red'>" + name + "</font>";
             }
         }
         String uname = "<i>" + u.getName() + "</i>";
         if (u.isDamaged()) {
-            uname = "<font color='Orange'>" + uname + "</font>";
+            uname = "<font color='red'>" + uname + "</font>";
         }
         return "<html>" + name + ", " + uname + "</html>";
     }

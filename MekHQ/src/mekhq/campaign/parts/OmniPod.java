@@ -234,11 +234,11 @@ public class OmniPod extends Part {
         timeSpent = 0;
         shorthandedMod = 0;
         if (skillMin > SkillType.EXP_ELITE) {
-            return " <font color='Orange'><b> failed and part destroyed.</b></font>";
+            return " <font color='red'><b> failed and part destroyed.</b></font>";
         } else {
             //OmniPod is only added back to warehouse if repair fails without destroying part.
             campaign.getQuartermaster().addPart(this, 0);
-            return " <font color='Orange'><b> failed.</b></font>";
+            return " <font color='red'><b> failed.</b></font>";
         }
     }
 

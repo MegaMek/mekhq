@@ -96,7 +96,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         toReturn += "<b>Replace " + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='Orange'>Impossible</font>";
+            toReturn += "<font color='red'>Impossible</font>";
         } else {
             toReturn += "" + getTimeLeft() + " minutes" + scheduled;
             if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
@@ -205,7 +205,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
             return "Replacement part available";
         } else {
             PartInventory inventories = campaign.getPartInventory(getNewPart());
-            return "<font color='Orange'>No replacement (" + inventories.getTransitOrderedDetails() + ")</font>";
+            return "<font color='red'>No replacement (" + inventories.getTransitOrderedDetails() + ")</font>";
         }
     }
 
@@ -240,9 +240,9 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
                 part.decrementQuantity();
                 skillMin = SkillType.EXP_GREEN;
             }
-            return " <font color='Orange'><b> failed and part destroyed.</b></font>";
+            return " <font color='red'><b> failed and part destroyed.</b></font>";
         } else {
-            return " <font color='Orange'><b> failed.</b></font>";
+            return " <font color='red'><b> failed.</b></font>";
         }
     }
 
@@ -327,7 +327,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='Orange'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+            return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
 
@@ -340,7 +340,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='Orange'><b> part not found</b>.</font>";
+        return "<font color='red'><b> part not found</b>.</font>";
     }
 
     @Override
