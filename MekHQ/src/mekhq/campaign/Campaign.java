@@ -1155,8 +1155,19 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Add a new unit to the campaign and set its quality to 3 (D).
+     *
+     * @param en              An <code>Entity</code> object that the new unit will be wrapped around
+     * @param allowNewPilots  A boolean indicating whether to add new pilots for the unit
+     * @param days            The number of days for the new unit to arrive
+     * @return The newly added unit
+     */
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days) {
+        return addNewUnit(en, allowNewPilots, days, 3);
+    }
+
+    /**
      * Add a new unit to the campaign and set its quality.
-     * Quality 3 (D) is suitable for most uses.
      *
      * @param en              An <code>Entity</code> object that the new unit will be wrapped around
      * @param allowNewPilots  A boolean indicating whether to add new pilots for the unit
