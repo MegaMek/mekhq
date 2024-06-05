@@ -28,6 +28,7 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
+import megamek.common.AmmoType.Munitions;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.BombMounted;
@@ -37,6 +38,10 @@ import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
+import megamek.common.weapons.autocannons.ACWeapon;
+import megamek.common.weapons.flamers.FlamerWeapon;
+import megamek.common.weapons.gaussrifles.GaussWeapon;
+import megamek.common.weapons.lasers.EnergyWeapon;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -5173,9 +5178,9 @@ public class Campaign implements ITechManager {
                 et = ((MissingEquipmentPart) acquisition).getType();
             }
 
-            StringBuilder partAvailabilityLog = new StringBuilder();
-            partAvailabilityLog.append("Part Rating Level: " + partAvailability)
-                    .append("(" + EquipmentType.ratingNames[partAvailability] + ")");
+            StringBuilder partAvailabilityLog = new StringBuilder("<html>");
+            partAvailabilityLog.append("Part Rating Level: ").append(partAvailability)
+                    .append(" (").append(EquipmentType.ratingNames[partAvailability]).append(')');
 
             /*
              * Even if we can acquire Clan parts, they have a minimum availability of F for
@@ -5183,63 +5188,64 @@ public class Campaign implements ITechManager {
              */
             if (acquisition.getTechBase() == Part.T_CLAN && !getFaction().isClan()) {
                 partAvailability = Math.max(partAvailability, EquipmentType.RATING_F);
-                partAvailabilityLog.append(";[clan part for non clan faction]");
+                partAvailabilityLog.append("<br>[clan part for non clan faction]");
             } else if (et != null) {
                 /*
-                 * AtB rules do not simply affect difficulty of obtaining parts, but whether
+                 * AtB rules do not simply affect the difficulty of getting parts, but whether
                  * they can be obtained at all. Changing the system to use availability codes
                  * can have a serious effect on game play, so we apply a few tweaks to keep some
                  * of the more basic items from becoming completely unobtainable, while applying
                  * a minimum for non-flamer energy weapons, which was the reason this rule was
                  * included in AtB to begin with.
                  */
-                if (et instanceof megamek.common.weapons.lasers.EnergyWeapon
-                        && !(et instanceof megamek.common.weapons.flamers.FlamerWeapon)
+                if (et instanceof EnergyWeapon
+                        && !(et instanceof FlamerWeapon)
                         && partAvailability < EquipmentType.RATING_C) {
                     partAvailability = EquipmentType.RATING_C;
-                    partAvailabilityLog.append(";(non-flamer lasers)");
+                    partAvailabilityLog.append("<br>[Non-Flamer Lasers]");
                 }
-                if (et instanceof megamek.common.weapons.autocannons.ACWeapon) {
+                if (et instanceof ACWeapon) {
                     partAvailability -= 2;
-                    partAvailabilityLog.append(";(autocannon): -2");
+                    partAvailabilityLog.append("<br>Autocannon: -2");
                 }
-                if (et instanceof megamek.common.weapons.gaussrifles.GaussWeapon
-                        || et instanceof megamek.common.weapons.flamers.FlamerWeapon) {
+                if (et instanceof GaussWeapon
+                        || et instanceof FlamerWeapon) {
                     partAvailability--;
-                    partAvailabilityLog.append(";(gauss rifle or flamer): -1");
+                    partAvailabilityLog.append("<br>Gauss Rifle or Flamer: -1");
                 }
-                if (et instanceof megamek.common.AmmoType) {
-                    switch (((megamek.common.AmmoType) et).getAmmoType()) {
-                        case megamek.common.AmmoType.T_AC:
+                if (et instanceof AmmoType) {
+                    switch (((AmmoType) et).getAmmoType()) {
+                        case AmmoType.T_AC:
                             partAvailability -= 2;
-                            partAvailabilityLog.append(";(autocannon ammo): -2");
+                            partAvailabilityLog.append("<br>Autocannon Ammo: -2");
                             break;
-                        case megamek.common.AmmoType.T_GAUSS:
+                        case AmmoType.T_GAUSS:
                             partAvailability -= 1;
-                            partAvailabilityLog.append(";(gauss ammo): -1");
+                            partAvailabilityLog.append("<br>Gauss Ammo: -1");
                             break;
                     }
-                    if (EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(
-                            ((megamek.common.AmmoType) et).getMunitionType())){
+                    if (EnumSet.of(Munitions.M_STANDARD).containsAll(
+                            ((AmmoType) et).getMunitionType())){
                         partAvailability--;
-                        partAvailabilityLog.append(";(standard ammo): -1");
+                        partAvailabilityLog.append("<br>Standard Ammo: -1");
                     }
                 }
             }
 
             if (((getGameYear() < 2950) || (getGameYear() > 3040))
                     && (acquisition instanceof Armor || acquisition instanceof MissingMekActuator
-                    || acquisition instanceof mekhq.campaign.parts.MissingMekCockpit
-                    || acquisition instanceof mekhq.campaign.parts.MissingMekLifeSupport
-                    || acquisition instanceof mekhq.campaign.parts.MissingMekLocation
-                    || acquisition instanceof mekhq.campaign.parts.MissingMekSensor)) {
+                    || acquisition instanceof MissingMekCockpit
+                    || acquisition instanceof MissingMekLifeSupport
+                    || acquisition instanceof MissingMekLocation
+                    || acquisition instanceof MissingMekSensor)) {
                 partAvailability--;
-                partAvailabilityLog.append("(Mek part prior to 2950 or after 3040): - 1");
+                partAvailabilityLog.append("<br>Mek part prior to 2950 or after 3040: - 1");
             }
 
             int AtBPartsAvailability = findAtBPartsAvailabilityLevel(acquisition, null);
-            partAvailabilityLog.append("; Total part availability: " + partAvailability)
-                    .append("; Current campaign availability: " + AtBPartsAvailability);
+            partAvailabilityLog.append("<br>Total part availability: ").append(partAvailability)
+                    .append("<br>Current campaign availability: ").append(AtBPartsAvailability)
+                    .append("</html>");
             if (partAvailability > AtBPartsAvailability) {
                 return new TargetRoll(TargetRoll.IMPOSSIBLE, partAvailabilityLog.toString());
             }
