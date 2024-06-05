@@ -2511,56 +2511,97 @@ public class AtBDynamicScenarioFactory {
         int maxBombers = Compute.randomInt(entityList.size()) + 1;
         int numBombers = 0;
 
-        // If there will be valid ground targets, randomly determine if this is 'combat air patrol'
-        // with air to air weapons
-        boolean isCAP = !groundTargets || (Compute.d6() <= 2);
-
-
         // For each entity that can carry bombs
+        int modifiedLoad;
+        int safeThrust;
+        int maxLoad;
+        List<Integer> generatedBombs;
+        boolean isGuided = false;
+        for (Entity curBomber : entityList) {
+            if (numBombers >= maxBombers) {
+                break;
+            }
+            if (curBomber.isBomber()) {
 
-            // Get a random percentage of the maximum bomb load, with unarmed elements always set to
-            // maximum load
+                boolean isUnarmed = curBomber.getIndividualWeaponList().isEmpty();
 
-            // Cap thrust loss, with CAP fighters having a higher minimum thrust
+                // If there will be valid ground targets, randomly determine if this is 'combat air
+                // patrol' with air to air weapons
+                boolean isCAP = !groundTargets || (Compute.d6() <= 2);
 
-            // Generate bomb load
+                // Set minimum thrust values, with lower minimums for unarmed entities and
+                // ground attack, and use that to limit maximum load
+                safeThrust = curBomber.getWalkMP();
+                if (isCAP) {
+                    safeThrust -= isUnarmed ? 2 : (int) Math.floor(safeThrust / 2.0);
+                } else {
+                    safeThrust -= isUnarmed ? 0 : 2;
+                }
+                maxLoad = Math.min((int) Math.floor(curBomber.getWeight() / 5.0), safeThrust * 5);
 
-            // Set a flag if any of the ordnance guided by TAG
+                // Get a random percentage (40 - 90) of the maximum bomb load, with unarmed elements
+                // always set to maximum load
+                if (!isUnarmed) {
+                    maxLoad = (int) Math.ceil((Compute.randomInt(50) + 40) * maxLoad / 100.0);
+                }
 
-            // Load the entity with a selection of bombs
-
-            // Do not increment bomber count for unarmed entities
-
-        // Next entity
-
-        // If any of the ordnance is TAG guided and TAG is valid for this era, randomly
-        // replace the first bomb unit on one of the bombers without guided ordnance
-
-
-
-        int[] validBombChoices = groundTargets ? validBotBombs : validBotAABombs;
-
-        for (Entity entity : entityList) {
-            if (entity.isBomber()) {
-                // if this entity has no guns (e.g. is a Boeing Jump Bomber)
-                if (entity.getIndividualWeaponList().isEmpty()) {
-                    loadBombs(entity, validBombChoices, campaign.getGameYear());
+                if (maxLoad == 0) {
                     continue;
                 }
 
-                if (numBombers >= maxBombers) {
-                    break;
+                // Generate bomb load
+                generatedBombs = generateExternalOrdnance(
+                        maxLoad,
+                        isCAP,
+                        false,
+                        IUnitRating.DRAGOON_D,
+                        campaign.getGameYear());
+                // Whoops,
+                if (null == generatedBombs) {
+                    continue;
+                }
+                isGuided = false;
+
+                // Set a flag if any of the ordnance guided by TAG
+                isGuided = generatedBombs.stream().anyMatch(curBomb -> curBomb == BombType.B_LG || curBomb == BombType.B_HOMING);
+
+                // Load the entity with a selection of bombs
+                ((IBomber) curBomber).setBombChoices(generatedBombs.stream().mapToInt(i->i).toArray());
+
+                // Do not increment bomber count for unarmed entities
+                if (!isUnarmed) {
+                    numBombers++;
                 }
 
-                loadBombs(entity, validBombChoices, campaign.getGameYear());
-                numBombers++;
             }
+
+            // Next entity
+
+        }
+
+        // If any of the ordnance is TAG guided and TAG is valid for this era, randomly
+        // add TAG to a number of entities
+        numBombers = 0;
+        if (isGuided &&
+                BombType.get(BombType.getBombInternalName(BombType.B_TAG)).isAvailableIn(campaign.getGameYear(),false)) {
+
+            for (numBombers = 0; numBombers < (Math.min(entityList.size() / 5.0, 1)); numBombers++) {
+                Entity curBomber = entityList.get(Compute.randomInt(entityList.size()));
+                if (curBomber.isBomber()) {
+                    generatedBombs = Arrays.stream(((IBomber) curBomber).getBombChoices()).boxed().collect(Collectors.toList());
+                    if (!generatedBombs.contains(BombType.B_TAG) &&
+                            generatedBombs.stream().mapToInt(BombType::getBombCost).sum() < Math.floor(curBomber.getWeight() / 5.0)) {
+                        generatedBombs.add(BombType.B_TAG);
+                    }
+                }
+            }
+
         }
     }
 
     /**
      * Randomly generate a set of external ordnance. Lower rated forces are more likely to get
-     * simpler bomb types.
+     * simpler types (HE and rockets).
      * @param bombCount   how many bomb units to generate, larger types means fewer selected
      * @param airOnly     true to only select air-to-air ordnance
      * @param isPirate    true if force is pirate, specific low-tech/high chaos selection
@@ -2568,7 +2609,7 @@ public class AtBDynamicScenarioFactory {
      * @param year        current year, for tech filter
      * @return            list of enum-equivalents for different external ordnance types, or null
      */
-    private static List<Integer> generateExternalOrdnanceMap(int bombCount,
+    private static List<Integer> generateExternalOrdnance (int bombCount,
                                                      boolean airOnly,
                                                      boolean isPirate,
                                                      int quality,
@@ -2579,13 +2620,10 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Randomly get a loadout
-
         String mapName = "";
-        double completeWeight = 0.0;
+        double completeWeight;
         double countWeight = 0.0;
-        for (int curWeight : bombMapSpread.values()) {
-            completeWeight += Math.max(curWeight, 1.0);
-        }
+        completeWeight = bombMapSpread.values().stream().mapToDouble(curWeight -> Math.max(curWeight, 1.0)).sum();
         double randomThreshold = (Compute.randomInt(100) / 100.0) * completeWeight;
         for (String curMap : bombMapSpread.keySet()) {
             countWeight += Math.max(bombMapSpread.get(curMap), 1.0);
@@ -2645,10 +2683,7 @@ public class AtBDynamicScenarioFactory {
         for (curLoad = 0; curLoad <= bombCount && loopSafety < 10;) {
 
             // Randomly get the ordnance type
-            completeWeight = 0.0;
-            for (int curWeight : workingBombMap.values()) {
-                completeWeight += Math.max(curWeight, 1.0);
-            }
+            completeWeight = workingBombMap.values().stream().mapToDouble(curWeight -> Math.max(curWeight, 1.0)).sum();
             randomThreshold = (Compute.randomInt(100) / 100.0) * completeWeight;
             countWeight = 0.0;
             for (int curBomb : workingBombMap.keySet()) {
@@ -2675,12 +2710,11 @@ public class AtBDynamicScenarioFactory {
         if (selectedBombs.isEmpty() || curLoad < bombCount) {
             selectedBombs = new ArrayList<>(bombCount);
             for (int i = 0; i < bombCount; i++){
-
+                selectedBombs.set(i, BombType.B_RL);
             }
         }
 
-        // Randomly replace bomb higher rated bomb types with rockets or HE, depending on
-        // force rating
+        // Randomly replace higher rated bomb types with rockets or HE, depending on force rating
         List<Integer> advancedOrdnance = Arrays.asList(
                 BombType.B_LG,
                 BombType.B_ARROW,
@@ -2697,6 +2731,7 @@ public class AtBDynamicScenarioFactory {
         for (int i = 0; i < selectedBombs.size(); i++) {
             if (advancedOrdnance.contains(selectedBombs.get(i))) {
                 switch (quality) {
+                    case IUnitRating.DRAGOON_ASTAR:
                     case IUnitRating.DRAGOON_A:
                         randomThreshold = 0;
                         break;
@@ -2733,14 +2768,6 @@ public class AtBDynamicScenarioFactory {
      * @param validBombChoices
      */
     private static void loadBombs(Entity entity, int[] validBombChoices, int year) {
-
-        // Safety check that we have actual bombs to load
-
-        //
-
-
-
-
 
         int[] bombChoices = new int[BombType.B_NUM];
 
