@@ -466,17 +466,26 @@ public class Quartermaster {
     public boolean buyUnit(Entity en, int days) {
         Objects.requireNonNull(en);
 
+        int quality = 3;
+
+        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        }
+
         if (getCampaignOptions().isPayForUnits()) {
             Money cost = new Unit(en, getCampaign()).getBuyCost();
             if (getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
                     cost, "Purchased " + en.getShortName())) {
-                getCampaign().addNewUnit(en, false, days);
+
+                getCampaign().addNewUnit(en, false, days, quality);
+
                 return true;
             } else {
                 return false;
             }
         } else {
-            getCampaign().addNewUnit(en, false, days);
+
+            getCampaign().addNewUnit(en, false, days, quality);
             return true;
         }
     }
