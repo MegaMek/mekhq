@@ -87,10 +87,10 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_FIXER, false);
         addOption(l3a, TECH_MAINTAINER, false);
 
-        addOption(edge, EDGE_MEDICAL, false);
-        addOption(edge, EDGE_REPAIR_BREAK_PART, false);
-        addOption(edge, EDGE_REPAIR_FAILED_REFIT, false);
-        addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, false);
+        addOption(edge, EDGE_MEDICAL, true);
+        addOption(edge, EDGE_REPAIR_BREAK_PART, true);
+        addOption(edge, EDGE_REPAIR_FAILED_REFIT, true);
+        addOption(edge, EDGE_ADMIN_ACQUIRE_FAIL, true);
 
         List<CustomOption> customs = CustomOption.getCustomAbilities();
         for (CustomOption option : customs) {
@@ -104,6 +104,8 @@ public class PersonnelOptions extends PilotOptions {
                 case PilotOptions.MD_ADVANTAGES:
                     addOption(md, option.getName(), option.getType(), option.getDefault());
                     break;
+                default:
+                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/PersonnelOptions.java/initialize: " + option.getGroup());
             }
         }
     }

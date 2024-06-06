@@ -39,7 +39,6 @@ import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.handler.XPHandler;
-import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.stratcon.StratconRulesManager;
@@ -478,15 +477,13 @@ public class MekHQ implements GameListener {
             ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true,
                     tracker);
             resolveDialog.setVisible(true);
-            if (campaignGUI.getCampaign().getCampaignOptions().isUseAtB()
-                    && (campaignGUI.getCampaign().getMission(currentScenario.getMissionId()) instanceof AtBContract)
-                    && !campaignGUI.getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-                RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
-                        (AtBContract) campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
-                rdd.setVisible(true);
-                if (!rdd.wasAborted()) {
-                    getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
-                }
+
+            RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI, campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
+
+            rdd.setVisible(true);
+
+            if (!rdd.wasAborted()) {
+                getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
             }
             // we need to trigger ScenarioResolvedEvent before stopping the thread or currentScenario may become null
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));

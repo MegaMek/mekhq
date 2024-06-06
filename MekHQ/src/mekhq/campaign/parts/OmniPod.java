@@ -20,7 +20,6 @@ package mekhq.campaign.parts;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -28,6 +27,7 @@ import mekhq.campaign.parts.equipment.HeatSink;
 import mekhq.campaign.parts.equipment.JumpJet;
 import mekhq.campaign.parts.equipment.MASC;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

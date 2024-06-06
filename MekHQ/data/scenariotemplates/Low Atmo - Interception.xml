@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Low Atmo - Interception</name>
     <shortBriefing>Hostile aircraft on approach. Intercept and destroy.</shortBriefing>
-    <detailedBriefing>Destory or cripple 50% of hostile aircraft.</detailedBriefing>
+    <detailedBriefing>Destroy or cripple 50% of hostile aircraft.</detailedBriefing>
     <mapParameters>
         <allowedTerrainTypes/>
         <allowRotation>false</allowRotation>
