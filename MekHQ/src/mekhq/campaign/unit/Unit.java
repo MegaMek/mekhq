@@ -23,6 +23,7 @@ package mekhq.campaign.unit;
 
 import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
 import megamek.common.annotations.Nullable;
@@ -5316,7 +5317,7 @@ public class Unit implements ITechnology {
             fuelCost = fuelCost.plus(getTonsBurnDay(entity));// * 3 * 15000;
         } else if (entity instanceof ConvFighter) {
             fuelCost = fuelCost.plus(getFighterFuelCost(entity));
-        } else if (entity instanceof megamek.common.Aero) {
+        } else if (entity instanceof Aero) {
             fuelCost = fuelCost.plus(((Aero) entity).getFuelTonnage() * 4.0 * 15000.0);
         } else if ((entity instanceof Tank) || (entity instanceof Mech)) {
             fuelCost = fuelCost.plus(getVehicleFuelCost(entity));
@@ -5356,7 +5357,7 @@ public class Unit implements ITechnology {
             return  (tonsburnday * 15 * 15000);
         } else if ((e instanceof SmallCraft)) {
             return (1.84 * 15 * 15000);
-        } else if (e instanceof megamek.common.Jumpship) {
+        } else if (e instanceof Jumpship) {
             if (e.getWeight() < 50000) {
                 tonsburnday = 2.82;
             } else if (e.getWeight() < 100000) {
@@ -5366,7 +5367,7 @@ public class Unit implements ITechnology {
             } else {
                 tonsburnday = 39.52;
             }
-            if (e instanceof megamek.common.Warship) {
+            if (e instanceof Warship) {
                 return (tonsburnday * 15 * 15000);
             }
             return (tonsburnday * 3 * 15000);
@@ -5688,5 +5689,44 @@ public class Unit implements ITechnology {
             }
             transportedUnits = newTransportedUnits;
         }
+    }
+
+    /**
+     * Generates a random unit quality based on a 2d6 roll and a modifier.
+     * This table is based on the AtB Mek Quality table, but is still useful outside of that ruleset
+     *
+     * @param modifier the modifier to be applied to the 2d6 roll
+     * @return an integer representing the generated unit quality
+     * @throws IllegalStateException if an unexpected value is encountered during the switch statement
+     */
+    public static int getRandomUnitQuality(int modifier) {
+        int roll = MathUtility.clamp(
+                (Compute.d6(2) + modifier),
+                2,
+                12
+        );
+
+        switch (roll) {
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                return Part.QUALITY_A;
+            case 6:
+            case 7:
+            case 8:
+                return Part.QUALITY_B;
+            case 9:
+            case 10:
+                return Part.QUALITY_C;
+            case 11:
+                return Part.QUALITY_D;
+            case 12:
+                return Part.QUALITY_F;
+            default:
+                throw new IllegalStateException("Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
+        }
+
+
     }
 }
