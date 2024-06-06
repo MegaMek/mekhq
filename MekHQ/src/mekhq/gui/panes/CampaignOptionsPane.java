@@ -1063,11 +1063,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panSubMaintenance.add(reverseQualityNames, gridBagConstraints);
 
         reverseQualityNames.addActionListener(evt -> {
-            if (reverseQualityNames.isSelected()) {
-                recreateFinancesPanel(true);
-            } else {
-                recreateFinancesPanel(false);
-            }
+            recreateFinancesPanel(reverseQualityNames.isSelected());
         });
 
         useUnofficialMaintenance = new JCheckBox(resources.getString("useUnofficialMaintenance.text"));
@@ -1714,7 +1710,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panFinances.add(usePercentageMaintBox, gridBagConstraints);
 
-        // Unofficial infantry don't count for contract pay
+        // Unofficial infantry doesn't count for contract pay
         useInfantryDontCountBox = new JCheckBox(resources.getString("infantryDontCount.text"));
         useInfantryDontCountBox.setToolTipText(resources.getString("infantryDontCount.toolTipText"));
         gridBagConstraints = new GridBagConstraints();
@@ -7147,6 +7143,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panel.setName("usedPartsValueMultipliersPanel");
 
         spnUsedPartPriceMultipliers = new JSpinner[Part.QUALITY_F + 1];
+
         for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
             final String qualityLevel = Part.getQualityName(i, reverseQualities);
 
@@ -9164,13 +9161,54 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Recreates the finances panel to reverse the qualities labels.
+     * Recreates the finances panel to reverse the quality labels.
      * @param reverseQualities boolean for if the qualities are reversed.
      */
     private void recreateFinancesPanel(boolean reverseQualities) {
         int financesTabIndex = indexOfTab(resources.getString("financesPanel.title"));
         removeTabAt(financesTabIndex);
         insertTab(resources.getString("financesPanel.title"), null, createFinancesTab(reverseQualities), null, financesTabIndex);
+
+        // The following setters and getter calls are so that recreating the tab doesn't reset all
+        // options to their default values
+
+        // General finances panel options
+        payForPartsBox.setSelected(options.isPayForParts());
+        payForRepairsBox.setSelected(options.isPayForRepairs());
+        payForUnitsBox.setSelected(options.isPayForUnits());
+        payForSalariesBox.setSelected(options.isPayForSalaries());
+        payForOverheadBox.setSelected(options.isPayForOverhead());
+        payForMaintainBox.setSelected(options.isPayForMaintain());
+        payForTransportBox.setSelected(options.isPayForTransport());
+        sellUnitsBox.setSelected(options.isSellUnits());
+        sellPartsBox.setSelected(options.isSellParts());
+        payForRecruitmentBox.setSelected(options.isPayForRecruitment());
+        useLoanLimitsBox.setSelected(options.isUseLoanLimits());
+
+        usePercentageMaintBox.setSelected(options.isUsePercentageMaint());
+        useInfantryDontCountBox.setSelected(options.isInfantryDontCount());
+
+        usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
+        useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
+        showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
+        comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
+        newFinancialYearFinancesToCSVExportBox.setSelected(options.isNewFinancialYearFinancesToCSVExport());
+
+        // Price Modifiers Panel
+        spnCommonPartPriceMultiplier.setValue(options.getCommonPartPriceMultiplier());
+        spnInnerSphereUnitPriceMultiplier.setValue(options.getInnerSphereUnitPriceMultiplier());
+        spnInnerSpherePartPriceMultiplier.setValue(options.getInnerSpherePartPriceMultiplier());
+        spnClanUnitPriceMultiplier.setValue(options.getClanUnitPriceMultiplier());
+        spnClanPartPriceMultiplier.setValue(options.getClanPartPriceMultiplier());
+        spnMixedTechUnitPriceMultiplier.setValue(options.getMixedTechUnitPriceMultiplier());
+        spnDamagedPartsValueMultiplier.setValue(options.getDamagedPartsValueMultiplier());
+        spnUnrepairablePartsValueMultiplier.setValue(options.getUnrepairablePartsValueMultiplier());
+        spnCancelledOrderRefundMultiplier.setValue(options.getCancelledOrderRefundMultiplier());
+
+        // Used Parts Multiplier Panel
+        for (int index = Part.QUALITY_A; index <= Part.QUALITY_F; index++) {
+            spnUsedPartPriceMultipliers[index].setValue(options.getUsedPartPriceMultipliers()[index]);
+        }
     }
 
     private void enableAtBComponents(JPanel panel, boolean enabled) {
