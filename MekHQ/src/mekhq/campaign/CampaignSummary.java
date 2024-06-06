@@ -24,12 +24,20 @@ import megamek.common.UnitType;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.campaign.unit.Unit;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrain;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getAdministrativeStrainModifier;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.getCombinedSkillValues;
 
 /**
  * calculates and stores summary information on a campaign for use in reporting, mostly for the command center
@@ -275,5 +283,45 @@ public class CampaignSummary {
         }
 
         return percentTransported + "% bay capacity" + dropshipAppend;
+    }
+
+    /**
+     * Generates an administrative capacity report for the Command Center.
+     *
+     * @param campaign the campaign for which the administrative capacity report is generated
+     * @return the administrative capacity report in HTML format
+     */
+    public String getAdministrativeCapacityReport(Campaign campaign) {
+        int combinedSkillValues = getCombinedSkillValues(campaign, SkillType.S_ADMIN);
+
+        StringBuilder administrativeCapacityReport = new StringBuilder()
+                .append(getAdministrativeStrain(campaign)).append(" / ")
+                .append(campaign.getCampaignOptions().getAdministrativeCapacity() * combinedSkillValues)
+                .append(" personnel");
+
+        if (getAdministrativeStrainModifier(campaign) > 0) {
+            administrativeCapacityReport
+                    .append(" (+")
+                    .append(getAdministrativeStrainModifier(campaign))
+                    .append(')');
+        }
+
+        return administrativeCapacityReport.toString();
+    }
+
+    /**
+     * Returns a summary of fatigue related facilities.
+     *
+     * @return A summary of fatigue related facilities.
+     */
+    public String getFatigueSummary() {
+        int personnelCount = campaign.getActivePersonnel().size();
+
+        return String.format("Kitchens (%s/%s)",
+                personnelCount, Fatigue.checkFieldKitchenCapacity(campaign));
+    }
+
+    private String createCsv(Collection<?> coll) {
+        return StringUtils.join(coll, ",");
     }
 }

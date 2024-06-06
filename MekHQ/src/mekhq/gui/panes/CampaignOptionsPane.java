@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -255,20 +255,97 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner[] spnBaseSalary;
     //endregion Personnel Tab
 
-    //region Life Paths Ta
+    //region Turnover and Retention Tab
+    // Header Options
+    private JCheckBox chkUseRetirementDateTracking;
+    private JCheckBox chkUseRandomRetirement;
+
+    // Settings
+    private JPanel turnoverAndRetentionSettingsPanel = new JPanel();
+    private JLabel lblTurnoverTargetNumberMethod;
+    private MMComboBox<TurnoverTargetNumberMethod> comboTurnoverTargetNumberMethod;
+    private JLabel lblTurnoverDifficulty;
+    private MMComboBox<SkillLevel> comboTurnoverDifficulty;
+    private JLabel lblTurnoverFixedTargetNumber;
+    private JSpinner spnTurnoverFixedTargetNumber;
+    private JLabel lblTurnoverFrequency;
+    private MMComboBox<TurnoverFrequency> comboTurnoverFrequency;
+    private JCheckBox chkUseContractCompletionRandomRetirement;
+    private JCheckBox chkUseRandomFounderTurnover;
+    private JCheckBox chkUseFounderRetirement;
+    private JCheckBox chkAeroRecruitsHaveUnits;
+    private JCheckBox chkTrackOriginalUnit;
+    private JCheckBox chkUseSubContractSoldiers;
+    private JLabel lblServiceContractDuration;
+    private JSpinner spnServiceContractDuration;
+    private JLabel lblServiceContractModifier;
+    private JSpinner spnServiceContractModifier;
+    private JCheckBox chkPayBonusDefault;
+
+    // Modifiers
+    private JPanel turnoverAndRetentionModifiersPanel = new JPanel();
+    private JCheckBox chkUseCustomRetirementModifiers;
+    private JCheckBox chkUseFatigueModifiers;
+    private JCheckBox chkUseSkillModifiers;
+    private JCheckBox chkUseAgeModifiers;
+    private JCheckBox chkUseUnitRatingModifiers;
+    private JCheckBox chkUseFactionModifiers;
+    private JCheckBox chkUseMissionStatusModifiers;
+    private JCheckBox chkUseMarriageModifiers;
+    private JCheckBox chkUseLoyaltyModifiers;
+
+    private JPanel loyaltySubPanel = new JPanel();
+    private JCheckBox chkUseHideLoyalty;
+
+    // Payout
+    private JPanel turnoverAndRetentionPayoutPanel = new JPanel();
+    private JLabel lblPayoutRateOfficer;
+    private JSpinner spnPayoutRateOfficer;
+    private JLabel lblPayoutRateEnlisted;
+    private JSpinner spnPayoutRateEnlisted;
+    private JLabel lblPayoutRetirementMultiplier;
+    private JSpinner spnPayoutRetirementMultiplier;
+    private JCheckBox chkUsePayoutServiceBonus;
+
+    private JPanel payoutServiceBonusSubPanel = new JPanel();
+    private JLabel lblPayoutServiceBonusRate;
+    private JSpinner spnPayoutServiceBonusRate;
+
+    // Unit Cohesion
+    private JPanel turnoverAndRetentionUnitCohesionPanel = new JPanel();
+    private JCheckBox chkUseAdministrativeStrain;
+    private JCheckBox chkUseManagementSkill;
+
+    private JPanel administrativeStrainSubPanel = new JPanel();
+    private JLabel lblAdministrativeCapacity;
+    private JSpinner spnAdministrativeCapacity;
+    private JLabel lblMultiCrewStrainDivider;
+    private JSpinner spnMultiCrewStrainDivider;
+
+    private JPanel managementSkillSubPanel = new JPanel();
+    private JCheckBox chkUseCommanderLeadershipOnly;
+    private JLabel lblManagementSkillPenalty;
+    private JSpinner spnManagementSkillPenalty;
+
+    // Fatigue
+    private JPanel turnoverAndRetentionFatiguePanel = new JPanel();
+    private JCheckBox chkUseFatigue;
+
+    private JPanel fatigueSubPanel = new JPanel();
+    private JLabel lblFatigueWarning;
+    private JLabel lblFatigueRate;
+    private JSpinner spnFatigueRate;
+    private JCheckBox chkUseInjuryFatigue;
+    private JLabel lblFieldKitchenCapacity;
+    private JSpinner spnFieldKitchenCapacity;
+    private JLabel lblFatigueLeaveThreshold;
+    private JSpinner spnFatigueLeaveThreshold;
+    //endregion Turnover and Retention Tab
+
+    //region Life Paths Tab
     // Personnel Randomization
     private JCheckBox chkUseDylansRandomXP;
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
-
-    // Retirement
-    private JCheckBox chkUseRetirementDateTracking;
-    private JPanel randomRetirementPanel;
-    private MMComboBox<RandomRetirementMethod> comboRandomRetirementMethod;
-    private JCheckBox chkUseYearEndRandomRetirement;
-    private JCheckBox chkUseContractCompletionRandomRetirement;
-    private JCheckBox chkUseCustomRetirementModifiers;
-    private JCheckBox chkUseRandomFounderRetirement;
-    private JCheckBox chkTrackUnitFatigue;
 
     // Marriage
     private JCheckBox chkUseManualMarriages;
@@ -432,6 +509,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnDamagedPartsValueMultiplier;
     private JSpinner spnUnrepairablePartsValueMultiplier;
     private JSpinner spnCancelledOrderRefundMultiplier;
+
+    private JPanel sharesPanel;
+    private JCheckBox chkUseShareSystem;
+    private JPanel sharesSubPanel;
+    private JCheckBox chkSharesExcludeLargeCraft;
+    private JCheckBox chkSharesForAll;
     //endregion Finances Tab
 
     //region Mercenary Tab
@@ -547,12 +630,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private MMComboBox<SkillLevel> comboSkillLevel;
 
     // unit administration
-    private JCheckBox chkUseShareSystem;
-    private JCheckBox chkSharesExcludeLargeCraft;
-    private JCheckBox chkSharesForAll;
-    private JCheckBox chkAeroRecruitsHaveUnits;
-    private JCheckBox chkUseLeadership;
-    private JCheckBox chkTrackOriginalUnit;
     private JCheckBox chkUseAero;
     private JCheckBox chkUseVehicles;
     private JCheckBox chkClanVehicles;
@@ -595,9 +672,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
-    private JSpinner spnScenarioModMax;
-    private JSpinner spnScenarioModChance;
-    private JSpinner spnScenarioModBV;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -644,6 +718,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         addTab(resources.getString("techLimitsPanel.title"), createTechLimitsTab());
         addTab(resources.getString("personnelPanel.title"), createPersonnelTab());
         addTab(resources.getString("lifePathsPanel.title"), createLifePathsPanel());
+        addTab(resources.getString("turnoverAndRetentionPanel.title"), createTurnoverAndRetentionTab());
         addTab(resources.getString("financesPanel.title"), createFinancesTab(campaign.getCampaignOptions().isReverseQualityNames()));
         addTab(resources.getString("mercenaryPanel.title"), createMercenaryTab());
         addTab(resources.getString("experiencePanel.title"), createExperienceTab());
@@ -992,11 +1067,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panSubMaintenance.add(reverseQualityNames, gridBagConstraints);
 
         reverseQualityNames.addActionListener(evt -> {
-            if (reverseQualityNames.isSelected()) {
-                recreateFinancesPanel(true);
-            } else {
-                recreateFinancesPanel(false);
-            }
+            recreateFinancesPanel(reverseQualityNames.isSelected());
         });
 
         useUnofficialMaintenance = new JCheckBox(resources.getString("useUnofficialMaintenance.text"));
@@ -1643,7 +1714,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panFinances.add(usePercentageMaintBox, gridBagConstraints);
 
-        // Unofficial infantry don't count for contract pay
+        // Unofficial infantry doesn't count for contract pay
         useInfantryDontCountBox = new JCheckBox(resources.getString("infantryDontCount.text"));
         useInfantryDontCountBox.setToolTipText(resources.getString("infantryDontCount.toolTipText"));
         gridBagConstraints = new GridBagConstraints();
@@ -1716,6 +1787,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 20;
         panFinances.add(createPriceModifiersPanel(reverseQualities), gridBagConstraints);
+
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 20;
+        panFinances.add(createSharesPanel(), gridBagConstraints);
 
         return new JScrollPane(panFinances);
     }
@@ -2679,14 +2755,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             final boolean enabled = chkUseAtB.isSelected();
             enableAtBComponents(panAtB, enabled);
 
-            // This is necessary to prevent issues where disabled options become visible
-            if (randomRetirementPanel.isEnabled() != enabled) {
-                randomRetirementPanel.setEnabled(enabled);
-                if (enabled) {
-                    comboRandomRetirementMethod.setSelectedItem(comboRandomRetirementMethod.getSelectedItem());
-                }
-            }
-
             if (randomDependentPanel.isEnabled() != enabled) {
                 randomDependentPanel.setEnabled(enabled);
                 if (enabled) {
@@ -2744,45 +2812,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panAtB.add(chkUseStratCon, gridBagConstraints);
 
         // AtB options: "Unit Administration" frame controls
-        chkUseShareSystem = new JCheckBox(resources.getString("chkUseShareSystem.text"));
-        chkUseShareSystem.setToolTipText(resources.getString("chkUseShareSystem.toolTipText"));
-        gridBagConstraints = new GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 1;
-        gridBagConstraints.fill = GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBAdmin.add(chkUseShareSystem, gridBagConstraints);
-
-        chkSharesExcludeLargeCraft = new JCheckBox(resources.getString("chkSharesExcludeLargeCraft.text"));
-        chkSharesExcludeLargeCraft.setToolTipText(resources.getString("chkSharesExcludeLargeCraft.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkSharesExcludeLargeCraft, gridBagConstraints);
-
-        chkSharesForAll = new JCheckBox(resources.getString("chkSharesForAll.text"));
-        chkSharesForAll.setToolTipText(resources.getString("chkSharesForAll.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkSharesForAll, gridBagConstraints);
-
-        chkAeroRecruitsHaveUnits = new JCheckBox(resources.getString("chkAeroRecruitsHaveUnits.text"));
-        chkAeroRecruitsHaveUnits.setToolTipText(resources.getString("chkAeroRecruitsHaveUnits.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkAeroRecruitsHaveUnits, gridBagConstraints);
-
-        chkUseLeadership = new JCheckBox(resources.getString("chkUseLeadership.text"));
-        chkUseLeadership.setToolTipText(resources.getString("chkUseLeadership.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkUseLeadership, gridBagConstraints);
-
-        chkTrackOriginalUnit = new JCheckBox(resources.getString("chkTrackOriginalUnit.text"));
-        chkTrackOriginalUnit.setToolTipText(resources.getString("chkTrackOriginalUnit.toolTipText"));
-        gridBagConstraints.gridy++;
-        panSubAtBAdmin.add(chkTrackOriginalUnit, gridBagConstraints);
-
         chkUseAero = new JCheckBox(resources.getString("chkUseAero.text"));
         chkUseAero.setToolTipText(resources.getString("chkUseAero.toolTipText"));
-        gridBagConstraints.gridy++;
+        gridBagConstraints.gridy = 0;
         panSubAtBAdmin.add(chkUseAero, gridBagConstraints);
 
         chkUseVehicles = new JCheckBox(resources.getString("chkUseVehicles.text"));
@@ -3148,56 +3180,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(panSPAUpgradeIntensity, gridBagConstraints);
 
-        JPanel panScenarioMod = new JPanel();
-        JLabel lblScenarioMod = new JLabel(resources.getString("lblScenarioMod.text"));
-        panScenarioMod.add(lblScenarioMod);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
-
-        JLabel lblScenarioModMax = new JLabel(resources.getString("lblScenarioModMax.text"));
-        lblScenarioModMax.setToolTipText(resources.getString("lblScenarioModMax.toolTipText"));
-        spnScenarioModMax = new JSpinner(new SpinnerNumberModel(3, 0, 10, 1));
-        panScenarioMod.add(lblScenarioModMax);
-        panScenarioMod.add(spnScenarioModMax);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
-
-        JLabel lblScenarioModChance = new JLabel(resources.getString("lblScenarioModChance.text"));
-        lblScenarioModChance.setToolTipText(resources.getString("lblScenarioModChance.toolTipText"));
-        spnScenarioModChance = new JSpinner(new SpinnerNumberModel(25, 5, 100, 5));
-        panScenarioMod.add(lblScenarioModChance);
-        panScenarioMod.add(spnScenarioModChance);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
-
-        JLabel lblScenarioModBV = new JLabel(resources.getString("lblScenarioModBV.text"));
-        lblScenarioModBV.setToolTipText(resources.getString("lblScenarioModBV.toolTipText"));
-        spnScenarioModBV = new JSpinner(new SpinnerNumberModel(50, 5, 100, 5));
-        panScenarioMod.add(lblScenarioModBV);
-        panScenarioMod.add(spnScenarioModBV);
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = yTablePosition++;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = GridBagConstraints.NONE;
-        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
-        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
-
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new Dimension(500, 410));
         return scrAtB;
@@ -3225,6 +3207,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridy++;
         personnelPanel.add(createAdministratorsPanel(), gbc);
 
+        gbc.gridx++;
+        personnelPanel.add(createAwardsPanel(), gbc);
+
         gbc.gridx = 0;
         gbc.gridy++;
         personnelPanel.add(createMedicalPanel(), gbc);
@@ -3232,7 +3217,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridx++;
         personnelPanel.add(createPrisonerPanel(), gbc);
 
-        gbc.gridy++;
+        gbc.gridx++;
         personnelPanel.add(createDependentPanel(), gbc);
 
         gbc.gridx = 0;
@@ -3246,7 +3231,43 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return scrollPersonnel;
     }
 
-    //region Personnel Tab
+    //region Turnover and Retention Tab
+    private JScrollPane createTurnoverAndRetentionTab() {
+        final AbstractMHQScrollablePanel turnoverAndRetentionPanel = new DefaultMHQScrollablePanel(getFrame(),
+                "turnoverAndRetentionPanel", new GridBagLayout());
+        turnoverAndRetentionPanel.setTracksViewportWidth(false);
+
+        final GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        turnoverAndRetentionPanel.add(createTurnoverAndRetentionHeaderPanel(), gbc);
+
+        gbc.gridy++;
+        turnoverAndRetentionPanel.add(createTurnoverAndRetentionSettingsPanel(), gbc);
+
+        gbc.gridx++;
+        turnoverAndRetentionPanel.add(createTurnoverAndRetentionModifiersPanel(), gbc);
+
+        gbc.gridx++;
+        turnoverAndRetentionPanel.add(createTurnoverAndRetentionPayoutPanel(), gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        turnoverAndRetentionPanel.add(createTurnoverAndRetentionFatiguePanel(), gbc);
+
+        gbc.gridx++;
+        turnoverAndRetentionPanel.add(createTurnoverAndRetentionUnitCohesionPanel(), gbc);
+
+        final JScrollPane scrollPersonnel = new JScrollPane(turnoverAndRetentionPanel);
+        scrollPersonnel.setPreferredSize(new Dimension(500, 400));
+
+        return scrollPersonnel;
+    }
+
+    //region Life Paths Tab
     private JScrollPane createLifePathsPanel() {
         final AbstractMHQScrollablePanel lifePathsPanel = new DefaultMHQScrollablePanel(getFrame(),
                 "lifePathsPanel", new GridBagLayout());
@@ -3259,9 +3280,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         lifePathsPanel.add(createPersonnelRandomizationPanel(), gbc);
-
-        gbc.gridx++;
-        lifePathsPanel.add(createRetirementPanel(), gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -3418,6 +3436,85 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return panel;
     }
 
+    private void createFatigueSubPanel() {
+        lblFatigueWarning = new JLabel(resources.getString("lblFatigueWarning.text"));
+        lblFatigueWarning.setName("lblFatigueWarning");
+        lblFatigueWarning.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        lblFatigueRate = new JLabel(resources.getString("lblFatigueRate.text"));
+        lblFatigueRate.setToolTipText(resources.getString("lblFatigueRate.toolTipText"));
+        lblFatigueRate.setName("lblFatigueRate");
+        lblFatigueRate.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        spnFatigueRate = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
+        spnFatigueRate.setToolTipText(resources.getString("lblFatigueRate.toolTipText"));
+        spnFatigueRate.setName("spnFatigueRate");
+        spnFatigueRate.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        chkUseInjuryFatigue = new JCheckBox(resources.getString("chkUseInjuryFatigue.text"));
+        chkUseInjuryFatigue.setToolTipText(resources.getString("chkUseInjuryFatigue.toolTipText"));
+        chkUseInjuryFatigue.setName("chkUseInjuryFatigue");
+
+        lblFieldKitchenCapacity = new JLabel(resources.getString("lblFieldKitchenCapacity.text"));
+        lblFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
+        lblFieldKitchenCapacity.setName("lblFieldKitchenCapacity");
+        lblFieldKitchenCapacity.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        spnFieldKitchenCapacity = new JSpinner(new SpinnerNumberModel(150, 0, 450, 1));
+        spnFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
+        spnFieldKitchenCapacity.setName("spnFieldKitchenCapacity");
+        spnFieldKitchenCapacity.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        lblFatigueLeaveThreshold = new JLabel(resources.getString("lblFatigueLeaveThreshold.text"));
+        lblFatigueLeaveThreshold.setToolTipText(resources.getString("lblFatigueLeaveThreshold.toolTipText"));
+        lblFatigueLeaveThreshold.setName("lblFatigueLeaveThreshold");
+        lblFatigueLeaveThreshold.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        spnFatigueLeaveThreshold = new JSpinner(new SpinnerNumberModel(13, 0, 17, 1));
+        spnFatigueLeaveThreshold.setToolTipText(resources.getString("lblFatigueLeaveThreshold.toolTipText"));
+        spnFatigueLeaveThreshold.setName("spnFatigueLeaveThreshold");
+        spnFatigueLeaveThreshold.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        fatigueSubPanel.setBorder(BorderFactory.createTitledBorder(""));
+        fatigueSubPanel.setName("fatigueSubPanel");
+        fatigueSubPanel.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        final GroupLayout layout = new GroupLayout(fatigueSubPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        fatigueSubPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(lblFatigueWarning)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblFatigueRate)
+                                .addComponent(spnFatigueRate, Alignment.LEADING))
+                        .addComponent(chkUseInjuryFatigue)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblFieldKitchenCapacity)
+                                .addComponent(spnFieldKitchenCapacity, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblFatigueLeaveThreshold)
+                                .addComponent(spnFatigueLeaveThreshold, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(lblFatigueWarning)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblFatigueRate)
+                                .addComponent(spnFatigueRate))
+                        .addComponent(chkUseInjuryFatigue)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblFieldKitchenCapacity)
+                                .addComponent(spnFieldKitchenCapacity))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblFatigueLeaveThreshold)
+                                .addComponent(spnFatigueLeaveThreshold))
+        );
+    }
+
     private JPanel createExpandedPersonnelInformationPanel() {
         // Initialize Labels Used in ActionListeners
         final JLabel lblTimeInServiceDisplayFormat = new JLabel();
@@ -3476,9 +3573,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseTimeInRank.setSelected(true);
         chkUseTimeInRank.doClick();
 
-        // Hook Awards panel
-        final JPanel awardsPanel = createAwardsPanel();
-
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("expandedPersonnelInformationPanel.title")));
@@ -3502,7 +3596,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkTrackTotalEarnings)
                         .addComponent(chkTrackTotalXPEarnings)
                         .addComponent(chkShowOriginFaction)
-                        .addComponent(awardsPanel)
         );
 
         layout.setHorizontalGroup(
@@ -3518,7 +3611,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkTrackTotalEarnings)
                         .addComponent(chkTrackTotalXPEarnings)
                         .addComponent(chkShowOriginFaction)
-                        .addComponent(awardsPanel)
         );
 
         return panel;
@@ -3973,6 +4065,720 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return panel;
     }
 
+    private JPanel createTurnoverAndRetentionHeaderPanel() {
+        chkUseRetirementDateTracking = new JCheckBox(resources.getString("chkUseRetirementDateTracking.text"));
+        chkUseRetirementDateTracking.setToolTipText(resources.getString("chkUseRetirementDateTracking.toolTipText"));
+        chkUseRetirementDateTracking.setName("chkUseRetirementDateTracking");
+
+        chkUseRandomRetirement = new JCheckBox(resources.getString("chkUseRandomRetirement.text"));
+        chkUseRandomRetirement.setToolTipText(resources.getString("chkUseRandomRetirement.toolTipText"));
+        chkUseRandomRetirement.setName("chkUseRandomRetirement");
+        chkUseRandomRetirement.addActionListener(evt -> {
+            boolean isEnabled = chkUseRandomRetirement.isSelected();
+
+            // General Handlers
+            for (Component component : turnoverAndRetentionSettingsPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            for (Component component : turnoverAndRetentionModifiersPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            for (Component component : turnoverAndRetentionPayoutPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            for (Component component : turnoverAndRetentionUnitCohesionPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            // Border Handlers
+            turnoverAndRetentionSettingsPanel.setEnabled(isEnabled);
+            turnoverAndRetentionModifiersPanel.setEnabled(isEnabled);
+            turnoverAndRetentionPayoutPanel.setEnabled(isEnabled);
+            turnoverAndRetentionUnitCohesionPanel.setEnabled(isEnabled);
+
+            // Special Case Handlers
+            // These are elements whose status is influenced by other campaign options.
+            final TurnoverTargetNumberMethod turnoverTargetNumberMethod = comboTurnoverTargetNumberMethod.getSelectedItem();
+            lblTurnoverDifficulty.setEnabled((isEnabled) && (!Objects.requireNonNull(turnoverTargetNumberMethod).isFixed()));
+            comboTurnoverDifficulty.setEnabled((isEnabled) && (!Objects.requireNonNull(turnoverTargetNumberMethod).isFixed()));
+            lblTurnoverFixedTargetNumber.setEnabled((isEnabled) && (Objects.requireNonNull(turnoverTargetNumberMethod).isFixed()));
+            spnTurnoverFixedTargetNumber.setEnabled((isEnabled) && (Objects.requireNonNull(turnoverTargetNumberMethod).isFixed()));
+
+            boolean isUseLoyaltyModifiers = chkUseLoyaltyModifiers.isSelected();
+            loyaltySubPanel.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
+            chkUseHideLoyalty.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
+
+            boolean isUseServiceBonus = chkUsePayoutServiceBonus.isSelected();
+            payoutServiceBonusSubPanel.setEnabled((isEnabled) && (isUseServiceBonus));
+            lblPayoutServiceBonusRate.setEnabled((isEnabled) && (isUseServiceBonus));
+            spnPayoutServiceBonusRate.setEnabled((isEnabled) && (isUseServiceBonus));
+
+            boolean isUseAdministrativeStrain = chkUseAdministrativeStrain.isSelected();
+            administrativeStrainSubPanel.setEnabled((isEnabled) && (isUseAdministrativeStrain));
+            lblAdministrativeCapacity.setEnabled((isEnabled) && (isUseAdministrativeStrain));
+            spnAdministrativeCapacity.setEnabled((isEnabled) && (isUseAdministrativeStrain));
+            lblMultiCrewStrainDivider.setEnabled((isEnabled) && (isUseAdministrativeStrain));
+            spnMultiCrewStrainDivider.setEnabled((isEnabled) && (isUseAdministrativeStrain));
+
+            boolean isUseManagementSkill = chkUseManagementSkill.isSelected();
+            managementSkillSubPanel.setEnabled((isEnabled) && (isUseManagementSkill));
+            chkUseCommanderLeadershipOnly.setEnabled((isEnabled) && (isUseManagementSkill));
+            lblManagementSkillPenalty.setEnabled((isEnabled) && (isUseManagementSkill));
+            spnManagementSkillPenalty.setEnabled((isEnabled) && (isUseManagementSkill));
+        });
+
+        final JPanel turnoverAndRetentionHeaderPanel = new JPanel();
+        turnoverAndRetentionHeaderPanel.setName("turnoverAndRetentionHeaderPanel");
+
+        final GroupLayout layout = new GroupLayout(turnoverAndRetentionHeaderPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        turnoverAndRetentionHeaderPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseRetirementDateTracking)
+                        .addComponent(chkUseRandomRetirement)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseRetirementDateTracking)
+                        .addComponent(chkUseRandomRetirement)
+        );
+
+        return turnoverAndRetentionHeaderPanel;
+    }
+
+    private JPanel createTurnoverAndRetentionSettingsPanel() {
+        boolean isUseTurnover = campaign.getCampaignOptions().isUseRandomRetirement();
+        boolean isUseFixedTargetNumber = campaign.getCampaignOptions().getTurnoverTargetNumberMethod().isFixed();
+
+        lblTurnoverTargetNumberMethod = new JLabel(resources.getString("lblTurnoverTargetNumberMethod.text"));
+        lblTurnoverTargetNumberMethod.setToolTipText(resources.getString("lblTurnoverTargetNumberMethod.toolTipText"));
+        lblTurnoverTargetNumberMethod.setName("lblTurnoverTargetNumberMethod");
+        lblTurnoverTargetNumberMethod.setEnabled(isUseTurnover);
+
+        comboTurnoverTargetNumberMethod = new MMComboBox<>("comboTurnoverTargetNumberMethod", TurnoverTargetNumberMethod.values());
+        comboTurnoverTargetNumberMethod.setToolTipText(resources.getString("lblTurnoverTargetNumberMethod.toolTipText"));
+        comboTurnoverTargetNumberMethod.setEnabled(isUseTurnover);
+        comboTurnoverTargetNumberMethod.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof TurnoverTargetNumberMethod) {
+                    list.setToolTipText(((TurnoverTargetNumberMethod) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+        comboTurnoverTargetNumberMethod.addActionListener(evt -> {
+            final TurnoverTargetNumberMethod method = comboTurnoverTargetNumberMethod.getSelectedItem();
+
+            if (method == null) {
+                return;
+            }
+
+            lblTurnoverDifficulty.setEnabled(!method.isFixed());
+            comboTurnoverDifficulty.setEnabled(!method.isFixed());
+
+            lblTurnoverFixedTargetNumber.setEnabled(method.isFixed());
+            spnTurnoverFixedTargetNumber.setEnabled(method.isFixed());
+        });
+
+        lblTurnoverDifficulty = new JLabel(resources.getString("lblTurnoverDifficulty.text"));
+        lblTurnoverDifficulty.setToolTipText(resources.getString("lblTurnoverDifficulty.toolTipText"));
+        lblTurnoverDifficulty.setName("lblTurnoverDifficulty");
+        lblTurnoverDifficulty.setEnabled((isUseTurnover) && (!isUseFixedTargetNumber));
+
+        final DefaultComboBoxModel<SkillLevel> skillLevelModel = new DefaultComboBoxModel<>(Skills.SKILL_LEVELS);
+        skillLevelModel.removeElement(SkillLevel.NONE);
+        comboTurnoverDifficulty = new MMComboBox<>("comboTurnoverDifficulty", skillLevelModel);
+        comboTurnoverDifficulty.setToolTipText(resources.getString("lblTurnoverDifficulty.toolTipText"));
+        comboTurnoverDifficulty.setEnabled((isUseTurnover) && (!isUseFixedTargetNumber));
+
+        lblTurnoverFixedTargetNumber = new JLabel(resources.getString("lblTurnoverFixedTargetNumber.text"));
+        lblTurnoverFixedTargetNumber.setToolTipText(resources.getString("lblTurnoverFixedTargetNumber.toolTipText"));
+        lblTurnoverFixedTargetNumber.setName("lblTurnoverFixedTargetNumber");
+        lblTurnoverFixedTargetNumber.setEnabled((isUseTurnover) && (isUseFixedTargetNumber));
+
+        spnTurnoverFixedTargetNumber = new JSpinner(new SpinnerNumberModel(3, 0, 10, 1));
+        spnTurnoverFixedTargetNumber.setToolTipText(resources.getString("lblTurnoverFixedTargetNumber.toolTipText"));
+        spnTurnoverFixedTargetNumber.setName("spnTurnoverFixedTargetNumber");
+        spnTurnoverFixedTargetNumber.setEnabled((isUseTurnover) && (isUseFixedTargetNumber));
+
+        lblTurnoverFixedTargetNumber = new JLabel(resources.getString("lblTurnoverFixedTargetNumber.text"));
+        lblTurnoverFixedTargetNumber.setToolTipText(resources.getString("lblTurnoverFixedTargetNumber.toolTipText"));
+        lblTurnoverFixedTargetNumber.setName("lblTurnoverFixedTargetNumber");
+        lblTurnoverFixedTargetNumber.setEnabled(isUseTurnover);
+
+        lblTurnoverFrequency = new JLabel(resources.getString("lblTurnoverFrequency.text"));
+        lblTurnoverFrequency.setToolTipText(resources.getString("lblTurnoverFrequency.toolTipText"));
+        lblTurnoverFrequency.setName("lblTurnoverFrequency");
+        lblTurnoverFrequency.setEnabled(isUseTurnover);
+
+        comboTurnoverFrequency = new MMComboBox<>("comboTurnoverFrequency", TurnoverFrequency.values());
+        comboTurnoverFrequency.setToolTipText(resources.getString("lblTurnoverFrequency.toolTipText"));
+        comboTurnoverFrequency.setEnabled(isUseTurnover);
+        comboTurnoverFrequency.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value,
+                                                          final int index, final boolean isSelected,
+                                                          final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof TurnoverFrequency) {
+                    list.setToolTipText(((TurnoverFrequency) value).getToolTipText());
+                }
+                return this;
+            }
+        });
+
+        chkUseContractCompletionRandomRetirement = new JCheckBox(resources.getString("chkUseContractCompletionRandomRetirement.text"));
+        chkUseContractCompletionRandomRetirement.setToolTipText(resources.getString("chkUseContractCompletionRandomRetirement.toolTipText"));
+        chkUseContractCompletionRandomRetirement.setName("chkUseContractCompletionRandomRetirement");
+        chkUseContractCompletionRandomRetirement.setEnabled(isUseTurnover);
+
+        chkUseRandomFounderTurnover = new JCheckBox(resources.getString("chkUseRandomFounderTurnover.text"));
+        chkUseRandomFounderTurnover.setToolTipText(resources.getString("chkUseRandomFounderTurnover.toolTipText"));
+        chkUseRandomFounderTurnover.setName("chkUseRandomFounderTurnover");
+        chkUseRandomFounderTurnover.setEnabled(isUseTurnover);
+
+        chkUseFounderRetirement = new JCheckBox(resources.getString("chkUseFounderRetirement.text"));
+        chkUseFounderRetirement.setToolTipText(resources.getString("chkUseFounderRetirement.toolTipText"));
+        chkUseFounderRetirement.setName("chkUseFounderRetirement");
+        chkUseFounderRetirement.setEnabled(isUseTurnover);
+
+        chkTrackOriginalUnit = new JCheckBox(resources.getString("chkTrackOriginalUnit.text"));
+        chkTrackOriginalUnit.setToolTipText(resources.getString("chkTrackOriginalUnit.toolTipText"));
+        chkTrackOriginalUnit.setName("chkTrackOriginalUnit");
+        chkTrackOriginalUnit.setEnabled(isUseTurnover);
+
+        chkAeroRecruitsHaveUnits = new JCheckBox(resources.getString("chkAeroRecruitsHaveUnits.text"));
+        chkAeroRecruitsHaveUnits.setToolTipText(resources.getString("chkAeroRecruitsHaveUnits.toolTipText"));
+        chkAeroRecruitsHaveUnits.setName("chkAeroRecruitsHaveUnits");
+        chkAeroRecruitsHaveUnits.setEnabled(isUseTurnover);
+
+        chkUseSubContractSoldiers = new JCheckBox(resources.getString("chkUseSubContractSoldiers.text"));
+        chkUseSubContractSoldiers.setToolTipText(resources.getString("chkUseSubContractSoldiers.toolTipText"));
+        chkUseSubContractSoldiers.setName("chkUseSubContractSoldiers");
+        chkUseSubContractSoldiers.setEnabled(isUseTurnover);
+
+        lblServiceContractDuration = new JLabel(resources.getString("lblServiceContractDuration.text"));
+        lblServiceContractDuration.setToolTipText(resources.getString("lblServiceContractDuration.toolTipText"));
+        lblServiceContractDuration.setName("lblServiceContractDuration");
+        lblServiceContractDuration.setEnabled(isUseTurnover);
+
+        spnServiceContractDuration = new JSpinner(new SpinnerNumberModel(36, 0, 120, 1));
+        spnServiceContractDuration.setToolTipText(resources.getString("lblServiceContractDuration.toolTipText"));
+        spnServiceContractDuration.setName("spnServiceContractDuration");
+        spnServiceContractDuration.setEnabled(isUseTurnover);
+
+        lblServiceContractModifier = new JLabel(resources.getString("lblServiceContractModifier.text"));
+        lblServiceContractModifier.setToolTipText(resources.getString("lblServiceContractModifier.toolTipText"));
+        lblServiceContractModifier.setName("lblServiceContractModifier");
+        lblServiceContractModifier.setEnabled(isUseTurnover);
+
+        spnServiceContractModifier = new JSpinner(new SpinnerNumberModel(5, 0, 10, 1));
+        spnServiceContractModifier.setToolTipText(resources.getString("lblServiceContractModifier.toolTipText"));
+        spnServiceContractModifier.setName("spnServiceContractModifier");
+        spnServiceContractModifier.setEnabled(isUseTurnover);
+
+        chkPayBonusDefault = new JCheckBox(resources.getString("chkPayBonusDefault.text"));
+        chkPayBonusDefault.setToolTipText(resources.getString("chkPayBonusDefault.toolTipText"));
+        chkPayBonusDefault.setName("chkPayBonusDefault");
+        chkPayBonusDefault.setEnabled(isUseTurnover);
+
+        turnoverAndRetentionSettingsPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionSettingsPanel.title")));
+        turnoverAndRetentionSettingsPanel.setName("turnoverAndRetentionSettingsPanel");
+        turnoverAndRetentionSettingsPanel.setEnabled(isUseTurnover);
+
+        final GroupLayout layout = new GroupLayout(turnoverAndRetentionSettingsPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        turnoverAndRetentionSettingsPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblTurnoverTargetNumberMethod)
+                                .addComponent(comboTurnoverTargetNumberMethod, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblTurnoverDifficulty)
+                                .addComponent(comboTurnoverDifficulty, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblTurnoverFixedTargetNumber)
+                                .addComponent(spnTurnoverFixedTargetNumber, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblTurnoverFrequency)
+                                .addComponent(comboTurnoverFrequency, Alignment.LEADING))
+                        .addComponent(chkUseContractCompletionRandomRetirement)
+                        .addComponent(chkUseRandomFounderTurnover)
+                        .addComponent(chkUseFounderRetirement)
+                        .addComponent(chkTrackOriginalUnit)
+                        .addComponent(chkAeroRecruitsHaveUnits)
+                        .addComponent(chkUseSubContractSoldiers)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblServiceContractDuration)
+                                .addComponent(spnServiceContractDuration, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblServiceContractModifier)
+                                .addComponent(spnServiceContractModifier, Alignment.LEADING))
+                        .addComponent(chkPayBonusDefault)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblTurnoverTargetNumberMethod)
+                                .addComponent(comboTurnoverTargetNumberMethod))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblTurnoverDifficulty)
+                                .addComponent(comboTurnoverDifficulty))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblTurnoverFixedTargetNumber)
+                                .addComponent(spnTurnoverFixedTargetNumber))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblTurnoverFrequency)
+                                .addComponent(comboTurnoverFrequency))
+                        .addComponent(chkUseContractCompletionRandomRetirement)
+                        .addComponent(chkUseRandomFounderTurnover)
+                        .addComponent(chkUseFounderRetirement)
+                        .addComponent(chkTrackOriginalUnit)
+                        .addComponent(chkAeroRecruitsHaveUnits)
+                        .addComponent(chkUseSubContractSoldiers)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblServiceContractDuration)
+                                .addComponent(spnServiceContractDuration))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblServiceContractModifier)
+                                .addComponent(spnServiceContractModifier))
+                        .addComponent(chkPayBonusDefault)
+        );
+
+        return turnoverAndRetentionSettingsPanel;
+    }
+
+    private JPanel createTurnoverAndRetentionModifiersPanel() {
+        boolean isUseTurnover = campaign.getCampaignOptions().isUseRandomRetirement();
+
+        chkUseCustomRetirementModifiers = new JCheckBox(resources.getString("chkUseCustomRetirementModifiers.text"));
+        chkUseCustomRetirementModifiers.setToolTipText(resources.getString("chkUseCustomRetirementModifiers.toolTipText"));
+        chkUseCustomRetirementModifiers.setName("chkUseCustomRetirementModifiers");
+        chkUseCustomRetirementModifiers.setEnabled(campaign.getCampaignOptions().isUseRandomRetirement());
+
+        chkUseFatigueModifiers = new JCheckBox(resources.getString("chkUseFatigueModifiers.text"));
+        chkUseFatigueModifiers.setToolTipText(resources.getString("chkUseFatigueModifiers.toolTipText"));
+        chkUseFatigueModifiers.setName("chkUseFatigueModifiers");
+        chkUseFatigueModifiers.setEnabled((isUseTurnover) && (campaign.getCampaignOptions().isUseFatigue()));
+
+        chkUseSkillModifiers = new JCheckBox(resources.getString("chkUseSkillModifiers.text"));
+        chkUseSkillModifiers.setToolTipText(resources.getString("chkUseSkillModifiers.toolTipText"));
+        chkUseSkillModifiers.setName("chkUseSkillModifiers");
+        chkUseSkillModifiers.setEnabled(isUseTurnover);
+
+        chkUseAgeModifiers = new JCheckBox(resources.getString("chkUseAgeModifiers.text"));
+        chkUseAgeModifiers.setToolTipText(resources.getString("chkUseAgeModifiers.toolTipText"));
+        chkUseAgeModifiers.setName("chkUseAgeModifiers");
+        chkUseAgeModifiers.setEnabled(isUseTurnover);
+
+        chkUseUnitRatingModifiers = new JCheckBox(resources.getString("chkUseUnitRatingModifiers.text"));
+        chkUseUnitRatingModifiers.setToolTipText(resources.getString("chkUseUnitRatingModifiers.toolTipText"));
+        chkUseUnitRatingModifiers.setName("chkUseUnitRatingModifiers");
+        chkUseUnitRatingModifiers.setEnabled(isUseTurnover);
+
+        chkUseFactionModifiers = new JCheckBox(resources.getString("chkUseFactionModifiers.text"));
+        chkUseFactionModifiers.setToolTipText(resources.getString("chkUseFactionModifiers.toolTipText"));
+        chkUseFactionModifiers.setName("chkUseFactionModifiers");
+        chkUseFactionModifiers.setEnabled(isUseTurnover);
+
+        chkUseMissionStatusModifiers = new JCheckBox(resources.getString("chkUseMissionStatusModifiers.text"));
+        chkUseMissionStatusModifiers.setToolTipText(resources.getString("chkUseMissionStatusModifiers.toolTipText"));
+        chkUseMissionStatusModifiers.setName("chkUseMissionStatusModifiers");
+        chkUseMissionStatusModifiers.setEnabled(isUseTurnover);
+
+        chkUseMarriageModifiers = new JCheckBox(resources.getString("chkUseMarriageModifiers.text"));
+        chkUseMarriageModifiers.setToolTipText(resources.getString("chkUseMarriageModifiers.toolTipText"));
+        chkUseMarriageModifiers.setName("chkUseMarriageModifiers");
+        chkUseMarriageModifiers.setEnabled(isUseTurnover);
+
+        chkUseLoyaltyModifiers = new JCheckBox(resources.getString("chkUseLoyaltyModifiers.text"));
+        chkUseLoyaltyModifiers.setToolTipText(resources.getString("chkUseLoyaltyModifiers.toolTipText"));
+        chkUseLoyaltyModifiers.setName("chkUseLoyaltyModifiers");
+        chkUseLoyaltyModifiers.setEnabled(isUseTurnover);
+        chkUseLoyaltyModifiers.addActionListener(evt -> {
+            final boolean isEnabled = chkUseLoyaltyModifiers.isSelected();
+
+            for (Component component : loyaltySubPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            loyaltySubPanel.setEnabled(isEnabled);
+        });
+
+        createLoyaltySubPanel(isUseTurnover);
+
+        turnoverAndRetentionModifiersPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionModifiersPanel.title")));
+        turnoverAndRetentionModifiersPanel.setName("turnoverAndRetentionModifiersPanel");
+        turnoverAndRetentionModifiersPanel.setEnabled(isUseTurnover);
+
+        final GroupLayout layout = new GroupLayout(turnoverAndRetentionModifiersPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        turnoverAndRetentionModifiersPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseCustomRetirementModifiers)
+                        .addComponent(chkUseFatigueModifiers)
+                        .addComponent(chkUseSkillModifiers)
+                        .addComponent(chkUseAgeModifiers)
+                        .addComponent(chkUseUnitRatingModifiers)
+                        .addComponent(chkUseFactionModifiers)
+                        .addComponent(chkUseMissionStatusModifiers)
+                        .addComponent(chkUseMarriageModifiers)
+                        .addGap(15)
+                        .addComponent(chkUseLoyaltyModifiers)
+                        .addComponent(loyaltySubPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseCustomRetirementModifiers)
+                        .addComponent(chkUseFatigueModifiers)
+                        .addComponent(chkUseSkillModifiers)
+                        .addComponent(chkUseAgeModifiers)
+                        .addComponent(chkUseUnitRatingModifiers)
+                        .addComponent(chkUseFactionModifiers)
+                        .addComponent(chkUseMissionStatusModifiers)
+                        .addComponent(chkUseMarriageModifiers)
+                        .addComponent(chkUseLoyaltyModifiers)
+                        .addComponent(loyaltySubPanel)
+        );
+
+        return turnoverAndRetentionModifiersPanel;
+    }
+
+    private void createLoyaltySubPanel(boolean isUseTurnover) {
+        chkUseHideLoyalty = new JCheckBox(resources.getString("chkUseHideLoyalty.text"));
+        chkUseHideLoyalty.setToolTipText(resources.getString("chkUseHideLoyalty.toolTipText"));
+        chkUseHideLoyalty.setName("chkUseHideLoyalty");
+        chkUseHideLoyalty.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
+
+        loyaltySubPanel.setBorder(BorderFactory.createTitledBorder(""));
+        loyaltySubPanel.setName("loyaltySubPanel");
+        loyaltySubPanel.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
+
+        final GroupLayout layout = new GroupLayout(loyaltySubPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        loyaltySubPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseHideLoyalty)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseHideLoyalty)
+        );
+    }
+
+    private JPanel createTurnoverAndRetentionPayoutPanel() {
+        boolean isUseTurnover = campaign.getCampaignOptions().isUseRandomRetirement();
+
+        lblPayoutRateOfficer = new JLabel(resources.getString("lblPayoutRateOfficer.text"));
+        lblPayoutRateOfficer.setToolTipText(resources.getString("lblPayoutRateOfficer.toolTipText"));
+        lblPayoutRateOfficer.setName("lblPayoutRateOfficer");
+        lblPayoutRateOfficer.setEnabled(isUseTurnover);
+
+        spnPayoutRateOfficer = new JSpinner(new SpinnerNumberModel(3, 0, 12, 1));
+        spnPayoutRateOfficer.setToolTipText(resources.getString("lblPayoutRateOfficer.toolTipText"));
+        spnPayoutRateOfficer.setName("spnPayoutRateOfficer");
+        spnPayoutRateOfficer.setEnabled(isUseTurnover);
+
+        lblPayoutRateEnlisted = new JLabel(resources.getString("lblPayoutRateEnlisted.text"));
+        lblPayoutRateEnlisted.setToolTipText(resources.getString("lblPayoutRateEnlisted.toolTipText"));
+        lblPayoutRateEnlisted.setName("lblPayoutRateEnlisted");
+        lblPayoutRateEnlisted.setEnabled(isUseTurnover);
+
+        spnPayoutRateEnlisted = new JSpinner(new SpinnerNumberModel(3, 0, 12, 1));
+        spnPayoutRateEnlisted.setToolTipText(resources.getString("lblPayoutRateEnlisted.toolTipText"));
+        spnPayoutRateEnlisted.setName("lblPayoutRateEnlisted");
+        spnPayoutRateEnlisted.setEnabled(isUseTurnover);
+
+        lblPayoutRetirementMultiplier = new JLabel(resources.getString("lblPayoutRetirementMultiplier.text"));
+        lblPayoutRetirementMultiplier.setToolTipText(resources.getString("lblPayoutRetirementMultiplier.toolTipText"));
+        lblPayoutRetirementMultiplier.setName("lblPayoutRetirementMultiplier");
+        lblPayoutRetirementMultiplier.setEnabled(isUseTurnover);
+
+        spnPayoutRetirementMultiplier = new JSpinner(new SpinnerNumberModel(24, 1, 120, 1));
+        spnPayoutRetirementMultiplier.setToolTipText(resources.getString("lblPayoutRateEnlisted.toolTipText"));
+        spnPayoutRetirementMultiplier.setName("spnPayoutRetirementMultiplier");
+        spnPayoutRetirementMultiplier.setEnabled(isUseTurnover);
+
+        chkUsePayoutServiceBonus = new JCheckBox(resources.getString("chkUsePayoutServiceBonus.text"));
+        chkUsePayoutServiceBonus.setToolTipText(resources.getString("chkUsePayoutServiceBonus.toolTipText"));
+        chkUsePayoutServiceBonus.setName("chkUsePayoutServiceBonus");
+        chkUsePayoutServiceBonus.setEnabled(isUseTurnover);
+        chkUsePayoutServiceBonus.addActionListener(evt -> {
+            final boolean isEnabled = chkUsePayoutServiceBonus.isSelected();
+
+            for (Component component : payoutServiceBonusSubPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            payoutServiceBonusSubPanel.setEnabled(isEnabled);
+        });
+
+        createPayoutServiceBonusSubPanel(isUseTurnover);
+
+        turnoverAndRetentionPayoutPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionPayoutPanel.title")));
+        turnoverAndRetentionPayoutPanel.setName("turnoverAndRetentionPayoutPanel");
+        turnoverAndRetentionPayoutPanel.setEnabled(isUseTurnover);
+
+        final GroupLayout layout = new GroupLayout(turnoverAndRetentionPayoutPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        turnoverAndRetentionPayoutPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblPayoutRateOfficer)
+                                .addComponent(spnPayoutRateOfficer, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblPayoutRateEnlisted)
+                                .addComponent(spnPayoutRateEnlisted, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblPayoutRetirementMultiplier)
+                                .addComponent(spnPayoutRetirementMultiplier, Alignment.LEADING))
+                        .addGap(15)
+                        .addComponent(chkUsePayoutServiceBonus)
+                        .addComponent(payoutServiceBonusSubPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPayoutRateOfficer)
+                                .addComponent(spnPayoutRateOfficer))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPayoutRateEnlisted)
+                                .addComponent(spnPayoutRateEnlisted))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPayoutRetirementMultiplier)
+                                .addComponent(spnPayoutRetirementMultiplier))
+                        .addComponent(chkUsePayoutServiceBonus)
+                        .addComponent(payoutServiceBonusSubPanel)
+        );
+
+        return turnoverAndRetentionPayoutPanel;
+    }
+
+    private void createPayoutServiceBonusSubPanel(boolean isUseTurnover) {
+        boolean isUseServiceBonus = campaign.getCampaignOptions().isUsePayoutServiceBonus();
+
+        lblPayoutServiceBonusRate = new JLabel(resources.getString("lblPayoutServiceBonusRate.text"));
+        lblPayoutServiceBonusRate.setToolTipText(resources.getString("lblPayoutServiceBonusRate.toolTipText"));
+        lblPayoutServiceBonusRate.setName("lblPayoutServiceBonusRate");
+        lblPayoutServiceBonusRate.setEnabled((isUseTurnover) && (isUseServiceBonus));
+
+        spnPayoutServiceBonusRate = new JSpinner(new SpinnerNumberModel(10, 1, 100, 1));
+        spnPayoutServiceBonusRate.setToolTipText(resources.getString("lblPayoutServiceBonusRate.toolTipText"));
+        spnPayoutServiceBonusRate.setName("spnPayoutServiceBonusRate");
+        spnPayoutServiceBonusRate.setEnabled((isUseTurnover) && (isUseServiceBonus));
+
+        payoutServiceBonusSubPanel.setBorder(BorderFactory.createTitledBorder(""));
+        payoutServiceBonusSubPanel.setName("payoutServiceBonusSubPanel");
+        payoutServiceBonusSubPanel.setEnabled((isUseTurnover) && (isUseServiceBonus));
+
+        final GroupLayout layout = new GroupLayout(payoutServiceBonusSubPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        payoutServiceBonusSubPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblPayoutServiceBonusRate)
+                                .addComponent(spnPayoutServiceBonusRate, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPayoutServiceBonusRate)
+                                .addComponent(spnPayoutServiceBonusRate))
+        );
+    }
+
+    private JPanel createTurnoverAndRetentionUnitCohesionPanel() {
+        boolean isUseTurnover = campaign.getCampaignOptions().isUseRandomRetirement();
+
+        chkUseAdministrativeStrain = new JCheckBox(resources.getString("chkUseAdministrativeStrain.text"));
+        chkUseAdministrativeStrain.setToolTipText(resources.getString("chkUseAdministrativeStrain.toolTipText"));
+        chkUseAdministrativeStrain.setName("chkUseAdministrativeStrain");
+        chkUseAdministrativeStrain.setEnabled(isUseTurnover);
+        chkUseAdministrativeStrain.addActionListener(evt -> {
+            final boolean isEnabled = chkUseAdministrativeStrain.isSelected();
+
+            for (Component component : administrativeStrainSubPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            administrativeStrainSubPanel.setEnabled(isEnabled);
+        });
+
+        createAdministrativeStrainSubPanel(isUseTurnover);
+
+        chkUseManagementSkill = new JCheckBox(resources.getString("chkUseManagementSkill.text"));
+        chkUseManagementSkill.setToolTipText(resources.getString("chkUseManagementSkill.toolTipText"));
+        chkUseManagementSkill.setName("chkUseManagementSkill");
+        chkUseManagementSkill.setEnabled(isUseTurnover);
+        chkUseManagementSkill.addActionListener(evt -> {
+            final boolean isEnabled = chkUseManagementSkill.isSelected();
+
+            for (Component component : managementSkillSubPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            managementSkillSubPanel.setEnabled(isEnabled);
+        });
+
+        createManagementSkillSubPanel(isUseTurnover);
+
+        turnoverAndRetentionUnitCohesionPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionUnitCohesionPanel.title")));
+        turnoverAndRetentionUnitCohesionPanel.setName("turnoverAndRetentionUnitCohesionPanel");
+        turnoverAndRetentionUnitCohesionPanel.setEnabled(isUseTurnover);
+
+        final GroupLayout layout = new GroupLayout(turnoverAndRetentionUnitCohesionPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        turnoverAndRetentionUnitCohesionPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseAdministrativeStrain)
+                        .addComponent(administrativeStrainSubPanel)
+                        .addGap(15)
+                        .addComponent(chkUseManagementSkill)
+                        .addComponent(managementSkillSubPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseAdministrativeStrain)
+                        .addComponent(administrativeStrainSubPanel)
+                        .addComponent(chkUseManagementSkill)
+                        .addComponent(managementSkillSubPanel)
+        );
+
+        return turnoverAndRetentionUnitCohesionPanel;
+    }
+
+    private void createAdministrativeStrainSubPanel(boolean isUseTurnover) {
+        boolean isUseAdministrativeStrain = campaign.getCampaignOptions().isUseAdministrativeStrain();
+
+        lblAdministrativeCapacity = new JLabel(resources.getString("lblAdministrativeCapacity.text"));
+        lblAdministrativeCapacity.setToolTipText(resources.getString("lblAdministrativeCapacity.toolTipText"));
+        lblAdministrativeCapacity.setName("lblAdministrativeCapacity");
+        lblAdministrativeCapacity.setEnabled((isUseTurnover) && (isUseAdministrativeStrain));
+
+        spnAdministrativeCapacity = new JSpinner(new SpinnerNumberModel(10, 1, 30, 1));
+        spnAdministrativeCapacity.setToolTipText(resources.getString("lblAdministrativeCapacity.toolTipText"));
+        spnAdministrativeCapacity.setName("spnAdministrativeCapacity");
+        spnAdministrativeCapacity.setEnabled((isUseTurnover) && (isUseAdministrativeStrain));
+
+        lblMultiCrewStrainDivider = new JLabel(resources.getString("lblMultiCrewStrainDivider.text"));
+        lblMultiCrewStrainDivider.setToolTipText(resources.getString("lblMultiCrewStrainDivider.toolTipText"));
+        lblMultiCrewStrainDivider.setName("lblMultiCrewStrainDivider");
+        lblMultiCrewStrainDivider.setEnabled((isUseTurnover) && (isUseAdministrativeStrain));
+
+        spnMultiCrewStrainDivider = new JSpinner(new SpinnerNumberModel(5, 1, 25, 1));
+        spnMultiCrewStrainDivider.setToolTipText(resources.getString("lblMultiCrewStrainDivider.toolTipText"));
+        spnMultiCrewStrainDivider.setName("spnMultiCrewStrainDivider");
+        spnMultiCrewStrainDivider.setEnabled((isUseTurnover) && (isUseAdministrativeStrain));
+
+        administrativeStrainSubPanel.setBorder(BorderFactory.createTitledBorder(""));
+        administrativeStrainSubPanel.setName("administrativeStrainSubPanel");
+        administrativeStrainSubPanel.setEnabled((isUseTurnover) && (isUseAdministrativeStrain));
+
+        final GroupLayout layout = new GroupLayout(administrativeStrainSubPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        administrativeStrainSubPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblAdministrativeCapacity)
+                                .addComponent(spnAdministrativeCapacity, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblMultiCrewStrainDivider)
+                                .addComponent(spnMultiCrewStrainDivider, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblAdministrativeCapacity)
+                                .addComponent(spnAdministrativeCapacity))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblMultiCrewStrainDivider)
+                                .addComponent(spnMultiCrewStrainDivider))
+        );
+    }
+
+    private void createManagementSkillSubPanel(boolean isUseTurnover) {
+        boolean isUseManagementSkill = campaign.getCampaignOptions().isUseManagementSkill();
+
+        chkUseCommanderLeadershipOnly = new JCheckBox(resources.getString("chkUseCommanderLeadershipOnly.text"));
+        chkUseCommanderLeadershipOnly.setToolTipText(resources.getString("chkUseCommanderLeadershipOnly.toolTipText"));
+        chkUseCommanderLeadershipOnly.setName("chkUseCommanderLeadershipOnly");
+        chkUseCommanderLeadershipOnly.setEnabled((isUseTurnover) && (isUseManagementSkill));
+
+        lblManagementSkillPenalty = new JLabel(resources.getString("lblManagementSkillPenalty.text"));
+        lblManagementSkillPenalty.setToolTipText(resources.getString("lblManagementSkillPenalty.toolTipText"));
+        lblManagementSkillPenalty.setName("lblManagementSkillPenalty");
+        lblManagementSkillPenalty.setEnabled((isUseTurnover) && (isUseManagementSkill));
+
+        spnManagementSkillPenalty = new JSpinner(new SpinnerNumberModel(-2, -10, 0, 1));
+        spnManagementSkillPenalty.setToolTipText(resources.getString("lblManagementSkillPenalty.toolTipText"));
+        spnManagementSkillPenalty.setName("spnManagementSkillPenalty");
+        spnManagementSkillPenalty.setEnabled((isUseTurnover) && (isUseManagementSkill));
+
+        managementSkillSubPanel.setBorder(BorderFactory.createTitledBorder(""));
+        managementSkillSubPanel.setName("managementSkillSubPanel");
+        managementSkillSubPanel.setEnabled((isUseTurnover) && (isUseManagementSkill));
+
+        final GroupLayout layout = new GroupLayout(managementSkillSubPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        managementSkillSubPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseCommanderLeadershipOnly)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblManagementSkillPenalty)
+                                .addComponent(spnManagementSkillPenalty, Alignment.LEADING))
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseCommanderLeadershipOnly)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblManagementSkillPenalty)
+                                .addComponent(spnManagementSkillPenalty))
+        );
+    }
+
     private JPanel createPersonnelRandomizationPanel() {
         // Create Panel Components
         chkUseDylansRandomXP = new JCheckBox(resources.getString("chkUseDylansRandomXP.text"));
@@ -4004,131 +4810,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         );
 
         return panel;
-    }
-
-    private JPanel createRetirementPanel() {
-        // Create Panel Components
-        chkUseRetirementDateTracking = new JCheckBox(resources.getString("chkUseRetirementDateTracking.text"));
-        chkUseRetirementDateTracking.setToolTipText(resources.getString("chkUseRetirementDateTracking.toolTipText"));
-        chkUseRetirementDateTracking.setName("chkUseRetirementDateTracking");
-
-        createRandomRetirementPanel();
-
-        // Layout the Panel
-        final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(resources.getString("retirementPanel.title")));
-        panel.setToolTipText(resources.getString("retirementPanel.toolTipText"));
-        panel.setName("retirementPanel");
-
-        final GroupLayout layout = new GroupLayout(panel);
-        panel.setLayout(layout);
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addComponent(chkUseRetirementDateTracking)
-                        .addComponent(randomRetirementPanel)
-        );
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(chkUseRetirementDateTracking)
-                        .addComponent(randomRetirementPanel)
-        );
-
-        return panel;
-    }
-
-    private void createRandomRetirementPanel() {
-        // Create Panel Components
-        final JLabel lblRandomRetirementMethod = new JLabel(resources.getString("lblRandomRetirementMethod.text"));
-        lblRandomRetirementMethod.setToolTipText(resources.getString("lblRandomRetirementMethod.toolTipText"));
-        lblRandomRetirementMethod.setName("lblRandomRetirementMethod");
-
-        comboRandomRetirementMethod = new MMComboBox<>("comboRandomRetirementMethod", RandomRetirementMethod.values());
-        comboRandomRetirementMethod.setToolTipText(resources.getString("lblRandomRetirementMethod.toolTipText"));
-        comboRandomRetirementMethod.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(final JList<?> list, final Object value,
-                                                          final int index, final boolean isSelected,
-                                                          final boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof RandomRetirementMethod) {
-                    list.setToolTipText(((RandomRetirementMethod) value).getToolTipText());
-                }
-                return this;
-            }
-        });
-        comboRandomRetirementMethod.addActionListener(evt -> {
-            final RandomRetirementMethod method = comboRandomRetirementMethod.getSelectedItem();
-            if (method == null) {
-                return;
-            }
-            final boolean enabled = randomRetirementPanel.isEnabled() && !method.isNone();
-            chkUseYearEndRandomRetirement.setEnabled(enabled);
-            chkUseContractCompletionRandomRetirement.setEnabled(enabled);
-            chkUseCustomRetirementModifiers.setEnabled(enabled);
-            chkUseRandomFounderRetirement.setEnabled(enabled);
-            chkTrackUnitFatigue.setEnabled(enabled);
-        });
-
-        chkUseYearEndRandomRetirement = new JCheckBox(resources.getString("chkUseYearEndRandomRetirement.text"));
-        chkUseYearEndRandomRetirement.setToolTipText(resources.getString("chkUseYearEndRandomRetirement.toolTipText"));
-        chkUseYearEndRandomRetirement.setName("chkUseYearEndRandomRetirement");
-
-        chkUseContractCompletionRandomRetirement = new JCheckBox(resources.getString("chkUseContractCompletionRandomRetirement.text"));
-        chkUseContractCompletionRandomRetirement.setToolTipText(resources.getString("chkUseContractCompletionRandomRetirement.toolTipText"));
-        chkUseContractCompletionRandomRetirement.setName("chkUseContractCompletionRandomRetirement");
-
-        chkUseCustomRetirementModifiers = new JCheckBox(resources.getString("chkUseCustomRetirementModifiers.text"));
-        chkUseCustomRetirementModifiers.setToolTipText(resources.getString("chkUseCustomRetirementModifiers.toolTipText"));
-        chkUseCustomRetirementModifiers.setName("chkUseCustomRetirementModifiers");
-
-        chkUseRandomFounderRetirement = new JCheckBox(resources.getString("chkUseRandomFounderRetirement.text"));
-        chkUseRandomFounderRetirement.setToolTipText(resources.getString("chkUseRandomFounderRetirement.toolTipText"));
-        chkUseRandomFounderRetirement.setName("chkUseRandomFounderRetirement");
-
-        chkTrackUnitFatigue = new JCheckBox(resources.getString("chkTrackUnitFatigue.text"));
-        chkTrackUnitFatigue.setToolTipText(resources.getString("chkTrackUnitFatigue.toolTipText"));
-        chkTrackUnitFatigue.setName("chkTrackUnitFatigue");
-
-        // Programmatically Assign Accessibility Labels
-        lblRandomRetirementMethod.setLabelFor(comboRandomRetirementMethod);
-
-        // Layout the Panel
-        randomRetirementPanel = new JDisableablePanel("randomRetirementPanel");
-        randomRetirementPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("randomRetirementPanel.title")));
-        randomRetirementPanel.setToolTipText(resources.getString("randomRetirementPanel.toolTipText"));
-
-        final GroupLayout layout = new GroupLayout(randomRetirementPanel);
-        randomRetirementPanel.setLayout(layout);
-        layout.setAutoCreateGaps(true);
-        layout.setAutoCreateContainerGaps(true);
-
-        layout.setVerticalGroup(
-                layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblRandomRetirementMethod)
-                                .addComponent(comboRandomRetirementMethod, Alignment.LEADING))
-                        .addComponent(chkUseYearEndRandomRetirement)
-                        .addComponent(chkUseContractCompletionRandomRetirement)
-                        .addComponent(chkUseRandomFounderRetirement)
-                        .addComponent(chkUseCustomRetirementModifiers)
-                        .addComponent(chkTrackUnitFatigue)
-        );
-
-        layout.setHorizontalGroup(
-                layout.createParallelGroup(Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRandomRetirementMethod)
-                                .addComponent(comboRandomRetirementMethod))
-                        .addComponent(chkUseYearEndRandomRetirement)
-                        .addComponent(chkUseContractCompletionRandomRetirement)
-                        .addComponent(chkUseRandomFounderRetirement)
-                        .addComponent(chkUseCustomRetirementModifiers)
-                        .addComponent(chkTrackUnitFatigue)
-        );
     }
 
     private JPanel createFamilyPanel() {
@@ -4197,6 +4878,47 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         );
 
         return panel;
+    }
+
+    private JPanel createTurnoverAndRetentionFatiguePanel() {
+        chkUseFatigue = new JCheckBox(resources.getString("chkUseFatigue.text"));
+        chkUseFatigue.setToolTipText(resources.getString("chkUseFatigue.toolTipText"));
+        chkUseFatigue.setName("chkUseFatigue");
+        chkUseFatigue.addActionListener(evt -> {
+            final boolean isEnabled = chkUseFatigue.isSelected();
+
+            for (Component component : fatigueSubPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+
+            fatigueSubPanel.setEnabled(isEnabled);
+
+            chkUseFatigueModifiers.setEnabled(isEnabled);
+        });
+
+        createFatigueSubPanel();
+
+        turnoverAndRetentionFatiguePanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionFatiguePanel.title")));
+        turnoverAndRetentionFatiguePanel.setName("turnoverAndRetentionFatiguePanel");
+
+        final GroupLayout layout = new GroupLayout(turnoverAndRetentionFatiguePanel);
+        turnoverAndRetentionFatiguePanel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseFatigue)
+                        .addComponent(fatigueSubPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseFatigue)
+                        .addComponent(fatigueSubPanel)
+        );
+
+        return turnoverAndRetentionFatiguePanel;
     }
 
     private void createRandomDependentPanel() {
@@ -6449,6 +7171,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         panel.setName("usedPartsValueMultipliersPanel");
 
         spnUsedPartPriceMultipliers = new JSpinner[Part.QUALITY_F + 1];
+
         for (int i = Part.QUALITY_A; i <= Part.QUALITY_F; i++) {
             final String qualityLevel = Part.getQualityName(i, reverseQualities);
 
@@ -6467,6 +7190,77 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
 
         return panel;
+    }
+
+    private JPanel createSharesPanel() {
+        chkUseShareSystem = new JCheckBox(resources.getString("chkUseShareSystem.text"));
+        chkUseShareSystem.setToolTipText(resources.getString("chkUseShareSystem.toolTipText"));
+        chkUseShareSystem.setName("chkUseShareSystem");
+        chkUseShareSystem.addActionListener(evt -> {
+            final boolean isEnabled = chkUseShareSystem.isSelected();
+
+            // general handlers
+            for (Component component : sharesSubPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+        });
+
+        sharesSubPanel = createSharesSubPanel();
+        for (Component component : sharesSubPanel.getComponents()) {
+            component.setEnabled(campaign.getCampaignOptions().isUseShareSystem());
+        }
+
+        sharesPanel = new JDisableablePanel("sharesPanel");
+        sharesPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("sharesPanel.title")));
+        sharesPanel.setEnabled(campaign.getCampaignOptions().isUseShareSystem());
+
+        final GroupLayout layout = new GroupLayout(sharesPanel);
+        sharesPanel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseShareSystem)
+                        .addComponent(sharesSubPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseShareSystem)
+                        .addComponent(sharesSubPanel)
+        );
+
+        return sharesPanel;
+    }
+
+    private JPanel createSharesSubPanel() {
+        chkSharesExcludeLargeCraft = new JCheckBox(resources.getString("chkSharesExcludeLargeCraft.text"));
+        chkSharesExcludeLargeCraft.setToolTipText(resources.getString("chkSharesExcludeLargeCraft.toolTipText"));
+        chkSharesExcludeLargeCraft.setName("chkSharesExcludeLargeCraft");
+
+        chkSharesForAll = new JCheckBox(resources.getString("chkSharesForAll.text"));
+        chkSharesForAll.setToolTipText(resources.getString("chkSharesForAll.toolTipText"));
+        chkSharesForAll.setName("chkSharesForAll");
+
+        sharesSubPanel = new JDisableablePanel("sharesSubPanel");
+
+        final GroupLayout layout = new GroupLayout(sharesSubPanel);
+        sharesSubPanel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(layout
+                .createSequentialGroup()
+                .addComponent(chkSharesExcludeLargeCraft)
+                .addComponent(chkSharesForAll));
+
+        layout.setHorizontalGroup(layout
+                .createParallelGroup(Alignment.LEADING)
+                .addComponent(chkSharesExcludeLargeCraft)
+                .addComponent(chkSharesForAll));
+
+        return sharesSubPanel;
     }
     //endregion Finances Tab
 
@@ -7173,19 +7967,67 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableMiscAwards.setSelected(options.isEnableMiscAwards());
         //endregion Personnel Tab
 
+        //region Turnover and Retention Tab
+        // Header
+        chkUseRetirementDateTracking.setSelected(options.isUseRetirementDateTracking());
+        chkUseRandomRetirement.setSelected(options.isUseRandomRetirement());
+
+        // Settings
+        comboTurnoverTargetNumberMethod.setSelectedItem(options.getTurnoverTargetNumberMethod());
+        comboTurnoverDifficulty.setSelectedItem(options.getTurnoverDifficulty());
+        spnTurnoverFixedTargetNumber.setValue(options.getTurnoverFixedTargetNumber());
+        comboTurnoverFrequency.setSelectedItem(options.getTurnoverFrequency());
+        chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
+        chkUseRandomFounderTurnover.setSelected(options.isUseRandomFounderTurnover());
+        chkUseFounderRetirement.setSelected(options.isUseFounderRetirement());
+        chkTrackOriginalUnit.setSelected(options.isTrackOriginalUnit());
+        chkAeroRecruitsHaveUnits.setSelected(options.isAeroRecruitsHaveUnits());
+        chkUseSubContractSoldiers.setSelected(options.isUseSubContractSoldiers());
+        spnServiceContractDuration.setValue(options.getServiceContractDuration());
+        spnServiceContractModifier.setValue(options.getServiceContractModifier());
+        chkPayBonusDefault.setSelected(options.isPayBonusDefault());
+
+        // Modifiers
+        chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
+        chkUseFatigueModifiers.setSelected(options.isUseFatigueModifiers());
+        chkUseSkillModifiers.setSelected(options.isUseSkillModifiers());
+        chkUseAgeModifiers.setSelected(options.isUseAgeModifiers());
+        chkUseUnitRatingModifiers.setSelected(options.isUseUnitRatingModifiers());
+        chkUseFactionModifiers.setSelected(options.isUseFactionModifiers());
+        chkUseMissionStatusModifiers.setSelected(options.isUseMissionStatusModifiers());
+        chkUseMarriageModifiers.setSelected(options.isUseMarriageModifiers());
+        chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
+        chkUseHideLoyalty.setSelected(options.isUseHideLoyalty());
+
+        // Payouts
+        spnPayoutRateOfficer.setValue(options.getPayoutRateOfficer());
+        spnPayoutRateEnlisted.setValue(options.getPayoutRateEnlisted());
+        spnPayoutRetirementMultiplier.setValue(options.getPayoutRetirementMultiplier());
+        chkUsePayoutServiceBonus.setSelected(options.isUsePayoutServiceBonus());
+        spnPayoutServiceBonusRate.setValue(options.getPayoutServiceBonusRate());
+
+        // Unit Cohesion
+        chkUseAdministrativeStrain.setSelected(options.isUseAdministrativeStrain());
+        chkUseManagementSkill.setSelected(options.isUseManagementSkill());
+
+        spnAdministrativeCapacity.setValue(options.getAdministrativeCapacity());
+        spnMultiCrewStrainDivider.setValue(options.getMultiCrewStrainDivider());
+
+        chkUseCommanderLeadershipOnly.setSelected(options.isUseCommanderLeadershipOnly());
+        spnManagementSkillPenalty.setValue(options.getManagementSkillPenalty());
+
+        // Fatigue
+        chkUseFatigue.setSelected(options.isUseFatigue());
+        spnFatigueRate.setValue(options.getFatigueRate());
+        chkUseInjuryFatigue.setVisible(options.isUseInjuryFatigue());
+        spnFieldKitchenCapacity.setValue(options.getFieldKitchenCapacity());
+        spnFatigueLeaveThreshold.setValue(options.getFatigueLeaveThreshold());
+        //endregion Turnover and Retention Tab
+
         //region Life Paths Tab
         // Personnel Randomization
         chkUseDylansRandomXP.setSelected(options.isUseDylansRandomXP());
         randomOriginOptionsPanel.setOptions(options.getRandomOriginOptions());
-
-        // Retirement
-        chkUseRetirementDateTracking.setSelected(options.isUseRetirementDateTracking());
-        comboRandomRetirementMethod.setSelectedItem(options.getRandomRetirementMethod());
-        chkUseYearEndRandomRetirement.setSelected(options.isUseYearEndRandomRetirement());
-        chkUseContractCompletionRandomRetirement.setSelected(options.isUseContractCompletionRandomRetirement());
-        chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
-        chkUseRandomFounderRetirement.setSelected(options.isUseRandomFounderRetirement());
-        chkTrackUnitFatigue.setSelected(options.isTrackUnitFatigue());
 
         // Family
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
@@ -7348,6 +8190,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnDamagedPartsValueMultiplier.setValue(options.getDamagedPartsValueMultiplier());
         spnUnrepairablePartsValueMultiplier.setValue(options.getUnrepairablePartsValueMultiplier());
         spnCancelledOrderRefundMultiplier.setValue(options.getCancelledOrderRefundMultiplier());
+
+        // Shares
+        chkUseShareSystem.setSelected(options.isUseShareSystem());
+        chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
+        chkSharesForAll.setSelected(options.isSharesForAll());
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -7499,12 +8346,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         }
         chkUseStratCon.setSelected(options.isUseStratCon());
         comboSkillLevel.setSelectedItem(options.getSkillLevel());
-        chkUseShareSystem.setSelected(options.isUseShareSystem());
-        chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
-        chkSharesForAll.setSelected(options.isSharesForAll());
-        chkAeroRecruitsHaveUnits.setSelected(options.isAeroRecruitsHaveUnits());
-        chkUseLeadership.setSelected(options.isUseLeadership());
-        chkTrackOriginalUnit.setSelected(options.isTrackOriginalUnit());
         chkUseAero.setSelected(options.isUseAero());
         chkUseVehicles.setSelected(options.isUseVehicles());
         chkClanVehicles.setSelected(options.isClanVehicles());
@@ -7537,9 +8378,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAdjustPlayerVehicles.setSelected(options.isAdjustPlayerVehicles());
         spnFixedMapChance.setValue(options.getFixedMapChance());
         spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
-        spnScenarioModMax.setValue(options.getScenarioModMax());
-        spnScenarioModChance.setValue(options.getScenarioModChance());
-        spnScenarioModBV.setValue(options.getScenarioModBV());
         chkRegionalMechVariations.setSelected(options.isRegionalMechVariations());
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
@@ -7753,6 +8591,26 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setAdminsHaveScrounge(chkAdminsHaveScrounge.isSelected());
             options.setAdminExperienceLevelIncludeScrounge(chkAdminExperienceLevelIncludeScrounge.isSelected());
 
+            // autoAwards
+            options.setEnableAutoAwards(chkEnableAutoAwards.isSelected());
+            options.setAwardBonusStyle(comboAwardBonusStyle.getSelectedItem());
+            options.setIssuePosthumousAwards(chkIssuePosthumousAwards.isSelected());
+            options.setIssueBestAwardOnly(chkIssueBestAwardOnly.isSelected());
+            options.setIgnoreStandardSet(chkIgnoreStandardSet.isSelected());
+            options.setAwardTierSize((int) spnAwardTierSize.getValue());
+            options.setEnableContractAwards(chkEnableContractAwards.isSelected());
+            options.setEnableFactionHunterAwards(chkEnableFactionHunterAwards.isSelected());
+            options.setEnableInjuryAwards(chkEnableInjuryAwards.isSelected());
+            options.setEnableIndividualKillAwards(chkEnableIndividualKillAwards.isSelected());
+            options.setEnableFormationKillAwards(chkEnableFormationKillAwards.isSelected());
+            options.setEnableRankAwards(chkEnableRankAwards.isSelected());
+            options.setEnableScenarioAwards(chkEnableScenarioAwards.isSelected());
+            options.setEnableSkillAwards(chkEnableSkillAwards.isSelected());
+            options.setEnableTheatreOfWarAwards(chkEnableTheatreOfWarAwards.isSelected());
+            options.setEnableTimeAwards(chkEnableTimeAwards.isSelected());
+            options.setEnableTimeAwards(chkEnableTrainingAwards.isSelected());
+            options.setEnableMiscAwards(chkEnableMiscAwards.isSelected());
+
             // Medical
             options.setUseAdvancedMedical(chkUseAdvancedMedical.isSelected());
             // we need to reset healing time options through the campaign because we may need to
@@ -7785,41 +8643,68 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             for (final PersonnelRole personnelRole : PersonnelRole.values()) {
                 options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
             }
-
-            // Awards
-            options.setEnableAutoAwards(chkEnableAutoAwards.isSelected());
-            options.setAwardBonusStyle(comboAwardBonusStyle.getSelectedItem());
-            options.setIssuePosthumousAwards(chkIssuePosthumousAwards.isSelected());
-            options.setIssueBestAwardOnly(chkIssueBestAwardOnly.isSelected());
-            options.setIgnoreStandardSet(chkIgnoreStandardSet.isSelected());
-            options.setAwardTierSize((int) spnAwardTierSize.getValue());
-            options.setEnableContractAwards(chkEnableContractAwards.isSelected());
-            options.setEnableFactionHunterAwards(chkEnableFactionHunterAwards.isSelected());
-            options.setEnableInjuryAwards(chkEnableInjuryAwards.isSelected());
-            options.setEnableIndividualKillAwards(chkEnableIndividualKillAwards.isSelected());
-            options.setEnableFormationKillAwards(chkEnableFormationKillAwards.isSelected());
-            options.setEnableRankAwards(chkEnableRankAwards.isSelected());
-            options.setEnableScenarioAwards(chkEnableScenarioAwards.isSelected());
-            options.setEnableSkillAwards(chkEnableSkillAwards.isSelected());
-            options.setEnableTheatreOfWarAwards(chkEnableTheatreOfWarAwards.isSelected());
-            options.setEnableTimeAwards(chkEnableTimeAwards.isSelected());
-            options.setEnableTimeAwards(chkEnableTrainingAwards.isSelected());
-            options.setEnableMiscAwards(chkEnableMiscAwards.isSelected());
             //endregion Personnel Tab
+
+            //region Turnover and Retention
+            // Header
+            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
+            options.setUseRandomRetirement(chkUseRandomRetirement.isSelected());
+
+            // Settings
+            options.setTurnoverTargetNumberMethod(comboTurnoverTargetNumberMethod.getSelectedItem());
+            options.setTurnoverDifficulty(comboTurnoverDifficulty.getSelectedItem());
+            options.setTurnoverFixedTargetNumber((Integer) spnTurnoverFixedTargetNumber.getValue());
+            options.setTurnoverFrequency(comboTurnoverFrequency.getSelectedItem());
+            options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
+            options.setUseRandomFounderTurnover(chkUseRandomFounderTurnover.isSelected());
+            options.setUseFounderRetirement(chkUseFounderRetirement.isSelected());
+            options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
+            options.setUseSubContractSoldiers(chkUseSubContractSoldiers.isSelected());
+            options.setServiceContractDuration((Integer) spnServiceContractDuration.getValue());
+            options.setServiceContractModifier((Integer) spnServiceContractModifier.getValue());
+            options.setPayBonusDefault(chkPayBonusDefault.isSelected());
+
+            // Modifiers
+            options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
+            options.setUseFatigueModifiers(chkUseFatigueModifiers.isSelected());
+            options.setUseSkillModifiers(chkUseSkillModifiers.isSelected());
+            options.setUseAgeModifiers(chkUseAgeModifiers.isSelected());
+            options.setUseUnitRatingModifiers(chkUseUnitRatingModifiers.isSelected());
+            options.setUseFactionModifiers(chkUseFactionModifiers.isSelected());
+            options.setUseMissionStatusModifiers(chkUseMissionStatusModifiers.isSelected());
+            options.setUseMarriageModifiers(chkUseMarriageModifiers.isSelected());
+            options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
+            options.setUseHideLoyalty(chkUseHideLoyalty.isSelected());
+
+            // Payouts
+            options.setPayoutRateOfficer((Integer) spnPayoutRateOfficer.getValue());
+            options.setPayoutRateEnlisted((Integer) spnPayoutRateEnlisted.getValue());
+            options.setPayoutRetirementMultiplier((Integer) spnPayoutRetirementMultiplier.getValue());
+            options.setUsePayoutServiceBonus(chkUsePayoutServiceBonus.isSelected());
+            options.setPayoutServiceBonusRate((Integer) spnPayoutServiceBonusRate.getValue());
+
+            // Unit Cohesion
+            options.setUseAdministrativeStrain(chkUseAdministrativeStrain.isSelected());
+            options.setUseManagementSkill(chkUseManagementSkill.isSelected());
+
+            options.setAdministrativeCapacity((Integer) spnAdministrativeCapacity.getValue());
+            options.setMultiCrewStrainDivider((Integer) spnMultiCrewStrainDivider.getValue());
+
+            options.setUseCommanderLeadershipOnly(chkUseCommanderLeadershipOnly.isSelected());
+            options.setManagementSkillPenalty((Integer) spnManagementSkillPenalty.getValue());
+
+            // Fatigue
+            options.setUseFatigue(chkUseFatigue.isSelected());
+            options.setFatigueRate((Integer) spnFatigueRate.getValue());
+            options.setUseInjuryFatigue(chkUseInjuryFatigue.isSelected());
+            options.setFieldKitchenCapacity((Integer) spnFieldKitchenCapacity.getValue());
+            options.setFatigueLeaveThreshold((Integer) spnFatigueLeaveThreshold.getValue());
+            //endregion Turnover and Retention
 
             //region Life Paths Tab
             // Personnel Randomization
             options.setUseDylansRandomXP(chkUseDylansRandomXP.isSelected());
             options.setRandomOriginOptions(randomOriginOptionsPanel.createOptionsFromPanel());
-
-            // Retirement
-            options.setUseRetirementDateTracking(chkUseRetirementDateTracking.isSelected());
-            options.setRandomRetirementMethod(comboRandomRetirementMethod.getSelectedItem());
-            options.setUseYearEndRandomRetirement(chkUseYearEndRandomRetirement.isSelected());
-            options.setUseContractCompletionRandomRetirement(chkUseContractCompletionRandomRetirement.isSelected());
-            options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());
-            options.setUseRandomFounderRetirement(chkUseRandomFounderRetirement.isSelected());
-            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
 
             // Family
             options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
@@ -7922,9 +8807,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 options.getAgeRangeRandomDeathMaleValues().put(ageRange, (double) spnAgeRangeRandomDeathMaleValues.get(ageRange).getValue());
                 options.getAgeRangeRandomDeathFemaleValues().put(ageRange, (double) spnAgeRangeRandomDeathFemaleValues.get(ageRange).getValue());
             }
-
-            // Education
-            // TODO add education options
             //endregion Life Paths Tab
 
             //region Finances Tab
@@ -7941,6 +8823,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setDamagedPartsValueMultiplier((Double) spnDamagedPartsValueMultiplier.getValue());
             options.setUnrepairablePartsValueMultiplier((Double) spnUnrepairablePartsValueMultiplier.getValue());
             options.setCancelledOrderRefundMultiplier((Double) spnCancelledOrderRefundMultiplier.getValue());
+
+            options.setUseShareSystem(chkUseShareSystem.isSelected());
+            options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
+            options.setSharesForAll(chkSharesForAll.isSelected());
             //endregion Finances Tab
 
             //start SPA
@@ -7983,14 +8869,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseAtB(chkUseAtB.isSelected());
             options.setUseStratCon(chkUseStratCon.isSelected());
             options.setSkillLevel(comboSkillLevel.getSelectedItem());
-            options.setUseShareSystem(chkUseShareSystem.isSelected());
-            options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
-            options.setSharesForAll(chkSharesForAll.isSelected());
-            options.setTrackOriginalUnit(chkTrackOriginalUnit.isSelected());
-            options.setTrackUnitFatigue(chkTrackUnitFatigue.isSelected());
             options.setLimitLanceWeight(chkLimitLanceWeight.isSelected());
             options.setLimitLanceNumUnits(chkLimitLanceNumUnits.isSelected());
-            options.setUseLeadership(chkUseLeadership.isSelected());
             options.setUseStrategy(chkUseStrategy.isSelected());
             options.setBaseStrategyDeployment((Integer) spnBaseStrategyDeployment.getValue());
             options.setAdditionalStrategyDeployment((Integer) spnAdditionalStrategyDeployment.getValue());
@@ -8011,9 +8891,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setOpForLocalUnitChance((Integer) spnOpForLocalForceChance.getValue());
             options.setFixedMapChance((Integer) spnFixedMapChance.getValue());
             options.setSpaUpgradeIntensity((Integer) spnSPAUpgradeIntensity.getValue());
-            options.setScenarioModMax((Integer) spnScenarioModMax.getValue());
-            options.setScenarioModChance((Integer) spnScenarioModChance.getValue());
-            options.setScenarioModBV((Integer) spnScenarioModBV.getValue());
             options.setUseDropShips(chkUseDropShips.isSelected());
 
             for (int i = 0; i < spnAtBBattleChance.length; i++) {
@@ -8030,7 +8907,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseWeatherConditions(chkUseWeatherConditions.isSelected());
             options.setUseLightConditions(chkUseLightConditions.isSelected());
             options.setUsePlanetaryConditions(chkUsePlanetaryConditions.isSelected());
-            options.setAeroRecruitsHaveUnits(chkAeroRecruitsHaveUnits.isSelected());
             //endregion Against the Bot
 
             campaign.setCampaignOptions(options);
@@ -8317,13 +9193,54 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     /**
-     * Recreates the finances panel to reverse the qualities labels.
+     * Recreates the finances panel to reverse the quality labels.
      * @param reverseQualities boolean for if the qualities are reversed.
      */
     private void recreateFinancesPanel(boolean reverseQualities) {
         int financesTabIndex = indexOfTab(resources.getString("financesPanel.title"));
         removeTabAt(financesTabIndex);
         insertTab(resources.getString("financesPanel.title"), null, createFinancesTab(reverseQualities), null, financesTabIndex);
+
+        // The following setters and getter calls are so that recreating the tab doesn't reset all
+        // options to their default values
+
+        // General finances panel options
+        payForPartsBox.setSelected(options.isPayForParts());
+        payForRepairsBox.setSelected(options.isPayForRepairs());
+        payForUnitsBox.setSelected(options.isPayForUnits());
+        payForSalariesBox.setSelected(options.isPayForSalaries());
+        payForOverheadBox.setSelected(options.isPayForOverhead());
+        payForMaintainBox.setSelected(options.isPayForMaintain());
+        payForTransportBox.setSelected(options.isPayForTransport());
+        sellUnitsBox.setSelected(options.isSellUnits());
+        sellPartsBox.setSelected(options.isSellParts());
+        payForRecruitmentBox.setSelected(options.isPayForRecruitment());
+        useLoanLimitsBox.setSelected(options.isUseLoanLimits());
+
+        usePercentageMaintBox.setSelected(options.isUsePercentageMaint());
+        useInfantryDontCountBox.setSelected(options.isInfantryDontCount());
+
+        usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
+        useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
+        showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
+        comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
+        newFinancialYearFinancesToCSVExportBox.setSelected(options.isNewFinancialYearFinancesToCSVExport());
+
+        // Price Modifiers Panel
+        spnCommonPartPriceMultiplier.setValue(options.getCommonPartPriceMultiplier());
+        spnInnerSphereUnitPriceMultiplier.setValue(options.getInnerSphereUnitPriceMultiplier());
+        spnInnerSpherePartPriceMultiplier.setValue(options.getInnerSpherePartPriceMultiplier());
+        spnClanUnitPriceMultiplier.setValue(options.getClanUnitPriceMultiplier());
+        spnClanPartPriceMultiplier.setValue(options.getClanPartPriceMultiplier());
+        spnMixedTechUnitPriceMultiplier.setValue(options.getMixedTechUnitPriceMultiplier());
+        spnDamagedPartsValueMultiplier.setValue(options.getDamagedPartsValueMultiplier());
+        spnUnrepairablePartsValueMultiplier.setValue(options.getUnrepairablePartsValueMultiplier());
+        spnCancelledOrderRefundMultiplier.setValue(options.getCancelledOrderRefundMultiplier());
+
+        // Used Parts Multiplier Panel
+        for (int index = Part.QUALITY_A; index <= Part.QUALITY_F; index++) {
+            spnUsedPartPriceMultipliers[index].setValue(options.getUsedPartPriceMultipliers()[index]);
+        }
     }
 
     private void enableAtBComponents(JPanel panel, boolean enabled) {

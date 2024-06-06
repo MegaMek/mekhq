@@ -2,7 +2,7 @@
  * Campaign.java
  *
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2022 - 2024 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,10 @@ import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
+import megamek.common.weapons.autocannons.ACWeapon;
+import megamek.common.weapons.flamers.FlamerWeapon;
+import megamek.common.weapons.gaussrifles.GaussWeapon;
+import megamek.common.weapons.lasers.EnergyWeapon;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
@@ -89,6 +93,8 @@ import mekhq.campaign.personnel.procreation.DisabledRandomProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.rating.CampaignOpsReputation;
 import mekhq.campaign.rating.FieldManualMercRevDragoonsRating;
 import mekhq.campaign.rating.IUnitRating;
@@ -130,6 +136,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
+import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 /**
  * The main campaign class, keeps track of teams and units
@@ -189,6 +196,8 @@ public class Campaign implements ITechManager {
     private transient String currentReportHTML;
     private transient List<String> newReports;
 
+    private Boolean fieldKitchenWithinCapacity;
+
     // this is updated and used per gaming session, it is enabled/disabled via the Campaign options
     // we're re-using the LogEntry class that is used to store Personnel entries
     public LinkedList<LogEntry> inMemoryLogHistory = new LinkedList<>();
@@ -226,8 +235,8 @@ public class Campaign implements ITechManager {
     private transient AbstractMarriage marriage;
     private transient AbstractProcreation procreation;
 
-    private RetirementDefectionTracker retirementDefectionTracker; // AtB
-    private int fatigueLevel; //AtB
+    private RetirementDefectionTracker retirementDefectionTracker;
+
     private AtBConfiguration atbConfig; //AtB
     private AtBEventProcessor atbEventProcessor; //AtB
     private LocalDate shipSearchStart; //AtB
@@ -289,12 +298,12 @@ public class Campaign implements ITechManager {
         setMarriage(new DisabledRandomMarriage(getCampaignOptions()));
         setProcreation(new DisabledRandomProcreation(getCampaignOptions()));
         retirementDefectionTracker = new RetirementDefectionTracker();
-        fatigueLevel = 0;
         atbConfig = null;
         autosaveService = new AutosaveService();
         hasActiveContract = false;
         campaignSummary = new CampaignSummary(this);
         quartermaster = new Quartermaster(this);
+        fieldKitchenWithinCapacity = false;
     }
 
     /**
@@ -396,13 +405,9 @@ public class Campaign implements ITechManager {
     }
 
     public ArrayList<Lance> getLanceList() {
-        ArrayList<Lance> retVal = new ArrayList<>();
-        for (Lance l : lances.values()) {
-            if (forceIds.containsKey(l.getForceId())) {
-                retVal.add(l);
-            }
-        }
-        return retVal;
+        return lances.values().stream()
+        .filter(l -> forceIds.containsKey(l.getForceId()))
+        .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void setShoppingList(ShoppingList sl) {
@@ -481,14 +486,6 @@ public class Campaign implements ITechManager {
 
     public RetirementDefectionTracker getRetirementDefectionTracker() {
         return retirementDefectionTracker;
-    }
-
-    public void setFatigueLevel(int fl) {
-        fatigueLevel = fl;
-    }
-
-    public int getFatigueLevel() {
-        return fatigueLevel;
     }
 
     /**
@@ -674,7 +671,7 @@ public class Campaign implements ITechManager {
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        addNewUnit(en, true, transitDays, 3);
+        addNewUnit(en, true, transitDays);
         if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
         }
@@ -691,41 +688,69 @@ public class Campaign implements ITechManager {
      */
     public boolean applyRetirement(Money totalPayout, Map<UUID, UUID> unitAssignments) {
         if ((totalPayout.isPositive()) || (null != getRetirementDefectionTracker().getRetirees())) {
-            if (getFinances().debit(TransactionType.RETIREMENT, getLocalDate(), totalPayout, "Final Payout")) {
+            if (getFinances().debit(TransactionType.PAYOUT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
-                    if (getPerson(pid).getStatus().isActive()) {
-                        getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
-                    }
+                    Person person = getPerson(pid);
 
-                    if (getRetirementDefectionTracker().getPayout(pid).getRecruitRole().isCivilian()) {
-                        LogManager.getLogger().error(String.format(
-                                "Attempted to process a payout for %s, who has a civilian role.",
-                                getRetirementDefectionTracker().getPayout(pid).getRecruitRole().name()));
-                    } else {
-                        getPersonnelMarket().addPerson(newPerson(getRetirementDefectionTracker().getPayout(pid).getRecruitRole()));
-                    }
+                    if (!person.getStatus().isDead()) {
+                        if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
+                            int roll = Compute.d6(1);
 
-                    if (getRetirementDefectionTracker().getPayout(pid).hasHeir()) {
-                        Person p = newPerson(getPerson(pid).getPrimaryRole());
-                        p.setOriginalUnitWeight(getPerson(pid).getOriginalUnitWeight());
-                        p.setOriginalUnitTech(getPerson(pid).getOriginalUnitTech());
-                        p.setOriginalUnitId(getPerson(pid).getOriginalUnitId());
-                        if (unitAssignments.containsKey(pid)) {
-                            getPersonnelMarket().addPerson(p, getHangar().getUnit(unitAssignments.get(pid)).getEntity());
+                            switch (roll) {
+                                case 1:
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                                    break;
+                                case 2:
+                                case 3:
+                                    addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverPoached.text"));
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                                    break;
+                                case 4:
+                                case 5:
+                                case 6:
+                                    addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverBurnedOut.text"));
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                                    break;
+                                default:
+                                    throw new IllegalStateException("Unexpected value in applyRetirement: " + roll);
+                            }
+                        } else if (person.getAge(getLocalDate()) >= 50) {
+                            getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         } else {
-                            getPersonnelMarket().addPerson(p);
+                            getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                         }
-                    }
 
-                    if (getCampaignOptions().getRandomDependentMethod().isAgainstTheBot()
-                            && getCampaignOptions().isUseRandomDependentAddition()) {
-                        int dependents = getRetirementDefectionTracker().getPayout(pid).getDependents();
-                        while (dependents > 0) {
-                            Person person = newDependent(false);
-                            if (recruitPerson(person)) {
-                                dependents--;
-                            } else {
-                                dependents = 0;
+                        // if marriage modifier is enabled, couples leave together
+                        if (campaignOptions.isUseMarriageModifiers()) {
+                            Person spouse = person.getGenealogy().getSpouse();
+
+                            if ((spouse != null) && (!getRetirementDefectionTracker().getRetirees().contains(spouse.getId()))) {
+                                if ((!spouse.getStatus().isDepartedUnit()) && (!spouse.getStatus().isAbsent())) {
+                                    addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
+                                    if (spouse.getPrimaryRole().isCivilian()) {
+                                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                                    } else {
+                                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                                    }
+                                }
+                            }
+                        }
+
+                        // This ensures children have a chance of following their parent into departure
+                        for (Person child : person.getGenealogy().getChildren()) {
+                            if ((child.isChild(getLocalDate())) && (!child.getStatus().isDepartedUnit())) {
+                                if (campaignOptions.isUseMarriageModifiers()) {
+                                    addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
+                                    child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                                } else {
+                                    boolean remainingParent = child.getGenealogy().getParents().stream()
+                                            .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
+
+                                    if ((!remainingParent) || (Compute.randomInt(2) == 0)) {
+                                        addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
+                                        child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                                    }
+                                }
                             }
                         }
                     }
@@ -736,10 +761,10 @@ public class Campaign implements ITechManager {
                 }
                 getRetirementDefectionTracker().resolveAllContracts();
                 return true;
-            } else {
-                addReport("<font color='red'>You cannot afford to make the final payments.</font>");
-                return false;
             }
+        } else {
+            addReport("<font color='red'>You cannot afford to make the final payments.</font>");
+            return false;
         }
 
         return true;
@@ -1157,14 +1182,30 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Add a new unit to the campaign, assigning a quality rating to the new unit.
-     * In most cases, quality should equal 3 (D).
+     * Add a new unit to the campaign and set its quality to 3 (D).
      *
-     * @param en An <code>Entity</code> object that the new unit will be wrapped around
+     * @param en              An <code>Entity</code> object that the new unit will be wrapped around
+     * @param allowNewPilots  A boolean indicating whether to add new pilots for the unit
+     * @param days            The number of days for the new unit to arrive
+     * @return The newly added unit
+     */
+    public Unit addNewUnit(Entity en, boolean allowNewPilots, int days) {
+        return addNewUnit(en, allowNewPilots, days, 3);
+    }
+
+    /**
+     * Add a new unit to the campaign and set its quality.
+     *
+     * @param en              An <code>Entity</code> object that the new unit will be wrapped around
+     * @param allowNewPilots  A boolean indicating whether to add new pilots for the unit
+     * @param days            The number of days for the new unit to arrive
+     * @param quality         The quality of the new unit (0-5)
+     * @return The newly added unit
+     * @throws IllegalArgumentException If the quality is not within the valid range (0-5)
      */
     public Unit addNewUnit(Entity en, boolean allowNewPilots, int days, int quality) {
         if ((quality < 0) || (quality > 5)) {
-            throw new IllegalArgumentException("Quality must be between 0 and 5");
+            throw new IllegalArgumentException("Invalid quality in mekhq/campaign/Campaign.java/addNewUnit: " + quality);
         }
 
         Unit unit = new Unit(en, this);
@@ -1239,6 +1280,12 @@ public class Campaign implements ITechManager {
 
     public Collection<Unit> getUnits() {
         return getHangar().getUnits();
+    }
+
+    public Collection<Unit> getLargeCraftAndWarShips() {
+        return getHangar().getUnits().stream()
+                .filter(unit -> (unit.getEntity().isLargeCraft()) || (unit.getEntity().isWarShip()))
+                .collect(Collectors.toList());
     }
 
     public List<Entity> getEntities() {
@@ -1360,6 +1407,14 @@ public class Campaign implements ITechManager {
         }
 
         return person;
+    }
+
+    public Boolean getFieldKitchenWithinCapacity() {
+        return fieldKitchenWithinCapacity;
+    }
+
+    public void setFieldKitchenWithinCapacity(final Boolean fieldKitchenWithinCapacity) {
+        this.fieldKitchenWithinCapacity = fieldKitchenWithinCapacity;
     }
     //endregion Person Creation
 
@@ -1563,7 +1618,7 @@ public class Campaign implements ITechManager {
             if (getCampaignOptions().getUnitRatingMethod().isEnabled()) {
                 IUnitRating rating = getUnitRating();
                 bloodnameTarget += IUnitRating.DRAGOON_C - (getCampaignOptions().getUnitRatingMethod().equals(
-                        mekhq.campaign.rating.UnitRatingMethod.FLD_MAN_MERCS_REV)
+                        UnitRatingMethod.FLD_MAN_MERCS_REV)
                         ? rating.getUnitRatingAsInteger() : rating.getModifier());
             }
 
@@ -1628,6 +1683,16 @@ public class Campaign implements ITechManager {
     public List<Person> getActivePersonnel() {
         return getPersonnel().stream()
                 .filter(p -> p.getStatus().isActive())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Provides a filtered list of personnel including only Persons with the AWOL status.
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getAwolPersonnel() {
+        return getPersonnel().stream()
+                .filter(p -> p.getStatus().isAwol())
                 .collect(Collectors.toList());
     }
 
@@ -3173,20 +3238,6 @@ public class Campaign implements ITechManager {
         }
     }
 
-    private void processNewDayATBFatigue() {
-        boolean inContract = false;
-        for (final AtBContract contract : getActiveAtBContracts()) {
-            fatigueLevel += contract.getContractType().getFatigue();
-            inContract = true;
-        }
-
-        if (!inContract && location.isOnPlanet()) {
-            fatigueLevel -= 2;
-        }
-        fatigueLevel = Math.max(fatigueLevel, 0);
-        addReport("Your fatigue level is: " + fatigueLevel);
-    }
-
     private void processNewDayATB() {
         contractMarket.generateContractOffers(this); // TODO : AbstractContractMarket : Remove
 
@@ -3250,20 +3301,15 @@ public class Campaign implements ITechManager {
 
         if (getLocalDate().getDayOfMonth() == 1) {
             /*
-             * First of the month; roll morale, track unit fatigue.
+             * First of the month; roll Morale.
              */
             IUnitRating rating = getUnitRating();
             rating.reInitialize();
 
             for (AtBContract contract : getActiveAtBContracts()) {
                 contract.checkMorale(getLocalDate(), getUnitRatingMod());
-                addReport("Enemy morale is now " + contract.getMoraleLevel()
+                addReport("Enemy Morale is now " + contract.getMoraleLevel()
                         + " on contract " + contract.getName());
-            }
-
-            // Account for fatigue
-            if (getCampaignOptions().isTrackUnitFatigue()) {
-                processNewDayATBFatigue();
             }
         }
 
@@ -3272,7 +3318,7 @@ public class Campaign implements ITechManager {
 
     public void processNewDayPersonnel() {
         // This MUST use getActivePersonnel as we only want to process active personnel, and
-        // furthermore this allows us to add and remove personnel without issue
+        //  furthermore, this allows us to add and remove personnel without issue
         for (Person p : getActivePersonnel()) {
             // Death
             if (getDeath().processNewDay(this, getLocalDate(), p)) {
@@ -3533,6 +3579,8 @@ public class Campaign implements ITechManager {
 
         processNewDayPersonnel();
 
+        processFatigueNewDay();
+
         if (campaignOptions.isUseEducationModule()) {
             processEducationNewDay();
         }
@@ -3586,13 +3634,29 @@ public class Campaign implements ITechManager {
         }
     }
 
-    public @Nullable Person getFlaggedCommander() {
-        for (Person p : getPersonnel()) {
-            if (p.isCommander()) {
-                return p;
-            }
+    /**
+     * This method is responsible for handling fatigue recovery and checking if the field kitchen is within capacity.
+     * Even if fatigue is disabled, fatigue recovery is still processed to ensure that fatigued personnel are not
+     * frozen in that state.
+     */
+    private void processFatigueNewDay() {
+        // even if Fatigue is disabled, we still want to process recovery so fatigued personnel aren't frozen in that state
+        Fatigue.processFatigueRecovery(this);
+
+        if (campaignOptions.isUseFatigue()) {
+            // we store these values, so this only needs to be checked once per day,
+            // otherwise we would need to check it once for each active person in the campaign
+            fieldKitchenWithinCapacity = getActivePersonnel().size() <= Fatigue.checkFieldKitchenCapacity(this);
+        } else {
+            fieldKitchenWithinCapacity = false;
         }
-        return null;
+    }
+
+    public @Nullable Person getFlaggedCommander() {
+        return getPersonnel().stream()
+                .filter(Person::isCommander)
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -4233,7 +4297,6 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastMissionId", lastMissionId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastScenarioId", lastScenarioId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "calendar", getLocalDate());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLevel", fatigueLevel);
 
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "nameGen");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "faction", RandomNameGenerator.getInstance().getChosenFaction());
@@ -4494,6 +4557,33 @@ public class Campaign implements ITechManager {
 
     public void setRankSystemDirect(final RankSystem rankSystem) {
         this.rankSystem = rankSystem;
+    }
+
+    /**
+     * Returns the highest ranked person from the given list of personnel.
+     *
+     * @param personnel           the list of personnel from which to find the highest ranked person
+     * @param useSkillTiebreaker  determines whether to use a experience level tiebreaker when comparing ranks
+     *                            (true - use skill tiebreaker, false - do not use skill tiebreaker)
+     * @return the highest ranked person from the list, or null if the provided personnel list is empty
+     */
+    public Person getHighestRankedPerson(List<Person> personnel, boolean useSkillTiebreaker) {
+        Person highestRankedPerson = null;
+
+        if (!personnel.isEmpty()) {
+            for (Person person : personnel) {
+                if (useSkillTiebreaker) {
+                    if (person.outRanksUsingSkillTiebreaker(this, highestRankedPerson)) {
+                        highestRankedPerson = person;
+                    }
+                } else {
+                    if (person.outRanks(highestRankedPerson)) {
+                        highestRankedPerson = person;
+                    }
+                }
+            }
+        }
+        return highestRankedPerson;
     }
     //endregion Ranks
 
@@ -5204,34 +5294,34 @@ public class Campaign implements ITechManager {
                  * a minimum for non-flamer energy weapons, which was the reason this rule was
                  * included in AtB to begin with.
                  */
-                if (et instanceof megamek.common.weapons.lasers.EnergyWeapon
-                        && !(et instanceof megamek.common.weapons.flamers.FlamerWeapon)
+                if (et instanceof EnergyWeapon
+                        && !(et instanceof FlamerWeapon)
                         && partAvailability < EquipmentType.RATING_C) {
                     partAvailability = EquipmentType.RATING_C;
                     partAvailabilityLog.append(";(non-flamer lasers)");
                 }
-                if (et instanceof megamek.common.weapons.autocannons.ACWeapon) {
+                if (et instanceof ACWeapon) {
                     partAvailability -= 2;
                     partAvailabilityLog.append(";(autocannon): -2");
                 }
-                if (et instanceof megamek.common.weapons.gaussrifles.GaussWeapon
-                        || et instanceof megamek.common.weapons.flamers.FlamerWeapon) {
+                if (et instanceof GaussWeapon
+                        || et instanceof FlamerWeapon) {
                     partAvailability--;
                     partAvailabilityLog.append(";(gauss rifle or flamer): -1");
                 }
-                if (et instanceof megamek.common.AmmoType) {
-                    switch (((megamek.common.AmmoType) et).getAmmoType()) {
-                        case megamek.common.AmmoType.T_AC:
+                if (et instanceof AmmoType) {
+                    switch (((AmmoType) et).getAmmoType()) {
+                        case AmmoType.T_AC:
                             partAvailability -= 2;
                             partAvailabilityLog.append(";(autocannon ammo): -2");
                             break;
-                        case megamek.common.AmmoType.T_GAUSS:
+                        case AmmoType.T_GAUSS:
                             partAvailability -= 1;
                             partAvailabilityLog.append(";(gauss ammo): -1");
                             break;
                     }
                     if (EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(
-                            ((megamek.common.AmmoType) et).getMunitionType())){
+                            ((AmmoType) et).getMunitionType())){
                         partAvailability--;
                         partAvailabilityLog.append(";(standard ammo): -1");
                     }
@@ -5240,10 +5330,10 @@ public class Campaign implements ITechManager {
 
             if (((getGameYear() < 2950) || (getGameYear() > 3040))
                     && (acquisition instanceof Armor || acquisition instanceof MissingMekActuator
-                    || acquisition instanceof mekhq.campaign.parts.MissingMekCockpit
-                    || acquisition instanceof mekhq.campaign.parts.MissingMekLifeSupport
-                    || acquisition instanceof mekhq.campaign.parts.MissingMekLocation
-                    || acquisition instanceof mekhq.campaign.parts.MissingMekSensor)) {
+                            || acquisition instanceof MissingMekCockpit
+                            || acquisition instanceof MissingMekLifeSupport
+                            || acquisition instanceof MissingMekLocation
+                            || acquisition instanceof MissingMekSensor)) {
                 partAvailability--;
                 partAvailabilityLog.append("(Mek part prior to 2950 or after 3040): - 1");
             }
@@ -6349,7 +6439,7 @@ public class Campaign implements ITechManager {
      * @param part A part to lookup its current inventory.
      * @return A PartInventory object detailing the current counts of
      * the part on hand, in transit, and ordered.
-     * @see mekhq.campaign.parts.PartInventory
+     * @see PartInventory
      */
     public PartInventory getPartInventory(Part part) {
         PartInventory inventory = new PartInventory();
@@ -6774,6 +6864,10 @@ public class Campaign implements ITechManager {
         }
     }
 
+    public void initTurnover() {
+        getRetirementDefectionTracker().setLastRetirementRoll(getLocalDate());
+    }
+
     public void initAtB(boolean newCampaign) {
         getRetirementDefectionTracker().setLastRetirementRoll(getLocalDate());
 
@@ -6807,13 +6901,11 @@ public class Campaign implements ITechManager {
              * that 'Mech (which is a less certain assumption)
              */
             for (Person p : getPersonnel()) {
-                LocalDate join = null;
-                for (LogEntry e : p.getPersonnelLog()) {
-                    if (e.getDesc().startsWith("Joined ")) {
-                        join = e.getDate();
-                        break;
-                    }
-                }
+                LocalDate join = p.getPersonnelLog().stream()
+                .filter(e -> e.getDesc().startsWith("Joined "))
+                .findFirst()
+                .map(LogEntry::getDate)
+                .orElse(null);
                 if ((join != null) && join.equals(founding)) {
                     p.setFounder(true);
                 }
@@ -6825,7 +6917,7 @@ public class Campaign implements ITechManager {
                             String mech = e.getDesc().substring(12);
                             MechSummary ms = MechSummaryCache.getInstance().getMech(mech);
                             if (null != ms && (p.isFounder()
-                                    || ms.getWeightClass() < megamek.common.EntityWeightClass.WEIGHT_ASSAULT)) {
+                                    || ms.getWeightClass() < EntityWeightClass.WEIGHT_ASSAULT)) {
                                 p.setOriginalUnitWeight(ms.getWeightClass());
                                 if (ms.isClan()) {
                                     p.setOriginalUnitTech(Person.TECH_CLAN);
@@ -6881,42 +6973,71 @@ public class Campaign implements ITechManager {
 
     public boolean checkRetirementDefections() {
         if (!getRetirementDefectionTracker().getRetirees().isEmpty()) {
-            // FIXME : Localize
-            Object[] options = { "Show Payout Dialog", "Cancel" };
-            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
-                    "You have personnel who have left the unit or been killed in action but have not received their final payout.\nYou must deal with these payments before advancing the day.\nHere are some options:\n  - Sell off equipment to generate funds.\n  - Pay one or more personnel in equipment.\n  - Just cheat and use GM mode to edit the settlement.",
-                    "Unresolved Final Payments", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+            Object[] options = {
+                    resources.getString("turnoverPayoutDialog.text"),
+                    resources.getString("turnoverCancel.text")
+            };
+
+            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(
+                    null,
+                    resources.getString("turnoverPersonnelKilled.text"),
+                    resources.getString("turnoverFinalPayments.text"),
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
         }
         return false;
     }
 
-    public boolean checkYearlyRetirements() {
-        if (!getCampaignOptions().getRandomRetirementMethod().isNone()
-                && getCampaignOptions().isUseYearEndRandomRetirement()
-                && (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate())
-                == getRetirementDefectionTracker().getLastRetirementRoll().lengthOfYear())) {
-            // FIXME : Localize
-            Object[] options = { "Show Retirement Dialog", "Not Now" };
-            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(null,
-                    "It has been a year since the last Employee Turnover roll, and it is time to do another.",
-                    "Employee Turnover roll required", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, options, options[0]);
+    public boolean checkTurnoverPrompt() {
+        int days = 0;
+        String period = "";
+
+        switch (campaignOptions.getTurnoverFrequency()) {
+            case NEVER:
+                return false;
+            case WEEKLY:
+                days = 7;
+                period = resources.getString("turnoverWeekly.text");
+                break;
+            case MONTHLY:
+                days = 28;
+                period = resources.getString("turnoverMonthly.text");
+                break;
+            case ANNUALLY:
+                days = 365;
+                period = resources.getString("turnoverAnnually.text");
+                break;
+        }
+
+        if (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate()) >= days) {
+            Object[] options = {
+                    resources.getString("turnoverEmployeeTurnoverDialog.text"),
+                    resources.getString("turnoverNotNow.text")
+            };
+
+            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(
+                    null,
+                    String.format(resources.getString("turnoverDialogDescription.text"),
+                            period),
+                    resources.getString("turnoverRollRequired.text"),
+                    JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
         }
         return false;
     }
 
     public boolean checkScenariosDue() {
-        for(Mission m : getActiveMissions(true)) {
-            for(Scenario s : m.getCurrentScenarios()) {
-                if((s.getDate() != null)
-                        && !(s instanceof AtBScenario)
-                        && !getLocalDate().isBefore(s.getDate())) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return getActiveMissions(true).stream()
+                .flatMap(m -> m.getCurrentScenarios().stream())
+                .anyMatch(s -> (s.getDate() != null) && !(s instanceof AtBScenario) && !getLocalDate().isBefore(s.getDate()));
     }
 
     /**
