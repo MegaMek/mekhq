@@ -1000,13 +1000,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setSurname(textSurname.getText());
         person.setPostNominal(textPostNominal.getText());
         person.setCallsign(textNickname.getText());
-        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error"))
-                ? "" : textBloodname.getText());
+        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error")) ? "" : textBloodname.getText());
         person.setBiography(txtBio.getText());
         if (choiceGender.getSelectedItem() != null) {
-            person.setGender(person.getGender().isInternal()
-                    ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
-                    : (Gender) choiceGender.getSelectedItem());
+            person.setGender(person.getGender().isInternal() ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant() : (Gender) choiceGender.getSelectedItem());
         }
         person.setBirthday(birthdate);
         person.setRecruitment(recruitment);
@@ -1022,25 +1019,29 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setClanPersonnel(chkClan.isSelected());
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch (NumberFormatException ignored) { }
+        } catch (NumberFormatException ignored) {
+        }
         try {
             person.setEduHighestEducation(MathUtility.clamp(Integer.parseInt(textEducationLevel.getText()), 0, 4));
-        } catch (NumberFormatException ignored) {}
-        if (null == choiceOriginalUnit.getSelectedItem()) {
-        try {
-            person.setFatigue(Integer.parseInt(textFatigue.getText()));
-        } catch (NumberFormatException ignored) { }
-        if (choiceOriginalUnit.getSelectedItem() == null) {
-            person.setOriginalUnit(null);
-            person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
-            person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
-        } else {
-            person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
+        } catch (NumberFormatException ignored) {
         }
-        person.setFounder(chkFounder.isSelected());
-        setSkills();
-        setOptions();
-        setVisible(false);
+        if (null == choiceOriginalUnit.getSelectedItem()) {
+            try {
+                person.setFatigue(Integer.parseInt(textFatigue.getText()));
+            } catch (NumberFormatException ignored) {
+            }
+            if (choiceOriginalUnit.getSelectedItem() == null) {
+                person.setOriginalUnit(null);
+                person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
+                person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
+            } else {
+                person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
+            }
+            person.setFounder(chkFounder.isSelected());
+            setSkills();
+            setOptions();
+            setVisible(false);
+        }
     }
 
     private void randomName() {
