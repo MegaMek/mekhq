@@ -243,7 +243,7 @@ public class Finances {
                     } else {
                         campaign.addReport(
                                 String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                        + resourceMap.getString("NotImplemented.text"), "for operating costs"));
+                                        + resourceMap.getString("NotImplemented.text"), "for operating costs", "</font>"));
                     }
                 } else {
                     Money sparePartsCost = campaign.getAccountant().getMonthlySpareParts();
@@ -258,7 +258,7 @@ public class Finances {
                     } else {
                         campaign.addReport(
                                 String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                        + resourceMap.getString("NotImplemented.text"), "for spare parts"));
+                                        + resourceMap.getString("NotImplemented.text"), "for spare parts", "</font>"));
                     }
 
                     if (debit(TransactionType.MAINTENANCE, today, ammoCost,
@@ -269,7 +269,7 @@ public class Finances {
                     } else {
                         campaign.addReport(
                                 String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                        + resourceMap.getString("NotImplemented.text"), "for training munitions"));
+                                        + resourceMap.getString("NotImplemented.text"), "for training munitions", "</font>"));
                     }
 
                     if (debit(TransactionType.MAINTENANCE, today, fuelCost,
@@ -279,7 +279,7 @@ public class Finances {
                                 fuelCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                        + resourceMap.getString("NotImplemented.text"), "for fuel"));
+                                        + resourceMap.getString("NotImplemented.text"), "for fuel", "</font>"));
                     }
                 }
             }
@@ -301,7 +301,7 @@ public class Finances {
                 } else {
                     campaign.addReport(
                             String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                        + resourceMap.getString("NotImplemented.text"), "payroll costs"));
+                                        + resourceMap.getString("NotImplemented.text"), "payroll costs", "</font>"));
                 }
             }
 
@@ -317,7 +317,7 @@ public class Finances {
                 } else {
                     campaign.addReport(
                             String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                        + resourceMap.getString("NotImplemented.text"), "overhead costs"));
+                                        + resourceMap.getString("NotImplemented.text"), "overhead costs", "</font>"));
                 }
             }
         }
@@ -333,7 +333,7 @@ public class Finances {
                 } else {
                     campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
                                     + resourceMap.getString("Loan.insufficient.report"),
-                            loan, loan.getPaymentAmount().toAmountAndSymbolString());
+                            loan, "</font>", loan.getPaymentAmount().toAmountAndSymbolString());
                     loan.setOverdue(true);
                 }
             }
@@ -379,7 +379,7 @@ public class Finances {
                  * payment that has just been made.
                  */
                 campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                        + resourceMap.getString("NotImplemented.text"), "shares");
+                                        + resourceMap.getString("NotImplemented.text"), "shares", "</font>");
                 LogManager.getLogger().error("Attempted to payout share amount larger than the payment of the contract");
             }
         }
