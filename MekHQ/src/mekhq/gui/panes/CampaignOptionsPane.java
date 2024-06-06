@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2023 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2021-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -3183,6 +3183,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridy++;
         personnelPanel.add(createAdministratorsPanel(), gbc);
 
+        gbc.gridx++;
+        personnelPanel.add(createAwardsPanel(), gbc);
+
         gbc.gridx = 0;
         gbc.gridy++;
         personnelPanel.add(createMedicalPanel(), gbc);
@@ -3546,9 +3549,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseTimeInRank.setSelected(true);
         chkUseTimeInRank.doClick();
 
-        // Hook Awards panel
-        final JPanel awardsPanel = createAwardsPanel();
-
         // Layout the Panel
         final JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createTitledBorder(resources.getString("expandedPersonnelInformationPanel.title")));
@@ -3572,7 +3572,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkTrackTotalEarnings)
                         .addComponent(chkTrackTotalXPEarnings)
                         .addComponent(chkShowOriginFaction)
-                        .addComponent(awardsPanel)
         );
 
         layout.setHorizontalGroup(
@@ -3588,7 +3587,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkTrackTotalEarnings)
                         .addComponent(chkTrackTotalXPEarnings)
                         .addComponent(chkShowOriginFaction)
-                        .addComponent(awardsPanel)
         );
 
         return panel;
@@ -8566,6 +8564,26 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setAdminsHaveScrounge(chkAdminsHaveScrounge.isSelected());
             options.setAdminExperienceLevelIncludeScrounge(chkAdminExperienceLevelIncludeScrounge.isSelected());
 
+            // autoAwards
+            options.setEnableAutoAwards(chkEnableAutoAwards.isSelected());
+            options.setAwardBonusStyle(comboAwardBonusStyle.getSelectedItem());
+            options.setIssuePosthumousAwards(chkIssuePosthumousAwards.isSelected());
+            options.setIssueBestAwardOnly(chkIssueBestAwardOnly.isSelected());
+            options.setIgnoreStandardSet(chkIgnoreStandardSet.isSelected());
+            options.setAwardTierSize((int) spnAwardTierSize.getValue());
+            options.setEnableContractAwards(chkEnableContractAwards.isSelected());
+            options.setEnableFactionHunterAwards(chkEnableFactionHunterAwards.isSelected());
+            options.setEnableInjuryAwards(chkEnableInjuryAwards.isSelected());
+            options.setEnableIndividualKillAwards(chkEnableIndividualKillAwards.isSelected());
+            options.setEnableFormationKillAwards(chkEnableFormationKillAwards.isSelected());
+            options.setEnableRankAwards(chkEnableRankAwards.isSelected());
+            options.setEnableScenarioAwards(chkEnableScenarioAwards.isSelected());
+            options.setEnableSkillAwards(chkEnableSkillAwards.isSelected());
+            options.setEnableTheatreOfWarAwards(chkEnableTheatreOfWarAwards.isSelected());
+            options.setEnableTimeAwards(chkEnableTimeAwards.isSelected());
+            options.setEnableTimeAwards(chkEnableTrainingAwards.isSelected());
+            options.setEnableMiscAwards(chkEnableMiscAwards.isSelected());
+
             // Medical
             options.setUseAdvancedMedical(chkUseAdvancedMedical.isSelected());
             // we need to reset healing time options through the campaign because we may need to
@@ -8598,26 +8616,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             for (final PersonnelRole personnelRole : PersonnelRole.values()) {
                 options.setRoleBaseSalary(personnelRole, (double) spnBaseSalary[personnelRole.ordinal()].getValue());
             }
-
-            // Awards
-            options.setEnableAutoAwards(chkEnableAutoAwards.isSelected());
-            options.setAwardBonusStyle(comboAwardBonusStyle.getSelectedItem());
-            options.setIssuePosthumousAwards(chkIssuePosthumousAwards.isSelected());
-            options.setIssueBestAwardOnly(chkIssueBestAwardOnly.isSelected());
-            options.setIgnoreStandardSet(chkIgnoreStandardSet.isSelected());
-            options.setAwardTierSize((int) spnAwardTierSize.getValue());
-            options.setEnableContractAwards(chkEnableContractAwards.isSelected());
-            options.setEnableFactionHunterAwards(chkEnableFactionHunterAwards.isSelected());
-            options.setEnableInjuryAwards(chkEnableInjuryAwards.isSelected());
-            options.setEnableIndividualKillAwards(chkEnableIndividualKillAwards.isSelected());
-            options.setEnableFormationKillAwards(chkEnableFormationKillAwards.isSelected());
-            options.setEnableRankAwards(chkEnableRankAwards.isSelected());
-            options.setEnableScenarioAwards(chkEnableScenarioAwards.isSelected());
-            options.setEnableSkillAwards(chkEnableSkillAwards.isSelected());
-            options.setEnableTheatreOfWarAwards(chkEnableTheatreOfWarAwards.isSelected());
-            options.setEnableTimeAwards(chkEnableTimeAwards.isSelected());
-            options.setEnableTimeAwards(chkEnableTrainingAwards.isSelected());
-            options.setEnableMiscAwards(chkEnableMiscAwards.isSelected());
             //endregion Personnel Tab
 
             //region Turnover and Retention
