@@ -31,20 +31,22 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.sorter.WeightClassSorter;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class UnitMarketPane extends AbstractMHQSplitPane {
     //region Variable Declarations
@@ -208,20 +210,20 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(filtersPanel)
-                                .addComponent(getEntityImagePanel(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getEntityImagePanel(), Alignment.LEADING))
                         .addComponent(marketTableScrollPane)
                         .addComponent(lblBlackMarketWarning)
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(filtersPanel)
                                 .addComponent(getEntityImagePanel()))
                         .addComponent(marketTableScrollPane)
-                        .addComponent(lblBlackMarketWarning, GroupLayout.Alignment.TRAILING)
+                        .addComponent(lblBlackMarketWarning, Alignment.TRAILING)
         );
         return panel;
     }
@@ -279,19 +281,19 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkShowMechs())
                                 .addComponent(getChkShowVehicles())
                                 .addComponent(getChkShowAerospace())
-                                .addComponent(getChkShowConvAero(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getChkShowConvAero(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkFilterByPercentageOfCost())
                                 .addComponent(getSpnCostPercentageThreshold())
-                                .addComponent(lblCostPercentageThreshold, GroupLayout.Alignment.LEADING))
+                                .addComponent(lblCostPercentageThreshold, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkShowMechs())
                                 .addComponent(getChkShowVehicles())
@@ -452,10 +454,21 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         finalizeEntityAcquisition(offers, true);
     }
 
-    private void finalizeEntityAcquisition(final List<UnitMarketOffer> offers,
-                                           final boolean instantDelivery) {
+    /**
+     * Finalizes the acquisition of entities from the market.
+     *
+     * @param offers           the list of UnitMarketOffers to be finalized
+     * @param instantDelivery  indicates if the delivery should be instantaneous
+     */
+    private void finalizeEntityAcquisition(final List<UnitMarketOffer> offers, final boolean instantDelivery) {
         for (final UnitMarketOffer offer : offers) {
-            getCampaign().addNewUnit(offer.getEntity(), false, instantDelivery ? 0 : offer.getTransitDuration());
+            getCampaign().addNewUnit(
+                    offer.getEntity(),
+                    false,
+                    instantDelivery ? 0 : offer.getTransitDuration(),
+                    getQuality(offer.getMarketType())
+            );
+
             if (!instantDelivery) {
                 getCampaign().addReport(String.format(resources.getString("UnitMarketPane.UnitDeliveryLength.report"),
                         offer.getTransitDuration()));
@@ -463,6 +476,50 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             getCampaign().getUnitMarket().getOffers().remove(offer);
         }
         getMarketModel().setData(getCampaign().getUnitMarket().getOffers());
+    }
+
+    /**
+     * Returns the quality of a unit based on the given market type.
+     *
+     * @param market the type of market
+     * @return the quality of the unit
+     */
+    private int getQuality(UnitMarketType market) {
+        HashMap<String, Integer> qualityAndModifier = new HashMap<>();
+
+        switch(market) {
+            case OPEN:
+            case MERCENARY:
+                qualityAndModifier.put("quality", Part.QUALITY_C);
+                qualityAndModifier.put("modifier", 0);
+                break;
+            case EMPLOYER:
+                qualityAndModifier.put("quality", Part.QUALITY_B);
+                qualityAndModifier.put("modifier", -1);
+                break;
+            case BLACK_MARKET:
+                if (Compute.d6(1) <= 2) {
+                    qualityAndModifier.put("quality", Part.QUALITY_A);
+                    // this is to force a result of 0 (A)
+                    qualityAndModifier.put("modifier", -12);
+                } else {
+                    qualityAndModifier.put("quality", Part.QUALITY_F);
+                    // this is to force a result of 5 (F)
+                    qualityAndModifier.put("modifier", 12);
+                }
+                break;
+            case FACTORY:
+                qualityAndModifier.put("quality", Part.QUALITY_F);
+                // this is to force a result of 5 (F)
+                qualityAndModifier.put("modifier", 12);
+                break;
+        }
+
+        if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+            return Unit.getRandomUnitQuality(qualityAndModifier.get("modifier"));
+        } else {
+            return qualityAndModifier.get("quality");
+        }
     }
 
     public void removeSelectedOffers() {
