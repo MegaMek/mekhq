@@ -25,11 +25,11 @@ import megamek.common.EntityMovementMode;
 import megamek.common.MechSummary;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.universe.Faction;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -97,10 +97,7 @@ public abstract class AbstractUnitMarket {
      * @param quality the quality of the unit to generate
      * @param priceTarget the target number used to determine the percent
      */
-    protected abstract void addOffers(final Campaign campaign, final int number,
-                                      UnitMarketType market, final int unitType,
-                                      @Nullable Faction faction, final int quality,
-                                      final int priceTarget);
+    public abstract void addOffers(final Campaign campaign, final int number, UnitMarketType market, final int unitType, @Nullable Faction faction, final int quality, final int priceTarget);
 
     /**
      * @param campaign the campaign to use to generate the unit
@@ -173,7 +170,7 @@ public abstract class AbstractUnitMarket {
      * @param percent the percentage of the original unit cost the unit will be offered at
      * @return the name of the unit that has been added to the market
      */
-    protected String addSingleUnit(final Campaign campaign, final UnitMarketType market,
+    public String addSingleUnit(final Campaign campaign, final UnitMarketType market,
                                    final int unitType, final MechSummary mechSummary,
                                    final int percent) {
         getOffers().add(new UnitMarketOffer(market, unitType, mechSummary, percent,
