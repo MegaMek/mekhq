@@ -211,28 +211,6 @@ public enum AtBContractType {
         }
     }
 
-    public int getFatigue() {
-        switch (this) {
-            case GARRISON_DUTY:
-            case SECURITY_DUTY:
-            case CADRE_DUTY:
-                return -1;
-            case RIOT_DUTY:
-            case PIRATE_HUNTING:
-                return 1;
-            case DIVERSIONARY_RAID:
-            case EXTRACTION_RAID:
-            case RECON_RAID:
-            case RELIEF_DUTY:
-            case OBJECTIVE_RAID:
-                return 2;
-            case GUERRILLA_WARFARE:
-            case PLANETARY_ASSAULT:
-                return 3;
-            default:
-                return 0;
-        }
-    }
     public int generateEventType() {
         final int roll = Compute.randomInt(20) + 1;
 

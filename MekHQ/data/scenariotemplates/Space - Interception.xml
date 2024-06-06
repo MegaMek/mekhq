@@ -2,7 +2,7 @@
 <ScenarioTemplate>
     <name>Space - Interception</name>
     <shortBriefing>Hostile aircraft on approach. Intercept and destroy.</shortBriefing>
-    <detailedBriefing>Destory or cripple 50% of hostile aircraft.</detailedBriefing>
+    <detailedBriefing>Destroy or cripple 50% of hostile aircraft.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>
     <mapParameters>

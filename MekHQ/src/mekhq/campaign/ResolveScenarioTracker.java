@@ -40,6 +40,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
@@ -1403,6 +1404,11 @@ public class ResolveScenarioTracker {
 
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if (status.getHits() > person.getHits()) {
+                if ((campaign.getCampaignOptions().isUseFatigue())
+                        && (campaign.getCampaignOptions().isUseInjuryFatigue())) {
+                    person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate() * (status.getHits() - person.getHits()));
+                }
+
                 person.setHits(status.getHits());
             }
 
@@ -1411,6 +1417,7 @@ public class ResolveScenarioTracker {
                 ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(),
                         scenario.getName(), mission.getName());
             }
+
             for (Kill k : status.getKills()) {
                 getCampaign().addKill(k);
             }
@@ -1423,6 +1430,11 @@ public class ResolveScenarioTracker {
                     getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
                             true, getCampaign(), (AtBContract) mission);
                 }
+            }
+
+            if (!status.isDead()) {
+                person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
+                Fatigue.processFatigueActions(campaign, person);
             }
 
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -1486,6 +1498,8 @@ public class ResolveScenarioTracker {
                     getCampaign().addReport(String.format("You have convinced %s to defect.",
                             person.getHyperlinkedName()));
                 }
+
+                person.generateLoyalty(Compute.d6(2));
             } else {
                 continue;
             }
@@ -1494,7 +1508,12 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            if (status.isCaptured()) {
+                ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            } else {
+                ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            }
+
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);

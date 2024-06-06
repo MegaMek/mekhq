@@ -435,22 +435,6 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PREGNANT_BACKGROUND, value.getRGB());
     }
 
-    public Color getPaidRetirementForeground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.PAID_RETIREMENT_FOREGROUND, Color.BLACK.getRGB()));
-    }
-
-    public void setPaidRetirementForeground(Color value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PAID_RETIREMENT_FOREGROUND, value.getRGB());
-    }
-
-    public Color getPaidRetirementBackground() {
-        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.PAID_RETIREMENT_BACKGROUND, Color.LIGHT_GRAY.getRGB()));
-    }
-
-    public void setPaidRetirementBackground(Color value) {
-        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.PAID_RETIREMENT_BACKGROUND, value.getRGB());
-    }
-
     public Color getStratConHexCoordForeground() {
         return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, Color.GREEN.getRGB()));
     }
