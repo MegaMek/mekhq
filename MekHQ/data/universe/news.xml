@@ -570,7 +570,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Is the Draconis Combine sated?</headline> <!-- Source: House Kurita (The Draconis Combine) -->
         <date>2367</date>
-        <desc><![CDATA[<p>As the Principality of Rasalhague invasion war comes to a close, the question that burns in the mind of any outside observer is: was it worth it? Tenno declared victory in the war against Rasalhague, but the reality is not that simple. Although the Principality had been defeated, and acknowledged the Combine as their overlords, in reality the Rasalhagians largely maintained their independence, and their culture remains strongly imbedded. How will the Dragon impose its doctrine and will the Rasalhagians accept it?</p>]]></desc>
+        <desc><![CDATA[<p>As the Principality of Rasalhague invasion war comes to a close, the question that burns in the mind of any outside observer is: was it worth it? Tenno declared victory in the war against Rasalhague, but the reality is not that simple. Although the Principality had been defeated, and acknowledged the Combine as their overlords, in reality the Rasalhagians largely maintained their independence, and their culture remains strongly embedded. How will the Dragon impose its doctrine and will the Rasalhagians accept it?</p>]]></desc>
         <service>Terran News Service</service>
         <location>New Samarkand</location>
     </newsItem>
@@ -813,7 +813,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
         <location>Terra</location>
     </newsItem>
     <newsItem>
-        <headline>The Director-General has sufered a fatal heart attack</headline> <!-- Source: The Star League -->
+        <headline>The Director-General has suffered a fatal heart attack</headline> <!-- Source: The Star League -->
         <date>2387-12</date>
         <desc><![CDATA[<p>Lord Protector Raymond Cameron has been confirmed dead from a heart attack brought by his medication. This comes after difficult days for the Director-General. After increased dissent from the public for months, he recently found his wife Katherine fathered a child with his own brother Brian. He had Brian arrested and accused of treason, for which Raymond wanted Brian put on trial for.</p> <p>That didn't come to be. After a meeting with the High Council, Raymond collapsed in his quarters. The President of Terran Congress was sworn in Pro-tem, in an attempt to recover political stability. Brian remains incarcerated.</p>]]></desc>
         <service>Terran News Service</service>
@@ -2107,7 +2107,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Obituary: Herodias Ap Gwynn</headline> <!-- Source: The Periphery Sourcebook -->
         <date>3013-04-12</date>
-        <desc><![CDATA[<p>It is with great remorse that I bring you the following report. Herodias Ap Gwynn, the founder of the Pan-Humanist doctrine, was found dead earlier today.</p> <p>Herodias Ap Gwynn was well respected throughout the Alliance as an idealist, pacifist and philosopher, whose idea attracted hundreds if not thousands of followers to his view that humanity shares a common path and goal. He spent his life as a conciliator, diplomat and techer, instructing his followers to offer aid to those in need and to spread peace, education and medicine throughout the known galaxy.</p> <p>Herodias Ap Gwynn was 60 years old, at this time the cause of death is unknown, though authorities do not suspect foul-play was involved. Ceremonies will be held on Alpheratz in two weeks, with hundreds of Pan Humanists expected to be in attendance.</p> <p>Officials from the organization that Herodias Ap Gwynn began decades ago promised that his works and teachings will continue even after his death.</p>]]></desc>
+        <desc><![CDATA[<p>It is with great remorse that I bring you the following report. Herodias Ap Gwynn, the founder of the Pan-Humanist doctrine, was found dead earlier today.</p> <p>Herodias Ap Gwynn was well respected throughout the Alliance as an idealist, pacifist and philosopher, whose idea attracted hundreds if not thousands of followers to his view that humanity shares a common path and goal. He spent his life as a conciliator, diplomat and teacher, instructing his followers to offer aid to those in need and to spread peace, education and medicine throughout the known galaxy.</p> <p>Herodias Ap Gwynn was 60 years old, at this time the cause of death is unknown, though authorities do not suspect foul-play was involved. Ceremonies will be held on Alpheratz in two weeks, with hundreds of Pan Humanists expected to be in attendance.</p> <p>Officials from the organization that Herodias Ap Gwynn began decades ago promised that his works and teachings will continue even after his death.</p>]]></desc>
         <service>OAB</service>
         <location>Alpheratz</location>
     </newsItem>
@@ -3263,7 +3263,7 @@ Information veracity as described in the 25 Years of Art & Fiction of "Story Fic
     <newsItem>
         <headline>Noisiel first inaugural Summer Games held: Father versus son to highlight the Games</headline> <!-- Source: Mercenaries Supplemental II -->
         <date>3047-07</date>
-        <desc><![CDATA[<p>Spectators were treated to a new form of 'Mech competition last month on Noisiel. Duke Michael Alextep and his son William faced off in the first ever <em>Atlas</em> rugby match. The event was the highlight of the first annual Noisiel Summer Games announced earlier this year. The event highlighted traditional athletes as well as some of the finest aerobatic maneuvers from AFFC pilots. The event was so popular talks are already under way as to the next years eventy with several ideas being submitted to the Duke's offices.</p>]]></desc>
+        <desc><![CDATA[<p>Spectators were treated to a new form of 'Mech competition last month on Noisiel. Duke Michael Alextep and his son William faced off in the first ever <em>Atlas</em> rugby match. The event was the highlight of the first annual Noisiel Summer Games announced earlier this year. The event highlighted traditional athletes as well as some of the finest aerobatic maneuvers from AFFC pilots. The event was so popular talks are already under way as to the next years event with several ideas being submitted to the Duke's offices.</p>]]></desc>
         <service>CNB</service>
         <location>Noisiel</location>
     </newsItem>

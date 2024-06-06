@@ -24,7 +24,7 @@
 		<fixedUnitCount>4</fixedUnitCount>
 		<forceName>Allied Mech Ace</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>AlliedOTTAce.mul</fixedMul>	
+			<fixedMul>AlliedOTTAce.mul</fixedMul>
 		<generationOrder>1</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>

@@ -21,21 +21,15 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
 
 public class UntreatedPersonnelNagDialog extends AbstractMHQNagDialog {
     private static boolean isUntreatedInjury (Campaign campaign) {
-        for (Person p : campaign.getActivePersonnel()) {
-            if((p.needsFixing()) && (p.getDoctorId() == null)) {
-                if (!p.getPrisonerStatus().isPrisoner()) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return campaign.getActivePersonnel().stream()
+                .filter(p -> (p.needsFixing()) && (p.getDoctorId() == null))
+                .anyMatch(p -> !p.getPrisonerStatus().isPrisoner());
     }
 
     //region Constructors

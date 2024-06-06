@@ -24,7 +24,7 @@
 		<fixedUnitCount>4</fixedUnitCount>
 		<forceName>Allied Light Brigade Horse Cavalry</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>MercThe600.mul</fixedMul>	
+			<fixedMul>MercThe600.mul</fixedMul>
 		<generationOrder>1</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>

@@ -245,12 +245,12 @@ public class TransactionTypeTest {
     }
 
     @Test
-    public void testIsRetirement() {
+    public void testIsPayout() {
         for (final TransactionType transactionType : types) {
-            if (transactionType == TransactionType.RETIREMENT) {
-                assertTrue(transactionType.isRetirement());
+            if (transactionType == TransactionType.PAYOUT) {
+                assertTrue(transactionType.isPayout());
             } else {
-                assertFalse(transactionType.isRetirement());
+                assertFalse(transactionType.isPayout());
             }
         }
     }
@@ -342,6 +342,17 @@ public class TransactionTypeTest {
             }
         }
     }
+
+    @Test
+    public void testIsTheft() {
+        for (final TransactionType transactionType : types) {
+            if (transactionType == TransactionType.THEFT) {
+                assertTrue(transactionType.isTheft());
+            } else {
+                assertFalse(transactionType.isTheft());
+            }
+        }
+    }
     //endregion Boolean Comparison Methods
 
     //region File I/O
@@ -373,7 +384,9 @@ public class TransactionTypeTest {
         assertEquals(TransactionType.RANSOM, TransactionType.parseFromString("16"));
         assertEquals(TransactionType.EDUCATION, TransactionType.parseFromString("17"));
         assertEquals(TransactionType.TAXES, TransactionType.parseFromString("18"));
-        assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("19"));
+        assertEquals(TransactionType.THEFT, TransactionType.parseFromString("19"));
+        assertEquals(TransactionType.PAYOUT, TransactionType.parseFromString("20"));
+        assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("21"));
 
         // Failure Testing
         assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("failureFailsFake"));

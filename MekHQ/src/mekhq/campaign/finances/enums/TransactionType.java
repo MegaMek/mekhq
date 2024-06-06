@@ -43,12 +43,13 @@ public enum TransactionType {
     RECRUITMENT("TransactionType.RECRUITMENT.text", "TransactionType.RECRUITMENT.toolTipText"),
     RENT("TransactionType.RENT.text", "TransactionType.RENT.toolTipText"),
     REPAIRS("TransactionType.REPAIRS.text", "TransactionType.REPAIRS.toolTipText"),
-    RETIREMENT("TransactionType.RETIREMENT.text", "TransactionType.RETIREMENT.toolTipText"),
+    PAYOUT("TransactionType.PAYOUT.text", "TransactionType.PAYOUT.toolTipText"),
     SALARIES("TransactionType.SALARIES.text", "TransactionType.SALARIES.toolTipText"),
     SALVAGE("TransactionType.SALVAGE.text", "TransactionType.SALVAGE.toolTipText"),
     SALVAGE_EXCHANGE("TransactionType.SALVAGE_EXCHANGE.text", "TransactionType.SALVAGE_EXCHANGE.toolTipText"),
     STARTING_CAPITAL("TransactionType.STARTING_CAPITAL.text", "TransactionType.STARTING_CAPITAL.toolTipText"),
     TAXES("TransactionType.TAXES.text", "TransactionType.TAXES.toolTipText"),
+    THEFT("TransactionType.THEFT.text", "TransactionType.THEFT.toolTipText"),
     TRANSPORTATION("TransactionType.TRANSPORTATION.text", "TransactionType.TRANSPORTATION.toolTipText"),
     UNIT_PURCHASE("TransactionType.UNIT_PURCHASE.text", "TransactionType.UNIT_PURCHASE.toolTipText"),
     UNIT_SALE("TransactionType.UNIT_SALE.text", "TransactionType.UNIT_SALE.toolTipText");
@@ -147,8 +148,8 @@ public enum TransactionType {
         return this == REPAIRS;
     }
 
-    public boolean isRetirement() {
-        return this == RETIREMENT;
+    public boolean isPayout() {
+        return this == PAYOUT;
     }
 
     public boolean isSalaries() {
@@ -169,6 +170,10 @@ public enum TransactionType {
 
     public boolean isTaxes() {
         return this == TAXES;
+    }
+
+    public boolean isTheft() {
+        return this == THEFT;
     }
 
     public boolean isTransportation() {
@@ -236,7 +241,11 @@ public enum TransactionType {
                 case 17:
                     return EDUCATION;
                 case 18:
+                    return THEFT;
+                case 19:
                     return TAXES;
+                case 20:
+                    return PAYOUT;
                 default:
                     break;
             }
