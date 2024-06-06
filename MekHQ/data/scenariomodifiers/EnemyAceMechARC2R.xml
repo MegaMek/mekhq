@@ -22,9 +22,9 @@
 		<forceAlignment>2</forceAlignment>
 		<forceName>Enemy Mech Ace</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>aceARC2R.mul</fixedMul>		
+			<fixedMul>aceARC2R.mul</fixedMul>
 		<generationOrder>1</generationOrder>
-		<maxWeightClass>4</maxWeightClass>		
+		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>75</retreatThreshold>
 		<startingAltitude>0</startingAltitude>
 		<objectiveLinkedForces>

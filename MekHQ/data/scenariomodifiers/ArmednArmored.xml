@@ -4,5 +4,5 @@
 	<eventTiming>PreForceGeneration</eventTiming>
 	<eventRecipient>Opposing</eventRecipient>
 	<qualityAdjustment>1</qualityAdjustment>
-	<bvBudgetAdditiveMultiplier>-1</bvBudgetAdditiveMultiplier>	
+	<bvBudgetAdditiveMultiplier>-1</bvBudgetAdditiveMultiplier>
 </AtBScenarioModifier>
