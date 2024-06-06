@@ -458,10 +458,18 @@ public class AtBDynamicScenarioFactory {
 
             if (forceTemplate.getAllowAeroBombs()) {
                 MapLocation mapLocation = scenario.getTemplate().mapParameters.getMapLocation();
-                boolean isAeroMap = (mapLocation == MapLocation.LowAtmosphere) ||
-                        (mapLocation == MapLocation.Space);
 
-                populateAeroBombs(generatedLance, campaign, !isAeroMap);
+
+
+                populateAeroBombs(generatedLance,
+                        campaign,
+                        (mapLocation == MapLocation.LowAtmosphere) || (mapLocation == MapLocation.Space),
+                        quality);
+
+
+//                boolean isAeroMap = (mapLocation == MapLocation.LowAtmosphere) ||
+//                        (mapLocation == MapLocation.Space);
+                //populateAeroBombs(generatedLance, campaign, !isAeroMap);
             }
 
             if (forceTemplate.getUseArtillery() && forceTemplate.getDeployOffboard()) {
@@ -2439,9 +2447,9 @@ public class AtBDynamicScenarioFactory {
     );
 
     private static final Map<Integer, Integer> normalBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_HE,45),
+            Map.entry(BombType.B_HE,40),
             Map.entry(BombType.B_LG,5),
-            Map.entry(BombType.B_CLUSTER,25),
+            Map.entry(BombType.B_CLUSTER,30),
             Map.entry(BombType.B_INFERNO,15),
             Map.entry(BombType.B_THUNDER, 10)
     );
@@ -2513,7 +2521,10 @@ public class AtBDynamicScenarioFactory {
      * @param campaign     Campaign object
      * @param groundTargets    true if there are valid ground targets
      */
-    public static void populateAeroBombs(List<Entity> entityList, Campaign campaign, boolean groundTargets) {
+    public static void populateAeroBombs(List<Entity> entityList,
+                                         Campaign campaign,
+                                         boolean groundTargets,
+                                         int quality) {
 
         // Get all valid bomber
         List<Entity> bomberList = entityList.stream().filter(Targetable::isBomber).collect(Collectors.toList());
