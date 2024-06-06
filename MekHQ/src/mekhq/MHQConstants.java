@@ -114,8 +114,9 @@ public final class MHQConstants extends SuiteConstants {
     public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
     public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
     public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
-    public static final String AUTO_AWARDS_FOREGROUND = "paidRetirementForeground";
-    public static final String AUTO_AWARDS_BACKGROUND = "paidRetirementBackground";
+    public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
+    public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
+    public static final String FONT_COLOR_WARNING = "fontColorWarning";
     //endregion Colours
 
     //region Fonts

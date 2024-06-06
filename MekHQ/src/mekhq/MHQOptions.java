@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -441,6 +441,65 @@ public final class MHQOptions extends SuiteOptions {
 
     public void setStratConHexCoordForeground(Color value) {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.STRATCON_HEX_COORD_FOREGROUND, value.getRGB());
+    }
+
+    public Color getFontColorNegative() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_NEGATIVE, Color.RED.getRGB()));
+    }
+
+    /**
+     * @return the hexadecimal color code for the negative event font color.
+     */
+    public String getFontColorNegativeHexColor() {
+        return convertFontColorToHexColor(getFontColorNegative());
+    }
+
+    public void setFontColorNegative(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_NEGATIVE, value.getRGB());
+    }
+
+    public Color getFontColorPositive() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_POSITIVE, Color.GREEN.getRGB()));
+    }
+
+    /**
+     * @return the hexadecimal color code for the positive event font color.
+     */
+    public String getFontColorPositiveHexColor() {
+        return convertFontColorToHexColor(getFontColorPositive());
+    }
+
+    public void setFontColorPositive(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_POSITIVE, value.getRGB());
+    }
+
+    public Color getFontColorWarning() {
+        return new Color(userPreferences.node(MHQConstants.DISPLAY_NODE).getInt(MHQConstants.FONT_COLOR_WARNING, Color.ORANGE.getRGB()));
+    }
+
+    /**
+     * @return the hexadecimal color code for the warning event font color.
+     */
+    public String getFontColorWarningHexColor() {
+        return convertFontColorToHexColor(getFontColorWarning());
+    }
+
+    public void setFontColorWarning(Color value) {
+        userPreferences.node(MHQConstants.DISPLAY_NODE).putInt(MHQConstants.FONT_COLOR_WARNING, value.getRGB());
+    }
+
+    /**
+     * Converts the font color to a hexadecimal color representation.
+     *
+     * @param color the font color to convert
+     * @return the hexadecimal color representation of the font color
+     */
+    public String convertFontColorToHexColor(Color color) {
+        int red = color.getRed();
+        int green = color.getGreen();
+        int blue = color.getBlue();
+
+        return String.format("#%02x%02x%02x", red, green, blue);
     }
     //endregion Colours
 
