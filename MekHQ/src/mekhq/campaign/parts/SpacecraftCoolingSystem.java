@@ -24,10 +24,11 @@ import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.verifier.TestAdvancedAerospace;
 import megamek.common.verifier.TestSmallCraft;
-import mekhq.utilities.MHQXMLUtility;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -130,10 +131,10 @@ public class SpacecraftCoolingSystem extends Part {
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return " <font color='green'><b> salvaged.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> salvaged.</b></font>";
         } else {
             fix();
-            return " <font color='green'><b> replaced.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> replaced.</b></font>";
         }
     }
 

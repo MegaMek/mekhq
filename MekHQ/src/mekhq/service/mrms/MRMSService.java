@@ -132,7 +132,7 @@ public class MRMSService {
                 activeMRMSOptions, configuredOptions);
 
         String actionDescriptor = unit.isSalvage() ? resources.getString("Salvage") : resources.getString("Repair");
-        String msg = String.format("<font color='green'>Mass %s complete on %s.</font>", actionDescriptor,
+        String msg = String.format("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>Mass %s complete on %s.</font>", actionDescriptor,
                 unit.getName());
 
         switch (unitAction.getStatus()) {
@@ -259,7 +259,7 @@ public class MRMSService {
             }
 
             StringBuilder sb = new StringBuilder(
-                    String.format("<font color='green'>Mass Repair/Salvage complete for %s units.</font>", totalCount));
+                    String.format("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>Mass Repair/Salvage complete for %s units.</font>", totalCount));
 
             if (actionsPerformed > 0) {
                 sb.append(String.format(" %s repair/salvage action%s performed.", actionsPerformed,
