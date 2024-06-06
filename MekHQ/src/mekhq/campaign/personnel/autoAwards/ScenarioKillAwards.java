@@ -59,23 +59,6 @@ public class ScenarioKillAwards {
             }
         }
 
-        if (!eligibleAwardsBestable.isEmpty()) {
-            if (campaign.getCampaignOptions().isIssueBestAwardOnly()) {
-                int rollingQty = 0;
-
-                for (Award award : eligibleAwardsBestable) {
-                    if (award.getQty() > rollingQty) {
-                        rollingQty = award.getQty();
-                        bestAward = award;
-                    }
-                }
-
-                eligibleAwards.add(bestAward);
-            } else {
-                eligibleAwards.addAll(eligibleAwardsBestable);
-            }
-        }
-
         return AutoAwardsController.prepareAwardData(person, eligibleAwards);
     }
 }

@@ -30,10 +30,10 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
+import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.utilities.BoardClassifier;
 import mekhq.MHQConstants;
@@ -370,6 +370,10 @@ public class AtBDynamicScenarioFactory {
 
         // determine generation parameters
         int forceBV = 0;
+
+        double forceMultiplier = getDifficultyMultiplier(campaign);
+        forceTemplate.setForceMultiplier(forceMultiplier);
+
         int forceBVBudget = (int) (effectiveBV * forceTemplate.getForceMultiplier());
         int forceUnitBudget = 0;
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {

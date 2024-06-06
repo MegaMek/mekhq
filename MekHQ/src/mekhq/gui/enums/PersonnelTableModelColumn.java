@@ -105,6 +105,7 @@ public enum PersonnelTableModelColumn {
     TRYING_TO_CONCEIVE("PersonnelTableModelColumn.TRYING_TO_CONCEIVE.text"),
     IMMORTAL("PersonnelTableModelColumn.IMMORTAL.text"),
     TOUGHNESS("PersonnelTableModelColumn.TOUGHNESS.text"),
+    FATIGUE("PersonnelTableModelColumn.FATIGUE.text"),
     EDGE("PersonnelTableModelColumn.EDGE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
     IMPLANT_COUNT("PersonnelTableModelColumn.IMPLANT_COUNT.text"),
@@ -366,6 +367,10 @@ public enum PersonnelTableModelColumn {
 
     public boolean isToughness() {
         return this == TOUGHNESS;
+    }
+
+    public boolean isFatigue() {
+        return this == FATIGUE;
     }
 
     public boolean isEdge() {
@@ -658,6 +663,8 @@ public enum PersonnelTableModelColumn {
                 return resources.getString(person.getStatus().isDead() ? "NA.text" : (person.isImmortal() ? "Yes.text" : "No.text"));
             case TOUGHNESS:
                 return Integer.toString(person.getToughness());
+            case FATIGUE:
+                return Integer.toString(person.getFatigue());
             case EDGE:
                 return Integer.toString(person.getEdge());
             case SPA_COUNT:
@@ -943,6 +950,7 @@ public enum PersonnelTableModelColumn {
                     case FIRST_NAME:
                     case LAST_NAME:
                     case TOUGHNESS:
+                    case FATIGUE:
                     case EDGE:
                     case SPA_COUNT:
                     case IMPLANT_COUNT:
