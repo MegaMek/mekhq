@@ -5726,7 +5726,5 @@ public class Unit implements ITechnology {
             default:
                 throw new IllegalStateException("Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
         }
-
-
     }
 }
