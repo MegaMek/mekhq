@@ -133,7 +133,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     }
 
     @Override
-    protected void addOffers(final Campaign campaign, final int num, UnitMarketType market,
+    public void addOffers(final Campaign campaign, final int num, UnitMarketType market,
                              final int unitType, @Nullable Faction faction, final int quality,
                              final int priceTarget) {
         if (faction == null) {

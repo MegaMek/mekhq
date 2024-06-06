@@ -25,13 +25,13 @@ import java.util.ResourceBundle;
 
 public enum AtBMoraleLevel {
     //region Enum Declarations
-    ROUT("AtBMoraleLevel.ROUT.text", "AtBMoraleLevel.ROUT.toolTipText"),
+    BROKEN("AtBMoraleLevel.BROKEN.text", "AtBMoraleLevel.BROKEN.toolTipText"),
     VERY_LOW("AtBMoraleLevel.VERY_LOW.text", "AtBMoraleLevel.VERY_LOW.toolTipText"),
     LOW("AtBMoraleLevel.LOW.text", "AtBMoraleLevel.LOW.toolTipText"),
     NORMAL("AtBMoraleLevel.NORMAL.text", "AtBMoraleLevel.NORMAL.toolTipText"),
     HIGH("AtBMoraleLevel.HIGH.text", "AtBMoraleLevel.HIGH.toolTipText"),
     VERY_HIGH("AtBMoraleLevel.VERY_HIGH.text", "AtBMoraleLevel.VERY_HIGH.toolTipText"),
-    INVINCIBLE("AtBMoraleLevel.INVINCIBLE.text", "AtBMoraleLevel.INVINCIBLE.toolTipText");
+    UNBREAKABLE("AtBMoraleLevel.UNBREAKABLE.text", "AtBMoraleLevel.UNBREAKABLE.toolTipText");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -56,7 +56,7 @@ public enum AtBMoraleLevel {
 
     //region Boolean Comparison Methods
     public boolean isRout() {
-        return this == ROUT;
+        return this == BROKEN;
     }
 
     public boolean isVeryLow() {
@@ -79,8 +79,8 @@ public enum AtBMoraleLevel {
         return this == VERY_HIGH;
     }
 
-    public boolean isInvincible() {
-        return this == INVINCIBLE;
+    public boolean isUnbreakable() {
+        return this == UNBREAKABLE;
     }
     //endregion Boolean Comparison Methods
 
@@ -99,7 +99,7 @@ public enum AtBMoraleLevel {
         try {
             switch (Integer.parseInt(text)) {
                 case 0:
-                    return ROUT;
+                    return BROKEN;
                 case 1:
                     return VERY_LOW;
                 case 2:
@@ -111,7 +111,7 @@ public enum AtBMoraleLevel {
                 case 5:
                     return VERY_HIGH;
                 case 6:
-                    return INVINCIBLE;
+                    return UNBREAKABLE;
                 default:
                     break;
             }

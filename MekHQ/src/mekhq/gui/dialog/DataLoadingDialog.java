@@ -336,6 +336,9 @@ public class DataLoadingDialog extends AbstractMHQDialog implements PropertyChan
                 if (campaign.getCampaignOptions().isUseAtB()) {
                     campaign.initAtB(true);
                 }
+
+                // Turnover
+                campaign.initTurnover();
                 //endregion Progress 7
             } else {
                 //region Progress 6

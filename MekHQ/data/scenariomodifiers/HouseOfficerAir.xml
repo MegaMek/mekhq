@@ -1,5 +1,5 @@
 <AtBScenarioModifier>
-	<additionalBriefingText>Your force will be deployed under the command of a house officer. Keep them alive. Additionally, allied command will dicatate retreat conditions.</additionalBriefingText>
+	<additionalBriefingText>Your force will be deployed under the command of a house officer. Keep them alive. Additionally, allied command will dictate retreat conditions.</additionalBriefingText>
 	<benefitsPlayer>true</benefitsPlayer>
 	<eventTiming>PreForceGeneration</eventTiming>
 	<forceDefinition>

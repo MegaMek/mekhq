@@ -108,12 +108,12 @@ public class PersonnelStatusTest {
     }
 
     @Test
-    public void testIsAWOL() {
+    public void testIsAwol() {
         for (final PersonnelStatus personnelStatus : statuses) {
             if (personnelStatus == PersonnelStatus.AWOL) {
-                assertTrue(personnelStatus.isAWOL());
+                assertTrue(personnelStatus.isAwol());
             } else {
-                assertFalse(personnelStatus.isAWOL());
+                assertFalse(personnelStatus.isAwol());
             }
         }
     }
@@ -372,9 +372,25 @@ public class PersonnelStatusTest {
         assertEquals(PersonnelStatus.MIA, PersonnelStatus.parseFromString("3"));
         assertEquals(PersonnelStatus.STUDENT, PersonnelStatus.parseFromString("4"));
         assertEquals(PersonnelStatus.MISSING, PersonnelStatus.parseFromString("5"));
+        assertEquals(PersonnelStatus.POW, PersonnelStatus.parseFromString("6"));
+        assertEquals(PersonnelStatus.ON_LEAVE, PersonnelStatus.parseFromString("7"));
+        assertEquals(PersonnelStatus.AWOL, PersonnelStatus.parseFromString("8"));
+        assertEquals(PersonnelStatus.RESIGNED, PersonnelStatus.parseFromString("9"));
+        assertEquals(PersonnelStatus.DESERTED, PersonnelStatus.parseFromString("10"));
+        assertEquals(PersonnelStatus.DEFECTED, PersonnelStatus.parseFromString("11"));
+        assertEquals(PersonnelStatus.HOMICIDE, PersonnelStatus.parseFromString("12"));
+        assertEquals(PersonnelStatus.WOUNDS, PersonnelStatus.parseFromString("13"));
+        assertEquals(PersonnelStatus.DISEASE, PersonnelStatus.parseFromString("14"));
+        assertEquals(PersonnelStatus.ACCIDENTAL, PersonnelStatus.parseFromString("15"));
+        assertEquals(PersonnelStatus.NATURAL_CAUSES, PersonnelStatus.parseFromString("16"));
+        assertEquals(PersonnelStatus.OLD_AGE, PersonnelStatus.parseFromString("17"));
+        assertEquals(PersonnelStatus.MEDICAL_COMPLICATIONS, PersonnelStatus.parseFromString("18"));
+        assertEquals(PersonnelStatus.PREGNANCY_COMPLICATIONS, PersonnelStatus.parseFromString("19"));
+        assertEquals(PersonnelStatus.UNDETERMINED, PersonnelStatus.parseFromString("20"));
+        assertEquals(PersonnelStatus.SUICIDE, PersonnelStatus.parseFromString("21"));
 
         // Error Case
-        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("6"));
+        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("22"));
         assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("blah"));
     }
     //endregion File I/O

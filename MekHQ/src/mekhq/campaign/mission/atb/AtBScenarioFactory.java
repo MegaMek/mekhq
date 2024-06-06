@@ -109,7 +109,7 @@ public class AtBScenarioFactory {
     /**
      * Iterate through the list of lances and make a scenario roll for each,
      * then sort them by date before adding them to the campaign.
-     * Contracts with enemy morale level of invincible have a base attack
+     * Contracts with enemy morale level of unbreakable have a base attack
      * (defender) scenario each week. If there is a base attack (attacker)
      * scenario, that is the only one for the week on that contracts.
      *
@@ -191,7 +191,7 @@ public class AtBScenarioFactory {
                         assignedLances.add(lance.getForceId());
 
                         // We care if the scenario is a Base Attack, as one must be generated if the
-                        // current contract's morale is Invincible
+                        // current contract's morale is Unbreakable
                         if (scenario.getScenarioType() == AtBScenario.BASEATTACK) {
                             hasBaseAttack = true;
 
@@ -208,9 +208,9 @@ public class AtBScenarioFactory {
             }
             //endregion Generate Scenarios
 
-            //region Invincible Morale Missions
-            // Make sure invincible morale missions have a base attack scenario generated
-            if (!hasBaseAttack && contract.getMoraleLevel().isInvincible()) {
+            //region Unbreakable Morale Missions
+            // Make sure Unbreakable morale missions have a base attack scenario generated
+            if (!hasBaseAttack && contract.getMoraleLevel().isUnbreakable()) {
                 /* find a lance to act as defender, giving preference
                  * first to those assigned to the same contract,
                  * then to those assigned to defense roles
@@ -272,10 +272,10 @@ public class AtBScenarioFactory {
                     }
                 } else {
                     LogManager.getLogger().warn("No lances assigned to mission " + contract.getName()
-                            + ". Can't generate an Invincible Morale base defence mission for this force.");
+                            + ". Can't generate an Unbreakable Morale base defence mission for this force.");
                 }
             }
-            //endregion Invincible Morale Missions
+            //endregion Unbreakable Morale Missions
 
             //region Base Attack (Attacker) Generated
             // If there is a base attack (attacker), it is the only one for this contract until it happens.
