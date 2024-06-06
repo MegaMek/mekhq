@@ -605,7 +605,7 @@ public class Campaign implements ITechManager {
             report.append(getAtBConfig().shipSearchCostPerWeek().toAmountAndSymbolString())
                     .append(" deducted for ship search.");
         } else {
-            addReport("<font color=\"red\">Insufficient funds for ship search.</font>");
+            addReport("<font color=" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + ">Insufficient funds for ship search.</font>");
             setShipSearchStart(null);
             return;
         }
@@ -636,7 +636,7 @@ public class Campaign implements ITechManager {
                             .append(" until ")
                             .append(MekHQ.getMHQOptions().getDisplayFormattedDate(getShipSearchExpiration()));
                 } else {
-                    report.append(" <font color=\"red\">Could not determine ship type.</font>");
+                    report.append(" <font color=" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + ">Could not determine ship type.</font>");
                 }
             } else {
                 report.append("<br/>Ship search unsuccessful.");
@@ -648,14 +648,14 @@ public class Campaign implements ITechManager {
     public void purchaseShipSearchResult() {
         MechSummary ms = MechSummaryCache.getInstance().getMech(getShipSearchResult());
         if (ms == null) {
-            LogManager.getLogger().error("Cannot find entry for " + getShipSearchResult());
+            LogManager.getLogger().error("Cannot find entry for {}", getShipSearchResult());
             return;
         }
 
         Money cost = Money.of(ms.getCost());
 
         if (getFunds().isLessThan(cost)) {
-            addReport("<font color='red'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
+            addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>");
             return;
         }
 
@@ -735,7 +735,7 @@ public class Campaign implements ITechManager {
                 getRetirementDefectionTracker().resolveAllContracts();
                 return true;
             } else {
-                addReport("<font color='red'>You cannot afford to make the final payments.</font>");
+                addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>You cannot afford to make the final payments.</font>");
                 return false;
             }
         }
@@ -1398,7 +1398,7 @@ public class Campaign implements ITechManager {
                 && !gmAdd && prisonerStatus.isFree()) {
             if (!getFinances().debit(TransactionType.RECRUITMENT, getLocalDate(),
                     p.getSalary(this).multipliedBy(2), "Recruitment of " + p.getFullName())) {
-                addReport("<font color='red'><b>Insufficient funds to recruit "
+                addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>Insufficient funds to recruit "
                         + p.getFullName() + "</b></font>");
                 return false;
             }
@@ -2369,7 +2369,7 @@ public class Campaign implements ITechManager {
                         // if we can't afford it, then don't keep searching for it on other planets
                         if (!canPayFor(shoppingItem)) {
                             if (!getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                                addReport("<font color='red'><b>You cannot afford to purchase another "
+                                addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>You cannot afford to purchase another "
                                         + shoppingItem.getAcquisitionName() + "</b></font>");
                             }
                             shelvedItems.add(shoppingItem);
@@ -2453,7 +2453,7 @@ public class Campaign implements ITechManager {
         // if it's already impossible, don't bother with the rest
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='red'><b>" + impossibleSentencePrefix + acquisition.getAcquisitionName()
+                addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>" + impossibleSentencePrefix + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + " because:</b></font> " + target.getDesc());
             }
             return PartAcquisitionResult.PartInherentFailure;
@@ -2464,7 +2464,7 @@ public class Campaign implements ITechManager {
 
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='red'><b>" + impossibleSentencePrefix + acquisition.getAcquisitionName()
+                addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>" + impossibleSentencePrefix + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + " because:</b></font> " + target.getDesc());
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
@@ -2472,7 +2472,7 @@ public class Campaign implements ITechManager {
         if (Compute.d6(2) < target.getValue()) {
             // no contacts on this planet, move along
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='red'><b>" + failedSentencePrefix + acquisition.getAcquisitionName()
+                addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>" + failedSentencePrefix + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + "</b></font>");
             }
             return PartAcquisitionResult.PlanetSpecificFailure;
@@ -2527,7 +2527,7 @@ public class Campaign implements ITechManager {
 
         // if impossible then return
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
-            report += ":<font color='red'><b> " + target.getDesc() + "</b></font>";
+            report += ":<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> " + target.getDesc() + "</b></font>";
             if (!getCampaignOptions().isUsePlanetaryAcquisition() || getCampaignOptions().isPlanetAcquisitionVerbose()) {
                 addReport(report);
             }
@@ -6419,7 +6419,7 @@ public class Campaign implements ITechManager {
             finances.removeLoan(loan);
             MekHQ.triggerEvent(new LoanPaidEvent(loan));
         } else {
-            addReport("<font color='red'>You do not have enough funds to pay off " + loan + "</font>");
+            addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>You do not have enough funds to pay off " + loan + "</font>");
         }
     }
 
@@ -6490,7 +6490,7 @@ public class Campaign implements ITechManager {
             if (campaignOptions.isPayForMaintain()) {
                 if (!(finances.debit(TransactionType.MAINTENANCE, getLocalDate(), u.getMaintenanceCost(),
                         "Maintenance for " + u.getName()))) {
-                    addReport("<font color='red'><b>You cannot afford to pay maintenance costs for "
+                    addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>You cannot afford to pay maintenance costs for "
                             + u.getHyperlinkedName() + "!</b></font>");
                     paidMaintenance = false;
                 }
@@ -6550,7 +6550,7 @@ public class Campaign implements ITechManager {
                         + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
                         + "</font>";
             } else if (quality < qualityOrig) {
-                qualityString = "<font color='red'>Overall quality declines from "
+                qualityString = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Overall quality declines from "
                         + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
                         + "</font>";
             } else {
@@ -6564,12 +6564,12 @@ public class Campaign implements ITechManager {
                 damageString += nDestroy + " parts were destroyed.";
             }
             if (!damageString.isEmpty()) {
-                damageString = "<b><font color='red'>" + damageString + "</b></font> [<a href='REPAIR|" + u.getId()
+                damageString = "<b><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + damageString + "</b></font> [<a href='REPAIR|" + u.getId()
                         + "'>Repair bay</a>]";
             }
             String paidString = "";
             if (!paidMaintenance) {
-                paidString = "<font color='red'>Could not afford maintenance costs, so check is at a penalty.</font>";
+                paidString = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Could not afford maintenance costs, so check is at a penalty.</font>";
             }
             addReport(techNameLinked + " performs maintenance on " + u.getHyperlinkedName() + ". " + paidString
                     + qualityString + ". " + damageString + " [<a href='MAINTENANCE|" + u.getId()
@@ -6684,15 +6684,15 @@ public class Campaign implements ITechManager {
         if (p.getQuality() > oldQuality) {
             partReport += ": <font color='green'>new quality is " + p.getQualityName() + "</font>";
         } else if (p.getQuality() < oldQuality) {
-            partReport += ": <font color='red'>new quality is " + p.getQualityName() + "</font>";
+            partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>new quality is " + p.getQualityName() + "</font>";
         } else {
             partReport += ": quality remains " + p.getQualityName();
         }
         if (null != partsToDamage.get(p)) {
             if (partsToDamage.get(p) > 3) {
-                partReport += ", <font color='red'><b>part destroyed</b></font>";
+                partReport += ", <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>part destroyed</b></font>";
             } else {
-                partReport += ", <font color='red'><b>part damaged</b></font>";
+                partReport += ", <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>part damaged</b></font>";
             }
         }
 

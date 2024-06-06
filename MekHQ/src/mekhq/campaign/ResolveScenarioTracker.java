@@ -2036,7 +2036,7 @@ public class ResolveScenarioTracker {
                         color = "orange";
                         break;
                     case Entity.DMG_CRIPPLED:
-                        color = "red";
+                        color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
                         break;
                 }
             }

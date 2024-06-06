@@ -365,16 +365,14 @@ public class StratconScenarioWizard extends JDialog {
         sb.append(": ");
         sb.append(u.getStatus());
 
-        int injuryCount = 0;
-
-        for (Person p : u.getCrew()) {
-            if (p.hasInjuries(true)) {
-                injuryCount++;
-            }
-        }
+        int injuryCount = (int) u.getCrew().stream().filter(p -> p.hasInjuries(true)).count();
 
         if (injuryCount > 0) {
-            sb.append(String.format(", <span color='red'>%d/%d injured crew</span>", injuryCount, u.getCrew().size()));
+            sb.append(String.format(
+                    ", <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>%d/%d injured crew</span>",
+                    injuryCount,
+                    u.getCrew().size())
+            );
         }
 
         sb.append("<br/>");

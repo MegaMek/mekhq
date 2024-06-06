@@ -1291,10 +1291,10 @@ public class Utilities {
         List<String> stub = new ArrayList<>();
         for (Entity en : entities) {
             if (null == en) {
-                stub.add("<html><font color='red'>No random assignment table found for faction</font></html>");
+                stub.add("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No random assignment table found for faction</font></html>");
             } else {
                 stub.add("<html>" + en.getCrew().getName() + " (" +
-                        en.getCrew().getGunnery() + "/" +
+                        en.getCrew().getGunnery() + '/' +
                         en.getCrew().getPiloting() + "), " +
                         "<i>" + en.getShortName() + "</i>" +
                         "</html>");

@@ -407,9 +407,9 @@ public abstract class Part implements IPartWork, ITechnology {
     public String getDesc() {
         String bonus = getAllMods(null).getValueAsString();
         if (getAllMods(null).getValue() > -1) {
-            bonus = "+" + bonus;
+            bonus = '+' + bonus;
         }
-        bonus = "(" + bonus + ")";
+        bonus = '(' + bonus + ')';
         String toReturn = "<html><font size='2'";
         String action = "Repair ";
         if (isSalvaging()) {
@@ -424,13 +424,13 @@ public abstract class Part implements IPartWork, ITechnology {
         toReturn += "<b>" + action + getName() + "</b><br/>";
         toReturn += getDetails() + "<br/>";
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='red'>Impossible</font>";
+            toReturn += "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</font>";
         } else {
-            toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+            toReturn += getTimeLeft() + " minutes" + scheduled;
             if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
                 toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
             }
-            toReturn += " " + bonus;
+            toReturn += ' ' + bonus;
             if (getMode() != WorkTime.NORMAL) {
                 toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
             }
@@ -1051,7 +1051,7 @@ public abstract class Part implements IPartWork, ITechnology {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
-        return " <font color='red'><b> failed.</b></font>";
+        return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed.</b></font>";
     }
 
     @Override
