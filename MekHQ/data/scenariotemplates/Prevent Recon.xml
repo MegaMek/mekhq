@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ScenarioTemplate>
     <name>Prevent Recon</name>
-    <shortBriefing>Prevent hostile reconnaisance.</shortBriefing>
+    <shortBriefing>Prevent hostile reconnaissance.</shortBriefing>
     <detailedBriefing>Destroy or rout 50% of the opposing force within the specified duration.</detailedBriefing>
     <isHostileFacility>false</isHostileFacility>
     <isAlliedFacility>false</isAlliedFacility>

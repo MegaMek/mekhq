@@ -1240,6 +1240,12 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblEdgeAvail1 = new JLabel();
         JLabel lblEdgeAvail2 = new JLabel();
 
+        JLabel lblLoyalty1 = new JLabel();
+        JLabel lblLoyalty2 = new JLabel();
+
+        JLabel lblFatigue1 = new JLabel();
+        JLabel lblFatigue2 = new JLabel();
+
         // education
         JLabel lblEducationLevel1 = new JLabel();
         JLabel lblEducationLevel2 = new JLabel();
@@ -1425,6 +1431,75 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())
+                && (person.getLoyalty() != 0)) {
+            lblLoyalty1.setName("lblLoyalty1");
+            lblLoyalty1.setText(resourceMap.getString("lblLoyalty1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblLoyalty1, gridBagConstraints);
+
+            lblLoyalty2.setName("lblLoyalty2");
+            lblLoyalty2.setText(String.valueOf(person.getLoyalty()));
+            lblLoyalty2.setLabelFor(lblLoyalty2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblLoyalty2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if ((campaign.getCampaignOptions().isUseFatigue())
+                && (person.getEffectiveFatigue(campaign) > 0)) {
+            lblFatigue1.setName("lblFatigue1");
+            lblFatigue1.setText(resourceMap.getString("lblFatigue1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblFatigue1, gridBagConstraints);
+
+            StringBuilder fatigueDisplay = new StringBuilder();
+            int effectiveFatigue = person.getEffectiveFatigue(campaign);
+            int fatigueTurnoverModifier = MathUtility.clamp(((person.getFatigue() - 1) / 4) - 1, 0, 3);
+
+            fatigueDisplay.append(person.getFatigue());
+
+            if (person.getFatigue() != effectiveFatigue) {
+                fatigueDisplay.append(" / ").append(effectiveFatigue);
+            }
+
+            if (fatigueTurnoverModifier > 0) {
+                fatigueDisplay.append(" (-").append(fatigueTurnoverModifier).append(')');
+            }
+
+            lblFatigue2.setName("lblFatigue2");
+            lblFatigue2.setText(fatigueDisplay.toString());
+            lblFatigue2.setLabelFor(lblFatigue2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblFatigue2, gridBagConstraints);
+
+            firsty++;
+        }
+
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             lblEducationLevel1.setName("lblEducationLevel1");
             lblEducationLevel1.setText(resourceMap.getString("lblEducationLevel1.text"));
@@ -1537,6 +1612,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillLog() {
         List<LogEntry> logs = person.getPersonnelLog();
+        Collections.reverse(logs);
 
         JPanel pnlLog = new JPanel(new GridBagLayout());
 
@@ -1575,6 +1651,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillScenarioLog() {
         List<LogEntry> scenarioLog = person.getScenarioLog();
+        Collections.reverse(scenarioLog);
 
         JPanel pnlScenariosLog = new JPanel(new GridBagLayout());
 
@@ -1747,6 +1824,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillKillRecord() {
         List<Kill> kills = campaign.getKillsFor(person.getId());
+        Collections.reverse(kills);
 
         JPanel pnlKills = new JPanel(new GridBagLayout());
 

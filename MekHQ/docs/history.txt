@@ -37,6 +37,7 @@ MEKHQ VERSION HISTORY:
 + PR #4117: Even More Education Module Bug Fixes
 + PR #4118: Added autoAwards Support for the Education Module
 + PR #4119: Added Reeducation Camps to Education Module, Replaced Placeholder Academy Descriptions
++ PR #4129: Correcting a bunch of spelling errors and typos
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
