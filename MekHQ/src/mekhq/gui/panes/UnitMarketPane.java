@@ -421,7 +421,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             final Money price = offer.getPrice();
             if (getCampaign().getFunds().isLessThan(price)) {
                 getCampaign().addReport(String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                + resources.getString("UnitMarketPane.CannotAfford.report"),
+                                + resources.getString("UnitMarketPane.CannotAfford.report") + "</font>",
                         entity.getShortName()));
                 offersIterator.remove();
                 continue;
@@ -433,7 +433,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                         price.dividedBy(roll), String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
                                 entity.getShortName()));
                 getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                        + resources.getString("UnitMarketPane.BlackMarketSwindled.report"));
+                        + resources.getString("UnitMarketPane.BlackMarketSwindled.report") + "</font>");
                 getCampaign().getUnitMarket().getOffers().remove(offer);
                 offersIterator.remove();
                 continue;
@@ -461,7 +461,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
             getCampaign().addNewUnit(offer.getEntity(), false, instantDelivery ? 0 : offer.getTransitDuration());
             if (!instantDelivery) {
                 getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                        + String.format(resources.getString("UnitMarketPane.UnitDeliveryLength.report"),
+                        + String.format(resources.getString("UnitMarketPane.UnitDeliveryLength.report") + "</font>",
                         offer.getTransitDuration()));
             }
             getCampaign().getUnitMarket().getOffers().remove(offer);

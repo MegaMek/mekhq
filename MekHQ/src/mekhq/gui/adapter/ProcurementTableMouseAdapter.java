@@ -177,12 +177,12 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
 
         if (success) {
             gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                    + String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report"),
+                    + String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report") + "</font>",
                     acquisition.getAcquisitionName()));
             acquisition.decrementQuantity();
         } else {
             gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                    + String.format(resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report"),
+                    + String.format(resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report") + "</font>",
                     acquisition.getAcquisitionName()));
         }
         return success;
@@ -205,7 +205,7 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
-                + String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report"),
+                + String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report") + "</font>",
                 acquisition.getAcquisitionName()));
         acquisition.decrementQuantity();
     }
