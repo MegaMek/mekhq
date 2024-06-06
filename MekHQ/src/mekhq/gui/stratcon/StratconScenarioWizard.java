@@ -24,7 +24,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
@@ -394,7 +393,8 @@ public class StratconScenarioWizard extends JDialog {
                 costBuilder.append(", ");
 
                 if (currentCampaignState.getVictoryPoints() <= 1) {
-                    costBuilder.append(resourceMap.getString("reinforcementRoll.Text"));
+                    costBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>")
+                            .append(resourceMap.getString("reinforcementRoll.Text"));
                 } else {
                     costBuilder.append(resourceMap.getString("supportPointConvert.text"));
                 }

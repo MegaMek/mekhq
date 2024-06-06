@@ -18,6 +18,7 @@
  */
 package mekhq.gui.panes;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.panels.EntityImagePanel;
 import megamek.client.ui.panes.EntityViewPane;
 import megamek.client.ui.preferences.*;
@@ -27,13 +28,13 @@ import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
-import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.WeightClassSorter;
 import org.apache.logging.log4j.LogManager;
 
@@ -419,7 +420,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             final Money price = offer.getPrice();
             if (getCampaign().getFunds().isLessThan(price)) {
-                getCampaign().addReport(String.format(resources.getString("UnitMarketPane.CannotAfford.report"),
+                getCampaign().addReport(String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                + resources.getString("UnitMarketPane.CannotAfford.report"),
                         entity.getShortName()));
                 offersIterator.remove();
                 continue;
@@ -430,7 +432,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                 getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
                         price.dividedBy(roll), String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
                                 entity.getShortName()));
-                getCampaign().addReport(resources.getString("UnitMarketPane.BlackMarketSwindled.report"));
+                getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                        + resources.getString("UnitMarketPane.BlackMarketSwindled.report"));
                 getCampaign().getUnitMarket().getOffers().remove(offer);
                 offersIterator.remove();
                 continue;
