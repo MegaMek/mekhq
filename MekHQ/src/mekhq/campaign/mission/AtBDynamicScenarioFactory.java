@@ -77,11 +77,135 @@ public class AtBDynamicScenarioFactory {
      */
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
-    // bomb types assignable to aerospace units on ground maps
-    private static final int[] validBotBombs = { BombType.B_HE, BombType.B_CLUSTER, BombType.B_RL,
-            BombType.B_INFERNO, BombType.B_THUNDER, BombType.B_FAE_SMALL, BombType.B_FAE_LARGE,
-            BombType.B_LG, BombType.B_ARROW, BombType.B_HOMING, BombType.B_TAG };
-    private static final int[] validBotAABombs = { BombType.B_RL, BombType.B_LAA, BombType.B_AAA };
+    /**
+     * Distribution of various external ordnance choices for non-pirate forces
+     */
+    private static final Map<String, Integer> bombMapGroundSpread = Map.ofEntries (
+            Map.entry("Normal", 6),
+            Map.entry("Anti-Mek", 3),
+            Map.entry("Anti-conventional", 2),
+            Map.entry("Standoff", 1),
+            Map.entry("Strike", 2)
+    );
+
+    /**
+     * Distribution of various external ordnance choices for pirate forces
+     */
+    private static final Map<String, Integer> bombMapPirateGroundSpread = Map.ofEntries(
+            Map.entry("Normal", 7),
+            Map.entry("Firestorm", 3)
+    );
+
+    /**
+     * General purpose external ordnance choices
+     */
+    private static final Map<Integer, Integer> normalBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_HE,40),
+            Map.entry(BombType.B_LG,5),
+            Map.entry(BombType.B_CLUSTER,30),
+            Map.entry(BombType.B_INFERNO,15),
+            Map.entry(BombType.B_THUNDER, 10)
+    );
+
+    /**
+     * External ordnance choices for use against Mechs
+     */
+    private static final Map<Integer,Integer> antiMekBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_HE,55),
+            Map.entry(BombType.B_LG,15),
+            Map.entry(BombType.B_INFERNO, 10),
+            Map.entry(BombType.B_THUNDER,10),
+            Map.entry(BombType.B_HOMING, 10)
+    );
+
+    /**
+     * External ordnance choices for use against ground vehicles and infantry
+     */
+    private static final Map<Integer,Integer> antiConvBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_CLUSTER,50),
+            Map.entry(BombType.B_INFERNO,40),
+            Map.entry(BombType.B_THUNDER, 8),
+            Map.entry(BombType.B_FAE_SMALL, 2)
+    );
+
+    /**
+     * External ordnance choices for providing artillery support
+     */
+    private static final Map<Integer,Integer> standoffBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_ARROW, 40),
+            Map.entry(BombType.B_HOMING, 60)
+    );
+
+    /**
+     * External ordnance choices for attacking static targets
+     */
+    private static final Map<Integer,Integer> strikeBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_LG,45),
+            Map.entry(BombType.B_HOMING,25),
+            Map.entry(BombType.B_HE,30)
+    );
+
+    /**
+     * External ordnance choices for low tech forces. Also used as a default/fall-back selection.
+     */
+    private static final Map<Integer,Integer> lowTechBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_HE, 35),
+            Map.entry(BombType.B_RL, 65)
+    );
+
+    /**
+     * External ordnance choices for pirates. Low tech, high chaos factor.
+     */
+    private static final Map<Integer,Integer> pirateBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_HE, 7),
+            Map.entry(BombType.B_RL, 45),
+            Map.entry(BombType.B_INFERNO, 35),
+            Map.entry(BombType.B_CLUSTER, 5),
+            Map.entry(BombType.B_FAE_SMALL, 6),
+            Map.entry(BombType.B_FAE_LARGE, 2)
+    );
+
+    /**
+     * External ordnance choices for pirates to set things on fire
+     */
+    private static final Map<Integer, Integer> pirateFirestormBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_INFERNO, 60),
+            Map.entry(BombType.B_FAE_SMALL, 30),
+            Map.entry(BombType.B_FAE_LARGE, 10)
+    );
+
+    /**
+     * External ordnance choices for air-to-air combat
+     */
+    private static final Map<Integer,Integer> antiAirBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_RL, 40),
+            Map.entry(BombType.B_LAA, 40),
+            Map.entry(BombType.B_AAA, 15),
+            Map.entry(BombType.B_AS, 4),
+            Map.entry(BombType.B_ASEW, 1)
+    );
+
+    /**
+     * External ordnance choices for attacking DropShips and other large craft
+     */
+    private static final Map<Integer, Integer> antiShipBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_AAA, 50),
+            Map.entry(BombType.B_AS, 35),
+            Map.entry(BombType.B_ASEW, 15)
+    );
+
+    /**
+     * External ordnance choices for pirate air-to-air combat. Selects fewer high tech choices than
+     * the standard loadout.
+     */
+    private static final Map<Integer,Integer> pirateAirBombLoad = Map.ofEntries(
+            Map.entry(BombType.B_RL, 60),
+            Map.entry(BombType.B_LAA, 30),
+            Map.entry(BombType.B_AAA, 10)
+    );
+
+
+
 
     private static final int[] minimumBVPercentage = { 50, 60, 70, 80, 90, 100 };
     // target number for 2d6 roll of infantry being upgraded to battle armor, indexed by dragoons rating
@@ -2443,142 +2567,6 @@ public class AtBDynamicScenarioFactory {
         }
     }
 
-
-
-
-
-
-
-
-    // Probabilities of generating a specific type of bomb by loadout
-    /**
-     * Distribution of different external ordnance choices for non-pirate forces
-     */
-    private static final Map<String, Integer> bombMapGroundSpread = Map.ofEntries (
-            Map.entry("Normal", 6),
-            Map.entry("Anti-Mek", 3),
-            Map.entry("Anti-conventional", 2),
-            Map.entry("Standoff", 1),
-            Map.entry("Strike", 2)
-    );
-
-    /**
-     * Distribution of different external ordnance choices for pirate forces
-     */
-    private static final Map<String, Integer> bombMapPirateGroundSpread = Map.ofEntries(
-            Map.entry("Normal", 7),
-            Map.entry("Firestorm", 3)
-    );
-
-    /**
-     * General purpose external ordnance load
-     */
-    private static final Map<Integer, Integer> normalBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_HE,40),
-            Map.entry(BombType.B_LG,5),
-            Map.entry(BombType.B_CLUSTER,30),
-            Map.entry(BombType.B_INFERNO,15),
-            Map.entry(BombType.B_THUNDER, 10)
-    );
-
-    /**
-     * External ordnance choices for use against Mechs
-     */
-    private static final Map<Integer,Integer> antiMekBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_HE,55),
-            Map.entry(BombType.B_LG,15),
-            Map.entry(BombType.B_INFERNO, 10),
-            Map.entry(BombType.B_THUNDER,10),
-            Map.entry(BombType.B_HOMING, 10)
-    );
-
-    /**
-     * External ordnance choices for use against ground vehicles and infantry
-     */
-    private static final Map<Integer,Integer> antiConvBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_CLUSTER,50),
-            Map.entry(BombType.B_INFERNO,40),
-            Map.entry(BombType.B_THUNDER, 8),
-            Map.entry(BombType.B_FAE_SMALL, 2)
-    );
-
-    /**
-     * External ordnance choices for providing artillery support
-     */
-    private static final Map<Integer,Integer> standoffBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_ARROW, 40),
-            Map.entry(BombType.B_HOMING, 60)
-    );
-
-    /**
-     * External ordnance choices for attacking static targets
-     */
-    private static final Map<Integer,Integer> strikeBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_LG,45),
-            Map.entry(BombType.B_HOMING,25),
-            Map.entry(BombType.B_HE,30)
-    );
-
-    /**
-     * External ordnance choices for low tech forces. Also used as a default/fall-back selection.
-     */
-    private static final Map<Integer,Integer> lowTechBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_HE, 35),
-            Map.entry(BombType.B_RL, 65)
-    );
-
-    /**
-     * External ordnance choices for pirates. Low tech, high chaos factor.
-     */
-    private static final Map<Integer,Integer> pirateBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_HE, 7),
-            Map.entry(BombType.B_RL, 45),
-            Map.entry(BombType.B_INFERNO, 35),
-            Map.entry(BombType.B_CLUSTER, 5),
-            Map.entry(BombType.B_FAE_SMALL, 6),
-            Map.entry(BombType.B_FAE_LARGE, 2)
-    );
-
-    /**
-     * External ordnance choices for pirates to set things on fire
-     */
-    private static final Map<Integer, Integer> pirateFirestormBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_INFERNO, 60),
-            Map.entry(BombType.B_FAE_SMALL, 30),
-            Map.entry(BombType.B_FAE_LARGE, 10)
-    );
-
-    /**
-     * External ordnance choices for air-to-air combat
-     */
-    private static final Map<Integer,Integer> antiAirBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_RL, 40),
-            Map.entry(BombType.B_LAA, 40),
-            Map.entry(BombType.B_AAA, 15),
-            Map.entry(BombType.B_AS, 4),
-            Map.entry(BombType.B_ASEW, 1)
-    );
-
-    /**
-     * External ordnance choices for attacking DropShips and other large craft
-     */
-    private static final Map<Integer, Integer> antiShipBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_AAA, 50),
-            Map.entry(BombType.B_AS, 35),
-            Map.entry(BombType.B_ASEW, 15)
-    );
-
-    /**
-     * External ordnance choices for pirate air-to-air combat. Selects fewer high tech choices than
-     * the standard loadout.
-     */
-    private static final Map<Integer,Integer> pirateAirBombLoad = Map.ofEntries(
-            Map.entry(BombType.B_RL, 60),
-            Map.entry(BombType.B_LAA, 30),
-            Map.entry(BombType.B_AAA, 10)
-    );
-
-
     /**
      * Helper function to load bombs onto a random portion of units that can carry them
      * @param entityList        The list of entities to process
@@ -2603,8 +2591,9 @@ public class AtBDynamicScenarioFactory {
         int maxLoad;
         int maxBombers = (int) Math.ceil(((Compute.randomInt(60) + 40) / 100.0) * bomberList.size());
         int numBombers = 0;
-        List<Integer> generatedBombs;
-        Map<Integer, List<Integer>> bombsByCarrier = new HashMap<>();
+
+        int[] generatedBombs = new int[BombType.B_NUM];
+        Map<Integer, int[]> bombsByCarrier = new HashMap<>();
 
         boolean hasGuided = false;
         for (int i = 0; i < bomberList.size(); i++) {
@@ -2645,14 +2634,15 @@ public class AtBDynamicScenarioFactory {
                     quality,
                     campaign.getGameYear());
             // Whoops, go yell at the ordnance technician
-            if (null == generatedBombs) {
+            if (Arrays.stream(generatedBombs).sum() == 0) {
                 continue;
             }
 
             // Set a flag if any of the ordnance guided by TAG
             hasGuided = !hasGuided &&
-                    generatedBombs.stream().anyMatch(curBomb -> curBomb == BombType.B_LG ||
-                            curBomb == BombType.B_HOMING);
+                    (generatedBombs[BombType.B_LG] > 0 ||
+                            generatedBombs[BombType.B_HOMING] > 0);
+
 
             // Store the bomb selections as we might need to add in TAG later
             bombsByCarrier.put(i, generatedBombs);
@@ -2675,22 +2665,24 @@ public class AtBDynamicScenarioFactory {
 
                 if (hasGuided &&
                         tagCount > 0 &&
-                        (generatedBombs.stream().mapToInt(BombType::getBombCost).sum() <
-                                (Math.floor(curBomber.getWeight() / 5))) &&
-                        generatedBombs.stream().noneMatch(curBomb -> curBomb == BombType.B_LG ||
-                                        curBomb == BombType.B_HOMING)) {
-                    generatedBombs.add(BombType.B_TAG);
+                        Arrays.stream(generatedBombs).sum() < (Math.floor(curBomber.getWeight() / 5)) &&
+                        generatedBombs[BombType.B_LG] == 0 &&
+                        generatedBombs[BombType.B_HOMING] == 0) {
+                    generatedBombs[BombType.B_TAG]++;
                     tagCount--;
                 }
-                ((IBomber) curBomber).setBombChoices(generatedBombs.stream().mapToInt(bomb->bomb).toArray());
+
+                ((IBomber) curBomber).setBombChoices(generatedBombs);
 
             } else {
 
+                // If one of the entities was given guided ordnance then put a TAG on the ones
+                // that have nothing
                 if (hasGuided && tagCount > 0) {
-                    generatedBombs = new ArrayList<>();
-                    generatedBombs.add(BombType.B_TAG);
+                    Arrays.fill(generatedBombs, BombType.B_NONE);
+                    generatedBombs[BombType.B_TAG]++;
                     tagCount--;
-                    ((IBomber) curBomber).setBombChoices(generatedBombs.stream().mapToInt(bomb->bomb).toArray());
+                    ((IBomber) curBomber).setBombChoices(generatedBombs);
                 }
 
             }
@@ -2702,21 +2694,26 @@ public class AtBDynamicScenarioFactory {
     /**
      * Randomly generate a set of external ordnance up to the number of indicated bomb units. Lower
      * rated forces are more likely to get simpler types (HE and rockets).
-     * @param bombUnits   how many bomb units to generate, some types count as more than one unit
+     * @param bombUnits   how many bomb units to generate, some types count as more than one unit so
+     *                    returned counts may be lower than this but never higher
      * @param airOnly     true to only select air-to-air ordnance
      * @param isPirate    true if force is pirate, specific low-tech/high chaos selections
      * @param quality     force rating to work with
      * @param year        current year, for tech filter
-     * @return            list of enum-equivalents for different external ordnance types, or null
+     * @return            array of integers, with each element being a bomb count using BombUnit
+     *                    enums as the lookup e.g. [BombUnit.HE] will get the number of HE
+     *                    bombs.
      */
-    private static List<Integer> generateExternalOrdnance (int bombUnits,
+    private static int[] generateExternalOrdnance (int bombUnits,
                                                      boolean airOnly,
                                                      boolean isPirate,
                                                      int quality,
                                                      int year) {
 
+        int[] bombLoad = new int[BombType.B_NUM];
+
         if (bombUnits <= 0) {
-            return null;
+            return bombLoad;
         }
 
         // Get a random predefined loadout
@@ -2831,7 +2828,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Generate enough bombs to meet the desired count
-        List<Integer> selectedBombs = new ArrayList<>();
+
         int selectedBombType = -1;
         int loopSafety = 0;
         for (int curLoad = 0; curLoad < bombUnits && loopSafety < 10;) {
@@ -2848,11 +2845,11 @@ public class AtBDynamicScenarioFactory {
                 }
             }
 
-            // If adding the selected ordnance doesn't exceed the provided limit add it to the
-            // return list, otherwise skip it and keep trying with some safeties to prevent infinite
-            // loops.
-            if (curLoad + BombType.getBombCost(selectedBombType) <= bombUnits) {
-                selectedBombs.add(selectedBombType);
+            // If the selected ordnance doesn't exceed the provided limit increment the counter,
+            // otherwise skip it and keep trying with some safeties to prevent infinite loops.
+            if (selectedBombType >= 0 &&
+                    curLoad + BombType.getBombCost(selectedBombType) <= bombUnits) {
+                bombLoad[selectedBombType]++;
                 curLoad += BombType.getBombCost(selectedBombType);
             } else {
                 loopSafety++;
@@ -2860,20 +2857,14 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Oops, nothing left - rocket launchers are always popular
-        if (selectedBombs.isEmpty()) {
-            selectedBombs = new ArrayList<>(bombUnits);
-            for (int i = 0; i < bombUnits; i++) {
-                if (airOnly) {
-                    selectedBombs.add(BombType.B_RL);
-                } else {
-                    selectedBombs.add(Compute.randomInt(2) == 2 ? BombType.B_RL : BombType.B_HE);
-                }
-            }
-            return selectedBombs;
+        if (Arrays.stream(bombLoad).sum() == 0) {
+            bombLoad[BombType.B_RL] = bombUnits;
+            return bombLoad;
         }
 
         // Randomly replace advanced ordnance with rockets or HE, depending on force rating and
         // air-air/ground preference
+
         List<Integer> advancedOrdnance = Arrays.asList(
                 BombType.B_LG,
                 BombType.B_ARROW,
@@ -2887,89 +2878,45 @@ public class AtBDynamicScenarioFactory {
                 BombType.B_ASEW
         );
 
-        for (int i = 0; i < selectedBombs.size(); i++) {
-            if (advancedOrdnance.contains(selectedBombs.get(i))) {
-                switch (quality) {
-                    case IUnitRating.DRAGOON_ASTAR:
-                    case IUnitRating.DRAGOON_A:
-                        randomThreshold = 5;
-                        break;
-                    case IUnitRating.DRAGOON_B:
-                        randomThreshold = 10;
-                        break;
-                    case IUnitRating.DRAGOON_C:
-                        randomThreshold = 25;
-                        break;
-                    case IUnitRating.DRAGOON_D:
-                        randomThreshold = 40;
-                        break;
-                    case IUnitRating.DRAGOON_F:
-                        randomThreshold = 80;
-                        break;
-                    default:
-                        randomThreshold = 99;
-                }
+        switch (quality) {
+            case IUnitRating.DRAGOON_ASTAR:
+            case IUnitRating.DRAGOON_A:
+                randomThreshold = 5;
+                break;
+            case IUnitRating.DRAGOON_B:
+                randomThreshold = 10;
+                break;
+            case IUnitRating.DRAGOON_C:
+                randomThreshold = 25;
+                break;
+            case IUnitRating.DRAGOON_D:
+                randomThreshold = 40;
+                break;
+            case IUnitRating.DRAGOON_F:
+                randomThreshold = 80;
+                break;
+            default:
+                randomThreshold = 99;
+        }
+
+        for (int curBomb : advancedOrdnance) {
+            int loadCount = bombLoad[curBomb];
+
+            for (int i = 0; i < loadCount; i++) {
                 if (Compute.randomInt(100) < randomThreshold) {
                     if (airOnly) {
-                        selectedBombs.set(i, BombType.B_RL);
+                        bombLoad[BombType.B_RL]++;
                     } else {
-                        selectedBombs.set(i, Compute.randomInt(2) == 0 ? BombType.B_RL : BombType.B_HE);
+                        bombLoad[Compute.randomInt(2) == 0 ? BombType.B_RL : BombType.B_HE]++;
                     }
+                    bombLoad[curBomb]--;
                 }
             }
+
         }
 
-        return selectedBombs;
+        return bombLoad;
     }
-
-
-    /**
-     * Worker function that takes an entity and an array of bomb types
-     * and loads it up with a random number of bombs up to the indicated limit
-     * @param entity
-     * @param year
-     * @param validBombChoices
-     */
-    private static void loadBombs(Entity entity, int[] validBombChoices, int year) {
-
-        int[] bombChoices = new int[BombType.B_NUM];
-
-        // remove bomb choices if they're not era-appropriate
-        List<Integer> actualValidBombChoices = new ArrayList<>();
-        for (int x = 0; x < validBombChoices.length; x++) {
-            String typeName = BombType.getBombInternalName(validBombChoices[x]);
-
-            // hack: make rocket launcher pods available before 3055
-            if ((validBombChoices[x] == BombType.B_RL) ||
-                    BombType.get(typeName).isAvailableIn(year, false)) {
-                actualValidBombChoices.add(validBombChoices[x]);
-            }
-        }
-
-        // pick out the index in the BombType array
-        int randomBombChoiceIndex = Compute.randomInt(actualValidBombChoices.size());
-        int bombIndex = actualValidBombChoices.get(randomBombChoiceIndex);
-        int weightModifier = 0;
-
-        // hack: we only really need one "tag", so add it then pack on some more bombs
-        if (bombIndex == BombType.B_TAG) {
-            weightModifier = 5;
-            bombChoices[bombIndex] = 1;
-            actualValidBombChoices.remove(randomBombChoiceIndex);
-            bombIndex = ObjectUtility.getRandomItem(actualValidBombChoices);
-        }
-
-        // # of bombs is the unit's weight / (bomb cost * 5)
-        int numBombs = (int) Math.floor((entity.getWeight() - weightModifier) /
-                (BombType.getBombCost(bombIndex) * 5.0));
-        bombChoices[bombIndex] = numBombs;
-
-        ((IBomber) entity).setBombChoices(bombChoices);
-    }
-
-
-
-
 
 
     /**
