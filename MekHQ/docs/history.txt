@@ -43,7 +43,6 @@ MEKHQ VERSION HISTORY:
 + PR #4124: Fixed Award Eligibility Tracker Issuing Double Scenario Kill Awards... again
 + PR #4125: Fixed Friendly Personnel Missing Post-Scenario Scenario Credit
 + PR #4127: Fixed Clan Creche Graduation in Education Module
-+ PR #4129: Minor spelling and typos
 + PR #4136: Updated Scenario Modifiers to More Consistently Contribute to Map Size
 + PR #4137: Tied StratCon Force Generation BV Allowance to AtB Difficulty Option
 + PR #4140: Added Dedicated Awards Panel to Personnel Tab of Campaign Options
@@ -53,11 +52,10 @@ MEKHQ VERSION HISTORY:
 + PR #4144: Changed "Operational Victory Points" to "Scenario Victory Points"
 + PR #4145: Reversed Order of Personnel Logs, Renamed 'Personnel Log' to 'Personal Log'
 + PR #4146: Added Ability to Change Original Unit Assignment via Personnel Table
-+ PR #4151: Updated Vehicle Gunner's Experience Level Calculation to Optionally Include Artillery Skill
-+ PR #4151: Updated Vehicle Gunner's Experience Level Calculation to Optionally Include Artillery Skill
-+ PR #4150: Added Unit Quality Parameter to addNewUnit Method and Related Tests
-+ PR #4153: Added Font Color Options to MHQ Options for Negative, Positive, and Warning Events
 + PR #4147: Set Default Edge Usage States to True
++ PR #4150: Added Unit Quality Parameter to addNewUnit Method and Related Tests
++ PR #4151: Updated Vehicle Gunner's Experience Level Calculation to Optionally Include Artillery Skill
++ PR #4153: Added Font Color Options to MHQ Options for Negative, Positive, and Warning Events
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
