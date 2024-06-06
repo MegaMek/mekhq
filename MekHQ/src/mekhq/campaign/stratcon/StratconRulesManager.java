@@ -34,7 +34,9 @@ import mekhq.campaign.mission.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.atb.AtBScenarioModifier.EventTiming;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.stratcon.StratconContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.stratcon.StratconScenario.ScenarioState;
 import mekhq.campaign.unit.Unit;
@@ -43,6 +45,7 @@ import org.apache.logging.log4j.LogManager;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class contains "rules" logic for the AtB-Stratcon state
@@ -244,21 +247,17 @@ public class StratconRulesManager {
     private static void swapInPlayerUnits(StratconScenario scenario, Campaign campaign, int explicitForceID) {
         for (ScenarioForceTemplate sft : scenario.getScenarioTemplate().getAllScenarioForces()) {
             if (sft.getGenerationMethod() == ForceGenerationMethod.PlayerOrFixedUnitCount.ordinal()) {
-                int unitCount = 0;
+                int unitCount = (int) scenario.getBackingScenario().getBotUnitTemplates().values().stream()
+                        .filter(template -> template.getForceName().equals(sft.getForceName()))
+                        .count();
 
                 // get all the units that have been generated for this template
-                for (ScenarioForceTemplate template : scenario.getBackingScenario().getBotUnitTemplates().values()) {
-                    if (template.getForceName().equals(sft.getForceName())) {
-                        unitCount++;
-                    }
-                }
 
                 // or the units embedded in bot forces
-                for (var tuple : scenario.getBackingScenario().getBotForceTemplates().entrySet()) {
-                    if (tuple.getValue().getForceName().equals(sft.getForceName())) {
-                        unitCount += tuple.getKey().getFullEntityList(campaign).size();
-                    }
-                }
+                unitCount += scenario.getBackingScenario().getBotForceTemplates().entrySet().stream()
+                        .filter(tuple -> tuple.getValue().getForceName().equals(sft.getForceName()))
+                        .mapToInt(tuple -> tuple.getKey().getFullEntityList(campaign).size())
+                        .sum();
 
                 // now we have a unit count. Don't bother with the next step if we don't have any substitutions to make
                 if (unitCount == 0) {
@@ -467,9 +466,18 @@ public class StratconRulesManager {
     public static void processForceDeployment(StratconCoords coords, int forceID, Campaign campaign,
             StratconTrackState track, boolean sticky) {
         // plan of action:
+        // increase fatigue if the coordinates are not currently unrevealed
         // reveal deployed coordinates
         // reveal facility in deployed coordinates (and all adjacent coordinates for scout lances)
         // reveal scenario in deployed coordinates (and all adjacent coordinates for scout lances)
+
+        // we want to ensure we only increase Fatigue once
+        boolean hasFatigueIncreased = false;
+
+        if (!track.getRevealedCoords().contains(coords)) {
+            increaseFatigue(forceID, campaign);
+            hasFatigueIncreased = true;
+        }
 
         track.getRevealedCoords().add(coords);
 
@@ -505,6 +513,11 @@ public class StratconRulesManager {
                     MekHQ.triggerEvent(new ScenarioChangedEvent(scenario.getBackingScenario()));
                 }
 
+                if ((!track.getRevealedCoords().contains(checkCoords)) && (!hasFatigueIncreased)) {
+                    increaseFatigue(forceID, campaign);
+                    hasFatigueIncreased = true;
+                }
+
                 track.getRevealedCoords().add(coords.translate(direction));
             }
         }
@@ -513,6 +526,21 @@ public class StratconRulesManager {
         track.unassignForce(forceID);
         track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
         MekHQ.triggerEvent(new StratconDeploymentEvent(campaign.getForce(forceID)));
+    }
+
+    /**
+     * Increases the fatigue for all crew members per Unit in a force.
+     *
+     * @param forceID the ID of the force
+     * @param campaign the campaign
+     */
+    private static void increaseFatigue(int forceID, Campaign campaign) {
+        for (UUID unit : campaign.getForce(forceID).getAllUnits(false)) {
+            for (Person person : campaign.getUnit(unit).getCrew()) {
+                person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
+                Fatigue.processFatigueActions(campaign, person);
+            }
+        }
     }
 
     /**
@@ -715,7 +743,7 @@ public class StratconRulesManager {
      * @return An informative string containing the reasons the user was nagged.
      */
     public static String nagUnresolvedContacts(Campaign campaign) {
-        StringBuilder sb = new StringBuilder();
+        String sb = "";
 
         // check every track attached to an active contract for unresolved scenarios
         // to which the player must deploy forces today
@@ -725,17 +753,16 @@ public class StratconRulesManager {
             }
 
             for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
-                for (StratconScenario scenario : track.getScenarios().values()) {
-                    if ((scenario.getCurrentState() == ScenarioState.UNRESOLVED)
-                            && campaign.getLocalDate().equals(scenario.getDeploymentDate())) {
-                        // "scenario name, track name"
-                        sb.append(String.format("%s, %s\n", scenario.getName(), track.getDisplayableName()));
-                    }
-                }
+                // "scenario name, track name"
+                sb = track.getScenarios().values().stream()
+                        .filter(scenario -> (scenario.getCurrentState() == ScenarioState.UNRESOLVED)
+                                && campaign.getLocalDate().equals(scenario.getDeploymentDate()))
+                        .map(scenario -> String.format("%s, %s\n", scenario.getName(), track.getDisplayableName()))
+                        .collect(Collectors.joining());
             }
         }
 
-        return sb.toString();
+        return sb;
     }
 
     /**
@@ -1015,30 +1042,27 @@ public class StratconRulesManager {
      * This is a set of all force IDs for forces that can be deployed to a scenario.
      *
      * @param campaign Current campaign
-     * @return Set of available force IDs.
+     * @return List of available force IDs.
      */
     public static List<Integer> getAvailableForceIDs(Campaign campaign) {
-        List<Integer> retVal = new ArrayList<>();
 
         // first, we gather a set of all forces that are already deployed to a track so
         // we eliminate those later
-        Set<Integer> forcesInTracks = new HashSet<>();
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
-                forcesInTracks.addAll(track.getAssignedForceCoords().keySet());
-            }
-        }
+        Set<Integer> forcesInTracks = campaign.getActiveAtBContracts().stream()
+                .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
+                .flatMap(track -> track.getAssignedForceCoords().keySet().stream())
+                .collect(Collectors.toSet());
 
         // now, we get all the forces that qualify as "lances", and filter out those that are
         // deployed to a scenario and not in a track already
-        for (int key : campaign.getLances().keySet()) {
-            Force force = campaign.getForce(key);
-            if ((force != null) && !force.isDeployed() && !forcesInTracks.contains(force.getId())) {
-                retVal.add(force.getId());
-            }
-        }
 
-        return retVal;
+        return campaign.getLances().keySet().stream()
+                .mapToInt(key -> key)
+                .mapToObj(campaign::getForce).filter(force -> (force != null)
+                        && !force.isDeployed()
+                        && !forcesInTracks.contains(force.getId()))
+                .map(Force::getId)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -1050,15 +1074,12 @@ public class StratconRulesManager {
             boolean reinforcements, @Nullable StratconScenario currentScenario, StratconCampaignState campaignState) {
         List<Integer> retVal = new ArrayList<>();
 
-        Set<Integer> forcesInTracks = new HashSet<>();
         // assemble a set of all force IDs that are currently assigned to tracks that are not this one
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
-                if ((track != currentTrack) || !reinforcements) {
-                    forcesInTracks.addAll(track.getAssignedForceCoords().keySet());
-                }
-            }
-        }
+        Set<Integer> forcesInTracks = campaign.getActiveAtBContracts().stream()
+                .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
+                .filter(track -> (track != currentTrack) || !reinforcements)
+                .flatMap(track -> track.getAssignedForceCoords().keySet().stream())
+                .collect(Collectors.toSet());
 
         // if there's an existing scenario and we're doing reinforcements,
         // prevent forces that failed to deploy from trying to deploy again
@@ -1096,21 +1117,14 @@ public class StratconRulesManager {
             return true;
         }
 
-        for (UUID unitID : force.getUnits()) {
-            Unit unit = campaign.getUnit(unitID);
-
-            if (unit.isDeployed()) {
-                return true;
-            }
+        if (force.getUnits().stream()
+                .map(campaign::getUnit)
+                .anyMatch(Unit::isDeployed)) {
+            return true;
         }
 
-        for (Force child : force.getSubForces()) {
-            if (subElementsOrSelfDeployed(child, campaign)) {
-                return true;
-            }
-        }
-
-        return false;
+        return force.getSubForces().stream()
+                .anyMatch(child -> subElementsOrSelfDeployed(child, campaign));
     }
 
     /**
@@ -1275,12 +1289,10 @@ public class StratconRulesManager {
     public static ReinforcementEligibilityType getReinforcementType(int forceID, StratconTrackState trackState,
             Campaign campaign, StratconCampaignState campaignState) {
         // if the force is deployed elsewhere, it cannot be deployed as reinforcements
-        for (AtBContract contract : campaign.getActiveAtBContracts()) {
-            for (StratconTrackState track : contract.getStratconCampaignState().getTracks()) {
-                if (track != trackState && track.getAssignedForceCoords().containsKey(forceID)) {
-                    return ReinforcementEligibilityType.None;
-                }
-            }
+        if (campaign.getActiveAtBContracts().stream()
+                .flatMap(contract -> contract.getStratconCampaignState().getTracks().stream())
+                .anyMatch(track -> !Objects.equals(track, trackState) && track.getAssignedForceCoords().containsKey(forceID))) {
+            return ReinforcementEligibilityType.None;
         }
 
         // TODO: If the force has completed a scenario which allows it,
@@ -1333,15 +1345,16 @@ public class StratconRulesManager {
     public static int calculateScenarioOdds(StratconTrackState track, AtBContract contract,
             boolean playerDeployingForce) {
         // rules:
-        // rout morale: 0%
+        // broken morale: 0%
         // very low morale: -10% when deploying forces to track, 0% attack
         // low morale: -5%
         // high morale: +5%
-        // invincible: special case, let's do +10% for now
+        // very high morale: +10%
+        // unbreakable: special case, let's do +15% for now
         int moraleModifier = 0;
 
         switch (contract.getMoraleLevel()) {
-            case ROUT:
+            case BROKEN:
                 return 0;
             case VERY_LOW:
                 if (playerDeployingForce) {
@@ -1359,7 +1372,7 @@ public class StratconRulesManager {
             case VERY_HIGH:
                 moraleModifier = 10;
                 break;
-            case INVINCIBLE:
+            case UNBREAKABLE:
                 moraleModifier = 15;
                 break;
             default:
@@ -1550,13 +1563,12 @@ public class StratconRulesManager {
      * @return Whether or not we also need to get rid of the backing scenario from the campaign
      */
     public static boolean processIgnoredScenario(AtBDynamicScenario scenario, StratconCampaignState campaignState) {
-        for (StratconTrackState track : campaignState.getTracks()) {
-            if (track.getBackingScenariosMap().containsKey(scenario.getId())) {
-                return processIgnoredScenario(track.getBackingScenariosMap().get(scenario.getId()), campaignState);
-            }
-        }
+        return campaignState.getTracks().stream()
+                .filter(track -> track.getBackingScenariosMap().containsKey(scenario.getId()))
+                .findFirst()
+                .map(track -> processIgnoredScenario(track.getBackingScenariosMap().get(scenario.getId()), campaignState))
+                .orElse(true);
 
-        return true;
     }
 
     /**
@@ -1689,13 +1701,10 @@ public class StratconRulesManager {
      * Worker function that goes through a track and cleans up scenarios missing required data
      */
     private void cleanupPhantomScenarios(StratconTrackState track) {
-        List<StratconScenario> cleanupList = new ArrayList<>();
-
-        for (StratconScenario scenario : track.getScenarios().values()) {
-            if ((scenario.getDeploymentDate() == null) && !scenario.isStrategicObjective()) {
-                cleanupList.add(scenario);
-            }
-        }
+        List<StratconScenario> cleanupList = track.getScenarios().values().stream()
+                .filter(scenario -> (scenario.getDeploymentDate() == null)
+                        && !scenario.isStrategicObjective())
+                .collect(Collectors.toList());
 
         for (StratconScenario scenario : cleanupList) {
             track.removeScenario(scenario);

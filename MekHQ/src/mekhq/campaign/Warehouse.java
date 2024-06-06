@@ -20,18 +20,19 @@ package mekhq.campaign;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.event.PartChangedEvent;
 import mekhq.campaign.event.PartNewEvent;
 import mekhq.campaign.event.PartRemovedEvent;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.utilities.MHQXMLUtility;
 
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -247,13 +248,9 @@ public class Warehouse {
      * @return A list of spare parts in the warehouse.
      */
     public List<Part> getSpareParts() {
-        List<Part> spares = new ArrayList<>();
-        for (Part part : getParts()) {
-            if (part.isSpare()) {
-                spares.add(part);
-            }
-        }
-        return spares;
+        return getParts().stream()
+                .filter(Part::isSpare)
+                .collect(Collectors.toList());
     }
 
     /**

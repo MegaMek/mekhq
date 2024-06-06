@@ -288,7 +288,7 @@ public class AtBContract extends Contract {
                 routEnd = null;
                 updateEnemy(today); // mix it up a little
             } else {
-                setMoraleLevel(AtBMoraleLevel.ROUT);
+                setMoraleLevel(AtBMoraleLevel.BROKEN);
             }
             return;
         }

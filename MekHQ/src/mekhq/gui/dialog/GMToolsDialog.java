@@ -67,6 +67,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private JTabbedPane tabbedPane;
 
     //region General Tab
+    // General Tools Panel
+    private JSpinner spnMorale;
+
     // Dice Panel
     private JSpinner spnDiceCount;
     private JSpinner spnDiceNumber;
@@ -183,6 +186,14 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
     public void setSpnDiceSides(final JSpinner spnDiceSides) {
         this.spnDiceSides = spnDiceSides;
+    }
+
+    public JSpinner getSpnMorale() {
+        return spnMorale;
+    }
+
+    public void setSpnMorale(final JSpinner spnMorale) {
+        this.spnMorale = spnMorale;
     }
 
     public JLabel getLblTotalDiceResult() {
