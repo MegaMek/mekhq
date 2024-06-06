@@ -4733,25 +4733,20 @@ public class Unit implements ITechnology {
     //endregion Mothballing/Activation
 
     /**
-     * Returns a list of all soldiers in a unit.
-     *
-     * @return a list of Person objects representing the soldiers.
+     * Returns all soldiers or battle armor assigned to the unit.
+     * As members of this category appear in both the drivers and gunners list, we only check drivers
      */
-    public List<Person> getSoldiers() {
-        // soldiers appear in both the drivers and gunners list,
-        // so we use drivers
+    public List<Person> getAllInfantry() {
         return drivers.stream()
                 .filter(person -> entity instanceof Infantry)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Retrieves a list of uninjured soldiers in a unit.
-     *
-     * @return The list of uninjured soldiers.
+     * Retrieves a list of uninjured soldiers or battle armor assigned to the unit.
      */
-    public List<Person> getActiveSoldiers() {
-        return getSoldiers().stream()
+    public List<Person> getUninjuredInfantry() {
+        return getAllInfantry().stream()
                 .filter(person -> person.getHits() == 0)
                 .collect(Collectors.toList());
     }
