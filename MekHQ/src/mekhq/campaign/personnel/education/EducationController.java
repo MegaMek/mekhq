@@ -850,6 +850,7 @@ public class EducationController {
             case 10:
                 ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedLabor.text"));
 
+
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                         resources.getString("graduatedLabor.text"),
                         resources.getString("washoutLabor.text")));
@@ -986,6 +987,7 @@ public class EducationController {
         int roll = Compute.randomInt(fallbackLabour);
 
         if (roll < fallbackScientist) {
+
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                     resources.getString(originCaste),
                     resources.getString("graduatedWarriorScientist.text")));
@@ -996,6 +998,7 @@ public class EducationController {
         }
 
         if (roll < fallbackMerchant) {
+
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                     resources.getString(originCaste),
                     resources.getString("graduatedWarriorMerchant.text")));
@@ -1006,6 +1009,7 @@ public class EducationController {
         }
 
         if (roll < fallbackTechnician) {
+
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                     resources.getString(originCaste),
                     resources.getString("graduatedWarriorTechnician.text")));
@@ -1016,6 +1020,7 @@ public class EducationController {
         }
 
         // Labor
+
         campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
                 resources.getString(originCaste),
                 resources.getString("graduatedWarriorLabor.text")));
@@ -1081,6 +1086,7 @@ public class EducationController {
         // graduated with honors
         if (graduationRoll >= 90) {
             if (Compute.d6(1) > 5) {
+
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedHonors.text"),
                         ' ' + resources.getString(graduationEventPicker())));
             } else {

@@ -18,14 +18,6 @@
  */
 package mekhq.campaign.mission;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
 import megamek.common.Entity;
 import megamek.common.OffBoardDirection;
 import mekhq.MHQConstants;
@@ -35,6 +27,8 @@ import mekhq.campaign.mission.ObjectiveEffect.EffectScalingType;
 import mekhq.campaign.mission.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.stratcon.StratconRulesManager;
+
+import java.util.*;
 
 /**
  * Handles processing for objectives for a scenario that has them
@@ -357,12 +351,12 @@ public class ScenarioObjectiveProcessor {
         switch (effect.effectType) {
             case ScenarioVictory:
                 if (dryRun) {
-                    return String.format("%d Operational Victory Point/s", effect.howMuch);
+                    return String.format("%d Scenario Victory Point/s", effect.howMuch);
                 }
                 break;
             case ScenarioDefeat:
                 if (dryRun) {
-                    return String.format("%d Operational Victory Point/s", -effect.howMuch);
+                    return String.format("%d Scenario Victory Point/s", -effect.howMuch);
                 }
                 break;
             case ContractScoreUpdate:

@@ -925,7 +925,7 @@ public class CampaignGUI extends JPanel {
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
         miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
         miRetirementDefectionDialog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miRetirementDefectionDialog.setVisible(!getCampaign().getCampaignOptions().getRandomRetirementMethod().isNone());
+        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().isUseRandomRetirement());
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
 
@@ -1210,6 +1210,7 @@ public class CampaignGUI extends JPanel {
         RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
                 getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
         rdd.setVisible(true);
+
         if (!rdd.wasAborted()) {
             getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
         }
@@ -1572,6 +1573,8 @@ public class CampaignGUI extends JPanel {
                 getCampaign().shutdownAtB();
             }
         }
+
+        getCampaign().initTurnover();
 
         if (staticRATs != newOptions.isUseStaticRATs()) {
             getCampaign().initUnitGenerator();
@@ -2397,10 +2400,12 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (getCampaign().checkYearlyRetirements()) {
-            showRetirementDefectionDialog();
-            evt.cancel();
-            return;
+        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
+            if (getCampaign().checkTurnoverPrompt()) {
+                showRetirementDefectionDialog();
+                evt.cancel();
+                return;
+            }
         }
 
         if(getCampaign().checkScenariosDue()) {
@@ -2426,6 +2431,11 @@ public class CampaignGUI extends JPanel {
         }
 
         if (new UntreatedPersonnelNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new NoCommanderNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
         }
@@ -2490,7 +2500,7 @@ public class CampaignGUI extends JPanel {
         fundsScheduler.schedule();
         refreshPartsAvailability();
 
-        miRetirementDefectionDialog.setVisible(!evt.getOptions().getRandomRetirementMethod().isNone());
+        miRetirementDefectionDialog.setVisible(evt.getOptions().isUseRandomRetirement());
         miAwardEligibilityDialog.setVisible((evt.getOptions().isEnableAutoAwards()));
         miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }

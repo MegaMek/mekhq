@@ -526,7 +526,7 @@
         <name>Canopian Institute of War (3080)</name>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
-        <description>Rebuild in 3080, the Canopian Institute of War, continues to elevate the Magistracy Armed Forces' training programs, inspired by the Sun Zhang MechWarrior Academy. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <description>Rebuilt in 3080, the Canopian Institute of War, continues to elevate the Magistracy Armed Forces' training programs, inspired by the Sun Zhang MechWarrior Academy. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <faction>MOC</faction>

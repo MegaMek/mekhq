@@ -45,7 +45,7 @@ public class Quartermaster {
         PlanetSpecificFailure,
         Success
     }
-    
+
     private final Campaign campaign;
 
     /**
