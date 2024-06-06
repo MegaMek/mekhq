@@ -47,10 +47,14 @@ import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.mod.am.InjuryTypes;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.equipment.*;
-import mekhq.campaign.personnel.*;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
@@ -720,8 +724,6 @@ public class CampaignXmlParser {
                     retVal.setAstechPoolOvertime(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("medicPool")) {
                     retVal.setMedicPool(Integer.parseInt(wn.getTextContent().trim()));
-                } else if (xn.equalsIgnoreCase("fatigueLevel")) {
-                    retVal.setFatigueLevel(Integer.parseInt(wn.getTextContent().trim()));
                 } else if (xn.equalsIgnoreCase("id")) {
                     retVal.setId(UUID.fromString(wn.getTextContent().trim()));
                 }

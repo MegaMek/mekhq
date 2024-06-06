@@ -357,36 +357,36 @@ public final class BriefingTab extends CampaignGuiTab {
             if (((AtBContract) mission).contractExtended(getCampaign())) {
                 return;
             }
+        }
 
-            if (getCampaign().getCampaignOptions().getRandomRetirementMethod().isAgainstTheBot()
-                    && getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
-                RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
-                        (AtBContract) mission, true);
-                rdd.setVisible(true);
-                if (rdd.wasAborted()) {
-                    /*
-                     * Once the retirement rolls have been made, the outstanding payouts can be resolved
-                     * without reference to the contract and the dialog can be accessed through the menu
-                     * provided they aren't still assigned to the mission in question.
-                     */
-                    if (!getCampaign().getRetirementDefectionTracker().isOutstanding(mission.getId())) {
-                        return;
-                    }
-                } else {
-                    if ((getCampaign().getRetirementDefectionTracker().getRetirees(mission) != null)
-                            && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
-                        for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
-                            Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
-                            if (admin != null) {
-                                admin.awardXP(getCampaign(), 1);
-                                getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
-                            }
+        if (getCampaign().getCampaignOptions().isUseRandomRetirement()
+                && getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
+            RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(), mission, true);
+            rdd.setVisible(true);
+
+            if (rdd.wasAborted()) {
+                /*
+                 * Once the retirement rolls have been made, the outstanding payouts can be resolved
+                 * without a reference to the contract and the dialog can be accessed through the menu
+                 * provided they aren't still assigned to the mission in question.
+                 */
+                if (!getCampaign().getRetirementDefectionTracker().isOutstanding(mission.getId())) {
+                    return;
+                }
+            } else {
+                if ((getCampaign().getRetirementDefectionTracker().getRetirees(mission) != null)
+                        && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
+                    for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
+                        Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
+                        if (admin != null) {
+                            admin.awardXP(getCampaign(), 1);
+                            getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
                         }
                     }
+                }
 
-                    if (!getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
-                        return;
-                    }
+                if (!getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
+                    return;
                 }
             }
         }
@@ -487,12 +487,13 @@ public final class BriefingTab extends CampaignGuiTab {
         // tracker.postProcessEntities(control);
         ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
         resolveDialog.setVisible(true);
-        if (getCampaign().getCampaignOptions().isUseAtB()
-                && getCampaign().getMission(scenario.getMissionId()) instanceof AtBContract
-                && !getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
+
+        if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
-                    (AtBContract) getCampaign().getMission(scenario.getMissionId()), false);
+                    getCampaign().getMission(scenario.getMissionId()), false);
+
             rdd.setVisible(true);
+
             if (!rdd.wasAborted()) {
                 getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
             }

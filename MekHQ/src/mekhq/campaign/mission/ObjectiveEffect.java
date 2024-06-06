@@ -51,13 +51,13 @@ public class ObjectiveEffect {
      */
     public enum ObjectiveEffectType {
         /*
-         *  contributes a "Operational Victory Point" towards the scenario's victory/defeat state
+         *  contributes a "Scenario Victory Point" towards the scenario's victory/defeat state
          */
-        ScenarioVictory("+%d Operational VP", true),
+        ScenarioVictory("+%d Scenario VP", true),
         /*
-         *  contributes a "negative Operational Victory Point/s" towards the scenario's victory/defeat state
+         *  contributes a "negative Scenario Victory Point/s" towards the scenario's victory/defeat state
          */
-        ScenarioDefeat("-%d Operational VP", true),
+        ScenarioDefeat("-%d Scenario VP", true),
         /*
          *  changes the contract score
          */
