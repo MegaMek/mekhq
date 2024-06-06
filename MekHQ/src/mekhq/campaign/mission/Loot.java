@@ -199,24 +199,24 @@ public class Loot {
         if (contract instanceof AtBContract) {
             switch (((AtBContract) contract).getEnemyQuality()) {
                 case IUnitRating.DRAGOON_F:
-                    qualityAndModifier.put("quality", 1);
+                    qualityAndModifier.put("quality", Part.QUALITY_A);
                     qualityAndModifier.put("modifier", -2);
                     break;
                 case IUnitRating.DRAGOON_D:
-                    qualityAndModifier.put("quality", 2);
+                    qualityAndModifier.put("quality", Part.QUALITY_B);
                     qualityAndModifier.put("modifier", -1);
                     break;
                 case IUnitRating.DRAGOON_C:
                 case IUnitRating.DRAGOON_B:
-                    qualityAndModifier.put("quality", 3);
+                    qualityAndModifier.put("quality", Part.QUALITY_C);
                     qualityAndModifier.put("modifier", 0);
                     break;
                 case IUnitRating.DRAGOON_A:
-                    qualityAndModifier.put("quality", 4);
+                    qualityAndModifier.put("quality", Part.QUALITY_D);
                     qualityAndModifier.put("modifier", 1);
                     break;
                 case IUnitRating.DRAGOON_ASTAR:
-                    qualityAndModifier.put("quality", 5);
+                    qualityAndModifier.put("quality", Part.QUALITY_F);
                     qualityAndModifier.put("modifier", 2);
                     break;
                 default:
