@@ -68,7 +68,7 @@ public class DisabledUnitMarket extends AbstractUnitMarket {
     }
 
     @Override
-    protected void addOffers(final Campaign campaign, final int number, final UnitMarketType market,
+    public void addOffers(final Campaign campaign, final int number, final UnitMarketType market,
                              final int unitType, final Faction faction, final int quality,
                              final int priceTarget) {
 

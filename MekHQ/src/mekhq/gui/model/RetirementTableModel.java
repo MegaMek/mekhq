@@ -2,13 +2,11 @@ package mekhq.gui.model;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.RetirementDefectionTracker;
-import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.dialog.RetirementDefectionDialog;
@@ -19,6 +17,7 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.*;
 
@@ -32,14 +31,13 @@ public class RetirementTableModel extends AbstractTableModel {
     public final static int COL_PAY_BONUS = 6;
     public final static int COL_MISC_MOD = 7;
     public final static int COL_PAYOUT = 8;
-    public final static int COL_RECRUIT = 9;
-    public final static int COL_UNIT = 10;
-    public final static int N_COL = 11;
+    public final static int COL_UNIT = 9;
+    public final static int N_COL = 10;
 
     private final static String[] colNames = {
-        "Person", "Assignment", "Force", "Target",
-        "Shares", "Bonus Cost", "Pay Bonus", "Misc Modifier",
-        "Payout", "Recruit", "Unit"
+        "Person", "Assignment", "Force", "Target Number",
+        "Shares", "Retention Bonus", "Pay Bonus", "Custom Modifier",
+        "Payout", "Unit"
     };
 
     private final Campaign campaign;
@@ -74,7 +72,7 @@ public class RetirementTableModel extends AbstractTableModel {
         data.clear();
         for (UUID id : targets.keySet()) {
             data.add(id);
-            payBonus.put(id, false);
+            payBonus.put(id, campaign.getCampaignOptions().isPayBonusDefault());
             miscMods.put(id, 0);
         }
         fireTableDataChanged();
@@ -101,11 +99,9 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_ASSIGN:
             case COL_FORCE:
             case COL_UNIT:
-            case COL_RECRUIT:
-                return 125;
+                return 70;
             case COL_BONUS_COST:
             case COL_PAYOUT:
-                return 70;
             case COL_TARGET:
             case COL_SHARES:
             case COL_MISC_MOD:
@@ -119,14 +115,12 @@ public class RetirementTableModel extends AbstractTableModel {
     public int getAlignment(int col) {
         switch (col) {
             case COL_PERSON:
+                return SwingConstants.LEFT;
             case COL_ASSIGN:
             case COL_FORCE:
             case COL_UNIT:
-            case COL_RECRUIT:
-                return SwingConstants.LEFT;
             case COL_BONUS_COST:
             case COL_PAYOUT:
-                return SwingConstants.RIGHT;
             case COL_TARGET:
             case COL_PAY_BONUS:
             case COL_SHARES:
@@ -144,8 +138,6 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_PAY_BONUS:
             case COL_MISC_MOD:
                 return true;
-            case COL_RECRUIT:
-                return campaign.getRetirementDefectionTracker().getPayout(data.get(row)).hasRecruit();
             default:
                 return false;
         }
@@ -205,7 +197,7 @@ public class RetirementTableModel extends AbstractTableModel {
                             return u.getName() + " (" + p.getMaintenanceTimeUsing() + "m)";
                         }
                     } else {
-                        return "" + p.getTechUnits().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
+                        return p.getTechUnits().size() + " units (" + p.getMaintenanceTimeUsing() + "m)";
                     }
                 }
                 return "-";
@@ -224,7 +216,7 @@ public class RetirementTableModel extends AbstractTableModel {
                         (payBonus.get(p.getId()) ? 2 : 0) +
                         miscMods.get(p.getId()) + generalMod;
             case COL_BONUS_COST:
-                return RetirementDefectionTracker.getBonusCost(campaign, p).toAmountAndSymbolString();
+                return RetirementDefectionTracker.getPayoutOrBonusValue(campaign, p).toAmountAndSymbolString();
             case COL_PAY_BONUS:
                 return payBonus.getOrDefault(p.getId(), false);
             case COL_MISC_MOD:
@@ -246,21 +238,31 @@ public class RetirementTableModel extends AbstractTableModel {
                 if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() == 0 &&
                         null != unitAssignments.get(p.getId())) ||
                         (campaign.getCampaignOptions().isUseShareSystem() &&
-                                campaign.getCampaignOptions().isTrackOriginalUnit() &&
-                                p.getOriginalUnitId() == unitAssignments.get(p.getId()) &&
+                                campaign.getCampaignOptions().isTrackOriginalUnit()
+                                && Objects.equals(p.getOriginalUnitId(), unitAssignments.get(p.getId())) &&
                                         null != campaign.getUnit(unitAssignments.get(p.getId())))) {
                     payout = payout.minus(campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost());
                 }
-                if (null != unitAssignments.get(p.getId())) {
-                    payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
-                            RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId())))));
+
+                // if the person is under contract we don't check whether they need a unit or are owed a shortfall
+                if (ChronoUnit.MONTHS.between(p.getRecruitment(), campaign.getLocalDate())
+                        >= campaign.getCampaignOptions().getServiceContractDuration()) {
+                    // if the person requires a unit, check to ensure there isn't a shortfall
+                    if (null != unitAssignments.get(p.getId())) {
+                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
+                                RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(p.getId())))));
+                    }
+
+                    // if the person requires a unit, but doesn't have one...
+                    if ((unitAssignments.get(p.getId()) == null) && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
+                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(
+                                campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass(),
+                                0)
+                        );
+                    }
                 }
-                /* No payout if the pilot stole a unit */
-                if (campaign.getRetirementDefectionTracker().getPayout(p.getId()).hasStolenUnit() &&
-                        null != unitAssignments.get(p.getId())) {
-                    payout = Money.zero();
-                }
-                // If payout is negative then just make it zero
+
+                // If payout is negative then make it zero
                 if (payout.isNegative()) {
                     payout = Money.zero();
                 }
@@ -275,20 +277,6 @@ public class RetirementTableModel extends AbstractTableModel {
                     return "";
                 } else {
                     return "Class " + campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass();
-                }
-            case COL_RECRUIT:
-                RetirementDefectionTracker.Payout pay =
-                    campaign.getRetirementDefectionTracker().getPayout(data.get(row));
-                if (null == pay) {
-                    return "";
-                } else if (pay.getDependents() > 0) {
-                    return pay.getDependents() + " Dependents";
-                } else if (pay.hasRecruit()) {
-                    return pay.getRecruitRole().getName(campaign.getFaction().isClan());
-                } else if (pay.hasHeir()) {
-                    return "Heir";
-                } else {
-                    return "";
                 }
             default:
                 return "?";
@@ -315,13 +303,6 @@ public class RetirementTableModel extends AbstractTableModel {
         } else if (col == COL_UNIT) {
             if (null != value) {
                 unitAssignments.put(getPerson(row).getId(), (UUID) value);
-            }
-        } else if (col == COL_RECRUIT) {
-            for (PersonnelRole role : PersonnelRole.values()) {
-                if (role.getName(campaign.getFaction().isClan()).equals(value)) {
-                    campaign.getRetirementDefectionTracker().getPayout(data.get(row)).setRecruitRole(role);
-                    break;
-                }
             }
         }
         fireTableDataChanged();
@@ -366,17 +347,9 @@ public class RetirementTableModel extends AbstractTableModel {
                                                        boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,
                     hasFocus, row, column);
-            int actualRow = table.convertRowIndexToModel(row);
             int actualCol = table.convertColumnIndexToModel(column);
-            Person p = getPerson(actualRow);
             setHorizontalAlignment(getAlignment(actualCol));
-            if (!isSelected) {
-                if (null != campaign.getRetirementDefectionTracker().getPayout(p.getId()) &&
-                    campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0) {
-                    setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
-                    setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
-                }
-            }
+
             return this;
         }
     }
@@ -395,7 +368,7 @@ public class RetirementTableModel extends AbstractTableModel {
             setText(getValueAt(actualRow, actualCol).toString());
             if (actualCol == COL_PERSON) {
                 setText(p.getFullDesc(campaign));
-                setImage(p.getPortrait().getImage(54));
+                setImage(p.getPortrait().getImage(40));
             } else if (actualCol == COL_ASSIGN) {
                 Unit u = p.getUnit();
                 if (!p.getTechUnits().isEmpty()) {
@@ -406,9 +379,9 @@ public class RetirementTableModel extends AbstractTableModel {
                     String desc = "<b>" + u.getName() + "</b><br>";
                     desc += u.getEntity().getWeightClassName();
                     if (!((u.getEntity() instanceof SmallCraft) || (u.getEntity() instanceof Jumpship))) {
-                        desc += " " + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
+                        desc += ' ' + UnitType.getTypeDisplayableName(u.getEntity().getUnitType());
                     }
-                    desc += "<br>" + u.getStatus() + "";
+                    desc += "<br>" + u.getStatus();
                     setText(desc);
                     Image mekImage = u.getImage(this);
                     if (null != mekImage) {
@@ -422,18 +395,18 @@ public class RetirementTableModel extends AbstractTableModel {
             } else if (actualCol == COL_FORCE) {
                 Force force = campaign.getForceFor(p);
                 if (null != force) {
-                    String desc = "<html><b>" + force.getName() + "</b>";
+                    StringBuilder desc = new StringBuilder("<html><b>" + force.getName() + "</b>");
                     Force parent = force.getParentForce();
                     //cut off after three lines and don't include the top level
                     int lines = 1;
                     while ((parent != null) && (null != parent.getParentForce()) && (lines < 4)) {
-                        desc += "<br>" + parent.getName();
+                        desc.append("<br>").append(parent.getName());
                         lines++;
                         parent = parent.getParentForce();
                     }
-                    desc += "</html>";
-                    setHtmlText(desc);
-                    final Image forceImage = force.getForceIcon().getImage(54);
+                    desc.append("</html>");
+                    setHtmlText(desc.toString());
+                    final Image forceImage = force.getForceIcon().getImage(40);
                     if (null != forceImage) {
                         setImage(forceImage);
                     } else {
@@ -445,13 +418,6 @@ public class RetirementTableModel extends AbstractTableModel {
             }
 
             MekHqTableCellRenderer.setupTableColors(this, table, isSelected, hasFocus, row);
-            if (!isSelected) {
-                if ((campaign.getRetirementDefectionTracker().getPayout(p.getId()) != null)
-                        && (campaign.getRetirementDefectionTracker().getPayout(p.getId()).getWeightClass() > 0)) {
-                    setForeground(MekHQ.getMHQOptions().getPaidRetirementForeground());
-                    setBackground(MekHQ.getMHQOptions().getPaidRetirementBackground());
-                }
-            }
 
             return this;
         }
