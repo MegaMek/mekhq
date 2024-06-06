@@ -577,11 +577,11 @@ public class MRMSService {
 
                         if (unfixable) {
                             campaign.addReport(String.format(
-                                    "<font color='orange'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
+                                    "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>Found an unfixable limb (%s) on %s which contains %s parts. Going to remove all parts and scrap the limb before proceeding with other repairs.</font>",
                                     loc.getName(), unit.getName(), countOfPartsPerLocation.get(locId)));
                         } else {
                             campaign.addReport(String.format(
-                                    "<font color='orange'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
+                                    "<font color='" + MekHQ.getMHQOptions().getFontColorWarningHexColor() + "'>Found missing location (%s) on %s which contains %s parts. Going to remove all parts before proceeding with other repairs.</font>",
                                     loc != null ? loc.getName() : Integer.toString(locId), unit.getName(), countOfPartsPerLocation.get(locId)));
                         }
                     }
