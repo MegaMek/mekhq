@@ -26,6 +26,7 @@ import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
+import megamek.common.TechConstants;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -44,8 +45,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.control.EditKillLogControl;
-import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
+import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import org.apache.logging.log4j.LogManager;
 
@@ -86,6 +87,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private AbstractMHQScrollablePanel skillsPanel;
     private AbstractMHQScrollablePanel optionsPanel;
     private JTextField textToughness;
+    private JTextField textFatigue;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -160,7 +162,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         textNickname = new JTextField();
         textBloodname = new JTextField();
         textToughness = new JTextField();
+        textFatigue = new JTextField();
         JLabel lblToughness = new JLabel();
+        JLabel lblFatigue = new JLabel();
         JScrollPane scrOptions = new JScrollPane();
         JScrollPane scrSkills = new JScrollPane();
         JPanel panButtons = new JPanel();
@@ -637,6 +641,31 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             panDemog.add(textToughness, gridBagConstraints);
+
+            y++;
+        }
+
+        lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
+        lblFatigue.setName("lblFatigue");
+
+        textFatigue.setText(Integer.toString(person.getFatigue()));
+        textFatigue.setName("textFatigue");
+
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblFatigue, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textFatigue, gridBagConstraints);
+
+            y++;
         }
 
         JLabel lblUnit = new JLabel();
@@ -686,19 +715,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             choiceOriginalUnit.setSelectedItem(campaign.getUnit(person.getOriginalUnitId()));
         }
         choiceOriginalUnit.addActionListener(ev -> {
-            if (null == choiceOriginalUnit.getSelectedItem()) {
-                choiceUnitWeight.setSelectedIndex(0);
-                choiceUnitTech.setSelectedIndex(0);
-            } else {
+            try {
                 Unit unit = (Unit) choiceOriginalUnit.getSelectedItem();
                 choiceUnitWeight.setSelectedIndex(unit.getEntity().getWeightClass());
                 if (unit.getEntity().isClan()) {
                     choiceUnitTech.setSelectedIndex(2);
-                } else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
+                } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
                     choiceUnitTech.setSelectedIndex(1);
                 } else {
                     choiceUnitTech.setSelectedIndex(0);
                 }
+            } catch (Exception e) {
+                choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
+                choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
             }
         });
 
@@ -967,7 +996,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
         } catch (NumberFormatException ignored) { }
-        if (null == choiceOriginalUnit.getSelectedItem()) {
+        try {
+            person.setFatigue(Integer.parseInt(textFatigue.getText()));
+        } catch (NumberFormatException ignored) { }
+        if (choiceOriginalUnit.getSelectedItem() == null) {
+            person.setOriginalUnit(null);
             person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
             person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
         } else {

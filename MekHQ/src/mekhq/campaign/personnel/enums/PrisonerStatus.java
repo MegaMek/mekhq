@@ -67,6 +67,9 @@ public enum PrisonerStatus {
     public boolean isFree() {
         return this == FREE;
     }
+    public boolean isFreeOrBondsman() {
+        return isFree() || isBondsman();
+    }
 
     public boolean isPrisoner() {
         return this == PRISONER;

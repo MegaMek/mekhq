@@ -22,53 +22,41 @@ import mekhq.MekHQ;
 
 import java.util.ResourceBundle;
 
-public enum RandomRetirementMethod {
-    //region Enum Declarations
-    NONE("RandomRetirementMethod.NONE.text", "RandomRetirementMethod.NONE.toolTipText"),
-    AGAINST_THE_BOT("RandomRetirementMethod.AGAINST_THE_BOT.text", "RandomRetirementMethod.AGAINST_THE_BOT.toolTipText");
-    //endregion Enum Declarations
+public enum TurnoverFrequency {
+    NEVER("TurnoverFrequency.NEVER.text", "TurnoverFrequency.NEVER.toolTipText"),
+    WEEKLY("TurnoverFrequency.WEEKLY.text", "TurnoverFrequency.WEEKLY.toolTipText"),
+    MONTHLY("TurnoverFrequency.MONTHLY.text", "TurnoverFrequency.MONTHLY.toolTipText"),
+    ANNUALLY("TurnoverFrequency.ANNUALLY.text", "TurnoverFrequency.ANNUALLY.toolTipText");
 
-    //region Variable Declarations
     private final String name;
     private final String toolTipText;
-    //endregion Variable Declarations
 
-    //region Constructors
-    RandomRetirementMethod(final String name, final String toolTipText) {
+    TurnoverFrequency(final String name, final String toolTipText) {
         final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Personnel",
                 MekHQ.getMHQOptions().getLocale());
         this.name = resources.getString(name);
         this.toolTipText = resources.getString(toolTipText);
     }
-    //endregion Constructors
 
-    //region Getters
     public String getToolTipText() {
         return toolTipText;
     }
-    //endregion Getters
 
-    //region Boolean Comparison Methods
-    public boolean isNone() {
-        return this == NONE;
+    public boolean isNever() {
+        return this == NEVER;
     }
 
-    public boolean isAgainstTheBot() {
-        return this == AGAINST_THE_BOT;
+    public boolean isWeekly() {
+        return this == WEEKLY;
     }
-    //endregion Boolean Comparison Methods
 
-/*
-    public AbstractRetirement getMethod(final CampaignOptions options) {
-        switch (this) {
-            case AGAINST_THE_BOT:
-                return new AtBRandomRetirement(options);
-            case NONE:
-            default:
-                return new DisabledRandomRetirement(options);
-        }
+    public boolean isMonthly() {
+        return this == MONTHLY;
     }
-*/
+
+    public boolean isAnnually() {
+        return this == ANNUALLY;
+    }
 
     @Override
     public String toString() {
