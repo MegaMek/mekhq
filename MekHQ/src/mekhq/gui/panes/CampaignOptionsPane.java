@@ -4255,7 +4255,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblServiceContractModifier.setName("lblServiceContractModifier");
         lblServiceContractModifier.setEnabled(isUseTurnover);
 
-        spnServiceContractModifier = new JSpinner(new SpinnerNumberModel(5, 0, 10, 1));
+        spnServiceContractModifier = new JSpinner(new SpinnerNumberModel(3, 0, 10, 1));
         spnServiceContractModifier.setToolTipText(resources.getString("lblServiceContractModifier.toolTipText"));
         spnServiceContractModifier.setName("spnServiceContractModifier");
         spnServiceContractModifier.setEnabled(isUseTurnover);

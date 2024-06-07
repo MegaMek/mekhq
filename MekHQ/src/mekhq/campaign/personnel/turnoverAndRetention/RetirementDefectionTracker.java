@@ -134,10 +134,8 @@ public class RetirementDefectionTracker {
                     if (!campaign.getCampaignOptions().isUseRandomFounderTurnover()) {
                         continue;
                     }
-                } else {
-                    if (!campaign.getCampaignOptions().isUseFounderRetirement()) {
-                        continue;
-                    }
+                } else if (!campaign.getCampaignOptions().isUseFounderRetirement()) {
+                    continue;
                 }
             }
 
@@ -151,7 +149,7 @@ public class RetirementDefectionTracker {
 
             // Founder Modifier
             if (person.isFounder()) {
-                targetNumber.addModifier(-4, resources.getString("founder.text"));
+                targetNumber.addModifier(-2, resources.getString("founder.text"));
             }
 
             // Service Contract
@@ -161,7 +159,7 @@ public class RetirementDefectionTracker {
 
             // Desirability modifier
             if ((campaign.getCampaignOptions().isUseSkillModifiers()) && (person.getAge(campaign.getLocalDate()) < 50)) {
-                targetNumber.addModifier(person.getExperienceLevel(campaign, false), resources.getString("desirability.text"));
+                targetNumber.addModifier(person.getExperienceLevel(campaign, false) - 2, resources.getString("desirability.text"));
             }
 
             // Fatigue modifier
@@ -689,10 +687,6 @@ public class RetirementDefectionTracker {
             } else {
                 shellPerson.addSkill(SkillType.S_ADMIN, 1, 0);
                 targetNumber = shellPerson.getSkills().getSkill(SkillType.S_ADMIN).getType().getTarget();
-            }
-
-            if (campaign.getCampaignOptions().getServiceContractDuration() == 0) {
-                targetNumber -= campaign.getCampaignOptions().getServiceContractModifier();
             }
 
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {

@@ -963,7 +963,7 @@ public class CampaignOptions {
         setUseFounderRetirement(true);
         setUseSubContractSoldiers(false);
         setServiceContractDuration(36);
-        setServiceContractModifier(5);
+        setServiceContractModifier(3);
         setPayBonusDefault(true);
 
         setUseCustomRetirementModifiers(true);
