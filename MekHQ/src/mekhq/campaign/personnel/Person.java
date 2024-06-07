@@ -1864,7 +1864,7 @@ public class Person {
                         }
                         retVal.originPlanet = p;
                     } catch (NullPointerException e) {
-                        LogManager.getLogger().error("Error loading originPlanet for " + systemId + ", " + planetId, e);
+                        LogManager.getLogger().error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
@@ -2168,7 +2168,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring advantage: " + adv);
+                        LogManager.getLogger().error("Error restoring advantage: {}", adv);
                     }
                 }
             }
@@ -2183,7 +2183,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring edge: " + adv);
+                        LogManager.getLogger().error("Error restoring edge: {}", adv);
                     }
                 }
             }
@@ -2198,7 +2198,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring implants: " + adv);
+                        LogManager.getLogger().error("Error restoring implants: {}", adv);
                     }
                 }
             }
@@ -2207,8 +2207,14 @@ public class Person {
             if (retVal.getRankNumeric() < 0) {
                 retVal.setRank(0);
             }
+
+            // Fixing recruitment dates
+            // I don't know when this metric was added, so we check all versions
+            if (retVal.getRecruitment() == null) {
+                retVal.setRecruitment(c.getLocalDate());
+            }
         } catch (Exception e) {
-            LogManager.getLogger().error("Failed to read person " + retVal.getFullName() + " from file", e);
+            LogManager.getLogger().error("Failed to read person {} from file", retVal.getFullName(), e);
             retVal = null;
         }
 
