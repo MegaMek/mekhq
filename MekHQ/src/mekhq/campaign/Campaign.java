@@ -3619,8 +3619,6 @@ public class Campaign implements ITechManager {
                 individualAcademyAttributes.add(academy.getName());
 
                 academyAttributesMap.put(person.getId(), individualAcademyAttributes);
-
-                person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
             }
         }
 
