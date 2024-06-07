@@ -300,7 +300,7 @@ public class CampaignOptions {
     private boolean useUnitRatingModifiers;
     private boolean useFactionModifiers;
     private boolean useMissionStatusModifiers;
-    private boolean useMarriageModifiers;
+    private boolean useFamilyModifiers;
     private boolean useLoyaltyModifiers;
     private boolean useHideLoyalty;
 
@@ -973,7 +973,7 @@ public class CampaignOptions {
         setUseUnitRatingModifiers(true);
         setUseFactionModifiers(true);
         setUseMissionStatusModifiers(true);
-        setUseMarriageModifiers(true);
+        setUseFamilyModifiers(true);
 
         setUseLoyaltyModifiers(true);
         setUseHideLoyalty(true);
@@ -1982,12 +1982,12 @@ public class CampaignOptions {
         this.useMissionStatusModifiers = useMissionStatusModifiers;
     }
 
-    public boolean isUseMarriageModifiers() {
-        return useMarriageModifiers;
+    public boolean isUseFamilyModifiers() {
+        return useFamilyModifiers;
     }
 
-    public void setUseMarriageModifiers(final boolean useMarriageModifiers) {
-        this.useMarriageModifiers = useMarriageModifiers;
+    public void setUseFamilyModifiers(final boolean useFamilyModifiers) {
+        this.useFamilyModifiers = useFamilyModifiers;
     }
 
     public boolean isUseAdministrativeStrain() {
@@ -4558,7 +4558,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnitRatingModifiers", isUseUnitRatingModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionModifiers", isUseFactionModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMissionStatusModifiers", isUseMissionStatusModifiers());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMarriageModifiers", isUseMarriageModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFamilyModifiers", isUseFamilyModifiers());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoyaltyModifiers", isUseLoyaltyModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useHideLoyalty", isUseHideLoyalty());
@@ -5554,8 +5554,8 @@ public class CampaignOptions {
                     retVal.setUseFactionModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMissionStatusModifiers")) {
                     retVal.setUseMissionStatusModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useMarriageModifiers")) {
-                    retVal.setUseMarriageModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useFamilyModifiers")) {
+                    retVal.setUseFamilyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useLoyaltyModifiers")) {
                     retVal.setUseLoyaltyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useHideLoyalty")) {

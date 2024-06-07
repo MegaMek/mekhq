@@ -718,36 +718,31 @@ public class Campaign implements ITechManager {
                             getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                         }
 
-                        // if marriage modifier is enabled, couples leave together
-                        if (campaignOptions.isUseMarriageModifiers()) {
-                            Person spouse = person.getGenealogy().getSpouse();
+                        // civilian spouses follow their partner in departing
+                        Person spouse = person.getGenealogy().getSpouse();
 
-                            if ((spouse != null) && (!getRetirementDefectionTracker().getRetirees().contains(spouse.getId()))) {
-                                if ((!spouse.getStatus().isDepartedUnit()) && (!spouse.getStatus().isAbsent())) {
-                                    addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
-                                    if (spouse.getPrimaryRole().isCivilian()) {
-                                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    } else {
-                                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                    }
-                                }
-                            }
+                        if ((spouse != null) && (spouse.getPrimaryRole().isCivilian())) {
+                            addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
+                            spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
                         }
 
                         // This ensures children have a chance of following their parent into departure
+                        // This needs to be after spouses, to ensure joint-departure spouses are factored in
                         for (Person child : person.getGenealogy().getChildren()) {
                             if ((child.isChild(getLocalDate())) && (!child.getStatus().isDepartedUnit())) {
-                                if (campaignOptions.isUseMarriageModifiers()) {
-                                    addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
-                                    child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                } else {
-                                    boolean remainingParent = child.getGenealogy().getParents().stream()
-                                            .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
+                                boolean hasRemainingParent = child.getGenealogy().getParents().stream()
+                                        .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
 
-                                    if ((!remainingParent) || (Compute.randomInt(2) == 0)) {
+                                // if there is a remaining parent, there is a 50/50 chance the child departs
+                                if ((hasRemainingParent) && (Compute.randomInt(2) == 0)) {
                                         addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
                                         child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                    }
+                                }
+
+                                // if there is no remaining parent, the child will always depart
+                                if (!hasRemainingParent) {
+                                    addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
+                                    child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
                                 }
                             }
                         }

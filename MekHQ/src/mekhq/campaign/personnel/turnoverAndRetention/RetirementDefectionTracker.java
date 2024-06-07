@@ -275,11 +275,32 @@ public class RetirementDefectionTracker {
             }
 
             // Family Modifier
-            if (campaign.getCampaignOptions().isUseMarriageModifiers()) {
+            if (campaign.getCampaignOptions().isUseFamilyModifiers()) {
                 Person spouse = person.getGenealogy().getSpouse();
+                List<Person> children = person.getGenealogy().getChildren();
 
-                if ((spouse != null) && (!spouse.getPrimaryRole().isCivilian())) {
-                    targetNumber.addModifier(-2, resources.getString("marriage.text"));
+                int modifier = 0;
+
+                // if 'person' is married to a non-civilian, apply a -1 modifier
+                if ((spouse != null)
+                        && (!spouse.getPrimaryRole().isCivilian())
+                        && (!spouse.getStatus().isDepartedUnit())) {
+                    modifier--;
+                }
+
+                // if 'person' has any non-civilian children in the unit, apply a -1 modifier
+                if ((!children.isEmpty()) && (spouse == null)) {
+                    if (children.stream()
+                            .filter(child -> !child.isChild(campaign.getLocalDate()))
+                            .anyMatch(child -> (!child.isChild(campaign.getLocalDate()))
+                                    && (!child.getPrimaryRole().isCivilian())
+                                    && (!child.getStatus().isDepartedUnit()))) {
+                        modifier--;
+                    }
+                }
+
+                if (modifier != 0) {
+                    targetNumber.addModifier(modifier, resources.getString("family.text"));
                 }
             }
 
@@ -799,20 +820,28 @@ public class RetirementDefectionTracker {
         }
 
         for (UUID id : targets.keySet()) {
+            // it's possible the person has already been added by soldier or marriage special handlers
+            if (payouts.containsKey(id)) {
+                continue;
+            }
+
             if (Compute.d6(2) < targets.get(id).getValue()) {
                 if (mission != null) {
                     unresolvedPersonnel.get(mission.getId()).add(id);
                 }
 
-                Person p = campaign.getPerson(id);
+                Person person = campaign.getPerson(id);
 
                 // if the retiree is the commander of an infantry platoon, all non-founders in the platoon follow them into retirement
                 if (campaign.getCampaignOptions().isUseSubContractSoldiers()) {
-                    if ((p.getUnit() != null) && (p.getUnit().usesSoldiers()) && (p.getUnit().isCommander(p))) {
-                        for (Person person : p.getUnit().getAllInfantry()) {
-                            if ((!person.isFounder()) || (campaign.getCampaignOptions().isUseRandomFounderTurnover())) {
-                                payouts.put(person.getId(), new Payout(campaign, campaign.getPerson(person.getId()),
-                                        shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
+                    if ((person.getUnit() != null) && (person.getUnit().usesSoldiers()) && (person.getUnit().isCommander(person))) {
+                        for (Person soldier : person.getUnit().getAllInfantry()) {
+                            if ((!soldier.isFounder()) || (campaign.getCampaignOptions().isUseRandomFounderTurnover())) {
+                                // this shouldn't be an issue, but we include it here as insurance
+                                if (!payouts.containsKey(id)) {
+                                    payouts.put(soldier.getId(), new Payout(campaign, campaign.getPerson(soldier.getId()),
+                                            shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
+                                }
                             }
                         }
 
