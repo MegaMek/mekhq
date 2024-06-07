@@ -386,9 +386,10 @@ public class AtBDynamicScenarioFactory {
         // Force template parameters - is the template calling for specific roles
 
         // Conditions parameters - hostile atmosphere, temperature, or low gravity
-        boolean isHostileEnvironment;
+        boolean isHostileEnvironment = false;
         boolean allowsConvInfantry = true;
         boolean allowsTanks = true;
+        boolean isLowGravity = false;
         if (scenario.getTemperature() > 50 || scenario.getTemperature() < -30) {
             isHostileEnvironment = true;
         }
@@ -423,14 +424,19 @@ public class AtBDynamicScenarioFactory {
         if (scenario.getGravity() <= 0.2) {
             isHostileEnvironment = true;
             allowsTanks = false;
+            isLowGravity = true;
         }
 
 
         // Parameters for infantry - check if XCT or marines are required
-
-
-
-        // Parameters for ground vehicles - check if conditions generally prohibit
+        Collection<MissionRole> infantryRoles = new HashSet<MissionRole>();
+        if (allowsConvInfantry && isHostileEnvironment) {
+            if (isLowGravity) {
+                infantryRoles.add(MissionRole.MARINE);
+            } else {
+                infantryRoles.add(MissionRole.XCT);
+            }
+        }
 
 
 
@@ -1804,22 +1810,30 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Generates a "lance" of entities given some parameters, with weight not specified. Doesn't have to be a lance, could be any number.
-     * @param faction The faction from which to generate entities.
-     * @param skill Skill level of the crew.
-     * @param quality Quality of the units.
-     * @param unitTypes The types of units. Length had better be equal to the length of weights.
-     * @param campaign working campaign.
-     * @return Generated entity list.
+     * Generates a lance or similar tactical grouping (star, Level II, etc.) of entities with given
+     * parameters. This overload is included as a convenience for when weight class is not
+     * important or does not apply to the desired entity types.
+     * @param faction   The faction from which to generate entities.
+     * @param skill     Skill level of the crew.
+     * @param quality   Quality of the units.
+     * @param unitTypes The types of units
+     * @param rolesByType Collections of roles required for each unit type
+     * @param artillery true to select entities with artillery
+     * @param campaign  working campaign.
+     * @return List of entities created for this lance/tactical group
      */
-    private static List<Entity> generateLance(String faction, SkillLevel skill, int quality,
-                                              List<Integer> unitTypes, boolean artillery,
+    private static List<Entity> generateLance(String faction,
+                                              SkillLevel skill,
+                                              int quality,
+                                              List<Integer> unitTypes,
+                                              Map<Integer, Collection<MissionRole>> rolesByType,
+                                              boolean artillery,
                                               Campaign campaign) {
+
         List<Entity> retval = new ArrayList<>();
 
         for (int i = 0; i < unitTypes.size(); i++) {
-            Entity en = getEntity(faction, skill, quality, unitTypes.get(i),
-                    UNIT_WEIGHT_UNSPECIFIED, artillery, campaign);
+            Entity en = getEntity(faction, skill, quality, unitTypes.get(i), UNIT_WEIGHT_UNSPECIFIED, artillery, campaign);
             if (en != null) {
                 retval.add(en);
             }
@@ -1829,18 +1843,27 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Generates a "lance" of entities given some parameters. Doesn't have to be a lance, could be any number.
-     * @param faction The faction from which to generate entities.
-     * @param skill Skill level of the crew.
-     * @param quality Quality of the units.
-     * @param unitTypes The types of units. Length had better be equal to the length of weights.
-     * @param weights Weight class string
-     * @param campaign Working campaign
-     * @return List of generated entities.
+     * Generates a lance or similar tactical grouping (star, Level II, etc.) of entities with given
+     * parameters. The number of entities generated is the lesser of unit types or number of provided
+     * weight classes.
+     * @param faction      The faction from which to generate entities.
+     * @param skill        Skill level of the crew.
+     * @param quality      Quality of the units.
+     * @param unitTypes    The types of units. Length had better be equal to the length of weights.
+     * @param weights      Weight class string suitable for AtBConfiguration.decodeWeightStr
+     *                     e.g. "LMMH" generates one light, two medium, and one heavy
+     * @param rolesByType  Collections of roles required for each unit type
+     * @param campaign     Working campaign
+     * @return List of entities created for this lance/tactical group
      */
-    private static List<Entity> generateLance(String faction, SkillLevel skill, int quality,
-                                              List<Integer> unitTypes, String weights,
-                                              boolean artillery, Campaign campaign) {
+    private static List<Entity> generateLance(String faction,
+                                              SkillLevel skill,
+                                              int quality,
+                                              List<Integer> unitTypes,
+                                              String weights,
+                                              Map<Integer, Collection<MissionRole>> rolesByType,
+                                              boolean artillery,
+                                              Campaign campaign) {
         List<Entity> retval = new ArrayList<>();
         int unitTypeSize = unitTypes.size();
 
