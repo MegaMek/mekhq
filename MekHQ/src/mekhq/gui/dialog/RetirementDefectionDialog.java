@@ -734,7 +734,8 @@ public class RetirementDefectionDialog extends JDialog {
         }
 
         // This allows us to ignore anything 0.99 c-bills or lower, in case of unusual fractional issues
-        if (totalPayout().isLessThan(Money.of(1))) {
+        // We use lblPayment as this means we don't need to reparse payout value
+        if (Double.parseDouble(lblPayment.getText().replaceAll(" C-Bill", "")) < 1) {
             return true;
         }
 
