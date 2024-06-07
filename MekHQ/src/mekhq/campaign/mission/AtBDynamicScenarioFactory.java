@@ -428,19 +428,22 @@ public class AtBDynamicScenarioFactory {
         }
 
 
+
+        // Required roles for units in this force. Because these can vary by unit type,
+        // they are stored separately.
+        Map<Integer, Collection<MissionRole>> requiredRoles = new HashMap<Integer, Collection<MissionRole>>();
+
         // Parameters for infantry - check if XCT or marines are required
-        Collection<MissionRole> infantryRoles = new HashSet<MissionRole>();
+
         if (allowsConvInfantry && isHostileEnvironment) {
+            Collection<MissionRole> infantryRoles = new HashSet<MissionRole>();
             if (isLowGravity) {
                 infantryRoles.add(MissionRole.MARINE);
             } else {
                 infantryRoles.add(MissionRole.XCT);
             }
+            requiredRoles.put(UnitType.INFANTRY, infantryRoles);
         }
-
-
-
-
 
 
 
@@ -491,23 +494,24 @@ public class AtBDynamicScenarioFactory {
                 // special case: if we're generating artillery, there's not a lot of variety
                 // in artillery unit weight classes, so we ignore that specification
                 if (!forceTemplate.getUseArtillery()) {
-                    final String unitWeights = generateUnitWeights(unitTypes, factionCode,
+                    final String unitWeights = generateUnitWeights(unitTypes,
+                            factionCode,
                             AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0),
-                            forceTemplate.getMaxWeightClass(), forceTemplate.getMinWeightClass(), campaign);
+                            forceTemplate.getMaxWeightClass(),
+                            forceTemplate.getMinWeightClass(),
+                            campaign);
                     if (unitWeights == null) {
                         generatedLance = new ArrayList<>();
                     } else {
-                        generatedLance = generateLance(factionCode, skill,
-                                quality, unitTypes, unitWeights, false, campaign);
+                        generatedLance = generateLance(factionCode, skill, quality, unitTypes, unitWeights, requiredRoles, false, campaign);
                     }
                 } else {
-                    generatedLance = generateLance(factionCode, skill,
-                            quality, unitTypes, true, campaign);
+                    generatedLance = generateLance(factionCode, skill, quality, unitTypes, requiredRoles, true, campaign);
                 }
             // everything else doesn't support weight class specification
             } else {
                 List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality, factionCode, campaign);
-                generatedLance = generateLance(factionCode, skill, quality, unitTypes, forceTemplate.getUseArtillery(), campaign);
+                generatedLance = generateLance(factionCode, skill, quality, unitTypes, requiredRoles, forceTemplate.getUseArtillery(), campaign);
             }
 
             // no reason to go into an endless loop if we can't generate a lance
