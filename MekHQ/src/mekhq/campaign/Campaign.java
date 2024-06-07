@@ -6992,24 +6992,26 @@ public class Campaign implements ITechManager {
         int days = 0;
         String period = "";
 
+        boolean triggerTurnoverPrompt = false;
+
         switch (campaignOptions.getTurnoverFrequency()) {
             case NEVER:
                 return false;
             case WEEKLY:
-                days = 7;
+                triggerTurnoverPrompt = getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY);
                 period = resources.getString("turnoverWeekly.text");
                 break;
             case MONTHLY:
-                days = 28;
+                triggerTurnoverPrompt = getLocalDate().getDayOfMonth() == 1;
                 period = resources.getString("turnoverMonthly.text");
                 break;
             case ANNUALLY:
-                days = 365;
+                triggerTurnoverPrompt = getLocalDate().getDayOfYear() == 1;
                 period = resources.getString("turnoverAnnually.text");
                 break;
         }
 
-        if (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate()) >= days) {
+        if (triggerTurnoverPrompt) {
             Object[] options = {
                     resources.getString("turnoverEmployeeTurnoverDialog.text"),
                     resources.getString("turnoverNotNow.text")
@@ -7027,6 +7029,7 @@ public class Campaign implements ITechManager {
                     options[0]
             );
         }
+
         return false;
     }
 
