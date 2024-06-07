@@ -57,6 +57,7 @@ public class HireBulkPersonnelDialog extends JDialog {
     private JTextField jtf;
 
     private JButton btnHire;
+    private JButton btnGmHire;
     private JButton btnClose;
     private JPanel panButtons;
 
@@ -96,12 +97,12 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     private void initComponents() {
-        GridBagConstraints gridBagConstraints;
 
         choiceType = new JComboBox<>();
         choiceRanks = new JComboBox<>();
 
         btnHire = new JButton(resourceMap.getString("btnHire.text"));
+        btnGmHire = new JButton(resourceMap.getString("btnGmHire.text"));
         btnClose = new JButton(resourceMap.getString("btnClose.text"));
         panButtons = new JPanel(new GridBagLayout());
 
@@ -119,11 +120,11 @@ public class HireBulkPersonnelDialog extends JDialog {
         }
         choiceType.setModel(personTypeModel);
         choiceType.setName("choiceType");
-        gridBagConstraints = newConstraints(1, 0, GridBagConstraints.HORIZONTAL);
+        GridBagConstraints gridBagConstraints = newConstraints(1, 0, GridBagConstraints.HORIZONTAL);
         gridBagConstraints.weightx = 1.0;
         choiceType.setSelectedIndex(0);
         choiceType.addActionListener(evt -> {
-            // If we change the type, we need to setup the ranks for that type
+            // If we change the type, we need to set up the ranks for that type
             refreshRanksCombo();
         });
         getContentPane().add(choiceType, gridBagConstraints);
@@ -276,18 +277,26 @@ public class HireBulkPersonnelDialog extends JDialog {
             ++ mainGridPos;
         }
 
-        btnHire.addActionListener(evt -> hire());
+        btnHire.addActionListener(evt -> hire(false));
         gridBagConstraints = newConstraints(0, 0);
         gridBagConstraints.insets = ZERO_INSETS;
 
         panButtons.add(btnHire, gridBagConstraints);
         gridBagConstraints.gridx++;
 
+        if (campaign.isGM()) {
+            btnGmHire.addActionListener(evt -> hire(true));
+            gridBagConstraints.insets = ZERO_INSETS;
+
+            panButtons.add(btnGmHire, gridBagConstraints);
+            gridBagConstraints.gridx++;
+        }
+
         btnClose.addActionListener(evt -> setVisible(false));
         panButtons.add(btnClose, gridBagConstraints);
 
         gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(panButtons, gridBagConstraints);
 
@@ -305,7 +314,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         }
     }
 
-    private void hire() {
+    private void hire(boolean isGmHire) {
         int number = (Integer) spnNumber.getModel().getValue();
         PersonTypeItem selectedItem = (PersonTypeItem) choiceType.getSelectedItem();
         if (selectedItem == null) {
@@ -348,7 +357,7 @@ public class HireBulkPersonnelDialog extends JDialog {
                 person.limitSkills(age - 13);
             }
 
-            if (!campaign.recruitPerson(person)) {
+            if (!campaign.recruitPerson(person, isGmHire)) {
                 number = 0;
             } else {
                 number--;
