@@ -381,15 +381,60 @@ public class AtBDynamicScenarioFactory {
         }
 
 
+
+
         // Force template parameters - is the template calling for specific roles
 
         // Conditions parameters - hostile atmosphere, temperature, or low gravity
+        boolean isHostileEnvironment;
+        boolean allowsConvInfantry = true;
+        boolean allowsTanks = true;
+        if (scenario.getTemperature() > 50 || scenario.getTemperature() < -30) {
+            isHostileEnvironment = true;
+        }
+        if (scenario.getAtmosphere().isLighterThan(Atmosphere.THIN)) {
+            isHostileEnvironment = true;
+            allowsTanks = false;
+        } else {
+            mekhq.campaign.universe.Atmosphere specific_atmosphere =
+                    contract.getSystem().getPrimaryPlanet().getAtmosphere(scenario.getDate());
+            switch (specific_atmosphere) {
+                case TOXICPOISON:
+                case TOXICCAUSTIC:
+                    isHostileEnvironment = true;
+                    allowsConvInfantry = false;
+                    allowsTanks = false;
+                    break;
+                case TAINTEDPOISON:
+                case TAINTEDCAUSTIC:
+                    isHostileEnvironment = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (scenario.getWind().isTornadoF1ToF3() || scenario.getWind().isTornadoF4()) {
+            isHostileEnvironment = true;
+            allowsConvInfantry = false;
+            if (scenario.getWind().isTornadoF4()) {
+                allowsTanks = false;
+            }
+        }
+        if (scenario.getGravity() <= 0.2) {
+            isHostileEnvironment = true;
+            allowsTanks = false;
+        }
 
 
         // Parameters for infantry - check if XCT or marines are required
 
 
+
         // Parameters for ground vehicles - check if conditions generally prohibit
+
+
+
+
 
 
 
