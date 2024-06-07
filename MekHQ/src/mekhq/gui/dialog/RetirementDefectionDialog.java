@@ -520,13 +520,6 @@ public class RetirementDefectionDialog extends JDialog {
                 }
             }
 
-            if ((person.getUnit() != null)
-                    && (person.getPrimaryRole().isSoldierOrBattleArmour())
-                    && (person.getUnit().isCommander(person))
-                    && (hqView.getCampaign().getUnit(person.getOriginalUnitId()) != null)) {
-                unitAssignments.put(id, person.getUnit().getId());
-            }
-
             ((UnitAssignmentTableModel) unitAssignmentTable.getModel()).setData(availableUnits);
         }
 
