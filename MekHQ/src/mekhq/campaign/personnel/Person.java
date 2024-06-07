@@ -1459,10 +1459,16 @@ public class Person {
         this.clanPersonnel = clanPersonnel;
     }
 
+    /**
+     * @return true if the person is the campaign commander, false otherwise.
+     */
     public boolean isCommander() {
         return commander;
     }
 
+    /**
+     * Flags the person as the campaign commander.
+     */
     public void setCommander(final boolean commander) {
         this.commander = commander;
     }

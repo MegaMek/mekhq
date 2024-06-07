@@ -499,18 +499,18 @@ public class RetirementDefectionDialog extends JDialog {
         });
 
         for (UUID id : rdTracker.getRetirees(contract)) {
-            Person p = hqView.getCampaign().getPerson(id);
+            Person person = hqView.getCampaign().getPerson(id);
             /* Retirees who brought a unit will take the same unit when
              * they go if it is still around
              */
             if (hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit()
-                    && (null != p.getOriginalUnitId())
-                    && !unitAssignments.containsValue(p.getOriginalUnitId())
-                    && (hqView.getCampaign().getUnit(p.getOriginalUnitId()) != null)) {
-                unitAssignments.put(id, p.getOriginalUnitId());
+                    && (null != person.getOriginalUnitId())
+                    && !unitAssignments.containsValue(person.getOriginalUnitId())
+                    && (hqView.getCampaign().getUnit(person.getOriginalUnitId()) != null)) {
+                unitAssignments.put(id, person.getOriginalUnitId());
                 if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
                     Money temp = rdTracker.getPayout(id).getPayoutAmount()
-                            .minus(hqView.getCampaign().getUnit(p.getOriginalUnitId()).getBuyCost());
+                            .minus(hqView.getCampaign().getUnit(person.getOriginalUnitId()).getBuyCost());
 
                     if (temp.isNegative()) {
                         temp = Money.zero();
@@ -520,9 +520,13 @@ public class RetirementDefectionDialog extends JDialog {
                 }
             }
 
-            if ((p.getUnit() != null) && p.getPrimaryRole().isSoldierOrBattleArmour()) {
-                unitAssignments.put(id, p.getUnit().getId());
+            if ((person.getUnit() != null)
+                    && (person.getPrimaryRole().isSoldierOrBattleArmour())
+                    && (person.getUnit().isCommander(person))
+                    && (hqView.getCampaign().getUnit(person.getOriginalUnitId()) != null)) {
+                unitAssignments.put(id, person.getUnit().getId());
             }
+
             ((UnitAssignmentTableModel) unitAssignmentTable.getModel()).setData(availableUnits);
         }
 
