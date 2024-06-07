@@ -37,6 +37,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
@@ -242,9 +243,23 @@ public class RetirementDefectionTracker {
 
             // Faction Modifiers
             if (campaign.getCampaignOptions().isUseFactionModifiers()) {
-                if (campaign.getFaction().isPirate()) {
+                Faction campaignFaction = campaign.getFaction();
+
+                // campaign faction modifiers
+                if (campaignFaction.isPirate()) {
                     targetNumber.addModifier(1, resources.getString("factionPirateCompany.text"));
-                } else if (person.getOriginFaction().isPirate()) {
+                } else if (campaignFaction.isComStarOrWoB()) {
+                    if (person.getOriginFaction().isComStarOrWoB()) {
+                        targetNumber.addModifier(2, resources.getString("factionComStarOrWob.text"));
+                    }
+                } else if ((!campaignFaction.isClan()) && (!campaignFaction.isMercenary())) {
+                    if (campaignFaction.equals(person.getOriginFaction())) {
+                        targetNumber.addModifier(1, resources.getString("factionLoyalty.text"));
+                    }
+                }
+
+                // origin faction modifiers
+                if ((!campaignFaction.isPirate()) && (person.getOriginFaction().isPirate())) {
                     targetNumber.addModifier(1, resources.getString("factionPirate.text"));
                 }
 
@@ -256,6 +271,7 @@ public class RetirementDefectionTracker {
                     targetNumber.addModifier(-2, resources.getString("factionClan.text"));
                 }
 
+                // wartime modifier
                 if (FactionHints.defaultFactionHints().isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
                     targetNumber.addModifier(2, resources.getString("factionEnemy.text"));
                 }
