@@ -380,6 +380,19 @@ public class AtBDynamicScenarioFactory {
                     lanceSize : forceTemplate.getFixedUnitCount();
         }
 
+
+        // Force template parameters - is the template calling for specific roles
+
+        // Conditions parameters - hostile atmosphere, temperature, or low gravity
+
+
+        // Parameters for infantry - check if XCT or marines are required
+
+
+        // Parameters for ground vehicles - check if conditions generally prohibit
+
+
+
         ArrayList<Entity> generatedEntities = new ArrayList<>();
 
         boolean stopGenerating = false;
