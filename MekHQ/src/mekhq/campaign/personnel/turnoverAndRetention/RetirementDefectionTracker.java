@@ -184,7 +184,18 @@ public class RetirementDefectionTracker {
 
             // Management Skill Modifier
             if (campaign.getCampaignOptions().isUseManagementSkill()) {
-                targetNumber.addModifier(getManagementSkillModifier(person), resources.getString("managementSkill.text"));
+                int modifier = 0;
+                
+                if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
+                    if (campaign.getFlaggedCommander().hasSkill((SkillType.S_LEADER))) {
+                        modifier += campaign.getCampaignOptions().getManagementSkillPenalty()
+                                + campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER).getFinalSkillValue();
+                    }
+                } else {
+                    modifier = getManagementSkillModifier(person);
+                }
+                
+                targetNumber.addModifier(modifier, resources.getString("managementSkill.text"));
             }
 
             // Shares Modifiers
@@ -394,35 +405,7 @@ public class RetirementDefectionTracker {
      */
     private void getManagementSkillValues(Campaign campaign) {
         int baseModifier = campaign.getCampaignOptions().getManagementSkillPenalty();
-
-        if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
-            Person commander = campaign.getFlaggedCommander();
-
-            if ((commander != null) && (commander.hasSkill(SkillType.S_LEADER))) {
-                int commanderSkill = baseModifier + commander.getSkill(SkillType.S_LEADER).getFinalSkillValue();
-
-                asfCommanderModifier = commanderSkill;
-                vehicleCrewCommanderModifier = commanderSkill;
-                infantryCommanderModifier = commanderSkill;
-                navalCommanderModifier = commanderSkill;
-                techCommanderModifier = commanderSkill;
-                medicalCommanderModifier = commanderSkill;
-                administrationCommanderModifier = commanderSkill;
-                mechWarriorCommanderModifier = commanderSkill;
-            } else {
-                asfCommanderModifier = baseModifier;
-                vehicleCrewCommanderModifier = baseModifier;
-                infantryCommanderModifier = baseModifier;
-                navalCommanderModifier = baseModifier;
-                techCommanderModifier = baseModifier;
-                medicalCommanderModifier = baseModifier;
-                administrationCommanderModifier = baseModifier;
-                mechWarriorCommanderModifier = baseModifier;
-            }
-
-            return;
-        }
-
+        
         for (Person person : campaign.getActivePersonnel()) {
             if ((person.getPrimaryRole().isCivilian())
                     || (person.getPrisonerStatus().isPrisoner())
