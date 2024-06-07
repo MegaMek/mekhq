@@ -692,25 +692,14 @@ public class Campaign implements ITechManager {
 
                     if (!person.getStatus().isDead()) {
                         if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
-                            int roll = Compute.d6(1);
+                            if (!getActiveContracts().isEmpty()) {
+                                int roll = Compute.randomInt(20);
 
-                            switch (roll) {
-                                case 1:
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    break;
-                                case 2:
-                                case 3:
-                                    addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverPoached.text"));
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    break;
-                                case 4:
-                                case 5:
-                                case 6:
-                                    addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverBurnedOut.text"));
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    break;
-                                default:
-                                    throw new IllegalStateException("Unexpected value in applyRetirement: " + roll);
+                                if (roll == 0) {
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+                                }
+                            } else {
+                                getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                             }
                         } else if (person.getAge(getLocalDate()) >= 50) {
                             getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
