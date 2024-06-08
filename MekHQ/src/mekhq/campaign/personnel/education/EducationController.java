@@ -341,7 +341,6 @@ public class EducationController {
      * @param campaign  The campaign the person is part of.
      * @param person    The person for whom the journey is being processed.
      * @param resources The resource bundle containing localized strings.
-     * @return True if the person's journey to campus was processed, false otherwise.
      */
     private static void journeyToAcademy(Campaign campaign, Person person, ResourceBundle resources) {
         int daysOfTravelTo = person.getEduDaysOfTravelToAcademy();
@@ -366,7 +365,6 @@ public class EducationController {
      */
     private static boolean ongoingEducation(Campaign campaign, Person person, Academy academy, boolean ageBypass, ResourceBundle resources) {
         int daysOfEducation = person.getEduDaysOfEducation();
-        boolean graduation = false;
 
         if (academy.isPrepSchool()) {
             if ((person.getAge(campaign.getLocalDate()) >= academy.getAgeMax()) || (ageBypass)) {
@@ -378,45 +376,49 @@ public class EducationController {
                 } else {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedCreche.text"));
                 }
-            }
 
-            graduation = true;
-        } else {
-            person.setEduDaysOfEducation(daysOfEducation - 1);
+                if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+                    processNewWeekChecks(campaign, academy, person, 0, resources);
+                }
+
+                return true;
+            }
 
             if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
                 processNewWeekChecks(campaign, academy, person, daysOfEducation, resources);
             }
 
-            if ((daysOfEducation - 1) < 1) {
-                graduationPicker(campaign, person, academy, resources);
+            return false;
+        } else {
+            person.setEduDaysOfEducation(daysOfEducation - 1);
 
-                graduation = true;
+            if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+                processNewWeekChecks(campaign, academy, person, daysOfEducation - 1, resources);
             }
 
-            person.setEduEducationStage(4);
+            if ((daysOfEducation - 1) < 1) {
+                if (graduationPicker(campaign, person, academy, resources)) {
+                    person.setEduEducationStage(4);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
 
-        if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-            processNewWeekChecks(campaign, academy, person, daysOfEducation, resources);
-        }
-
-        return graduation;
+        return false;
     }
 
     /**
-     * Determine the appropriate graduation method based on the given parameters.
-     * If the academy is both a clan and a prep school, the graduateClanCreche method will be called.
-     * If the academy is a clan but not a prep school, the graduateClanSibko method will be called.
-     * If the academy is a prep school but not a clan, the graduateChild method will be called.
-     * If the academy is neither a clan nor a prep school, the graduateAdult method will be called.
+     * Picks the appropriate graduation method based on the given campaign, person, academy, and resources.
      *
-     * @param campaign   the current campaign
-     * @param person     the person graduating
-     * @param academy    the academy person is graduating from
-     * @param resources  the resource bundle for localization
+     * @param campaign the campaign to use for calculations
+     * @param person the person to determine graduation for
+     * @param academy the academy to determine graduation from
+     * @param resources the resources to use for graduation
+     * @return true if the person successfully graduates; otherwise, false
      */
-    private static void graduationPicker(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+    private static boolean graduationPicker(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         if ((academy.isClan()) && (academy.isPrepSchool())) {
             if (person.getAge(campaign.getLocalDate()) < 10) {
                 graduateClanCreche(campaign, person, academy, resources);
@@ -428,19 +430,19 @@ public class EducationController {
         } else if (academy.isClan()) {
             graduateReeducationCamp(campaign, person, academy, resources);
         } else {
-            graduateAdult(campaign, person, academy, resources);
+            return graduateAdult(campaign, person, academy, resources);
         }
+
+        return true;
     }
 
     /**
-     * This method begins the journey home for a person after their education.
+     * Begins the journey for a person to return home from an academy.
      *
-     * @param campaign        The campaign the person is part of.
-     * @param person          The person for whom the journey is being processed.
-     * @param daysOfEducation the number education days the person has remaining
-     * @param resources       the resource bundle for localization
-     * @return the number of travel days from the academy, or null if the person has no education days and no
-     * previous travel days
+     * @param campaign   the current campaign
+     * @param person     the person returning from the academy
+     * @param academy    the academy the person attended
+     * @param resources  the resource bundle containing localized strings
      */
     private static void beginJourneyHome(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         int travelTime = 0;
@@ -958,13 +960,15 @@ public class EducationController {
 
 
     /**
-     * Graduates a person from an academy.
+     * Checks if a person graduates from an academy as an adult.
      *
-     * @param campaign the campaign the person belongs to
-     * @param person the person being graduated
-     * @param academy the academy from which the person is being graduated
+     * @param campaign    the campaign in which the graduation occurs
+     * @param person      the person who is graduating
+     * @param academy     the academy from which the person is graduating
+     * @param resources   the ResourceBundle containing localized messages
+     * @return true if the person completed their education, false otherwise
      */
-    private static void graduateAdult(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+    private static boolean graduateAdult(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         int graduationRoll = Compute.randomInt(100);
         int roll;
 
@@ -975,7 +979,7 @@ public class EducationController {
 
             improveSkills(campaign, person, academy, false);
 
-            return;
+            return true;
         }
 
         // class resits required
@@ -985,7 +989,7 @@ public class EducationController {
 
             person.setEduDaysOfEducation(roll);
 
-            return;
+            return false;
         }
 
         if (graduationRoll == 99) {
@@ -1008,7 +1012,7 @@ public class EducationController {
                         String.format(resources.getString("graduatedRank.text"), academy.getPromotion()));
             }
 
-            return;
+            return true;
         }
 
         // graduated with honors
@@ -1033,7 +1037,7 @@ public class EducationController {
                         academy.getPromotion()));
             }
 
-            return;
+            return true;
         }
 
         // default graduation
@@ -1054,6 +1058,7 @@ public class EducationController {
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedRank.text"),
                     academy.getPromotion()));
         }
+        return true;
     }
 
     /**
