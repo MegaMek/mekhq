@@ -244,6 +244,7 @@ public class CampaignOptions {
     private boolean useRandomDependentRemoval;
 
     // Salary
+    private boolean disableSecondaryRoleSalary;
     private double salaryAntiMekMultiplier;
     private double salarySpecialistInfantryMultiplier;
     private Map<SkillLevel, Double> salaryXPMultipliers;
@@ -754,6 +755,7 @@ public class CampaignOptions {
         setUseRandomDependentRemoval(true);
 
         // Salary
+        setDisableSecondaryRoleSalary(false);
         setSalaryAntiMekMultiplier(1.5);
         setSalarySpecialistInfantryMultiplier(1.28);
         setSalaryXPMultipliers(new HashMap<>());
@@ -2160,6 +2162,14 @@ public class CampaignOptions {
     //endregion Dependent
 
     //region Salary
+    public boolean isDisableSecondaryRoleSalary() {
+        return disableSecondaryRoleSalary;
+    }
+
+    public void setDisableSecondaryRoleSalary(final boolean disableSecondaryRoleSalary) {
+        this.disableSecondaryRoleSalary = disableSecondaryRoleSalary;
+    }
+
     public double getSalaryAntiMekMultiplier() {
         return salaryAntiMekMultiplier;
     }
@@ -4608,6 +4618,7 @@ public class CampaignOptions {
         //endregion Dependent
 
         //region Salary
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disableSecondaryRoleSalary", isDisableSecondaryRoleSalary());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salaryXPMultipliers");
@@ -5295,6 +5306,8 @@ public class CampaignOptions {
                     //endregion Dependent
 
                     //region Salary
+                } else if (wn2.getNodeName().equalsIgnoreCase("disableSecondaryRoleSalary")) {
+                    retVal.setDisableSecondaryRoleSalary(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                     retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salarySpecialistInfantryMultiplier")) {

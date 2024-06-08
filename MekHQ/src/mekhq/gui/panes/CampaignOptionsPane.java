@@ -249,6 +249,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseRandomDependentRemoval;
 
     // Salary
+    private JCheckBox chkDisableSecondaryRoleSalary;
     private JSpinner spnAntiMekSalary;
     private JSpinner spnSpecialistInfantrySalary;
     private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
@@ -5061,6 +5062,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel createSalaryPanel() {
         // Create Panel Components
+        chkDisableSecondaryRoleSalary = new JCheckBox(resources.getString("chkDisableSecondaryRoleSalary.text"));
+        chkDisableSecondaryRoleSalary.setToolTipText(resources.getString("chkDisableSecondaryRoleSalary.toolTipText"));
+        chkDisableSecondaryRoleSalary.setName("chkDisableSecondaryRoleSalary");
+
         final JPanel salaryMultiplierPanel = createSalaryMultiplierPanel();
 
         final JPanel salaryExperienceModifierPanel = createSalaryExperienceMultiplierPanel();
@@ -5079,6 +5084,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addComponent(chkDisableSecondaryRoleSalary)
                         .addComponent(salaryMultiplierPanel)
                         .addComponent(salaryExperienceModifierPanel)
                         .addComponent(baseSalaryPanel)
@@ -5086,6 +5092,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkDisableSecondaryRoleSalary)
                         .addComponent(salaryMultiplierPanel)
                         .addComponent(salaryExperienceModifierPanel)
                         .addComponent(baseSalaryPanel)
@@ -8113,6 +8120,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
 
         // Salary
+        chkDisableSecondaryRoleSalary.setSelected(options.isDisableSecondaryRoleSalary());
         spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
         spnSpecialistInfantrySalary.setValue(options.getSalarySpecialistInfantryMultiplier());
         for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
@@ -8823,6 +8831,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 
             // Salary
+            options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
             options.setSalaryAntiMekMultiplier((Double) spnAntiMekSalary.getValue());
             options.setSalarySpecialistInfantryMultiplier((Double) spnSpecialistInfantrySalary.getValue());
             for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {

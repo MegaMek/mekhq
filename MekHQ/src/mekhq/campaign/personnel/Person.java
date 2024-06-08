@@ -2275,22 +2275,26 @@ public class Person {
         }
 
         // CamOps doesn't cover secondary roles, so we just half the base salary of the secondary role.
-        Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
+        Money secondaryBase = Money.zero();
 
-        // SpecInf is a special case, this needs to be applied first to bring base salary up to RAW.
-        if (getSecondaryRole().isSoldierOrBattleArmour()) {
-            if (hasSkill(SkillType.S_ANTI_MECH)) {
-                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+        if (!campaign.getCampaignOptions().isDisableSecondaryRoleSalary()) {
+            secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
+
+            // SpecInf is a special case, this needs to be applied first to bring base salary up to RAW.
+            if (getSecondaryRole().isSoldierOrBattleArmour()) {
+                if (hasSkill(SkillType.S_ANTI_MECH)) {
+                    secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                }
             }
-        }
 
-        // Experience modifier
-        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
+            // Experience modifier
+            secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
 
-        // Specialization
-        if (getSecondaryRole().isSoldierOrBattleArmour()) {
-            if (hasSkill(SkillType.S_ANTI_MECH)) {
-                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+            // Specialization
+            if (getSecondaryRole().isSoldierOrBattleArmour()) {
+                if (hasSkill(SkillType.S_ANTI_MECH)) {
+                    secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                }
             }
         }
 
