@@ -235,8 +235,7 @@
         <isFactionRestricted>true</isFactionRestricted>
         <faction>DC</faction>
         <locationSystem>An Ting</locationSystem>
-        <constructionYear>2750</constructionYear>
-        <destructionYear>3015</destructionYear>
+        <constructionYear>3055</constructionYear>
         <tuition>21000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
@@ -593,7 +592,7 @@
         <promotion>Lieutenant Jr. Grade</promotion>
         <description>Built in 2331, the Combat College was the first military academy on a foreign world. The college prided itself on being equal to any academy on Terra. To prove their worth, the graduating warrior and pilot class challenging the Sandhurst graduates to a military contest.</description>
         <faction>TH</faction>
-        <locationSystem>New Earth</locationSystem>
+        <locationSystem>New Earth (Tau Ceti 2116-)</locationSystem>
         <constructionYear>2331</constructionYear>
         <closureYear>2788</closureYear>
         <tuition>21000</tuition>
@@ -614,14 +613,13 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Combat College of New Earth (ComStar)</name>
+        <name>Combat College of New Earth</name>
         <isMilitary>true</isMilitary>
         <promotion>Lieutenant Jr. Grade</promotion>
         <description>Built in 2331, the Combat College was the first military academy on a foreign world. The college prided itself on being equal to any academy on Terra. To prove their worth, the graduating warrior and pilot class challenging the Sandhurst graduates to a military contest.</description>
         <factionDiscount>0</factionDiscount>
         <faction>CS</faction>
-        <isLocal>true</isLocal>
-        <locationSystem>New Earth</locationSystem>
+        <locationSystem>New Earth (Tau Ceti 2116-)</locationSystem>
         <constructionYear>2788</constructionYear>
         <tuition>21000</tuition>
         <durationDays>1200</durationDays>

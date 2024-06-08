@@ -37,6 +37,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.FactionHints;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.commons.lang3.StringUtils;
@@ -134,10 +135,8 @@ public class RetirementDefectionTracker {
                     if (!campaign.getCampaignOptions().isUseRandomFounderTurnover()) {
                         continue;
                     }
-                } else {
-                    if (!campaign.getCampaignOptions().isUseFounderRetirement()) {
-                        continue;
-                    }
+                } else if (!campaign.getCampaignOptions().isUseFounderRetirement()) {
+                    continue;
                 }
             }
 
@@ -151,7 +150,7 @@ public class RetirementDefectionTracker {
 
             // Founder Modifier
             if (person.isFounder()) {
-                targetNumber.addModifier(-4, resources.getString("founder.text"));
+                targetNumber.addModifier(-2, resources.getString("founder.text"));
             }
 
             // Service Contract
@@ -161,7 +160,7 @@ public class RetirementDefectionTracker {
 
             // Desirability modifier
             if ((campaign.getCampaignOptions().isUseSkillModifiers()) && (person.getAge(campaign.getLocalDate()) < 50)) {
-                targetNumber.addModifier(person.getExperienceLevel(campaign, false), resources.getString("desirability.text"));
+                targetNumber.addModifier(person.getExperienceLevel(campaign, false) - 2, resources.getString("desirability.text"));
             }
 
             // Fatigue modifier
@@ -184,7 +183,18 @@ public class RetirementDefectionTracker {
 
             // Management Skill Modifier
             if (campaign.getCampaignOptions().isUseManagementSkill()) {
-                targetNumber.addModifier(getManagementSkillModifier(person), resources.getString("managementSkill.text"));
+                int modifier = 0;
+                
+                if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
+                    if (campaign.getFlaggedCommander().hasSkill((SkillType.S_LEADER))) {
+                        modifier += campaign.getCampaignOptions().getManagementSkillPenalty()
+                                + campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER).getFinalSkillValue();
+                    }
+                } else {
+                    modifier = getManagementSkillModifier(person);
+                }
+                
+                targetNumber.addModifier(modifier, resources.getString("managementSkill.text"));
             }
 
             // Shares Modifiers
@@ -244,9 +254,23 @@ public class RetirementDefectionTracker {
 
             // Faction Modifiers
             if (campaign.getCampaignOptions().isUseFactionModifiers()) {
-                if (campaign.getFaction().isPirate()) {
+                Faction campaignFaction = campaign.getFaction();
+
+                // campaign faction modifiers
+                if (campaignFaction.isPirate()) {
                     targetNumber.addModifier(1, resources.getString("factionPirateCompany.text"));
-                } else if (person.getOriginFaction().isPirate()) {
+                } else if (campaignFaction.isComStarOrWoB()) {
+                    if (person.getOriginFaction().isComStarOrWoB()) {
+                        targetNumber.addModifier(2, resources.getString("factionComStarOrWob.text"));
+                    }
+                } else if ((!campaignFaction.isClan()) && (!campaignFaction.isMercenary())) {
+                    if (campaignFaction.equals(person.getOriginFaction())) {
+                        targetNumber.addModifier(1, resources.getString("factionLoyalty.text"));
+                    }
+                }
+
+                // origin faction modifiers
+                if ((!campaignFaction.isPirate()) && (person.getOriginFaction().isPirate())) {
                     targetNumber.addModifier(1, resources.getString("factionPirate.text"));
                 }
 
@@ -258,6 +282,7 @@ public class RetirementDefectionTracker {
                     targetNumber.addModifier(-2, resources.getString("factionClan.text"));
                 }
 
+                // wartime modifier
                 if (FactionHints.defaultFactionHints().isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
                     targetNumber.addModifier(2, resources.getString("factionEnemy.text"));
                 }
@@ -415,35 +440,7 @@ public class RetirementDefectionTracker {
      */
     private void getManagementSkillValues(Campaign campaign) {
         int baseModifier = campaign.getCampaignOptions().getManagementSkillPenalty();
-
-        if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
-            Person commander = campaign.getFlaggedCommander();
-
-            if ((commander != null) && (commander.hasSkill(SkillType.S_LEADER))) {
-                int commanderSkill = baseModifier + commander.getSkill(SkillType.S_LEADER).getFinalSkillValue();
-
-                asfCommanderModifier = commanderSkill;
-                vehicleCrewCommanderModifier = commanderSkill;
-                infantryCommanderModifier = commanderSkill;
-                navalCommanderModifier = commanderSkill;
-                techCommanderModifier = commanderSkill;
-                medicalCommanderModifier = commanderSkill;
-                administrationCommanderModifier = commanderSkill;
-                mechWarriorCommanderModifier = commanderSkill;
-            } else {
-                asfCommanderModifier = baseModifier;
-                vehicleCrewCommanderModifier = baseModifier;
-                infantryCommanderModifier = baseModifier;
-                navalCommanderModifier = baseModifier;
-                techCommanderModifier = baseModifier;
-                medicalCommanderModifier = baseModifier;
-                administrationCommanderModifier = baseModifier;
-                mechWarriorCommanderModifier = baseModifier;
-            }
-
-            return;
-        }
-
+        
         for (Person person : campaign.getActivePersonnel()) {
             if ((person.getPrimaryRole().isCivilian())
                     || (person.getPrisonerStatus().isPrisoner())
@@ -710,10 +707,6 @@ public class RetirementDefectionTracker {
             } else {
                 shellPerson.addSkill(SkillType.S_ADMIN, 1, 0);
                 targetNumber = shellPerson.getSkills().getSkill(SkillType.S_ADMIN).getType().getTarget();
-            }
-
-            if (campaign.getCampaignOptions().getServiceContractDuration() == 0) {
-                targetNumber -= campaign.getCampaignOptions().getServiceContractModifier();
             }
 
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {

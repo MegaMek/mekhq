@@ -1896,7 +1896,7 @@ public class CampaignGUI extends JPanel {
         if (unitFile != null) {
             try {
                 for (Entity entity : new MULParser(unitFile, getCampaign().getGameOptions()).getEntities()) {
-                    getCampaign().addNewUnit(entity, allowNewPilots, 0);
+                    getCampaign().addNewUnit(entity, allowNewPilots, 0, 3);
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);
@@ -2269,7 +2269,7 @@ public class CampaignGUI extends JPanel {
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
             // FIXME : Localize
-            inDebt = " <font color='red'>(in Debt)</font>";
+            inDebt = " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>(in Debt)</font>";
         }
         // FIXME : Localize
         String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";
