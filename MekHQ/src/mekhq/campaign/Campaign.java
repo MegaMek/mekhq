@@ -28,6 +28,7 @@ import megamek.client.ui.swing.util.PlayerColour;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
+import megamek.common.AmmoType.Munitions;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.equipment.BombMounted;
@@ -669,7 +670,7 @@ public class Campaign implements ITechManager {
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        addNewUnit(en, true, transitDays, 3);
+        addNewUnit(en, true, transitDays);
         if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
             addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
         }
@@ -5285,9 +5286,9 @@ public class Campaign implements ITechManager {
                 et = ((MissingEquipmentPart) acquisition).getType();
             }
 
-            StringBuilder partAvailabilityLog = new StringBuilder();
-            partAvailabilityLog.append("Part Rating Level: " + partAvailability)
-                    .append("(" + EquipmentType.ratingNames[partAvailability] + ")");
+            StringBuilder partAvailabilityLog = new StringBuilder("<html>");
+            partAvailabilityLog.append("Part Rating Level: ").append(partAvailability)
+                    .append(" (").append(EquipmentType.ratingNames[partAvailability]).append(')');
 
             /*
              * Even if we can acquire Clan parts, they have a minimum availability of F for
@@ -5295,10 +5296,10 @@ public class Campaign implements ITechManager {
              */
             if (acquisition.getTechBase() == Part.T_CLAN && !getFaction().isClan()) {
                 partAvailability = Math.max(partAvailability, EquipmentType.RATING_F);
-                partAvailabilityLog.append(";[clan part for non clan faction]");
+                partAvailabilityLog.append("<br>[clan part for non clan faction]");
             } else if (et != null) {
                 /*
-                 * AtB rules do not simply affect difficulty of obtaining parts, but whether
+                 * AtB rules do not simply affect the difficulty of getting parts, but whether
                  * they can be obtained at all. Changing the system to use availability codes
                  * can have a serious effect on game play, so we apply a few tweaks to keep some
                  * of the more basic items from becoming completely unobtainable, while applying
@@ -5309,32 +5310,32 @@ public class Campaign implements ITechManager {
                         && !(et instanceof FlamerWeapon)
                         && partAvailability < EquipmentType.RATING_C) {
                     partAvailability = EquipmentType.RATING_C;
-                    partAvailabilityLog.append(";(non-flamer lasers)");
+                    partAvailabilityLog.append("<br>[Non-Flamer Lasers]");
                 }
                 if (et instanceof ACWeapon) {
                     partAvailability -= 2;
-                    partAvailabilityLog.append(";(autocannon): -2");
+                    partAvailabilityLog.append("<br>Autocannon: -2");
                 }
                 if (et instanceof GaussWeapon
                         || et instanceof FlamerWeapon) {
                     partAvailability--;
-                    partAvailabilityLog.append(";(gauss rifle or flamer): -1");
+                    partAvailabilityLog.append("<br>Gauss Rifle or Flamer: -1");
                 }
                 if (et instanceof AmmoType) {
                     switch (((AmmoType) et).getAmmoType()) {
                         case AmmoType.T_AC:
                             partAvailability -= 2;
-                            partAvailabilityLog.append(";(autocannon ammo): -2");
+                            partAvailabilityLog.append("<br>Autocannon Ammo: -2");
                             break;
                         case AmmoType.T_GAUSS:
                             partAvailability -= 1;
-                            partAvailabilityLog.append(";(gauss ammo): -1");
+                            partAvailabilityLog.append("<br>Gauss Ammo: -1");
                             break;
                     }
-                    if (EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(
+                    if (EnumSet.of(Munitions.M_STANDARD).containsAll(
                             ((AmmoType) et).getMunitionType())){
                         partAvailability--;
-                        partAvailabilityLog.append(";(standard ammo): -1");
+                        partAvailabilityLog.append("<br>Standard Ammo: -1");
                     }
                 }
             }
@@ -5346,12 +5347,13 @@ public class Campaign implements ITechManager {
                             || acquisition instanceof MissingMekLocation
                             || acquisition instanceof MissingMekSensor)) {
                 partAvailability--;
-                partAvailabilityLog.append("(Mek part prior to 2950 or after 3040): - 1");
+                partAvailabilityLog.append("<br>Mek part prior to 2950 or after 3040: - 1");
             }
 
             int AtBPartsAvailability = findAtBPartsAvailabilityLevel(acquisition, null);
-            partAvailabilityLog.append("; Total part availability: " + partAvailability)
-                    .append("; Current campaign availability: " + AtBPartsAvailability);
+            partAvailabilityLog.append("<br>Total part availability: ").append(partAvailability)
+                    .append("<br>Current campaign availability: ").append(AtBPartsAvailability)
+                    .append("</html>");
             if (partAvailability > AtBPartsAvailability) {
                 return new TargetRoll(TargetRoll.IMPOSSIBLE, partAvailabilityLog.toString());
             }
@@ -6880,8 +6882,6 @@ public class Campaign implements ITechManager {
     }
 
     public void initAtB(boolean newCampaign) {
-        getRetirementDefectionTracker().setLastRetirementRoll(getLocalDate());
-
         if (!newCampaign) {
             /*
              * Switch all contracts to AtBContract's
