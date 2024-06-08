@@ -404,6 +404,7 @@ public class CampaignOptions {
     private Integer warriorCasteAccidents;
     private Integer otherCasteAccidents;
     private boolean liveFireBlooding;
+    private SecondChanceCaste secondChanceCaste;
     private Integer fallbackScientist;
     private Integer fallbackMerchant;
     private Integer fallbackTechnician;
@@ -916,6 +917,7 @@ public class CampaignOptions {
         setWarriorCasteAccidents(250);
         setOtherCasteAccidents(5000);
         setLiveFireBlooding(true);
+        setSecondChanceCaste(SecondChanceCaste.NONE);
         setFallbackScientist(6);
         setFallbackMerchant(12);
         setFallbackTechnician(5);
@@ -2852,6 +2854,14 @@ public class CampaignOptions {
         this.liveFireBlooding = liveFireBlooding;
     }
 
+    public SecondChanceCaste getSecondChanceCaste() {
+        return secondChanceCaste;
+    }
+
+    public void setSecondChanceCaste(final SecondChanceCaste secondChanceCaste) {
+        this.secondChanceCaste = secondChanceCaste;
+    }
+
     public Integer getFallbackScientist() {
         return fallbackScientist;
     }
@@ -4759,6 +4769,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "warriorCasteAccidents", getWarriorCasteAccidents());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "otherCasteAccidents", getOtherCasteAccidents());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "liveFireBlooding", isLiveFireBlooding());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondChanceCaste", getSecondChanceCaste().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackScientist", getFallbackScientist());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackMerchant", getFallbackMerchant());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackTechnician", getFallbackTechnician());
@@ -5531,6 +5542,8 @@ public class CampaignOptions {
                     retVal.setOtherCasteAccidents(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("liveFireBlooding")) {
                     retVal.setLiveFireBlooding(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("secondChanceCaste")) {
+                    retVal.setSecondChanceCaste(SecondChanceCaste.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fallbackScientist")) {
                     retVal.setFallbackScientist(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fallbackMerchant")) {
