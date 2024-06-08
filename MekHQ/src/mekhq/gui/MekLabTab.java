@@ -341,7 +341,7 @@ public class MekLabTab extends CampaignGuiTab {
         lblCost.setText(refit.getCost().toAmountAndSymbolString());
         lblMove.setText("Movement: " + walk + "/" + run + "/" + jump);
         if (bvDiff > 0) {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='green'>+"
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>+"
                     + bvDiff + "</font>)</html>");
         } else if (bvDiff < 0) {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + bvDiff

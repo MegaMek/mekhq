@@ -155,8 +155,6 @@ public class Loot {
 
             campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
                     "Reward for " + getName() + " during " + scenario.getName());
-
-            LogManager.getLogger().debug("Looting cash complete");
         }
 
         for (Part p : parts) {
