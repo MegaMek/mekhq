@@ -394,7 +394,7 @@ public class StratconScenarioWizard extends JDialog {
 
                 if (currentCampaignState.getVictoryPoints() <= 1) {
                     costBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>")
-                            .append(resourceMap.getString("reinforcementRoll.Text"));
+                            .append(resourceMap.getString("reinforcementRoll.Text")).append("</span>");
                 } else {
                     costBuilder.append(resourceMap.getString("supportPointConvert.text"));
                 }

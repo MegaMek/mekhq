@@ -244,6 +244,8 @@ public enum TransactionType {
                     return THEFT;
                 case 19:
                     return PAYOUT;
+                case 20:
+                    return TAXES;
                 default:
                     break;
             }

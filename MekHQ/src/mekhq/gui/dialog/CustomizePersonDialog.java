@@ -24,6 +24,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
@@ -88,6 +89,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private AbstractMHQScrollablePanel optionsPanel;
     private JTextField textToughness;
     private JTextField textFatigue;
+    private JTextField textEducationLevel;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -162,9 +164,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         textNickname = new JTextField();
         textBloodname = new JTextField();
         textToughness = new JTextField();
+        JLabel lblFatigue = new JLabel();
         textFatigue = new JTextField();
         JLabel lblToughness = new JLabel();
-        JLabel lblFatigue = new JLabel();
+        textEducationLevel = new JTextField();
+        JLabel lblEducationLevel = new JLabel();
         JScrollPane scrOptions = new JScrollPane();
         JScrollPane scrSkills = new JScrollPane();
         JPanel panButtons = new JPanel();
@@ -645,6 +649,29 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
+        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
+        lblEducationLevel.setName("lblEducationLevel");
+
+        textEducationLevel.setText(Integer.toString(person.getEduHighestEducation()));
+        textEducationLevel.setName("textEducationLevel");
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblEducationLevel, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textEducationLevel, gridBagConstraints);
+
+            y++;
+        }
+
         lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
         lblFatigue.setName("lblFatigue");
 
@@ -973,13 +1000,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setSurname(textSurname.getText());
         person.setPostNominal(textPostNominal.getText());
         person.setCallsign(textNickname.getText());
-        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error"))
-                ? "" : textBloodname.getText());
+        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error")) ? "" : textBloodname.getText());
         person.setBiography(txtBio.getText());
         if (choiceGender.getSelectedItem() != null) {
-            person.setGender(person.getGender().isInternal()
-                    ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
-                    : (Gender) choiceGender.getSelectedItem());
+            person.setGender(person.getGender().isInternal() ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant() : (Gender) choiceGender.getSelectedItem());
         }
         person.setBirthday(birthdate);
         person.setRecruitment(recruitment);
@@ -995,21 +1019,29 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setClanPersonnel(chkClan.isSelected());
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch (NumberFormatException ignored) { }
-        try {
-            person.setFatigue(Integer.parseInt(textFatigue.getText()));
-        } catch (NumberFormatException ignored) { }
-        if (choiceOriginalUnit.getSelectedItem() == null) {
-            person.setOriginalUnit(null);
-            person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
-            person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
-        } else {
-            person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
+        } catch (NumberFormatException ignored) {
         }
-        person.setFounder(chkFounder.isSelected());
-        setSkills();
-        setOptions();
-        setVisible(false);
+        try {
+            person.setEduHighestEducation(MathUtility.clamp(Integer.parseInt(textEducationLevel.getText()), 0, 4));
+        } catch (NumberFormatException ignored) {
+        }
+        if (null == choiceOriginalUnit.getSelectedItem()) {
+            try {
+                person.setFatigue(Integer.parseInt(textFatigue.getText()));
+            } catch (NumberFormatException ignored) {
+            }
+            if (choiceOriginalUnit.getSelectedItem() == null) {
+                person.setOriginalUnit(null);
+                person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
+                person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
+            } else {
+                person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
+            }
+            person.setFounder(chkFounder.isSelected());
+            setSkills();
+            setOptions();
+            setVisible(false);
+        }
     }
 
     private void randomName() {
