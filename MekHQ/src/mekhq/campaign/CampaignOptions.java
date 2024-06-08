@@ -245,6 +245,7 @@ public class CampaignOptions {
     private boolean useRandomDependentRemoval;
 
     // Salary
+    private boolean disableSecondaryRoleSalary;
     private double salaryAntiMekMultiplier;
     private double salarySpecialistInfantryMultiplier;
     private Map<SkillLevel, Double> salaryXPMultipliers;
@@ -405,6 +406,7 @@ public class CampaignOptions {
     private Integer warriorCasteAccidents;
     private Integer otherCasteAccidents;
     private boolean liveFireBlooding;
+    private SecondChanceCaste secondChanceCaste;
     private Integer fallbackScientist;
     private Integer fallbackMerchant;
     private Integer fallbackTechnician;
@@ -555,6 +557,8 @@ public class CampaignOptions {
     // Contract Operations
     private boolean mercSizeLimited;
     private boolean restrictPartsByMission;
+    private int bonusPartExchangeValue = 500000;
+    private int bonusPartMaxExchangeCount = 10;
     private boolean limitLanceWeight;
     private boolean limitLanceNumUnits;
     private boolean useStrategy;
@@ -753,6 +757,7 @@ public class CampaignOptions {
         setUseRandomDependentRemoval(true);
 
         // Salary
+        setDisableSecondaryRoleSalary(false);
         setSalaryAntiMekMultiplier(1.5);
         setSalarySpecialistInfantryMultiplier(1.28);
         setSalaryXPMultipliers(new HashMap<>());
@@ -918,6 +923,7 @@ public class CampaignOptions {
         setWarriorCasteAccidents(250);
         setOtherCasteAccidents(5000);
         setLiveFireBlooding(true);
+        setSecondChanceCaste(SecondChanceCaste.NONE);
         setFallbackScientist(6);
         setFallbackMerchant(12);
         setFallbackTechnician(5);
@@ -981,7 +987,7 @@ public class CampaignOptions {
         setUseFounderRetirement(true);
         setUseSubContractSoldiers(false);
         setServiceContractDuration(36);
-        setServiceContractModifier(5);
+        setServiceContractModifier(3);
         setPayBonusDefault(true);
 
         setUseCustomRetirementModifiers(true);
@@ -1164,6 +1170,8 @@ public class CampaignOptions {
         // Contract Operations
         mercSizeLimited = false;
         restrictPartsByMission = true;
+        bonusPartExchangeValue = 500000;
+        bonusPartMaxExchangeCount = 10;
         limitLanceWeight = true;
         limitLanceNumUnits = true;
         useStrategy = true;
@@ -2164,6 +2172,14 @@ public class CampaignOptions {
     //endregion Dependent
 
     //region Salary
+    public boolean isDisableSecondaryRoleSalary() {
+        return disableSecondaryRoleSalary;
+    }
+
+    public void setDisableSecondaryRoleSalary(final boolean disableSecondaryRoleSalary) {
+        this.disableSecondaryRoleSalary = disableSecondaryRoleSalary;
+    }
+
     public double getSalaryAntiMekMultiplier() {
         return salaryAntiMekMultiplier;
     }
@@ -2860,6 +2876,14 @@ public class CampaignOptions {
 
     public void setLiveFireBlooding(boolean liveFireBlooding) {
         this.liveFireBlooding = liveFireBlooding;
+    }
+
+    public SecondChanceCaste getSecondChanceCaste() {
+        return secondChanceCaste;
+    }
+
+    public void setSecondChanceCaste(final SecondChanceCaste secondChanceCaste) {
+        this.secondChanceCaste = secondChanceCaste;
     }
 
     public Integer getFallbackScientist() {
@@ -4363,6 +4387,22 @@ public class CampaignOptions {
         this.restrictPartsByMission = restrictPartsByMission;
     }
 
+    public int getBonusPartExchangeValue() {
+        return bonusPartExchangeValue;
+    }
+
+    public void setBonusPartExchangeValue(final int bonusPartExchangeValue) {
+        this.bonusPartExchangeValue = bonusPartExchangeValue;
+    }
+
+    public int getBonusPartMaxExchangeCount() {
+        return bonusPartMaxExchangeCount;
+    }
+
+    public void setBonusPartMaxExchangeCount(final int bonusPartMaxExchangeCount) {
+        this.bonusPartMaxExchangeCount = bonusPartMaxExchangeCount;
+    }
+
     public boolean isLimitLanceWeight() {
         return limitLanceWeight;
     }
@@ -4589,6 +4629,7 @@ public class CampaignOptions {
         //endregion Dependent
 
         //region Salary
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "disableSecondaryRoleSalary", isDisableSecondaryRoleSalary());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salaryAntiMekMultiplier", getSalaryAntiMekMultiplier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salarySpecialistInfantryMultiplier", getSalarySpecialistInfantryMultiplier());
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "salaryXPMultipliers");
@@ -4770,6 +4811,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "warriorCasteAccidents", getWarriorCasteAccidents());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "otherCasteAccidents", getOtherCasteAccidents());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "liveFireBlooding", isLiveFireBlooding());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondChanceCaste", getSecondChanceCaste().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackScientist", getFallbackScientist());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackMerchant", getFallbackMerchant());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackTechnician", getFallbackTechnician());
@@ -4914,6 +4956,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "additionalStrategyDeployment", additionalStrategyDeployment);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPaymentForStrategy", adjustPaymentForStrategy);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "restrictPartsByMission", restrictPartsByMission);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonusPartExchangeValue", bonusPartExchangeValue);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonusPartMaxExchangeCount", bonusPartMaxExchangeCount);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceWeight", limitLanceWeight);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "limitLanceNumUnits", limitLanceNumUnits);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "assignPortraitOnRoleChange", assignPortraitOnRoleChange);
@@ -5275,6 +5319,8 @@ public class CampaignOptions {
                     //endregion Dependent
 
                     //region Salary
+                } else if (wn2.getNodeName().equalsIgnoreCase("disableSecondaryRoleSalary")) {
+                    retVal.setDisableSecondaryRoleSalary(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salaryAntiMekMultiplier")) {
                     retVal.setSalaryAntiMekMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("salarySpecialistInfantryMultiplier")) {
@@ -5544,6 +5590,8 @@ public class CampaignOptions {
                     retVal.setOtherCasteAccidents(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("liveFireBlooding")) {
                     retVal.setLiveFireBlooding(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("secondChanceCaste")) {
+                    retVal.setSecondChanceCaste(SecondChanceCaste.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fallbackScientist")) {
                     retVal.setFallbackScientist(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fallbackMerchant")) {
@@ -5934,6 +5982,10 @@ public class CampaignOptions {
                     retVal.adjustPaymentForStrategy = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("restrictPartsByMission")) {
                     retVal.restrictPartsByMission = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("bonusPartExchangeValue")) {
+                    retVal.bonusPartExchangeValue = Integer.parseInt(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("bonusPartMaxExchangeCount")) {
+                    retVal.bonusPartMaxExchangeCount = Integer.parseInt(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceWeight")) {
                     retVal.limitLanceWeight = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("limitLanceNumUnits")) {

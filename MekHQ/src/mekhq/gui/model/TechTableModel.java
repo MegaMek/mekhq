@@ -1,5 +1,6 @@
 package mekhq.gui.model;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -84,7 +85,7 @@ public class TechTableModel extends DataTableModel {
         StringBuilder toReturn = new StringBuilder(128);
         toReturn.append("<html><font size='2'");
         if ((null != part) && (null != part.getUnit()) && tech.getTechUnits().contains(part.getUnit())) {
-            toReturn.append(" color='green'><b>@");
+            toReturn.append(" color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b>@");
         }
         else {
             toReturn.append("><b>");

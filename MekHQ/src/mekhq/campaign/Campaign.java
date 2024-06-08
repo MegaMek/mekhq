@@ -658,12 +658,14 @@ public class Campaign implements ITechManager {
         }
 
         MechFileParser mechFileParser;
+
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
             LogManager.getLogger().error("Unable to load unit: {}", ms.getEntryName(), ex);
             return;
         }
+
         Entity en = mechFileParser.getEntity();
 
         int transitDays = getCampaignOptions().isInstantUnitMarketDelivery() ? 0
@@ -679,7 +681,7 @@ public class Campaign implements ITechManager {
         addNewUnit(en, true, transitDays, quality);
 
         if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
-            addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
+            addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>Unit will be delivered in " + transitDays + " days.</font>");
         }
         setShipSearchResult(null);
         setShipSearchExpiration(null);
@@ -700,25 +702,14 @@ public class Campaign implements ITechManager {
 
                     if (!person.getStatus().isDead()) {
                         if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
-                            int roll = Compute.d6(1);
+                            if (!getActiveContracts().isEmpty()) {
+                                int roll = Compute.randomInt(20);
 
-                            switch (roll) {
-                                case 1:
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    break;
-                                case 2:
-                                case 3:
-                                    addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverPoached.text"));
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    break;
-                                case 4:
-                                case 5:
-                                case 6:
-                                    addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverBurnedOut.text"));
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    break;
-                                default:
-                                    throw new IllegalStateException("Unexpected value in applyRetirement: " + roll);
+                                if (roll == 0) {
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+                                }
+                            } else {
+                                getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                             }
                         } else if (person.getAge(getLocalDate()) >= 50) {
                             getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
@@ -1236,6 +1227,7 @@ public class Campaign implements ITechManager {
         if (!unit.isRepairable()) {
             unit.setSalvage(true);
         }
+
         unit.setDaysToArrival(days);
 
         if (allowNewPilots) {
@@ -1244,6 +1236,7 @@ public class Campaign implements ITechManager {
             newCrew.forEach((type, personnel) ->
                     personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
+
         unit.resetPilotAndEntity();
 
         unit.setQuality(quality);
@@ -2432,7 +2425,7 @@ public class Campaign implements ITechManager {
                                 totalQuantity++;
                             }
                             if (totalQuantity > 0) {
-                                addReport(personTitle + "<font color='green'><b> found "
+                                addReport(personTitle + "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> found "
                                         + shoppingItem.getQuantityName(totalQuantity)
                                         + " on "
                                         + system.getPrintableName(currentDate)
@@ -2558,7 +2551,7 @@ public class Campaign implements ITechManager {
             return PartAcquisitionResult.PlanetSpecificFailure;
         } else {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='green'>" + succeededSentencePrefix + acquisition.getAcquisitionName()
+                addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>" + succeededSentencePrefix + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + "</font>");
             }
             return PartAcquisitionResult.Success;
@@ -2605,7 +2598,7 @@ public class Campaign implements ITechManager {
         }
         report += "attempts to find " + acquisition.getAcquisitionName();
 
-        // if impossible then return
+        // if impossible, then return
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             report += ":<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> " + target.getDesc() + "</b></font>";
             if (!getCampaignOptions().isUsePlanetaryAcquisition() || getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -6667,7 +6660,7 @@ public class Campaign implements ITechManager {
             String qualityString;
             boolean reverse = getCampaignOptions().isReverseQualityNames();
             if (quality > qualityOrig) {
-                qualityString = "<font color='green'>Overall quality improves from "
+                qualityString = "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>Overall quality improves from "
                         + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
                         + "</font>";
             } else if (quality < qualityOrig) {
@@ -6803,7 +6796,7 @@ public class Campaign implements ITechManager {
                 break;
         }
         if (p.getQuality() > oldQuality) {
-            partReport += ": <font color='green'>new quality is " + p.getQualityName() + "</font>";
+            partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>new quality is " + p.getQualityName() + "</font>";
         } else if (p.getQuality() < oldQuality) {
             partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>new quality is " + p.getQualityName() + "</font>";
         } else {
@@ -7014,24 +7007,26 @@ public class Campaign implements ITechManager {
         int days = 0;
         String period = "";
 
+        boolean triggerTurnoverPrompt = false;
+
         switch (campaignOptions.getTurnoverFrequency()) {
             case NEVER:
                 return false;
             case WEEKLY:
-                days = 7;
+                triggerTurnoverPrompt = getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY);
                 period = resources.getString("turnoverWeekly.text");
                 break;
             case MONTHLY:
-                days = 28;
+                triggerTurnoverPrompt = getLocalDate().getDayOfMonth() == 1;
                 period = resources.getString("turnoverMonthly.text");
                 break;
             case ANNUALLY:
-                days = 365;
+                triggerTurnoverPrompt = getLocalDate().getDayOfYear() == 1;
                 period = resources.getString("turnoverAnnually.text");
                 break;
         }
 
-        if (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate()) >= days) {
+        if (triggerTurnoverPrompt) {
             Object[] options = {
                     resources.getString("turnoverEmployeeTurnoverDialog.text"),
                     resources.getString("turnoverNotNow.text")
@@ -7049,6 +7044,7 @@ public class Campaign implements ITechManager {
                     options[0]
             );
         }
+
         return false;
     }
 

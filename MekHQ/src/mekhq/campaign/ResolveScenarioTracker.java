@@ -2046,13 +2046,13 @@ public class ResolveScenarioTracker {
             } else {
                 switch (entity.getDamageLevel(false)) {
                     case Entity.DMG_LIGHT:
-                        color = "green";
+                        color =  MekHQ.getMHQOptions().getFontColorPositiveHexColor();
                         break;
                     case Entity.DMG_MODERATE:
                         color = "yellow";
                         break;
                     case Entity.DMG_HEAVY:
-                        color = "orange";
+                        color = MekHQ.getMHQOptions().getFontColorWarningHexColor();
                         break;
                     case Entity.DMG_CRIPPLED:
                         color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();

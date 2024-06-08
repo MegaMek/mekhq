@@ -1002,14 +1002,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setCallsign(textNickname.getText());
         person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error")) ? "" : textBloodname.getText());
         person.setBiography(txtBio.getText());
+
         if (choiceGender.getSelectedItem() != null) {
-            person.setGender(person.getGender().isInternal() ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant() : (Gender) choiceGender.getSelectedItem());
+            person.setGender(person.getGender().isInternal()
+                    ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
+                    : (Gender) choiceGender.getSelectedItem());
         }
+
         person.setBirthday(birthdate);
         person.setRecruitment(recruitment);
         person.setLastRankChangeDate(lastRankChangeDate);
         person.setRetirement(retirement);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
+
         if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
             person.setOriginPlanet((Planet) choicePlanet.getSelectedItem());
         } else {
@@ -1017,19 +1022,20 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
         person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
         person.setClanPersonnel(chkClan.isSelected());
+
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch (NumberFormatException ignored) {
-        }
+        } catch (NumberFormatException ignored) {}
+
         try {
             person.setEduHighestEducation(MathUtility.clamp(Integer.parseInt(textEducationLevel.getText()), 0, 4));
-        } catch (NumberFormatException ignored) {
-        }
+        } catch (NumberFormatException ignored) {}
+
         if (null == choiceOriginalUnit.getSelectedItem()) {
             try {
                 person.setFatigue(Integer.parseInt(textFatigue.getText()));
-            } catch (NumberFormatException ignored) {
-            }
+            } catch (NumberFormatException ignored) {}
+
             if (choiceOriginalUnit.getSelectedItem() == null) {
                 person.setOriginalUnit(null);
                 person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
@@ -1037,6 +1043,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             } else {
                 person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
             }
+
             person.setFounder(chkFounder.isSelected());
             setSkills();
             setOptions();
