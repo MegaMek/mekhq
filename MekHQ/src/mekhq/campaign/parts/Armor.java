@@ -166,7 +166,7 @@ public class Armor extends Part implements IAcquisitionWork {
                 } else if (amountAvailable < amountNeeded) {
                     availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
                 } else {
-                    availability = "<br><font color='green'>" + amountAvailable + " available " + orderTransitString + "</font>";
+                    availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>" + amountAvailable + " available " + orderTransitString + "</font>";
                 }
 
                 return unit.getEntity().getLocationName(location) + rearMount + ", " + amountNeeded + " points" + availability;
@@ -320,7 +320,7 @@ public class Armor extends Part implements IAcquisitionWork {
         newPart.setBrandNew(true);
         newPart.setDaysToArrival(transitDays);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }

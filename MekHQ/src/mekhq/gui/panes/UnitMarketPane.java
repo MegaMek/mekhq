@@ -460,7 +460,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         for (final UnitMarketOffer offer : offers) {
             getCampaign().addNewUnit(offer.getEntity(), false, instantDelivery ? 0 : offer.getTransitDuration(), 3);
             if (!instantDelivery) {
-                getCampaign().addReport(String.format(resources.getString("UnitMarketPane.UnitDeliveryLength.report"),
+                getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + String.format(resources.getString("UnitMarketPane.UnitDeliveryLength.report") + "</font>",
                         offer.getTransitDuration()));
             }
             getCampaign().getUnitMarket().getOffers().remove(offer);
