@@ -249,6 +249,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseRandomDependentRemoval;
 
     // Salary
+    private JCheckBox chkDisableSecondaryRoleSalary;
     private JSpinner spnAntiMekSalary;
     private JSpinner spnSpecialistInfantrySalary;
     private Map<SkillLevel, JSpinner> spnSalaryExperienceMultipliers;
@@ -434,6 +435,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // Family
     private MMComboBox<FamilialRelationshipDisplayLevel> comboFamilyDisplayLevel;
 
+    // Anniversaries
+    private JPanel anniversaryPanel = new JPanel();
+    private JCheckBox chkAnnounceBirthdays;
+    private JCheckBox chkAnnounceOfficersOnly;
+    private JCheckBox chkAnnounceChildBirthdays;
+
     // Education
     private JCheckBox chkUseEducationModule;
     private JLabel lblMaximumJumpCount;
@@ -468,6 +475,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JLabel lblOtherCasteAccidents;
     private JSpinner spnOtherCasteAccidents;
     private JCheckBox chkLiveFireBlooding;
+    private JLabel lblSecondChanceCaste;
+    private MMComboBox<SecondChanceCaste> comboSecondChanceCaste;
     private JLabel lblFallbackScientist;
     private JSpinner spnFallbackScientist;
     private JLabel lblFallbackMerchant;
@@ -509,6 +518,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnDamagedPartsValueMultiplier;
     private JSpinner spnUnrepairablePartsValueMultiplier;
     private JSpinner spnCancelledOrderRefundMultiplier;
+
+    // Taxes
+    private JCheckBox chkUseTaxes;
+    private JPanel taxesSubPanel = new JPanel();
+    private JLabel lblTaxesPercentage;
+    private JSpinner spnTaxesPercentage;
+    private JCheckBox chkUseNotMercenaryExemption;
+    private JCheckBox chkUseClanExemption;
 
     private JPanel sharesPanel;
     private JCheckBox chkUseShareSystem;
@@ -637,6 +654,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // contract operations
     private JCheckBox chkMercSizeLimited;
     private JCheckBox chkRestrictPartsByMission;
+    private JLabel lblBonusPartExchangeValue;
+    private JSpinner spnBonusPartExchangeValue;
+    private JLabel lblBonusPartMaxExchangeCount;
+    private JSpinner spnBonusPartMaxExchangeCount;
     private JCheckBox chkLimitLanceWeight;
     private JCheckBox chkLimitLanceNumUnits;
     private JCheckBox chkUseStrategy;
@@ -1784,6 +1805,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridheight = 20;
         panFinances.add(createPriceModifiersPanel(reverseQualities), gridBagConstraints);
 
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridy++;
+        panFinances.add(createTaxesPanel(), gridBagConstraints);
+
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 20;
@@ -2837,68 +2862,92 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkRestrictPartsByMission, gridBagConstraints);
 
+        lblBonusPartExchangeValue = new JLabel(resources.getString("lblBonusPartExchangeValue.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblBonusPartExchangeValue, gridBagConstraints);
+
+        spnBonusPartExchangeValue = new JSpinner(new SpinnerNumberModel(500000, 0, 1000000, 1));
+        spnBonusPartExchangeValue.setToolTipText(resources.getString("lblBonusPartExchangeValue.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        panSubAtBContract.add(spnBonusPartExchangeValue, gridBagConstraints);
+
+        lblBonusPartMaxExchangeCount = new JLabel(resources.getString("lblBonusPartMaxExchangeCount.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblBonusPartMaxExchangeCount, gridBagConstraints);
+
+        spnBonusPartMaxExchangeCount = new JSpinner(new SpinnerNumberModel(10, 0, 100, 1));
+        spnBonusPartMaxExchangeCount.setToolTipText(resources.getString("lblBonusPartMaxExchangeCount.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        panSubAtBContract.add(spnBonusPartMaxExchangeCount, gridBagConstraints);
+
         chkLimitLanceWeight = new JCheckBox(resources.getString("chkLimitLanceWeight.text"));
         chkLimitLanceWeight.setToolTipText(resources.getString("chkLimitLanceWeight.toolTipText"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkLimitLanceWeight, gridBagConstraints);
 
         chkLimitLanceNumUnits = new JCheckBox(resources.getString("chkLimitLanceNumUnits.text"));
         chkLimitLanceNumUnits.setToolTipText(resources.getString("chkLimitLanceNumUnits.toolTipText"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkLimitLanceNumUnits, gridBagConstraints);
 
         JLabel lblLanceStructure = new JLabel(resources.getString("lblLanceStructure.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblLanceStructure, gridBagConstraints);
 
         chkUseStrategy = new JCheckBox(resources.getString("chkUseStrategy.text"));
         chkUseStrategy.setToolTipText(resources.getString("chkUseStrategy.toolTipText"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkUseStrategy, gridBagConstraints);
 
         JLabel lblBaseStrategyDeployment = new JLabel(resources.getString("lblBaseStrategyDeployment.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblBaseStrategyDeployment, gridBagConstraints);
 
         spnBaseStrategyDeployment = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnBaseStrategyDeployment.setToolTipText(resources.getString("spnBaseStrategyDeployment.toolTipText"));
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 10;
         panSubAtBContract.add(spnBaseStrategyDeployment, gridBagConstraints);
 
         JLabel lblAdditionalStrategyDeployment = new JLabel(resources.getString("lblAdditionalStrategyDeployment.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblAdditionalStrategyDeployment, gridBagConstraints);
 
         spnAdditionalStrategyDeployment = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnAdditionalStrategyDeployment.setToolTipText(resources.getString("spnAdditionalStrategyDeployment.toolTipText"));
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 11;
         panSubAtBContract.add(spnAdditionalStrategyDeployment, gridBagConstraints);
 
         chkAdjustPaymentForStrategy = new JCheckBox(resources.getString("chkAdjustPaymentForStrategy.text"));
         chkAdjustPaymentForStrategy.setName("chkAdjustPaymentForStrategy");
         chkAdjustPaymentForStrategy.setToolTipText(resources.getString("chkAdjustPaymentForStrategy.toolTipText"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkAdjustPaymentForStrategy, gridBagConstraints);
 
         JLabel lblIntensity = new JLabel(resources.getString("lblIntensity.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 13;
         panSubAtBContract.add(lblIntensity, gridBagConstraints);
 
         // Note that spnAtBBattleIntensity is located here visibly, however must be initialized
@@ -2906,14 +2955,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JLabel lblBattleFrequency = new JLabel(resources.getString("lblBattleFrequency.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(lblBattleFrequency, gridBagConstraints);
 
         spnAtBBattleChance = new JSpinner[AtBLanceRole.values().length - 1];
 
         JLabel lblFightChance = new JLabel(AtBLanceRole.FIGHTING + ":");
-        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridy = 15;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblFightChance, gridBagConstraints);
 
@@ -2924,7 +2973,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JLabel lblDefendChance = new JLabel(AtBLanceRole.DEFENCE + ":");
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridy = 16;
         panSubAtBContract.add(lblDefendChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
@@ -2934,7 +2983,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JLabel lblScoutChance = new JLabel(AtBLanceRole.SCOUTING + ":");
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 15;
+        gridBagConstraints.gridy = 17;
         panSubAtBContract.add(lblScoutChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
@@ -2944,7 +2993,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JLabel lblTrainingChance = new JLabel(AtBLanceRole.TRAINING + ":");
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridy = 18;
         panSubAtBContract.add(lblTrainingChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
@@ -2960,7 +3009,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             spnAtBBattleIntensity.addChangeListener(atBBattleIntensityChangeListener);
         });
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 19;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(btnIntensityUpdate, gridBagConstraints);
 
@@ -2972,7 +3021,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnAtBBattleIntensity.setMinimumSize(new Dimension(60, 25));
         spnAtBBattleIntensity.setPreferredSize(new Dimension(60, 25));
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(spnAtBBattleIntensity, gridBagConstraints);
 
@@ -2980,7 +3029,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkGenerateChases.setName("chkGenerateChases");
         chkGenerateChases.setToolTipText(resources.getString("chkGenerateChases.toolTipText"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 20;
         panSubAtBContract.add(chkGenerateChases, gridBagConstraints);
 
         int yTablePosition = 0;
@@ -3255,11 +3304,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = 2;
         lifePathsPanel.add(createFamilyPanel(), gbc);
 
+        gbc.gridx++;
+        lifePathsPanel.add(createAnniversaryPanel(), gbc);
+
+        gbc.gridx = 0;
         gbc.gridy++;
-        gbc.gridwidth = 1;
         lifePathsPanel.add(createMarriagePanel(), gbc);
 
         gbc.gridx++;
@@ -4255,7 +4306,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblServiceContractModifier.setName("lblServiceContractModifier");
         lblServiceContractModifier.setEnabled(isUseTurnover);
 
-        spnServiceContractModifier = new JSpinner(new SpinnerNumberModel(5, 0, 10, 1));
+        spnServiceContractModifier = new JSpinner(new SpinnerNumberModel(3, 0, 10, 1));
         spnServiceContractModifier.setToolTipText(resources.getString("lblServiceContractModifier.toolTipText"));
         spnServiceContractModifier.setName("spnServiceContractModifier");
         spnServiceContractModifier.setEnabled(isUseTurnover);
@@ -4824,6 +4875,52 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return panel;
     }
 
+    private JPanel createAnniversaryPanel() {
+        chkAnnounceBirthdays = new JCheckBox(resources.getString("chkAnnounceBirthdays.text"));
+        chkAnnounceBirthdays.setToolTipText(resources.getString("chkAnnounceBirthdays.toolTipText"));
+        chkAnnounceBirthdays.setName("chkAnnounceBirthdays");
+        chkAnnounceBirthdays.addActionListener(evt -> {
+            final boolean isEnabled = chkAnnounceBirthdays.isSelected();
+
+            chkAnnounceOfficersOnly.setEnabled(isEnabled);
+            chkAnnounceChildBirthdays.setEnabled(isEnabled);
+        });
+
+        chkAnnounceOfficersOnly = new JCheckBox(resources.getString("chkAnnounceOfficersOnly.text"));
+        chkAnnounceOfficersOnly.setToolTipText(resources.getString("chkAnnounceOfficersOnly.toolTipText"));
+        chkAnnounceOfficersOnly.setName("chkAnnounceOfficersOnly");
+        chkAnnounceOfficersOnly.setEnabled(campaign.getCampaignOptions().isAnnounceBirthdays());
+
+        chkAnnounceChildBirthdays = new JCheckBox(resources.getString("chkAnnounceChildBirthdays.text"));
+        chkAnnounceChildBirthdays.setToolTipText(resources.getString("chkAnnounceChildBirthdays.toolTipText"));
+        chkAnnounceChildBirthdays.setName("chkAnnounceChildBirthdays");
+        chkAnnounceChildBirthdays.setEnabled(campaign.getCampaignOptions().isAnnounceBirthdays());
+
+        anniversaryPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("anniversaryPanel.title")));
+        anniversaryPanel.setName("anniversaryPanel");
+
+        final GroupLayout layout = new GroupLayout(anniversaryPanel);
+        anniversaryPanel.setLayout(layout);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkAnnounceBirthdays)
+                        .addComponent(chkAnnounceOfficersOnly)
+                        .addComponent(chkAnnounceChildBirthdays)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkAnnounceBirthdays)
+                        .addComponent(chkAnnounceOfficersOnly)
+                        .addComponent(chkAnnounceChildBirthdays)
+        );
+
+        return anniversaryPanel;
+    }
+
     private JPanel createDependentPanel() {
         // Create Panel Components
         createRandomDependentPanel();
@@ -4965,6 +5062,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel createSalaryPanel() {
         // Create Panel Components
+        chkDisableSecondaryRoleSalary = new JCheckBox(resources.getString("chkDisableSecondaryRoleSalary.text"));
+        chkDisableSecondaryRoleSalary.setToolTipText(resources.getString("chkDisableSecondaryRoleSalary.toolTipText"));
+        chkDisableSecondaryRoleSalary.setName("chkDisableSecondaryRoleSalary");
+
         final JPanel salaryMultiplierPanel = createSalaryMultiplierPanel();
 
         final JPanel salaryExperienceModifierPanel = createSalaryExperienceMultiplierPanel();
@@ -4983,6 +5084,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
+                        .addComponent(chkDisableSecondaryRoleSalary)
                         .addComponent(salaryMultiplierPanel)
                         .addComponent(salaryExperienceModifierPanel)
                         .addComponent(baseSalaryPanel)
@@ -4990,6 +5092,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkDisableSecondaryRoleSalary)
                         .addComponent(salaryMultiplierPanel)
                         .addComponent(salaryExperienceModifierPanel)
                         .addComponent(baseSalaryPanel)
@@ -5908,6 +6011,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             accidentsAndEventsPanel.setEnabled(isEnabled);
             chkAllAges.setEnabled(isEnabled);
             chkLiveFireBlooding.setEnabled(isEnabled);
+            lblSecondChanceCaste.setEnabled(isEnabled);
+            comboSecondChanceCaste.setEnabled(isEnabled);
             lblMilitaryAcademyAccidents.setEnabled(isEnabled);
             spnMilitaryAcademyAccidents.setEnabled(isEnabled);
             lblWarriorCasteAccidents.setEnabled(isEnabled);
@@ -6325,6 +6430,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createWarriorCasteFallbackPanel() {
+        lblSecondChanceCaste = new JLabel(resources.getString("lblSecondChanceCaste.text"));
+        lblSecondChanceCaste.setToolTipText(resources.getString("lblSecondChanceCaste.toolTip"));
+        lblSecondChanceCaste.setName("lblSecondChanceCaste");
+
+        comboSecondChanceCaste = new MMComboBox<>("comboSecondChanceCaste", SecondChanceCaste.values());
+        comboSecondChanceCaste.setToolTipText(resources.getString("lblSecondChanceCaste.toolTip"));
+        comboSecondChanceCaste.setName("comboSecondChanceCaste");
+
         lblFallbackScientist = new JLabel(resources.getString("lblFallbackScientist.text"));
         lblFallbackScientist.setToolTipText(resources.getString("lblFallbackScientist.toolTip"));
         lblFallbackScientist.setName("lblFallbackScientist");
@@ -6355,6 +6468,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // These prevent a really annoying bug where disabled options don't stay disabled when
         // reloading Campaign Options
+        lblSecondChanceCaste.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        comboSecondChanceCaste.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnFallbackScientist.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         lblFallbackScientist.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnFallbackMerchant.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
@@ -6377,6 +6492,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblSecondChanceCaste)
+                                .addComponent(comboSecondChanceCaste, Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblFallbackScientist)
                                 .addComponent(spnFallbackScientist, Alignment.LEADING)
                                 .addGroup(layout.createParallelGroup(Alignment.BASELINE)
@@ -6392,6 +6510,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblSecondChanceCaste)
+                                .addComponent(comboSecondChanceCaste))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFallbackScientist)
                                 .addComponent(spnFallbackScientist)
@@ -7164,6 +7285,97 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return panel;
     }
 
+    private JPanel createTaxesPanel() {
+        taxesSubPanel = createTaxesSubPanel();
+
+        chkUseTaxes = new JCheckBox(resources.getString("chkUseTaxes.text"));
+        chkUseTaxes.setToolTipText(resources.getString("chkUseTaxes.toolTipText"));
+        chkUseTaxes.setName("chkUseTaxes");
+        chkUseTaxes.addActionListener(evt -> {
+            final boolean isEnabled = chkUseTaxes.isSelected();
+
+            for (Component component : taxesSubPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+        });
+
+        final JPanel taxesPanel = new JPanel();
+        taxesPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("taxesPanel.title")));
+        taxesPanel.setName("taxesPanel");
+
+        final GroupLayout layout = new GroupLayout(taxesPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        taxesPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseTaxes)
+                        .addComponent(taxesSubPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseTaxes)
+                        .addComponent(taxesSubPanel)
+        );
+
+        return taxesPanel;
+    }
+
+    private JPanel createTaxesSubPanel() {
+        boolean isEnabled = campaign.getCampaignOptions().isUseTaxes();
+
+        lblTaxesPercentage = new JLabel();
+        lblTaxesPercentage.setText(resources.getString("lblTaxesPercentage.text"));
+        lblTaxesPercentage.setToolTipText(resources.getString("lblTaxesPercentage.toolTipText"));
+        lblTaxesPercentage.setName("lblTaxesPercentage");
+        lblTaxesPercentage.setEnabled(isEnabled);
+
+        spnTaxesPercentage = new JSpinner(new SpinnerNumberModel(30, 1, 100, 1));
+        spnTaxesPercentage.setToolTipText(resources.getString("lblTaxesPercentage.toolTipText"));
+        spnTaxesPercentage.setName("spnTaxesPercentage");
+        spnTaxesPercentage.setEnabled(isEnabled);
+
+        chkUseNotMercenaryExemption = new JCheckBox(resources.getString("chkUseNotMercenaryExemption.text"));
+        chkUseNotMercenaryExemption.setToolTipText(resources.getString("chkUseNotMercenaryExemption.toolTipText"));
+        chkUseNotMercenaryExemption.setName("chkUseNotMercenaryExemption");
+        chkUseNotMercenaryExemption.setEnabled(isEnabled);
+
+        chkUseClanExemption = new JCheckBox(resources.getString("chkUseClanExemption.text"));
+        chkUseClanExemption.setToolTipText(resources.getString("chkUseClanExemption.toolTipText"));
+        chkUseClanExemption.setName("chkUseClanExemption");
+        chkUseClanExemption.setEnabled(isEnabled);
+
+        taxesSubPanel.setBorder(BorderFactory.createTitledBorder(""));
+        taxesSubPanel.setName("taxesSubPanel");
+
+        final GroupLayout layout = new GroupLayout(taxesSubPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        taxesSubPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblTaxesPercentage)
+                                .addComponent(spnTaxesPercentage, Alignment.LEADING))
+                        .addComponent(chkUseNotMercenaryExemption)
+                        .addComponent(chkUseClanExemption)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblTaxesPercentage)
+                                .addComponent(spnTaxesPercentage))
+                        .addComponent(chkUseNotMercenaryExemption)
+                        .addComponent(chkUseClanExemption)
+        );
+
+        return taxesSubPanel;
+    }
+
     private JPanel createSharesPanel() {
         chkUseShareSystem = new JCheckBox(resources.getString("chkUseShareSystem.text"));
         chkUseShareSystem.setToolTipText(resources.getString("chkUseShareSystem.toolTipText"));
@@ -7908,6 +8120,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseRandomDependentRemoval.setSelected(options.isUseRandomDependentRemoval());
 
         // Salary
+        chkDisableSecondaryRoleSalary.setSelected(options.isDisableSecondaryRoleSalary());
         spnAntiMekSalary.setValue(options.getSalaryAntiMekMultiplier());
         spnSpecialistInfantrySalary.setValue(options.getSalarySpecialistInfantryMultiplier());
         for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
@@ -8003,6 +8216,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Family
         comboFamilyDisplayLevel.setSelectedItem(options.getFamilyDisplayLevel());
+
+        // Anniversaries
+        chkAnnounceBirthdays.setSelected(options.isAnnounceBirthdays());
+        chkAnnounceOfficersOnly.setSelected(options.isAnnounceOfficersOnly());
+        chkAnnounceChildBirthdays.setSelected(options.isAnnounceChildBirthdays());
 
         // Marriage
         chkUseManualMarriages.setSelected(options.isUseManualMarriages());
@@ -8105,6 +8323,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnOtherCasteAccidents.setValue(options.getOtherCasteAccidents());
         chkLiveFireBlooding.setSelected(options.isLiveFireBlooding());
         spnFallbackScientist.setValue(options.getFallbackScientist());
+        comboSecondChanceCaste.setSelectedItem(options.getSecondChanceCaste());
         spnFallbackMerchant.setValue(options.getFallbackMerchant());
         spnFallbackTechnician.setValue(options.getFallbackTechnician());
         spnFallbackLabor.setValue(options.getFallbackLabor());
@@ -8167,6 +8386,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseShareSystem.setSelected(options.isUseShareSystem());
         chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
         chkSharesForAll.setSelected(options.isSharesForAll());
+
+        // Taxes
+        chkUseTaxes.setSelected(options.isUseTaxes());
+        spnTaxesPercentage.setValue(options.getTaxesPercentage());
+        chkUseNotMercenaryExemption.setSelected(options.isUseNotMercenaryExemption());
+        chkUseClanExemption.setSelected(options.isUseClanExemption());
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -8323,6 +8548,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkClanVehicles.setSelected(options.isClanVehicles());
         chkMercSizeLimited.setSelected(options.isMercSizeLimited());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
+        spnBonusPartExchangeValue.setValue(options.getBonusPartExchangeValue());
+        spnBonusPartMaxExchangeCount.setValue(options.getBonusPartMaxExchangeCount());
         chkLimitLanceWeight.setSelected(options.isLimitLanceWeight());
         chkLimitLanceNumUnits.setSelected(options.isLimitLanceNumUnits());
         chkUseStrategy.setSelected(options.isUseStrategy());
@@ -8604,6 +8831,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseRandomDependentRemoval(chkUseRandomDependentRemoval.isSelected());
 
             // Salary
+            options.setDisableSecondaryRoleSalary(chkDisableSecondaryRoleSalary.isSelected());
             options.setSalaryAntiMekMultiplier((Double) spnAntiMekSalary.getValue());
             options.setSalarySpecialistInfantryMultiplier((Double) spnSpecialistInfantrySalary.getValue());
             for (final Entry<SkillLevel, JSpinner> entry : spnSalaryExperienceMultipliers.entrySet()) {
@@ -8678,6 +8906,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Family
             options.setFamilyDisplayLevel(comboFamilyDisplayLevel.getSelectedItem());
+
+            // Anniversaries
+            options.setAnnounceBirthdays(chkAnnounceBirthdays.isSelected());
+            options.setAnnounceOfficersOnly(chkAnnounceOfficersOnly.isSelected());
+            options.setAnnounceChildBirthdays(chkAnnounceChildBirthdays.isSelected());
 
             // Marriage
             options.setUseManualMarriages(chkUseManualMarriages.isSelected());
@@ -8754,6 +8987,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setWarriorCasteAccidents((Integer) spnWarriorCasteAccidents.getValue());
             options.setOtherCasteAccidents((Integer) spnOtherCasteAccidents.getValue());
             options.setLiveFireBlooding(chkLiveFireBlooding.isSelected());
+            options.setSecondChanceCaste(comboSecondChanceCaste.getSelectedItem());
             options.setFallbackScientist((Integer) spnFallbackScientist.getValue());
             options.setFallbackMerchant((Integer) spnFallbackMerchant.getValue());
             options.setFallbackTechnician((Integer) spnFallbackTechnician.getValue());
@@ -8797,6 +9031,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseShareSystem(chkUseShareSystem.isSelected());
             options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
             options.setSharesForAll(chkSharesForAll.isSelected());
+
+            //region Taxes
+            options.setUseTaxes(chkUseTaxes.isSelected());
+            options.setTaxesPercentage((Integer) spnTaxesPercentage.getValue());
+            options.setUseNotMercenaryExemption(chkUseNotMercenaryExemption.isSelected());
+            options.setUseClanExemption(chkUseClanExemption.isSelected());
+            //endregion Taxes
             //endregion Finances Tab
 
             //start SPA
@@ -8869,6 +9110,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setGenerateChases(chkGenerateChases.isSelected());
             options.setMercSizeLimited(chkMercSizeLimited.isSelected());
             options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
+            options.setBonusPartExchangeValue((Integer) spnBonusPartExchangeValue.getValue());
+            options.setBonusPartMaxExchangeCount((Integer) spnBonusPartMaxExchangeCount.getValue());
             options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
             options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
             options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());

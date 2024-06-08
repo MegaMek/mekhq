@@ -1373,7 +1373,7 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         if (getLastRolledUnit() != null) {
-            final Unit unit = getGUI().getCampaign().addNewUnit(getLastRolledUnit(), false, 0);
+            final Unit unit = getGUI().getCampaign().addNewUnit(getLastRolledUnit(), false, 0, 3);
             if ((getPerson() != null) && (getPerson().getUnit() == null)) {
                 unit.addPilotOrSoldier(getPerson());
                 getPerson().setOriginalUnit(unit);

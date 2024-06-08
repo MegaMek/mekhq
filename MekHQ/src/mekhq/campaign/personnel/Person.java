@@ -991,11 +991,29 @@ public class Person {
                 setRetirement(null);
                 break;
             case RETIRED:
-            case RESIGNED:
-            case DESERTED:
-            case DEFECTED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.retired(this, today);
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
+                    setRetirement(today);
+                }
+                break;
+            case RESIGNED:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.resigned(this, today);
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
+                    setRetirement(today);
+                }
+                break;
+            case DESERTED:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.deserted(this, today);
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
+                    setRetirement(today);
+                }
+                break;
+            case DEFECTED:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.defected(this, today);
                 if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
                     setRetirement(today);
                 }
@@ -1870,7 +1888,7 @@ public class Person {
                         }
                         retVal.originPlanet = p;
                     } catch (NullPointerException e) {
-                        LogManager.getLogger().error("Error loading originPlanet for " + systemId + ", " + planetId, e);
+                        LogManager.getLogger().error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
@@ -2174,7 +2192,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring advantage: " + adv);
+                        LogManager.getLogger().error("Error restoring advantage: {}", adv);
                     }
                 }
             }
@@ -2189,7 +2207,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring edge: " + adv);
+                        LogManager.getLogger().error("Error restoring edge: {}", adv);
                     }
                 }
             }
@@ -2204,7 +2222,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring implants: " + adv);
+                        LogManager.getLogger().error("Error restoring implants: {}", adv);
                     }
                 }
             }
@@ -2213,8 +2231,14 @@ public class Person {
             if (retVal.getRankNumeric() < 0) {
                 retVal.setRank(0);
             }
+
+            // Fixing recruitment dates
+            // I don't know when this metric was added, so we check all versions
+            if (retVal.getRecruitment() == null) {
+                retVal.setRecruitment(c.getLocalDate());
+            }
         } catch (Exception e) {
-            LogManager.getLogger().error("Failed to read person " + retVal.getFullName() + " from file", e);
+            LogManager.getLogger().error("Failed to read person {} from file", retVal.getFullName(), e);
             retVal = null;
         }
 
@@ -2257,22 +2281,26 @@ public class Person {
         }
 
         // CamOps doesn't cover secondary roles, so we just half the base salary of the secondary role.
-        Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
+        Money secondaryBase = Money.zero();
 
-        // SpecInf is a special case, this needs to be applied first to bring base salary up to RAW.
-        if (getSecondaryRole().isSoldierOrBattleArmour()) {
-            if (hasSkill(SkillType.S_ANTI_MECH)) {
-                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+        if (!campaign.getCampaignOptions().isDisableSecondaryRoleSalary()) {
+            secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
+
+            // SpecInf is a special case, this needs to be applied first to bring base salary up to RAW.
+            if (getSecondaryRole().isSoldierOrBattleArmour()) {
+                if (hasSkill(SkillType.S_ANTI_MECH)) {
+                    secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                }
             }
-        }
 
-        // Experience modifier
-        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
+            // Experience modifier
+            secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
 
-        // Specialization
-        if (getSecondaryRole().isSoldierOrBattleArmour()) {
-            if (hasSkill(SkillType.S_ANTI_MECH)) {
-                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+            // Specialization
+            if (getSecondaryRole().isSoldierOrBattleArmour()) {
+                if (hasSkill(SkillType.S_ANTI_MECH)) {
+                    secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                }
             }
         }
 
@@ -2806,7 +2834,7 @@ public class Person {
     }
 
     public String fail() {
-        return " <font color='red'><b>Failed to heal.</b></font>";
+        return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>Failed to heal.</b></font>";
     }
 
     //region skill
@@ -2915,7 +2943,7 @@ public class Person {
 
     public String succeed() {
         heal();
-        return " <font color='green'><b>Successfully healed one hit.</b></font>";
+        return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b>Successfully healed one hit.</b></font>";
     }
 
     //region Personnel Options

@@ -219,7 +219,7 @@ public class CurrentLocation {
                                     true, campaign.getCampaignOptions().isEquipmentContractBase()),
                             "Jump from " + currentSystem.getName(campaign.getLocalDate())
                                     + " to " + jumpPath.get(1).getName(campaign.getLocalDate()))) {
-                        campaign.addReport("<font color='red'><b>You cannot afford to make the jump!</b></font>");
+                        campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>You cannot afford to make the jump!</b></font>");
                         return;
                     }
                 }
