@@ -510,6 +510,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnUnrepairablePartsValueMultiplier;
     private JSpinner spnCancelledOrderRefundMultiplier;
 
+    // Taxes
+    private JCheckBox chkUseTaxes;
+    private JPanel taxesSubPanel = new JPanel();
+    private JLabel lblTaxesPercentage;
+    private JSpinner spnTaxesPercentage;
+    private JCheckBox chkUseNotMercenaryExemption;
+    private JCheckBox chkUseClanExemption;
+
     private JPanel sharesPanel;
     private JCheckBox chkUseShareSystem;
     private JPanel sharesSubPanel;
@@ -1783,6 +1791,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 20;
         panFinances.add(createPriceModifiersPanel(reverseQualities), gridBagConstraints);
+
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = gridy++;
+        panFinances.add(createTaxesPanel(), gridBagConstraints);
 
         gridBagConstraints.gridx = 4;
         gridBagConstraints.gridy = 0;
@@ -7164,6 +7176,97 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         return panel;
     }
 
+    private JPanel createTaxesPanel() {
+        taxesSubPanel = createTaxesSubPanel();
+
+        chkUseTaxes = new JCheckBox(resources.getString("chkUseTaxes.text"));
+        chkUseTaxes.setToolTipText(resources.getString("chkUseTaxes.toolTipText"));
+        chkUseTaxes.setName("chkUseTaxes");
+        chkUseTaxes.addActionListener(evt -> {
+            final boolean isEnabled = chkUseTaxes.isSelected();
+
+            for (Component component : taxesSubPanel.getComponents()) {
+                component.setEnabled(isEnabled);
+            }
+        });
+
+        final JPanel taxesPanel = new JPanel();
+        taxesPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("taxesPanel.title")));
+        taxesPanel.setName("taxesPanel");
+
+        final GroupLayout layout = new GroupLayout(taxesPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        taxesPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseTaxes)
+                        .addComponent(taxesSubPanel)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseTaxes)
+                        .addComponent(taxesSubPanel)
+        );
+
+        return taxesPanel;
+    }
+
+    private JPanel createTaxesSubPanel() {
+        boolean isEnabled = campaign.getCampaignOptions().isUseTaxes();
+
+        lblTaxesPercentage = new JLabel();
+        lblTaxesPercentage.setText(resources.getString("lblTaxesPercentage.text"));
+        lblTaxesPercentage.setToolTipText(resources.getString("lblTaxesPercentage.toolTipText"));
+        lblTaxesPercentage.setName("lblTaxesPercentage");
+        lblTaxesPercentage.setEnabled(isEnabled);
+
+        spnTaxesPercentage = new JSpinner(new SpinnerNumberModel(30, 1, 100, 1));
+        spnTaxesPercentage.setToolTipText(resources.getString("lblTaxesPercentage.toolTipText"));
+        spnTaxesPercentage.setName("spnTaxesPercentage");
+        spnTaxesPercentage.setEnabled(isEnabled);
+
+        chkUseNotMercenaryExemption = new JCheckBox(resources.getString("chkUseNotMercenaryExemption.text"));
+        chkUseNotMercenaryExemption.setToolTipText(resources.getString("chkUseNotMercenaryExemption.toolTipText"));
+        chkUseNotMercenaryExemption.setName("chkUseNotMercenaryExemption");
+        chkUseNotMercenaryExemption.setEnabled(isEnabled);
+
+        chkUseClanExemption = new JCheckBox(resources.getString("chkUseClanExemption.text"));
+        chkUseClanExemption.setToolTipText(resources.getString("chkUseClanExemption.toolTipText"));
+        chkUseClanExemption.setName("chkUseClanExemption");
+        chkUseClanExemption.setEnabled(isEnabled);
+
+        taxesSubPanel.setBorder(BorderFactory.createTitledBorder(""));
+        taxesSubPanel.setName("taxesSubPanel");
+
+        final GroupLayout layout = new GroupLayout(taxesSubPanel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        taxesSubPanel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblTaxesPercentage)
+                                .addComponent(spnTaxesPercentage, Alignment.LEADING))
+                        .addComponent(chkUseNotMercenaryExemption)
+                        .addComponent(chkUseClanExemption)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblTaxesPercentage)
+                                .addComponent(spnTaxesPercentage))
+                        .addComponent(chkUseNotMercenaryExemption)
+                        .addComponent(chkUseClanExemption)
+        );
+
+        return taxesSubPanel;
+    }
+
     private JPanel createSharesPanel() {
         chkUseShareSystem = new JCheckBox(resources.getString("chkUseShareSystem.text"));
         chkUseShareSystem.setToolTipText(resources.getString("chkUseShareSystem.toolTipText"));
@@ -8167,6 +8270,12 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseShareSystem.setSelected(options.isUseShareSystem());
         chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
         chkSharesForAll.setSelected(options.isSharesForAll());
+
+        // Taxes
+        chkUseTaxes.setSelected(options.isUseTaxes());
+        spnTaxesPercentage.setValue(options.getTaxesPercentage());
+        chkUseNotMercenaryExemption.setSelected(options.isUseNotMercenaryExemption());
+        chkUseClanExemption.setSelected(options.isUseClanExemption());
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -8797,6 +8906,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseShareSystem(chkUseShareSystem.isSelected());
             options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
             options.setSharesForAll(chkSharesForAll.isSelected());
+
+            //region Taxes
+            options.setUseTaxes(chkUseTaxes.isSelected());
+            options.setTaxesPercentage((Integer) spnTaxesPercentage.getValue());
+            options.setUseNotMercenaryExemption(chkUseNotMercenaryExemption.isSelected());
+            options.setUseClanExemption(chkUseClanExemption.isSelected());
+            //endregion Taxes
             //endregion Finances Tab
 
             //start SPA

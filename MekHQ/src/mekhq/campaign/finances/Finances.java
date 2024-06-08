@@ -180,23 +180,27 @@ public class Finances {
     }
 
     /**
-     * This function will update the starting amount to the current balance and
-     * clear transactions By default, this will be called up on Jan 1 of every year
-     * in order to keep the transaction record from becoming too large
+     * This function will update the starting amount to the current balance and clear transactions.
+     * This will be called at the beginning of each new financial term
      */
     public void newFiscalYear(final Campaign campaign) {
         if (campaign.getCampaignOptions().isNewFinancialYearFinancesToCSVExport()) {
             final String exportFileName = campaign.getName() + " Finances for "
                     + campaign.getCampaignOptions().getFinancialYearDuration().getExportFilenameDateString(campaign.getLocalDate())
-                    + "." + FileType.CSV.getRecommendedExtension();
+                    + '.' + FileType.CSV.getRecommendedExtension();
             exportFinancesToCSV(new File(MekHQ.getCampaignsDirectory().getValue(),
                             exportFileName).getPath(), FileType.CSV.getRecommendedExtension());
         }
 
         Money carryover = getBalance();
         transactions = new ArrayList<>();
-        credit(TransactionType.FINANCIAL_TERM_END_CARRYOVER, campaign.getLocalDate(), carryover,
-                resourceMap.getString("FinancialTermEndCarryover.finances"));
+
+        credit(
+                TransactionType.FINANCIAL_TERM_END_CARRYOVER,
+                campaign.getLocalDate(),
+                carryover,
+                resourceMap.getString("FinancialTermEndCarryover.finances")
+        );
     }
 
     public void addLoan(Loan loan) {
@@ -206,8 +210,17 @@ public class Finances {
     public void newDay(final Campaign campaign, final LocalDate yesterday, final LocalDate today) {
         // check for a new fiscal year
         if (campaign.getCampaignOptions().getFinancialYearDuration().isEndOfFinancialYear(campaign.getLocalDate())) {
+            // calculate profits
+            Money profits = getProfits();
+            campaign.addReport(String.format(resourceMap.getString("Profits.finances"), profits.toAmountAndSymbolString()));
+
             // clear the ledger
             newFiscalYear(campaign);
+
+            // pay taxes
+            if ((campaign.getCampaignOptions().isUseTaxes()) && (!profits.isZero())) {
+                payTaxes(campaign, profits);
+            }
         }
 
         // Handle contract payments
@@ -343,6 +356,63 @@ public class Finances {
         }
 
         loans = newLoans;
+    }
+
+
+    /**
+     * Calculates the profits made by the campaign based on the transactions recorded.
+     *
+     * @return The profits made by the campaign, or zero if no profits were made.
+     */
+    private Money getProfits() {
+        Money profits = Money.zero();
+
+        for (Transaction transaction : getTransactions()) {
+            if ((transaction.getType() == TransactionType.STARTING_CAPITAL)
+                    || (transaction.getType() == TransactionType.FINANCIAL_TERM_END_CARRYOVER)) {
+                continue;
+            }
+
+            if (transaction.getAmount().isPositive()) {
+                profits = profits.plus(transaction.getAmount());
+            } else {
+                profits = profits.minus(transaction.getAmount());
+            }
+        }
+
+        if (profits.isPositive()) {
+            return profits;
+        } else {
+            return Money.zero();
+        }
+    }
+
+    /**
+     * Calculates and pays the taxes for the given campaign based on the profits.
+     *
+     * @param campaign The campaign for which taxes are to be paid.
+     * @param profits  The profits made by the campaign.
+     * @return True if the taxes are paid successfully, false otherwise. (included for debugging)
+     */
+    private boolean payTaxes(Campaign campaign, Money profits) {
+        if ((campaign.getCampaignOptions().isUseNotMercenaryExemption())
+                && (!campaign.getFaction().isMercenary())) {
+            return false;
+        }
+
+        if ((campaign.getCampaignOptions().isUseClanExemption())
+                && (campaign.getFaction().isClan())) {
+            return false;
+        }
+
+        Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions().getTaxesPercentage() / 100).round();
+
+        return debit(
+                TransactionType.TAXES,
+                campaign.getLocalDate(),
+                taxAmount,
+                resourceMap.getString("Taxes.finances")
+        );
     }
 
     private void payoutShares(Campaign campaign, Contract contract, LocalDate date) {

@@ -450,6 +450,12 @@ public class CampaignOptions {
     private double unrepairablePartsValueMultiplier;
     private double cancelledOrderRefundMultiplier;
 
+    // Taxes
+    private boolean useTaxes;
+    private int taxesPercentage;
+    private boolean useNotMercenaryExemption;
+    private boolean useClanExemption;
+
     // Shares
     private boolean useShareSystem;
     private boolean sharesExcludeLargeCraft;
@@ -1030,6 +1036,12 @@ public class CampaignOptions {
         setDamagedPartsValueMultiplier(0.33);
         setUnrepairablePartsValueMultiplier(0.1);
         setCancelledOrderRefundMultiplier(0.5);
+
+        // Taxes
+        setUseTaxes(false);
+        setTaxesPercentage(30);
+        setUseNotMercenaryExemption(true);
+        setUseClanExemption(true);
 
         // Shares
         setUseShareSystem(false);
@@ -3308,6 +3320,40 @@ public class CampaignOptions {
         this.cancelledOrderRefundMultiplier = cancelledOrderRefundMultiplier;
     }
     //endregion Price Multipliers
+
+    // region Taxes
+    public boolean isUseTaxes() {
+        return useTaxes;
+    }
+
+    public void setUseTaxes(final boolean useTaxes) {
+        this.useTaxes = useTaxes;
+    }
+
+    public Integer getTaxesPercentage() {
+        return taxesPercentage;
+    }
+
+    public void setTaxesPercentage(final int taxesPercentage) {
+        this.taxesPercentage = taxesPercentage;
+    }
+
+    public boolean isUseNotMercenaryExemption() {
+        return useNotMercenaryExemption;
+    }
+
+    public void setUseNotMercenaryExemption(boolean useNotMercenaryExemption) {
+        this.useNotMercenaryExemption = useNotMercenaryExemption;
+    }
+
+    public boolean isUseClanExemption() {
+        return useClanExemption;
+    }
+
+    public void setUseClanExemption(final boolean useClanExemption) {
+        this.useClanExemption = useClanExemption;
+    }
+    // endregion Taxes
     //endregion Finances Tab
 
     //region Markets Tab
@@ -4741,6 +4787,13 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", isSharesExcludeLargeCraft());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", isSharesForAll());
         //endregion Price Multipliers
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTaxes", isUseTaxes());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "taxesPercentage", getTaxesPercentage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useNotMercenaryExemption", isUseNotMercenaryExemption());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanExemption", isUseClanExemption());
+        //region Taxes
+        //endregion Taxes
         //endregion Finances Tab
 
         //region Markets Tab
@@ -4834,7 +4887,7 @@ public class CampaignOptions {
         CampaignOptions retVal = new CampaignOptions();
         NodeList wList = wn.getChildNodes();
 
-        // Okay, lets iterate through the children, eh?
+        // Okay, let's iterate through the children, eh?
         for (int x = 0; x < wList.getLength(); x++) {
             Node wn2 = wList.item(x);
 
@@ -5660,6 +5713,19 @@ public class CampaignOptions {
                     retVal.setUnrepairablePartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("cancelledOrderRefundMultiplier")) {
                     retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    //endregion Price Multipliers
+
+                    //region Taxes
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTaxes")) {
+                    retVal.setUseTaxes(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("taxesPercentage")) {
+                    retVal.setTaxesPercentage(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useNotMercenaryExemption")) {
+                    retVal.setUseNotMercenaryExemption(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useClanExemption")) {
+                    retVal.setUseClanExemption(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    //endregion Taxes
+                    //endregion Finances Tab
 
                 // Shares
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
