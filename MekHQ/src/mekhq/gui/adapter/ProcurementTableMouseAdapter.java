@@ -171,16 +171,18 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         } else if (equipment instanceof Entity) {
             success = gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime);
         } else {
-            LogManager.getLogger().error("Attempted to acquire unknown equipment of " + acquisition.getAcquisitionName());
+            LogManager.getLogger().error("Attempted to acquire unknown equipment of {}", acquisition.getAcquisitionName());
             return false;
         }
 
         if (success) {
-            gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report"),
+            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                    + String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report") + "</font>",
                     acquisition.getAcquisitionName()));
             acquisition.decrementQuantity();
         } else {
-            gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report"),
+            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                    + String.format(resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report") + "</font>",
                     acquisition.getAcquisitionName()));
         }
         return success;
@@ -196,13 +198,14 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         if (equipment instanceof Part) {
             gui.getCampaign().getQuartermaster().addPart((Part) equipment, 0);
         } else if (equipment instanceof Entity) {
-            gui.getCampaign().addNewUnit((Entity) equipment, false, 0);
+            gui.getCampaign().addNewUnit((Entity) equipment, false, 0, 3);
         } else {
-            LogManager.getLogger().error("Attempted to add unknown equipment of " + acquisition.getAcquisitionName());
+            LogManager.getLogger().error("Attempted to add unknown equipment of {}", acquisition.getAcquisitionName());
             return;
         }
 
-        gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report"),
+        gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                + String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report") + "</font>",
                 acquisition.getAcquisitionName()));
         acquisition.decrementQuantity();
     }
