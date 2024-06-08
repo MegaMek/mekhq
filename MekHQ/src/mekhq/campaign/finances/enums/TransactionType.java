@@ -250,6 +250,8 @@ public enum TransactionType {
                 case 19:
                     return PAYOUT;
                 case 20:
+                    return TAXES;
+                case 21:
                     return BONUS_EXCHANGE;
                 default:
                     break;

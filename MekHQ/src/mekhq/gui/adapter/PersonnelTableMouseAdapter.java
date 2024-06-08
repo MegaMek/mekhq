@@ -2751,10 +2751,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 if (campaign.getGameYear() >= academy.getQualificationStartYears().get(courseIndex)) {
                     String course = academy.getQualifications().get(courseIndex);
                     courses = new JMenuItem(course);
-                    courses.setToolTipText(academy.getTooltip(campaign, person, courseIndex, campaign.getSystemById(campus)));
+
                     if (academy.isLocal()) {
+                        courses.setToolTipText(academy.getTooltip(campaign, person, courseIndex, campaign.getCurrentSystem()));
                         courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campaign.getCurrentSystem().getId(), faction));
                     } else {
+                        courses.setToolTipText(academy.getTooltip(campaign, person, courseIndex, campaign.getSystemById(campus)));
                         courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campus, faction));
                     }
                     courses.addActionListener(this);

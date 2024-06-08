@@ -327,6 +327,11 @@ public class CampaignOptions {
     // Family
     private FamilialRelationshipDisplayLevel familyDisplayLevel;
 
+    // Anniversaries
+    private boolean announceBirthdays;
+    private boolean announceOfficersOnly;
+    private boolean announceChildBirthdays;
+
     // Marriage
     private boolean useManualMarriages;
     private boolean useClanPersonnelMarriages;
@@ -449,6 +454,12 @@ public class CampaignOptions {
     private double damagedPartsValueMultiplier;
     private double unrepairablePartsValueMultiplier;
     private double cancelledOrderRefundMultiplier;
+
+    // Taxes
+    private boolean useTaxes;
+    private int taxesPercentage;
+    private boolean useNotMercenaryExemption;
+    private boolean useClanExemption;
 
     // Shares
     private boolean useShareSystem;
@@ -813,6 +824,11 @@ public class CampaignOptions {
         // Family
         setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.SPOUSE);
 
+        // Anniversaries
+        setAnnounceBirthdays(true);
+        setAnnounceOfficersOnly(true);
+        setAnnounceChildBirthdays(true);
+
         // Marriage
         setUseManualMarriages(true);
         setUseClanPersonnelMarriages(false);
@@ -1032,6 +1048,12 @@ public class CampaignOptions {
         setDamagedPartsValueMultiplier(0.33);
         setUnrepairablePartsValueMultiplier(0.1);
         setCancelledOrderRefundMultiplier(0.5);
+
+        // Taxes
+        setUseTaxes(false);
+        setTaxesPercentage(30);
+        setUseNotMercenaryExemption(true);
+        setUseClanExemption(true);
 
         // Shares
         setUseShareSystem(false);
@@ -2082,6 +2104,32 @@ public class CampaignOptions {
         this.familyDisplayLevel = familyDisplayLevel;
     }
     //endregion Family
+
+    //region anniversaries
+    public boolean isAnnounceBirthdays() {
+        return announceBirthdays;
+    }
+
+    public void setAnnounceBirthdays(final boolean announceBirthdays) {
+        this.announceBirthdays = announceBirthdays;
+    }
+
+    public boolean isAnnounceOfficersOnly() {
+        return announceOfficersOnly;
+    }
+
+    public void setAnnounceOfficersOnly(final boolean announceOfficersOnly) {
+        this.announceOfficersOnly = announceOfficersOnly;
+    }
+
+    public boolean isAnnounceChildBirthdays() {
+        return announceChildBirthdays;
+    }
+
+    public void setAnnounceChildBirthdays(final boolean announceChildBirthdays) {
+        this.announceChildBirthdays = announceChildBirthdays;
+    }
+    //endregion anniversaries
 
     //region Dependent
     public RandomDependentMethod getRandomDependentMethod() {
@@ -3312,6 +3360,40 @@ public class CampaignOptions {
         this.cancelledOrderRefundMultiplier = cancelledOrderRefundMultiplier;
     }
     //endregion Price Multipliers
+
+    // region Taxes
+    public boolean isUseTaxes() {
+        return useTaxes;
+    }
+
+    public void setUseTaxes(final boolean useTaxes) {
+        this.useTaxes = useTaxes;
+    }
+
+    public Integer getTaxesPercentage() {
+        return taxesPercentage;
+    }
+
+    public void setTaxesPercentage(final int taxesPercentage) {
+        this.taxesPercentage = taxesPercentage;
+    }
+
+    public boolean isUseNotMercenaryExemption() {
+        return useNotMercenaryExemption;
+    }
+
+    public void setUseNotMercenaryExemption(boolean useNotMercenaryExemption) {
+        this.useNotMercenaryExemption = useNotMercenaryExemption;
+    }
+
+    public boolean isUseClanExemption() {
+        return useClanExemption;
+    }
+
+    public void setUseClanExemption(final boolean useClanExemption) {
+        this.useClanExemption = useClanExemption;
+    }
+    // endregion Taxes
     //endregion Finances Tab
 
     //region Markets Tab
@@ -4608,6 +4690,12 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "familyDisplayLevel", getFamilyDisplayLevel().name());
         //endregion Family
 
+        //region Announcements
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceBirthdays", isAnnounceBirthdays());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceOfficersOnly", isAnnounceOfficersOnly());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "announceChildBirthdays", isAnnounceChildBirthdays());
+        //endregion Announcements
+
         //region Marriage
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useManualMarriages", isUseManualMarriages());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanPersonnelMarriages", isUseClanPersonnelMarriages());
@@ -4761,6 +4849,13 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", isSharesExcludeLargeCraft());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", isSharesForAll());
         //endregion Price Multipliers
+
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTaxes", isUseTaxes());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "taxesPercentage", getTaxesPercentage());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useNotMercenaryExemption", isUseNotMercenaryExemption());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanExemption", isUseClanExemption());
+        //region Taxes
+        //endregion Taxes
         //endregion Finances Tab
 
         //region Markets Tab
@@ -4856,7 +4951,7 @@ public class CampaignOptions {
         CampaignOptions retVal = new CampaignOptions();
         NodeList wList = wn.getChildNodes();
 
-        // Okay, lets iterate through the children, eh?
+        // Okay, let's iterate through the children, eh?
         for (int x = 0; x < wList.getLength(); x++) {
             Node wn2 = wList.item(x);
 
@@ -5279,6 +5374,15 @@ public class CampaignOptions {
                     retVal.setFamilyDisplayLevel(FamilialRelationshipDisplayLevel.parseFromString(wn2.getTextContent().trim()));
                     //endregion Family
 
+                    //region anniversaries
+                } else if (wn2.getNodeName().equalsIgnoreCase("announceBirthdays")) {
+                    retVal.setAnnounceBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("announceOfficersOnly")) {
+                    retVal.setAnnounceOfficersOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("announceChildBirthdays")) {
+                    retVal.setAnnounceChildBirthdays(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    //endregion anniversaries
+
                     //region Marriage
                 } else if (wn2.getNodeName().equalsIgnoreCase("useManualMarriages")) {
                     retVal.setUseManualMarriages(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -5682,6 +5786,19 @@ public class CampaignOptions {
                     retVal.setUnrepairablePartsValueMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("cancelledOrderRefundMultiplier")) {
                     retVal.setCancelledOrderRefundMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                    //endregion Price Multipliers
+
+                    //region Taxes
+                } else if (wn2.getNodeName().equalsIgnoreCase("useTaxes")) {
+                    retVal.setUseTaxes(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("taxesPercentage")) {
+                    retVal.setTaxesPercentage(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useNotMercenaryExemption")) {
+                    retVal.setUseNotMercenaryExemption(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useClanExemption")) {
+                    retVal.setUseClanExemption(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                    //endregion Taxes
+                    //endregion Finances Tab
 
                 // Shares
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {

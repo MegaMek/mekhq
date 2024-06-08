@@ -56,6 +56,7 @@ import megameklab.ui.supportVehicle.SVStructureTab;
 import megameklab.ui.util.RefreshListener;
 import megameklab.util.CConfig;
 import megameklab.util.UnitUtil;
+import mekhq.MekHQ;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.enums.MHQTabType;
@@ -343,7 +344,7 @@ public class MekLabTab extends CampaignGuiTab {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='green'>+"
                     + bvDiff + "</font>)</html>");
         } else if (bvDiff < 0) {
-            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='red'>" + bvDiff
+            lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + bvDiff
                     + "</font>)</html>");
         } else {
             lblBV.setText("<html>BV: " + entity.calculateBattleValue(true, true) + " (+" + bvDiff + ")</html>");
@@ -351,14 +352,14 @@ public class MekLabTab extends CampaignGuiTab {
 
         if (currentTonnage != tonnage) {
             lblTons.setText(
-                    "<html>Tonnage: <font color='red'>" + currentTonnage + "/" + tonnage + "</font></html>");
+                    "<html>Tonnage: <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + currentTonnage + '/' + tonnage + "</font></html>");
         } else {
-            lblTons.setText("Tonnage: " + currentTonnage + "/" + tonnage);
+            lblTons.setText("Tonnage: " + currentTonnage + '/' + tonnage);
         }
         if (totalHeat > heat) {
-            lblHeat.setText("<html>Heat: <font color='red'>" + totalHeat + "/" + heat + "</font></html>");
+            lblHeat.setText("<html>Heat: <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + totalHeat + '/' + heat + "</font></html>");
         } else {
-            lblHeat.setText("<html>Heat: " + totalHeat + "/" + heat + "</html>");
+            lblHeat.setText("<html>Heat: " + totalHeat + '/' + heat + "</html>");
         }
         shoppingPanel.removeAll();
         JLabel lblItem;
