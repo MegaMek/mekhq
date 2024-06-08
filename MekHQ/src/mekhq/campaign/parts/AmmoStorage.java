@@ -25,6 +25,7 @@ import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -253,7 +254,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
 
@@ -264,7 +265,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='red'><b> part not found</b>.</font>";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> part not found</b>.</font>";
     }
 
     @Override
