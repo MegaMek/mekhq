@@ -653,6 +653,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // contract operations
     private JCheckBox chkMercSizeLimited;
     private JCheckBox chkRestrictPartsByMission;
+    private JLabel lblBonusPartExchangeValue;
+    private JSpinner spnBonusPartExchangeValue;
+    private JLabel lblBonusPartMaxExchangeCount;
+    private JSpinner spnBonusPartMaxExchangeCount;
     private JCheckBox chkLimitLanceWeight;
     private JCheckBox chkLimitLanceNumUnits;
     private JCheckBox chkUseStrategy;
@@ -2857,68 +2861,92 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkRestrictPartsByMission, gridBagConstraints);
 
+        lblBonusPartExchangeValue = new JLabel(resources.getString("lblBonusPartExchangeValue.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblBonusPartExchangeValue, gridBagConstraints);
+
+        spnBonusPartExchangeValue = new JSpinner(new SpinnerNumberModel(500000, 0, 1000000, 1));
+        spnBonusPartExchangeValue.setToolTipText(resources.getString("lblBonusPartExchangeValue.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 4;
+        panSubAtBContract.add(spnBonusPartExchangeValue, gridBagConstraints);
+
+        lblBonusPartMaxExchangeCount = new JLabel(resources.getString("lblBonusPartMaxExchangeCount.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBContract.add(lblBonusPartMaxExchangeCount, gridBagConstraints);
+
+        spnBonusPartMaxExchangeCount = new JSpinner(new SpinnerNumberModel(10, 0, 100, 1));
+        spnBonusPartMaxExchangeCount.setToolTipText(resources.getString("lblBonusPartMaxExchangeCount.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        panSubAtBContract.add(spnBonusPartMaxExchangeCount, gridBagConstraints);
+
         chkLimitLanceWeight = new JCheckBox(resources.getString("chkLimitLanceWeight.text"));
         chkLimitLanceWeight.setToolTipText(resources.getString("chkLimitLanceWeight.toolTipText"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkLimitLanceWeight, gridBagConstraints);
 
         chkLimitLanceNumUnits = new JCheckBox(resources.getString("chkLimitLanceNumUnits.text"));
         chkLimitLanceNumUnits.setToolTipText(resources.getString("chkLimitLanceNumUnits.toolTipText"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkLimitLanceNumUnits, gridBagConstraints);
 
         JLabel lblLanceStructure = new JLabel(resources.getString("lblLanceStructure.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblLanceStructure, gridBagConstraints);
 
         chkUseStrategy = new JCheckBox(resources.getString("chkUseStrategy.text"));
         chkUseStrategy.setToolTipText(resources.getString("chkUseStrategy.toolTipText"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 9;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkUseStrategy, gridBagConstraints);
 
         JLabel lblBaseStrategyDeployment = new JLabel(resources.getString("lblBaseStrategyDeployment.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblBaseStrategyDeployment, gridBagConstraints);
 
         spnBaseStrategyDeployment = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnBaseStrategyDeployment.setToolTipText(resources.getString("spnBaseStrategyDeployment.toolTipText"));
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridy = 10;
         panSubAtBContract.add(spnBaseStrategyDeployment, gridBagConstraints);
 
         JLabel lblAdditionalStrategyDeployment = new JLabel(resources.getString("lblAdditionalStrategyDeployment.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 11;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblAdditionalStrategyDeployment, gridBagConstraints);
 
         spnAdditionalStrategyDeployment = new JSpinner(new SpinnerNumberModel(0, 0, 10, 1));
         spnAdditionalStrategyDeployment.setToolTipText(resources.getString("spnAdditionalStrategyDeployment.toolTipText"));
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 9;
+        gridBagConstraints.gridy = 11;
         panSubAtBContract.add(spnAdditionalStrategyDeployment, gridBagConstraints);
 
         chkAdjustPaymentForStrategy = new JCheckBox(resources.getString("chkAdjustPaymentForStrategy.text"));
         chkAdjustPaymentForStrategy.setName("chkAdjustPaymentForStrategy");
         chkAdjustPaymentForStrategy.setToolTipText(resources.getString("chkAdjustPaymentForStrategy.toolTipText"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 10;
+        gridBagConstraints.gridy = 12;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(chkAdjustPaymentForStrategy, gridBagConstraints);
 
         JLabel lblIntensity = new JLabel(resources.getString("lblIntensity.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 13;
         panSubAtBContract.add(lblIntensity, gridBagConstraints);
 
         // Note that spnAtBBattleIntensity is located here visibly, however must be initialized
@@ -2926,14 +2954,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JLabel lblBattleFrequency = new JLabel(resources.getString("lblBattleFrequency.text"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 12;
+        gridBagConstraints.gridy = 14;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(lblBattleFrequency, gridBagConstraints);
 
         spnAtBBattleChance = new JSpinner[AtBLanceRole.values().length - 1];
 
         JLabel lblFightChance = new JLabel(AtBLanceRole.FIGHTING + ":");
-        gridBagConstraints.gridy = 13;
+        gridBagConstraints.gridy = 15;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(lblFightChance, gridBagConstraints);
 
@@ -2944,7 +2972,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JLabel lblDefendChance = new JLabel(AtBLanceRole.DEFENCE + ":");
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 14;
+        gridBagConstraints.gridy = 16;
         panSubAtBContract.add(lblDefendChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
@@ -2954,7 +2982,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JLabel lblScoutChance = new JLabel(AtBLanceRole.SCOUTING + ":");
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 15;
+        gridBagConstraints.gridy = 17;
         panSubAtBContract.add(lblScoutChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
@@ -2964,7 +2992,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         JLabel lblTrainingChance = new JLabel(AtBLanceRole.TRAINING + ":");
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 16;
+        gridBagConstraints.gridy = 18;
         panSubAtBContract.add(lblTrainingChance, gridBagConstraints);
 
         atbBattleChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
@@ -2980,7 +3008,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             spnAtBBattleIntensity.addChangeListener(atBBattleIntensityChangeListener);
         });
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 17;
+        gridBagConstraints.gridy = 19;
         gridBagConstraints.gridwidth = 2;
         panSubAtBContract.add(btnIntensityUpdate, gridBagConstraints);
 
@@ -2992,7 +3020,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnAtBBattleIntensity.setMinimumSize(new Dimension(60, 25));
         spnAtBBattleIntensity.setPreferredSize(new Dimension(60, 25));
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 11;
+        gridBagConstraints.gridy = 13;
         gridBagConstraints.gridwidth = 1;
         panSubAtBContract.add(spnAtBBattleIntensity, gridBagConstraints);
 
@@ -3000,7 +3028,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkGenerateChases.setName("chkGenerateChases");
         chkGenerateChases.setToolTipText(resources.getString("chkGenerateChases.toolTipText"));
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 18;
+        gridBagConstraints.gridy = 20;
         panSubAtBContract.add(chkGenerateChases, gridBagConstraints);
 
         int yTablePosition = 0;
@@ -8512,6 +8540,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkClanVehicles.setSelected(options.isClanVehicles());
         chkMercSizeLimited.setSelected(options.isMercSizeLimited());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
+        spnBonusPartExchangeValue.setValue(options.getBonusPartExchangeValue());
+        spnBonusPartMaxExchangeCount.setValue(options.getBonusPartMaxExchangeCount());
         chkLimitLanceWeight.setSelected(options.isLimitLanceWeight());
         chkLimitLanceNumUnits.setSelected(options.isLimitLanceNumUnits());
         chkUseStrategy.setSelected(options.isUseStrategy());
@@ -9071,6 +9101,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setGenerateChases(chkGenerateChases.isSelected());
             options.setMercSizeLimited(chkMercSizeLimited.isSelected());
             options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
+            options.setBonusPartExchangeValue((Integer) spnBonusPartExchangeValue.getValue());
+            options.setBonusPartMaxExchangeCount((Integer) spnBonusPartMaxExchangeCount.getValue());
             options.setRegionalMechVariations(chkRegionalMechVariations.isSelected());
             options.setAttachedPlayerCamouflage(chkAttachedPlayerCamouflage.isSelected());
             options.setPlayerControlsAttachedUnits(chkPlayerControlsAttachedUnits.isSelected());

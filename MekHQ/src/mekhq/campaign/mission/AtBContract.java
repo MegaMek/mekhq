@@ -526,7 +526,7 @@ public class AtBContract extends Contract {
             }
 
             if (null != en) {
-                c.addNewUnit(en, false, 0);
+                c.addNewUnit(en, false, 0, 3);
             } else {
                 c.addReport("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Could not load unit</font></html>");
             }

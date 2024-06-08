@@ -658,12 +658,14 @@ public class Campaign implements ITechManager {
         }
 
         MechFileParser mechFileParser;
+
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
-            LogManager.getLogger().error("Unable to load unit: " + ms.getEntryName(), ex);
+            LogManager.getLogger().error("Unable to load unit: {}", ms.getEntryName(), ex);
             return;
         }
+
         Entity en = mechFileParser.getEntity();
 
         int transitDays = getCampaignOptions().isInstantUnitMarketDelivery() ? 0
@@ -1229,6 +1231,7 @@ public class Campaign implements ITechManager {
         if (!unit.isRepairable()) {
             unit.setSalvage(true);
         }
+
         unit.setDaysToArrival(days);
 
         if (allowNewPilots) {
@@ -1237,6 +1240,7 @@ public class Campaign implements ITechManager {
             newCrew.forEach((type, personnel) ->
                     personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
+
         unit.resetPilotAndEntity();
 
         unit.setQuality(quality);
