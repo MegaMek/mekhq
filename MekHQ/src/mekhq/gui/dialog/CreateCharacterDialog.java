@@ -25,6 +25,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
 import megamek.common.enums.Gender;
@@ -93,6 +94,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JPanel panSkills;
     private JPanel panOptions;
     private JTextField textToughness;
+    private JTextField textEducationLevel;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -187,6 +189,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textBloodname = new JTextField();
         textToughness = new JTextField();
         JLabel lblToughness = new JLabel();
+        textEducationLevel = new JTextField();
+        JLabel lblEducationLevel = new JLabel();
 
         JButton btnRandomName = new JButton();
         JButton btnRandomBloodname = new JButton();
@@ -597,6 +601,29 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             demogPanel.add(textToughness, gridBagConstraints);
+        }
+
+        y++;
+
+        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text")); // NOI18N
+        lblEducationLevel.setName("lblEducationLevel"); // NOI18N
+
+        textEducationLevel.setText(Integer.toString(person.getEduHighestEducation()));
+        textEducationLevel.setName("textEducationLevel"); // NOI18N
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblEducationLevel, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textEducationLevel, gridBagConstraints);
         }
 
         y++;
@@ -1264,6 +1291,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
         } catch (NumberFormatException ignored) { }
+        try {
+            person.setEduHighestEducation(MathUtility.clamp(Integer.parseInt(textEducationLevel.getText()), 0, 4));
+        } catch (NumberFormatException ignored) {}
         person.setPortrait(portrait);
         int xpSpent = xpPool - getSkillXpSpent();
         if (xpSpent > 0) {
