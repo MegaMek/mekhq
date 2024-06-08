@@ -672,7 +672,14 @@ public class Campaign implements ITechManager {
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        addNewUnit(en, true, transitDays);
+        int quality = 3;
+
+        if (campaignOptions.isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        }
+
+        addNewUnit(en, true, transitDays, quality);
+
         if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
             addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>Unit will be delivered in " + transitDays + " days.</font>");
         }

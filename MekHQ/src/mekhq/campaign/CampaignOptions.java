@@ -128,6 +128,7 @@ public class CampaignOptions {
     private int maintenanceBonus;
     private boolean useQualityMaintenance;
     private boolean reverseQualityNames;
+    private boolean useRandomUnitQualities;
     private boolean useUnofficialMaintenance;
     private boolean logMaintenance;
 
@@ -617,6 +618,7 @@ public class CampaignOptions {
         maintenanceBonus = -1;
         useQualityMaintenance = true;
         reverseQualityNames = false;
+        setUseRandomUnitQualities(true);
         useUnofficialMaintenance = false;
         logMaintenance = false;
 
@@ -1274,6 +1276,14 @@ public class CampaignOptions {
 
     public void setReverseQualityNames(final boolean reverseQualityNames) {
         this.reverseQualityNames = reverseQualityNames;
+    }
+
+    public boolean isUseRandomUnitQualities() {
+        return useRandomUnitQualities;
+    }
+
+    public void setUseRandomUnitQualities(final boolean useRandomUnitQualities) {
+        this.useRandomUnitQualities = useRandomUnitQualities;
     }
 
     public boolean isUseUnofficialMaintenance() {
@@ -4552,6 +4562,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maintenanceBonus", maintenanceBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useQualityMaintenance", useQualityMaintenance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "reverseQualityNames", reverseQualityNames);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useRandomUnitQualities", isUseRandomUnitQualities());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnofficialMaintenance", isUseUnofficialMaintenance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "checkMaintenance", checkMaintenance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maxAcquisitions", maxAcquisitions);
@@ -4995,6 +5006,8 @@ public class CampaignOptions {
                     retVal.useQualityMaintenance = Boolean.parseBoolean(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("reverseQualityNames")) {
                     retVal.reverseQualityNames = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("useRandomUnitQualities")) {
+                    retVal.setUseRandomUnitQualities(Boolean.parseBoolean(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useUnofficialMaintenance")
                         || wn2.getNodeName().equalsIgnoreCase("useUnofficalMaintenance")) { // Legacy, 0.49.12 Removal
                     retVal.setUseUnofficialMaintenance(Boolean.parseBoolean(wn2.getTextContent()));

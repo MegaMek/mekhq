@@ -31,6 +31,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
@@ -374,7 +375,15 @@ public class PersonnelMarketDialog extends JDialog {
                 unitCost, "Purchased " + en.getShortName())) {
             return;
         }
-        Unit unit = campaign.addNewUnit(en, false, 0, 3);
+
+        int quality = 3;
+
+        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = UnitOrder.getRandomUnitQuality(0);
+        }
+
+        Unit unit = campaign.addNewUnit(en, false, 0, quality);
+
         if (unit == null) {
             // No such unit matching the entity.
             return;
