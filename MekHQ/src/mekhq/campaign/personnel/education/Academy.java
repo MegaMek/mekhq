@@ -949,12 +949,16 @@ public class Academy implements Comparable<Academy> {
         skills = Arrays.stream(skills)
                 .map(String::trim)
                 .toArray(String[]::new);
-      
+
         for (String skill : skills) {
             tooltip.append(skill).append(" (");
 
             if (skill.equalsIgnoreCase("xp bonus") || (skill.equalsIgnoreCase("bonus xp"))) {
-                tooltip.append(educationLevel).append(resources.getString("xpBonus.text")).append(")<br>");
+                if (person.getEduHighestEducation() >= educationLevel) {
+                    tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                } else {
+                    tooltip.append(educationLevel).append(resources.getString("xpBonus.text")).append(")<br>");
+                }
             } else {
                 String skillParsed = skillParser(skill);
 
