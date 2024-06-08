@@ -739,9 +739,9 @@ public class RetirementDefectionDialog extends JDialog {
             return true;
         }
 
-        // This allows us to ignore anything 0.99 c-bills or lower, in case of unusual fractional issues
         Money totalPayout = totalPayout();
 
+        // This allows us to ignore anything 0.99 c-bills or lower, in case of unusual fractional issues
         if (totalPayout.isLessThan(Money.of(1.0))) {
             return true;
         }

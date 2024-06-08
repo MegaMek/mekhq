@@ -276,4 +276,10 @@ public class ServiceLogger {
                     campaign.getCampaignOptions().isUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
         }
     }
+
+    public static void oprhaned(Person person, LocalDate date) {
+        String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
+
+        person.addLogEntry(new ServiceLogEntry(date, message));
+    }
 }
