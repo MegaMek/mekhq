@@ -27,6 +27,7 @@ import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.storyarc.StoryTrigger;
+import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
@@ -46,7 +47,7 @@ public class AddUnitStoryTrigger extends StoryTrigger {
     protected void execute() {
         MechSummary ms = MechSummaryCache.getInstance().getMech(entityName);
         if (ms == null) {
-            LogManager.getLogger().error("Cannot find entry for " + entityName);
+            LogManager.getLogger().error("Cannot find entry for {}", entityName);
             return;
         }
 
@@ -54,11 +55,19 @@ public class AddUnitStoryTrigger extends StoryTrigger {
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
-            LogManager.getLogger().error("Unable to load unit: " + ms.getEntryName(), ex);
+            LogManager.getLogger().error("Unable to load unit: {}", ms.getEntryName(), ex);
             return;
         }
+
         Entity en = mechFileParser.getEntity();
-        getCampaign().addNewUnit(en, false, 0, 3);
+
+        int quality = 3;
+
+        if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        }
+
+        getCampaign().addNewUnit(en, false, 0, quality);
     }
 
     @Override

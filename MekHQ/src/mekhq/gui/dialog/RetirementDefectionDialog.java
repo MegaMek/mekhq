@@ -393,7 +393,7 @@ public class RetirementDefectionDialog extends JDialog {
         btnEdit.setVisible(currentPanel.equals(PAN_RESULTS));
         btnEdit.setEnabled(hqView.getCampaign().isGM());
         btnEdit.addActionListener(evt -> {
-            btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
+            btnDone.setEnabled((btnEdit.isSelected()) || (unitAssignmentsComplete()));
             ((RetirementTableModel) retireeTable.getModel()).setEditPayout(btnEdit.isSelected());
         });
         btnRoll = new JButton(resourceMap.getString("btnRoll.text"));
@@ -730,6 +730,11 @@ public class RetirementDefectionDialog extends JDialog {
             return true;
         }
 
+        // This allows us to ignore anything 0.99 c-bills or lower, in case of unusual fractional issues
+        if (totalPayout().isLessThan(Money.of(1.0))) {
+            return true;
+        }
+
         return rdTracker.getRetirees().stream()
                 .filter(uuid -> isBreakingContract(hqView.getCampaign().getPerson(uuid),
                         hqView.getCampaign().getLocalDate(),
@@ -784,7 +789,7 @@ public class RetirementDefectionDialog extends JDialog {
         Unit unit = ((UnitAssignmentTableModel) unitAssignmentTable.getModel())
                 .getUnit(unitAssignmentTable.convertRowIndexToModel(unitAssignmentTable.getSelectedRow()));
         unitAssignments.put(person.getId(), unit.getId());
-        btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
+        btnDone.setEnabled((btnEdit.isSelected()) || (unitAssignmentsComplete()));
         ((RetirementTableModel) retireeTable.getModel()).fireTableDataChanged();
         filterUnits();
     }
@@ -793,7 +798,7 @@ public class RetirementDefectionDialog extends JDialog {
         Person person = ((RetirementTableModel) retireeTable.getModel())
                 .getPerson(retireeTable.convertRowIndexToModel(retireeTable.getSelectedRow()));
         unitAssignments.remove(person.getId());
-        btnDone.setEnabled(btnEdit.isSelected() || unitAssignmentsComplete());
+        btnDone.setEnabled((btnEdit.isSelected()) || (unitAssignmentsComplete()));
         ((RetirementTableModel) retireeTable.getModel()).fireTableDataChanged();
         filterUnits();
     }

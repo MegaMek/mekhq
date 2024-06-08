@@ -80,10 +80,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
@@ -672,7 +669,14 @@ public class Campaign implements ITechManager {
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        addNewUnit(en, true, transitDays);
+        int quality = 3;
+
+        if (campaignOptions.isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        }
+
+        addNewUnit(en, true, transitDays, quality);
+
         if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
             addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>Unit will be delivered in " + transitDays + " days.</font>");
         }
@@ -710,36 +714,40 @@ public class Campaign implements ITechManager {
                             getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                         }
 
-                        // if marriage modifier is enabled, couples leave together
-                        if (campaignOptions.isUseMarriageModifiers()) {
-                            Person spouse = person.getGenealogy().getSpouse();
+                        // civilian spouses follow their partner in departing
+                        Person spouse = person.getGenealogy().getSpouse();
 
-                            if ((spouse != null) && (!getRetirementDefectionTracker().getRetirees().contains(spouse.getId()))) {
-                                if ((!spouse.getStatus().isDepartedUnit()) && (!spouse.getStatus().isAbsent())) {
-                                    addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
-                                    if (spouse.getPrimaryRole().isCivilian()) {
-                                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    } else {
-                                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                    }
+                        if ((spouse != null) && (spouse.getPrimaryRole().isCivilian())) {
+                            addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
+                            spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                        }
+
+                        // non-civilian spouses may divorce the remaining partner
+                        if ((person.getAge(getLocalDate()) >= 50) && (!campaignOptions.getRandomDivorceMethod().isNone())) {
+                            if ((spouse != null) && (spouse.isDivorceable()) && (!spouse.getPrimaryRole().isCivilian())) {
+                                if ((person.getStatus().isDefected()) || (Compute.randomInt(20) == 0)) {
+                                    getDivorce().divorce(this, getLocalDate(), person, SplittingSurnameStyle.WEIGHTED);
                                 }
                             }
                         }
 
                         // This ensures children have a chance of following their parent into departure
+                        // This needs to be after spouses, to ensure joint-departure spouses are factored in
                         for (Person child : person.getGenealogy().getChildren()) {
                             if ((child.isChild(getLocalDate())) && (!child.getStatus().isDepartedUnit())) {
-                                if (campaignOptions.isUseMarriageModifiers()) {
-                                    addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
-                                    child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                } else {
-                                    boolean remainingParent = child.getGenealogy().getParents().stream()
-                                            .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
+                                boolean hasRemainingParent = child.getGenealogy().getParents().stream()
+                                        .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
 
-                                    if ((!remainingParent) || (Compute.randomInt(2) == 0)) {
+                                // if there is a remaining parent, there is a 50/50 chance the child departs
+                                if ((hasRemainingParent) && (Compute.randomInt(2) == 0)) {
                                         addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
                                         child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                    }
+                                }
+
+                                // if there is no remaining parent, the child will always depart
+                                if (!hasRemainingParent) {
+                                    addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
+                                    child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
                                 }
                             }
                         }
@@ -3628,8 +3636,6 @@ public class Campaign implements ITechManager {
                 individualAcademyAttributes.add(academy.getName());
 
                 academyAttributesMap.put(person.getId(), individualAcademyAttributes);
-
-                person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
             }
         }
 

@@ -150,7 +150,7 @@ public class AutoAwardsController {
      * @param c                    the campaign to be processed
      */
     public void PostGraduationController(Campaign c, List<UUID> personnel, HashMap<UUID, List<Object>> academyAttributes) {
-        LogManager.getLogger().info("autoAwards (Mission Conclusion) has started");
+        LogManager.getLogger().info("autoAwards (Education Conclusion) has started");
 
         campaign = c;
 
@@ -164,7 +164,7 @@ public class AutoAwardsController {
             LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
 
-        LogManager.getLogger().info("autoAwards (Mission Conclusion) has finished");
+        LogManager.getLogger().info("autoAwards (Education Conclusion) has finished");
     }
 
     /**
