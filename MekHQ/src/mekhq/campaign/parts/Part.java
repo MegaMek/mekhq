@@ -1058,10 +1058,10 @@ public abstract class Part implements IPartWork, ITechnology {
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return " <font color='green'><b> salvaged.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> salvaged.</b></font>";
         } else {
             fix();
-            return " <font color='green'><b> fixed.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> fixed.</b></font>";
         }
     }
 

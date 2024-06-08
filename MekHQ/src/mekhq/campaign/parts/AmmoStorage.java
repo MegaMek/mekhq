@@ -252,7 +252,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }

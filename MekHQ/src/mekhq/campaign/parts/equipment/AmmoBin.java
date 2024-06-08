@@ -512,7 +512,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork {
             } else if (shotsAvailable < getShotsNeeded()) {
                 availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only " + shotsAvailable + " available" + orderTransitString + "</font>";
             } else {
-                availability = "<br><font color='green'>" + shotsAvailable + " available " + orderTransitString + "</font>";
+                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>" + shotsAvailable + " available " + orderTransitString + "</font>";
             }
 
             return getType().getDesc() + ", " + getShotsNeeded() + " shots needed" + availability;

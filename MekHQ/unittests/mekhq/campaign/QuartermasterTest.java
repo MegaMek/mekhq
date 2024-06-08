@@ -273,7 +273,7 @@ public class QuartermasterTest {
         assertFalse(quartermaster.buyUnit(mockEntity, 0));
 
         // ...and the new unit should NOT be added to the campaign.
-        verify(mockCampaign, times(0)).addNewUnit(eq(mockEntity), eq(false), eq(0));
+        verify(mockCampaign, times(0)).addNewUnit(eq(mockEntity), eq(false), eq(0), eq(3));
     }
 
     @Test

@@ -183,7 +183,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
     public String find(int transitDays) {
         //TODO: probably get a duplicate entity
         if (getCampaign().getQuartermaster().buyUnit((Entity) getNewEquipment(), transitDays)) {
-            return "<font color='green'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> unit found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
             return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this unit. Transaction cancelled</b>.</font>";
         }

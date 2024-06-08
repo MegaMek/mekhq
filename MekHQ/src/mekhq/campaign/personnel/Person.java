@@ -2927,7 +2927,7 @@ public class Person {
 
     public String succeed() {
         heal();
-        return " <font color='green'><b>Successfully healed one hit.</b></font>";
+        return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b>Successfully healed one hit.</b></font>";
     }
 
     //region Personnel Options
