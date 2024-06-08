@@ -184,7 +184,7 @@ public class RetirementDefectionTracker {
             // Management Skill Modifier
             if (campaign.getCampaignOptions().isUseManagementSkill()) {
                 int modifier = 0;
-                
+
                 if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
                     if (campaign.getFlaggedCommander().hasSkill((SkillType.S_LEADER))) {
                         modifier += campaign.getCampaignOptions().getManagementSkillPenalty()
@@ -193,7 +193,7 @@ public class RetirementDefectionTracker {
                 } else {
                     modifier = getManagementSkillModifier(person);
                 }
-                
+
                 targetNumber.addModifier(modifier, resources.getString("managementSkill.text"));
             }
 
@@ -284,7 +284,7 @@ public class RetirementDefectionTracker {
 
                 // wartime modifier
                 if (FactionHints.defaultFactionHints().isAtWarWith(campaign.getFaction(), person.getOriginFaction(), campaign.getLocalDate())) {
-                    targetNumber.addModifier(2, resources.getString("factionEnemy.text"));
+                    targetNumber.addModifier(4, resources.getString("factionEnemy.text"));
                 }
             }
 
@@ -440,7 +440,7 @@ public class RetirementDefectionTracker {
      */
     private void getManagementSkillValues(Campaign campaign) {
         int baseModifier = campaign.getCampaignOptions().getManagementSkillPenalty();
-        
+
         for (Person person : campaign.getActivePersonnel()) {
             if ((person.getPrimaryRole().isCivilian())
                     || (person.getPrisonerStatus().isPrisoner())
