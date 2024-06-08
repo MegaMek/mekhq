@@ -42,8 +42,10 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 public final class BatchXPDialog extends JDialog {
     private final Campaign campaign;
@@ -385,7 +387,7 @@ public final class BatchXPDialog extends JDialog {
                 PersonalLogger.improvedSkill(campaign, p, campaign.getLocalDate(),
                         p.getSkill(skillName).getType().getName(), p.getSkill(skillName).toString());
 
-                // The next part is bollocks and doesn't belong here, but as long as we hardcode AtB ...
+                // The next part isn't ideal and doesn't belong here, but as long as we hardcode AtB ...
                 if (campaign.getCampaignOptions().isUseAtB()) {
                     if (p.getPrimaryRole().isCombat() && !p.getPrimaryRole().isVesselCrew()
                             && (p.getExperienceLevel(campaign, false) > startingExperienceLevel)
