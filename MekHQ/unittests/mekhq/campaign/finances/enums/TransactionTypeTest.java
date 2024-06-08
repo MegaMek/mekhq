@@ -385,7 +385,8 @@ public class TransactionTypeTest {
         assertEquals(TransactionType.EDUCATION, TransactionType.parseFromString("17"));
         assertEquals(TransactionType.THEFT, TransactionType.parseFromString("18"));
         assertEquals(TransactionType.PAYOUT, TransactionType.parseFromString("19"));
-        assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("20"));
+        assertEquals(TransactionType.TAXES, TransactionType.parseFromString("20"));
+        assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("21"));
 
         // Failure Testing
         assertEquals(TransactionType.MISCELLANEOUS, TransactionType.parseFromString("failureFailsFake"));
