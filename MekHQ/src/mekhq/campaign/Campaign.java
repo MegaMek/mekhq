@@ -79,10 +79,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
@@ -724,6 +721,15 @@ public class Campaign implements ITechManager {
                         if ((spouse != null) && (spouse.getPrimaryRole().isCivilian())) {
                             addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
                             spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                        }
+
+                        // non-civilian spouses may divorce the remaining partner
+                        if ((person.getAge(getLocalDate()) >= 50) && (!campaignOptions.getRandomDivorceMethod().isNone())) {
+                            if ((spouse != null) && (spouse.isDivorceable()) && (!spouse.getPrimaryRole().isCivilian())) {
+                                if ((person.getStatus().isDefected()) || (Compute.randomInt(20) == 0)) {
+                                    getDivorce().divorce(this, getLocalDate(), person, SplittingSurnameStyle.WEIGHTED);
+                                }
+                            }
                         }
 
                         // This ensures children have a chance of following their parent into departure
