@@ -946,7 +946,10 @@ public class EducationController {
 
         // check for second chance caste
         if (!campaign.getCampaignOptions().getSecondChanceCaste().isNone()) {
-            if (person.getEduCourseIndex() != getSecondChanceCasteIndex(campaign)) {
+            int secondChanceCasteIndex = getSecondChanceCasteIndex(campaign);
+
+            // a secondChanceCasteIndex of -1 means second chance caste is set to 'NONE', so we can skip the switch
+            if ((secondChanceCasteIndex != -1) && (person.getEduCourseIndex() != secondChanceCasteIndex)) {
                 switch (campaign.getCampaignOptions().getSecondChanceCaste()) {
                     case BA:
                         campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
@@ -972,8 +975,9 @@ public class EducationController {
                         person.setEduAcademyName(generateClanEducationCode(campaign, person, 6, resources));
 
                         return;
-                    case NONE:
-                        break;
+                    default:
+                        throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/education/EducationController.java/processWarriorCasteWashout: "
+                                + campaign.getCampaignOptions().getSecondChanceCaste());
                 }
             }
         }
