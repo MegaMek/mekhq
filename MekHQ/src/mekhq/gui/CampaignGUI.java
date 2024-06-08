@@ -2394,18 +2394,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (getCampaign().checkRetirementDefections()) {
+        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) && (getCampaign().checkTurnoverPrompt())) {
             showRetirementDefectionDialog();
-            evt.cancel();
-            return;
-        }
-
-        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
-            if (getCampaign().checkTurnoverPrompt()) {
-                showRetirementDefectionDialog();
-                evt.cancel();
-                return;
-            }
         }
 
         if(getCampaign().checkScenariosDue()) {

@@ -3543,10 +3543,10 @@ public class Campaign implements ITechManager {
 
         // Advance the day by one
         final LocalDate yesterday = getLocalDate();
-        setLocalDate(getLocalDate().plus(1, ChronoUnit.DAYS));
+        setLocalDate(getLocalDate().plusDays(1));
 
         // Determine if we have an active contract or not, as this can get used elsewhere before
-        // we actually hit the AtB new day (e.g. personnel market)
+        // we actually hit the AtB new day (e.g., personnel market)
         if (getCampaignOptions().isUseAtB()) {
             setHasActiveContract();
         }
@@ -4405,12 +4405,13 @@ public class Campaign implements ITechManager {
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lances");
             }
-            retirementDefectionTracker.writeToXML(pw, indent);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchStart", getShipSearchStart());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchResult", shipSearchResult);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchExpiration", getShipSearchExpiration());
         }
+
+        retirementDefectionTracker.writeToXML(pw, indent);
 
         // Customised planetary events
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "customPlanetaryEvents");
@@ -6997,7 +6998,6 @@ public class Campaign implements ITechManager {
     }
 
     public boolean checkTurnoverPrompt() {
-        int days = 0;
         String period = "";
 
         boolean triggerTurnoverPrompt = false;
