@@ -942,16 +942,34 @@ public abstract class AbstractCompanyGenerator {
     private List<Unit> createUnits(final Campaign campaign,
                                    final List<CompanyGenerationPersonTracker> trackers) {
         final List<Unit> units = new ArrayList<>();
+
         for (final CompanyGenerationPersonTracker tracker : trackers) {
             if (tracker.getEntity() == null) {
                 continue;
             }
 
-            final Unit unit = campaign.addNewUnit(tracker.getEntity(), false, 0, 3);
+            int quality = 3;
+
+            if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+                int modifier = 0;
+
+                if (tracker.getPerson().isCommander()) {
+                    modifier = 2;
+                } else if (tracker.getPerson().getRank().isOfficer()) {
+                    modifier = 1;
+                }
+
+                quality = Unit.getRandomUnitQuality(modifier);
+            }
+
+            final Unit unit = campaign.addNewUnit(tracker.getEntity(), false, 0, quality);
+
             unit.addPilotOrSoldier(tracker.getPerson());
+
             if (getOptions().isGenerateUnitsAsAttached()) {
                 tracker.getPerson().setOriginalUnit(unit);
             }
+
             units.add(unit);
         }
         return units;
@@ -1286,8 +1304,16 @@ public abstract class AbstractCompanyGenerator {
      */
     private List<Unit> createMothballedSpareUnits(final Campaign campaign,
                                                   final List<Entity> mothballedEntities) {
+        int quality;
+
+        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        } else {
+            quality = 3;
+        }
+
         final List<Unit> mothballedUnits = mothballedEntities.stream()
-                .map(entity -> campaign.addNewUnit(entity, false, 0, 3))
+                .map(entity -> campaign.addNewUnit(entity, false, 0, quality))
                 .collect(Collectors.toList());
         mothballedUnits.forEach(Unit::completeMothball);
         return mothballedUnits;

@@ -143,6 +143,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JSpinner spnMaintenanceBonus;
     private JCheckBox useQualityMaintenance;
     private JCheckBox reverseQualityNames;
+    private JCheckBox chkUseRandomUnitQualities;
     private JCheckBox useUnofficialMaintenance;
     private JCheckBox logMaintenance;
     //endregion Repair and Maintenance Tab
@@ -292,7 +293,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseUnitRatingModifiers;
     private JCheckBox chkUseFactionModifiers;
     private JCheckBox chkUseMissionStatusModifiers;
-    private JCheckBox chkUseMarriageModifiers;
+    private JCheckBox chkUseFamilyModifiers;
     private JCheckBox chkUseLoyaltyModifiers;
 
     private JPanel loyaltySubPanel = new JPanel();
@@ -1018,6 +1019,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 useQualityMaintenance.setEnabled(true);
                 useUnofficialMaintenance.setEnabled(true);
                 reverseQualityNames.setEnabled(true);
+                chkUseRandomUnitQualities.setEnabled(true);
                 spnMaintenanceBonus.setEnabled(true);
                 logMaintenance.setEnabled(true);
             } else {
@@ -1025,6 +1027,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 useQualityMaintenance.setEnabled(false);
                 useUnofficialMaintenance.setEnabled(false);
                 reverseQualityNames.setEnabled(false);
+                chkUseRandomUnitQualities.setEnabled(false);
                 spnMaintenanceBonus.setEnabled(false);
                 logMaintenance.setEnabled(false);
             }
@@ -1083,6 +1086,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(reverseQualityNames, gridBagConstraints);
 
+        chkUseRandomUnitQualities = new JCheckBox(resources.getString("chkUseRandomUnitQualities.text"));
+        chkUseRandomUnitQualities.setToolTipText(resources.getString("chkUseRandomUnitQualities.toolTipText"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.weightx = 0.0;
+        gridBagConstraints.weighty = 0.0;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubMaintenance.add(chkUseRandomUnitQualities, gridBagConstraints);
+
         reverseQualityNames.addActionListener(evt -> {
             recreateFinancesPanel(reverseQualityNames.isSelected());
         });
@@ -1091,7 +1105,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         useUnofficialMaintenance.setToolTipText(resources.getString("useUnofficialMaintenance.toolTipText"));
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.fill = GridBagConstraints.NONE;
         gridBagConstraints.weightx = 0.0;
         gridBagConstraints.weighty = 0.0;
@@ -1101,7 +1115,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         logMaintenance = new JCheckBox(resources.getString("logMaintenance.text"));
         logMaintenance.setToolTipText(resources.getString("logMaintenance.toolTipText"));
         logMaintenance.setName("logMaintenance");
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         panSubMaintenance.add(logMaintenance, gridBagConstraints);
@@ -4424,10 +4438,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMissionStatusModifiers.setName("chkUseMissionStatusModifiers");
         chkUseMissionStatusModifiers.setEnabled(isUseTurnover);
 
-        chkUseMarriageModifiers = new JCheckBox(resources.getString("chkUseMarriageModifiers.text"));
-        chkUseMarriageModifiers.setToolTipText(resources.getString("chkUseMarriageModifiers.toolTipText"));
-        chkUseMarriageModifiers.setName("chkUseMarriageModifiers");
-        chkUseMarriageModifiers.setEnabled(isUseTurnover);
+        chkUseFamilyModifiers = new JCheckBox(resources.getString("chkUseFamilyModifiers.text"));
+        chkUseFamilyModifiers.setToolTipText(resources.getString("chkUseFamilyModifiers.toolTipText"));
+        chkUseFamilyModifiers.setName("chkUseFamilyModifiers");
+        chkUseFamilyModifiers.setEnabled(isUseTurnover);
 
         chkUseLoyaltyModifiers = new JCheckBox(resources.getString("chkUseLoyaltyModifiers.text"));
         chkUseLoyaltyModifiers.setToolTipText(resources.getString("chkUseLoyaltyModifiers.toolTipText"));
@@ -4463,7 +4477,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
-                        .addComponent(chkUseMarriageModifiers)
+                        .addComponent(chkUseFamilyModifiers)
                         .addGap(15)
                         .addComponent(chkUseLoyaltyModifiers)
                         .addComponent(loyaltySubPanel)
@@ -4478,7 +4492,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
-                        .addComponent(chkUseMarriageModifiers)
+                        .addComponent(chkUseFamilyModifiers)
                         .addComponent(chkUseLoyaltyModifiers)
                         .addComponent(loyaltySubPanel)
         );
@@ -8009,6 +8023,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnMaintenanceBonus.setValue(options.getMaintenanceBonus());
         useQualityMaintenance.setSelected(options.isUseQualityMaintenance());
         reverseQualityNames.setSelected(options.isReverseQualityNames());
+        chkUseRandomUnitQualities.setSelected(options.isUseRandomUnitQualities());
         useUnofficialMaintenance.setSelected(options.isUseUnofficialMaintenance());
         logMaintenance.setSelected(options.isLogMaintenance());
         //endregion Repair and Maintenance Tab
@@ -8180,7 +8195,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseUnitRatingModifiers.setSelected(options.isUseUnitRatingModifiers());
         chkUseFactionModifiers.setSelected(options.isUseFactionModifiers());
         chkUseMissionStatusModifiers.setSelected(options.isUseMissionStatusModifiers());
-        chkUseMarriageModifiers.setSelected(options.isUseMarriageModifiers());
+        chkUseFamilyModifiers.setSelected(options.isUseFamilyModifiers());
         chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
         chkUseHideLoyalty.setSelected(options.isUseHideLoyalty());
 
@@ -8626,6 +8641,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setCheckMaintenance(checkMaintenance.isSelected());
             options.setUseQualityMaintenance(useQualityMaintenance.isSelected());
             options.setReverseQualityNames(reverseQualityNames.isSelected());
+            options.setUseRandomUnitQualities(chkUseRandomUnitQualities.isSelected());
             options.setUseUnofficialMaintenance(useUnofficialMaintenance.isSelected());
             options.setLogMaintenance(logMaintenance.isSelected());
             options.setMaintenanceBonus((Integer) spnMaintenanceBonus.getValue());
@@ -8870,7 +8886,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseUnitRatingModifiers(chkUseUnitRatingModifiers.isSelected());
             options.setUseFactionModifiers(chkUseFactionModifiers.isSelected());
             options.setUseMissionStatusModifiers(chkUseMissionStatusModifiers.isSelected());
-            options.setUseMarriageModifiers(chkUseMarriageModifiers.isSelected());
+            options.setUseFamilyModifiers(chkUseFamilyModifiers.isSelected());
             options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
             options.setUseHideLoyalty(chkUseHideLoyalty.isSelected());
 
