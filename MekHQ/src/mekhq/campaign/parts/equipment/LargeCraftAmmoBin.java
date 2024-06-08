@@ -24,6 +24,7 @@ import megamek.common.Mounted;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.WeaponMounted;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
@@ -395,9 +396,9 @@ public class LargeCraftAmmoBin extends AmmoBin {
             int shotsAvailable = getAmountAvailable();
             PartInventory inventories = campaign.getPartInventory(getNewPart());
             if (shotsAvailable == 0) {
-                availability = "<br><font color='red'>No ammo ("+ inventories.getTransitOrderedDetails() + ")</font>";
+                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No ammo ("+ inventories.getTransitOrderedDetails() + ")</font>";
             } else if (shotsAvailable < shotsNeeded) {
-                availability = "<br><font color='red'>Only " + shotsAvailable + " available ("+ inventories.getTransitOrderedDetails() + ")</font>";
+                availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only " + shotsAvailable + " available ("+ inventories.getTransitOrderedDetails() + ")</font>";
             }
             return getType().getDesc() + ", " + shotsNeeded + " shots needed" + availability;
         } else {

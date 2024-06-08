@@ -24,7 +24,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.ScenarioForceTemplate;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.stratcon.StratconCampaignState;
 import mekhq.campaign.stratcon.StratconRulesManager;
@@ -365,16 +364,14 @@ public class StratconScenarioWizard extends JDialog {
         sb.append(": ");
         sb.append(u.getStatus());
 
-        int injuryCount = 0;
-
-        for (Person p : u.getCrew()) {
-            if (p.hasInjuries(true)) {
-                injuryCount++;
-            }
-        }
+        int injuryCount = (int) u.getCrew().stream().filter(p -> p.hasInjuries(true)).count();
 
         if (injuryCount > 0) {
-            sb.append(String.format(", <span color='red'>%d/%d injured crew</span>", injuryCount, u.getCrew().size()));
+            sb.append(String.format(
+                    ", <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>%d/%d injured crew</span>",
+                    injuryCount,
+                    u.getCrew().size())
+            );
         }
 
         sb.append("<br/>");
@@ -396,7 +393,8 @@ public class StratconScenarioWizard extends JDialog {
                 costBuilder.append(", ");
 
                 if (currentCampaignState.getVictoryPoints() <= 1) {
-                    costBuilder.append(resourceMap.getString("reinforcementRoll.Text"));
+                    costBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>")
+                            .append(resourceMap.getString("reinforcementRoll.Text")).append("</span>");
                 } else {
                     costBuilder.append(resourceMap.getString("supportPointConvert.text"));
                 }

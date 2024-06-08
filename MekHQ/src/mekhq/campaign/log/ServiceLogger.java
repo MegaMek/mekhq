@@ -174,6 +174,18 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("retired.text")));
     }
 
+    public static void resigned(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("resigned.text")));
+    }
+
+    public static void deserted(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("deserted.text")));
+    }
+
+    public static void defected(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("defected.text")));
+    }
+
     public static void promotedTo(Person person, LocalDate date) {
         String message = logEntriesResourceMap.getString("promotedTo.text");
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message, person.getRankName())));

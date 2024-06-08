@@ -172,7 +172,8 @@ public class StratconScenario implements IStratconDisplayable {
         StringBuilder stateBuilder = new StringBuilder();
 
         if (isStrategicObjective()) {
-            stateBuilder.append("<span color='red'>Contract objective located</span>").append(html ? "<br/>" : "");
+            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>Contract objective located</span>")
+                    .append(html ? "<br/>" : "");
         }
 
         stateBuilder.append("Scenario: ")
@@ -185,8 +186,9 @@ public class StratconScenario implements IStratconDisplayable {
         }
 
         if (isRequiredScenario()) {
-            stateBuilder.append("<span color='red'>Deployment required by contract</span>").append(html ? "<br/>" : "")
-                .append("<span color='red'>-1 VP if lost/ignored; +1 VP if won</span>").append(html ? "<br/>" : "");
+            stateBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>Deployment required by contract</span>")
+                    .append(html ? "<br/>" : "").append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>-1 VP if lost/ignored; +1 VP if won</span>")
+                    .append(html ? "<br/>" : "");
         }
 
         stateBuilder.append("Status: ")
