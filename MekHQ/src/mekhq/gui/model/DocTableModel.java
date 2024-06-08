@@ -1,5 +1,6 @@
 package mekhq.gui.model;
 
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.Skill;
@@ -41,7 +42,7 @@ public class DocTableModel extends DataTableModel {
         toReturn.append(String.format(" (%d XP)", doc.getXP()));
 
         if (campaign.requiresAdditionalMedics()) {
-            toReturn.append("</font><font size='2' color='red'>, ")
+            toReturn.append("</font><font size='2' color='").append(MekHQ.getMHQOptions().getFontColorNegativeHexColor()).append("'>, ")
                     .append(campaign.getMedicsPerDoctor())
                     .append(" medics</font><font size='2'><br/>");
         } else {

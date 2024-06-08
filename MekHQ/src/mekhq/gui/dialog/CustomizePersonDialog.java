@@ -88,8 +88,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private AbstractMHQScrollablePanel skillsPanel;
     private AbstractMHQScrollablePanel optionsPanel;
     private JTextField textToughness;
-    private JTextField textEducationLevel;
     private JTextField textFatigue;
+    private JTextField textEducationLevel;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -164,9 +164,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         textNickname = new JTextField();
         textBloodname = new JTextField();
         textToughness = new JTextField();
+        JLabel lblFatigue = new JLabel();
         textFatigue = new JTextField();
         JLabel lblToughness = new JLabel();
-        JLabel lblFatigue = new JLabel();
         textEducationLevel = new JTextField();
         JLabel lblEducationLevel = new JLabel();
         JScrollPane scrOptions = new JScrollPane();
@@ -1004,7 +1004,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setBiography(txtBio.getText());
 
         if (choiceGender.getSelectedItem() != null) {
-            person.setGender(person.getGender().isInternal() ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant() : (Gender) choiceGender.getSelectedItem());
+            person.setGender(person.getGender().isInternal()
+                    ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
+                    : (Gender) choiceGender.getSelectedItem());
         }
 
         person.setBirthday(birthdate);
@@ -1032,8 +1034,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         if (null == choiceOriginalUnit.getSelectedItem()) {
             try {
                 person.setFatigue(Integer.parseInt(textFatigue.getText()));
-            } catch (NumberFormatException ignored) {
-            }
+            } catch (NumberFormatException ignored) {}
+
             if (choiceOriginalUnit.getSelectedItem() == null) {
                 person.setOriginalUnit(null);
                 person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
@@ -1041,6 +1043,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             } else {
                 person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
             }
+
             person.setFounder(chkFounder.isSelected());
             setSkills();
             setOptions();

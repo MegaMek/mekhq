@@ -23,6 +23,7 @@ package mekhq.campaign.parts;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.ArmorType;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -161,9 +162,9 @@ public class Armor extends Part implements IAcquisitionWork {
                 String orderTransitString = getOrderTransitStringForDetails(inventories);
 
                 if (amountAvailable == 0) {
-                    availability = "<br><font color='red'>No armor " + orderTransitString + "</font>";
+                    availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No armor " + orderTransitString + "</font>";
                 } else if (amountAvailable < amountNeeded) {
-                    availability = "<br><font color='red'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
+                    availability = "<br><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Only " + amountAvailable + " available " + orderTransitString + "</font>";
                 } else {
                     availability = "<br><font color='green'>" + amountAvailable + " available " + orderTransitString + "</font>";
                 }
@@ -321,7 +322,7 @@ public class Armor extends Part implements IAcquisitionWork {
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
             return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
 
@@ -332,7 +333,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='red'><b> part not found</b>.</font>";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> part not found</b>.</font>";
     }
 
     @Override
@@ -561,7 +562,7 @@ public class Armor extends Part implements IAcquisitionWork {
                 changeAmountAvailable(-1 * Math.min((unit.getEntity().isCapitalScale() ? (amountNeeded * 10) : amountNeeded), getAmountAvailable()));
             }
         }
-        return " <font color='red'><b> failed." + scrap + "</b></font>";
+        return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed." + scrap + "</b></font>";
     }
 
     @Override
