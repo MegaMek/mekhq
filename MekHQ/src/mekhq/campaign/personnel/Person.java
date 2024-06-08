@@ -2800,7 +2800,7 @@ public class Person {
     }
 
     public String fail() {
-        return " <font color='red'><b>Failed to heal.</b></font>";
+        return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>Failed to heal.</b></font>";
     }
 
     //region skill

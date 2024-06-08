@@ -255,7 +255,8 @@ public class Finances {
                                 peacetimeCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(
-                                String.format(resourceMap.getString("NotImplemented.text"), "for operating costs"));
+                                String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                        + resourceMap.getString("NotImplemented.text"), "for operating costs", "</font>"));
                     }
                 } else {
                     Money sparePartsCost = campaign.getAccountant().getMonthlySpareParts();
@@ -269,7 +270,8 @@ public class Finances {
                                 sparePartsCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(
-                                String.format(resourceMap.getString("NotImplemented.text"), "for spare parts"));
+                                String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                        + resourceMap.getString("NotImplemented.text"), "for spare parts", "</font>"));
                     }
 
                     if (debit(TransactionType.MAINTENANCE, today, ammoCost,
@@ -279,7 +281,8 @@ public class Finances {
                                 ammoCost.toAmountAndSymbolString()));
                     } else {
                         campaign.addReport(
-                                String.format(resourceMap.getString("NotImplemented.text"), "for training munitions"));
+                                String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                        + resourceMap.getString("NotImplemented.text"), "for training munitions", "</font>"));
                     }
 
                     if (debit(TransactionType.MAINTENANCE, today, fuelCost,
@@ -288,7 +291,8 @@ public class Finances {
                                 resourceMap.getString("PeacetimeCostsFuel.text"),
                                 fuelCost.toAmountAndSymbolString()));
                     } else {
-                        campaign.addReport(String.format(resourceMap.getString("NotImplemented.text"), "for fuel"));
+                        campaign.addReport(String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                        + resourceMap.getString("NotImplemented.text"), "for fuel", "</font>"));
                     }
                 }
             }
@@ -309,7 +313,8 @@ public class Finances {
                     }
                 } else {
                     campaign.addReport(
-                            String.format(resourceMap.getString("NotImplemented.text"), "payroll costs"));
+                            String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                        + resourceMap.getString("NotImplemented.text"), "payroll costs", "</font>"));
                 }
             }
 
@@ -324,7 +329,8 @@ public class Finances {
                             overheadCost.toAmountAndSymbolString()));
                 } else {
                     campaign.addReport(
-                            String.format(resourceMap.getString("NotImplemented.text"), "overhead costs"));
+                            String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                        + resourceMap.getString("NotImplemented.text"), "overhead costs", "</font>"));
                 }
             }
         }
@@ -338,8 +344,9 @@ public class Finances {
                             loan.getPaymentAmount().toAmountAndSymbolString(), loan);
                     loan.paidLoan();
                 } else {
-                    campaign.addReport(resourceMap.getString("Loan.insufficient.report"),
-                            loan, loan.getPaymentAmount().toAmountAndSymbolString());
+                    campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                    + resourceMap.getString("Loan.insufficient.report"),
+                            loan, "</font>", loan.getPaymentAmount().toAmountAndSymbolString());
                     loan.setOverdue(true);
                 }
             }
@@ -441,7 +448,8 @@ public class Finances {
                  * This should not happen, as the shares payment should be less than the contract
                  * payment that has just been made.
                  */
-                campaign.addReport(resourceMap.getString("NotImplemented.text"), "shares");
+                campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                        + resourceMap.getString("NotImplemented.text"), "shares", "</font>");
                 LogManager.getLogger().error("Attempted to payout share amount larger than the payment of the contract");
             }
         }

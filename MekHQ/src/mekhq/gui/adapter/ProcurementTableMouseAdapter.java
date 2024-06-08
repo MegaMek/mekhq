@@ -180,7 +180,8 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
                     acquisition.getAcquisitionName()));
             acquisition.decrementQuantity();
         } else {
-            gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report"),
+            gui.getCampaign().addReport(String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                            + resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report"),
                     acquisition.getAcquisitionName()));
         }
         return success;
