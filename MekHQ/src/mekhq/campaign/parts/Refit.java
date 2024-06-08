@@ -1095,7 +1095,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         if (isRefurbishing) {
             if (campaign.getQuartermaster().buyRefurbishment(this)) {
-                campaign.addReport("<font color='green'><b>Refurbishment ready to begin</b></font>");
+                campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b>Refurbishment ready to begin</b></font>");
             } else {
                 campaign.addReport("You cannot afford to refurbish " + oldUnit.getEntity().getShortName() + ". Transaction cancelled");
             }
@@ -2161,15 +2161,15 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public String find(int transitDays) {
         if (campaign.getQuartermaster().buyPart(this, transitDays)) {
-            return "<font color='green'><b> refit kit found.</b> Kit will arrive in " + transitDays + " days.</font>";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> refit kit found.</b> Kit will arrive in " + transitDays + " days.</font>";
         } else {
-            return "<font color='red'><b> You cannot afford this refit kit. Transaction cancelled</b>.</font>";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this refit kit. Transaction cancelled</b>.</font>";
         }
     }
 
     @Override
     public String failToFind() {
-        return "<font color='red'> refit kit not found.</font>";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'> refit kit not found.</font>";
     }
 
     @Override
