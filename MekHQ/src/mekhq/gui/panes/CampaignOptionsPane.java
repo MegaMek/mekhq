@@ -8608,8 +8608,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
             campaign.setLocalDate(date);
 
-            if (campaign.getCampaignStartDay() == null) {
-                campaign.setCampaignStartDay(date);
+            if (campaign.getCampaignStartDate() == null) {
+                campaign.setCampaignStartDate(date);
             }
             // Ensure that the MegaMek year GameOption matches the campaign year
             campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());

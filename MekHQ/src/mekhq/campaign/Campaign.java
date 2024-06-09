@@ -376,11 +376,11 @@ public class Campaign implements ITechManager {
         this.currentDay = currentDay;
     }
 
-    public LocalDate getCampaignStartDay() {
+    public LocalDate getCampaignStartDate() {
         return campaignStartDate;
     }
 
-    public void setCampaignStartDay(LocalDate campaignStartDate) {
+    public void setCampaignStartDate(LocalDate campaignStartDate) {
         this.campaignStartDate = campaignStartDate;
     }
 
@@ -4306,9 +4306,9 @@ public class Campaign implements ITechManager {
 
         // this handles campaigns that predate 49.20
         if (campaignStartDate == null) {
-            setCampaignStartDay(getLocalDate());
+            setCampaignStartDate(getLocalDate());
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "campaignStartDate", getCampaignStartDay());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "campaignStartDate", getCampaignStartDate());
 
         getRankSystem().writeToXML(pw, indent, false);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtime", overtime);
