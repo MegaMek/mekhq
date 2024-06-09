@@ -79,6 +79,11 @@ MEKHQ VERSION HISTORY:
 + PR #4172: Implemented More Education Module Bug Fixes
 + PR #4174: Fixed Payout of 0 c-bills Causing Soft Lock in Turnover and Retention Module
 + PR #4178: Updated Family Modifier Logic, a Warring Faction Modifier, in Turnover and Retention Module
++ PR #4183: Fixed Multi-Person Original Unit Assignments in Personnel Market & Interactions with Turnover and Retention Module
++ PR #4173: Added Multiple Turnover and Retention Module Improvements
++ Fix #4182: Added Nag to Alert Users at Contract End fix
++ PR #4187: Restored Missing Code for Scenario Modifier Options & Campaign Option Layout Tweaks
++ PR #4188: Added Campaign Start Date Logging to Campaign
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
