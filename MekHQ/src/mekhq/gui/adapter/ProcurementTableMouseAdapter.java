@@ -22,6 +22,7 @@ import megamek.common.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.event.ProcurementEvent;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.model.ProcurementTableModel;
@@ -171,16 +172,18 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         } else if (equipment instanceof Entity) {
             success = gui.getCampaign().getQuartermaster().buyUnit((Entity) equipment, transitTime);
         } else {
-            LogManager.getLogger().error("Attempted to acquire unknown equipment of " + acquisition.getAcquisitionName());
+            LogManager.getLogger().error("Attempted to acquire unknown equipment of {}", acquisition.getAcquisitionName());
             return false;
         }
 
         if (success) {
-            gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report"),
+            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                    + String.format(resources.getString("ProcurementTableMouseAdapter.ProcuredItem.report") + "</font>",
                     acquisition.getAcquisitionName()));
             acquisition.decrementQuantity();
         } else {
-            gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report"),
+            gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                    + String.format(resources.getString("ProcurementTableMouseAdapter.CannotAffordToPurchaseItem.report") + "</font>",
                     acquisition.getAcquisitionName()));
         }
         return success;
@@ -196,13 +199,22 @@ public class ProcurementTableMouseAdapter extends JPopupMenuAdapter {
         if (equipment instanceof Part) {
             gui.getCampaign().getQuartermaster().addPart((Part) equipment, 0);
         } else if (equipment instanceof Entity) {
-            gui.getCampaign().addNewUnit((Entity) equipment, false, 0);
+            int quality;
+
+            if (gui.getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+                quality = Unit.getRandomUnitQuality(0);
+            } else {
+                quality = 3;
+            }
+
+            gui.getCampaign().addNewUnit((Entity) equipment, false, 0, quality);
         } else {
-            LogManager.getLogger().error("Attempted to add unknown equipment of " + acquisition.getAcquisitionName());
+            LogManager.getLogger().error("Attempted to add unknown equipment of {}", acquisition.getAcquisitionName());
             return;
         }
 
-        gui.getCampaign().addReport(String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report"),
+        gui.getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                + String.format(resources.getString("ProcurementTableMouseAdapter.GMAdded.report") + "</font>",
                 acquisition.getAcquisitionName()));
         acquisition.decrementQuantity();
     }

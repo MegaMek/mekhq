@@ -510,25 +510,37 @@ public class AtBContract extends Contract {
                 rat = "CivilianUnits_PrimMech";
                 c.addReport("Bonus: civilian Mek");
                 break;
+            default:
+                throw new IllegalStateException("Unexpected value in mekhq/campaign/mission/AtBContract.java/doBonusRoll: " + roll);
         }
 
         if (null != rat) {
             Entity en = null;
             RandomUnitGenerator.getInstance().setChosenRAT(rat);
             ArrayList<MechSummary> msl = RandomUnitGenerator.getInstance().generate(1);
+
+            int quality = 3;
+
+            if (c.getCampaignOptions().isUseRandomUnitQualities()) {
+                quality = Unit.getRandomUnitQuality(0);
+            }
+
             if (!msl.isEmpty() && (msl.get(0) != null)) {
                 try {
                     en = new MechFileParser(msl.get(0).getSourceFile(), msl.get(0).getEntryName()).getEntity();
                 } catch (EntityLoadingException ex) {
-                    LogManager.getLogger().error("Unable to load entity: " + msl.get(0).getSourceFile()
-                            + ": " + msl.get(0).getEntryName() + ": " + ex.getMessage(), ex);
+                    LogManager.getLogger().error("Unable to load entity: {}: {}: {}",
+                            msl.get(0).getSourceFile(),
+                            msl.get(0).getEntryName(),
+                            ex.getMessage(),
+                            ex);
                 }
             }
 
             if (null != en) {
-                c.addNewUnit(en, false, 0);
+                c.addNewUnit(en, false, 0, quality);
             } else {
-                c.addReport("<html><font color='red'>Could not load unit</font></html>");
+                c.addReport("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Could not load unit</font></html>");
             }
         }
     }

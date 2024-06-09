@@ -232,10 +232,10 @@ public class PodSpace implements IPartWork {
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return " <font color='green'><b> removed.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> removed.</b></font>";
         } else {
             fix();
-            return " <font color='green'><b> fixed.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> fixed.</b></font>";
         }
     }
 
@@ -253,9 +253,9 @@ public class PodSpace implements IPartWork {
             }
         }
         if (rating >= SkillType.EXP_ELITE && replacing) {
-                return " <font color='red'><b> failed and part(s) destroyed.</b></font>";
+                return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed and part(s) destroyed.</b></font>";
         } else {
-            return " <font color='red'><b> failed.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> failed.</b></font>";
         }
     }
 
@@ -366,9 +366,9 @@ public class PodSpace implements IPartWork {
     public String getDesc() {
         String bonus = getAllMods(null).getValueAsString();
         if (getAllMods(null).getValue() > -1) {
-            bonus = "+" + bonus;
+            bonus = '+' + bonus;
         }
-        bonus = "(" + bonus + ")";
+        bonus = '(' + bonus + ')';
         String toReturn = "<html><font size='2'";
         String action = "Replace ";
         if (isSalvaging()) {
@@ -383,13 +383,13 @@ public class PodSpace implements IPartWork {
         toReturn += "<b>" + action + getPartName() + " Equipment</b><br/>";
         toReturn += getDetails() + "<br/>";
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='red'>Impossible</font>";
+            toReturn += "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</font>";
         } else {
-            toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+            toReturn += getTimeLeft() + " minutes" + scheduled;
             if (!campaign.getCampaignOptions().isDestroyByMargin()) {
                 toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
             }
-            toReturn += " " + bonus;
+            toReturn += ' ' + bonus;
         }
         toReturn += "</font></html>";
         return toReturn;

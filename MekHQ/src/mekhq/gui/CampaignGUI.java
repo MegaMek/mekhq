@@ -1201,7 +1201,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void showRetirementDefectionDialog() {
+    public boolean showRetirementDefectionDialog() {
         /*
          * if there are unresolved personnel, show the results view; otherwise,
          * present the retirement view to give the player a chance to follow a
@@ -1213,6 +1213,9 @@ public class CampaignGUI extends JPanel {
 
         if (!rdd.wasAborted()) {
             getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -1893,10 +1896,17 @@ public class CampaignGUI extends JPanel {
 
     protected void loadListFile(final boolean allowNewPilots) {
         final File unitFile = FileDialogs.openUnits(getFrame()).orElse(null);
+
+        int quality = 3;
+
+        if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        }
+
         if (unitFile != null) {
             try {
                 for (Entity entity : new MULParser(unitFile, getCampaign().getGameOptions()).getEntities()) {
-                    getCampaign().addNewUnit(entity, allowNewPilots, 0);
+                    getCampaign().addNewUnit(entity, allowNewPilots, 0, quality);
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);
@@ -2269,7 +2279,7 @@ public class CampaignGUI extends JPanel {
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
             // FIXME : Localize
-            inDebt = " <font color='red'>(in Debt)</font>";
+            inDebt = " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>(in Debt)</font>";
         }
         // FIXME : Localize
         String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";
@@ -2394,15 +2404,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (getCampaign().checkRetirementDefections()) {
-            showRetirementDefectionDialog();
-            evt.cancel();
-            return;
-        }
-
-        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
-            if (getCampaign().checkTurnoverPrompt()) {
-                showRetirementDefectionDialog();
+        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) && (getCampaign().checkTurnoverPrompt())) {
+            if (!showRetirementDefectionDialog()) {
                 evt.cancel();
                 return;
             }
@@ -2431,6 +2434,11 @@ public class CampaignGUI extends JPanel {
         }
 
         if (new UntreatedPersonnelNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new EndContractNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
         }

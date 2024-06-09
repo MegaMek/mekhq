@@ -300,6 +300,13 @@ public enum PersonnelRole {
         return isDoctor() || isMedic();
     }
 
+    /**
+     * @return true if the person is an Astech or Medic, false otherwise.
+     */
+    public boolean isAssistant() {
+        return isAstech() || isMedic();
+    }
+
     public boolean isAdministrator() {
         return isAdministratorCommand() || isAdministratorLogistics()
                 || isAdministratorTransport() || isAdministratorHR();

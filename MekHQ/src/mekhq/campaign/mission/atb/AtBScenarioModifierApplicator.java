@@ -64,7 +64,7 @@ public class AtBScenarioModifierApplicator {
         int deploymentZone = AtBDynamicScenarioFactory.calculateDeploymentZone(templateToApply, scenario, templateToApply.getForceName());
 
         AtBDynamicScenarioFactory.generateForce(scenario, scenario.getContract(campaign), campaign,
-                effectiveBV, effectiveUnitCount, EntityWeightClass.WEIGHT_ASSAULT, templateToApply);
+                effectiveBV, effectiveUnitCount, EntityWeightClass.WEIGHT_ASSAULT, templateToApply, true);
 
         // the most recently added bot force is the one we just generated
         BotForce generatedBotForce = scenario.getBotForce(scenario.getNumBots() - 1);

@@ -182,7 +182,7 @@ public class EducationController {
                 case 4:
                 case 5:
                 case 6:
-                    caste = resources.getString("graduatedWarrior.text");
+                    caste = resources.getString(getWarriorCasteSubCasteString(person.getEduCourseIndex()));
                     break;
                 case 7:
                     caste = resources.getString("graduatedScientist.text");
@@ -214,6 +214,44 @@ public class EducationController {
 
             return "Education Camp " + campHash + "( ";
         }
+    }
+
+    /**
+     * Returns the sub-caste string corresponding to the given course index.
+     *
+     * @param courseIndex the index of the course
+     * @return the sub-caste string
+     */
+    private static String getWarriorCasteSubCasteString(int courseIndex) {
+        String originCaste;
+
+        switch (courseIndex) {
+            case 0:
+                originCaste = "graduatedWarriorMechWarrior.text";
+                break;
+            case 1:
+                originCaste = "graduatedWarriorProtoMech.text";
+                break;
+            case 2:
+                originCaste = "graduatedWarriorAerospace.text";
+                break;
+            case 3:
+                originCaste = "graduatedWarriorSpace.text";
+                break;
+            case 4:
+                originCaste = "graduatedWarriorBa.text";
+                break;
+            case 5:
+                originCaste = "graduatedWarriorInfantry.text";
+                break;
+            case 6:
+                originCaste = "graduatedWarriorVehicle.text";
+                break;
+            default:
+                originCaste = "graduatedWarrior.text";
+                break;
+        }
+        return originCaste;
     }
 
     /**
@@ -907,8 +945,50 @@ public class EducationController {
      * @param resources  the resource bundle containing the necessary text resources
      */
     private static void processWarriorCasteWashout(Campaign campaign, Person person, ResourceBundle resources) {
-        ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString("graduatedWarrior.text"));
+        // log washout
+        String originCaste = getWarriorCasteSubCasteString(person.getEduCourseIndex());
 
+        ServiceLogger.eduClanWashout(person, campaign.getLocalDate(), resources.getString(originCaste));
+
+        // check for second chance caste
+        if (!campaign.getCampaignOptions().getSecondChanceCaste().isNone()) {
+            int secondChanceCasteIndex = getSecondChanceCasteIndex(campaign);
+
+            // a secondChanceCasteIndex of -1 means second chance caste is set to 'NONE', so we can skip the switch
+            if ((secondChanceCasteIndex != -1) && (person.getEduCourseIndex() != secondChanceCasteIndex)) {
+                switch (campaign.getCampaignOptions().getSecondChanceCaste()) {
+                    case BA:
+                        campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
+                                resources.getString(originCaste),
+                                resources.getString("graduatedWarriorBa.text")));
+                        person.setEduCourseIndex(4);
+                        person.setEduAcademyName(generateClanEducationCode(campaign, person, 4, resources));
+
+                        return;
+                    case INFANTRY:
+                        campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
+                                resources.getString(originCaste),
+                                resources.getString("graduatedWarriorInfantry.text")));
+                        person.setEduCourseIndex(5);
+                        person.setEduAcademyName(generateClanEducationCode(campaign, person, 5, resources));
+
+                        return;
+                    case VEHICLE:
+                        campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
+                                resources.getString(originCaste),
+                                resources.getString("graduatedWarriorVehicle.text")));
+                        person.setEduCourseIndex(6);
+                        person.setEduAcademyName(generateClanEducationCode(campaign, person, 6, resources));
+
+                        return;
+                    default:
+                        throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/education/EducationController.java/processWarriorCasteWashout: "
+                                + campaign.getCampaignOptions().getSecondChanceCaste());
+                }
+            }
+        }
+
+        // otherwise, process washout into a civilian caste
         int fallbackScientist = campaign.getCampaignOptions().getFallbackScientist();
         int fallbackMerchant = campaign.getCampaignOptions().getFallbackMerchant() + fallbackScientist;
         int fallbackTechnician = campaign.getCampaignOptions().getFallbackTechnician() + fallbackMerchant;
@@ -919,7 +999,7 @@ public class EducationController {
         if (roll < fallbackScientist) {
 
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                    resources.getString("graduatedWarrior.text"),
+                    resources.getString(originCaste),
                     resources.getString("graduatedWarriorScientist.text")));
             person.setEduCourseIndex(7);
             person.setEduAcademyName(generateClanEducationCode(campaign, person, 7, resources));
@@ -930,7 +1010,7 @@ public class EducationController {
         if (roll < fallbackMerchant) {
 
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                    resources.getString("graduatedWarrior.text"),
+                    resources.getString(originCaste),
                     resources.getString("graduatedWarriorMerchant.text")));
             person.setEduCourseIndex(8);
             person.setEduAcademyName(generateClanEducationCode(campaign, person, 8, resources));
@@ -941,7 +1021,7 @@ public class EducationController {
         if (roll < fallbackTechnician) {
 
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                    resources.getString("graduatedWarrior.text"),
+                    resources.getString(originCaste),
                     resources.getString("graduatedWarriorTechnician.text")));
             person.setEduCourseIndex(9);
             person.setEduAcademyName(generateClanEducationCode(campaign, person, 9, resources));
@@ -952,7 +1032,7 @@ public class EducationController {
         // Labor
 
         campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("washout.text"),
-                resources.getString("graduatedWarrior.text"),
+                resources.getString(originCaste),
                 resources.getString("graduatedWarriorLabor.text")));
         person.setEduCourseIndex(10);
         person.setEduAcademyName(generateClanEducationCode(campaign, person, 10, resources));
@@ -1139,7 +1219,7 @@ public class EducationController {
      */
     private static void graduateClanSibko(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         // Warrior Caste
-        // [0]MechWarrior, [1]ProtoMech, [2]AreoSpace, [3]Space, [4]BA, [5]CI, [6]Vehicle
+        // [0]MechWarrior, [1]ProtoMech, [2]Aerospace, [3]Space, [4]BA, [5]CI, [6]Vehicle
         if (person.getEduCourseIndex() <= 6) {
             graduateWarriorCaste(campaign, person, academy, resources);
 
@@ -1614,6 +1694,27 @@ public class EducationController {
         List<String> graduationEventTable = graduationEventTable();
 
         return graduationEventTable.get(Compute.randomInt(graduationEventTable.size()));
+    }
+
+    /**
+     * Retrieves the course index value associated with the SecondChanceCaste assigned in campaign options.
+     *
+     * @return The course index of the chosen SecondChanceCaste.
+     * Returns -1 if NONE; 4 if BA; 5 if INFANTRY; 6 if VEHICLE.
+     */
+    private static int getSecondChanceCasteIndex(Campaign campaign) {
+        switch (campaign.getCampaignOptions().getSecondChanceCaste()) {
+            case NONE:
+                return -1;
+            case BA:
+                return 4;
+            case INFANTRY:
+                return 5;
+            case VEHICLE:
+                return 6;
+        }
+
+        return -1;
     }
 
     /**
