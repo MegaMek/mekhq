@@ -16,8 +16,6 @@ import org.apache.logging.log4j.LogManager;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static mekhq.gui.dialog.AutoAwardsDialog.getCenterOfScreen;
-
 public class AutoAwardsController {
     private Campaign campaign;
     private Mission mission;
@@ -138,7 +136,7 @@ public class AutoAwardsController {
 
         if (!allAwardData.isEmpty()) {
             AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
-            autoAwardsDialog.setLocation(getCenterOfScreen(), 0);
+            autoAwardsDialog.setLocation(autoAwardsDialog.getCenterOfScreen(), 0);
             autoAwardsDialog.setVisible(true);
         } else {
             LogManager.getLogger().info("Zero personnel were found eligible for Awards");
@@ -601,7 +599,7 @@ public class AutoAwardsController {
 
         if (!allAwardData.isEmpty()) {
             AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
-            autoAwardsDialog.setLocation(getCenterOfScreen(), 0);
+            autoAwardsDialog.setLocation(autoAwardsDialog.getCenterOfScreen(), 0);
             autoAwardsDialog.setVisible(true);
         } else {
             LogManager.getLogger().info("Zero personnel were found eligible for Awards");

@@ -278,9 +278,9 @@ public class AutoAwardsDialog extends JDialog {
     /**
      * @return The horizontal center point of the screen.
      */
-    public static int getCenterOfScreen() {
+    public int getCenterOfScreen() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        return screenSize.width / 2;
+        return (screenSize.width - getWidth()) / 2;
     }
 }
 
