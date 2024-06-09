@@ -2229,13 +2229,19 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         tableXP = new JTable(getSkillCostsArray(SkillType.getSkillHash()), TABLE_XP_COLUMN_NAMES);
         tableXP.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableXP.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        tableXP.setRowHeight(25);
         tableXP.setRowSelectionAllowed(false);
         tableXP.setColumnSelectionAllowed(false);
         tableXP.setCellSelectionEnabled(true);
+        tableXP.setShowGrid(true);
         final JScrollPane scrXP = new JScrollPane(tableXP);
-        scrXP.setMinimumSize(new Dimension(550, 140));
-        scrXP.setPreferredSize(new Dimension(550, 140));
+        scrXP.setMinimumSize(new Dimension(500, ((tableXP.getRowCount() * 25) + 50)));
+        scrXP.setPreferredSize(new Dimension(500, ((tableXP.getRowCount() * 25) + 50)));
         JTable rowTable = new RowNamesTable(tableXP);
+        rowTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        rowTable.setShowGrid(true);
+        rowTable.setRowHeight(25);
         scrXP.setRowHeaderView(rowTable);
         scrXP.setCorner(JScrollPane.UPPER_LEFT_CORNER, rowTable.getTableHeader());
         gridBagConstraints = new GridBagConstraints();
