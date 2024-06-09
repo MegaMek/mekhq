@@ -41,6 +41,7 @@ import mekhq.gui.view.PersonViewPanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -216,7 +217,7 @@ public class PersonnelMarketDialog extends JDialog {
         sorter = new TableRowSorter<>(personnelModel);
 
         final XTableColumnModel columnModel = (XTableColumnModel) tablePersonnel.getColumnModel();
-        final ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        final ArrayList<SortKey> sortKeys = new ArrayList<>();
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
             final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
             if (!personnelMarketColumns.contains(column)) {
@@ -391,7 +392,6 @@ public class PersonnelMarketDialog extends JDialog {
 
         if (unit.usesSoloPilot()) {
             unit.addPilotOrSoldier(selectedPerson);
-            selectedPerson.setOriginalUnit(unit);
         } else if (unit.usesSoldiers()) {
             unit.addPilotOrSoldier(selectedPerson);
         } else if (selectedPerson.canDrive(en)) {
@@ -402,6 +402,10 @@ public class PersonnelMarketDialog extends JDialog {
             unit.setNavigator(selectedPerson);
         } else {
             unit.addVesselCrew(selectedPerson);
+        }
+
+        if (unit.isCommander(selectedPerson)) {
+            selectedPerson.setOriginalUnit(unit);
         }
 
         HirePersonnelUnitAction hireAction = new HirePersonnelUnitAction(!pay);
