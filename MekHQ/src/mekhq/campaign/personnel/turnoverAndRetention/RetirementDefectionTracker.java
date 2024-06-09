@@ -25,7 +25,6 @@ import megamek.common.Compute;
 import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
-import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
@@ -833,7 +832,7 @@ public class RetirementDefectionTracker {
                                 // this shouldn't be an issue, but we include it here as insurance
                                 if (!payouts.containsKey(id)) {
                                     payouts.put(soldier.getId(), new Payout(campaign, campaign.getPerson(soldier.getId()),
-                                            shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
+                                            shareValue, false, false, campaign.getCampaignOptions().isSharesForAll()));
                                 }
                             }
                         }
@@ -843,7 +842,7 @@ public class RetirementDefectionTracker {
                 }
 
                 payouts.put(id, new Payout(campaign, campaign.getPerson(id),
-                            shareValue, false, campaign.getCampaignOptions().isSharesForAll()));
+                            shareValue, false, false, campaign.getCampaignOptions().isSharesForAll()));
             }
         }
 
@@ -863,22 +862,23 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Handles final payout to any personnel who are sacked or killed in battle
+     * Removes a person from a campaign and updates relevant data.
      *
-     * @param person The person to be removed from the campaign
-     * @param killed True if killed in battle, false if sacked
-     * @param campaign the ongoing campaign
-     * @param contract If not null, the payout must be resolved before the contract can be resolved.
-     * @return true, if the person is due a payout, otherwise false
+     * @param person   The person to be removed from the campaign.
+     * @param killed   Indicates whether the person was killed.
+     * @param sacked   Indicates whether the person was sacked.
+     * @param campaign The campaign from which to remove the person.
+     * @param contract The contract associated with the event trigger, if applicable.
+     * @return True if the person was successfully removed from the campaign, false otherwise.
      */
-    public boolean removeFromCampaign(Person person, boolean killed, Campaign campaign,
+    public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign,
                                       AtBContract contract) {
         if (!person.getPrisonerStatus().isFree()) {
             return false;
         }
 
         payouts.put(person.getId(), new Payout(campaign, person, getShareValue(campaign),
-                killed, campaign.getCampaignOptions().isSharesForAll()));
+                killed, sacked, campaign.getCampaignOptions().isSharesForAll()));
 
         if (null != contract) {
             unresolvedPersonnel.computeIfAbsent(contract.getId(), k -> new HashSet<>());
@@ -985,53 +985,51 @@ public class RetirementDefectionTracker {
     public static class Payout {
         private int weightClass = 0;
         private Money payoutAmount = Money.zero();
-        private boolean stolenUnit = false;
-        private UUID stolenUnitId = null;
+        private boolean wasKilled = false;
+        private boolean wasSacked = false;
 
         public Payout() {
 
         }
 
-        public Payout(final Campaign campaign, final Person person, final Money shareValue, final boolean killed, final boolean sharesForAll) {
-            calculatePayout(campaign, person, killed, shareValue.isPositive());
+        public Payout(final Campaign campaign, final Person person, final Money shareValue, final boolean killed, final boolean sacked,
+                      final boolean sharesForAll) {
+            if (killed) {
+                setWasKilled(true);
+            } else if (sacked) {
+                setWasSacked(true);
+            }
+
+            calculatePayout(campaign, person, killed, sacked, shareValue.isPositive());
 
             if ((shareValue.isPositive()) && (campaign.getCampaignOptions().isUseShareSystem())) {
                 payoutAmount = payoutAmount.plus(shareValue.multipliedBy(person.getNumShares(campaign, sharesForAll)));
             }
         }
 
-        private void calculatePayout(final Campaign campaign, final Person person, final boolean killed, final boolean shareSystem) {
-            int roll;
+        private void calculatePayout(final Campaign campaign, final Person person, final boolean killed, final boolean sacked, final boolean shareSystem) {
+            final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
 
+            // person was killed
             if (killed) {
-                roll = Utilities.dice(1, 5);
+                payoutAmount = getPayoutOrBonusValue(campaign, person);
+            // person was sacked
+            } else if (sacked) {
+                payoutAmount = Money.of(0);
+            // person is defecting
+            } else if (isBreakingContract(person, campaign.getLocalDate(), campaign.getCampaignOptions().getServiceContractDuration())) {
+                payoutAmount = Money.of(0);
+            // person is retiring
+            } else if (person.getAge(campaign.getLocalDate()) >= 50) {
+                payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
+            // person is resigning
             } else {
-                roll = Compute.d6() + Math.max(-1, person.getExperienceLevel(campaign, false) - 2);
-                if (person.getRank().isOfficer()) {
-                    roll += 1;
-                }
+                payoutAmount = getPayoutOrBonusValue(campaign, person);
             }
 
-            if (roll >= 6 && (person.getPrimaryRole().isAerospacePilot() || person.getSecondaryRole().isAerospacePilot())) {
-                stolenUnit = true;
-            } else {
-                final Profession profession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
-
-                // person is defecting
-                if (isBreakingContract(person, campaign.getLocalDate(), campaign.getCampaignOptions().getServiceContractDuration())) {
-                    payoutAmount = Money.of(0);
-                // person is retiring
-                } else if (person.getAge(campaign.getLocalDate()) >= 50) {
-                    payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
-                // person is resigning
-                } else {
-                    payoutAmount = getPayoutOrBonusValue(campaign, person);
-                }
-
-                if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
-                        && (person.getOriginalUnitWeight() > 0)) {
-                    weightClass = person.getOriginalUnitWeight() + person.getOriginalUnitTech();
-                }
+            if (!shareSystem && (profession.isMechWarrior() || profession.isAerospace())
+                    && (person.getOriginalUnitWeight() > 0)) {
+                weightClass = person.getOriginalUnitWeight() + person.getOriginalUnitTech();
             }
         }
 
@@ -1052,20 +1050,20 @@ public class RetirementDefectionTracker {
             this.payoutAmount = payoutAmount;
         }
 
-        public boolean hasStolenUnit() {
-            return stolenUnit;
+        public boolean isWasKilled() {
+            return wasKilled;
         }
 
-        public void setStolenUnit(boolean stolen) {
-            stolenUnit = stolen;
+        public void setWasKilled(boolean wasKilled) {
+            this.wasKilled = wasKilled;
         }
 
-        public UUID getStolenUnitId() {
-            return stolenUnitId;
+        public boolean isWasSacked() {
+            return wasSacked;
         }
 
-        public void setStolenUnitId(UUID id) {
-            stolenUnitId = id;
+        public void setWasSacked(boolean wasSacked) {
+            this.wasSacked = wasSacked;
         }
 
         public static boolean isBreakingContract(Person person, LocalDate localDate, int ContractDuration) {
@@ -1091,8 +1089,6 @@ public class RetirementDefectionTracker {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "payout", "id", pid);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weightClass", payouts.get(pid).getWeightClass());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cbills", payouts.get(pid).getPayoutAmount());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stolenUnit", payouts.get(pid).hasStolenUnit());
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "stolenUnitId", payouts.get(pid).getStolenUnitId());
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payout");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payouts");
@@ -1164,10 +1160,6 @@ public class RetirementDefectionTracker {
                                     payout.setWeightClass(Integer.parseInt(wn4.getTextContent()));
                                 } else if (wn4.getNodeName().equalsIgnoreCase("c-bills")) {
                                     payout.setPayoutAmount(Money.fromXmlString(wn4.getTextContent().trim()));
-                                } else if (wn4.getNodeName().equalsIgnoreCase("stolenUnit")) {
-                                    payout.setStolenUnit(Boolean.parseBoolean(wn4.getTextContent()));
-                                } else if (wn4.getNodeName().equalsIgnoreCase("stolenUnitId")) {
-                                    payout.setStolenUnitId(UUID.fromString(wn4.getTextContent()));
                                 }
                             }
                             retVal.payouts.put(pid, payout);

@@ -1428,7 +1428,7 @@ public class ResolveScenarioTracker {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
                 if (getCampaign().getCampaignOptions().isUseAtB() && isAtBContract) {
                     getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
-                            true, getCampaign(), (AtBContract) mission);
+                            true, false, getCampaign(), (AtBContract) mission);
                 }
             }
 

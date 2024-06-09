@@ -56,6 +56,7 @@ import mekhq.campaign.icons.StandardForceIcon;
 import mekhq.campaign.icons.UnitIcon;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
+import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.market.ContractMarket;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.PersonnelMarket;
@@ -180,6 +181,7 @@ public class Campaign implements ITechManager {
 
     private String name;
     private LocalDate currentDay;
+    private LocalDate campaignStartDate;
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
@@ -261,6 +263,7 @@ public class Campaign implements ITechManager {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         currentDay = LocalDate.ofYearDay(3067, 1);
+        campaignStartDate = null;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
         campaignOptions = new CampaignOptions();
@@ -372,6 +375,14 @@ public class Campaign implements ITechManager {
 
     public void setLocalDate(LocalDate currentDay) {
         this.currentDay = currentDay;
+    }
+
+    public LocalDate getCampaignStartDate() {
+        return campaignStartDate;
+    }
+
+    public void setCampaignStartDate(LocalDate campaignStartDate) {
+        this.campaignStartDate = campaignStartDate;
     }
 
     public PlanetarySystem getCurrentSystem() {
@@ -696,8 +707,10 @@ public class Campaign implements ITechManager {
             if (getFinances().debit(TransactionType.PAYOUT, getLocalDate(), totalPayout, "Final Payout")) {
                 for (UUID pid : getRetirementDefectionTracker().getRetirees()) {
                     Person person = getPerson(pid);
+                    boolean wasKilled = getRetirementDefectionTracker().getPayout(pid).isWasKilled();
+                    boolean wasSacked = getRetirementDefectionTracker().getPayout(pid).isWasSacked();
 
-                    if (!person.getStatus().isDead()) {
+                    if ((!wasKilled) && (!wasSacked)) {
                         if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
                             if (!getActiveContracts().isEmpty()) {
                                 int roll = Compute.randomInt(20);
@@ -713,42 +726,49 @@ public class Campaign implements ITechManager {
                         } else {
                             getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                         }
+                    }
 
-                        // civilian spouses follow their partner in departing
-                        Person spouse = person.getGenealogy().getSpouse();
+                    if (wasSacked) {
+                        getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
+                    }
 
-                        if ((spouse != null) && (spouse.getPrimaryRole().isCivilian())) {
-                            addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
-                            spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                        }
+                    // civilian spouses follow their partner in departing
+                    Person spouse = person.getGenealogy().getSpouse();
 
-                        // non-civilian spouses may divorce the remaining partner
-                        if ((person.getAge(getLocalDate()) >= 50) && (!campaignOptions.getRandomDivorceMethod().isNone())) {
-                            if ((spouse != null) && (spouse.isDivorceable()) && (!spouse.getPrimaryRole().isCivilian())) {
-                                if ((person.getStatus().isDefected()) || (Compute.randomInt(20) == 0)) {
-                                    getDivorce().divorce(this, getLocalDate(), person, SplittingSurnameStyle.WEIGHTED);
-                                }
+                    if ((spouse != null) && (spouse.getPrimaryRole().isCivilian())) {
+                        addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
+                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                    }
+
+                    // non-civilian spouses may divorce the remaining partner
+                    if ((person.getAge(getLocalDate()) >= 50) && (!campaignOptions.getRandomDivorceMethod().isNone())) {
+                        if ((spouse != null) && (spouse.isDivorceable()) && (!spouse.getPrimaryRole().isCivilian())) {
+                            if ((person.getStatus().isDefected()) || (Compute.randomInt(20) == 0)) {
+                                getDivorce().divorce(this, getLocalDate(), person, SplittingSurnameStyle.WEIGHTED);
                             }
                         }
+                    }
 
-                        // This ensures children have a chance of following their parent into departure
-                        // This needs to be after spouses, to ensure joint-departure spouses are factored in
-                        for (Person child : person.getGenealogy().getChildren()) {
-                            if ((child.isChild(getLocalDate())) && (!child.getStatus().isDepartedUnit())) {
-                                boolean hasRemainingParent = child.getGenealogy().getParents().stream()
-                                        .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
+                    // This ensures children have a chance of following their parent into departure
+                    // This needs to be after spouses, to ensure joint-departure spouses are factored in
+                    for (Person child : person.getGenealogy().getChildren()) {
+                        if ((child.isChild(getLocalDate())) && (!child.getStatus().isDepartedUnit())) {
+                            boolean hasRemainingParent = child.getGenealogy().getParents().stream()
+                                    .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
 
-                                // if there is a remaining parent, there is a 50/50 chance the child departs
-                                if ((hasRemainingParent) && (Compute.randomInt(2) == 0)) {
-                                        addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
-                                        child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                }
-
-                                // if there is no remaining parent, the child will always depart
-                                if (!hasRemainingParent) {
+                            // if there is a remaining parent, there is a 50/50 chance the child departs
+                            if ((hasRemainingParent) && (Compute.randomInt(2) == 0)) {
                                     addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
                                     child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                }
+                            }
+
+                            // if there is no remaining parent, the child will always depart, unless the parents are dead
+                            if ((!hasRemainingParent) && (child.getGenealogy().hasLivingParents())) {
+                                addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
+                                child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                            } else if (!child.getGenealogy().hasLivingParents()) {
+                                addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("orphaned.text"));
+                                ServiceLogger.oprhaned(person, getLocalDate());
                             }
                         }
                     }
@@ -3551,10 +3571,10 @@ public class Campaign implements ITechManager {
 
         // Advance the day by one
         final LocalDate yesterday = getLocalDate();
-        setLocalDate(getLocalDate().plus(1, ChronoUnit.DAYS));
+        setLocalDate(getLocalDate().plusDays(1));
 
         // Determine if we have an active contract or not, as this can get used elsewhere before
-        // we actually hit the AtB new day (e.g. personnel market)
+        // we actually hit the AtB new day (e.g., personnel market)
         if (getCampaignOptions().isUseAtB()) {
             setHasActiveContract();
         }
@@ -4294,6 +4314,12 @@ public class Campaign implements ITechManager {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retainerEmployerCode", retainerEmployerCode);
         }
 
+        // this handles campaigns that predate 49.20
+        if (campaignStartDate == null) {
+            setCampaignStartDate(getLocalDate());
+        }
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "campaignStartDate", getCampaignStartDate());
+
         getRankSystem().writeToXML(pw, indent, false);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtime", overtime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gmMode", gmMode);
@@ -4411,12 +4437,13 @@ public class Campaign implements ITechManager {
                 }
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "lances");
             }
-            retirementDefectionTracker.writeToXML(pw, indent);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchStart", getShipSearchStart());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchType", shipSearchType);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchResult", shipSearchResult);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "shipSearchExpiration", getShipSearchExpiration());
         }
+
+        retirementDefectionTracker.writeToXML(pw, indent);
 
         // Customised planetary events
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "customPlanetaryEvents");
@@ -7003,7 +7030,6 @@ public class Campaign implements ITechManager {
     }
 
     public boolean checkTurnoverPrompt() {
-        int days = 0;
         String period = "";
 
         boolean triggerTurnoverPrompt = false;
