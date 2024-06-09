@@ -7030,8 +7030,6 @@ public class Campaign implements ITechManager {
     }
 
     public boolean checkTurnoverPrompt() {
-        String period = "";
-
         boolean triggerTurnoverPrompt = false;
 
         switch (campaignOptions.getTurnoverFrequency()) {
@@ -7039,15 +7037,12 @@ public class Campaign implements ITechManager {
                 return false;
             case WEEKLY:
                 triggerTurnoverPrompt = getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY);
-                period = resources.getString("turnoverWeekly.text");
                 break;
             case MONTHLY:
                 triggerTurnoverPrompt = getLocalDate().getDayOfMonth() == 1;
-                period = resources.getString("turnoverMonthly.text");
                 break;
             case ANNUALLY:
                 triggerTurnoverPrompt = getLocalDate().getDayOfYear() == 1;
-                period = resources.getString("turnoverAnnually.text");
                 break;
         }
 
@@ -7059,8 +7054,7 @@ public class Campaign implements ITechManager {
 
             return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(
                     null,
-                    String.format(resources.getString("turnoverDialogDescription.text"),
-                            period),
+                    resources.getString("turnoverDialogDescription.text"),
                     resources.getString("turnoverRollRequired.text"),
                     JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.WARNING_MESSAGE,
