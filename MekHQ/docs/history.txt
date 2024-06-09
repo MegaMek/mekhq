@@ -75,6 +75,10 @@ MEKHQ VERSION HISTORY:
 + PR #4175: Removed Flavor Text from Breach of Contract Departure in Turnover and Retention Module
 + PR #4176: Turnover Target Number Revision & Updated Documentation
 + PR #4177: Fix NPE Resulting from Null Recruitment Date
++ PR #4158: Added Campaign Option to Randomize New Unit Quality
++ PR #4172: Implemented More Education Module Bug Fixes
++ PR #4174: Fixed Payout of 0 c-bills Causing Soft Lock in Turnover and Retention Module
++ PR #4178: Updated Family Modifier Logic, a Warring Faction Modifier, in Turnover and Retention Module
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
