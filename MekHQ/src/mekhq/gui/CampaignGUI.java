@@ -2438,6 +2438,11 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
+        if (new EndContractNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
         if (new NoCommanderNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
