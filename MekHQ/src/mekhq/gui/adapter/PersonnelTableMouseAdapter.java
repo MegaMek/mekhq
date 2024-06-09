@@ -2620,7 +2620,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 // are any of the local academies accepting applicants from person's Faction or campaign's Faction?
                 String faction = academy.getFilteredFaction(campaign, person, campaign.getCurrentSystem().getId());
 
-                // we add this exception so Clan players always have access to Trueborn Crèches and Sibkos.
+                // we add this exception so Clan players always have access to Trueborn Creches and Sibkos.
                 if (faction == null) {
                     if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowFactionConflict())) {
                         JMenuItem academyOption;

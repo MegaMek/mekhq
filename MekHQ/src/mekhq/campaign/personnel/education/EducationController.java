@@ -202,7 +202,7 @@ public class EducationController {
         }
 
         if (person.getAge(campaign.getLocalDate()) < 10) {
-            return "Crèche " + birthDate.getYear() + birthDate.getMonth().getValue() + birthDate.getDayOfMonth() + campaign.getFaction().getShortName() + " (";
+            return "Creche " + birthDate.getYear() + birthDate.getMonth().getValue() + birthDate.getDayOfMonth() + campaign.getFaction().getShortName() + " (";
         } else if (person.getAge(campaign.getLocalDate()) < 20) {
             return (caste + ' ' + birthDate.getYear() + birthDate.getMonth().getValue() + birthDate.getDayOfMonth() + campaign.getFaction().getShortName()) + " (";
         } else {
@@ -1192,14 +1192,14 @@ public class EducationController {
     }
 
     /**
-     * Graduates a person from the Clan Crèche in a campaign.
+     * Graduates a person from the Clan Creche in a campaign.
      * This method adds a report to the campaign, logs the event using the ServiceLogger,
      * improves the person's skills, and sets their highest education level to the education level
-     * obtained from the Crèche.
+     * obtained from the Creche.
      *
      * @param campaign   the campaign where the graduation is taking place
      * @param person     the person being graduated
-     * @param academy    the Crèche responsible for the graduation
+     * @param academy    the Creche responsible for the graduation
      * @param resources  the ResourceBundle containing localized text
      */
     private static void graduateClanCreche(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {

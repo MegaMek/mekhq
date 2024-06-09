@@ -156,7 +156,7 @@ public class Academy implements Comparable<Academy> {
      * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
      * @param isReeducationCamp       indicates if the academy is a reeducation camp (true) or not (false)
      * @param promotion               indicates the promotion rank earned for completing an academic course
-     * @param isClan                  indicates if the academy is a Clan Sibko or Crèche (true) or not (false)
+     * @param isClan                  indicates if the academy is a Clan Sibko or Creche (true) or not (false)
      * @param isTrueborn              indicates if the Sibko is intended for Trueborn (true) or not (false)
      * @param isPrepSchool            indicates if the academy is focused on children (true) or not (false)
      * @param description             the description of the academy
@@ -329,36 +329,36 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
-     * Checks if the academy is a Clan Sibko or Crèche.
+     * Checks if the academy is a Clan Sibko or Creche.
      *
-     * @return {@code true} if the academy is a Clan Sibko or Crèche, {@code false} otherwise.
+     * @return {@code true} if the academy is a Clan Sibko or Creche, {@code false} otherwise.
      */
     public Boolean isClan() {
         return isClan;
     }
 
     /**
-     * Sets the value indicating whether the academy is a Clan Sibko or Crèche.
+     * Sets the value indicating whether the academy is a Clan Sibko or Creche.
      *
-     * @param isClan true if the academy is a Clan Sibko or Crèche, false otherwise.
+     * @param isClan true if the academy is a Clan Sibko or Creche, false otherwise.
      */
     public void setIsClan(final boolean isClan) {
         this.isClan = isClan;
     }
 
     /**
-     * Checks if the academy is a Truenorn Sibko or Crèche.
+     * Checks if the academy is a Truenorn Sibko or Creche.
      *
-     * @return {@code true} if the academy is a Trueborn Sibko or Crèche, {@code false} otherwise.
+     * @return {@code true} if the academy is a Trueborn Sibko or Creche, {@code false} otherwise.
      */
     public Boolean isTrueborn() {
         return isTrueborn;
     }
 
     /**
-     * Sets the value indicating whether the academy is a Trueborn Sibko or Crèche.
+     * Sets the value indicating whether the academy is a Trueborn Sibko or Creche.
      *
-     * @param isTrueborn true if the academy is a Trueborn Sibko or Crèche, false otherwise.
+     * @param isTrueborn true if the academy is a Trueborn Sibko or Creche, false otherwise.
      */
     public void setIsTrueborn(final boolean isTrueborn) {
         this.isTrueborn = isTrueborn;
