@@ -745,7 +745,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 reinforcements.addAll(AtBDynamicScenarioFactory.fillTransports(this, reinforcements,
                         getContract(campaign).getEnemyCode(),
                         getContract(campaign).getEnemySkill(), getContract(campaign).getEnemyQuality(),
-                        campaign));
+                        null, true, campaign));
 
             }
 
@@ -912,7 +912,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if (campaign.getCampaignOptions().isAllowOpForLocalUnits()) {
             list.addAll(AtBDynamicScenarioFactory.fillTransports(this, list,
                     getContract(campaign).getEnemyCode(), getContract(campaign).getEnemySkill(),
-                    getContract(campaign).getEnemyQuality(), campaign));
+                    getContract(campaign).getEnemyQuality(), null, true, campaign));
         }
     }
 
@@ -940,17 +940,27 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
     /**
      * Determines the most appropriate RAT and uses it to generate a random Entity
      *
-     * @param faction The faction code to use for locating the correct RAT and assigning a crew name
-     * @param skill The {@link SkillLevel} that represents the skill level of the overall force.
-     * @param quality The equipment rating of the force.
-     * @param unitType The UnitTableData constant for the type of unit to generate.
-     * @param weightClass The weight class of the unit to generate
-     * @param campaign The current campaign
-     * @return A new Entity with crew.
+     * @param faction      The faction code to use for locating the correct RAT and assigning a crew name
+     * @param skill        The {@link SkillLevel} of the overall force.
+     * @param quality      The equipment rating of the force.
+     * @param unitType     The {@link UnitType} constant of the type of unit to generate.
+     * @param weightClass  The {@link EntityWeightClass} constant of the unit to generate.
+     * @param campaign     The current campaign
+     * @return             A randomly selected Entity from the parameters specified, with crew. May return null.
      */
-    protected @Nullable Entity getEntity(String faction, SkillLevel skill, int quality,
-                                         int unitType, int weightClass, Campaign campaign) {
-        return AtBDynamicScenarioFactory.getEntity(faction, skill, quality, unitType, weightClass, false, campaign);
+    protected @Nullable Entity getEntity (String faction,
+                                          SkillLevel skill,
+                                          int quality,
+                                          int unitType,
+                                          int weightClass,
+                                          Campaign campaign) {
+        return AtBDynamicScenarioFactory.getEntity(faction,
+                skill,
+                quality,
+                unitType,
+                weightClass,
+                null,
+                campaign);
     }
 
     /**
