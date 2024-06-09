@@ -79,7 +79,7 @@ public class AutoAwardsDialog extends JDialog {
         setTitle(resourceMap.getString("AutoAwardsDialog.title"));
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setSize(screenSize);
+        setSize((int) screenSize.getWidth(), (int) (screenSize.getHeight() * 0.94));
 
         setLayout(new BorderLayout());
         CardLayout cardLayout = new CardLayout();
@@ -241,6 +241,7 @@ public class AutoAwardsDialog extends JDialog {
                 // if necessary, this initiates the next page
                 if ((currentPageCount + 1) < allData.size()) {
                     AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allData, (currentPageCount + 1));
+                    autoAwardsDialog.setLocation(getCenterOfScreen(), 0);
                     autoAwardsDialog.setVisible(true);
                 }
             } else if (event.getSource().equals(btnSkip)) {
@@ -248,6 +249,7 @@ public class AutoAwardsDialog extends JDialog {
 
                 if ((currentPageCount + 1) < allData.size()) {
                     AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allData, (currentPageCount + 1));
+                    autoAwardsDialog.setLocation(getCenterOfScreen(), 0);
                     autoAwardsDialog.setVisible(true);
                 }
             } else if (event.getSource().equals(btnSkipAll)) {
@@ -271,6 +273,14 @@ public class AutoAwardsDialog extends JDialog {
                 return filter.getFilteredInformation(person, campaign.getLocalDate());
             }
         });
+    }
+
+    /**
+     * @return The horizontal center point of the screen.
+     */
+    public static int getCenterOfScreen() {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        return screenSize.width / 2;
     }
 }
 
