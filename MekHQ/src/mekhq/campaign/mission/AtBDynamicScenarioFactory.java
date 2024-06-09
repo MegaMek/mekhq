@@ -417,22 +417,14 @@ public class AtBDynamicScenarioFactory {
 
         // Force template parameters - is the template calling for specific roles
 
-        // Conditions parameters - hostile atmosphere, temperature, or low gravity
-        boolean isHostileEnvironment = false;
-        boolean isHot = false;
-        boolean isCold = false;
+        // Conditions parameters - atmospheric pressure, toxic atmosphere, or low gravity
+        boolean isLowGravity = false;
+        boolean isLowPressure = false;
+        boolean isTainted = false;
         boolean allowsConvInfantry = true;
         boolean allowsTanks = true;
-        boolean isLowGravity = false;
-        if (scenario.getTemperature() > 50) {
-            isHostileEnvironment = true;
-            isHot = true;
-        } else if (scenario.getTemperature() < -30) {
-            isHostileEnvironment = true;
-            isCold = true;
-        }
         if (scenario.getAtmosphere().isLighterThan(Atmosphere.THIN)) {
-            isHostileEnvironment = true;
+            isLowPressure = true;
             allowsTanks = false;
         } else {
             mekhq.campaign.universe.Atmosphere specific_atmosphere =
@@ -440,27 +432,24 @@ public class AtBDynamicScenarioFactory {
             switch (specific_atmosphere) {
                 case TOXICPOISON:
                 case TOXICCAUSTIC:
-                    isHostileEnvironment = true;
                     allowsConvInfantry = false;
                     allowsTanks = false;
                     break;
                 case TAINTEDPOISON:
                 case TAINTEDCAUSTIC:
-                    isHostileEnvironment = true;
+                    isTainted = true;
                     break;
                 default:
                     break;
             }
         }
         if (scenario.getWind().isTornadoF1ToF3() || scenario.getWind().isTornadoF4()) {
-            isHostileEnvironment = true;
             allowsConvInfantry = false;
             if (scenario.getWind().isTornadoF4()) {
                 allowsTanks = false;
             }
         }
         if (scenario.getGravity() <= 0.2) {
-            isHostileEnvironment = true;
             allowsTanks = false;
             isLowGravity = true;
         }
@@ -474,11 +463,11 @@ public class AtBDynamicScenarioFactory {
         // TODO: get required roles from force template
 
         // Parameters for infantry - check if XCT or marines are required
-        if (allowsConvInfantry && isHostileEnvironment) {
+        if (allowsConvInfantry && (isTainted || isLowPressure || isLowGravity)) {
             Collection<MissionRole> infantryRoles = new HashSet<>();
             if (isLowGravity) {
                 infantryRoles.add(MissionRole.MARINE);
-            } else if (!isHot && !isCold) {
+            } else {
                 infantryRoles.add(MissionRole.XCT);
             }
             if (requiredRoles.containsKey(UnitType.INFANTRY)) {
@@ -548,9 +537,8 @@ public class AtBDynamicScenarioFactory {
 
             // Hazardous conditions may prohibit deploying infantry or vehicles
             // TODO: test this to see what happens with all-infantry or all-vehicle forces
-            } else if (isHostileEnvironment &&
-                    ((actualUnitType == UnitType.INFANTRY && !allowsConvInfantry) ||
-                            actualUnitType == UnitType.TANK && !allowsTanks)) {
+            } else if ((actualUnitType == UnitType.INFANTRY && !allowsConvInfantry) ||
+                    (actualUnitType == UnitType.TANK && !allowsTanks)) {
                 generatedLance = new ArrayList<>();
 
             // Gun emplacements use fixed tables instead of the force generator system
@@ -607,10 +595,12 @@ public class AtBDynamicScenarioFactory {
 
                     // If extreme temperatures are present and XCT infantry is not being generated,
                     // swap out standard armor for snowsuits or heat suits as appropriate
-                    if (actualUnitType == UnitType.INFANTRY && (isHot || isCold)) {
+                    if (actualUnitType == UnitType.INFANTRY) {
                         for (Entity curPlatoon : generatedLance) {
-                            ((Infantry) curPlatoon).setArmorKit(isCold ?
-                                    MiscType.createSnowSuitInfArmor() : MiscType.createISHeatSuitInfArmor());
+                            changeInfantryKit((Infantry) curPlatoon,
+                                    isLowPressure,
+                                    isTainted,
+                                    scenario.getTemperature());
                         }
                     }
 
@@ -797,7 +787,15 @@ public class AtBDynamicScenarioFactory {
                 campaign);
         generatedEntities.addAll(transportedEntities);
 
-        // TODO: accommodate hostile temperatures by swapping armor out for heat suits or snowsuits
+        if (transportedEntities != null)
+        {
+            for (Entity curPlatoon : transportedEntities) {
+                changeInfantryKit((Infantry) curPlatoon,
+                        isLowPressure,
+                        isTainted,
+                        scenario.getTemperature());
+            }
+        }
 
         BotForce generatedForce = new BotForce();
         generatedForce.setFixedEntityList(generatedEntities);
@@ -1388,6 +1386,43 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * Swaps out infantry armor kit based on provided conditions. Alternate armor kits are
+     * snow/heat suits (temperature only), light environment suits (low pressure only),
+     * and hostile environment suit (tainted or multiple conditions).
+     *
+     * @param platoon        Conventional infantry platoon to configure
+     * @param isLowPressure  true if atmosphere is too thin to breathe
+     * @param isTainted      true if atmosphere has contaminants
+     * @param temperature    Scenario temperature, in degrees C
+     */
+    private static void changeInfantryKit (Infantry platoon,
+                                           boolean isLowPressure,
+                                           boolean isTainted,
+                                           int temperature) {
+        boolean isHot = temperature > 50;
+        boolean isCold = temperature < -30;
+
+        if (isTainted) {
+            platoon.setArmorKit(MiscType.createISEnvironmentSuitHostileInfArmor());
+        } else if (!isLowPressure) {
+
+            // Normal pressure, with extreme temperature
+            platoon.setArmorKit(isHot ? MiscType.createISHeatSuitInfArmor() : MiscType.createSnowSuitInfArmor());
+
+        } else {
+
+            // Low/no atmosphere, with or without extreme temperature
+            if (isHot || isCold) {
+                platoon.setArmorKit(MiscType.createISEnvironmentSuitHostileInfArmor());
+            } else {
+                platoon.setArmorKit(MiscType.createISEnvironmentSuitLightInfArmor());
+            }
+
+        }
+    }
+
+
+    /**
      * Identify all units which can carry infantry, and attempt to generate infantry or battle
      * armor to fill them.
      *
@@ -1620,9 +1655,9 @@ public class AtBDynamicScenarioFactory {
             crewedPlatoon = createEntityWithCrew(newParams.getFaction(), skill, campaign, ms);
         }
 
-        // If needed, temporarily assign troops light environmental suits
+        // If needed, temporarily assign troops hostile environmental suits
         if (temporaryXCT) {
-            ((Infantry) crewedPlatoon).setArmorKit(MiscType.createISEnvironmentSuitHostileInfArmor());
+            changeInfantryKit(((Infantry) crewedPlatoon), false, true, 25);
         }
 
         return crewedPlatoon;
