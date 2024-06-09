@@ -725,23 +725,33 @@ public class RetirementDefectionDialog extends JDialog {
         return aborted;
     }
 
+    /**
+     * Determines if the unit assignments are complete based on available campaign funds and total payout.
+     *
+     * @return true if the unit assignments are complete and the total payout is greater than or equal to the campaign funds,
+     * false otherwise
+     */
     private boolean unitAssignmentsComplete() {
         if (unitAssignmentTable.getModel().getRowCount() <= 0) {
             return true;
         }
 
+        Money totalPayout = totalPayout();
+
         // This allows us to ignore anything 0.99 c-bills or lower, in case of unusual fractional issues
-        if (totalPayout().isLessThan(Money.of(1.0))) {
+        if (totalPayout.isLessThan(Money.of(1.0))) {
             return true;
         }
 
-        return rdTracker.getRetirees().stream()
+        boolean assignmentComplete = rdTracker.getRetirees().stream()
                 .filter(uuid -> isBreakingContract(hqView.getCampaign().getPerson(uuid),
                         hqView.getCampaign().getLocalDate(),
                         hqView.getCampaign().getCampaignOptions().getServiceContractDuration()))
                 .findFirst()
                 .map(uuid -> (!unitAssignments.containsKey(uuid)))
                 .orElse(true);
+
+        return ((assignmentComplete) && (totalPayout.isLessThan(hqView.getCampaign().getFunds())));
     }
 
     private void enableAddRemoveButtons() {
