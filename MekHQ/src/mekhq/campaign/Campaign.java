@@ -180,7 +180,7 @@ public class Campaign implements ITechManager {
 
     private String name;
     private LocalDate currentDay;
-    private LocalDate campaignStartDay;
+    private LocalDate campaignStartDate;
 
     // hierarchically structured Force object to define TO&E
     private Force forces;
@@ -262,7 +262,7 @@ public class Campaign implements ITechManager {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         currentDay = LocalDate.ofYearDay(3067, 1);
-        campaignStartDay = null;
+        campaignStartDate = null;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
         campaignOptions = new CampaignOptions();
@@ -377,11 +377,11 @@ public class Campaign implements ITechManager {
     }
 
     public LocalDate getCampaignStartDay() {
-        return campaignStartDay;
+        return campaignStartDate;
     }
 
-    public void setCampaignStartDay(LocalDate campaignStartDay) {
-        this.campaignStartDay = campaignStartDay;
+    public void setCampaignStartDay(LocalDate campaignStartDate) {
+        this.campaignStartDate = campaignStartDate;
     }
 
     public PlanetarySystem getCurrentSystem() {
@@ -4305,10 +4305,10 @@ public class Campaign implements ITechManager {
         }
 
         // this handles campaigns that predate 49.20
-        if (campaignStartDay == null) {
+        if (campaignStartDate == null) {
             setCampaignStartDay(getLocalDate());
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "campaignStartDay", getCampaignStartDay());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "campaignStartDate", getCampaignStartDay());
 
         getRankSystem().writeToXML(pw, indent, false);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "overtime", overtime);
