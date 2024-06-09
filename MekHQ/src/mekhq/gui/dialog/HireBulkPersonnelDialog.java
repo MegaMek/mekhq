@@ -331,7 +331,7 @@ public class HireBulkPersonnelDialog extends JDialog {
 
             // while this isn't the most efficient way of doing this, we don't currently have a way
             // to generate personnel at specific skill levels
-            if (useSkill) {
+            if ((useSkill) && (!selectedItem.getRole().isCivilian()) && (!selectedItem.getRole().isAssistant())) {
                 while (person.getSkillLevel(campaign, false) != skillLevel.getSelectedItem()) {
                     person = campaign.newPerson(selectedItem.getRole());
                 }
