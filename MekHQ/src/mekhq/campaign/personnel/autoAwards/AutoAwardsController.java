@@ -136,7 +136,7 @@ public class AutoAwardsController {
 
         if (!allAwardData.isEmpty()) {
             AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
-            autoAwardsDialog.setLocation(autoAwardsDialog.getCenterOfScreen(), 0);
+            autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
             autoAwardsDialog.setVisible(true);
         } else {
             LogManager.getLogger().info("Zero personnel were found eligible for Awards");
@@ -599,7 +599,7 @@ public class AutoAwardsController {
 
         if (!allAwardData.isEmpty()) {
             AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
-            autoAwardsDialog.setLocation(autoAwardsDialog.getCenterOfScreen(), 0);
+            autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
             autoAwardsDialog.setVisible(true);
         } else {
             LogManager.getLogger().info("Zero personnel were found eligible for Awards");
