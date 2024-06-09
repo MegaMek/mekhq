@@ -388,9 +388,10 @@ public class PersonnelStatusTest {
         assertEquals(PersonnelStatus.PREGNANCY_COMPLICATIONS, PersonnelStatus.parseFromString("19"));
         assertEquals(PersonnelStatus.UNDETERMINED, PersonnelStatus.parseFromString("20"));
         assertEquals(PersonnelStatus.SUICIDE, PersonnelStatus.parseFromString("21"));
+        assertEquals(PersonnelStatus.SACKED, PersonnelStatus.parseFromString("22"));
 
         // Error Case
-        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("22"));
+        assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("23"));
         assertEquals(PersonnelStatus.ACTIVE, PersonnelStatus.parseFromString("blah"));
     }
     //endregion File I/O

@@ -1201,7 +1201,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void showRetirementDefectionDialog() {
+    public boolean showRetirementDefectionDialog() {
         /*
          * if there are unresolved personnel, show the results view; otherwise,
          * present the retirement view to give the player a chance to follow a
@@ -1213,6 +1213,9 @@ public class CampaignGUI extends JPanel {
 
         if (!rdd.wasAborted()) {
             getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -2401,15 +2404,8 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (getCampaign().checkRetirementDefections()) {
-            showRetirementDefectionDialog();
-            evt.cancel();
-            return;
-        }
-
-        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
-            if (getCampaign().checkTurnoverPrompt()) {
-                showRetirementDefectionDialog();
+        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) && (getCampaign().checkTurnoverPrompt())) {
+            if (!showRetirementDefectionDialog()) {
                 evt.cancel();
                 return;
             }
@@ -2438,6 +2434,11 @@ public class CampaignGUI extends JPanel {
         }
 
         if (new UntreatedPersonnelNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new EndContractNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
         }

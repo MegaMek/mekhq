@@ -151,6 +151,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionPrisonersNag;
     private JCheckBox optionUntreatedPersonnelNag;
     private JCheckBox optionNoCommanderNag;
+    private JCheckBox optionContractEndedNag;
     private JCheckBox optionInsufficientAstechsNag;
     private JCheckBox optionInsufficientAstechTimeNag;
     private JCheckBox optionInsufficientMedicsNag;
@@ -882,6 +883,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionNoCommanderNag.setToolTipText(resources.getString("optionNoCommanderNag.toolTipText"));
         optionNoCommanderNag.setName("optionNoCommanderNag");
 
+        optionContractEndedNag = new JCheckBox(resources.getString("optionContractEndedNag.text"));
+        optionContractEndedNag.setToolTipText(resources.getString("optionContractEndedNag.toolTipText"));
+        optionContractEndedNag.setName("optionContractEndedNag");
+
         optionInsufficientAstechsNag = new JCheckBox(resources.getString("optionInsufficientAstechsNag.text"));
         optionInsufficientAstechsNag.setToolTipText(resources.getString("optionInsufficientAstechsNag.toolTipText"));
         optionInsufficientAstechsNag.setName("optionInsufficientAstechsNag");
@@ -925,6 +930,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionPrisonersNag)
                         .addComponent(optionUntreatedPersonnelNag)
                         .addComponent(optionNoCommanderNag)
+                        .addComponent(optionContractEndedNag)
                         .addComponent(optionInsufficientAstechsNag)
                         .addComponent(optionInsufficientAstechTimeNag)
                         .addComponent(optionInsufficientMedicsNag)
@@ -941,6 +947,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionPrisonersNag)
                         .addComponent(optionUntreatedPersonnelNag)
                         .addComponent(optionNoCommanderNag)
+                        .addComponent(optionContractEndedNag)
                         .addComponent(optionInsufficientAstechsNag)
                         .addComponent(optionInsufficientAstechTimeNag)
                         .addComponent(optionInsufficientMedicsNag)
@@ -1200,6 +1207,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_PRISONERS, optionPrisonersNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL, optionUntreatedPersonnelNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER, optionNoCommanderNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_CONTRACT_ENDED, optionContractEndedNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS, optionInsufficientAstechsNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME, optionInsufficientAstechTimeNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS, optionInsufficientMedicsNag.isSelected());
@@ -1314,6 +1322,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPrisonersNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_PRISONERS));
         optionUntreatedPersonnelNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL));
         optionNoCommanderNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER));
+        optionContractEndedNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_CONTRACT_ENDED));
         optionInsufficientAstechsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS));
         optionInsufficientAstechTimeNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME));
         optionInsufficientMedicsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS));

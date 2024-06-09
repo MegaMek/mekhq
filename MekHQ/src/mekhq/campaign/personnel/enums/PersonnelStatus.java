@@ -38,6 +38,7 @@ public enum PersonnelStatus {
     AWOL("PersonnelStatus.AWOL.text", "PersonnelStatus.AWOL.toolTipText", "PersonnelStatus.AWOL.reportText", "PersonnelStatus.AWOL.logText"),
     RETIRED("PersonnelStatus.RETIRED.text", "PersonnelStatus.RETIRED.toolTipText", "PersonnelStatus.RETIRED.reportText", "PersonnelStatus.RETIRED.logText"),
     RESIGNED("PersonnelStatus.RESIGNED.text", "PersonnelStatus.RESIGNED.toolTipText", "PersonnelStatus.RESIGNED.reportText", "PersonnelStatus.RESIGNED.logText"),
+    SACKED("PersonnelStatus.SACKED.text", "PersonnelStatus.SACKED.toolTipText", "PersonnelStatus.SACKED.reportText", "PersonnelStatus.SACKED.logText"),
     LEFT("PersonnelStatus.LEFT.text", "PersonnelStatus.LEFT.toolTipText", "PersonnelStatus.LEFT.reportText", "PersonnelStatus.LEFT.logText"),
     DESERTED("PersonnelStatus.DESERTED.text", "PersonnelStatus.DESERTED.toolTipText", "PersonnelStatus.DESERTED.reportText", "PersonnelStatus.DESERTED.logText"),
     DEFECTED("PersonnelStatus.DEFECTED.text", "PersonnelStatus.DEFECTED.toolTipText", "PersonnelStatus.DEFECTED.reportText", "PersonnelStatus.DEFECTED.logText"),
@@ -118,6 +119,10 @@ public enum PersonnelStatus {
         return this == RESIGNED;
     }
 
+    public boolean isSacked() {
+        return this == SACKED;
+    }
+
     public boolean isLeft() {
         return this == LEFT;
     }
@@ -193,7 +198,7 @@ public enum PersonnelStatus {
      * @return true if a person has left the unit, otherwise false
      */
     public boolean isDepartedUnit() {
-        return isDead() || isRetired() || isResigned() || isDeserted() || isDefected() || isMissing() || isLeft();
+        return isDead() || isRetired() || isResigned() || isSacked() || isDeserted() || isDefected() || isMissing() || isLeft();
     }
 
     /**
@@ -278,6 +283,8 @@ public enum PersonnelStatus {
                     return UNDETERMINED;
                 case 21:
                     return SUICIDE;
+                case 22:
+                    return SACKED;
                 default:
                     break;
             }
@@ -285,7 +292,7 @@ public enum PersonnelStatus {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a PersonnelStatus. Returning ACTIVE.");
+        LogManager.getLogger().error("Unable to parse {} into a PersonnelStatus. Returning ACTIVE.", text);
         return ACTIVE;
     }
     //endregion File I/O

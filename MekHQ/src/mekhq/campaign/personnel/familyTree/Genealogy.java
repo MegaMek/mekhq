@@ -202,6 +202,19 @@ public class Genealogy {
     }
 
     /**
+     * @return {@code true} if the person at least one living parent, otherwise {@code false}.
+     * Will also return false if the person has no parents
+     */
+    public boolean hasLivingParents() {
+        if (hasParents()) {
+            return getFamily().get(FamilialRelationshipType.PARENT).stream()
+                    .anyMatch(parent -> !parent.getStatus().isDead());
+        }
+
+        return false;
+    }
+
+    /**
      * This is used to determine if two people have mutual ancestors based on their genealogies
      * @param person the person to check if they are related or not
      * @param depth the depth to check mutual ancestry up to
