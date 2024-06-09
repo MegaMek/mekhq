@@ -263,7 +263,7 @@ public class Campaign implements ITechManager {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         currentDay = LocalDate.ofYearDay(3067, 1);
-        campaignStartDate = currentDay;
+        campaignStartDate = null;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
         campaignOptions = new CampaignOptions();
