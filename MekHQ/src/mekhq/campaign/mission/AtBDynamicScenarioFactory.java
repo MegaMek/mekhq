@@ -1902,16 +1902,18 @@ public class AtBDynamicScenarioFactory {
         List<Integer> unitTypes = new ArrayList<>(unitCount);
         int actualUnitType = unitTypeCode;
 
+        // This special unit type code randomly selects between all Mech, all vehicle, or mixed
+        // Mech/vehicle formations
         if (unitTypeCode == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
             Faction faction = Factions.getInstance().getFaction(factionCode);
 
-            // "AtB Mix" will skip vehicles if the "use vehicles" checkbox is turned off
-            // or if the faction is clan and "clan opfors use vehicles" is turned off
-            boolean useVehicles = campaign.getCampaignOptions().isUseVehicles() &&
-                    (!faction.isClan() || (faction.isClan() && campaign.getCampaignOptions().isClanVehicles()));
+            // If ground vehicles are permitted in general and by environmental conditions, and
+            // for Clans if this is a Clan faction, then use them. Otherwise, only use Mechs.
+            if (campaign.getCampaignOptions().isUseVehicles() &&
+                    allowTanks &&
+                    (!faction.isClan() ||
+                            (faction.isClan() && campaign.getCampaignOptions().isClanVehicles()))) {
 
-            // logic mostly lifted from AtBScenario.java, uses campaign config to determine tank/mech mixture
-            if (useVehicles || allowTanks) {
                 // some specialized logic for clan opfors
                 // if we're in the late republic or dark ages, clans no longer have the luxury of mech only stars
                 boolean clanEquipmentScarcity = campaign.getEra()
@@ -1921,6 +1923,8 @@ public class AtBDynamicScenarioFactory {
                     return generateClanUnitTypes(unitCount, forceQuality, factionCode, campaign);
                 }
 
+                // Use the Mech/vehicle/mixed ratios from campaign options as weighted values for
+                // random unit type
                 int totalWeight = campaign.getCampaignOptions().getOpForLanceTypeMechs() +
                         campaign.getCampaignOptions().getOpForLanceTypeMixed() +
                         campaign.getCampaignOptions().getOpForLanceTypeVehicles();
@@ -1930,7 +1934,7 @@ public class AtBDynamicScenarioFactory {
                     int roll = Compute.randomInt(totalWeight);
                     if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles()) {
                         actualUnitType = UnitType.TANK;
-                    // if we actually rolled a mixed unit, apply "random" distribution of tank/mech
+                    // Mixed units randomly select between Mech or ground vehicle
                     } else if (roll < campaign.getCampaignOptions().getOpForLanceTypeVehicles() +
                             campaign.getCampaignOptions().getOpForLanceTypeMixed()) {
                         for (int x = 0; x < unitCount; x++) {
@@ -1947,7 +1951,6 @@ public class AtBDynamicScenarioFactory {
                         actualUnitType = UnitType.MEK;
                     }
                 }
-            // if we're not using vehicles, just generate meks
             } else {
                 actualUnitType = UnitType.MEK;
             }
