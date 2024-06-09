@@ -141,6 +141,12 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         FixedUnitCount,
 
         /**
+         * Option to override the BV cap when generating the force. When the overrideBvCap option is true,
+         * the BV cap is ignored and the force is generated without any restriction on the BV value.
+         */
+        OverrideBvCap,
+
+        /**
          * Either assigned by player from TO&amp;E or a minimum fixed number of units;
          */
         PlayerOrFixedUnitCount,
@@ -311,6 +317,11 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     private int fixedUnitCount = 0;
 
     /**
+     * Whether to override the Scenario Mod BV Cap, assigned in Campaign Options
+     */
+    private boolean overrideBvCap = false;
+
+    /**
      * The "generation bucket" to which this force template is assigned.
      * Forces within a particular "generation bucket" will be generated at the same time, taking into account
      * forces previously generated.
@@ -417,6 +428,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         contributesToMapSize = forceDefinition.contributesToMapSize;
         actualDeploymentZone =  forceDefinition.actualDeploymentZone;
         fixedUnitCount = forceDefinition.fixedUnitCount;
+        overrideBvCap = forceDefinition.overrideBvCap;
         generationOrder = forceDefinition.generationOrder;
         allowAeroBombs = forceDefinition.allowAeroBombs;
         startingAltitude = forceDefinition.startingAltitude;
@@ -507,6 +519,10 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
 
     public int getFixedUnitCount() {
         return fixedUnitCount;
+    }
+
+    public boolean getOverrideBvCap() {
+        return overrideBvCap;
     }
 
     public boolean getAllowAeroBombs() {
@@ -603,6 +619,10 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
 
     public void setFixedUnitCount(int fixedUnitCount) {
         this.fixedUnitCount = fixedUnitCount;
+    }
+
+    public void setOverrideBvCap(boolean overrideBvCap) {
+        this.overrideBvCap = overrideBvCap;
     }
 
     public void setGenerationOrder(int generationOrder) {

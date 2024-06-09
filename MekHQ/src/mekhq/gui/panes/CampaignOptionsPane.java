@@ -690,6 +690,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseWeatherConditions;
     private JCheckBox chkUseLightConditions;
     private JCheckBox chkUsePlanetaryConditions;
+    private JSpinner spnScenarioModMax;
+    private JSpinner spnScenarioModChance;
+    private JSpinner spnScenarioModBV;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -3221,6 +3224,56 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubAtBScenario.add(panSPAUpgradeIntensity, gridBagConstraints);
 
+        JPanel panScenarioMod = new JPanel();
+        JLabel lblScenarioMod = new JLabel(resources.getString("lblScenarioMod.text"));
+        panScenarioMod.add(lblScenarioMod);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
+
+        JLabel lblScenarioModMax = new JLabel(resources.getString("lblScenarioModMax.text"));
+        lblScenarioModMax.setToolTipText(resources.getString("lblScenarioModMax.toolTipText"));
+        spnScenarioModMax = new JSpinner(new SpinnerNumberModel(3, 0, 10, 1));
+        panScenarioMod.add(lblScenarioModMax);
+        panScenarioMod.add(spnScenarioModMax);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
+
+        JLabel lblScenarioModChance = new JLabel(resources.getString("lblScenarioModChance.text"));
+        lblScenarioModChance.setToolTipText(resources.getString("lblScenarioModChance.toolTipText"));
+        spnScenarioModChance = new JSpinner(new SpinnerNumberModel(25, 5, 100, 5));
+        panScenarioMod.add(lblScenarioModChance);
+        panScenarioMod.add(spnScenarioModChance);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
+
+        JLabel lblScenarioModBV = new JLabel(resources.getString("lblScenarioModBV.text"));
+        lblScenarioModBV.setToolTipText(resources.getString("lblScenarioModBV.toolTipText"));
+        spnScenarioModBV = new JSpinner(new SpinnerNumberModel(50, 5, 100, 5));
+        panScenarioMod.add(lblScenarioModBV);
+        panScenarioMod.add(spnScenarioModBV);
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = yTablePosition++;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.insets = new Insets(0, 5, 5, 5);
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        panSubAtBScenario.add(panScenarioMod, gridBagConstraints);
+
         JScrollPane scrAtB = new JScrollPane(panAtB);
         scrAtB.setPreferredSize(new Dimension(500, 410));
         return scrAtB;
@@ -3237,29 +3290,41 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         personnelPanel.add(createGeneralPersonnelPanel(), gbc);
 
         gbc.gridx++;
         personnelPanel.add(createExpandedPersonnelInformationPanel(), gbc);
 
+        //
+
         gbc.gridx = 0;
         gbc.gridy++;
+        personnelPanel.add(createLogPanel(), gbc);
+
+        gbc.gridx++;
         personnelPanel.add(createAdministratorsPanel(), gbc);
 
-        gbc.gridx++;
-        personnelPanel.add(createAwardsPanel(), gbc);
+        //
 
         gbc.gridx = 0;
         gbc.gridy++;
-        personnelPanel.add(createMedicalPanel(), gbc);
+        personnelPanel.add(createAwardsPanel(), gbc);
 
         gbc.gridx++;
+        personnelPanel.add(createMedicalPanel(), gbc);
+
+        //
+
+        gbc.gridx = 0;
+        gbc.gridy++;
         personnelPanel.add(createPrisonerPanel(), gbc);
 
         gbc.gridx++;
         personnelPanel.add(createDependentPanel(), gbc);
+
+        //
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -3282,7 +3347,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         turnoverAndRetentionPanel.add(createTurnoverAndRetentionHeaderPanel(), gbc);
 
@@ -3319,22 +3384,29 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-
         lifePathsPanel.add(createPersonnelRandomizationPanel(), gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy++;
-        lifePathsPanel.add(createFamilyPanel(), gbc);
 
         gbc.gridx++;
         lifePathsPanel.add(createAnniversaryPanel(), gbc);
 
+        //
+
         gbc.gridx = 0;
         gbc.gridy++;
+        gbc.gridwidth = 2;
+        lifePathsPanel.add(createFamilyPanel(), gbc);
+
+        //
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.gridwidth = 1;
         lifePathsPanel.add(createMarriagePanel(), gbc);
 
         gbc.gridx++;
         lifePathsPanel.add(createDivorcePanel(), gbc);
+
+        //
 
         gbc.gridx = 0;
         gbc.gridy++;
@@ -3343,8 +3415,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gbc.gridx++;
         lifePathsPanel.add(createProcreationPanel(), gbc);
 
+        //
+
         gbc.gridx = 0;
         gbc.gridy++;
+        gbc.gridwidth = 2;
         lifePathsPanel.add(createDeathPanel(), gbc);
 
         final JScrollPane scrollLifePaths = new JScrollPane(lifePathsPanel);
@@ -3392,6 +3467,46 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseAlternativeQualityAveraging.setToolTipText(resources.getString("chkUseAlternativeQualityAveraging.toolTipText"));
         chkUseAlternativeQualityAveraging.setName("chkUseAlternativeQualityAveraging");
 
+        // Layout the Panel
+        final JPanel panel = new JPanel();
+        panel.setBorder(BorderFactory.createTitledBorder(""));
+        panel.setName("generalPersonnelPanel");
+
+        final GroupLayout layout = new GroupLayout(panel);
+        layout.setAutoCreateGaps(true);
+        layout.setAutoCreateContainerGaps(true);
+        panel.setLayout(layout);
+
+        layout.setVerticalGroup(
+                layout.createSequentialGroup()
+                        .addComponent(chkUseTactics)
+                        .addComponent(chkUseInitiativeBonus)
+                        .addComponent(chkUseToughness)
+                        .addComponent(chkUseArtillery)
+                        .addComponent(chkUseAbilities)
+                        .addComponent(chkUseEdge)
+                        .addComponent(chkUseSupportEdge)
+                        .addComponent(chkUseImplants)
+                        .addComponent(chkUseAlternativeQualityAveraging)
+        );
+
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkUseTactics)
+                        .addComponent(chkUseInitiativeBonus)
+                        .addComponent(chkUseToughness)
+                        .addComponent(chkUseArtillery)
+                        .addComponent(chkUseAbilities)
+                        .addComponent(chkUseEdge)
+                        .addComponent(chkUseSupportEdge)
+                        .addComponent(chkUseImplants)
+                        .addComponent(chkUseAlternativeQualityAveraging)
+        );
+
+        return panel;
+    }
+
+    private JPanel createLogPanel() {
         chkUseTransfers = new JCheckBox(resources.getString("chkUseTransfers.text"));
         chkUseTransfers.setToolTipText(resources.getString("chkUseTransfers.toolTipText"));
         chkUseTransfers.setName("chkUseTransfers");
@@ -3424,27 +3539,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkDisplayKillRecord.setToolTipText(resources.getString("chkDisplayKillRecord.toolTipText"));
         chkDisplayKillRecord.setName("chkDisplayKillRecord");
 
-        // Layout the Panel
-        final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(""));
-        panel.setName("generalPersonnelPanel");
+        final JPanel logPanel = new JPanel();
+        logPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("logPanel.title")));
+        logPanel.setName("logPanel");
 
-        final GroupLayout layout = new GroupLayout(panel);
+        final GroupLayout layout = new GroupLayout(logPanel);
         layout.setAutoCreateGaps(true);
         layout.setAutoCreateContainerGaps(true);
-        panel.setLayout(layout);
+        logPanel.setLayout(layout);
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addComponent(chkUseTactics)
-                        .addComponent(chkUseInitiativeBonus)
-                        .addComponent(chkUseToughness)
-                        .addComponent(chkUseArtillery)
-                        .addComponent(chkUseAbilities)
-                        .addComponent(chkUseEdge)
-                        .addComponent(chkUseSupportEdge)
-                        .addComponent(chkUseImplants)
-                        .addComponent(chkUseAlternativeQualityAveraging)
                         .addComponent(chkUseTransfers)
                         .addComponent(chkUseExtendedTOEForceName)
                         .addComponent(chkPersonnelLogSkillGain)
@@ -3457,15 +3562,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
-                        .addComponent(chkUseTactics)
-                        .addComponent(chkUseInitiativeBonus)
-                        .addComponent(chkUseToughness)
-                        .addComponent(chkUseArtillery)
-                        .addComponent(chkUseAbilities)
-                        .addComponent(chkUseEdge)
-                        .addComponent(chkUseSupportEdge)
-                        .addComponent(chkUseImplants)
-                        .addComponent(chkUseAlternativeQualityAveraging)
                         .addComponent(chkUseTransfers)
                         .addComponent(chkUseExtendedTOEForceName)
                         .addComponent(chkPersonnelLogSkillGain)
@@ -3476,7 +3572,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkDisplayKillRecord)
         );
 
-        return panel;
+        return logPanel;
     }
 
     private void createFatigueSubPanel() {
@@ -7400,23 +7496,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseShareSystem = new JCheckBox(resources.getString("chkUseShareSystem.text"));
         chkUseShareSystem.setToolTipText(resources.getString("chkUseShareSystem.toolTipText"));
         chkUseShareSystem.setName("chkUseShareSystem");
-        chkUseShareSystem.addActionListener(evt -> {
-            final boolean isEnabled = chkUseShareSystem.isSelected();
-
-            // general handlers
-            for (Component component : sharesSubPanel.getComponents()) {
-                component.setEnabled(isEnabled);
-            }
-        });
 
         sharesSubPanel = createSharesSubPanel();
-        for (Component component : sharesSubPanel.getComponents()) {
-            component.setEnabled(campaign.getCampaignOptions().isUseShareSystem());
-        }
 
         sharesPanel = new JDisableablePanel("sharesPanel");
         sharesPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("sharesPanel.title")));
-        sharesPanel.setEnabled(campaign.getCampaignOptions().isUseShareSystem());
 
         final GroupLayout layout = new GroupLayout(sharesPanel);
         sharesPanel.setLayout(layout);
@@ -8596,6 +8680,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkAdjustPlayerVehicles.setSelected(options.isAdjustPlayerVehicles());
         spnFixedMapChance.setValue(options.getFixedMapChance());
         spnSPAUpgradeIntensity.setValue(options.getSpaUpgradeIntensity());
+        spnScenarioModMax.setValue(options.getScenarioModMax());
+        spnScenarioModChance.setValue(options.getScenarioModChance());
+        spnScenarioModBV.setValue(options.getScenarioModBV());
         chkRegionalMechVariations.setSelected(options.isRegionalMechVariations());
         chkAttachedPlayerCamouflage.setSelected(options.isAttachedPlayerCamouflage());
         chkPlayerControlsAttachedUnits.setSelected(options.isPlayerControlsAttachedUnits());
@@ -9124,6 +9211,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setOpForLocalUnitChance((Integer) spnOpForLocalForceChance.getValue());
             options.setFixedMapChance((Integer) spnFixedMapChance.getValue());
             options.setSpaUpgradeIntensity((Integer) spnSPAUpgradeIntensity.getValue());
+            options.setScenarioModMax((Integer) spnScenarioModMax.getValue());
+            options.setScenarioModChance((Integer) spnScenarioModChance.getValue());
+            options.setScenarioModBV((Integer) spnScenarioModBV.getValue());
             options.setUseDropShips(chkUseDropShips.isSelected());
 
             for (int i = 0; i < spnAtBBattleChance.length; i++) {
@@ -9449,17 +9539,21 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         sellPartsBox.setSelected(options.isSellParts());
         payForRecruitmentBox.setSelected(options.isPayForRecruitment());
         useLoanLimitsBox.setSelected(options.isUseLoanLimits());
-
         usePercentageMaintBox.setSelected(options.isUsePercentageMaint());
         useInfantryDontCountBox.setSelected(options.isInfantryDontCount());
-
         usePeacetimeCostBox.setSelected(options.isUsePeacetimeCost());
         useExtendedPartsModifierBox.setSelected(options.isUseExtendedPartsModifier());
         showPeacetimeCostBox.setSelected(options.isShowPeacetimeCost());
         comboFinancialYearDuration.setSelectedItem(options.getFinancialYearDuration());
         newFinancialYearFinancesToCSVExportBox.setSelected(options.isNewFinancialYearFinancesToCSVExport());
 
-        // Price Modifiers Panel
+        // Taxes
+        chkUseTaxes.setSelected(options.isUseTaxes());
+        spnTaxesPercentage.setValue(options.getTaxesPercentage());
+        chkUseClanExemption.setSelected(options.isUseClanExemption());
+        chkUseNotMercenaryExemption.setSelected(options.isUseNotMercenaryExemption());
+
+        // Price Multipliers Panel
         spnCommonPartPriceMultiplier.setValue(options.getCommonPartPriceMultiplier());
         spnInnerSphereUnitPriceMultiplier.setValue(options.getInnerSphereUnitPriceMultiplier());
         spnInnerSpherePartPriceMultiplier.setValue(options.getInnerSpherePartPriceMultiplier());
@@ -9474,6 +9568,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         for (int index = Part.QUALITY_A; index <= Part.QUALITY_F; index++) {
             spnUsedPartPriceMultipliers[index].setValue(options.getUsedPartPriceMultipliers()[index]);
         }
+
+        // Shares System
+        chkUseShareSystem.setSelected(options.isUseShareSystem());
+        chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
+        chkSharesForAll.setSelected(options.isSharesForAll());
     }
 
     private void enableAtBComponents(JPanel panel, boolean enabled) {
