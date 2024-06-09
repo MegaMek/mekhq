@@ -728,6 +728,11 @@ public class EducationController {
         int clanOtherDiceSize = campaign.getCampaignOptions().getOtherCasteDropOutChance();
 
         if (academy.isClan()) {
+            // we don't want creche aspirants washing out
+            if (academy.isPrepSchool()) {
+                return false;
+            }
+
             if ((person.getAge(campaign.getLocalDate()) < 20) && (person.getEduCourseIndex() <= 6)) {
                 if (clanWarriorDiceSize > 1) {
                     roll = Compute.randomInt(clanWarriorDiceSize);
