@@ -729,7 +729,7 @@ public class EducationController {
 
         if (academy.isClan()) {
             // we don't want creche aspirants washing out
-            if (academy.isPrepSchool()) {
+            if (person.getAge(campaign.getLocalDate()) < 10) {
                 return false;
             }
 
