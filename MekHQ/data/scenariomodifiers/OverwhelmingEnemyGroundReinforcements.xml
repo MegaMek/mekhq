@@ -28,6 +28,7 @@
 		</deploymentZones>
 		<destinationZone>5</destinationZone>
 		<fixedUnitCount>-1</fixedUnitCount>
+        <overrideBvCap>true</overrideBvCap>
 		<forceAlignment>2</forceAlignment>
 		<forceMultiplier>1.0</forceMultiplier>
 		<forceName>Opfor Ground Reinforcements</forceName>
