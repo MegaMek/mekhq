@@ -263,7 +263,7 @@ public class Campaign implements ITechManager {
         player = new Player(0, "self");
         game.addPlayer(0, player);
         currentDay = LocalDate.ofYearDay(3067, 1);
-        campaignStartDate = null;
+        campaignStartDate = currentDay;
         CurrencyManager.getInstance().setCampaign(this);
         location = new CurrentLocation(Systems.getInstance().getSystems().get("Outreach"), 0);
         campaignOptions = new CampaignOptions();
@@ -7009,7 +7009,9 @@ public class Campaign implements ITechManager {
     }
 
     public boolean checkRetirementDefections() {
-        if (!getRetirementDefectionTracker().getRetirees().isEmpty()) {
+        if (getRetirementDefectionTracker().getRetirees().isEmpty()) {
+            return true;
+        } else {
             Object[] options = {
                     resources.getString("turnoverPayoutDialog.text"),
                     resources.getString("turnoverCancel.text")
@@ -7026,10 +7028,13 @@ public class Campaign implements ITechManager {
                     options[0]
             );
         }
-        return false;
     }
 
     public boolean checkTurnoverPrompt() {
+        if (getLocalDate().isBefore(getCampaignStartDate().plusDays(6))) {
+            return false;
+        }
+
         boolean triggerTurnoverPrompt = false;
 
         switch (campaignOptions.getTurnoverFrequency()) {
