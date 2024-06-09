@@ -232,10 +232,10 @@ public class PodSpace implements IPartWork {
     public String succeed() {
         if (isSalvaging()) {
             remove(true);
-            return " <font color='green'><b> removed.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> removed.</b></font>";
         } else {
             fix();
-            return " <font color='green'><b> fixed.</b></font>";
+            return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> fixed.</b></font>";
         }
     }
 

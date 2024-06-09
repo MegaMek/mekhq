@@ -148,7 +148,7 @@ public class Loot {
         }
 
         for (Entity e : units) {
-            campaign.addNewUnit(e, false, 0);
+            campaign.addNewUnit(e, false, 0, 3);
         }
 
         for (Part p : parts) {

@@ -56,6 +56,29 @@ MEKHQ VERSION HISTORY:
 + PR #4150: Added Unit Quality Parameter to addNewUnit Method and Related Tests
 + PR #4151: Updated Vehicle Gunner's Experience Level Calculation to Optionally Include Artillery Skill
 + PR #4153: Added Font Color Options to MHQ Options for Negative, Positive, and Warning Events
++ PR #4126: Added Ability to Manually Edit Education Level to Edit Person View & Fixed Minor Bugs
++ PR #4133: Implemented Basic Tax System, Profits Calculations, and Minor Financial Term Changes
++ PR #4134: Updated Menu Labels and Tooltips for Better Clarity and Grammar
++ PR #4135: Added Birthday Announcement Options
++ PR #4138: Added Scenario Modifier Options to Campaign Options
++ PR #4139: Added Second Chance Caste to the Education Module for Warrior Caste Washouts
++ PR #4149: Added Automatic Bonus Parts Exchange at Contract End, Added Bonus Parts Display to Mission Stats Panel
++ PR #4152: Updated Parts Acquisition Dialog in Repair Tab
++ PR #4156: Replaced Uses of Font Color 'Red' with New MekHQ Font Color Option Call
++ PR #4157: Replaced Uses of Font Color 'Green' and 'Orange' with New MekHQ Font Color Option Calls
++ PR #4162: Updated Tooltip Text for Contract Command Rights to Include Clearer Game Mechanics
++ PR #4165: Added GM Hire & Fixed Skill Level Options to Bulk Hire Dialog
++ PR #4166: Added Campaign Option to Disable Salary Increases from Secondary Roles
++ PR #4167: Fixed Missing Personal Log Messages for Resign, Desert, and Defect
++ PR #4168: Updated Turnover Frequency Logic in Turnover and Retention Module
++ PR #4169: Streamlined Management Modifier Calculations in Turnover and Retention Module
++ PR #4175: Removed Flavor Text from Breach of Contract Departure in Turnover and Retention Module
++ PR #4176: Turnover Target Number Revision & Updated Documentation
++ PR #4177: Fix NPE Resulting from Null Recruitment Date
++ PR #4158: Added Campaign Option to Randomize New Unit Quality
++ PR #4172: Implemented More Education Module Bug Fixes
++ PR #4174: Fixed Payout of 0 c-bills Causing Soft Lock in Turnover and Retention Module
++ PR #4178: Updated Family Modifier Logic, a Warring Faction Modifier, in Turnover and Retention Module
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.

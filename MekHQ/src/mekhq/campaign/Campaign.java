@@ -80,10 +80,7 @@ import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
-import mekhq.campaign.personnel.enums.Phenotype;
-import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
@@ -658,21 +655,30 @@ public class Campaign implements ITechManager {
         }
 
         MechFileParser mechFileParser;
+
         try {
             mechFileParser = new MechFileParser(ms.getSourceFile(), ms.getEntryName());
         } catch (Exception ex) {
-            LogManager.getLogger().error("Unable to load unit: " + ms.getEntryName(), ex);
+            LogManager.getLogger().error("Unable to load unit: {}", ms.getEntryName(), ex);
             return;
         }
+
         Entity en = mechFileParser.getEntity();
 
         int transitDays = getCampaignOptions().isInstantUnitMarketDelivery() ? 0
                 : calculatePartTransitTime(Compute.d6(2) - 2);
 
         getFinances().debit(TransactionType.UNIT_PURCHASE, getLocalDate(), cost, "Purchased " + en.getShortName());
-        addNewUnit(en, true, transitDays);
+        int quality = 3;
+
+        if (campaignOptions.isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        }
+
+        addNewUnit(en, true, transitDays, quality);
+
         if (!getCampaignOptions().isInstantUnitMarketDelivery()) {
-            addReport("<font color='green'>Unit will be delivered in " + transitDays + " days.</font>");
+            addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>Unit will be delivered in " + transitDays + " days.</font>");
         }
         setShipSearchResult(null);
         setShipSearchExpiration(null);
@@ -693,25 +699,14 @@ public class Campaign implements ITechManager {
 
                     if (!person.getStatus().isDead()) {
                         if (isBreakingContract(person, getLocalDate(), getCampaignOptions().getServiceContractDuration())) {
-                            int roll = Compute.d6(1);
+                            if (!getActiveContracts().isEmpty()) {
+                                int roll = Compute.randomInt(20);
 
-                            switch (roll) {
-                                case 1:
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    break;
-                                case 2:
-                                case 3:
-                                    addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverPoached.text"));
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    break;
-                                case 4:
-                                case 5:
-                                case 6:
-                                    addReport(getPerson(pid).getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverBurnedOut.text"));
-                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    break;
-                                default:
-                                    throw new IllegalStateException("Unexpected value in applyRetirement: " + roll);
+                                if (roll == 0) {
+                                    getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
+                                }
+                            } else {
+                                getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                             }
                         } else if (person.getAge(getLocalDate()) >= 50) {
                             getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
@@ -719,36 +714,40 @@ public class Campaign implements ITechManager {
                             getPerson(pid).changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
                         }
 
-                        // if marriage modifier is enabled, couples leave together
-                        if (campaignOptions.isUseMarriageModifiers()) {
-                            Person spouse = person.getGenealogy().getSpouse();
+                        // civilian spouses follow their partner in departing
+                        Person spouse = person.getGenealogy().getSpouse();
 
-                            if ((spouse != null) && (!getRetirementDefectionTracker().getRetirees().contains(spouse.getId()))) {
-                                if ((!spouse.getStatus().isDepartedUnit()) && (!spouse.getStatus().isAbsent())) {
-                                    addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
-                                    if (spouse.getPrimaryRole().isCivilian()) {
-                                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                                    } else {
-                                        spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                    }
+                        if ((spouse != null) && (spouse.getPrimaryRole().isCivilian())) {
+                            addReport(spouse.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDeparture.text"));
+                            spouse.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
+                        }
+
+                        // non-civilian spouses may divorce the remaining partner
+                        if ((person.getAge(getLocalDate()) >= 50) && (!campaignOptions.getRandomDivorceMethod().isNone())) {
+                            if ((spouse != null) && (spouse.isDivorceable()) && (!spouse.getPrimaryRole().isCivilian())) {
+                                if ((person.getStatus().isDefected()) || (Compute.randomInt(20) == 0)) {
+                                    getDivorce().divorce(this, getLocalDate(), person, SplittingSurnameStyle.WEIGHTED);
                                 }
                             }
                         }
 
                         // This ensures children have a chance of following their parent into departure
+                        // This needs to be after spouses, to ensure joint-departure spouses are factored in
                         for (Person child : person.getGenealogy().getChildren()) {
                             if ((child.isChild(getLocalDate())) && (!child.getStatus().isDepartedUnit())) {
-                                if (campaignOptions.isUseMarriageModifiers()) {
-                                    addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
-                                    child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                } else {
-                                    boolean remainingParent = child.getGenealogy().getParents().stream()
-                                            .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
+                                boolean hasRemainingParent = child.getGenealogy().getParents().stream()
+                                        .anyMatch(parent -> (!parent.getStatus().isDepartedUnit()) && (!parent.getStatus().isAbsent()));
 
-                                    if ((!remainingParent) || (Compute.randomInt(2) == 0)) {
+                                // if there is a remaining parent, there is a 50/50 chance the child departs
+                                if ((hasRemainingParent) && (Compute.randomInt(2) == 0)) {
                                         addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
                                         child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
-                                    }
+                                }
+
+                                // if there is no remaining parent, the child will always depart
+                                if (!hasRemainingParent) {
+                                    addReport(child.getHyperlinkedFullTitle() + ' ' + resources.getString("turnoverJointDepartureChild.text"));
+                                    child.changeStatus(this, getLocalDate(), PersonnelStatus.LEFT);
                                 }
                             }
                         }
@@ -1229,6 +1228,7 @@ public class Campaign implements ITechManager {
         if (!unit.isRepairable()) {
             unit.setSalvage(true);
         }
+
         unit.setDaysToArrival(days);
 
         if (allowNewPilots) {
@@ -1237,6 +1237,7 @@ public class Campaign implements ITechManager {
             newCrew.forEach((type, personnel) ->
                     personnel.forEach(p -> type.getAddMethod().accept(unit, p)));
         }
+
         unit.resetPilotAndEntity();
 
         unit.setQuality(quality);
@@ -2425,7 +2426,7 @@ public class Campaign implements ITechManager {
                                 totalQuantity++;
                             }
                             if (totalQuantity > 0) {
-                                addReport(personTitle + "<font color='green'><b> found "
+                                addReport(personTitle + "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> found "
                                         + shoppingItem.getQuantityName(totalQuantity)
                                         + " on "
                                         + system.getPrintableName(currentDate)
@@ -2551,7 +2552,7 @@ public class Campaign implements ITechManager {
             return PartAcquisitionResult.PlanetSpecificFailure;
         } else {
             if (getCampaignOptions().isPlanetAcquisitionVerbose()) {
-                addReport("<font color='green'>" + succeededSentencePrefix + acquisition.getAcquisitionName()
+                addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>" + succeededSentencePrefix + acquisition.getAcquisitionName()
                         + " on " + system.getPrintableName(getLocalDate()) + "</font>");
             }
             return PartAcquisitionResult.Success;
@@ -2598,7 +2599,7 @@ public class Campaign implements ITechManager {
         }
         report += "attempts to find " + acquisition.getAcquisitionName();
 
-        // if impossible then return
+        // if impossible, then return
         if (target.getValue() == TargetRoll.IMPOSSIBLE) {
             report += ":<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> " + target.getDesc() + "</b></font>";
             if (!getCampaignOptions().isUsePlanetaryAcquisition() || getCampaignOptions().isPlanetAcquisitionVerbose()) {
@@ -3635,8 +3636,6 @@ public class Campaign implements ITechManager {
                 individualAcademyAttributes.add(academy.getName());
 
                 academyAttributesMap.put(person.getId(), individualAcademyAttributes);
-
-                person.changeStatus(this, getLocalDate(), PersonnelStatus.ACTIVE);
             }
         }
 
@@ -6660,7 +6659,7 @@ public class Campaign implements ITechManager {
             String qualityString;
             boolean reverse = getCampaignOptions().isReverseQualityNames();
             if (quality > qualityOrig) {
-                qualityString = "<font color='green'>Overall quality improves from "
+                qualityString = "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>Overall quality improves from "
                         + Part.getQualityName(qualityOrig, reverse) + " to " + Part.getQualityName(quality, reverse)
                         + "</font>";
             } else if (quality < qualityOrig) {
@@ -6796,7 +6795,7 @@ public class Campaign implements ITechManager {
                 break;
         }
         if (p.getQuality() > oldQuality) {
-            partReport += ": <font color='green'>new quality is " + p.getQualityName() + "</font>";
+            partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>new quality is " + p.getQualityName() + "</font>";
         } else if (p.getQuality() < oldQuality) {
             partReport += ": <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>new quality is " + p.getQualityName() + "</font>";
         } else {
@@ -7007,24 +7006,26 @@ public class Campaign implements ITechManager {
         int days = 0;
         String period = "";
 
+        boolean triggerTurnoverPrompt = false;
+
         switch (campaignOptions.getTurnoverFrequency()) {
             case NEVER:
                 return false;
             case WEEKLY:
-                days = 7;
+                triggerTurnoverPrompt = getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY);
                 period = resources.getString("turnoverWeekly.text");
                 break;
             case MONTHLY:
-                days = 28;
+                triggerTurnoverPrompt = getLocalDate().getDayOfMonth() == 1;
                 period = resources.getString("turnoverMonthly.text");
                 break;
             case ANNUALLY:
-                days = 365;
+                triggerTurnoverPrompt = getLocalDate().getDayOfYear() == 1;
                 period = resources.getString("turnoverAnnually.text");
                 break;
         }
 
-        if (ChronoUnit.DAYS.between(getRetirementDefectionTracker().getLastRetirementRoll(), getLocalDate()) >= days) {
+        if (triggerTurnoverPrompt) {
             Object[] options = {
                     resources.getString("turnoverEmployeeTurnoverDialog.text"),
                     resources.getString("turnoverNotNow.text")
@@ -7042,6 +7043,7 @@ public class Campaign implements ITechManager {
                     options[0]
             );
         }
+
         return false;
     }
 
