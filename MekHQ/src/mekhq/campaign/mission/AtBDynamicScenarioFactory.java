@@ -787,7 +787,6 @@ public class AtBDynamicScenarioFactory {
 
         // Units with infantry bays get conventional infantry or battle armor added
         // TODO: because this generates conventional infantry, it needs to handle environment checks
-        // TODO: pass role requirements
         List<Entity> transportedEntities = fillTransports(scenario,
                 generatedEntities,
                 factionCode,
@@ -1411,7 +1410,14 @@ public class AtBDynamicScenarioFactory {
                                                boolean allowInfantry,
                                                Campaign campaign) {
 
-        if ((transports == null) || transports.isEmpty()) {
+        // Don't bother processing if various non-useful conditions are present
+        if (transports == null ||
+                transports.isEmpty() ||
+                transports.stream().map(Entity::getUnitType).allMatch(curType ->
+                        curType != UnitType.TANK &&
+                        curType != UnitType.VTOL &&
+                        curType != UnitType.NAVAL &&
+                        curType != UnitType.CONV_FIGHTER)) {
             return new ArrayList<>();
         }
 
@@ -1432,8 +1438,11 @@ public class AtBDynamicScenarioFactory {
         params.setQuality(quality);
         params.setYear(campaign.getGameYear());
 
+        // Only check unit types that can have an infantry bay
         for (Entity transport : transports) {
-            transportedUnits.addAll(fillTransport(scenario, transport, params, skill, transportedRoles, allowInfantry, campaign));
+            if (IntStream.of(UnitType.TANK, UnitType.VTOL, UnitType.NAVAL, UnitType.CONV_FIGHTER).anyMatch(i -> transport.getUnitType() == i)) {
+                transportedUnits.addAll(fillTransport(scenario, transport, params, skill, transportedRoles, allowInfantry, campaign));
+            }
         }
 
         return transportedUnits;
@@ -2807,6 +2816,7 @@ public class AtBDynamicScenarioFactory {
      * Convenience function to get the standard ground tactical formation size, based on faction. In
      * the case of Clan factions, this returns the number of points rather than a number of units,
      * as points may be 2 ground vehicles or 5 ProtoMechs.
+     * TODO: conventional infantry typically uses 3 units per formation (company) - make a separate method
      * @param factionCode  string with faction short name/lookup key
      * @return             Number of units (points for Clan) in the formation
      */
