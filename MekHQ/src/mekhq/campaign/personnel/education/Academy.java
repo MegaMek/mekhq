@@ -816,13 +816,11 @@ public class Academy implements Comparable<Academy> {
      *
      * @param campaign The campaign being played.
      * @param person The person for whom to filter the faction.
-     * @param system The system in which the local campus is located.
+     * @param factions The factions to check eligibility against.
      * @return The filtered faction for the local campus, or null if no faction is found.
      */
-    public String getFilteredFaction(Campaign campaign, Person person, String system) {
-        List<String> systemOwners = campaign.getSystemById(system).getFactions(campaign.getLocalDate());
-
-        for (String faction : systemOwners) {
+    public String getFilteredFaction(Campaign campaign, Person person, List<String> factions) {
+        for (String faction : factions) {
             if ((isFactionRestricted) && (Objects.equals(campaign.getFaction().getShortName(), faction))) {
                 return Factions.getInstance().getFaction(faction).getShortName();
             } else if ((isFactionRestricted) && (Objects.equals(person.getOriginFaction().getShortName(), faction))) {
@@ -920,14 +918,15 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
-     * Returns an HTML formatted string to be used as a tooltip.
+     * Retrieves the tooltip for an academy, based on the number of persons in 'personnel'
      *
-     * @param campaign      the current campaign
-     * @param person        the person we're generating the tooltip for
-     * @param courseIndex   the index of the course in the curriculum
-     * @return the tooltip string
+     * @param campaign     The campaign to retrieve the tooltip for.
+     * @param personnel    The list of personnel.
+     * @param courseIndex  The index of the course.
+     * @param destination  The campus.
+     * @return The tooltip as a String.
      */
-    public String getTooltip(Campaign campaign, Person person, int courseIndex, PlanetarySystem destination) {
+    public String getTooltip(Campaign campaign, List<Person> personnel, int courseIndex, PlanetarySystem destination) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
                 MekHQ.getMHQOptions().getLocale());
 
@@ -935,12 +934,18 @@ public class Academy implements Comparable<Academy> {
         tooltip.append("<i>").append(description).append("</i><br><br>");
         tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
 
-        int educationLevel = getEducationLevel(person) + baseAcademicSkillLevel;
+        Person person = personnel.get(0);
 
-        if (educationLevel > 10) {
-            educationLevel = 10;
-        } else if (educationLevel < 0) {
-            educationLevel = 0;
+        int educationLevel = 0;
+
+        if (personnel.size() == 1) {
+            educationLevel = getEducationLevel(person) + baseAcademicSkillLevel;
+
+            if (educationLevel > 10) {
+                educationLevel = 10;
+            } else if (educationLevel < 0) {
+                educationLevel = 0;
+            }
         }
 
         // here we display the skills
@@ -950,22 +955,24 @@ public class Academy implements Comparable<Academy> {
                 .map(String::trim)
                 .toArray(String[]::new);
 
-        for (String skill : skills) {
-            tooltip.append(skill).append(" (");
+        if (personnel.size() == 1) {
+            for (String skill : skills) {
+                tooltip.append(skill).append(" (");
 
-            if (skill.equalsIgnoreCase("xp bonus") || (skill.equalsIgnoreCase("bonus xp"))) {
-                if (person.getEduHighestEducation() >= educationLevel) {
-                    tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                if (skill.equalsIgnoreCase("xp bonus") || (skill.equalsIgnoreCase("bonus xp"))) {
+                    if (person.getEduHighestEducation() >= educationLevel) {
+                        tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                    } else {
+                        tooltip.append(educationLevel).append(resources.getString("xpBonus.text")).append(")<br>");
+                    }
                 } else {
-                    tooltip.append(educationLevel).append(resources.getString("xpBonus.text")).append(")<br>");
-                }
-            } else {
-                String skillParsed = skillParser(skill);
+                    String skillParsed = skillParser(skill);
 
-                if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() >= educationLevel)) {
-                    tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
-                } else {
-                    tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
+                    if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() >= educationLevel)) {
+                        tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                    } else {
+                        tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
+                    }
                 }
             }
         }
@@ -973,10 +980,13 @@ public class Academy implements Comparable<Academy> {
         tooltip.append("<br>");
 
         // with the skill content resolved, we can move onto the rest of the tooltip
-        if (tuition * getFactionDiscountAdjusted(campaign, person) > 0) {
-            tooltip.append("<b>").append(resources.getString("tuition.text")).append("</b> ")
-                    .append(tuition * getFactionDiscountAdjusted(campaign, person)).append(" CSB").append("<br>");
+        if (personnel.size() == 1) {
+            if (tuition * getFactionDiscountAdjusted(campaign, person) > 0) {
+                tooltip.append("<b>").append(resources.getString("tuition.text")).append("</b> ")
+                        .append(tuition * getFactionDiscountAdjusted(campaign, person)).append(" CSB").append("<br>");
+            }
         }
+
         if (isPrepSchool) {
             tooltip.append("<b>").append(resources.getString("duration.text"))
                     .append("</b> ").append(' ').append(String.format(resources.getString("durationAge.text"), ageMax)).append("<br>");
@@ -1033,10 +1043,12 @@ public class Academy implements Comparable<Academy> {
         if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
             tooltip.append("<b>").append(resources.getString("reeducation.text")).append("</b> ");
 
-            if (!Objects.equals(person.getOriginFaction().getShortName(), campaign.getFaction().getShortName())) {
-                tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
-            } else {
-                tooltip.append(resources.getString("reeducationNoChange.text")).append("<br>");
+            if (personnel.size() == 1) {
+                if (!Objects.equals(person.getOriginFaction().getShortName(), campaign.getFaction().getShortName())) {
+                    tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
+                } else {
+                    tooltip.append(resources.getString("reeducationNoChange.text")).append("<br>");
+                }
             }
 
             tooltip.append("<br>");
@@ -1044,8 +1056,11 @@ public class Academy implements Comparable<Academy> {
 
         tooltip.append("<b>").append(resources.getString("facultySkill.text")).append("</b> ")
                 .append(facultySkill).append ('+').append("<br>");
-        tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")
-                .append(getEducationLevel(person)).append("<br>");
+
+        if (personnel.size() == 1) {
+            tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")
+                    .append(getEducationLevel(person)).append("<br>");
+        }
 
         return tooltip.append("</html>").toString();
     }
