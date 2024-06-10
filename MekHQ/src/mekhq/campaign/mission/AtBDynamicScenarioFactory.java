@@ -78,6 +78,11 @@ public class AtBDynamicScenarioFactory {
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
 
     /**
+     * External ordnance types that rely on TAG
+     */
+    private static final Collection<Integer> GUIDED_ORDNANCE = new HashSet<>(Arrays.asList(BombType.B_LG, BombType.B_HOMING));
+
+    /**
      * Distribution of various external ordnance choices for non-pirate forces
      */
     private static final Map<String, Integer> bombMapGroundSpread = Map.ofEntries (
@@ -2581,7 +2586,7 @@ public class AtBDynamicScenarioFactory {
                                          int quality,
                                          boolean isPirate) {
 
-        // Get all valid bomber
+        // Get all valid bombers
         List<Entity> bomberList = entityList.stream().filter(Targetable::isBomber).collect(Collectors.toList());
         if (bomberList.isEmpty()) {
             return;
@@ -2589,13 +2594,15 @@ public class AtBDynamicScenarioFactory {
 
         int minThrust;
         int maxLoad;
+
+        // Some bombers may not be loaded
         int maxBombers = (int) Math.ceil(((Compute.randomInt(60) + 40) / 100.0) * bomberList.size());
         int numBombers = 0;
 
         int[] generatedBombs = new int[BombType.B_NUM];
         Map<Integer, int[]> bombsByCarrier = new HashMap<>();
 
-        boolean hasGuided = false;
+        boolean forceHasGuided = false;
         for (int i = 0; i < bomberList.size(); i++) {
             if (numBombers >= maxBombers) {
                 break;
@@ -2638,11 +2645,8 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            // Set a flag if any of the ordnance guided by TAG
-            hasGuided = !hasGuided &&
-                    (generatedBombs[BombType.B_LG] > 0 ||
-                            generatedBombs[BombType.B_HOMING] > 0);
-
+            // Set a flag to indicate at least one of the bombers is carrying guided ordnance
+            forceHasGuided = forceHasGuided || hasGuidedOrdnance(generatedBombs);
 
             // Store the bomb selections as we might need to add in TAG later
             bombsByCarrier.put(i, generatedBombs);
@@ -2655,7 +2659,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Load bombs onto entities. If there is guided ordnance present then randomly add some TAG
-        // pods to those without the guided ordnance
+        // pods to those without the guided ordnance.
         int tagCount = Math.min(bomberList.size(), Compute.randomInt(3));
         for (int i = 0; i < bomberList.size(); i++) {
             Entity curBomber = bomberList.get(i);
@@ -2663,11 +2667,10 @@ public class AtBDynamicScenarioFactory {
             if (bombsByCarrier.containsKey(i)) {
                 generatedBombs = bombsByCarrier.get(i);
 
-                if (hasGuided &&
+                if (forceHasGuided &&
                         tagCount > 0 &&
                         Arrays.stream(generatedBombs).sum() < (Math.floor(curBomber.getWeight() / 5)) &&
-                        generatedBombs[BombType.B_LG] == 0 &&
-                        generatedBombs[BombType.B_HOMING] == 0) {
+                        !hasGuidedOrdnance(generatedBombs)) {
                     generatedBombs[BombType.B_TAG]++;
                     tagCount--;
                 }
@@ -2678,7 +2681,7 @@ public class AtBDynamicScenarioFactory {
 
                 // If one of the entities was given guided ordnance then put a TAG on the ones
                 // that have nothing
-                if (hasGuided && tagCount > 0) {
+                if (forceHasGuided && tagCount > 0) {
                     Arrays.fill(generatedBombs, BombType.B_NONE);
                     generatedBombs[BombType.B_TAG]++;
                     tagCount--;
@@ -2916,6 +2919,28 @@ public class AtBDynamicScenarioFactory {
         }
 
         return bombLoad;
+    }
+
+
+    /**
+     * Checks to see if a bomb load contains ordnance that relies on TAG guidance, such as laser/TAG
+     * guided bombs and homing Arrow IV
+     *
+     * @param bombLoad  array of size BombType.B_NUM, suitable for setting bombs on IBomber entities
+     * @return          true if guided ordnance is carried
+     */
+    private static boolean hasGuidedOrdnance(int[] bombLoad) {
+        if (bombLoad.length < Collections.max(GUIDED_ORDNANCE)) {
+            throw new IllegalArgumentException("Invalid array LENGTH for bombLoad parameter.");
+        }
+
+        for (int curHomingBomb : GUIDED_ORDNANCE) {
+            if (bombLoad[curHomingBomb] > 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
