@@ -66,6 +66,7 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * This class handles the creation and substantive manipulation of AtBDynamicScenarios
@@ -2589,8 +2590,18 @@ public class AtBDynamicScenarioFactory {
                                          int quality,
                                          boolean isPirate) {
 
-        // Get all valid bombers
-        List<Entity> bomberList = entityList.stream().filter(Targetable::isBomber).collect(Collectors.toList());
+        // Get all valid bombers, and sort unarmed ones to the front
+        List<Entity> bomberList = new ArrayList<>();
+        for (Entity curEntity : entityList) {
+            if (curEntity.isBomber()) {
+                if (!curEntity.getIndividualWeaponList().isEmpty()) {
+                    bomberList.add(curEntity);
+                } else {
+                    bomberList.add(0, curEntity);
+                }
+            }
+        }
+
         if (bomberList.isEmpty()) {
             return;
         }
@@ -2602,13 +2613,16 @@ public class AtBDynamicScenarioFactory {
         int maxBombers = (int) Math.ceil(((Compute.randomInt(60) + 40) / 100.0) * bomberList.size());
         int numBombers = 0;
 
-        int[] generatedBombs = new int[BombType.B_NUM];
+        int[] generatedBombs;
         Map<Integer, int[]> bombsByCarrier = new HashMap<>();
 
         boolean forceHasGuided = false;
         for (int i = 0; i < bomberList.size(); i++) {
+            bombsByCarrier.put(i, new int[BombType.B_NUM]);
+
+            // Only generate loadouts up to the maximum number, use empty loadout for the rest
             if (numBombers >= maxBombers) {
-                break;
+                continue;
             }
 
             Entity curBomber = bomberList.get(i);
@@ -2661,36 +2675,25 @@ public class AtBDynamicScenarioFactory {
 
         }
 
-        // Load bombs onto entities. If there is guided ordnance present then randomly add some TAG
+        // Load ordnance onto units. If there is guided ordnance present then randomly add some TAG
         // pods to those without the guided ordnance.
         int tagCount = Math.min(bomberList.size(), Compute.randomInt(3));
         for (int i = 0; i < bomberList.size(); i++) {
             Entity curBomber = bomberList.get(i);
 
-            if (bombsByCarrier.containsKey(i)) {
-                generatedBombs = bombsByCarrier.get(i);
+            generatedBombs = bombsByCarrier.get(i);
 
-                if (forceHasGuided &&
-                        tagCount > 0 &&
-                        Arrays.stream(generatedBombs).sum() < (Math.floor(curBomber.getWeight() / 5)) &&
-                        !hasGuidedOrdnance(generatedBombs)) {
-                    generatedBombs[BombType.B_TAG]++;
+            // Don't combine guided ordnance with external TAG
+            if (forceHasGuided && tagCount > 0) {
+                if (addExternalTAG(generatedBombs, true,
+                        Math.min((int) Math.floor(curBomber.getWeight() / 5.0), (curBomber.getWalkMP() - 2) * 5))) {
                     tagCount--;
                 }
+            }
 
+            // Load the provided ordnance onto the unit
+            if (generatedBombs != null && Arrays.stream(generatedBombs).sum() > 0) {
                 ((IBomber) curBomber).setBombChoices(generatedBombs);
-
-            } else {
-
-                // If one of the entities was given guided ordnance then put a TAG on the ones
-                // that have nothing
-                if (forceHasGuided && tagCount > 0) {
-                    Arrays.fill(generatedBombs, BombType.B_NONE);
-                    generatedBombs[BombType.B_TAG]++;
-                    tagCount--;
-                    ((IBomber) curBomber).setBombChoices(generatedBombs);
-                }
-
             }
 
         }
@@ -2700,6 +2703,7 @@ public class AtBDynamicScenarioFactory {
     /**
      * Randomly generate a set of external ordnance up to the number of indicated bomb units. Lower
      * rated forces are more likely to get simpler types (HE and rockets).
+     * Because TAG is only useful as one-per-fighter, it should be handled elsewhere.
      * @param bombUnits   how many bomb units to generate, some types count as more than one unit so
      *                    returned counts may be lower than this but never higher
      * @param airOnly     true to only select air-to-air ordnance
@@ -2941,6 +2945,56 @@ public class AtBDynamicScenarioFactory {
             if (bombLoad[curHomingBomb] > 0) {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    /**
+     * Updates a bomb load to include an external TAG system. If this exceeds the provided
+     * maximum load (in bomb units i.e. Arrow IV counts as multiple units), then one of the basic
+     * one-slot types is removed and the TAG system is added in it's place.
+     *
+     * @param bombLoad    array of size BombType.B_NUM, suitable for setting bombs on IBomber
+     *                    entities
+     * @param skipGuided  true to only select external TAG for units without guided ordnance
+     * @param maxLoad     Maximum external ordnance load in total bomb units (NOT bomb count)
+     * @return            true, if TAG was added, false otherwise
+     */
+    private static boolean addExternalTAG (int[] bombLoad, boolean skipGuided, int maxLoad) {
+        if (bombLoad.length < BombType.B_NUM) {
+            throw new IllegalArgumentException("Invalid array length for bombLoad parameter.");
+        }
+
+        if (!skipGuided || !hasGuidedOrdnance(bombLoad)) {
+
+            // If there's enough room, add it
+            int totalLoad = IntStream.range(0, bombLoad.length).map(i -> BombType.getBombCost(i) * Math.max(bombLoad[i], 0)).sum();
+            if (totalLoad < maxLoad) {
+                bombLoad[BombType.B_TAG]++;
+                return true;
+            } else if (totalLoad == maxLoad) {
+
+                List<Integer> replaceableTypes = Arrays.asList(
+                        BombType.B_RL,
+                        BombType.B_HE,
+                        BombType.B_INFERNO,
+                        BombType.B_CLUSTER);
+                for (int i = 0; i < replaceableTypes.size(); i++) {
+                    if (bombLoad[i] > 0) {
+                        bombLoad[i]--;
+                        bombLoad[BombType.B_TAG]++;
+                        return true;
+                    }
+                }
+
+            } else {
+                // Already overloaded, don't bother
+                return false;
+            }
+
+            bombLoad[BombType.B_TAG]++;
+            return true;
         }
 
         return false;
