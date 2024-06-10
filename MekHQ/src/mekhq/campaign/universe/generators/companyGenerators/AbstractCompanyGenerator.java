@@ -398,6 +398,7 @@ public abstract class AbstractCompanyGenerator {
         }
 
 
+
         // Improve Skills
         final Skill gunnery = tracker.getPerson().getSkill(SkillType.S_GUN_MECH);
         final Skill piloting = tracker.getPerson().getSkill(SkillType.S_PILOT_MECH);
