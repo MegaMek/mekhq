@@ -94,6 +94,8 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JPanel panSkills;
     private JPanel panOptions;
     private JTextField textToughness;
+    private JTextField textFatigue;
+    private JTextField textLoyalty;
     private JTextField textEducationLevel;
     private JTextField textPreNominal;
     private JTextField textGivenName;
@@ -189,6 +191,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textBloodname = new JTextField();
         textToughness = new JTextField();
         JLabel lblToughness = new JLabel();
+        textFatigue = new JTextField();
+        JLabel lblFatigue = new JLabel();
+        textLoyalty = new JTextField();
+        JLabel lblLoyalty = new JLabel();
         textEducationLevel = new JTextField();
         JLabel lblEducationLevel = new JLabel();
 
@@ -601,15 +607,38 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             demogPanel.add(textToughness, gridBagConstraints);
+
+            y++;
         }
 
-        y++;
+        lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
+        lblToughness.setName("lblToughness"); // NOI18N
 
-        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text")); // NOI18N
-        lblEducationLevel.setName("lblEducationLevel"); // NOI18N
+        textToughness.setText(Integer.toString(person.getToughness()));
+        textToughness.setName("textToughness"); // NOI18N
+
+        if (campaign.getCampaignOptions().isUseToughness()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblToughness, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textToughness, gridBagConstraints);
+
+            y++;
+        }
+
+        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
+        lblEducationLevel.setName("lblEducationLevel");
 
         textEducationLevel.setText(Integer.toString(person.getEduHighestEducation()));
-        textEducationLevel.setName("textEducationLevel"); // NOI18N
+        textEducationLevel.setName("textEducationLevel");
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             gridBagConstraints = new GridBagConstraints();
@@ -624,9 +653,56 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             demogPanel.add(textEducationLevel, gridBagConstraints);
+
+            y++;
         }
 
-        y++;
+        lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
+        lblFatigue.setName("lblFatigue");
+
+        textFatigue.setText(Integer.toString(person.getFatigue()));
+        textFatigue.setName("textFatigue");
+
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblFatigue, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textFatigue, gridBagConstraints);
+
+            y++;
+        }
+
+        lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
+        lblLoyalty.setName("lblLoyalty");
+
+        textLoyalty.setText(Integer.toString(person.getLoyalty()));
+        textLoyalty.setName("textLoyalty");
+
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblLoyalty, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textLoyalty, gridBagConstraints);
+
+            y++;
+        }
 
         txtBio = new MarkdownEditorPanel("Biography");
         txtBio.setText(person.getBiography());
@@ -1291,6 +1367,15 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
         } catch (NumberFormatException ignored) { }
+
+        try {
+            person.setFatigue(Integer.parseInt(textFatigue.getText()));
+        } catch (NumberFormatException ignored) { }
+
+        try {
+            person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
+        } catch (NumberFormatException ignored) { }
+
         try {
             person.setEduHighestEducation(MathUtility.clamp(Integer.parseInt(textEducationLevel.getText()), 0, 4));
         } catch (NumberFormatException ignored) {}

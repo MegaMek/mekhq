@@ -89,6 +89,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private AbstractMHQScrollablePanel optionsPanel;
     private JTextField textToughness;
     private JTextField textFatigue;
+    private JTextField textLoyalty;
     private JTextField textEducationLevel;
     private JTextField textPreNominal;
     private JTextField textGivenName;
@@ -166,6 +167,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         textToughness = new JTextField();
         JLabel lblFatigue = new JLabel();
         textFatigue = new JTextField();
+        JLabel lblLoyalty = new JLabel();
+        textLoyalty = new JTextField();
         JLabel lblToughness = new JLabel();
         textEducationLevel = new JTextField();
         JLabel lblEducationLevel = new JLabel();
@@ -695,6 +698,30 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
+        lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
+        lblLoyalty.setName("lblLoyalty");
+
+        textLoyalty.setText(Integer.toString(person.getLoyalty()));
+        textLoyalty.setName("textLoyalty");
+
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblLoyalty, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textLoyalty, gridBagConstraints);
+
+            y++;
+        }
+
         JLabel lblUnit = new JLabel();
         lblUnit.setText("Original unit:");
         lblUnit.setName("lblUnit");
@@ -1029,6 +1056,10 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         try {
             person.setEduHighestEducation(MathUtility.clamp(Integer.parseInt(textEducationLevel.getText()), 0, 4));
+        } catch (NumberFormatException ignored) {}
+
+        try {
+            person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
         } catch (NumberFormatException ignored) {}
 
         if (null == choiceOriginalUnit.getSelectedItem()) {
