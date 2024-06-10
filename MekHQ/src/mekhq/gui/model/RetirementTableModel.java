@@ -218,7 +218,7 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_BONUS_COST:
                 return RetirementDefectionTracker.getPayoutOrBonusValue(campaign, p).toAmountAndSymbolString();
             case COL_PAY_BONUS:
-                return payBonus.getOrDefault(p.getId(), false);
+                return payBonus.getOrDefault(p.getId(), campaign.getCampaignOptions().isPayBonusDefault());
             case COL_MISC_MOD:
                 return miscMods.getOrDefault(p.getId(), 0);
             case COL_SHARES:
@@ -244,7 +244,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     payout = payout.minus(campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost());
                 }
 
-                // if the person is under contract we don't check whether they need a unit or are owed a shortfall
+                // if the person is under contract, we don't check whether they need a unit or are owed a shortfall
                 if (ChronoUnit.MONTHS.between(p.getRecruitment(), campaign.getLocalDate())
                         >= campaign.getCampaignOptions().getServiceContractDuration()) {
                     // if the person requires a unit, check to ensure there isn't a shortfall
