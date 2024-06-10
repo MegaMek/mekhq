@@ -18,6 +18,7 @@
  */
 package mekhq.gui.panels;
 
+import megamek.client.ui.baseComponents.JDisableablePanel;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.enums.ValidationState;
 import megamek.common.EntityWeightClass;
@@ -30,7 +31,6 @@ import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.enums.*;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
-import megamek.client.ui.baseComponents.JDisableablePanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
 
 import javax.swing.*;
@@ -2270,27 +2270,27 @@ public class CompanyGenerationOptionsPanel extends AbstractMHQScrollablePanel {
 
         //region Warnings
         // Only need to check these if they are to be displayed
-        if (display) {
-            // Support Personnel Count:
-            // 1) Above Recommended Maximum Support Personnel Count
-            // 2) Below Half of Recommended Maximum Support Personnel Count
-            final int maximumSupportPersonnelCount = determineMaximumSupportPersonnel();
-            final int currentSupportPersonnelCount = getSpnSupportPersonnelNumbers().values().stream()
-                    .mapToInt(spinner -> (int) spinner.getValue()).sum();
-            if ((maximumSupportPersonnelCount < currentSupportPersonnelCount)
-                    && (JOptionPane.showConfirmDialog(getFrame(),
-                    resources.getString("CompanyGenerationOptionsPanel.OverMaximumSupportPersonnel.text"),
-                    resources.getString("CompanyGenerationOptionsPanel.OverMaximumSupportPersonnel.title"),
-                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)) {
-                return ValidationState.WARNING;
-            } else if ((currentSupportPersonnelCount < (maximumSupportPersonnelCount / 2.0))
-                    && (JOptionPane.showConfirmDialog(getFrame(),
-                    resources.getString("CompanyGenerationOptionsPanel.UnderHalfMaximumSupportPersonnel.text"),
-                    resources.getString("CompanyGenerationOptionsPanel.UnderHalfMaximumSupportPersonnel.title"),
-                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)) {
-                return ValidationState.WARNING;
-            }
-        }
+//        if (display) {
+//            // Support Personnel Count:
+//            // 1) Above Recommended Maximum Support Personnel Count
+//            // 2) Below Half of Recommended Maximum Support Personnel Count
+//            final int maximumSupportPersonnelCount = determineMaximumSupportPersonnel();
+//            final int currentSupportPersonnelCount = getSpnSupportPersonnelNumbers().values().stream()
+//                    .mapToInt(spinner -> (int) spinner.getValue()).sum();
+//            if ((maximumSupportPersonnelCount < currentSupportPersonnelCount)
+//                    && (JOptionPane.showConfirmDialog(getFrame(),
+//                    resources.getString("CompanyGenerationOptionsPanel.OverMaximumSupportPersonnel.text"),
+//                    resources.getString("CompanyGenerationOptionsPanel.OverMaximumSupportPersonnel.title"),
+//                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)) {
+//                return ValidationState.WARNING;
+//            } else if ((currentSupportPersonnelCount < (maximumSupportPersonnelCount / 2.0))
+//                    && (JOptionPane.showConfirmDialog(getFrame(),
+//                    resources.getString("CompanyGenerationOptionsPanel.UnderHalfMaximumSupportPersonnel.text"),
+//                    resources.getString("CompanyGenerationOptionsPanel.UnderHalfMaximumSupportPersonnel.title"),
+//                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)) {
+//                return ValidationState.WARNING;
+//            }
+//        }
         //endregion Warnings
 
         // The options specified are correct, and thus can be saved
