@@ -454,11 +454,11 @@ public class EducationController {
      * @param person the person to determine graduation for
      * @param academy the academy to determine graduation from
      * @param resources the resources to use for graduation
-     * @return true if the person successfully graduates; otherwise, false
+     * @return true, if the person successfully graduates; otherwise, false
      */
     private static boolean graduationPicker(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         if ((academy.isClan()) && (academy.isPrepSchool())) {
-            if (person.getAge(campaign.getLocalDate()) < 10) {
+            if (person.getAge(campaign.getLocalDate()) == 10) {
                 graduateClanCreche(campaign, person, academy, resources);
             } else {
                 graduateClanSibko(campaign, person, academy, resources);
