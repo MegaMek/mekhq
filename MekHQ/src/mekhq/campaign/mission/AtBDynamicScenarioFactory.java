@@ -2928,7 +2928,7 @@ public class AtBDynamicScenarioFactory {
                 randomThreshold = 80;
                 break;
             default:
-                randomThreshold = 99;
+                throw new IllegalArgumentException("Unrecognized rating value: " + quality);
         }
 
         for (int curBomb : advancedOrdnance) {
