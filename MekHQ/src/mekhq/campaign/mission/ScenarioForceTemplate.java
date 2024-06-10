@@ -23,6 +23,8 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
+import megamek.client.ratgenerator.MissionRole;
+import megamek.client.ratgenerator.ModelRecord;
 import megamek.common.Board;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
@@ -525,6 +527,18 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         return deployOffBoard;
     }
 
+
+    /**
+     * Randomly choose one of the sets of roles supplied from the force template. If no roles
+     * are provided, returns an empty set.
+     * FIXME:placeholder function. Needs to be properly tied into the UI and file read/write.
+     * @return
+     */
+    public Collection<MissionRole> getRequiredRoles () {
+        return new HashSet<>();
+    }
+
+
     public void setForceAlignment(int forceAlignment) {
         this.forceAlignment = forceAlignment;
     }
@@ -624,6 +638,15 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     public void setDeployOffboard(boolean deployOffBoard) {
         this.deployOffBoard = deployOffBoard;
     }
+
+    /**
+     * Adds a set of roles required for this formation. Duplicates are ignored.
+     * FIXME: placeholder function. Needs to be properly tied into the UI and file read/write.
+     * @param newRoles
+     */
+    public void addRequiredRoles (Collection<ModelRecord> newRoles) {
+    }
+
 
     public boolean isSubjectToRandomRemoval() {
         return subjectToRandomRemoval;
