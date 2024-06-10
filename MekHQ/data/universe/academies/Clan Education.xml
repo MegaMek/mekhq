@@ -125,6 +125,27 @@
         <constructionYear>2807</constructionYear>
         <durationDays>300</durationDays>
         <ageMin>16</ageMin>
+        <qualification>MechWarrior Sibko</qualification>
+        <curriculum>Small Arms, Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>ProtoMech Sibko</qualification>
+        <curriculum>Small Arms, Gunnery/ProtoMech</curriculum>
+        <qualificationStartYear>3060</qualificationStartYear>
+        <qualification>AeroSpace Sibko</qualification>
+        <curriculum>Small Arms, Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Naval Sibko</qualification>
+        <curriculum>Small Arms, Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Elemental Sibko</qualification>
+        <curriculum>Small Arms, Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>2868</qualificationStartYear>
+        <qualification>Combat Infantry Sibko</qualification>
+        <curriculum>Small Arms, Anti-Mech, Medtech</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Vehicle Sibko</qualification>
+        <curriculum>Small Arms, Piloting/VTOL, Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Scientist Caste Reeducation</qualification>
         <curriculum>Doctor, Administration, Hyperspace Navigation</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
@@ -149,6 +170,27 @@
         <constructionYear>2807</constructionYear>
         <durationDays>300</durationDays>
         <ageMin>16</ageMin>
+        <qualification>MechWarrior Sibko</qualification>
+        <curriculum>Small Arms, Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>ProtoMech Sibko</qualification>
+        <curriculum>Small Arms, Gunnery/ProtoMech</curriculum>
+        <qualificationStartYear>3060</qualificationStartYear>
+        <qualification>AeroSpace Sibko</qualification>
+        <curriculum>Small Arms, Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Naval Sibko</qualification>
+        <curriculum>Small Arms, Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Elemental Sibko</qualification>
+        <curriculum>Small Arms, Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>2868</qualificationStartYear>
+        <qualification>Combat Infantry Sibko</qualification>
+        <curriculum>Small Arms, Anti-Mech, Medtech</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
+        <qualification>Vehicle Sibko</qualification>
+        <curriculum>Small Arms, Piloting/VTOL, Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2807</qualificationStartYear>
         <qualification>Scientist Caste Reeducation</qualification>
         <curriculum>Doctor, Administration, Hyperspace Navigation</curriculum>
         <qualificationStartYear>2807</qualificationStartYear>
