@@ -1253,7 +1253,7 @@ public class Person {
      *
      * @throws IllegalStateException if the loyalty value is not within a -3 to +3 range
      */
-    public String getLoyaltyName() {
+    public static String getLoyaltyName(int loyalty) {
         switch (loyalty) {
             case 3:
                 return "Treacherous";

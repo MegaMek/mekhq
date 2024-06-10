@@ -50,6 +50,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 /**
@@ -248,7 +249,14 @@ public class RetirementDefectionTracker {
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
                     && (!campaign.getCampaignOptions().isUseHideLoyalty())
                     && (person.getLoyalty() != 0)) {
-                targetNumber.addModifier(person.getLoyalty(), resources.getString("loyalty.text"));
+
+                int loyaltyModifier = person.getLoyalty();
+
+                if (person.isCommander()) {
+                    loyaltyModifier = MathUtility.clamp(loyaltyModifier - 1, -3, 3);
+                }
+
+                targetNumber.addModifier(loyaltyModifier, getLoyaltyName(loyaltyModifier));
             }
 
             // Faction Modifiers
@@ -709,7 +717,13 @@ public class RetirementDefectionTracker {
             }
 
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
-                return targetNumber - hrSkill + difficulty - person.getLoyalty();
+                int loyaltyModifier = person.getLoyalty();
+
+                if (person.isCommander()) {
+                    loyaltyModifier = MathUtility.clamp(loyaltyModifier - 1, -3, 3);
+                }
+
+                return targetNumber - hrSkill + difficulty + loyaltyModifier;
             } else {
                 return targetNumber - hrSkill + difficulty;
             }
