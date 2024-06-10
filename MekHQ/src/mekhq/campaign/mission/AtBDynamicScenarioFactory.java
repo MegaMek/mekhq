@@ -2379,7 +2379,7 @@ public class AtBDynamicScenarioFactory {
     private static int calculateAtBSpeed(Entity entity) {
         int speed = entity.getWalkMP();
         if (entity.getJumpMP() > 0) {
-            if (entity instanceof megamek.common.Infantry) {
+            if (entity instanceof Infantry) {
                 speed = entity.getJumpMP();
             } else {
                 speed++;
@@ -2727,69 +2727,83 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Get a random predefined loadout
-        String mapName = "";
         double countWeight = 0.0;
+        double completeWeight = 0.0;
+        double randomThreshold = 0.0;
 
-        Map<String, Integer> loadoutMap;
-        if (!isPirate) {
-            loadoutMap = bombMapGroundSpread;
-        } else {
-            loadoutMap = bombMapPirateGroundSpread;
-        }
-
-        double completeWeight = loadoutMap.values().stream().mapToDouble(curWeight -> Math.max(curWeight, 1.0)).sum();
-        double randomThreshold = (Compute.randomInt(100) / 100.0) * completeWeight;
-        for (String curMap : loadoutMap.keySet()) {
-            countWeight += Math.max(loadoutMap.get(curMap), 1.0);
-            if (countWeight >= randomThreshold) {
-                mapName = curMap;
-                break;
-            }
-        }
-
+        // Use weighted random generation for air-to-ground loadouts. Use simple random selection
+        // for air-to-air.
         Map<Integer,Integer> bombMap;
-        if (!isPirate) {
-            if (!airOnly) {
-                switch (mapName) {
-                    case "Normal":
-                        bombMap = normalBombLoad;
-                        break;
-                    case "Anti-Mek":
-                        bombMap = antiMekBombLoad;
-                        break;
-                    case "Anti-conventional":
-                        bombMap = antiConvBombLoad;
-                        break;
-                    case "Standoff":
-                        bombMap = standoffBombLoad;
-                        break;
-                    case "Strike":
-                        bombMap = strikeBombLoad;
-                        break;
-                    default:
-                        bombMap = lowTechBombLoad;
-                        break;
-                }
+        if (!airOnly) {
+            bombMap = lowTechBombLoad;
+
+            // Randomly select a loadout using the weighted map of names. Pirates use a separate
+            // map with different loadouts.
+            Map<String, Integer> loadoutMap;
+            List<String> mapNames = new ArrayList<>();
+            List<Integer> mapWeights = new ArrayList<>();
+            if (!isPirate) {
+                loadoutMap = bombMapGroundSpread;
             } else {
+                loadoutMap = bombMapPirateGroundSpread;
+            }
+            for (String curName : loadoutMap.keySet()) {
+                mapNames.add(curName);
+                mapWeights.add(loadoutMap.get(curName));
+            }
+
+            // Weighted random selection
+            completeWeight = mapWeights.stream().mapToInt(curWeight -> curWeight).asDoubleStream().sum();
+            randomThreshold = (Compute.randomInt(100) / 100.0) * completeWeight;
+            for (int i = 0; i < mapNames.size(); i++) {
+                countWeight += Math.max(mapWeights.get(i), 1.0);
+                if (countWeight >= randomThreshold) {
+
+                    if (!isPirate) {
+                        switch (mapNames.get(i)) {
+                            case "Normal":
+                                bombMap = normalBombLoad;
+                                break;
+                            case "Anti-Mek":
+                                bombMap = antiMekBombLoad;
+                                break;
+                            case "Anti-conventional":
+                                bombMap = antiConvBombLoad;
+                                break;
+                            case "Standoff":
+                                bombMap = standoffBombLoad;
+                                break;
+                            case "Strike":
+                                bombMap = strikeBombLoad;
+                                break;
+                            default:
+                                break;
+                        }
+                    } else {
+                        switch (mapNames.get(i)) {
+                            case "Normal":
+                                bombMap = pirateBombLoad;
+                                break;
+                            case "Firestorm":
+                                bombMap = pirateFirestormBombLoad;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+        } else {
+
+            // Air-to-air loadouts are more limited, just use explicit random selection
+            if (!isPirate) {
                 if (Compute.randomInt(100) > 20) {
                     bombMap = antiAirBombLoad;
                 } else {
                     bombMap = antiShipBombLoad;
-                }
-            }
-        } else {
-
-            if (!airOnly) {
-                switch (mapName) {
-                    case "Normal":
-                        bombMap = pirateBombLoad;
-                        break;
-                    case "Firestorm":
-                        bombMap = pirateFirestormBombLoad;
-                        break;
-                    default:
-                        bombMap = lowTechBombLoad;
-                        break;
                 }
             } else {
                 bombMap = pirateAirBombLoad;
@@ -2841,16 +2855,24 @@ public class AtBDynamicScenarioFactory {
 
         int selectedBombType = -1;
         int loopSafety = 0;
+
+        List<Integer> ordnanceIDs = new ArrayList<>();
+        List<Integer> ordnanceRandomWeights = new ArrayList<>();
+        for (int curID : workingBombMap.keySet()) {
+            ordnanceIDs.add(curID);
+            ordnanceRandomWeights.add(workingBombMap.get(curID));
+        }
+        completeWeight = ordnanceRandomWeights.stream().mapToInt(curWeight -> Math.max(curWeight, 1)).asDoubleStream().sum();
+
         for (int curLoad = 0; curLoad < bombUnits && loopSafety < 10;) {
 
             // Randomly get the ordnance type
-            completeWeight = workingBombMap.values().stream().mapToDouble(curWeight -> Math.max(curWeight, 1.0)).sum();
             randomThreshold = (Compute.randomInt(100) / 100.0) * completeWeight;
             countWeight = 0.0;
-            for (int curBomb : workingBombMap.keySet()) {
-                countWeight += Math.max(workingBombMap.get(curBomb), 1.0);
+            for (int i = 0; i < ordnanceIDs.size(); i++) {
+                countWeight += Math.max(ordnanceRandomWeights.get(i), 1.0);
                 if (countWeight >= randomThreshold) {
-                    selectedBombType = curBomb;
+                    selectedBombType = ordnanceIDs.get(i);
                     break;
                 }
             }
