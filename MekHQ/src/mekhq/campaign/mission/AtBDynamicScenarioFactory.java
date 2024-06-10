@@ -455,10 +455,25 @@ public class AtBDynamicScenarioFactory {
 
 
         // Required roles for units in this force. Because these can vary by unit type,
-        // they are tracked separately.
+        // each unit type tracks them separately.
         Map<Integer, Collection<MissionRole>> requiredRoles = new HashMap<>();
 
-        // TODO: get required roles from force template
+        Collection<MissionRole> baseRoles = forceTemplate.getRequiredRoles();
+        if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
+            requiredRoles.put(UnitType.MEK, baseRoles);
+            requiredRoles.put(UnitType.TANK, baseRoles);
+        } else if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
+            requiredRoles.put(UnitType.CONV_FIGHTER, baseRoles);
+            requiredRoles.put(UnitType.AEROSPACEFIGHTER, baseRoles);
+        } else if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
+            for (int i = 0; i <= UnitType.AERO; i++) {
+                if (MissionRole.CIVILIAN.fitsUnitType(i)) {
+                    requiredRoles.put(i, baseRoles);
+                }
+            }
+        } else {
+            requiredRoles.put(forceTemplate.getAllowedUnitType(), baseRoles);
+        }
 
         // Parameters for infantry - check if XCT or marines are required
         if (allowsConvInfantry && (isTainted || isLowPressure || isLowGravity)) {
@@ -500,17 +515,11 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-
         ArrayList<Entity> generatedEntities = new ArrayList<>();
-
         boolean stopGenerating = false;
         String currentLanceWeightString = "";
 
-        //  While force has not surpassed BV cap || unit cap
-        //      get me a unit types array
-        //      get me a unit weight string
-        //      use unit weight string to generate a list of entities
-        //  Step 2.1 If force has surpassed unit cap, remove randomly selected units until it's at unit cap
+        // Generate a tactical formation (lance/star/etc.) until the BV or unit count limits are exceeded
         while (!stopGenerating) {
             List<Entity> generatedLance;
 
@@ -518,6 +527,7 @@ public class AtBDynamicScenarioFactory {
             // Generate a number of tactical formations for this force based on the desired average
             // weight class. This may generate higher numbers of lighter formations, or fewer
             // (minimum of one) of heavier formations.
+            // TODO: change this to a list
             if (currentLanceWeightString.isEmpty()) {
                 currentLanceWeightString = campaign.getAtBConfig().selectBotLances(parentFactionType, weightClass);
             }
@@ -578,7 +588,7 @@ public class AtBDynamicScenarioFactory {
                     // class and lower/upper bounds
                     final String unitWeights = generateUnitWeights(unitTypes,
                             factionCode,
-                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0),
+                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), //TODO: special string handling here
                             forceTemplate.getMaxWeightClass(),
                             forceTemplate.getMinWeightClass(),
                             campaign);
@@ -617,70 +627,9 @@ public class AtBDynamicScenarioFactory {
                 }
 
             }
-            // TODO: remove commented code after extensive review of working replacement above
-            // Formations built solely from aerospace fighters (but not conventional), Mechs,
-            // ProtoMechs, and ground vehicles use the force generator system with weight categories.
-            // The SPECIAL_UNIT_TYPE_ATB_MIX unit type prompts for random selection of Mechs and/or
-            // vehicles (including VTOLs) based on the campaign ratio settings.
-            /*
-            else if (IUnitGenerator.unitTypeSupportsWeightClass(actualUnitType) ||
-                    (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX)) {
 
-                // Determine unit types for each unit of the formation. Normally this is all one
-                // type, but SPECIAL_UNIT_TYPE_ATB_MIX may generate all Mechs, all vehicles, or
-                // a Mech/vehicle mixed formation.
-                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality, factionCode, campaign);
-
-                if (!forceTemplate.getUseArtillery()) {
-
-                    // Generate a specific weight class for each unit based on the formation weight
-                    // class and lower/upper bounds
-                    final String unitWeights = generateUnitWeights(unitTypes,
-                            factionCode,
-                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0),
-                            forceTemplate.getMaxWeightClass(),
-                            forceTemplate.getMinWeightClass(),
-                            campaign);
-
-                    // Only generate specific units if valid weight classes were created
-                    if (unitWeights == null) {
-                        generatedLance = new ArrayList<>();
-                    } else {
-                        generatedLance = generateLance(factionCode,
-                                skill,
-                                quality,
-                                unitTypes,
-                                unitWeights,
-                                requiredRoles,
-                                false,
-                                campaign);
-                    }
-
-                // Artillery formations get generated without weight classes for maximum flexibility
-                } else {
-                    generatedLance = generateLance(factionCode,
-                            skill,
-                            quality,
-                            unitTypes,
-                            requiredRoles,
-                            true,
-                            campaign);
-                }
-
-            // Battle armor, conventional infantry, VTOL, blue water naval, and conventional
-            // fighter formations generate individual units without weight classes
-            } else {
-                List<Integer> unitTypes = generateUnitTypes(actualUnitType, lanceSize, quality, factionCode, campaign);
-                generatedLance = generateLance(factionCode, skill, quality, unitTypes, requiredRoles, forceTemplate.getUseArtillery(), campaign);
-            }
-
-            */
-
-
-
-
-
-            // no reason to go into an endless loop if we can't generate a lance
+            // If something went wrong with unit generation, stop generating formations and work
+            // with what is already generated
             if (generatedLance.isEmpty()) {
                 stopGenerating = true;
                 LogManager.getLogger().warn(
@@ -689,9 +638,8 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-
-
-            // After generating each formation, trim it's weight class from the string/list
+            // After generating each formation, trim its weight class from the string/list
+            // TODO: change this to a list rather than a string
             currentLanceWeightString = currentLanceWeightString.substring(1);
 
 
