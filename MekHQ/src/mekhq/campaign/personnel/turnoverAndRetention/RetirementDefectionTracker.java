@@ -247,8 +247,7 @@ public class RetirementDefectionTracker {
 
             // Loyalty
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
-                    && (!campaign.getCampaignOptions().isUseHideLoyalty())
-                    && (person.getLoyalty() != 0)) {
+                    && (!campaign.getCampaignOptions().isUseHideLoyalty())) {
 
                 int loyaltyModifier = person.getLoyalty();
 
@@ -256,7 +255,9 @@ public class RetirementDefectionTracker {
                     loyaltyModifier = MathUtility.clamp(loyaltyModifier - 1, -3, 3);
                 }
 
-                targetNumber.addModifier(loyaltyModifier, getLoyaltyName(loyaltyModifier));
+                if (loyaltyModifier != 0) {
+                    targetNumber.addModifier(loyaltyModifier, getLoyaltyName(loyaltyModifier));
+                }
             }
 
             // Faction Modifiers
