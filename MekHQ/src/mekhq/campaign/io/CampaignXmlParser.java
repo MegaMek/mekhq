@@ -716,12 +716,12 @@ public class CampaignXmlParser {
                         retVal.setName(val);
                     }
                 } else if (xn.equalsIgnoreCase("campaignStartDate")) {
-                    String val = wn.getTextContent().trim();
+                    String campaignStartDate = wn.getTextContent().trim();
 
-                    if (val.equals("null")) {
+                    if (campaignStartDate.equals("null")) {
                         retVal.setCampaignStartDate(null);
                     } else {
-                        retVal.setCampaignStartDate(LocalDate.parse(wn.getTextContent().trim()));
+                        retVal.setCampaignStartDate(LocalDate.parse(campaignStartDate));
                     }
                 } else if (xn.equalsIgnoreCase("overtime")) {
                     retVal.setOvertime(Boolean.parseBoolean(wn.getTextContent().trim()));
