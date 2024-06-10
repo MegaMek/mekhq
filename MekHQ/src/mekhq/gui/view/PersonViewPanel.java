@@ -1444,7 +1444,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblLoyalty1, gridBagConstraints);
 
             lblLoyalty2.setName("lblLoyalty2");
-            lblLoyalty2.setText(String.valueOf(person.getLoyalty()));
+            lblLoyalty2.setText(person.getLoyalty() + " (" + person.getLoyaltyName() + ')');
             lblLoyalty2.setLabelFor(lblLoyalty2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;

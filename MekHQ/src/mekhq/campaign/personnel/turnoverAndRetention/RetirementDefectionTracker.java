@@ -248,7 +248,7 @@ public class RetirementDefectionTracker {
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
                     && (!campaign.getCampaignOptions().isUseHideLoyalty())
                     && (person.getLoyalty() != 0)) {
-                targetNumber.addModifier(-person.getLoyalty(), resources.getString("loyalty.text"));
+                targetNumber.addModifier(person.getLoyalty(), resources.getString("loyalty.text"));
             }
 
             // Faction Modifiers

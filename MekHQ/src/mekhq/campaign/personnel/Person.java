@@ -21,6 +21,7 @@ package mekhq.campaign.personnel;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -1235,8 +1236,42 @@ public class Person {
         return loyalty;
     }
 
-    public void setLoyalty(final int loyalty) {
+    /**
+     * Sets the loyalty level of the customer.
+     * The loyalty level should be within the range of -3 to 3.
+     *
+     * @param loyalty the loyalty level to be set
+     */
+    public void setLoyalty(int loyalty) {
+        loyalty = MathUtility.clamp(loyalty, -3, 3);
+
         this.loyalty = loyalty;
+    }
+
+    /**
+     * @return the loyalty name based on the person's loyalty score.
+     *
+     * @throws IllegalStateException if the loyalty value is not within a -3 to +3 range
+     */
+    public String getLoyaltyName() {
+        switch (loyalty) {
+            case 3:
+                return "Treacherous";
+            case 2:
+                return "Disloyal";
+            case 1:
+                return "Unreliable";
+            case 0:
+                return "Neutral";
+            case -1:
+                return "Reliable";
+            case -2:
+                return "Loyal";
+            case -3:
+                return "Devoted";
+            default:
+                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/Person.java/getLoyaltyName: " + loyalty);
+        }
     }
 
     public int getFatigue() {
@@ -3769,23 +3804,22 @@ public class Person {
 
     /**
      * Generates the loyalty value for a person based on the given roll value.
-     * Roll should be set to 3 for normal loyalty, 2 for low loyalty, or 4 for high loyalty.
      *
      * @param roll the roll value used to determine loyalty
      */
     public void generateLoyalty(int roll) {
         if (roll == 3) {
-            setLoyalty(-3);
-        } else if (roll == 4) {
-            setLoyalty(-2);
-        } else if (roll < 7) {
-            setLoyalty(-1);
-        } else if (roll == 18) {
             setLoyalty(3);
-        } else if (roll >= 17) {
+        } else if (roll == 4) {
             setLoyalty(2);
-        } else if (roll > 14) {
+        } else if (roll < 7) {
             setLoyalty(1);
+        } else if (roll == 18) {
+            setLoyalty(-3);
+        } else if (roll >= 17) {
+            setLoyalty(-2);
+        } else if (roll > 14) {
+            setLoyalty(-1);
         } else {
             setLoyalty(0);
         }
