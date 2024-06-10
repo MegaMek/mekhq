@@ -4887,7 +4887,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblManagementSkillPenalty.setName("lblManagementSkillPenalty");
         lblManagementSkillPenalty.setEnabled((isUseTurnover) && (isUseManagementSkill));
 
-        spnManagementSkillPenalty = new JSpinner(new SpinnerNumberModel(-2, -10, 0, 1));
+        spnManagementSkillPenalty = new JSpinner(new SpinnerNumberModel(0, -10, 0, 1));
         spnManagementSkillPenalty.setToolTipText(resources.getString("lblManagementSkillPenalty.toolTipText"));
         spnManagementSkillPenalty.setName("spnManagementSkillPenalty");
         spnManagementSkillPenalty.setEnabled((isUseTurnover) && (isUseManagementSkill));

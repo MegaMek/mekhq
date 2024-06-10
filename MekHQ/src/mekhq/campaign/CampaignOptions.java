@@ -1017,7 +1017,7 @@ public class CampaignOptions {
 
         setUseManagementSkill(false);
         setUseCommanderLeadershipOnly(false);
-        setManagementSkillPenalty(-2);
+        setManagementSkillPenalty(0);
 
         setUseFatigue(true);
         setFatigueRate(1);

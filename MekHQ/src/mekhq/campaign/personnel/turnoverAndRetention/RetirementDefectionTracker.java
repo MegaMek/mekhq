@@ -183,14 +183,14 @@ public class RetirementDefectionTracker {
 
             // Management Skill Modifier
             if (campaign.getCampaignOptions().isUseManagementSkill()) {
-                int modifier = 0;
+                int modifier = campaign.getCampaignOptions().getManagementSkillPenalty();
 
                 if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
                     if (campaign.getFlaggedCommander().hasSkill((SkillType.S_LEADER))) {
-                        modifier += campaign.getCampaignOptions().getManagementSkillPenalty()
-                                + campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER).getFinalSkillValue();
+                        modifier -= campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER).getFinalSkillValue();
                     }
                 } else {
+                    // unlike commander leadership only, this already factors in the base modifier
                     modifier = getManagementSkillModifier(person);
                 }
 
@@ -460,49 +460,49 @@ public class RetirementDefectionTracker {
                 case AEROSPACE:
                     if (person.outRanksUsingSkillTiebreaker(campaign, asfCommander)) {
                         asfCommander = person;
-                        asfCommanderModifier = baseModifier + getIndividualCommanderLeadership(asfCommander);
+                        asfCommanderModifier = baseModifier - getIndividualCommanderLeadership(asfCommander);
                     }
                     break;
                 case VEHICLE:
                     if (person.outRanksUsingSkillTiebreaker(campaign, vehicleCrewCommander)) {
                         vehicleCrewCommander = person;
-                        vehicleCrewCommanderModifier = baseModifier + getIndividualCommanderLeadership(vehicleCrewCommander);
+                        vehicleCrewCommanderModifier = baseModifier - getIndividualCommanderLeadership(vehicleCrewCommander);
                     }
                     break;
                 case INFANTRY:
                     if (person.outRanksUsingSkillTiebreaker(campaign, infantryCommander)) {
                         infantryCommander = person;
-                        infantryCommanderModifier = baseModifier + getIndividualCommanderLeadership(infantryCommander);
+                        infantryCommanderModifier = baseModifier - getIndividualCommanderLeadership(infantryCommander);
                     }
                     break;
                 case NAVAL:
                     if (person.outRanksUsingSkillTiebreaker(campaign, navalCommander)) {
                         navalCommander = person;
-                        navalCommanderModifier = baseModifier + getIndividualCommanderLeadership(navalCommander);
+                        navalCommanderModifier = baseModifier - getIndividualCommanderLeadership(navalCommander);
                     }
                     break;
                 case TECH:
                     if (person.outRanksUsingSkillTiebreaker(campaign, techCommander)) {
                         techCommander = person;
-                        techCommanderModifier = baseModifier + getIndividualCommanderLeadership(techCommander);
+                        techCommanderModifier = baseModifier - getIndividualCommanderLeadership(techCommander);
                     }
                     break;
                 case MEDICAL:
                     if (person.outRanksUsingSkillTiebreaker(campaign, medicalCommander)) {
                         medicalCommander = person;
-                        medicalCommanderModifier = baseModifier + getIndividualCommanderLeadership(medicalCommander);
+                        medicalCommanderModifier = baseModifier - getIndividualCommanderLeadership(medicalCommander);
                     }
                     break;
                 case ADMINISTRATOR:
                     if (person.outRanksUsingSkillTiebreaker(campaign, administrationCommander)) {
                         administrationCommander = person;
-                        administrationCommanderModifier = baseModifier + getIndividualCommanderLeadership(administrationCommander);
+                        administrationCommanderModifier = baseModifier - getIndividualCommanderLeadership(administrationCommander);
                     }
                     break;
                 case MECHWARRIOR:
                     if (person.outRanksUsingSkillTiebreaker(campaign, mechWarriorCommander)) {
                         mechWarriorCommander = person;
-                        mechWarriorCommanderModifier = baseModifier + getIndividualCommanderLeadership(mechWarriorCommander);
+                        mechWarriorCommanderModifier = baseModifier - getIndividualCommanderLeadership(mechWarriorCommander);
                     }
                     break;
                 case CIVILIAN:
