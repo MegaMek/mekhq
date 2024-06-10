@@ -397,6 +397,7 @@ public abstract class AbstractCompanyGenerator {
             return;
         }
 
+
         // Improve Skills
         final Skill gunnery = tracker.getPerson().getSkill(SkillType.S_GUN_MECH);
         final Skill piloting = tracker.getPerson().getSkill(SkillType.S_PILOT_MECH);
@@ -445,19 +446,19 @@ public abstract class AbstractCompanyGenerator {
                                                   final int boosts) {
         for (int i = 0; i < boosts; i++) {
             switch (Utilities.dice(1, 3)) {
-                case 0:
+                case 1:
                     tracker.getPerson().improveSkill(SkillType.S_LEADER);
                     if (tracker.getPerson().getSkillLevel(SkillType.S_LEADER) == 0) {
                         tracker.getPerson().improveSkill(SkillType.S_LEADER);
                     }
                     break;
-                case 1:
+                case 2:
                     tracker.getPerson().improveSkill(SkillType.S_STRATEGY);
                     if (tracker.getPerson().getSkillLevel(SkillType.S_STRATEGY) == 0) {
                         tracker.getPerson().improveSkill(SkillType.S_STRATEGY);
                     }
                     break;
-                case 2:
+                case 3:
                     tracker.getPerson().improveSkill(SkillType.S_TACTICS);
                     if (tracker.getPerson().getSkillLevel(SkillType.S_TACTICS) == 0) {
                         tracker.getPerson().improveSkill(SkillType.S_TACTICS);
