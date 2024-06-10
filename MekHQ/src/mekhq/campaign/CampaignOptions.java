@@ -980,7 +980,7 @@ public class CampaignOptions {
         // Retirement
         setUseRetirementDateTracking(false);
         setUseRandomRetirement(true);
-        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.NEGOTIATION);
+        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.FIXED);
         setTurnoverDifficulty(SkillLevel.REGULAR);
         setTurnoverFrequency(TurnoverFrequency.MONTHLY);
         setTurnoverFixedTargetNumber(3);

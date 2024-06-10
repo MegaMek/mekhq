@@ -2404,14 +2404,21 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) && (getCampaign().checkTurnoverPrompt())) {
-            if (!showRetirementDefectionDialog()) {
+        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
+            if (getCampaign().checkTurnoverPrompt()) {
+                if (!showRetirementDefectionDialog()) {
+                    evt.cancel();
+                    return;
+                }
+            }
+
+            if (!getCampaign().checkRetirementDefections()) {
                 evt.cancel();
                 return;
             }
         }
 
-        if(getCampaign().checkScenariosDue()) {
+        if (getCampaign().checkScenariosDue()) {
             JOptionPane.showMessageDialog(null, getResourceMap().getString("dialogCheckDueScenarios.text"),
                     getResourceMap().getString("dialogCheckDueScenarios.title"), JOptionPane.WARNING_MESSAGE);
             evt.cancel();

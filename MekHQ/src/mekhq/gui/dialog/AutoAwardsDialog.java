@@ -79,7 +79,10 @@ public class AutoAwardsDialog extends JDialog {
         setTitle(resourceMap.getString("AutoAwardsDialog.title"));
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setSize((int) screenSize.getWidth(), (int) (screenSize.getHeight() * 0.94));
+        int screenWidth = (int) (screenSize.getWidth() * 0.75);
+        int screenHeight = (int) (screenSize.getHeight() * 0.94);
+
+        setSize(screenWidth, screenHeight);
 
         setLayout(new BorderLayout());
         CardLayout cardLayout = new CardLayout();
@@ -91,7 +94,7 @@ public class AutoAwardsDialog extends JDialog {
         JPanel imageAndInstructionsPanel = new JPanel(new BorderLayout());
 
         Image image = new ImageIcon("data/images/awards/awardceremony.png")
-                .getImage().getScaledInstance(screenSize.width, (screenSize.width / 7), Image.SCALE_FAST);
+                .getImage().getScaledInstance(screenWidth, (screenHeight / 7), Image.SCALE_FAST);
         JLabel lblImage = new JLabel(new ImageIcon(image));
         imageAndInstructionsPanel.add(lblImage, BorderLayout.CENTER);
 

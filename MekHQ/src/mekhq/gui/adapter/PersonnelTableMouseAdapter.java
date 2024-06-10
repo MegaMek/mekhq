@@ -666,9 +666,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 boolean showDialog = false;
                 List<Person> toRemove = new ArrayList<>();
                 for (Person person : people) {
-                    if (gui.getCampaign().getRetirementDefectionTracker().removeFromCampaign(
-                            person, false, true, gui.getCampaign(), null)) {
-                        showDialog = true;
+                    if (!person.getPrimaryRole().isCivilian()) {
+                        if (gui.getCampaign().getRetirementDefectionTracker().removeFromCampaign(
+                                person, false, true, gui.getCampaign(), null)) {
+                            showDialog = true;
+                        } else {
+                            toRemove.add(person);
+                        }
                     } else {
                         toRemove.add(person);
                     }
