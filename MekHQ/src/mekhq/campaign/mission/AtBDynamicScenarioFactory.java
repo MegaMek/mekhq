@@ -83,7 +83,7 @@ public class AtBDynamicScenarioFactory {
     private static final Collection<Integer> GUIDED_ORDNANCE = new HashSet<>(Arrays.asList(BombType.B_LG, BombType.B_HOMING));
 
     /**
-     * Distribution of various external ordnance choices for non-pirate forces
+     * Relative weight distribution of various external ordnance choices for non-pirate forces
      */
     private static final Map<String, Integer> bombMapGroundSpread = Map.ofEntries (
             Map.entry("Normal", 6),
@@ -94,7 +94,7 @@ public class AtBDynamicScenarioFactory {
     );
 
     /**
-     * Distribution of various external ordnance choices for pirate forces
+     * Relative weight distribution of various external ordnance choices for pirate forces
      */
     private static final Map<String, Integer> bombMapPirateGroundSpread = Map.ofEntries(
             Map.entry("Normal", 7),
@@ -102,7 +102,7 @@ public class AtBDynamicScenarioFactory {
     );
 
     /**
-     * General purpose external ordnance choices
+     * Relative weight distribution of general purpose external ordnance choices
      */
     private static final Map<Integer, Integer> normalBombLoad = Map.ofEntries(
             Map.entry(BombType.B_HE,40),
@@ -113,7 +113,7 @@ public class AtBDynamicScenarioFactory {
     );
 
     /**
-     * External ordnance choices for use against Mechs
+     * Relative weight distribution of external ordnance choices for use against Mechs
      */
     private static final Map<Integer,Integer> antiMekBombLoad = Map.ofEntries(
             Map.entry(BombType.B_HE,55),
@@ -124,7 +124,8 @@ public class AtBDynamicScenarioFactory {
     );
 
     /**
-     * External ordnance choices for use against ground vehicles and infantry
+     * Relative weight distribution of external ordnance choices for use against ground vehicles
+     * and infantry
      */
     private static final Map<Integer,Integer> antiConvBombLoad = Map.ofEntries(
             Map.entry(BombType.B_CLUSTER,50),
@@ -134,7 +135,7 @@ public class AtBDynamicScenarioFactory {
     );
 
     /**
-     * External ordnance choices for providing artillery support
+     * Relative weight distribution of external ordnance choices for providing artillery support
      */
     private static final Map<Integer,Integer> standoffBombLoad = Map.ofEntries(
             Map.entry(BombType.B_ARROW, 40),
@@ -142,7 +143,7 @@ public class AtBDynamicScenarioFactory {
     );
 
     /**
-     * External ordnance choices for attacking static targets
+     * Relative weight distribution of external ordnance choices for attacking static targets
      */
     private static final Map<Integer,Integer> strikeBombLoad = Map.ofEntries(
             Map.entry(BombType.B_LG,45),
@@ -151,7 +152,8 @@ public class AtBDynamicScenarioFactory {
     );
 
     /**
-     * External ordnance choices for low tech forces. Also used as a default/fall-back selection.
+     * Relative weight distribution of external ordnance choices for low tech forces. Also used as
+     * a default/fall-back selection.
      */
     private static final Map<Integer,Integer> lowTechBombLoad = Map.ofEntries(
             Map.entry(BombType.B_HE, 35),
@@ -159,7 +161,8 @@ public class AtBDynamicScenarioFactory {
     );
 
     /**
-     * External ordnance choices for pirates. Low tech, high chaos factor.
+     * Relative weight distribution of external ordnance choices for pirates. Low tech, high chaos
+     * factor.
      */
     private static final Map<Integer,Integer> pirateBombLoad = Map.ofEntries(
             Map.entry(BombType.B_HE, 7),
