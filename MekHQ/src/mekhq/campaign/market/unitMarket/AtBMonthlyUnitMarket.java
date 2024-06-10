@@ -215,13 +215,12 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             case "rare":
                 return Compute.d6(1) - 5;
             case "very rare":
-                if (Compute.d6(1) == 6) {
-                    if (Compute.d6(1) <= 3) {
-                        return 0;
-                    } else {
-                        return 1;
-                    }
+                // two rolls: the first needs a 6, the second 4+
+                if ((Compute.d6(1) == 6) && (Compute.d6(1) > 3)) {
+                    return 1;
                 }
+
+                return 0;
             default:
                 throw new IllegalStateException("Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getMarketItemCount: " + rarity);
         }
