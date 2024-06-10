@@ -1003,7 +1003,7 @@ public class CampaignOptions {
         setUseFamilyModifiers(true);
 
         setUseLoyaltyModifiers(true);
-        setUseHideLoyalty(true);
+        setUseHideLoyalty(false);
 
         setPayoutRateOfficer(3);
         setPayoutRateEnlisted(3);
@@ -1011,11 +1011,11 @@ public class CampaignOptions {
         setUsePayoutServiceBonus(true);
         setPayoutServiceBonusRate(10);
 
-        setUseAdministrativeStrain(true);
+        setUseAdministrativeStrain(false);
         setAdministrativeCapacity(10);
         setMultiCrewStrainDivider(5);
 
-        setUseManagementSkill(true);
+        setUseManagementSkill(false);
         setUseCommanderLeadershipOnly(false);
         setManagementSkillPenalty(-2);
 
