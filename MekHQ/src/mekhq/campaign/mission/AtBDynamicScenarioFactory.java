@@ -415,7 +415,7 @@ public class AtBDynamicScenarioFactory {
 
 
 
-        // Conditions parameters - atmospheric pressure, toxic atmosphere, or low gravity
+        // Conditions parameters - atmospheric pressure, toxic atmosphere, and gravity
         boolean isLowGravity = false;
         boolean isLowPressure = false;
         boolean isTainted = false;
@@ -459,20 +459,24 @@ public class AtBDynamicScenarioFactory {
         Map<Integer, Collection<MissionRole>> requiredRoles = new HashMap<>();
 
         Collection<MissionRole> baseRoles = forceTemplate.getRequiredRoles();
-        if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
-            requiredRoles.put(UnitType.MEK, baseRoles);
-            requiredRoles.put(UnitType.TANK, baseRoles);
-        } else if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
-            requiredRoles.put(UnitType.CONV_FIGHTER, baseRoles);
-            requiredRoles.put(UnitType.AEROSPACEFIGHTER, baseRoles);
-        } else if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
-            for (int i = 0; i <= UnitType.AERO; i++) {
-                if (MissionRole.CIVILIAN.fitsUnitType(i)) {
-                    requiredRoles.put(i, baseRoles);
+
+        if (!baseRoles.isEmpty()) {
+            if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX) {
+                requiredRoles.put(UnitType.MEK, new ArrayList<>(baseRoles));
+                requiredRoles.put(UnitType.TANK, new ArrayList<>(baseRoles));
+            } else if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX) {
+                requiredRoles.put(UnitType.CONV_FIGHTER, new ArrayList<>(baseRoles));
+                requiredRoles.put(UnitType.AEROSPACEFIGHTER, new ArrayList<>(baseRoles));
+            } else if (forceTemplate.getAllowedUnitType() == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
+                // TODO: this will need to be adjusted to cover SUPPORT and CIVILIAN separately
+                for (int i = 0; i <= UnitType.AERO; i++) {
+                    if (MissionRole.CIVILIAN.fitsUnitType(i)) {
+                        requiredRoles.put(i, new ArrayList<>(baseRoles));
+                    }
                 }
+            } else {
+                requiredRoles.put(forceTemplate.getAllowedUnitType(), new ArrayList<>(baseRoles));
             }
-        } else {
-            requiredRoles.put(forceTemplate.getAllowedUnitType(), baseRoles);
         }
 
         // Parameters for infantry - check if XCT or marines are required

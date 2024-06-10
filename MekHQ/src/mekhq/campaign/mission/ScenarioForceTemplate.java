@@ -26,12 +26,14 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import megamek.client.ratgenerator.MissionRole;
 import megamek.client.ratgenerator.ModelRecord;
 import megamek.common.Board;
+import megamek.common.Compute;
 import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> {
     // A scenario force template is a way to describe a particular force that gets generated when creating a DymanicScenario
@@ -362,6 +364,11 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      */
     private String fixedMul;
 
+    /**
+     * Potential roles to control how this force is generated
+     */
+    private List<String> forceRoleStrings;
+
     @Override
     public ScenarioForceTemplate clone() {
         return new ScenarioForceTemplate(this);
@@ -373,6 +380,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     public ScenarioForceTemplate() {
         deploymentZones = new ArrayList<>();
         objectiveLinkedForces = new ArrayList<>();
+        forceRoleStrings = new ArrayList<>();
     }
 
     /**
@@ -388,6 +396,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.allowedUnitType = allowedUnitType;
         this.deploymentZones = deploymentZones == null ? new ArrayList<>() : new ArrayList<>(deploymentZones);
         this.objectiveLinkedForces = new ArrayList<>();
+        this.forceRoleStrings = new ArrayList<>();
     }
 
     /**
@@ -427,6 +436,8 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         objectiveLinkedForces = new ArrayList<>();
         objectiveLinkedForces.addAll(forceDefinition.objectiveLinkedForces);
         fixedMul = forceDefinition.fixedMul;
+        forceRoleStrings = new ArrayList<>();
+        forceRoleStrings.addAll(forceDefinition.forceRoleStrings);
     }
 
     public int getForceAlignment() {
@@ -529,13 +540,29 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
 
 
     /**
+     * Deserialization support for roles that could be applied to this force
+     * @return
+     */
+    @XmlElementWrapper(name = "roleChoices")
+    @XmlElement(name = "forceRole")
+    public List<String> getRoleCollections () {
+        return forceRoleStrings;
+    }
+
+    /**
      * Randomly choose one of the sets of roles supplied from the force template. If no roles
      * are provided, returns an empty set.
-     * FIXME:placeholder function. Needs to be properly tied into the UI and file read/write.
+     * FIXME: placeholder function. Needs to be properly tied into the UI and file read/write.
      * @return
      */
     public Collection<MissionRole> getRequiredRoles () {
-        return new HashSet<>();
+        String roleString = "";
+        if (!forceRoleStrings.isEmpty()) {
+            roleString = forceRoleStrings.get(Compute.randomInt(forceRoleStrings.size()));
+        }
+        Collection<MissionRole> roleSet = new HashSet<>();
+        roleSet = Arrays.stream(roleString.split(",")).map(MissionRole::parseRole).filter(Objects::nonNull).collect(Collectors.toSet());
+        return roleSet;
     }
 
 
