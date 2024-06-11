@@ -1580,7 +1580,7 @@ public class AtBDynamicScenarioFactory {
         UnitGeneratorParameters newParams = params.clone();
         newParams.setUnitType(UnitType.INFANTRY);
         MechSummary unitData;
-        boolean temporaryXCT =false;
+        boolean temporaryXCT = false;
         UnitGeneratorParameters noXCTParams;
         Entity crewedPlatoon;
 
