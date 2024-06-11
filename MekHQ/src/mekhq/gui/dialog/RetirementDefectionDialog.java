@@ -180,12 +180,9 @@ public class RetirementDefectionDialog extends JDialog {
             panTop.add(cbGroupOverview);
             panTop.add(Box.createHorizontalGlue());
 
-            JLabel lblTotalDesc = new JLabel();
             lblTotal = new JLabel();
             lblTotal.setHorizontalAlignment(SwingConstants.RIGHT);
-            lblTotalDesc.setText(resourceMap.getString("lblTotalBonus.text"));
-            lblTotal.setText("0");
-            panTop.add(lblTotalDesc);
+            lblTotal.setText("ERROR LOADING BONUS SELECTION");
             panTop.add(Box.createRigidArea(new Dimension(5, 0)));
             panTop.add(lblTotal);
             panTop.add(Box.createRigidArea(new Dimension(20, 0)));
@@ -251,21 +248,14 @@ public class RetirementDefectionDialog extends JDialog {
             }
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)),
                     hqView.getCampaign().getCampaignOptions().isUseCustomRetirementModifiers());
+
             model.setData(targetRolls);
             model.addTableModelListener(ev -> {
-                Money bonus = getTotalBonus();
-                if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
-                    lblTotal.setText("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                            + resourceMap.getString("lblTotalBonus.text") + ' '
-                            + getTotalBonus().toAmountAndSymbolString() + "</font></html>");
-                    lblTotalShares.setText(Integer.toString(getTotalShares()));
+                setBonusAndShareTotals(getTotalBonus());
 
-                    btnRoll.setEnabled(false);
-                } else {
-                    lblTotal.setText(getTotalBonus().toAmountAndSymbolString());
-                    btnRoll.setEnabled(true);
-                }
+                btnRoll.setEnabled(!getTotalBonus().isGreaterThan(hqView.getCampaign().getFinances().getBalance()));
             });
+            setBonusAndShareTotals(getTotalBonus());
 
             JScrollPane scroll = new JScrollPane();
             scroll.setViewportView(personnelTable);
@@ -418,6 +408,21 @@ public class RetirementDefectionDialog extends JDialog {
         btnRoll.setVisible(doRetirement);
         btnDone.setVisible(!doRetirement);
         add(btnPanel, BorderLayout.PAGE_END);
+    }
+
+    private void setBonusAndShareTotals(Money bonus) {
+        if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
+            lblTotal.setText("<html>" + resourceMap.getString("lblTotalBonus.text")
+                    + ' ' + "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                    + getTotalBonus().toAmountAndSymbolString() + "</font></html>");
+        } else {
+            lblTotal.setText(resourceMap.getString("lblTotalBonus.text")
+                    + ' ' + getTotalBonus().toAmountAndSymbolString());
+        }
+
+        if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
+            lblTotalShares.setText(Integer.toString(getTotalShares()));
+        }
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
