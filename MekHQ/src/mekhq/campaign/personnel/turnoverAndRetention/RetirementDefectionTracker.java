@@ -29,7 +29,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -234,6 +236,13 @@ public class RetirementDefectionTracker {
                 targetNumber.addModifier(unitRatingModifier, resources.getString("unitRating.text"));
             }
 
+            // Active Mission modifier
+            if (true) {
+                if (isHostileTerritory(campaign)) {
+                    targetNumber.addModifier(-2, resources.getString("hostileTerritory.text"));
+                }
+            }
+
             // Mission completion status modifiers
             if ((mission != null) && (campaign.getCampaignOptions().isUseMissionStatusModifiers())) {
                 if (mission.getStatus().isSuccess()) {
@@ -364,6 +373,39 @@ public class RetirementDefectionTracker {
             targets.put(person.getId(), targetNumber);
         }
         return targets;
+    }
+
+    /**
+     * Determines whether the campaign is in the middle of a contract in hostile territory.
+     * If AtB is disabled, this method only checks whether there is an active contract.
+     *
+     * @param campaign the campaign to check for hostile territory modifier
+     * @return true if the campaign is in hostile territory modifier
+     * or (if AtB is disabled) whether the campaign is in an active contract, false otherwise
+     */
+    private boolean isHostileTerritory(Campaign campaign) {
+        List<AtBContractType> defensiveContracts = Arrays.asList(
+                AtBContractType.GARRISON_DUTY,
+                AtBContractType.CADRE_DUTY,
+                AtBContractType.SECURITY_DUTY,
+                AtBContractType.RIOT_DUTY);
+
+        List<Contract> activeContracts = campaign.getActiveContracts();
+
+        if (!activeContracts.isEmpty()) {
+            if (campaign.getCampaignOptions().isUseAtB()) {
+                Optional<Contract> defensiveContract = activeContracts.stream()
+                        .filter(contract -> contract instanceof AtBContract)
+                        .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
+                        .findFirst();
+
+                return defensiveContract.isPresent();
+            } else {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
