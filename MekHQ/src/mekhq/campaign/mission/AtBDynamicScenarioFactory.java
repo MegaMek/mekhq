@@ -559,10 +559,11 @@ public class AtBDynamicScenarioFactory {
                 generatedLance = new ArrayList<>();
 
             // Hazardous conditions may prohibit deploying infantry or vehicles
-            // TODO: test this to see what happens with all-infantry or all-vehicle forces
             } else if ((actualUnitType == UnitType.INFANTRY && !allowsConvInfantry) ||
                     (actualUnitType == UnitType.TANK && !allowsTanks)) {
                 generatedLance = new ArrayList<>();
+                LogManager.getLogger().warn(String.format("Skipping generation of unit type %s due to hostile conditions.",
+                        UnitType.getTypeName(actualUnitType)));
 
             // Gun emplacements use fixed tables instead of the force generator system
             } else if (actualUnitType == UnitType.GUN_EMPLACEMENT) {
