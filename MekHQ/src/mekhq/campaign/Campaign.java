@@ -7008,6 +7008,15 @@ public class Campaign implements ITechManager {
         return false;
     }
 
+    /**
+     * Checks if a turnover prompt should be displayed based on campaign options and current date.
+     *
+     * @return An integer representing the user's choice:
+     *         -1 if turnover prompt should not be displayed.
+     *         0 to indicate the user selected "Employee Turnover".
+     *         1 to indicate the user selected "Advance Day Regardless".
+     *         2 to indicate the user selected "Cancel Advance Day".
+     */
     public int checkTurnoverPrompt() {
         if (getLocalDate().isBefore(getCampaignStartDate().plusDays(6))) {
             return -1;
@@ -7042,9 +7051,9 @@ public class Campaign implements ITechManager {
             }
 
             Object[] options = {
-                    resources.getString("turnoverEmployeeTurnoverDialog.text"), // 0
-                    resources.getString("turnoverNotNow.text"), // 1
-                    resources.getString("turnoverCancel.text") // 2
+                    resources.getString("turnoverEmployeeTurnoverDialog.text"),
+                    resources.getString("turnoverAdvanceRegardless"),
+                    resources.getString("turnoverCancel.text")
             };
 
             return JOptionPane.showOptionDialog(
