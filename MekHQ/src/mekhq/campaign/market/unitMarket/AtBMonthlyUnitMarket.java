@@ -153,10 +153,10 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
                 // this forces a chance artillery will be available.
                 // Otherwise, we have issues with artillery not appearing in the market.
-                if (Compute.randomInt(30) == 0) {
+                int roll = Compute.randomInt(30);
+
+                if (roll == 0) {
                     missionRoles.add(MissionRole.ARTILLERY);
-                } else {
-                    missionRoles.add(MissionRole.ANY);
                 }
             }
             final int percent = 100 - (Compute.d6(2) - priceTarget) * 5;
