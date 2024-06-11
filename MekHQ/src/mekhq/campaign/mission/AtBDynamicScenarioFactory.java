@@ -2220,7 +2220,7 @@ public class AtBDynamicScenarioFactory {
                     quality,
                     unitTypes.get(i),
                     UNIT_WEIGHT_UNSPECIFIED,
-                    rolesByType.get(unitTypes.get(i)),
+                    rolesByType.getOrDefault(unitTypes.get(i), new ArrayList<>()),
                     campaign);
             if (newEntity != null) {
                 generatedEntities.add(newEntity);
@@ -2271,7 +2271,7 @@ public class AtBDynamicScenarioFactory {
                     quality,
                     unitTypes.get(i),
                     AtBConfiguration.decodeWeightStr(weights, i),
-                    rolesByType.get(unitTypes.get(i)),
+                    rolesByType.getOrDefault(unitTypes.get(i), new ArrayList<>()),
                     campaign);
             if (newEntity != null) {
                 generatedEntities.add(newEntity);
