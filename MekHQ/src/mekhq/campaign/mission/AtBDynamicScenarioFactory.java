@@ -595,6 +595,7 @@ public class AtBDynamicScenarioFactory {
                             AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), //TODO: special string handling here
                             forceTemplate.getMaxWeightClass(),
                             forceTemplate.getMinWeightClass(),
+                            requiredRoles,
                             campaign);
 
                     if (unitWeights != null) {
@@ -2039,19 +2040,40 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Generates a "unit weights" string according to AtB rules.
-     * @param unitTypes   List of unit types (mek, tank, etc)
-     * @param faction     Faction for unit generation
-     * @param weightClass "Base" weight class, drives the generated weights with some variation
-     * @param maxWeight   Maximum weight class
-     * @param campaign    Current campaign
-     * @return            Unit weight string.
+     * Generates a string indicating the weights of individual units in a formation, such as "LLMH"
+     * (two light class, one medium class, one heavy class), based on AtB guidelines. The selected
+     * weight classes include adjustments for unit types:
+     * <ul>
+     *     <li>Aerospace fighters do not have an assault weight class</li>
+     * </ul>
+     * <br/>
+     * Certain roles have either explicit or implicit weight restrictions:
+     * <ul>
+     *     <li>RECON with Mechs and ProtoMechs is limited to light and medium weight classes</li>
+     *     <li>APC should include light and medium weights, as few heavy/assault weight classes
+     *         include infantry bays</li>
+ *         <li>CAVALRY is limited to heavy weight class and lighter with Mechs and ProtoMechs, and
+     *         medium weight class and lighter with vehicles. Heavy cavalry Mechs are rare without
+     *         advanced technology and may fail to generate a random unit.</li>
+ *         <li>RAIDER is limited to heavy weight class and lighter for Mechs and ProtoMechs</li>
+     * </ul>
+     *
+     * @param unitTypes      List of unit types (mek, tank, etc)
+     * @param faction        Faction for unit generation
+     * @param weightClass    "Base" weight class, drives the generated weights with some variation
+     * @param minWeight      Fixed minimum weight class
+     * @param maxWeight      Fixed maximum weight class
+     * @param requiredRoles  Lists of required roles for generated units
+     * @param campaign       Current campaign
+     * @return               String with number of characters equal to standard formation size for
+     *                       faction parameter
      */
     private static @Nullable String generateUnitWeights (List<Integer> unitTypes,
                                                          String faction,
                                                          int weightClass,
                                                          int maxWeight,
                                                          int minWeight,
+                                                         Map<Integer, Collection<MissionRole>> requiredRoles,
                                                          Campaign campaign) {
 
         Faction genFaction = Factions.getInstance().getFaction(faction);
@@ -2071,8 +2093,50 @@ public class AtBDynamicScenarioFactory {
             return null;
         }
 
+        // Modify weight classes to account for the provided maximum/minimum
         weights = adjustForMaxWeight(weights, maxWeight);
         weights = adjustForMinWeight(weights, minWeight);
+
+        // Aerospace fighter weight cap
+        if (unitTypes.contains(UnitType.AEROSPACEFIGHTER)) {
+            weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_HEAVY);
+        }
+
+        // Role handling
+
+        // FIXME: certain roles have weight restrictions
+
+        if (requiredRoles != null && !requiredRoles.isEmpty()) {
+            for (int curType : requiredRoles.keySet()) {
+
+                if (requiredRoles.get(curType).contains(MissionRole.RECON)) {
+                    if (curType == UnitType.MEK || curType == UnitType.PROTOMEK) {
+                        weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_MEDIUM);
+                    }
+                }
+
+                if (requiredRoles.get(curType).contains(MissionRole.APC)) {
+                    if (curType == UnitType.TANK || curType == UnitType.VTOL) {
+                        weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_MEDIUM);
+                    }
+                }
+
+                if (requiredRoles.get(curType).contains(MissionRole.CAVALRY)) {
+                    if (curType == UnitType.MEK) {
+                        weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_HEAVY);
+                    } else if (curType == UnitType.TANK || curType == UnitType.PROTOMEK) {
+                        weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_MEDIUM);
+                    }
+                }
+
+                if (requiredRoles.get(curType).contains(MissionRole.RAIDER)) {
+                    if (curType == UnitType.MEK || curType == UnitType.PROTOMEK) {
+                        weights = adjustForMaxWeight(weights, EntityWeightClass.WEIGHT_HEAVY);
+                    }
+                }
+
+            }
+        }
 
         if (campaign.getCampaignOptions().isRegionalMechVariations()) {
             weights = adjustWeightsForFaction(weights, faction);
