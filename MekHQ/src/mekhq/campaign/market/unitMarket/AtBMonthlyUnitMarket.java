@@ -150,14 +150,6 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             final Collection<MissionRole> missionRoles = new ArrayList<>();
             if (unitType == UnitType.TANK) {
                 movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
-
-                // this forces a chance artillery will be available.
-                // Otherwise, we have issues with artillery not appearing in the market.
-                int roll = Compute.randomInt(30);
-
-                if (roll == 0) {
-                    missionRoles.add(MissionRole.ARTILLERY);
-                }
             }
             final int percent = 100 - (Compute.d6(2) - priceTarget) * 5;
             addSingleUnit(campaign, market, unitType, faction, quality, movementModes, missionRoles, percent);
