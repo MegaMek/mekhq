@@ -1410,14 +1410,14 @@ public class AtBDynamicScenarioFactory {
      * Identify all units which can carry infantry, and attempt to generate infantry or battle
      * armor to fill them.
      *
-     * @param scenario
-     * @param transports  list of potential transports
-     * @param factionCode
-     * @param skill
-     * @param quality
+     * @param scenario        current scenario, for accessing transport linkages
+     * @param transports      list of potential transports
+     * @param factionCode     Faction code for generating infantry
+     * @param skill           {@link SkillLevel} target skill for crews of generated units
+     * @param quality         {@link IUnitRating} Base quality for selection of infantry
      * @param requiredRoles   Lists of required roles for generated units
      * @param allowInfantry   false if conventional infantry should not be generated
-     * @param campaign
+     * @param campaign        current campaign
      * @return            List of newly created and crewed infantry or battle armor entities, may be
      *                    empty but should not be null
      */
@@ -1462,8 +1462,17 @@ public class AtBDynamicScenarioFactory {
 
         // Only check unit types that can have an infantry bay
         for (Entity transport : transports) {
-            if (IntStream.of(UnitType.TANK, UnitType.VTOL, UnitType.NAVAL, UnitType.CONV_FIGHTER).anyMatch(i -> transport.getUnitType() == i)) {
-                transportedUnits.addAll(fillTransport(scenario, transport, params, skill, transportedRoles, allowInfantry, campaign));
+            if (IntStream.of(UnitType.TANK,
+                    UnitType.VTOL,
+                    UnitType.NAVAL,
+                    UnitType.CONV_FIGHTER).anyMatch(i -> transport.getUnitType() == i)) {
+                transportedUnits.addAll(fillTransport(scenario,
+                        transport,
+                        params,
+                        skill,
+                        transportedRoles,
+                        allowInfantry,
+                        campaign));
             }
         }
 
@@ -1474,13 +1483,13 @@ public class AtBDynamicScenarioFactory {
      * Identify if the provided entity can carry infantry, and if not already doing so try adding
      * battle armor or conventional infantry
      *
-     * @param scenario
+     * @param scenario       current scenario, for accessing transport linkages
      * @param transport      Entity to generate infantry for
-     * @param params
-     * @param skill          {@link SkillLevel} target skill for generated units
+     * @param params         {@link UnitGeneratorParameters} for passing settings to random generation
+     * @param skill          {@link SkillLevel} target skill for crews of generated units
      * @param requiredRoles  Lists of required roles for generated units
      * @param allowInfantry  false if conventional infantry should not be generated
-     * @param campaign
+     * @param campaign       current campaign
      * @return               List of Entities, containing infantry to load onto this transport. May
      *                       be empty but should not be null.
      */
@@ -1574,12 +1583,12 @@ public class AtBDynamicScenarioFactory {
      * Randomly select a conventional infantry unit with crew. Small bays (under 3 tons) may
      * reduce the number of squads below the unit standard. If the XCT role is required,
      * normal infantry may have a hostile environmental suit substituted for their normal armor.
-     * @param params
+     * @param params       {@link UnitGeneratorParameters} for passing settings to random generation
      * @param bayCapacity  Remaining bay capacity for internal transport
-     * @param skill
+     * @param skill        {@link SkillLevel} target skill for crews of generated units
      * @param useTempXCT   true to swap standard armor for hostile environmental suit if XCT role is
      *                     required but no unit is generated
-     * @param campaign
+     * @param campaign     current campaign
      * @return             Generated infantry unit, or null if one cannot be generated
      */
     private static Entity generateTransportedInfantryUnit (UnitGeneratorParameters params,
@@ -1667,12 +1676,12 @@ public class AtBDynamicScenarioFactory {
      * Worker function that generates a battle armor unit for transport in a bay or riding as
      * mechanized BA
      *
-     * @param params
+     * @param params             {@link UnitGeneratorParameters} for passing settings to random generation
      * @param bayCapacity        Remaining bay capacity for internal transport, or IUnitGenerator.NO_WEIGHT_LIMIT
      *                           for circumstances such as mechanized battle armor
-     * @param skill
+     * @param skill              {@link SkillLevel} target skill for crews of generated units
      * @param retryAsMechanized  true to retry failed bay transport as mechanized transport
-     * @param campaign
+     * @param campaign           current campign
      * @return              Generated battle armor entity with crew, null if one cannot be generated
      */
     private static Entity generateTransportedBAUnit (UnitGeneratorParameters params,
@@ -1819,18 +1828,23 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * @param faction the Faction the crew is a part of
-     * @param skill the {@link SkillLevel} for the average crew skill level
-     * @param campaign The campaign instance
-     * @param ms Which entity to generate
+     * @param faction    Faction for selection of crew name(s)
+     * @param skill      {@link SkillLevel} for the average crew skill level
+     * @param campaign   Current campaign
+     * @param unitData   Chassis/model data of unit
      * @return A crewed entity
      */
-    public static @Nullable Entity createEntityWithCrew(Faction faction, SkillLevel skill, Campaign campaign, MechSummary ms) {
+    public static @Nullable Entity createEntityWithCrew (Faction faction,
+                                                         SkillLevel skill,
+                                                         Campaign campaign,
+                                                         MechSummary unitData) {
         Entity en;
         try {
-            en = new MechFileParser(ms.getSourceFile(), ms.getEntryName()).getEntity();
+            en = new MechFileParser(unitData.getSourceFile(), unitData.getEntryName()).getEntity();
         } catch (Exception ex) {
-            LogManager.getLogger().error("Unable to load entity: " + ms.getSourceFile() + ": " + ms.getEntryName(), ex);
+            LogManager.getLogger().error("Unable to load entity: {}: {}",
+                    unitData.getSourceFile(),
+                    unitData.getEntryName(), ex);
             return null;
         }
 
@@ -1953,11 +1967,11 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Adjust weights of units in a lance for factions that do not fit the typical
+     * Adjust weights of units in a formation for factions that do not fit the typical
      * weight distribution.
      *
-     * @param weights        A string of single-character letter codes for the weights of the units in the lance (e.g. "LMMH")
-     * @param faction        The code of the faction to which the force belongs.
+     * @param weights  A string of single-character letter codes for the weights of the units in the lance (e.g. "LMMH")
+     * @param faction  The code of the faction to which the force belongs.
      * @return                A new String of the same format as weights
      */
     private static String adjustWeightsForFaction(String weights, String faction) {
@@ -1986,7 +2000,7 @@ public class AtBDynamicScenarioFactory {
      * @param unitTypeCode The type of units to generate, also accepts SPECIAL_UNIT_TYPE_ATB_MIX for
      *                     random Mech/vehicle/mixed lance generation
      * @param unitCount    Number of units to generate
-     * @param forceQuality The equipment rating of the force
+     * @param forceQuality The equipment rating of the formation
      * @param factionCode  Short faction name
      * @param allowTanks   false to prohibit selecting ground vehicles
      * @param campaign     Current campaign
@@ -2064,13 +2078,20 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Specialized logic for generating clan units
-     * @return
+     * Generates a selection of unit types, typically for a Clan star of five points
+     *
+     * @param unitCount     Number of units to generate (typically 'points')
+     * @param forceQuality  {@link IUnitRating} constant with equipment rating of the formation
+     * @param factionCode   Short faction name
+     * @param campaign      Current campaign
+     * @return              List of UnitType constants, one for each requested
      */
-    private static List<Integer> generateClanUnitTypes(int unitCount, int forceQuality, String factionCode, Campaign campaign) {
-        // logic inspired by AtBScenario.addStar
-        // for fluff reasons, hell's horses + pals use more vehicles
-        // higher-rated clan units become increasingly unlikely to use vehicles
+    private static List<Integer> generateClanUnitTypes (int unitCount,
+                                                        int forceQuality,
+                                                        String factionCode,
+                                                        Campaign campaign) {
+        // Certain clans are more likely to use vehicles, while the rest relegate them to the
+        // lowest rated
         int vehicleTarget = 6;
         if (factionCode.equals("CHH") || factionCode.equals("CSL") || factionCode.equals("CBS")) {
             vehicleTarget = 8;
@@ -2946,10 +2967,11 @@ public class AtBDynamicScenarioFactory {
      * uses 3 per flight. Conventional fighters return 1-3 flights/2-6 total. The
      * SPECIAL_UNIT_TYPE_ATB_AERO_MIX unit type randomly returns an aerospace flight or conventional
      * squadron.
-     * @param unitTypeCode
-     * @param isPlanetOwner
-     * @param factionCode
-     * @return
+     * @param unitTypeCode  type of unit, may be aerospace, conventional ,or ATB 'special'
+     * @param isPlanetOwner true if the generating faction controls the system, which is required
+     *                      to generate conventional fighters
+     * @param factionCode   Short name of faction
+     * @return              Number of fighters to use as a formation size
      */
     public static int getAeroLanceSize (int unitTypeCode, boolean isPlanetOwner, String factionCode) {
         int numFightersPerFlight = factionCode.equals("CC") ? 3 : 2;
