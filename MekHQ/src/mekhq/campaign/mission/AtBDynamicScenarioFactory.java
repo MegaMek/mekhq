@@ -1322,7 +1322,9 @@ public class AtBDynamicScenarioFactory {
         } else if (!isLowPressure) {
 
             // Normal pressure, with extreme temperature
-            platoon.setArmorKit(isHot ? MiscType.createISHeatSuitInfArmor() : MiscType.createSnowSuitInfArmor());
+            if (isHot || isCold) {
+                platoon.setArmorKit(isHot ? MiscType.createISHeatSuitInfArmor() : MiscType.createSnowSuitInfArmor());
+            }
 
         } else {
 
