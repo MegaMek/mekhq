@@ -2404,20 +2404,6 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
-            if (getCampaign().checkTurnoverPrompt()) {
-                if (!showRetirementDefectionDialog()) {
-                    evt.cancel();
-                    return;
-                }
-            }
-
-            if (!getCampaign().checkRetirementDefections()) {
-                evt.cancel();
-                return;
-            }
-        }
-
         if (getCampaign().checkScenariosDue()) {
             JOptionPane.showMessageDialog(null, getResourceMap().getString("dialogCheckDueScenarios.text"),
                     getResourceMap().getString("dialogCheckDueScenarios.title"), JOptionPane.WARNING_MESSAGE);
@@ -2489,6 +2475,31 @@ public class CampaignGUI extends JPanel {
             if (new OutstandingScenariosNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
                 evt.cancel();
                 return;
+            }
+        }
+
+        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
+            int turnoverPrompt = getCampaign().checkTurnoverPrompt();
+
+            switch (turnoverPrompt) {
+                case -1:
+                    // the user wasn't presented with the dialog
+                    break;
+                case 0:
+                    // the user launched the turnover dialog
+                    if (!showRetirementDefectionDialog()) {
+                        evt.cancel();
+                        return;
+                    }
+                case 1:
+                    // the user picked 'Advance Day Regardless'
+                    break;
+                case 2:
+                    // the user canceled
+                    evt.cancel();
+                    return;
+                default:
+                    throw new IllegalStateException("Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " + turnoverPrompt);
             }
         }
     }

@@ -7008,38 +7008,16 @@ public class Campaign implements ITechManager {
         return false;
     }
 
-    public boolean checkRetirementDefections() {
-        if (getRetirementDefectionTracker().getRetirees().isEmpty()) {
-            return true;
-        } else {
-            Object[] options = {
-                    resources.getString("turnoverPayoutDialog.text"),
-                    resources.getString("turnoverCancel.text")
-            };
-
-            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(
-                    null,
-                    resources.getString("turnoverPersonnelKilled.text"),
-                    resources.getString("turnoverFinalPayments.text"),
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE,
-                    null,
-                    options,
-                    options[0]
-            );
-        }
-    }
-
-    public boolean checkTurnoverPrompt() {
+    public int checkTurnoverPrompt() {
         if (getLocalDate().isBefore(getCampaignStartDate().plusDays(6))) {
-            return false;
+            return -1;
         }
 
         boolean triggerTurnoverPrompt = false;
 
         switch (campaignOptions.getTurnoverFrequency()) {
             case NEVER:
-                return false;
+                return -1;
             case WEEKLY:
                 triggerTurnoverPrompt = getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY);
                 break;
@@ -7052,24 +7030,36 @@ public class Campaign implements ITechManager {
         }
 
         if (triggerTurnoverPrompt) {
+            String dialogTitle;
+            String dialogBody;
+
+            if (getRetirementDefectionTracker().getRetirees().isEmpty()) {
+                dialogTitle = resources.getString("turnoverRollRequired.text");
+                dialogBody = resources.getString("turnoverDialogDescription.text");
+            } else {
+                dialogTitle = resources.getString("turnoverFinalPayments.text");
+                dialogBody = resources.getString("turnoverPersonnelKilled.text");
+            }
+
             Object[] options = {
-                    resources.getString("turnoverEmployeeTurnoverDialog.text"),
-                    resources.getString("turnoverNotNow.text")
+                    resources.getString("turnoverEmployeeTurnoverDialog.text"), // 0
+                    resources.getString("turnoverNotNow.text"), // 1
+                    resources.getString("turnoverCancel.text") // 2
             };
 
-            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(
+            return JOptionPane.showOptionDialog(
                     null,
-                    resources.getString("turnoverDialogDescription.text"),
-                    resources.getString("turnoverRollRequired.text"),
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE,
+                    dialogBody,
+                    dialogTitle,
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
                     null,
                     options,
                     options[0]
             );
         }
 
-        return false;
+        return -1;
     }
 
     public boolean checkScenariosDue() {
