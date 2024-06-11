@@ -207,20 +207,15 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     private int getMarketItemCount(String rarity) {
         switch (rarity.toLowerCase()) {
             case "very common":
-                return Compute.d6(1) - 2;
+                return Compute.d6(1) + 2;
             case "common":
-                return Compute.d6(1) - 3;
+                return Compute.d6(1) + 1;
             case "uncommon":
-                return Compute.d6(1) - 4;
+                return Compute.d6(1);
             case "rare":
-                return Compute.d6(1) - 5;
+                return Compute.d6(1) - 1;
             case "very rare":
-                // two rolls: the first needs a 6, the second 4+
-                if ((Compute.d6(1) == 6) && (Compute.d6(1) > 3)) {
-                    return 1;
-                }
-
-                return 0;
+                return Compute.d6(1) - 2;
             default:
                 throw new IllegalStateException("Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getMarketItemCount: " + rarity);
         }
@@ -246,6 +241,11 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                 movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
                 missionRoles.add(MissionRole.MIXED_ARTILLERY);
             }
+
+            if (missionRoles.isEmpty()) {
+                missionRoles.add(MissionRole.ANY);
+            }
+
             final int percent = 100 - (Compute.d6(2) - priceTarget) * 5;
             addSingleUnit(campaign, market, unitType, faction, quality, movementModes, missionRoles, percent);
         }
