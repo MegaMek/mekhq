@@ -237,7 +237,7 @@ public class RetirementDefectionTracker {
             }
 
             // Active Mission modifier
-            if (true) {
+            if (campaign.getCampaignOptions().isUseHostileTerritoryModifiers()) {
                 if (isHostileTerritory(campaign)) {
                     targetNumber.addModifier(-2, resources.getString("hostileTerritory.text"));
                 }
