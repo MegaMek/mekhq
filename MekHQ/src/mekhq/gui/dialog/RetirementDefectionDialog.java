@@ -716,6 +716,12 @@ public class RetirementDefectionDialog extends JDialog {
             if (((RetirementTableModel) personnelTable.getModel()).getPayBonus(id)) {
                 retVal = retVal.plus(RetirementDefectionTracker.getPayoutOrBonusValue(hqView.getCampaign(),
                         hqView.getCampaign().getPerson(id)));
+
+                if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isMonthly()) {
+                    retVal = retVal.dividedBy(12);
+                } else if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isWeekly()) {
+                    retVal = retVal.dividedBy(52);
+                }
             }
         }
         return retVal;
