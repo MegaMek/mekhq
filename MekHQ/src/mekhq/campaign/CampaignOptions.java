@@ -1011,11 +1011,11 @@ public class CampaignOptions {
         setUsePayoutServiceBonus(true);
         setPayoutServiceBonusRate(10);
 
-        setUseAdministrativeStrain(false);
+        setUseAdministrativeStrain(true);
         setAdministrativeCapacity(10);
         setMultiCrewStrainDivider(5);
 
-        setUseManagementSkill(false);
+        setUseManagementSkill(true);
         setUseCommanderLeadershipOnly(false);
         setManagementSkillPenalty(0);
 

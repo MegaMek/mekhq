@@ -1255,20 +1255,20 @@ public class Person {
      */
     public static String getLoyaltyName(int loyalty) {
         switch (loyalty) {
-            case 3:
-                return "Treacherous";
-            case 2:
-                return "Disloyal";
-            case 1:
-                return "Unreliable";
-            case 0:
-                return "Neutral";
-            case -1:
-                return "Reliable";
-            case -2:
-                return "Loyal";
             case -3:
                 return "Devoted";
+            case -2:
+                return "Loyal";
+            case -1:
+                return "Reliable";
+            case 0:
+                return "Neutral";
+            case 1:
+                return "Unreliable";
+            case 2:
+                return "Disloyal";
+            case 3:
+                return "Treacherous";
             default:
                 throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/Person.java/getLoyaltyName: " + loyalty);
         }
@@ -3803,25 +3803,28 @@ public class Person {
     }
 
     /**
-     * Generates the loyalty value for a person based on the given roll value.
+     * Generates the loyalty value for a given roll.
      *
-     * @param roll the roll value used to determine loyalty
+     * @param roll the 3d6 roll used to determine the loyalty value
+     * @throws IllegalArgumentException if the provided roll is not between 3 and 18
      */
     public void generateLoyalty(int roll) {
         if (roll == 3) {
             setLoyalty(3);
         } else if (roll == 4) {
             setLoyalty(2);
-        } else if (roll < 7) {
+        } else if (roll <= 6) {
             setLoyalty(1);
-        } else if (roll == 18) {
-            setLoyalty(-3);
-        } else if (roll >= 17) {
-            setLoyalty(-2);
-        } else if (roll > 14) {
-            setLoyalty(-1);
-        } else {
+        } else if (roll <= 14) {
             setLoyalty(0);
+        } else if (roll <= 16) {
+            setLoyalty(-1);
+        } else if (roll == 17) {
+            setLoyalty(-2);
+        } else  if (roll == 18){
+            setLoyalty(-3);
+        } else {
+            throw new IllegalArgumentException("Invalid roll in mekhq/campaign/personnel/Person.java/generateLoyalty: " + roll);
         }
     }
 
