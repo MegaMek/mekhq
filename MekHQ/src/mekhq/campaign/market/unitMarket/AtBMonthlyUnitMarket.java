@@ -239,11 +239,17 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             final Collection<MissionRole> missionRoles = new ArrayList<>();
             if (unitType == UnitType.TANK) {
                 movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
-                missionRoles.add(MissionRole.MIXED_ARTILLERY);
-            }
 
-            if (missionRoles.isEmpty()) {
-                missionRoles.add(MissionRole.ANY);
+                // should a special unit type be picked? This allows us to force MissionRole that would otherwise be filtered out
+                if (Compute.randomInt(30) == 0) {
+                    int roll = Compute.randomInt(20);
+
+                    if (roll < 15) {
+                        missionRoles.add(MissionRole.ARTILLERY);
+                    } else {
+                        missionRoles.add(MissionRole.SUPPORT);
+                    }
+                }
             }
 
             final int percent = 100 - (Compute.d6(2) - priceTarget) * 5;
