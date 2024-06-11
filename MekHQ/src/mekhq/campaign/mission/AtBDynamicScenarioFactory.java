@@ -532,7 +532,6 @@ public class AtBDynamicScenarioFactory {
             // Generate a number of tactical formations for this force based on the desired average
             // weight class. This may generate higher numbers of lighter formations, or fewer
             // (minimum of one) of heavier formations.
-            // TODO: change this to a list
             if (currentLanceWeightString.isEmpty()) {
                 currentLanceWeightString = campaign.getAtBConfig().selectBotLances(parentFactionType, weightClass);
             }
@@ -593,7 +592,7 @@ public class AtBDynamicScenarioFactory {
                     // class and lower/upper bounds
                     final String unitWeights = generateUnitWeights(unitTypes,
                             factionCode,
-                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0), //TODO: special string handling here
+                            AtBConfiguration.decodeWeightStr(currentLanceWeightString, 0),
                             forceTemplate.getMaxWeightClass(),
                             forceTemplate.getMinWeightClass(),
                             requiredRoles,
@@ -1910,19 +1909,18 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Units that exceed the maximum weight for individual entities in the scenario
-     * are replaced in the lance by two lighter units.
+     * Modifies the provided string-list of weight classes to not exceed the indicated weight class
      *
-     * @param weights   A string of single-character letter codes for the weights of the units in the lance (e.g. "LMMH")
-     * @param maxWeight The maximum weight allowed for the force by the parameters of the scenario type
-     * @return          A new String of the same format as weights
+     * @param weights   A string of single-character letter codes for the weights of the units in
+     *                  the formation e.g. "LMMH" is one light, two medium, one heavy
+     * @param maxWeight {@link EntityWeightClass} constant with maximum weight class allowed for the
+     *                  formation
+     * @return          An updated version of the string with weight values replaced and/or added
      */
     private static String adjustForMaxWeight(String weights, int maxWeight) {
         if (maxWeight == EntityWeightClass.WEIGHT_HEAVY) {
-            // Hide and Seek (defender)
             return weights.replaceAll("A", "LM");
         } else if (maxWeight == EntityWeightClass.WEIGHT_MEDIUM) {
-            // Probe, Recon Raid (attacker)
             return weights.replaceAll("A", "MM")
                     .replaceAll("H", "LM");
         } else if (maxWeight == EntityWeightClass.WEIGHT_LIGHT) {
@@ -1933,7 +1931,13 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Adjust a weight string for a minimum weight value
+     * Modifies the provided string-list of weight classes to not go below the indicated weight
+     * class
+     *
+     * @param weights    A string of single-character letter codes for the weights of the units in
+     *                   the formation e.g. "LMMH" is one light, two medium, one heavy
+     * @param minWeight  {@link EntityWeightClass} constant with minimum weight class allowed for
+     *                   the formation
      */
     private static String adjustForMinWeight(String weights, int minWeight) {
         if (minWeight == EntityWeightClass.WEIGHT_MEDIUM) {
