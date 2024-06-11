@@ -412,10 +412,6 @@ public class AtBDynamicScenarioFactory {
                     lanceSize : forceTemplate.getFixedUnitCount();
         }
 
-
-
-
-
         // Conditions parameters - atmospheric pressure, toxic atmosphere, and gravity
         boolean isLowGravity = false;
         boolean isLowPressure = false;
@@ -452,13 +448,11 @@ public class AtBDynamicScenarioFactory {
             allowsTanks = false;
             isLowGravity = true;
         }
-
-
-
         // Required roles for units in this force. Because these can vary by unit type,
         // each unit type tracks them separately.
         Map<Integer, Collection<MissionRole>> requiredRoles = new HashMap<>();
 
+        // If the force template has one or more preferred roles, get one
         Collection<MissionRole> baseRoles = forceTemplate.getRequiredRoles();
 
         if (!baseRoles.isEmpty()) {
@@ -528,7 +522,6 @@ public class AtBDynamicScenarioFactory {
         while (!stopGenerating) {
             List<Entity> generatedLance;
 
-
             // Generate a number of tactical formations for this force based on the desired average
             // weight class. This may generate higher numbers of lighter formations, or fewer
             // (minimum of one) of heavier formations.
@@ -574,7 +567,7 @@ public class AtBDynamicScenarioFactory {
             } else if (actualUnitType == ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_CIVILIANS) {
                 generatedLance = generateCivilianUnits(4, campaign);
 
-            // All other unit types use the force generator system to create units
+            // All other unit types use the force generator system to randomly select units
             } else {
 
                 // Determine unit types for each unit of the formation. Normally this is all one
@@ -704,31 +697,36 @@ public class AtBDynamicScenarioFactory {
             setStartingAltitude(generatedLance, forceTemplate.getStartingAltitude());
             correctNonAeroFlyerBehavior(generatedLance, scenario.getBoardType());
 
-            // if force contributes to map size, increment the generated "lance" count
+            // If force contributes to map size, increment the generated count of formations added
             if (forceTemplate.getContributesToMapSize()) {
                 generatedLanceCount++;
             }
 
-            // if appropriate, generate an extra BA unit for clan novas
-            // TODO: consider loosening parameters, and including WOB choir formations
+            // Check for mechanized battle armor added to Clan star formations (must be exactly
+            // 5 OmniMechs, no more no less)
             generatedLance.addAll(generateBAForNova(scenario, generatedLance, factionCode, skill, quality, campaign));
 
-
+            // Add the formation member BVs to the running total, and the entities to the tracking
+            // list
             for (Entity ent : generatedLance) {
                 forceBV += ent.calculateBattleValue();
                 generatedEntities.add(ent);
             }
 
-            // terminate force generation if we've gone over our unit count or bv budget
+            // Terminate force generation if we've gone over the unit count or BV budget.
+            // For BV-scaled forces, check whether to stop generating after each formation is
+            // generated.
             if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
-                // for bv-scaled forces, we check whether to stop generating after every lance
-                // the target number is the percentage of the bv budget generated so far
-                // if we roll below it, we stop
+
+                // Check random number vs percentage of the BV budget already generated, with the
+                // percentage chosen based on unit rating
                 int roll = Compute.randomInt(100);
                 double rollTarget = ((double) forceBV / forceBVBudget) * 100;
-                stopGenerating = rollTarget > minimumBVPercentage[campaign.getUnitRating().getUnitRatingAsInteger()]
-                        && roll < rollTarget;
+                stopGenerating = rollTarget > minimumBVPercentage[campaign.getUnitRating().getUnitRatingAsInteger()] &&
+                        roll < rollTarget;
+
             } else {
+                // For generation methods other than scaled BV, just compare to the overall budget
                 stopGenerating = generatedEntities.size() >= forceUnitBudget;
             }
 
@@ -1273,7 +1271,7 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Randomly creates a ground vehicle, or VTOL if campaign operations allows, with a randomly
+     * Randomly creates a ground vehicle, or VTOL if campaign options allows, with a randomly
      * generated crew. Selection of specific functions such as artillery are handled through the
      * roles contained in the UnitGeneratorParameters object.
      *
@@ -1729,7 +1727,7 @@ public class AtBDynamicScenarioFactory {
 
     /**
      * Worker function that generates a battle armor unit to attach to a unit of clan mechs
-     * TODO: consider rebuilding to include mechanized BA on every omni-unit regardless of number
+     *
      */
     public static List<Entity> generateBAForNova(AtBScenario scenario, List<Entity> starUnits,
                                                  String factionCode, SkillLevel skill, int quality,
@@ -1740,7 +1738,8 @@ public class AtBDynamicScenarioFactory {
         // if yes, then pick the fastest mech and load it up, adding the generated BA to the transport relationships.
 
         // non-clan forces and units that aren't stars don't become novas
-        // TODO: logic test doesn't function as it should, instead pick the first five (?) OmniMechs
+        // TODO: allow for non-Clan integrated mechanized foramtions, like WOB choirs,
+        //  as well as stars that are short one or more omnis
         if (!Factions.getInstance().getFaction(factionCode).isClan() && (starUnits.size() != 5)) {
             return transportedUnits;
         }
@@ -1798,11 +1797,11 @@ public class AtBDynamicScenarioFactory {
     /**
      * Generates a new Entity without using a RAT. Useful for "persistent" or fixed units.
      *
-     * @param name Full name (chassis + model) of the entity to generate.
-     * @param factionCode Faction code to use for name generation
-     * @param skill {@link SkillLevel} for the average crew skill level
-     * @param campaign The campaign instance
-     * @return The newly generated Entity
+     * @param name         Full name (chassis + model) of the entity to generate.
+     * @param factionCode  Faction code to use for name generation
+     * @param skill        {@link SkillLevel} for the average crew skill level
+     * @param campaign     The campaign instance
+     * @return             The newly generated Entity
      * @note This is a debugging method
      */
     @SuppressWarnings(value = "unused")
@@ -1817,11 +1816,14 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * @param factionCode Faction code to use for name generation
-     * @param skill the {@link SkillLevel} for the average crew skill level
-     * @param campaign The campaign instance
-     * @param ms Which entity to generate
-     * @return A crewed entity
+     * Overloaded method provided to generate a crewed unit using a faction short name rather than
+     * a Faction object.
+     *
+     * @param factionCode  String with faction short name
+     * @param skill        the {@link SkillLevel} for the average crew skill level
+     * @param campaign     The campaign instance
+     * @param ms           Which entity to generate
+     * @return             A crewed entity
      */
     public static @Nullable Entity createEntityWithCrew(String factionCode, SkillLevel skill, Campaign campaign, MechSummary ms) {
         return createEntityWithCrew(Factions.getInstance().getFaction(factionCode), skill, campaign, ms);
@@ -1997,6 +1999,8 @@ public class AtBDynamicScenarioFactory {
      * Generates a selection of unit types, typically composing a lance, star, Level II, or similar
      * tactical formation.
      * TODO: generate ProtoMech points when Clan mixed stars are called for
+     * TODO: generate Clan mixed nova stars e.g. two points of Mechs, two of vehicles, one ProtoMech
+     *  point
      * @param unitTypeCode The type of units to generate, also accepts SPECIAL_UNIT_TYPE_ATB_MIX for
      *                     random Mech/vehicle/mixed lance generation
      * @param unitCount    Number of units to generate
@@ -2078,7 +2082,9 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Generates a selection of unit types, typically for a Clan star of five points
+     * Generates a selection of unit types, typically for a Clan star of five points. May generate
+     * ground vehicles, provided the option for Clan vehicles is set in Campaign options.
+     * TODO: Clan vehicle points are two vehicles, and vehicle stars are 10 vehicles total
      *
      * @param unitCount     Number of units to generate (typically 'points')
      * @param forceQuality  {@link IUnitRating} constant with equipment rating of the formation
@@ -2099,7 +2105,7 @@ public class AtBDynamicScenarioFactory {
             vehicleTarget -= forceQuality;
         }
 
-        // we randomly determine tank or mek
+        // Random determination of Mech or ground vehicle
         int roll = Compute.d6(2);
         int unitType = campaign.getCampaignOptions().isClanVehicles() && (roll <= vehicleTarget) ?
                 UnitType.TANK : UnitType.MEK;
@@ -2178,8 +2184,6 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Role handling
-
-        // FIXME: certain roles have weight restrictions
 
         if (requiredRoles != null && !requiredRoles.isEmpty()) {
             for (int curType : requiredRoles.keySet()) {
