@@ -1259,6 +1259,12 @@ public class AtBDynamicScenarioFactory {
         }
 
         if (unitData == null) {
+            if (!params.getMissionRoles().isEmpty()) {
+                LogManager.getLogger().warn(String.format("Unable to randomly generate %s %s with roles: %s",
+                        EntityWeightClass.getClassName(params.getWeightClass()),
+                        UnitType.getTypeName(unitType),
+                        params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(","))));
+            }
             return null;
         }
 
@@ -1293,6 +1299,12 @@ public class AtBDynamicScenarioFactory {
         MechSummary unitData = campaign.getUnitGenerator().generate(params);
 
         if (unitData == null) {
+            if (!params.getMissionRoles().isEmpty()) {
+                LogManager.getLogger().warn(String.format("Unable to randomly generate %s %s with roles: %s",
+                        EntityWeightClass.getClassName(params.getWeightClass()),
+                        UnitType.getTypeName(UnitType.TANK),
+                        params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(","))));
+            }
             return null;
         }
 
@@ -1335,6 +1347,11 @@ public class AtBDynamicScenarioFactory {
                 temporaryXCT = true;
             }
             if (unitData == null) {
+                if (!params.getMissionRoles().isEmpty()) {
+                    LogManager.getLogger().warn(String.format("Unable to randomly generate %s with roles: %s",
+                            UnitType.getTypeName(UnitType.INFANTRY),
+                            params.getMissionRoles().stream().map(Enum::name).collect(Collectors.joining(","))));
+                }
                 return null;
             }
         }
