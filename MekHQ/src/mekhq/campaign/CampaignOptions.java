@@ -992,7 +992,7 @@ public class CampaignOptions {
         setUseSubContractSoldiers(false);
         setServiceContractDuration(36);
         setServiceContractModifier(3);
-        setPayBonusDefault(true);
+        setPayBonusDefault(false);
 
         setUseCustomRetirementModifiers(true);
         setUseFatigueModifiers(true);
