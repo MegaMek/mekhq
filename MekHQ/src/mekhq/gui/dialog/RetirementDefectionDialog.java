@@ -135,7 +135,10 @@ public class RetirementDefectionDialog extends JDialog {
         setTitle(resourceMap.getString("title.text"));
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setSize(screenSize);
+        int screenWidth = (int) (screenSize.getWidth() * 0.75);
+        int screenHeight = (int) (screenSize.getHeight() * 0.94);
+
+        setSize(screenWidth, screenHeight);
 
         setLayout(new BorderLayout());
         cardLayout = new CardLayout();

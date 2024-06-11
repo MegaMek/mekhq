@@ -479,7 +479,7 @@ public class MekHQ implements GameListener {
             resolveDialog.setVisible(true);
 
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI, campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
-
+            rdd.setLocation(rdd.getLocation().x, 0);
             rdd.setVisible(true);
 
             if (!rdd.wasAborted()) {
