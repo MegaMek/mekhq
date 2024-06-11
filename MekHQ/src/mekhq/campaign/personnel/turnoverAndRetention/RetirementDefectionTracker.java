@@ -1104,6 +1104,8 @@ public class RetirementDefectionTracker {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "payout", "id", pid);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weightClass", payouts.get(pid).getWeightClass());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cbills", payouts.get(pid).getPayoutAmount());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wasKilled", payouts.get(pid).isWasKilled());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wasSacked", payouts.get(pid).isWasSacked());
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payout");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payouts");
@@ -1173,8 +1175,12 @@ public class RetirementDefectionTracker {
                                 }
                                 if (wn4.getNodeName().equalsIgnoreCase("weightClass")) {
                                     payout.setWeightClass(Integer.parseInt(wn4.getTextContent()));
-                                } else if (wn4.getNodeName().equalsIgnoreCase("c-bills")) {
+                                } else if (wn4.getNodeName().equalsIgnoreCase("cbills")) {
                                     payout.setPayoutAmount(Money.fromXmlString(wn4.getTextContent().trim()));
+                                } else if (wn4.getNodeName().equalsIgnoreCase("wasKilled")) {
+                                    payout.setWasKilled(Boolean.parseBoolean(wn4.getTextContent()));
+                                } else if (wn4.getNodeName().equalsIgnoreCase("wasSacked")) {
+                                    payout.setWasSacked(Boolean.parseBoolean(wn4.getTextContent()));
                                 }
                             }
                             retVal.payouts.put(pid, payout);
