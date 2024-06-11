@@ -1452,59 +1452,69 @@ public class AtBDynamicScenarioFactory {
         for (Transporter bay : transport.getTransports()) {
             // If unit has an infantry bay
             if (bay instanceof TroopSpace) {
-                double bayCapacity = bay.getUnused();
 
-                // Set base random generation parameters
-                UnitGeneratorParameters newParams = params.clone();
-                newParams.clearMovementModes();
-                newParams.setWeightClass(AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED);
+                boolean isLargeBay = bay.getUnused() >= 6.0;
 
-                Entity transportedUnit = null;
-                Entity mechanizedBAUnit = null;
+                boolean keepLoading = true;
+                while (keepLoading) {
+                    double bayCapacity = bay.getUnused();
 
-                // If a roll against the battle armor target number succeeds, try to generate a
-                // battle armor unit first
-                if (Compute.d6(2) >= infantryToBAUpgradeTNs[params.getQuality()]) {
-                    newParams.setMissionRoles(requiredRoles.getOrDefault(UnitType.BATTLE_ARMOR, new HashSet<>()));
-                    transportedUnit = generateTransportedBAUnit(newParams, bayCapacity, skill, false, campaign);
+                    // Set base random generation parameters
+                    UnitGeneratorParameters newParams = params.clone();
+                    newParams.clearMovementModes();
+                    newParams.setWeightClass(AtBDynamicScenarioFactory.UNIT_WEIGHT_UNSPECIFIED);
 
-                    // If the transporter has both bay space and is an omni unit, try to add a
-                    // second battle armor unit on the outside
-                    if (transport.isOmni()) {
-                        mechanizedBAUnit = generateTransportedBAUnit(newParams, IUnitGenerator.NO_WEIGHT_LIMIT, skill, false, campaign);
+                    Entity transportedUnit = null;
+                    Entity mechanizedBAUnit = null;
+
+                    // If a roll against the battle armor target number succeeds, try to generate a
+                    // battle armor unit first
+                    if (Compute.d6(2) >= infantryToBAUpgradeTNs[params.getQuality()]) {
+                        newParams.setMissionRoles(requiredRoles.getOrDefault(UnitType.BATTLE_ARMOR, new HashSet<>()));
+                        transportedUnit = generateTransportedBAUnit(newParams, bayCapacity, skill, false, campaign);
+
+                        // If the transporter has both bay space and is an omni unit, try to add a
+                        // second battle armor unit on the outside
+                        if (transport.isOmni()) {
+                            mechanizedBAUnit = generateTransportedBAUnit(newParams, IUnitGenerator.NO_WEIGHT_LIMIT, skill, false, campaign);
+                        }
                     }
-                }
 
-                // If a battle armor unit wasn't generated and conditions permit, try generating
-                // conventional infantry. Generate air assault infantry for VTOL transports.
-                if (transportedUnit == null && allowInfantry) {
-                    newParams.setMissionRoles(requiredRoles.getOrDefault(UnitType.INFANTRY, new HashSet<>()));
-                    if (transport.getUnitType() == UnitType.VTOL &&
-                            !newParams.getMissionRoles().contains(MissionRole.XCT)) {
-                        UnitGeneratorParameters paratrooperParams = newParams.clone();
-                        paratrooperParams.addMissionRole(MissionRole.PARATROOPER);
-                        transportedUnit = generateTransportedInfantryUnit(paratrooperParams, bayCapacity, skill, true, campaign);
-                    } else {
-                        transportedUnit = generateTransportedInfantryUnit(newParams, bayCapacity, skill, true, campaign);
+                    // If a battle armor unit wasn't generated and conditions permit, try generating
+                    // conventional infantry. Generate air assault infantry for VTOL transports.
+                    if (transportedUnit == null && allowInfantry) {
+                        newParams.setMissionRoles(requiredRoles.getOrDefault(UnitType.INFANTRY, new HashSet<>()));
+                        if (transport.getUnitType() == UnitType.VTOL && !newParams.getMissionRoles().contains(MissionRole.XCT)) {
+                            UnitGeneratorParameters paratrooperParams = newParams.clone();
+                            paratrooperParams.addMissionRole(MissionRole.PARATROOPER);
+                            transportedUnit = generateTransportedInfantryUnit(paratrooperParams, bayCapacity, skill, true, campaign);
+                        } else {
+                            transportedUnit = generateTransportedInfantryUnit(newParams, bayCapacity, skill, true, campaign);
+                        }
                     }
+
+                    // If no suitable battle armor or infantry
+                    if (transportedUnit == null) {
+                        break;
+                    }
+
+                    // Set the infantry deployment to the same deployment round as the transport
+                    transportedUnit.setDeployRound(transport.getDeployRound());
+                    scenario.addTransportRelationship(transport.getExternalIdAsString(), transportedUnit.getExternalIdAsString());
+
+                    if (mechanizedBAUnit != null) {
+                        mechanizedBAUnit.setDeployRound((transport.getDeployRound()));
+                        scenario.addTransportRelationship(transport.getExternalIdAsString(), mechanizedBAUnit.getExternalIdAsString());
+                    }
+
+                    transportedUnits.add(transportedUnit);
+                    bayCapacity -= transportedUnit.getWeight();
+
+                    keepLoading = isLargeBay && bayCapacity >= IUnitGenerator.FOOT_PLATOON_INFANTRY_WEIGHT;
                 }
 
-                // No suitable infantry was found, so switch to the next transport
-                if (transportedUnit == null) {
-                    continue;
-                }
-
-                // Set the infantry deployment to the same deployment round as the transport
-                transportedUnit.setDeployRound(transport.getDeployRound());
-                scenario.addTransportRelationship(transport.getExternalIdAsString(), transportedUnit.getExternalIdAsString());
-
-                if (mechanizedBAUnit != null) {
-                    mechanizedBAUnit.setDeployRound((transport.getDeployRound()));
-                    scenario.addTransportRelationship(transport.getExternalIdAsString(), mechanizedBAUnit.getExternalIdAsString());
-                }
-
-                transportedUnits.add(transportedUnit);
             }
+
         }
 
         return transportedUnits;
