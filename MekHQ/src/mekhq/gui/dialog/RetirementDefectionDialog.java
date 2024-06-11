@@ -150,12 +150,7 @@ public class RetirementDefectionDialog extends JDialog {
         txtInstructions.setWrapStyleWord(true);
         txtInstructions.setLineWrap(true);
         if (doRetirement) {
-            String instructions;
-            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
-                instructions = resourceMap.getString("txtInstructions.OverviewShare.text");
-            } else {
-                instructions = resourceMap.getString("txtInstructions.Overview.text");
-            }
+            String instructions = resourceMap.getString("txtInstructions.Overview.text");
             if (null == contract) {
                 instructions += "\n\nDays since last Employee Turnover check: "
                         + ChronoUnit.DAYS.between(rdTracker.getLastRetirementRoll(),
@@ -473,11 +468,7 @@ public class RetirementDefectionDialog extends JDialog {
 
                 currentPanel = PAN_RESULTS;
                 cardLayout.show(panMain, currentPanel);
-                if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
-                    txtInstructions.setText(resourceMap.getString("txtInstructions.ResultsShare.text"));
-                } else {
-                    txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
-                }
+                txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
 
                 hqView.getCampaign().getFinances().debit(TransactionType.SALARIES,
                         hqView.getCampaign().getLocalDate(), getTotalBonus(), "Bonus Payments");
