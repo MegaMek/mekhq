@@ -244,6 +244,7 @@ public class AutoAwardsDialog extends JDialog {
                 // if necessary, this initiates the next page
                 if ((currentPageCount + 1) < allData.size()) {
                     AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allData, (currentPageCount + 1));
+                    autoAwardsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
                     autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
                     autoAwardsDialog.setVisible(true);
                 }
@@ -252,6 +253,7 @@ public class AutoAwardsDialog extends JDialog {
 
                 if ((currentPageCount + 1) < allData.size()) {
                     AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allData, (currentPageCount + 1));
+                    autoAwardsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
                     autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
                     autoAwardsDialog.setVisible(true);
                 }

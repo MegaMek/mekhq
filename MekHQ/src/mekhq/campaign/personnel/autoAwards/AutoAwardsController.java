@@ -13,6 +13,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.AutoAwardsDialog;
 import org.apache.logging.log4j.LogManager;
 
+import java.awt.Dialog.ModalityType;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -136,6 +137,7 @@ public class AutoAwardsController {
 
         if (!allAwardData.isEmpty()) {
             AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
+            autoAwardsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
             autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
             autoAwardsDialog.setVisible(true);
         } else {
@@ -599,6 +601,7 @@ public class AutoAwardsController {
 
         if (!allAwardData.isEmpty()) {
             AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
+            autoAwardsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
             autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
             autoAwardsDialog.setVisible(true);
         } else {
