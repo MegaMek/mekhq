@@ -909,11 +909,11 @@ public class AtBDynamicScenarioFactory {
         int numMods = 0;
         boolean addMods = true;
         int modMax = campaignOptions.getScenarioModMax();
-        int modChance = campaignOptions.getScenarioModChance() - 1;
+        int modChance = campaignOptions.getScenarioModChance();
 
         if (modMax != 0) {
             while (addMods) {
-                if (Compute.randomInt(100) <= modChance) {
+                if (Compute.randomInt(100) < modChance) {
                     numMods++;
 
                     if (numMods >= modMax) {
