@@ -38,6 +38,7 @@ import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.utilities.BoardClassifier;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -898,19 +899,21 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Sets up scenario modifiers for this scenario.
+     * Randomly generates the number of scenario modifiers for a scenario,
+     * for each random scenario in the count a random modifier is applied to the scenario.
      *
-     * @param scenario
+     * @param campaignOptions The prior defined campaign options
+     * @param scenario The scenario to receive the modifiers.
      */
-    public static void setScenarioModifiers(Campaign campaign, AtBDynamicScenario scenario) {
+    public static void setScenarioModifiers(CampaignOptions campaignOptions, AtBDynamicScenario scenario) {
         int numMods = 0;
         boolean addMods = true;
-        int modMax = campaign.getCampaignOptions().getScenarioModMax();
-        int modChance = campaign.getCampaignOptions().getScenarioModChance() - 1;
+        int modMax = campaignOptions.getScenarioModMax();
+        int modChance = campaignOptions.getScenarioModChance() - 1;
 
         if (modMax != 0) {
             while (addMods) {
-                if (Compute.randomInt(100) >= modChance) {
+                if (Compute.randomInt(100) <= modChance) {
                     numMods++;
 
                     if (numMods >= modMax) {
