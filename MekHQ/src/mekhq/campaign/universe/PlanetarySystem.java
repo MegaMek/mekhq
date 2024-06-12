@@ -34,7 +34,6 @@ import mekhq.campaign.universe.Planet.PlanetaryEvent;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This is a PlanetarySystem object which will contain information
@@ -170,27 +169,28 @@ public class PlanetarySystem {
     }
 
     public List<String> getFactions(LocalDate when) {
-        List<String> factions = planets.values().stream()
-                .map(planet -> planet.getFactions(when))
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-
+        List<String> factions = new ArrayList<>();
+        for (Planet planet : planets.values()) {
+            List<String> f = planet.getFactions(when);
+            if (null != f) {
+                factions.addAll(f);
+            }
+        }
         return factions;
     }
 
     public Set<Faction> getFactionSet(LocalDate when) {
-        Set<Faction> factions = planets.values().stream()
-                .map(planet -> planet.getFactionSet(when))
-                .filter(Objects::nonNull)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
-
+        Set<Faction> factions = new HashSet<>();
+        for (Planet planet : planets.values()) {
+            Set<Faction> f = planet.getFactionSet(when);
+            if (null != f) {
+                factions.addAll(f);
+            }
+        }
         // ignore cases where abandoned (ABN) is given in addition to real factions
         if (factions.size() > 1) {
             factions.remove(Factions.getInstance().getFaction("ABN"));
         }
-
         return factions;
     }
 

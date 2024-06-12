@@ -237,17 +237,33 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         for (int i = 0; i < num; i++) {
             final Collection<EntityMovementMode> movementModes = new ArrayList<>();
             final Collection<MissionRole> missionRoles = new ArrayList<>();
+
             if (unitType == UnitType.TANK) {
                 movementModes.addAll(IUnitGenerator.MIXED_TANK_VTOL);
 
-                // should a special unit type be picked? This allows us to force MissionRole that would otherwise be filtered out
-                if (Compute.randomInt(30) == 0) {
-                    int roll = Compute.randomInt(20);
+                // should a special unit type be picked? This allows us to force a MissionRole that would otherwise be filtered out
+                int specialUnitChance = campaign.getCampaignOptions().getUnitMarketSpecialUnitChance();
 
-                    if (roll < 15) {
-                        missionRoles.add(MissionRole.ARTILLERY);
-                    } else {
-                        missionRoles.add(MissionRole.SUPPORT);
+                if (specialUnitChance != 0) {
+                    if ((specialUnitChance == 1) || (Compute.randomInt(specialUnitChance) == 0)) {
+                        // this will need to be incremented by 1,
+                        // whenever we add additional unit types to this special handler
+                        int roll = Compute.randomInt(2);
+
+                        // while this gives even chances for each role,
+                        // it gives greater control to the user
+                        // to define how often they want to see special units.
+                        // really, this is just a band-aid fix, and ideally we wouldn't be filtering out these units in the first place
+                        switch (roll) {
+                            case 0:
+                                missionRoles.add(MissionRole.SUPPORT);
+                                break;
+                            case 1:
+                                missionRoles.add(MissionRole.ARTILLERY);
+                                break;
+                            default:
+                                throw new IllegalStateException("Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/addOffers: " + roll);
+                        }
                     }
                 }
             }
