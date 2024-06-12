@@ -216,7 +216,15 @@ public class RetirementTableModel extends AbstractTableModel {
                         (payBonus.get(p.getId()) ? 2 : 0) +
                         miscMods.get(p.getId()) + generalMod;
             case COL_BONUS_COST:
-                return RetirementDefectionTracker.getPayoutOrBonusValue(campaign, p).toAmountAndSymbolString();
+                Money bonusCost = RetirementDefectionTracker.getPayoutOrBonusValue(campaign, p);
+
+                if (campaign.getCampaignOptions().getTurnoverFrequency().isMonthly()) {
+                    return bonusCost.dividedBy(12).toAmountAndSymbolString();
+                } else if (campaign.getCampaignOptions().getTurnoverFrequency().isWeekly()) {
+                    return bonusCost.dividedBy(52).toAmountAndSymbolString();
+                } else {
+                    return bonusCost;
+                }
             case COL_PAY_BONUS:
                 return payBonus.getOrDefault(p.getId(), campaign.getCampaignOptions().isPayBonusDefault());
             case COL_MISC_MOD:

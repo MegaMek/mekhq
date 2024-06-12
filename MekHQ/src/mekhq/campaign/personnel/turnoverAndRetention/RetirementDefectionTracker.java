@@ -278,11 +278,11 @@ public class RetirementDefectionTracker {
                     targetNumber.addModifier(1, resources.getString("factionPirateCompany.text"));
                 } else if (campaignFaction.isComStarOrWoB()) {
                     if (person.getOriginFaction().isComStarOrWoB()) {
-                        targetNumber.addModifier(2, resources.getString("factionComStarOrWob.text"));
+                        targetNumber.addModifier(-2, resources.getString("factionComStarOrWob.text"));
                     }
                 } else if ((!campaignFaction.isClan()) && (!campaignFaction.isMercenary())) {
                     if (campaignFaction.equals(person.getOriginFaction())) {
-                        targetNumber.addModifier(1, resources.getString("factionLoyalty.text"));
+                        targetNumber.addModifier(-1, resources.getString("factionLoyalty.text"));
                     }
                 }
 
