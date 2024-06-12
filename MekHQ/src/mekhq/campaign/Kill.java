@@ -41,8 +41,8 @@ public class Kill {
     private LocalDate date;
     private String killed;
     private String killer;
-    private int missionId;
-    private int scenarioId;
+    private int missionId = 0;
+    private int scenarioId = 0;
 
     public Kill() {
     }

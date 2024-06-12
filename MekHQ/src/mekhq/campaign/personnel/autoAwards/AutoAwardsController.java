@@ -764,11 +764,17 @@ public class AutoAwardsController {
         for (UUID person : personnel) {
             Map<Integer, List<Object>> data;
 
-            List<Kill> kills = campaign.getKillsFor(campaign.getPerson(person).getId());
-            kills.removeIf(kill -> kill.getScenarioId() != scenarioId);
+            List<Kill> allKills = campaign.getKillsFor(campaign.getPerson(person).getId());
+            List<Kill> scenarioKills = new ArrayList<>();
+
+            for (Kill kill : allKills) {
+                if (kill.getScenarioId() == scenarioId) {
+                    scenarioKills.add(kill);
+                }
+            }
 
             try {
-                data = ScenarioKillAwards.ScenarioKillAwardsProcessor(campaign, person, killAwards, kills);
+                data = ScenarioKillAwards.ScenarioKillAwardsProcessor(campaign, person, killAwards, scenarioKills.size());
             } catch (Exception e) {
                 data = null;
                 LogManager.getLogger().info("{} is not eligible for any Scenario Kill Awards.",
@@ -805,15 +811,21 @@ public class AutoAwardsController {
 
         for (UUID person : personnel.keySet()) {
             Map<Integer, List<Object>> data;
-            List<Kill> kills = new ArrayList<>();
+            List<Kill> allKills;
+            List<Kill> scenarioKills = new ArrayList<>();
 
             if (scenarioId != -1) {
-                kills = campaign.getKillsFor(campaign.getPerson(person).getId());
-                kills.removeIf(kill -> kill.getScenarioId() != scenarioId);
+                allKills = campaign.getKillsFor(campaign.getPerson(person).getId());
+
+                for (Kill kill : allKills) {
+                    if (kill.getScenarioId() == scenarioId) {
+                        scenarioKills.add(kill);
+                    }
+                }
             }
 
             try {
-                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful, kills.size(), personnel.get(person));
+                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful, scenarioKills.size(), personnel.get(person));
             } catch (Exception e) {
                 data = null;
                 LogManager.getLogger().info("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());
