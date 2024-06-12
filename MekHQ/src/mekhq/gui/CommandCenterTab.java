@@ -335,7 +335,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
             panInfo.add(lblFacilityCapacities, gridBagConstraints);
         }
 
-        panInfo.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panInfo.title")));
+        panInfo.setBorder(BorderFactory.createTitledBorder(getCampaign().getName()));
     }
 
     /**
