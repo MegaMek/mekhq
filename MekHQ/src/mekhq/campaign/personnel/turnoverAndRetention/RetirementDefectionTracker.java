@@ -928,8 +928,7 @@ public class RetirementDefectionTracker {
      * @param contract The contract associated with the event trigger, if applicable.
      * @return True if the person was successfully removed from the campaign, false otherwise.
      */
-    public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign,
-                                      AtBContract contract) {
+    public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign, Mission contract) {
         if (!person.getPrisonerStatus().isFree()) {
             return false;
         }

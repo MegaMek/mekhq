@@ -37,10 +37,13 @@ import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.event.ScenarioResolvedEvent;
 import mekhq.campaign.handler.XPHandler;
 import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -61,7 +64,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 /**
@@ -474,25 +479,52 @@ public class MekHQ implements GameListener {
             tracker.setClient(gameThread.getClient());
             tracker.setEvent(gve);
             tracker.processGame();
+
             ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(campaignGUI.getFrame(), true,
                     tracker);
             resolveDialog.setVisible(true);
 
-            RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI, campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
-            rdd.setLocation(rdd.getLocation().x, 0);
-            rdd.setVisible(true);
+            if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
+                RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI, campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
+                rdd.setLocation(rdd.getLocation().x, 0);
+                rdd.setVisible(true);
 
-            if (!rdd.wasAborted()) {
-                getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+                if (!rdd.wasAborted()) {
+                    getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+                }
             }
+
+            if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+                HashMap<UUID, Integer> personnel = new HashMap<>();
+
+                for (UUID personId : tracker.getPeopleStatus().keySet()) {
+                    Person person = getCampaign().getPerson(personId);
+                    PersonStatus status = tracker.getPeopleStatus().get(personId);
+                    int injuryCount = 0;
+
+                    if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
+                        if (status.getHits() > person.getHits()) {
+                            injuryCount = status.getHits() - person.getHits();
+                        }
+                    }
+
+                    personnel.put(personId, injuryCount);
+                }
+
+                AutoAwardsController autoAwardsController = new AutoAwardsController();
+                autoAwardsController.PostScenarioController(getCampaign(), currentScenario.getId(), personnel);
+            }
+
             // we need to trigger ScenarioResolvedEvent before stopping the thread or currentScenario may become null
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
             gameThread.requestStop();
+
             // MegaMek dumps these in the deployment phase to free memory
             if (getCampaign().getCampaignOptions().isUseAtB()) {
                 RandomUnitGenerator.getInstance();
                 RandomNameGenerator.getInstance();
             }
+
             // MegaMek creates some temporary files that MHQ needs to remove between runs
             final File tempImageDirectory = new File("data/images/temp");
             if (tempImageDirectory.isDirectory()) {

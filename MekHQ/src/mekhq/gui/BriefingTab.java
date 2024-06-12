@@ -28,6 +28,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.event.*;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -532,6 +533,27 @@ public final class BriefingTab extends CampaignGuiTab {
             if (!rdd.wasAborted()) {
                 getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
             }
+        }
+
+        if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+            HashMap<UUID, Integer> personnel = new HashMap<>();
+
+            for (UUID personId : tracker.getPeopleStatus().keySet()) {
+                Person person = getCampaign().getPerson(personId);
+                PersonStatus status = tracker.getPeopleStatus().get(personId);
+                int injuryCount = 0;
+
+                if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
+                    if (status.getHits() > person.getHits()) {
+                        injuryCount = status.getHits() - person.getHits();
+                    }
+                }
+
+                personnel.put(personId, injuryCount);
+            }
+
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+            autoAwardsController.PostScenarioController(getCampaign(), scenario.getId(), personnel);
         }
 
         MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
