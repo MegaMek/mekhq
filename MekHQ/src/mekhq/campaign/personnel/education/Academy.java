@@ -65,12 +65,6 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "isPrepSchool")
     private Boolean isPrepSchool = false;
 
-    @XmlElement(name = "isClan")
-    private Boolean isClan = false;
-
-    @XmlElement(name = "isTrueborn")
-    private Boolean isTrueborn = false;
-
     @XmlElement(name = "description")
     private String description = "Error: no description";
 
@@ -156,8 +150,6 @@ public class Academy implements Comparable<Academy> {
      * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
      * @param isReeducationCamp       indicates if the academy is a reeducation camp (true) or not (false)
      * @param promotion               indicates the promotion rank earned for completing an academic course
-     * @param isClan                  indicates if the academy is a Clan Sibko or Crèche (true) or not (false)
-     * @param isTrueborn              indicates if the Sibko is intended for Trueborn (true) or not (false)
      * @param isPrepSchool            indicates if the academy is focused on children (true) or not (false)
      * @param description             the description of the academy
      * @param factionDiscount         the discount offered by the academy to faction members
@@ -181,10 +173,10 @@ public class Academy implements Comparable<Academy> {
      * @param id                      the id number of the academy, used for sorting academies in mhq
      */
     public Academy(String set, String name, int type, Boolean isMilitary, Boolean isReeducationCamp, String promotion,
-                   Boolean isClan, Boolean isTrueborn, Boolean isPrepSchool, String description, Integer factionDiscount,
-                   Boolean isFactionRestricted, String faction, List<String> locationSystems, Boolean isLocal,
-                   Integer constructionYear, Integer destructionYear, Integer closureYear, Integer tuition,
-                   Integer durationDays, Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax,
+                   Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
+                   String faction, List<String> locationSystems, Boolean isLocal, Integer constructionYear,
+                   Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
+                   Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax,
                    Integer ageMin, Integer ageMax, List<String> qualifications, List<String> curriculums,
                    List<Integer> qualificationStartYears, Integer baseAcademicSkillLevel, Integer id) {
         this.set = set;
@@ -193,8 +185,6 @@ public class Academy implements Comparable<Academy> {
         this.isMilitary = isMilitary;
         this.isReeducationCamp = isReeducationCamp;
         this.promotion = promotion;
-        this.isClan = isClan;
-        this.isTrueborn = isTrueborn;
         this.isPrepSchool = isPrepSchool;
         this.description = description;
         this.factionDiscount = factionDiscount;
@@ -326,42 +316,6 @@ public class Academy implements Comparable<Academy> {
      */
     public void setPromotion(final String promotion) {
         this.promotion = promotion;
-    }
-
-    /**
-     * Checks if the academy is a Clan Sibko or Crèche.
-     *
-     * @return {@code true} if the academy is a Clan Sibko or Crèche, {@code false} otherwise.
-     */
-    public Boolean isClan() {
-        return isClan;
-    }
-
-    /**
-     * Sets the value indicating whether the academy is a Clan Sibko or Crèche.
-     *
-     * @param isClan true if the academy is a Clan Sibko or Crèche, false otherwise.
-     */
-    public void setIsClan(final boolean isClan) {
-        this.isClan = isClan;
-    }
-
-    /**
-     * Checks if the academy is a Truenorn Sibko or Crèche.
-     *
-     * @return {@code true} if the academy is a Trueborn Sibko or Crèche, {@code false} otherwise.
-     */
-    public Boolean isTrueborn() {
-        return isTrueborn;
-    }
-
-    /**
-     * Sets the value indicating whether the academy is a Trueborn Sibko or Crèche.
-     *
-     * @param isTrueborn true if the academy is a Trueborn Sibko or Crèche, false otherwise.
-     */
-    public void setIsTrueborn(final boolean isTrueborn) {
-        this.isTrueborn = isTrueborn;
     }
 
     /**
@@ -1000,19 +954,7 @@ public class Academy implements Comparable<Academy> {
         }
 
         // we need to do a little extra work to get travel time, to cover academies with multiple campuses or Clan nonsense
-        int distance = 2;
-
-        if ((isClan) && (!isLocal)) {
-            if (!isTrueborn) {
-                try {
-                    distance = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
-                } catch (Exception e) {
-                    distance = campaign.getSimplifiedTravelTime(campaign.getSystemById("Strana Mechty"));
-                }
-            }
-        } else {
-            distance = campaign.getSimplifiedTravelTime(destination);
-        }
+        int distance = campaign.getSimplifiedTravelTime(destination);
 
         tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
 
@@ -1022,17 +964,7 @@ public class Academy implements Comparable<Academy> {
             tooltip.append(distance / 7).append(' ').append(resources.getString("durationWeeks.text"));
         }
 
-        if ((isClan) && (!isLocal)) {
-            destination = campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate());
-
-            try {
-                tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
-            } catch (Exception e) {
-                tooltip.append("Strana Mechty").append(")<br>");
-            }
-        } else {
-            tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
-        }
+        tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
 
         // with travel time out the way; all that's left is to add the last couple of entries
         if ((isMilitary) && (!Objects.equals(promotion, "None"))) {
