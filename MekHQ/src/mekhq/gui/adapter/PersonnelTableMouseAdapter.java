@@ -1522,9 +1522,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     for (Academy academy : academiesOfSet) {
                         // time to start filtering the academies
                         if (oneSelected) {
-                            buildEducationMenusSingleton(campaign, person, academy, clanMenu, militaryMenu, civilianMenu);
+                            buildEducationMenusSingleton(campaign, person, academy, militaryMenu, civilianMenu);
                         } else {
-                            buildEducationMenusMassEnroll(campaign, Arrays.asList(selected), academy, clanMenu, militaryMenu, civilianMenu);
+                            buildEducationMenusMassEnroll(campaign, Arrays.asList(selected), academy, militaryMenu, civilianMenu);
                         }
                     }
                     academyMenu.add(setAcademyMenu);
@@ -2579,11 +2579,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param campaign      the campaign to check parameters against
      * @param person        the person to check parameters against
      * @param academy       the academy to build menus for
-     * @param clanMenu      the clan menu object
      * @param militaryMenu  the military menu object
      * @param civilianMenu  the civilian menu object
      */
-    private void buildEducationMenusSingleton(Campaign campaign, Person person, Academy academy, JMenu clanMenu, JMenu militaryMenu, JMenu civilianMenu) {
+    private void buildEducationMenusSingleton(Campaign campaign, Person person, Academy academy, JMenu militaryMenu, JMenu civilianMenu) {
         boolean showIneligibleAcademies = campaign.getCampaignOptions().isEnableShowIneligibleAcademies();
         // has the academy been constructed, is still standing, & has not closed?
         if ((campaign.getGameYear() >= academy.getConstructionYear())
@@ -2670,11 +2669,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param campaign      the campaign to check parameters against
      * @param personnel  the people to check parameters against
      * @param academy       the academy to build menus for
-     * @param clanMenu      the clan menu object
      * @param militaryMenu  the military menu object
      * @param civilianMenu  the civilian menu object
      */
-    private void buildEducationMenusMassEnroll(Campaign campaign, List<Person> personnel, Academy academy, JMenu clanMenu, JMenu militaryMenu, JMenu civilianMenu) {
+    private void buildEducationMenusMassEnroll(Campaign campaign, List<Person> personnel, Academy academy, JMenu militaryMenu, JMenu civilianMenu) {
         // has the academy been constructed, is still standing, & has not closed?
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())

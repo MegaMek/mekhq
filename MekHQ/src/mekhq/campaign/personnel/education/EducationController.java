@@ -1,7 +1,6 @@
 package mekhq.campaign.personnel.education;
 
 import megamek.common.Compute;
-import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -117,13 +116,11 @@ public class EducationController {
     /**
      * Generates a name for a local academy or clan education facility.
      *
-     * @param person      The person for whom the name is being generated (nullable, if not Clan Sibko).
      * @param academy     The academy to which the person is applying.
-     * @param courseIndex The index of the course (nullable, if not Clan Sibko).
      * @param campus      The campus of the academy.
      * @return The generated name.
      */
-    public static String generateName(@Nullable Campaign campaign, @Nullable Person person, Academy academy, @Nullable Integer courseIndex, String campus) {
+    public static String generateName(Academy academy, String campus) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
         if (Compute.d6(1) <= 3) {
@@ -359,10 +356,9 @@ public class EducationController {
      *
      * @param campaign   the current campaign
      * @param person     the person returning from the academy
-     * @param academy    the academy the person attended
      * @param resources  the resource bundle containing localized strings
      */
-    private static void beginJourneyHome(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+    private static void beginJourneyHome(Campaign campaign, Person person, ResourceBundle resources) {
         int travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
 
         campaign.addReport(person.getHyperlinkedName() + ' '
@@ -471,10 +467,8 @@ public class EducationController {
      */
     private static void checkForTrainingAccidents(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (academy.isMilitary()) {
-            int roll;
-            int diceSize;
-
             int militaryDiceSize = campaign.getCampaignOptions().getMilitaryAcademyAccidents();
+            int roll;
 
             if (militaryDiceSize > 1) {
                 roll = Compute.randomInt(militaryDiceSize);
