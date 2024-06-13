@@ -50,7 +50,7 @@ class AcademyTests {
                 Arrays.asList("Combat", "Strategy"), Arrays.asList(3050, 3055), 5, 101);
 
         assertEquals("MekWarrior Academy", academy.getName());
-        assertEquals(AcademyType.NONE, academy.getType());
+        assertEquals(AcademyType.COLLEGE, academy.getType());
         assertTrue(academy.isMilitary());
         assertEquals("Colonel", academy.getPromotion());
         assertEquals(20, academy.getFactionDiscount());
