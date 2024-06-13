@@ -29,6 +29,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.enums.education.EducationLevel.Adapter;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -97,10 +98,10 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "facultySkill")
     private Integer facultySkill = 7;
 
-    @XmlJavaTypeAdapter(EducationLevel.Adapter.class)
+    @XmlJavaTypeAdapter(value = Adapter.class)
     private EducationLevel educationLevelMin = EducationLevel.EARLY_CHILDHOOD;
 
-    @XmlJavaTypeAdapter(EducationLevel.Adapter.class)
+    @XmlJavaTypeAdapter(value = Adapter.class)
     private EducationLevel educationLevelMax = EducationLevel.HIGH_SCHOOL;
 
     @XmlElement(name = "ageMin")
