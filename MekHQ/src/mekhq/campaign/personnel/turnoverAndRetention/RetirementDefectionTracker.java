@@ -2,6 +2,7 @@
  * RetirementDefectionTracker.java
  *
  * Copyright (c) 2014 - Carl Spain. All rights reserved.
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,7 +27,6 @@ import megamek.common.TargetRoll;
 import megamek.common.annotations.Nullable;
 import megamek.common.options.IOption;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.FinancialReport;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
@@ -750,12 +750,7 @@ public class RetirementDefectionTracker {
             return Money.zero();
         }
 
-        FinancialReport r = FinancialReport.calculate(campaign);
-
-        Money netWorth = r.getNetWorth();
-        if (campaign.getCampaignOptions().isSharesExcludeLargeCraft()) {
-            netWorth = netWorth.minus(r.getLargeCraftValue());
-        }
+        Money profits = campaign.getFinances().getProfits();
 
         int totalShares = campaign.getActivePersonnel()
                 .stream()
@@ -766,7 +761,7 @@ public class RetirementDefectionTracker {
             return Money.zero();
         }
 
-        return netWorth.dividedBy(totalShares);
+        return profits.dividedBy(totalShares);
     }
 
     /**

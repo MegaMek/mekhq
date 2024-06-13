@@ -531,7 +531,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel sharesPanel;
     private JCheckBox chkUseShareSystem;
     private JPanel sharesSubPanel;
-    private JCheckBox chkSharesExcludeLargeCraft;
     private JCheckBox chkSharesForAll;
     //endregion Finances Tab
 
@@ -7523,10 +7522,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createSharesSubPanel() {
-        chkSharesExcludeLargeCraft = new JCheckBox(resources.getString("chkSharesExcludeLargeCraft.text"));
-        chkSharesExcludeLargeCraft.setToolTipText(resources.getString("chkSharesExcludeLargeCraft.toolTipText"));
-        chkSharesExcludeLargeCraft.setName("chkSharesExcludeLargeCraft");
-
         chkSharesForAll = new JCheckBox(resources.getString("chkSharesForAll.text"));
         chkSharesForAll.setToolTipText(resources.getString("chkSharesForAll.toolTipText"));
         chkSharesForAll.setName("chkSharesForAll");
@@ -7540,12 +7535,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(layout
                 .createSequentialGroup()
-                .addComponent(chkSharesExcludeLargeCraft)
                 .addComponent(chkSharesForAll));
 
         layout.setHorizontalGroup(layout
                 .createParallelGroup(Alignment.LEADING)
-                .addComponent(chkSharesExcludeLargeCraft)
                 .addComponent(chkSharesForAll));
 
         return sharesSubPanel;
@@ -8489,7 +8482,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Shares
         chkUseShareSystem.setSelected(options.isUseShareSystem());
-        chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
         chkSharesForAll.setSelected(options.isSharesForAll());
 
         // Taxes
@@ -9142,7 +9134,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setCancelledOrderRefundMultiplier((Double) spnCancelledOrderRefundMultiplier.getValue());
 
             options.setUseShareSystem(chkUseShareSystem.isSelected());
-            options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
             options.setSharesForAll(chkSharesForAll.isSelected());
 
             //region Taxes
@@ -9575,7 +9566,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Shares System
         chkUseShareSystem.setSelected(options.isUseShareSystem());
-        chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
         chkSharesForAll.setSelected(options.isSharesForAll());
     }
 

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -371,7 +371,7 @@ public class Finances {
      *
      * @return The profits made by the campaign, or zero if no profits were made.
      */
-    private Money getProfits() {
+    public Money getProfits() {
         Money profits = Money.zero();
 
         for (Transaction transaction : getTransactions()) {
