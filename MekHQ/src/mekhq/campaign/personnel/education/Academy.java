@@ -803,7 +803,7 @@ public class Academy implements Comparable<Academy> {
         int minimumEducationLevel = EducationLevel.parseToInt(educationLevelMin);
         int maximumEducationLevel = EducationLevel.parseToInt(educationLevelMax);
 
-        int educationLevel = 0;
+        int educationLevel;
 
         if ((currentEducationLevel + minimumEducationLevel) >= maximumEducationLevel) {
             educationLevel = maximumEducationLevel;
@@ -813,6 +813,7 @@ public class Academy implements Comparable<Academy> {
             educationLevel = maximumEducationLevel + minimumEducationLevel;
         }
 
+        // this probably isn't necessary, but a little insurance goes a long way
         if (educationLevel > EducationLevel.values().length - 1) {
             educationLevel = EducationLevel.values().length - 1;
         } else if (educationLevel < 0) {
