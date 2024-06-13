@@ -608,7 +608,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
         lblEducationLevel.setName("lblEducationLevel");
 
-        textEducationLevel.setSelectedItem(person.getEduHighestEducation());
+        for (EducationLevel level : EducationLevel.values()) {
+            textEducationLevel.addItem(level);
+        }
         textEducationLevel.setName("textEducationLevel");
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {

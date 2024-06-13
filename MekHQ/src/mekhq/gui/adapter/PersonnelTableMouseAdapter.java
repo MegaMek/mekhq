@@ -45,6 +45,7 @@ import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -375,12 +376,27 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 HashMap<UUID, List<Object>> academyAttributesMap = new HashMap<>();
 
                 for (Person person : people) {
-                    person.setEduDaysOfEducation(1);
-
                     Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                    EducationStage educationStage = person.getEduEducationStage();
+
+                    switch (educationStage) {
+                        case JOURNEY_TO_CAMPUS:
+                        case JOURNEY_FROM_CAMPUS:
+                            person.setEduJourneyTime(1);
+                            break;
+                        case EDUCATION:
+                            if (!academy.isPrepSchool()) {
+                                person.setEduEducationTime(1);
+                            }
+                            break;
+                        default:
+                            break;
+                    }
 
                     List<Object> individualAcademyAttributes = new ArrayList<>();
 
+                    // if graduating, process autoAwards component for this person
                     if (EducationController.processNewDay(gui.getCampaign(), person, true)) {
                         graduatingPersonnel.add(person.getId());
 

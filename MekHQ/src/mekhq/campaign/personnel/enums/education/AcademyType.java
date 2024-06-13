@@ -103,10 +103,6 @@ public enum AcademyType {
  */
 //region File I/O
     public static AcademyType parseFromString(final String text) {
-        try {
-            return valueOf(text);
-        } catch (Exception ignored) {}
-
         switch (Integer.parseInt(text)) {
             case 0:
                 return NONE;

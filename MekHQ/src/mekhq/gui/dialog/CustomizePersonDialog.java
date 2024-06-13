@@ -649,29 +649,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
-        lblEducationLevel.setName("lblEducationLevel");
-
-        textEducationLevel.setSelectedItem(person.getEduHighestEducation());
-        textEducationLevel.setName("textEducationLevel");
-
-        if (campaign.getCampaignOptions().isUseEducationModule()) {
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            panDemog.add(lblEducationLevel, gridBagConstraints);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            panDemog.add(textEducationLevel, gridBagConstraints);
-
-            y++;
-        }
-
         lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
         lblFatigue.setName("lblFatigue");
 
@@ -691,6 +668,32 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             panDemog.add(textFatigue, gridBagConstraints);
+
+            y++;
+        }
+
+        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
+        lblEducationLevel.setName("lblEducationLevel");
+
+        for (EducationLevel level : EducationLevel.values()) {
+            textEducationLevel.addItem(level);
+        }
+        textEducationLevel.setSelectedItem(person.getEduHighestEducation());
+        textEducationLevel.setName("textEducationLevel");
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblEducationLevel, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textEducationLevel, gridBagConstraints);
 
             y++;
         }

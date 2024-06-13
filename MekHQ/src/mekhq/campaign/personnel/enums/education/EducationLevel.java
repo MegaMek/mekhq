@@ -84,20 +84,16 @@ public enum EducationLevel {
      * @throws IllegalStateException if the given string does not match any valid AcademyType
      */
     public static EducationLevel parseFromString(final String educationLevel) {
-        try {
-            return valueOf(educationLevel);
-        } catch (Exception ignored) {}
-
-        switch (Integer.parseInt(educationLevel)) {
-            case 0:
+        switch (educationLevel) {
+            case "None":
                 return EARLY_CHILDHOOD;
-            case 1:
+            case "High School":
                 return HIGH_SCHOOL;
-            case 2:
+            case "College":
                 return COLLEGE;
-            case 3:
+            case "Post-Graduate":
                 return POST_GRADUATE;
-            case 4:
+            case "Doctorate":
                 return DOCTORATE;
             default:
                 throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/EducationLevel.java/parseFromString: "

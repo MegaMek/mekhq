@@ -9,6 +9,7 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.enums.education.EducationStage;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
@@ -66,7 +67,7 @@ public class EducationController {
         campaign.addReport(String.format(resources.getString("offToSchool.text"),
                     person.getFullName(),
                     person.getEduAcademyName(),
-                    person.getEduDaysOfTravelToAcademy()));
+                    person.getEduJourneyTime()));
     }
 
     /**
@@ -85,20 +86,23 @@ public class EducationController {
         // change status will wipe the academic information, so must always precede the setters
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
 
-        person.setEduEducationStage(1);
+        person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
         person.setEduAcademySet(academy.getSet());
         person.setEduAcademyNameInSet(academy.getName());
-        person.setEduDaysOfEducation(academy.getDurationDays());
+        person.setEduEducationTime(academy.getDurationDays());
         person.setEduAcademyFaction(faction);
         person.setEduCourseIndex(courseIndex);
 
         if (academy.isLocal()) {
-            person.setEduDaysOfTravelToAcademy(2);
+            person.setEduJourneyTime(2);
             person.setEduAcademySystem(campaign.getCurrentSystem().getId());
         } else {
-            person.setEduDaysOfTravelToAcademy(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
+            person.setEduJourneyTime(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
             person.setEduAcademySystem(campaign.getSystemById(campus).getName(campaign.getLocalDate()));
         }
+
+        // this should already be 0, but we reset it just in case
+        person.setEduDaysOfTravel(0);
 
         person.setEduAcademyNameInSet(academy.getName());
 
@@ -229,32 +233,32 @@ public class EducationController {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
         Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
 
-        int educationStage = person.getEduEducationStage();
+        EducationStage educationStage = person.getEduEducationStage();
 
         // is person in transit to the institution?
-        if (educationStage == 1) {
+        if (educationStage == EducationStage.JOURNEY_TO_CAMPUS) {
             journeyToAcademy(campaign, person, resources);
             return false;
         }
 
-        // is person on campus and undergoing education, or awaiting assignment to a sibko?
-        if ((educationStage == 2) || (educationStage == 3)) {
+        // is the person on campus and undergoing education
+        if (educationStage == EducationStage.EDUCATION) {
             return ongoingEducation(campaign, person, academy, ageBypass, resources);
         }
 
         // if education has concluded and the journey home hasn't started, we begin the journey
-        if (educationStage == 4) {
+        if (educationStage == EducationStage.GRADUATING) {
             beginJourneyHome(campaign, person, resources);
             return false;
         }
 
         // if we reach this point it means Person is already in transit, so we continue their journey
-        if (educationStage == 5) {
+        if (educationStage == EducationStage.JOURNEY_FROM_CAMPUS) {
             processJourneyHome(campaign, person);
             return false;
         }
 
-        LogManager.getLogger().error("Unexpected education stage: {}", educationStage);
+        LogManager.getLogger().error("Failed to process education stage: {}", educationStage);
         return false;
     }
 
@@ -266,14 +270,12 @@ public class EducationController {
      * @param resources The resource bundle containing localized strings.
      */
     private static void journeyToAcademy(Campaign campaign, Person person, ResourceBundle resources) {
-        int daysOfTravelTo = person.getEduDaysOfTravelToAcademy();
-
-        person.setEduDaysOfTravelToAcademy(daysOfTravelTo - 1);
+        person.incrementEduDaysOfTravel();
 
         // has Person just arrived?
-        if ((daysOfTravelTo - 1) < 1) {
+        if (person.getEduDaysOfTravel() >= person.getEduJourneyTime()) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("arrived.text"));
-            person.setEduEducationStage(2);
+            person.setEduEducationStage(EducationStage.EDUCATION);
         }
     }
 
@@ -287,42 +289,37 @@ public class EducationController {
      * @return The remaining days of education for the person.
      */
     private static boolean ongoingEducation(Campaign campaign, Person person, Academy academy, boolean ageBypass, ResourceBundle resources) {
-        int daysOfEducation = person.getEduDaysOfEducation();
+        int daysOfEducation = person.getEduEducationTime();
 
         if (academy.isPrepSchool()) {
             if ((person.getAge(campaign.getLocalDate()) >= academy.getAgeMax()) || (ageBypass)) {
-                if (person.getEduEducationStage() == 2) {
-                    graduationPicker(campaign, person, academy, resources);
+                graduationPicker(campaign, person, academy, resources);
 
-                    person.setEduDaysOfEducation(0);
-                    person.setEduEducationStage(3);
-                } else {
-                    campaign.addReport(person.getHyperlinkedName() + ' '
-                            + String.format(resources.getString("graduatedChild.text"), person.getEduAcademyName()));
-                }
+                person.setEduEducationStage(EducationStage.GRADUATING);
 
                 if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                    processNewWeekChecks(campaign, academy, person, 0, resources);
+                    processNewWeekChecks(campaign, academy, person, resources);
                 }
 
                 return true;
             }
 
             if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                processNewWeekChecks(campaign, academy, person, daysOfEducation, resources);
+                processNewWeekChecks(campaign, academy, person, resources);
             }
 
             return false;
         } else {
-            person.setEduDaysOfEducation(daysOfEducation - 1);
+            person.setEduEducationTime(daysOfEducation - 1);
 
             if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                processNewWeekChecks(campaign, academy, person, daysOfEducation - 1, resources);
+                processNewWeekChecks(campaign, academy, person, resources);
             }
 
-            if ((daysOfEducation - 1) < 1) {
+            // we use 2 as that would be the value prior the day's decrement
+            if (daysOfEducation < 2) {
                 if (graduationPicker(campaign, person, academy, resources)) {
-                    person.setEduEducationStage(4);
+                    person.setEduEducationStage(EducationStage.GRADUATING);
                     return true;
                 } else {
                     return false;
@@ -365,9 +362,9 @@ public class EducationController {
         campaign.addReport(person.getHyperlinkedName() + ' '
                 + String.format(resources.getString("returningFromSchool.text"), travelTime));
 
-        person.setEduDaysOfTravelFromAcademy(travelTime);
+        person.setEduJourneyTime(travelTime);
         person.setEduDaysOfTravel(0);
-        person.setEduEducationStage(5);
+        person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
     }
 
     /**
@@ -377,19 +374,18 @@ public class EducationController {
      * @param person           the person whose journey home is being processed
      */
     private static void processJourneyHome(Campaign campaign, Person person) {
-        int travelTime;
+        // has the journey time changed?
+        int travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
 
-        try {
-            travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
-
-            if (travelTime != person.getEduDaysOfTravel()) {
-                person.setEduDaysOfTravelFromAcademy(travelTime);
-            }
-        } finally {
-            person.setEduDaysOfTravel(person.getEduDaysOfTravel() + 1);
+        // if so, update the journey time
+        if (travelTime != person.getEduJourneyTime()) {
+            person.setEduJourneyTime(travelTime);
         }
 
-        if ((travelTime - person.getEduDaysOfTravel()) < 1) {
+        person.incrementEduDaysOfTravel();
+
+        // has the person arrived home?
+        if (person.getEduDaysOfTravel() >= person.getEduJourneyTime()) {
             person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
         }
     }
@@ -418,20 +414,19 @@ public class EducationController {
      * @param campaign        The campaign in which the person is participating.
      * @param academy         The academy where the person is receiving education.
      * @param person          The person whose new week checks need to be processed.
-     * @param daysOfEducation The number of days the person has received education.
-     * @param resources       The resource bundle used for obtaining localized strings.
+     * @param resources       The resource bundle used for localized strings.
      */
-    private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person, int daysOfEducation, ResourceBundle resources) {
+    private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if ((campaign.getCampaignOptions().isEnableRandomXp()) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
             if (Compute.d6(2) >= academy.getFacultySkill()) {
                 person.awardXP(campaign, campaign.getCampaignOptions().getRandomXpRate());
             }
         }
 
-        if (daysOfEducation > 0) {
+        if (person.getEduEducationStage() != EducationStage.GRADUATING) {
             // It's unlikely we'll ever get canonical destruction or closure dates for all the academies,
             // so no need to check these more than once a year
-            if ((campaign.getLocalDate().getDayOfMonth() == 1) && (campaign.getLocalDate().getMonthValue() == 1)) {
+            if (campaign.getLocalDate().getDayOfYear() == 1) {
                 // time to check whether the academy is still standing.
                 if (checkForAcademyDestruction(campaign, academy, person, resources)) {
                     return;
@@ -449,7 +444,7 @@ public class EducationController {
             }
 
             // does person want to drop out?
-            if (checkForDropout(campaign, academy, person, daysOfEducation, resources)) {
+            if (checkForDropout(campaign, academy, person, resources)) {
                 return;
             }
 
@@ -486,7 +481,7 @@ public class EducationController {
                                 + String.format(resources.getString("eventTrainingAccident.text"), roll));
 
                         if (!academy.isPrepSchool()) {
-                            person.setEduDaysOfEducation(person.getEduDaysOfEducation() + roll);
+                            person.setEduEducationTime(person.getEduEducationTime() + roll);
                         }
                     } else {
                         campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventTrainingAccidentKilled.text"));
@@ -499,7 +494,7 @@ public class EducationController {
                             + String.format(resources.getString("eventTrainingAccident.text"), roll));
 
                     if (!academy.isPrepSchool()) {
-                        person.setEduDaysOfEducation(person.getEduDaysOfEducation() + roll);
+                        person.setEduEducationTime(person.getEduEducationTime() + roll);
                     }
                 }
             }
@@ -512,11 +507,10 @@ public class EducationController {
      * @param campaign The campaign the person is enrolled in.
      * @param academy The academy the person is attending.
      * @param person The person being evaluated.
-     * @param daysOfEducation The number of days the person has been in education.
      * @param resources The resource bundle containing localization strings.
      * @return true if the person should drop out, false otherwise.
      */
-    private static boolean checkForDropout(Campaign campaign, Academy academy, Person person, int daysOfEducation, ResourceBundle resources) {
+    private static boolean checkForDropout(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         int roll;
         int diceSize;
 
@@ -544,7 +538,7 @@ public class EducationController {
         if (diceSize > 0) {
             if (roll == 0) {
                 // we add this limiter to avoid a bad play experience when someone drops out in the final stretch
-                if (daysOfEducation >= 10) {
+                if (person.getEduEducationTime() >= 10) {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
                 } else {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
@@ -573,7 +567,7 @@ public class EducationController {
     private static boolean checkForAcademyFactionConflict(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (academy.isFactionConflict(campaign, person)) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWarExpelled.text"));
-            person.setEduDaysOfEducation(0);
+            person.setEduEducationTime(0);
 
             return true;
         }
@@ -592,7 +586,7 @@ public class EducationController {
     private static boolean checkForAcademyClosure(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (campaign.getLocalDate().getYear() >= academy.getClosureYear()) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventClosure.text"));
-            person.setEduDaysOfEducation(0);
+            person.setEduEducationTime(0);
 
             return true;
         }
@@ -613,15 +607,15 @@ public class EducationController {
             if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
                 if (Compute.d6(2) >= 5) {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
-                    person.setEduDaysOfEducation(0);
+                    person.setEduEducationTime(0);
                 } else {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestructionKilled.text"));
                     person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
-                    person.setEduDaysOfEducation(0);
+                    person.setEduEducationTime(0);
                 }
             } else {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
-                person.setEduDaysOfEducation(0);
+                person.setEduEducationTime(0);
             }
             return true;
         }
@@ -657,7 +651,7 @@ public class EducationController {
             roll = Compute.d6(3);
             campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedClassNeeded.text"), roll));
 
-            person.setEduDaysOfEducation(roll);
+            person.setEduEducationTime(roll);
 
             return false;
         }
