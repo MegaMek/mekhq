@@ -34,6 +34,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.event.PersonChangedEvent;
 import mekhq.campaign.event.PersonLogEvent;
+import mekhq.campaign.event.PersonStatusChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.LogEntry;
@@ -405,9 +406,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         individualAcademyAttributes.add(academy.getName());
 
                         academyAttributesMap.put(person.getId(), individualAcademyAttributes);
-
-                        person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), PersonnelStatus.ACTIVE);
                     }
+
+                    MekHQ.triggerEvent(new PersonStatusChangedEvent(person));
                 }
 
                 if (!graduatingPersonnel.isEmpty()) {

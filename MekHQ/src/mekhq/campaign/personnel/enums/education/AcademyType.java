@@ -97,33 +97,34 @@ public enum AcademyType {
  * Parses a given string and returns the corresponding AcademyType.
  * Accepts either the ENUM ordinal value, or its name
  *
- * @param text the string to be parsed
+ * @param academyType the string to be parsed
  * @return the AcademyType object that corresponds to the given string
  * @throws IllegalStateException if the given string does not match any valid AcademyType
  */
 //region File I/O
-    public static AcademyType parseFromString(final String text) {
-        switch (Integer.parseInt(text)) {
-            case 0:
+    public static AcademyType parseFromString(final String academyType) {
+        switch (academyType) {
+            case "None":
                 return NONE;
-            case 1:
+            case "High School":
                 return HIGH_SCHOOL;
-            case 2:
+            case "College":
                 return COLLEGE;
-            case 3:
+            case "University":
                 return UNIVERSITY;
-            case 4:
+            case "Military Academy":
                 return MILITARY_ACADEMY;
-            case 5:
+            case "Basic Training":
                 return BASIC_TRAINING;
-            case 6:
+            case "NCO Academy":
                 return NCO_ACADEMY;
-            case 7:
+            case "Warrant Officer Academy":
                 return WARRANT_OFFICER_ACADEMY;
-            case 8:
+            case "Officer Academy":
                 return OFFICER_ACADEMY;
             default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/AcademyType.java/parseFromString: " + Integer.parseInt(text));
+                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/enums/education/AcademyType.java/parseFromString: "
+                        + academyType);
         }
     }
     //endregion File I/O
