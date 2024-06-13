@@ -28,6 +28,7 @@ public enum EducationStage {
     JOURNEY_TO_CAMPUS("EducationStage.JOURNEY_TO_CAMPUS.text", "EducationStage.JOURNEY_TO_CAMPUS.toolTipText"),
     EDUCATION("EducationStage.EDUCATION.text", "EducationStage.EDUCATION.toolTipText"),
     GRADUATING("EducationStage.GRADUATING.text", "EducationStage.GRADUATING.toolTipText"),
+    DROPPING_OUT("EducationStage.DROPPING_OUT.text", "EducationStage.DROPPING_OUT.toolTipText"),
     JOURNEY_FROM_CAMPUS("EducationStage.JOURNEY_FROM_CAMPUS.text", "EducationStage.JOURNEY_FROM_CAMPUS.toolTipText");
     //endregion Enum Declarations
 
@@ -68,6 +69,10 @@ public enum EducationStage {
         return this == GRADUATING;
     }
 
+    public boolean isDroppingOut() {
+        return this == DROPPING_OUT;
+    }
+
     public boolean isJourneyFromCampus() {
         return this == JOURNEY_FROM_CAMPUS;
     }
@@ -84,6 +89,8 @@ public enum EducationStage {
                 return EDUCATION;
             case "Graduating":
                 return GRADUATING;
+            case "Dropping Out":
+                return DROPPING_OUT;
             case "Journeying from Campus":
                 return JOURNEY_FROM_CAMPUS;
             default:

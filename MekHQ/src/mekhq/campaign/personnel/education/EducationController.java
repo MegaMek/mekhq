@@ -265,7 +265,7 @@ public class EducationController {
         }
 
         // if education has concluded and the journey home hasn't started, we begin the journey
-        if (educationStage == EducationStage.GRADUATING) {
+        if ((educationStage == EducationStage.GRADUATING) || (educationStage == EducationStage.DROPPING_OUT)) {
             beginJourneyHome(campaign, person, resources);
             return false;
         }
@@ -554,10 +554,11 @@ public class EducationController {
         }
 
         if (diceSize > 0) {
-            if (roll == 0) {
+            if ((diceSize == 1) || (roll == 0)) {
                 // we add this limiter to avoid a bad play experience when someone drops out in the final stretch
                 if (person.getEduEducationTime() >= 10) {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
+                    person.setEduEducationStage(EducationStage.DROPPING_OUT);
                 } else {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
                 }
@@ -585,7 +586,7 @@ public class EducationController {
     private static boolean checkForAcademyFactionConflict(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (academy.isFactionConflict(campaign, person)) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventWarExpelled.text"));
-            person.setEduEducationTime(0);
+            person.setEduEducationStage(EducationStage.DROPPING_OUT);
 
             return true;
         }
@@ -604,7 +605,7 @@ public class EducationController {
     private static boolean checkForAcademyClosure(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (campaign.getLocalDate().getYear() >= academy.getClosureYear()) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventClosure.text"));
-            person.setEduEducationTime(0);
+            person.setEduEducationStage(EducationStage.DROPPING_OUT);
 
             return true;
         }
@@ -625,15 +626,14 @@ public class EducationController {
             if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
                 if (Compute.d6(2) >= 5) {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
-                    person.setEduEducationTime(0);
+                    person.setEduEducationStage(EducationStage.DROPPING_OUT);
                 } else {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestructionKilled.text"));
                     person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
-                    person.setEduEducationTime(0);
                 }
             } else {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
-                person.setEduEducationTime(0);
+                person.setEduEducationStage(EducationStage.DROPPING_OUT);
             }
             return true;
         }

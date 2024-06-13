@@ -384,7 +384,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     switch (educationStage) {
                         case JOURNEY_TO_CAMPUS:
                         case JOURNEY_FROM_CAMPUS:
-                            person.setEduJourneyTime(1);
+                            // this should be enough to ensure even the most distant academy is reached/returned from
+                            person.setEduDaysOfTravel(9999);
                             break;
                         case EDUCATION:
                             if (!academy.isPrepSchool()) {
@@ -2604,7 +2605,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         boolean showIneligibleAcademies = campaign.getCampaignOptions().isEnableShowIneligibleAcademies();
         // has the academy been constructed, is still standing, & has not closed?
 
-        LogManager.getLogger().info(academy.getName());
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {

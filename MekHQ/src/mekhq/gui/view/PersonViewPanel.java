@@ -1629,6 +1629,7 @@ public class PersonViewPanel extends JScrollablePanel {
                         firsty++;
                         break;
                     case GRADUATING:
+                    case DROPPING_OUT:
                     case NONE:
                         break;
                 }

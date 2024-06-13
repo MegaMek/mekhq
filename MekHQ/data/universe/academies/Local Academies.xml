@@ -9,7 +9,7 @@
         <constructionYear>2300</constructionYear>
         <tuition>47500</tuition>
         <durationDays>1</durationDays>
-        <educationLevelMax>0</educationLevelMax>
+        <educationLevelMax>Early Childhood</educationLevelMax>
         <ageMax>10</ageMax>
         <qualification>General Education</qualification>
         <curriculum>Bonus XP</curriculum>
@@ -73,7 +73,7 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>6250</tuition>
-        <educationLevelMax>0</educationLevelMax>
+        <educationLevelMax>Early Childhood</educationLevelMax>
         <facultySkill>8</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
@@ -118,8 +118,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>5000</tuition>
         <durationDays>600</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced BattleMech Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
@@ -145,8 +145,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>5000</tuition>
         <durationDays>600</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Vocational Administrator</qualification>
         <curriculum>Administration</curriculum>
@@ -168,8 +168,8 @@
         <tuition>7500</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Bachelor's in Advanced BattleMech Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
@@ -209,8 +209,8 @@
         <tuition>7500</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>3</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>Post-Graduate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Masters's in Advanced BattleMech Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
@@ -250,8 +250,8 @@
         <tuition>7500</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>3</educationLevelMin>
-        <educationLevelMax>4</educationLevelMax>
+        <educationLevelMin>Post-Graduate</educationLevelMin>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Doctorate in Advanced BattleMech Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
@@ -289,8 +289,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>750</tuition>
         <durationDays>70</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>1</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>High School</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Field Officer Training</qualification>
         <curriculum>Small Arms</curriculum>
@@ -308,8 +308,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>1750</tuition>
         <durationDays>150</durationDays>
-        <educationLevelMin>0</educationLevelMin>
-        <educationLevelMax>0</educationLevelMax>
+        <educationLevelMin>Early Childhood</educationLevelMin>
+        <educationLevelMax>Early Childhood</educationLevelMax>
         <qualification>Reeducation &amp; Social Encouragement</qualification>
         <curriculum>Bonus XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -325,7 +325,7 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>1250</tuition>
-        <educationLevelMax>0</educationLevelMax>
+        <educationLevelMax>Early Childhood</educationLevelMax>
         <durationDays>70</durationDays>
         <facultySkill>8</facultySkill>
         <ageMin>16</ageMin>
@@ -357,8 +357,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>3500</tuition>
         <durationDays>600</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Academy</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
@@ -396,8 +396,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>3000</tuition>
         <durationDays>70</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>1</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>High School</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>NCO Graduate</qualification>
         <curriculum>Leadership</curriculum>
@@ -415,8 +415,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>7000</tuition>
         <durationDays>300</durationDays>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Warrant Officer Graduate</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -433,8 +433,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>7000</tuition>
         <durationDays>300</durationDays>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Field Officer Graduate</qualification>
         <curriculum>Leadership, Tactics</curriculum>
