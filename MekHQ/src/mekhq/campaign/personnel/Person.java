@@ -262,7 +262,7 @@ public class Person {
     }
 
     public Person(final String givenName, final String surname, final Campaign campaign) {
-        this(givenName, surname, campaign, campaign.getFactionCode());
+        this(givenName, surname, campaign, campaign.getFaction().getShortName());
     }
 
     public Person(final String givenName, final String surname, final @Nullable Campaign campaign,
