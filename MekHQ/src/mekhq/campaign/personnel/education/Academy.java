@@ -26,6 +26,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -41,17 +42,8 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "name")
     private String name = "Error: Name Missing";
 
-    // 0: none
-    // 1: high school
-    // 2: college
-    // 3: university
-    // 4: military academy
-    // 5: basic training
-    // 6: nco academy
-    // 7: warrant officer academy
-    // 8: officer academy
     @XmlElement(name = "type")
-    private int type = 0;
+    private AcademyType type = AcademyType.NONE;
 
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary = false;
@@ -172,7 +164,7 @@ public class Academy implements Comparable<Academy> {
      * @param baseAcademicSkillLevel  the base skill level provided by the academy
      * @param id                      the id number of the academy, used for sorting academies in mhq
      */
-    public Academy(String set, String name, int type, Boolean isMilitary, Boolean isReeducationCamp, String promotion,
+    public Academy(String set, String name, AcademyType type, Boolean isMilitary, Boolean isReeducationCamp, String promotion,
                    Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
                    String faction, List<String> locationSystems, Boolean isLocal, Integer constructionYear,
                    Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
@@ -251,7 +243,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The type of academy.
      */
-    public int getType() {
+    public AcademyType getType() {
         return type;
     }
 
@@ -260,7 +252,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param type the type to be set.
      */
-    public void setType(final int type) {
+    public void setType(final AcademyType type) {
         this.type = type;
     }
 

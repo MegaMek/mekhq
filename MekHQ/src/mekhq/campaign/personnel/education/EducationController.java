@@ -103,7 +103,7 @@ public class EducationController {
 
         // if the academy is Local, we need to generate a name, otherwise we use the listed name
         if (academy.isLocal()) {
-            person.setEduAcademyName(generateName(campaign, person, academy, courseIndex, campus));
+            person.setEduAcademyName(generateName(academy, campus));
         } else {
             person.setEduAcademyName(person.getEduAcademyNameInSet() + " (" + campus + ')');
         }
@@ -243,7 +243,7 @@ public class EducationController {
 
         // if education has concluded and the journey home hasn't started, we begin the journey
         if (educationStage == 4) {
-            beginJourneyHome(campaign, person, academy, resources);
+            beginJourneyHome(campaign, person, resources);
             return false;
         }
 
@@ -339,7 +339,7 @@ public class EducationController {
      * @param person the person to determine graduation for
      * @param academy the academy to determine graduation from
      * @param resources the resources to use for graduation
-     * @return true, if the person successfully graduates; otherwise, false
+     * @return true, if the person successfully graduates, otherwise, false
      */
     private static boolean graduationPicker(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         if (academy.isPrepSchool()) {

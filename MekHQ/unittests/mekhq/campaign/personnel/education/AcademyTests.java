@@ -3,6 +3,7 @@ package mekhq.campaign.personnel.education;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,7 @@ class AcademyTests {
 
     @Test
     void testAcademyCreationAllFields() {
-        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", 0, true,
+        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", AcademyType.COLLEGE, true,
                 false, "Colonel", true,
                 "Top level MechWarrior Training", 20, true,
                 "FWL", Arrays.asList("Sol", "Terra"), false, 3045,
@@ -49,7 +50,7 @@ class AcademyTests {
                 Arrays.asList("Combat", "Strategy"), Arrays.asList(3050, 3055), 5, 101);
 
         assertEquals("MekWarrior Academy", academy.getName());
-        assertEquals(0, academy.getType());
+        assertEquals(AcademyType.NONE, academy.getType());
         assertTrue(academy.isMilitary());
         assertEquals("Colonel", academy.getPromotion());
         assertEquals(20, academy.getFactionDiscount());
