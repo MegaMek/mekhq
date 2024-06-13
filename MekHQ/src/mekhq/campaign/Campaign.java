@@ -82,6 +82,7 @@ import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.generator.DefaultPersonnelGenerator;
 import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
@@ -1422,6 +1423,11 @@ public class Campaign implements ITechManager {
         // Assign a random portrait after we generate a new person
         if (getCampaignOptions().isUsePortraitForRole(primaryRole)) {
             assignRandomPortraitFor(person);
+        }
+
+        // TODO remove this once we have the Personnel Histories module
+        if (person.getAge(getLocalDate()) >= 16) {
+            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
         }
 
         return person;

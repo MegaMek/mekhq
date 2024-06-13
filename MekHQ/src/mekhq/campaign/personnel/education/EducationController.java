@@ -8,6 +8,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
@@ -738,12 +739,12 @@ public class EducationController {
      * @param resources  the resource bundle containing localized strings
      */
     private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, ResourceBundle resources) {
-        if (person.getEduHighestEducation() == 3) {
+        if (person.getEduHighestEducation().isPostGraduate()) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedMasters.text"));
 
             ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName());
 
-        } else if (person.getEduHighestEducation() == 4) {
+        } else if (person.getEduHighestEducation().isDoctorate()) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedDoctorate.text"));
 
             ServiceLogger.eduGraduatedDoctorate(person, campaign.getLocalDate(), person.getEduAcademyName());
@@ -798,8 +799,9 @@ public class EducationController {
 
         int educationLevel = academy.getEducationLevel(person);
 
-        if (person.getEduHighestEducation() < educationLevel) {
-            person.setEduHighestEducation(educationLevel);
+        if (EducationLevel.parseToInt(person.getEduHighestEducation()) < educationLevel) {
+            LogManager.getLogger().info(educationLevel);
+            person.setEduHighestEducation(EducationLevel.parseFromInt(educationLevel));
         }
 
         if ((academy.isReeducationCamp()) && (campaign.getCampaignOptions().isUseReeducationCamps())) {

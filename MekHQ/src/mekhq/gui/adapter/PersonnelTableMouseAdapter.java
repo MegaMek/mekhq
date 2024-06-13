@@ -44,6 +44,7 @@ import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.AcademyFactory;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -1468,10 +1469,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         //region Education Menu
         // TODO remove this once we have the Personnel Histories module
-        // this tells mhq that all adults have completed high school.
+        // this tells mhq that all characters over 16 have completed high school.
         // this helps grandfather in existing campaign personnel.
-        if ((!person.isChild(gui.getCampaign().getLocalDate())) && (person.getEduHighestEducation() < 1)) {
-            person.setEduHighestEducation(1);
+        if ((person.getAge(gui.getCampaign().getLocalDate()) >= 16) && (EducationLevel.parseToInt(person.getEduHighestEducation()) < 1)) {
+            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
         }
 
         if (gui.getCampaign().getCampaignOptions().isUseEducationModule()) {
@@ -2585,6 +2586,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private void buildEducationMenusSingleton(Campaign campaign, Person person, Academy academy, JMenu militaryMenu, JMenu civilianMenu) {
         boolean showIneligibleAcademies = campaign.getCampaignOptions().isEnableShowIneligibleAcademies();
         // has the academy been constructed, is still standing, & has not closed?
+
+        LogManager.getLogger().info(academy.getName());
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {
@@ -2596,12 +2599,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     JMenuItem academyOption;
 
                     if (academy.getAgeMax() != 9999) {
-                        academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduAgeConflictRange.text")
-                                .replaceAll("ageA", String.valueOf(academy.getAgeMin()))
-                                .replaceAll("ageB", String.valueOf(academy.getAgeMax())));
+                        academyOption = new JMenuItem("<html>" + academy.getName()
+                                + String.format(resources.getString("eduAgeConflictRange.text"), academy.getAgeMin(), academy.getAgeMax())
+                                + "</html>");
                     } else {
-                        academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduAgeConflictPlus.text")
-                                .replaceAll("0", String.valueOf(academy.getAgeMin())));
+                        academyOption = new JMenuItem("<html>" + academy.getName()
+                                + String.format(resources.getString("eduAgeConflictPlus.text"), academy.getAgeMin()));
                     }
 
                     educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
@@ -2609,8 +2612,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 // is the applicant qualified?
             } else if (!academy.isQualified(person)) {
                 if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowUnqualified())) {
-                    JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduUnqualified.text")
-                            .replaceAll("0", String.valueOf(academy.getEducationLevelMin())));
+                    JMenuItem academyOption = new JMenuItem("<html>" + academy.getName()
+                            + String.format(resources.getString("eduUnqualified.text"), academy.getEducationLevelMin()));
                     educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
                 }
             } else if (academy.isLocal()) {

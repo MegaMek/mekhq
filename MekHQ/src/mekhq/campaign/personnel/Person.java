@@ -46,6 +46,7 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -193,7 +194,7 @@ public class Person {
     //endregion Against the Bot
 
     //region Education
-    private int eduHighestEducation;
+    private EducationLevel eduHighestEducation;
     private String eduAcademyName;
     private String eduAcademySet;
     private String eduAcademyNameInSet;
@@ -346,7 +347,7 @@ public class Person {
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
         acquisitions = 0;
-        eduHighestEducation = 0;
+        eduHighestEducation = EducationLevel.EARLY_CHILDHOOD;
         eduAcademyName = null;
         eduAcademySystem = null;
         eduCourseIndex = 0;
@@ -1372,11 +1373,11 @@ public class Person {
         this.biography = biography;
     }
 
-    public int getEduHighestEducation() {
+    public EducationLevel getEduHighestEducation() {
         return eduHighestEducation;
     }
 
-    public void setEduHighestEducation(final int eduHighestEducation) {
+    public void setEduHighestEducation(final EducationLevel eduHighestEducation) {
         this.eduHighestEducation = eduHighestEducation;
     }
 
@@ -1753,8 +1754,8 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitions", acquisitions);
             }
 
-            if (eduHighestEducation != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation);
+            if (eduHighestEducation != EducationLevel.EARLY_CHILDHOOD) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation.toString());
             }
 
             if (eduDaysOfTravelToAcademy != 0) {
@@ -2106,7 +2107,7 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduHighestEducation")) {
-                    retVal.eduHighestEducation = Integer.parseInt(wn2.getTextContent());
+                    retVal.eduHighestEducation = EducationLevel.parseFromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelToAcademy")) {
                     retVal.eduDaysOfTravelToAcademy = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelFromAcademy")) {

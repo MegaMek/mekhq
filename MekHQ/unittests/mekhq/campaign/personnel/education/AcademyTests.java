@@ -4,6 +4,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.education.AcademyType;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class AcademyTests {
                 "Top level MechWarrior Training", 20, true,
                 "FWL", Arrays.asList("Sol", "Terra"), false, 3045,
                 3089, 3099, 2000, 365, 10,
-                1, 4, 18, 35, Arrays.asList("MechWarrior", "Leadership"),
+                EducationLevel.EARLY_CHILDHOOD, EducationLevel.DOCTORATE, 18, 35, Arrays.asList("MechWarrior", "Leadership"),
                 Arrays.asList("Combat", "Strategy"), Arrays.asList(3050, 3055), 5, 101);
 
         assertEquals("MekWarrior Academy", academy.getName());
@@ -76,39 +77,40 @@ class AcademyTests {
         assertTrue(academy1.compareTo(academy2) < 0);
     }
 
-    @Test
-    void testGetTuitionAdjustedLowEducationLevel() {
+    @Test void testGetTuitionAdjustedLowEducationLevel() {
         Academy academy = new Academy();
         academy.setTuition(1000);
+        academy.setEducationLevelMin(EducationLevel.EARLY_CHILDHOOD);
+        academy.setEducationLevelMax(EducationLevel.HIGH_SCHOOL);
         Person person = Mockito.mock(Person.class);
-        when(person.getEduHighestEducation()).thenReturn(1);
+        when(person.getEduHighestEducation()).thenReturn(EducationLevel.HIGH_SCHOOL);
         assertEquals(1000, academy.getTuitionAdjusted(person));
     }
 
     @Test void testGetTuitionAdjustedHighEducationLevel() {
         Academy academy = new Academy();
         academy.setTuition(1000);
-        academy.setEducationLevelMin(0);
-        academy.setEducationLevelMax(3);
+        academy.setEducationLevelMin(EducationLevel.HIGH_SCHOOL);
+        academy.setEducationLevelMax(EducationLevel.POST_GRADUATE);
         Person person = Mockito.mock(Person.class);
-        when(person.getEduHighestEducation()).thenReturn(3);
+        when(person.getEduHighestEducation()).thenReturn(EducationLevel.COLLEGE);
         assertEquals(3000, academy.getTuitionAdjusted(person));
     }
 
     @Test void testIsQualifiedTrue() {
         Academy academy = new Academy();
-        academy.setEducationLevelMin(3);
+        academy.setEducationLevelMin(EducationLevel.COLLEGE);
         Person person = Mockito.mock(Person.class);
-        when(person.getEduHighestEducation()).thenReturn(4);
+        when(person.getEduHighestEducation()).thenReturn(EducationLevel.POST_GRADUATE);
         assertTrue(academy.isQualified(person));
     }
 
     @Test
     void testIsQualifiedFalse() {
         Academy academy = new Academy();
-        academy.setEducationLevelMin(3);
+        academy.setEducationLevelMin(EducationLevel.COLLEGE);
         Person person = Mockito.mock(Person.class);
-        when(person.getEduHighestEducation()).thenReturn(2);
+        when(person.getEduHighestEducation()).thenReturn(EducationLevel.EARLY_CHILDHOOD);
         assertFalse(academy.isQualified(person));
     }
 
