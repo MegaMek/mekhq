@@ -1034,24 +1034,22 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         } catch (NumberFormatException ignored) {}
 
+        try {
+            person.setFatigue(Integer.parseInt(textFatigue.getText()));
+        } catch (NumberFormatException ignored) {}
+
         if (null == choiceOriginalUnit.getSelectedItem()) {
-            try {
-                person.setFatigue(Integer.parseInt(textFatigue.getText()));
-            } catch (NumberFormatException ignored) {}
-
-            if (choiceOriginalUnit.getSelectedItem() == null) {
-                person.setOriginalUnit(null);
-                person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
-                person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
-            } else {
-                person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
-            }
-
-            person.setFounder(chkFounder.isSelected());
-            setSkills();
-            setOptions();
-            setVisible(false);
+            person.setOriginalUnit(null);
+            person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
+            person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
+        } else {
+            person.setOriginalUnit((Unit) choiceOriginalUnit.getSelectedItem());
         }
+
+        person.setFounder(chkFounder.isSelected());
+        setSkills();
+        setOptions();
+        setVisible(false);
     }
 
     private void randomName() {
