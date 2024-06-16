@@ -84,6 +84,13 @@ MEKHQ VERSION HISTORY:
 + Fix #4182: Added Nag to Alert Users at Contract End fix
 + PR #4187: Restored Missing Code for Scenario Modifier Options & Campaign Option Layout Tweaks
 + PR #4188: Added Campaign Start Date Logging to Campaign
++ Fix #4203: Fixed Monthly Unit Market Incorrectly Filtering Out Vehicles
++ PR #4205: Fixed bug in Company Generator, add word Dragoon in front of Dragoon rating.
++ PR #4202: Added Parsing for "campaignStartDate" on Campaign Load
++ PR #4201: Fixed Intersected Conditions in CustomizePersonDialog.java
++ PR #4199: Updated PersonnelTableMouseAdapter to Support Enrolling Multiple Personnel
++ PR #4197: Updated Default Support Personnel Counts in Company Generator
++ Fix 2405: Added Variable Unit Quality to Salvaged Units
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
