@@ -25,7 +25,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
-import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
 import megamek.common.enums.Gender;
@@ -38,6 +37,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
@@ -94,9 +94,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JPanel panSkills;
     private JPanel panOptions;
     private JTextField textToughness;
+    private JComboBox<EducationLevel> textEducationLevel;
     private JTextField textFatigue;
     private JTextField textLoyalty;
-    private JTextField textEducationLevel;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -191,11 +191,11 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textBloodname = new JTextField();
         textToughness = new JTextField();
         JLabel lblToughness = new JLabel();
+        textEducationLevel = new JComboBox<>();
         textFatigue = new JTextField();
         JLabel lblFatigue = new JLabel();
         textLoyalty = new JTextField();
         JLabel lblLoyalty = new JLabel();
-        textEducationLevel = new JTextField();
         JLabel lblEducationLevel = new JLabel();
 
         JButton btnRandomName = new JButton();
@@ -637,7 +637,10 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
         lblEducationLevel.setName("lblEducationLevel");
 
-        textEducationLevel.setText(Integer.toString(person.getEduHighestEducation()));
+        for (EducationLevel level : EducationLevel.values()) {
+            textEducationLevel.addItem(level);
+        }
+
         textEducationLevel.setName("textEducationLevel");
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
@@ -1377,7 +1380,7 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         } catch (NumberFormatException ignored) { }
 
         try {
-            person.setEduHighestEducation(MathUtility.clamp(Integer.parseInt(textEducationLevel.getText()), 0, 4));
+            person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         } catch (NumberFormatException ignored) {}
         person.setPortrait(portrait);
         int xpSpent = xpPool - getSkillXpSpent();
