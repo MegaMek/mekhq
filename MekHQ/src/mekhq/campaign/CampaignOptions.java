@@ -386,10 +386,8 @@ public class CampaignOptions {
     private boolean useEducationModule;
     private Integer maximumJumpCount;
     private boolean useReeducationCamps;
-    private boolean useTruebornTravelException;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
-    private boolean enableClanEducation;
     private boolean enableShowIneligibleAcademies;
     private boolean enableShowAgeConflict;
     private boolean enableShowUnqualified;
@@ -400,18 +398,8 @@ public class CampaignOptions {
     private boolean enableBonuses;
     private Integer adultDropoutChance;
     private Integer childrenDropoutChance;
-    private Integer warriorCasteDropOutChance;
-    private Integer otherCasteDropOutChance;
     private boolean allAges;
     private Integer militaryAcademyAccidents;
-    private Integer warriorCasteAccidents;
-    private Integer otherCasteAccidents;
-    private boolean liveFireBlooding;
-    private SecondChanceCaste secondChanceCaste;
-    private Integer fallbackScientist;
-    private Integer fallbackMerchant;
-    private Integer fallbackTechnician;
-    private Integer fallbackLabor;
 
     // Death
     private boolean keepMarriedNameUponSpouseDeath;
@@ -907,10 +895,8 @@ public class CampaignOptions {
         setUseEducationModule(true);
         setMaximumJumpCount(5);
         setUseReeducationCamps(true);
-        setUseTruebornTravelException(true);
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
-        setEnableClanEducation(true);
         setEnableShowIneligibleAcademies(true);
         setEnableShowAgeConflict(true);
         setEnableShowUnqualified(true);
@@ -921,18 +907,8 @@ public class CampaignOptions {
         setEnableBonuses(true);
         setAdultDropoutChance(1000);
         setChildrenDropoutChance(10000);
-        setWarriorCasteDropOutChance(500);
-        setOtherCasteDropOutChance(5000);
         setAllAges(false);
         setMilitaryAcademyAccidents(10000);
-        setWarriorCasteAccidents(250);
-        setOtherCasteAccidents(5000);
-        setLiveFireBlooding(true);
-        setSecondChanceCaste(SecondChanceCaste.NONE);
-        setFallbackScientist(6);
-        setFallbackMerchant(12);
-        setFallbackTechnician(5);
-        setFallbackLabor(31);
 
         // Death
         setKeepMarriedNameUponSpouseDeath(true);
@@ -2728,14 +2704,6 @@ public class CampaignOptions {
         this.useReeducationCamps = useReeducationCamps;
     }
 
-    public boolean isUseTruebornTravelException() {
-        return useTruebornTravelException;
-    }
-
-    public void setUseTruebornTravelException(boolean useTruebornTravelException) {
-        this.useTruebornTravelException = useTruebornTravelException;
-    }
-
     public boolean isEnableLocalAcademies() {
         return enableLocalAcademies;
     }
@@ -2750,14 +2718,6 @@ public class CampaignOptions {
 
     public void setEnablePrestigiousAcademies(boolean enablePrestigiousAcademies) {
         this.enablePrestigiousAcademies = enablePrestigiousAcademies;
-    }
-
-    public boolean isEnableClanEducation() {
-        return enableClanEducation;
-    }
-
-    public void setEnableClanEducation(boolean enableClanEducation) {
-        this.enableClanEducation = enableClanEducation;
     }
 
     public boolean isEnableShowIneligibleAcademies() {
@@ -2840,22 +2800,6 @@ public class CampaignOptions {
         this.childrenDropoutChance = childrenDropoutChance;
     }
 
-    public Integer getWarriorCasteDropOutChance() {
-        return warriorCasteDropOutChance;
-    }
-
-    public void setWarriorCasteDropOutChance(Integer warriorCasteDropOutChance) {
-        this.warriorCasteDropOutChance = warriorCasteDropOutChance;
-    }
-
-    public Integer getOtherCasteDropOutChance() {
-        return otherCasteDropOutChance;
-    }
-
-    public void setOtherCasteDropOutChance(Integer otherCasteDropOutChance) {
-        this.otherCasteDropOutChance = otherCasteDropOutChance;
-    }
-
     public boolean isAllAges() {
         return allAges;
     }
@@ -2870,70 +2814,6 @@ public class CampaignOptions {
 
     public void setMilitaryAcademyAccidents(Integer militaryAcademyAccidents) {
         this.militaryAcademyAccidents = militaryAcademyAccidents;
-    }
-
-    public Integer getWarriorCasteAccidents() {
-        return warriorCasteAccidents;
-    }
-
-    public void setWarriorCasteAccidents(Integer warriorCasteAccidents) {
-        this.warriorCasteAccidents = warriorCasteAccidents;
-    }
-
-    public Integer getOtherCasteAccidents() {
-        return otherCasteAccidents;
-    }
-
-    public void setOtherCasteAccidents(Integer otherCasteAccidents) {
-        this.otherCasteAccidents = otherCasteAccidents;
-    }
-
-    public boolean isLiveFireBlooding() {
-        return liveFireBlooding;
-    }
-
-    public void setLiveFireBlooding(boolean liveFireBlooding) {
-        this.liveFireBlooding = liveFireBlooding;
-    }
-
-    public SecondChanceCaste getSecondChanceCaste() {
-        return secondChanceCaste;
-    }
-
-    public void setSecondChanceCaste(final SecondChanceCaste secondChanceCaste) {
-        this.secondChanceCaste = secondChanceCaste;
-    }
-
-    public Integer getFallbackScientist() {
-        return fallbackScientist;
-    }
-
-    public void setFallbackScientist(Integer fallbackScientist) {
-        this.fallbackScientist = fallbackScientist;
-    }
-
-    public Integer getFallbackMerchant() {
-        return fallbackMerchant;
-    }
-
-    public void setFallbackMerchant(Integer fallbackMerchant) {
-        this.fallbackMerchant = fallbackMerchant;
-    }
-
-    public Integer getFallbackTechnician() {
-        return fallbackTechnician;
-    }
-
-    public void setFallbackTechnician(Integer fallbackTechnician) {
-        this.fallbackTechnician = fallbackTechnician;
-    }
-
-    public Integer getFallbackLabor() {
-        return fallbackLabor;
-    }
-
-    public void setFallbackLabor(Integer fallbackLabor) {
-        this.fallbackLabor = fallbackLabor;
     }
 
     /**
@@ -4841,10 +4721,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCount", getMaximumJumpCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReeducationCamps", isUseReeducationCamps());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTruebornTravelException", isUseTruebornTravelException());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableClanEducation", isEnableClanEducation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowAgeConflict", isEnableShowAgeConflict());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowUnqualified", isEnableShowUnqualified());
@@ -4855,18 +4733,8 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableBonuses", isEnableBonuses());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adultDropoutChance", getAdultDropoutChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childrenDropoutChance", getChildrenDropoutChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "warriorCasteDropOutChance", getWarriorCasteDropOutChance());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "otherCasteDropOutChance", getOtherCasteDropOutChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "allAges", isAllAges());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "militaryAcademyAccidents", getMilitaryAcademyAccidents());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "warriorCasteAccidents", getWarriorCasteAccidents());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "otherCasteAccidents", getOtherCasteAccidents());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "liveFireBlooding", isLiveFireBlooding());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondChanceCaste", getSecondChanceCaste().name());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackScientist", getFallbackScientist());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackMerchant", getFallbackMerchant());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackTechnician", getFallbackTechnician());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fallbackLabor", getFallbackLabor());
         //endregion Education
 
         //region Death
@@ -5603,14 +5471,10 @@ public class CampaignOptions {
                     retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useReeducationCamps")) {
                     retVal.setUseReeducationCamps(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useTruebornTravelException")) {
-                    retVal.setUseTruebornTravelException(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableLocalAcademies")) {
                     retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
                     retVal.setEnablePrestigiousAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableClanEducation")) {
-                    retVal.setEnableClanEducation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
                     retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowAgeConflict")) {
@@ -5631,30 +5495,10 @@ public class CampaignOptions {
                     retVal.setAdultDropoutChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("childrenDropoutChance")) {
                     retVal.setChildrenDropoutChance(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("warriorCasteDropOutChance")) {
-                    retVal.setWarriorCasteDropOutChance(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("otherCasteDropOutChance")) {
-                    retVal.setOtherCasteDropOutChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("allAges")) {
                     retVal.setAllAges(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("militaryAcademyAccidents")) {
                     retVal.setMilitaryAcademyAccidents(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("warriorCasteAccidents")) {
-                    retVal.setWarriorCasteAccidents(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("otherCasteAccidents")) {
-                    retVal.setOtherCasteAccidents(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("liveFireBlooding")) {
-                    retVal.setLiveFireBlooding(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("secondChanceCaste")) {
-                    retVal.setSecondChanceCaste(SecondChanceCaste.valueOf(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fallbackScientist")) {
-                    retVal.setFallbackScientist(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fallbackMerchant")) {
-                    retVal.setFallbackMerchant(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fallbackTechnician")) {
-                    retVal.setFallbackTechnician(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("fallbackLabor")) {
-                    retVal.setFallbackLabor(Integer.parseInt(wn2.getTextContent().trim()));
                     //endregion Education
 
                     //region Death

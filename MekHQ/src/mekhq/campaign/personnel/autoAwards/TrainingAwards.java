@@ -1,8 +1,27 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.education.AcademyType;
 import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
@@ -22,7 +41,7 @@ public class TrainingAwards {
         List<Award> eligibleAwards = new ArrayList<>();
 
         int academyEducationLevel;
-        int academyType;
+        AcademyType academyType;
         String academyName;
 
         // We start by prepping the data we're going to be comparing against and ensuring it's all valid
@@ -36,7 +55,7 @@ public class TrainingAwards {
         }
 
         try {
-            academyType = (int) academyAttributes.get(1);
+            academyType = (AcademyType) academyAttributes.get(1);
         } catch (ClassCastException e) {
             LogManager.getLogger().warn("{} has invalid academyType value '{}'. Aborting.",
                     student.getFullName(), academyAttributes.get(1).toString());
@@ -56,7 +75,7 @@ public class TrainingAwards {
         // Then we process the individual awards
         for (Award award : awards) {
             int requiredEducationLevel;
-            int requiredType;
+            AcademyType requiredType;
             String requiredAcademyName;
 
             try {
@@ -68,7 +87,7 @@ public class TrainingAwards {
             }
 
             try {
-                requiredType = Integer.parseInt(award.getSize());
+                requiredType = AcademyType.parseFromString(award.getSize());
             } catch (Exception e) {
                 LogManager.getLogger().warn("Award {} from the {} set has an invalid size value {}",
                         award.getName(), award.getSet(), award.getSize());
@@ -89,7 +108,7 @@ public class TrainingAwards {
                     continue;
                 }
 
-                if ((requiredType != 0) && (requiredType == academyType)) {
+                if ((requiredType != AcademyType.NONE) && (requiredType == academyType)) {
                     eligibleAwards.add(award);
                     continue;
                 }
