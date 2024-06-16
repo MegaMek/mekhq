@@ -37,6 +37,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
@@ -640,8 +641,6 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             textEducationLevel.addItem(level);
         }
 
-        textEducationLevel.setName("textEducationLevel");
-        textEducationLevel.setText(Integer.toString(person.getEduHighestEducation()));
         textEducationLevel.setName("textEducationLevel");
 
         if (campaign.getCampaignOptions().isUseEducationModule()) {
