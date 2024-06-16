@@ -542,6 +542,7 @@ public class CampaignOptions {
     private boolean useAero;
     private boolean useVehicles;
     private boolean clanVehicles;
+    private double atbCamOpsDivision;
 
     // Contract Operations
     private boolean mercSizeLimited;
@@ -1147,6 +1148,7 @@ public class CampaignOptions {
         useAero = false;
         useVehicles = true;
         clanVehicles = false;
+        atbCamOpsDivision = 2.5;
 
         // Contract Operations
         mercSizeLimited = false;
@@ -4067,6 +4069,14 @@ public class CampaignOptions {
         this.clanVehicles = clanVehicles;
     }
 
+    public double getAtbCamOpsDivision() {
+        return atbCamOpsDivision;
+    }
+
+    public void setAtbCamOpsDivision(final double atbCamOpsDivision) {
+        this.atbCamOpsDivision = atbCamOpsDivision;
+    }
+
     public boolean isDoubleVehicles() {
         return doubleVehicles;
     }
@@ -4844,6 +4854,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAero", useAero);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVehicles", useVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanVehicles", clanVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atbCamOpsDivision", atbCamOpsDivision);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doubleVehicles", doubleVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPlayerVehicles", adjustPlayerVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMechs", getOpForLanceTypeMechs());
@@ -5820,6 +5831,8 @@ public class CampaignOptions {
                     retVal.useVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanVehicles")) {
                     retVal.clanVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("atbCamOpsDivision")) {
+                    retVal.atbCamOpsDivision = Double.parseDouble(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doubleVehicles")) {
                     retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {
