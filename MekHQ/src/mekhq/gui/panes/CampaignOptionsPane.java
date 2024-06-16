@@ -293,6 +293,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseUnitRatingModifiers;
     private JCheckBox chkUseFactionModifiers;
     private JCheckBox chkUseMissionStatusModifiers;
+    private JCheckBox chkUseHostileTerritoryModifiers;
     private JCheckBox chkUseFamilyModifiers;
     private JCheckBox chkUseLoyaltyModifiers;
 
@@ -4542,6 +4543,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMissionStatusModifiers.setName("chkUseMissionStatusModifiers");
         chkUseMissionStatusModifiers.setEnabled(isUseTurnover);
 
+        chkUseHostileTerritoryModifiers = new JCheckBox(resources.getString("chkUseHostileTerritoryModifiers.text"));
+        chkUseHostileTerritoryModifiers.setToolTipText(resources.getString("chkUseHostileTerritoryModifiers.toolTipText"));
+        chkUseHostileTerritoryModifiers.setName("chkUseHostileTerritoryModifiers");
+        chkUseHostileTerritoryModifiers.setEnabled(isUseTurnover);
+
         chkUseFamilyModifiers = new JCheckBox(resources.getString("chkUseFamilyModifiers.text"));
         chkUseFamilyModifiers.setToolTipText(resources.getString("chkUseFamilyModifiers.toolTipText"));
         chkUseFamilyModifiers.setName("chkUseFamilyModifiers");
@@ -4580,6 +4586,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseAgeModifiers)
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
+                        .addComponent(chkUseHostileTerritoryModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
                         .addComponent(chkUseFamilyModifiers)
                         .addGap(15)
@@ -4595,6 +4602,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseAgeModifiers)
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
+                        .addComponent(chkUseHostileTerritoryModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
                         .addComponent(chkUseFamilyModifiers)
                         .addComponent(chkUseLoyaltyModifiers)
@@ -4889,7 +4897,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblManagementSkillPenalty.setName("lblManagementSkillPenalty");
         lblManagementSkillPenalty.setEnabled((isUseTurnover) && (isUseManagementSkill));
 
-        spnManagementSkillPenalty = new JSpinner(new SpinnerNumberModel(-2, -10, 0, 1));
+        spnManagementSkillPenalty = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
         spnManagementSkillPenalty.setToolTipText(resources.getString("lblManagementSkillPenalty.toolTipText"));
         spnManagementSkillPenalty.setName("spnManagementSkillPenalty");
         spnManagementSkillPenalty.setEnabled((isUseTurnover) && (isUseManagementSkill));
@@ -8303,6 +8311,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseAgeModifiers.setSelected(options.isUseAgeModifiers());
         chkUseUnitRatingModifiers.setSelected(options.isUseUnitRatingModifiers());
         chkUseFactionModifiers.setSelected(options.isUseFactionModifiers());
+        chkUseHostileTerritoryModifiers.setSelected(options.isUseHostileTerritoryModifiers());
         chkUseMissionStatusModifiers.setSelected(options.isUseMissionStatusModifiers());
         chkUseFamilyModifiers.setSelected(options.isUseFamilyModifiers());
         chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
@@ -9002,6 +9011,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseAgeModifiers(chkUseAgeModifiers.isSelected());
             options.setUseUnitRatingModifiers(chkUseUnitRatingModifiers.isSelected());
             options.setUseFactionModifiers(chkUseFactionModifiers.isSelected());
+            options.setUseHostileTerritoryModifiers(chkUseHostileTerritoryModifiers.isSelected());
             options.setUseMissionStatusModifiers(chkUseMissionStatusModifiers.isSelected());
             options.setUseFamilyModifiers(chkUseFamilyModifiers.isSelected());
             options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
