@@ -24,7 +24,6 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
-import megamek.codeUtilities.MathUtility;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
 import megamek.common.TechConstants;
@@ -37,6 +36,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
@@ -89,8 +89,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private AbstractMHQScrollablePanel optionsPanel;
     private JTextField textToughness;
     private JTextField textFatigue;
+    private JComboBox<EducationLevel> textEducationLevel;
     private JTextField textLoyalty;
-    private JTextField textEducationLevel;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -170,7 +170,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblLoyalty = new JLabel();
         textLoyalty = new JTextField();
         JLabel lblToughness = new JLabel();
-        textEducationLevel = new JTextField();
+        textEducationLevel = new JComboBox<>();
         JLabel lblEducationLevel = new JLabel();
         JScrollPane scrOptions = new JScrollPane();
         JScrollPane scrSkills = new JScrollPane();
@@ -652,29 +652,6 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
-        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
-        lblEducationLevel.setName("lblEducationLevel");
-
-        textEducationLevel.setText(Integer.toString(person.getEduHighestEducation()));
-        textEducationLevel.setName("textEducationLevel");
-
-        if (campaign.getCampaignOptions().isUseEducationModule()) {
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
-            panDemog.add(lblEducationLevel, gridBagConstraints);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = y;
-            gridBagConstraints.anchor = GridBagConstraints.WEST;
-            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-            panDemog.add(textEducationLevel, gridBagConstraints);
-
-            y++;
-        }
-
         lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
         lblFatigue.setName("lblFatigue");
 
@@ -694,6 +671,32 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             panDemog.add(textFatigue, gridBagConstraints);
+
+            y++;
+        }
+
+        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
+        lblEducationLevel.setName("lblEducationLevel");
+
+        for (EducationLevel level : EducationLevel.values()) {
+            textEducationLevel.addItem(level);
+        }
+        textEducationLevel.setSelectedItem(person.getEduHighestEducation());
+        textEducationLevel.setName("textEducationLevel");
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblEducationLevel, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textEducationLevel, gridBagConstraints);
 
             y++;
         }
@@ -1055,7 +1058,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         } catch (NumberFormatException ignored) {}
 
         try {
-            person.setEduHighestEducation(MathUtility.clamp(Integer.parseInt(textEducationLevel.getText()), 0, 4));
+            person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         } catch (NumberFormatException ignored) {}
 
         try {

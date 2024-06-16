@@ -47,6 +47,8 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -194,17 +196,16 @@ public class Person {
     //endregion Against the Bot
 
     //region Education
-    private int eduHighestEducation;
+    private EducationLevel eduHighestEducation;
     private String eduAcademyName;
     private String eduAcademySet;
     private String eduAcademyNameInSet;
     private String eduAcademyFaction;
     private String eduAcademySystem;
     private int eduCourseIndex;
-    private int eduEducationStage;
-    private int eduDaysOfTravelToAcademy;
-    private int eduDaysOfEducation;
-    private int eduDaysOfTravelFromAcademy;
+    private EducationStage eduEducationStage;
+    private int eduJourneyTime;
+    private int eduEducationTime;
     private int eduDaysOfTravel;
     //endregion Education
 
@@ -347,14 +348,13 @@ public class Person {
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
         acquisitions = 0;
-        eduHighestEducation = 0;
+        eduHighestEducation = EducationLevel.EARLY_CHILDHOOD;
         eduAcademyName = null;
         eduAcademySystem = null;
         eduCourseIndex = 0;
-        eduEducationStage = 0;
-        eduDaysOfTravelToAcademy = 0;
-        eduDaysOfEducation = 0;
-        eduDaysOfTravelFromAcademy = 0;
+        eduEducationStage = EducationStage.NONE;
+        eduJourneyTime = 0;
+        eduEducationTime = 0;
         eduDaysOfTravel = 0;
         eduAcademySet = null;
         eduAcademyNameInSet = null;
@@ -1064,12 +1064,10 @@ public class Person {
         this.setEduAcademyNameInSet(null);
         this.setEduAcademySystem(null);
         this.setEduCourseIndex(0);
-        this.setEduEducationStage(0);
-        this.setEduDaysOfTravelToAcademy(0);
-        this.setEduDaysOfTravelFromAcademy(0);
+        this.setEduEducationStage(EducationStage.NONE);
+        this.setEduEducationTime(0);
+        this.setEduJourneyTime(0);
         this.setEduDaysOfTravel(0);
-        this.setEduDaysOfEducation(0);
-        this.setEduEducationStage(0);
 
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }
@@ -1407,28 +1405,20 @@ public class Person {
         this.biography = biography;
     }
 
-    public int getEduHighestEducation() {
+    public EducationLevel getEduHighestEducation() {
         return eduHighestEducation;
     }
 
-    public void setEduHighestEducation(final int eduHighestEducation) {
+    public void setEduHighestEducation(final EducationLevel eduHighestEducation) {
         this.eduHighestEducation = eduHighestEducation;
     }
 
-    public int getEduDaysOfTravelToAcademy() {
-        return eduDaysOfTravelToAcademy;
+    public int getEduJourneyTime() {
+        return eduJourneyTime;
     }
 
-    public void setEduDaysOfTravelToAcademy(final int eduDaysOfTravelToAcademy) {
-        this.eduDaysOfTravelToAcademy = eduDaysOfTravelToAcademy;
-    }
-
-    public int getEduDaysOfTravelFromAcademy() {
-        return eduDaysOfTravelFromAcademy;
-    }
-
-    public void setEduDaysOfTravelFromAcademy(final int eduDaysOfTravelFromAcademy) {
-        this.eduDaysOfTravelFromAcademy = eduDaysOfTravelFromAcademy;
+    public void setEduJourneyTime(final int eduJourneyTime) {
+        this.eduJourneyTime = eduJourneyTime;
     }
 
     public int getEduDaysOfTravel() {
@@ -1439,12 +1429,19 @@ public class Person {
         this.eduDaysOfTravel = eduDaysOfTravel;
     }
 
-    public int getEduDaysOfEducation() {
-        return eduDaysOfEducation;
+    /**
+     * Increments the number educational travel days by 1.
+     */
+    public void incrementEduDaysOfTravel() {
+        this.eduDaysOfTravel++;
     }
 
-    public void setEduDaysOfEducation(final int eduDaysOfEducation) {
-        this.eduDaysOfEducation = eduDaysOfEducation;
+    public int getEduEducationTime() {
+        return eduEducationTime;
+    }
+
+    public void setEduEducationTime(final int eduEducationTime) {
+        this.eduEducationTime = eduEducationTime;
     }
 
     public String getEduAcademySystem() {
@@ -1479,11 +1476,11 @@ public class Person {
         this.eduCourseIndex = eduCourseIndex;
     }
 
-    public int getEduEducationStage() {
+    public EducationStage getEduEducationStage() {
         return eduEducationStage;
     }
 
-    public void setEduEducationStage(final int eduEducationStage) {
+    public void setEduEducationStage(final EducationStage eduEducationStage) {
         this.eduEducationStage = eduEducationStage;
     }
 
@@ -1788,16 +1785,12 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitions", acquisitions);
             }
 
-            if (eduHighestEducation != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation);
+            if (eduHighestEducation != EducationLevel.EARLY_CHILDHOOD) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation.toString());
             }
 
-            if (eduDaysOfTravelToAcademy != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelToAcademy", eduDaysOfTravelToAcademy);
-            }
-
-            if (eduDaysOfTravelFromAcademy != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelFromAcademy", eduDaysOfTravelFromAcademy);
+            if (eduJourneyTime != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduJourneyTime", eduJourneyTime);
             }
 
             if (eduDaysOfTravel != 0) {
@@ -1828,12 +1821,12 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduCourseIndex", eduCourseIndex);
             }
 
-            if (eduEducationStage != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEducationStage", eduEducationStage);
+            if (eduEducationStage != EducationStage.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEducationStage", eduEducationStage.toString());
             }
 
-            if (eduDaysOfEducation != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfEducation", eduDaysOfEducation);
+            if (eduEducationTime != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEducationTime", eduEducationTime);
             }
 
             //region Flags
@@ -2141,11 +2134,9 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduHighestEducation")) {
-                    retVal.eduHighestEducation = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelToAcademy")) {
-                    retVal.eduDaysOfTravelToAcademy = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelFromAcademy")) {
-                    retVal.eduDaysOfTravelFromAcademy = Integer.parseInt(wn2.getTextContent());
+                    retVal.eduHighestEducation = EducationLevel.parseFromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduJourneyTime")) {
+                    retVal.eduJourneyTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravel")) {
                     retVal.eduDaysOfTravel = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
@@ -2161,9 +2152,9 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduCourseIndex")) {
                     retVal.eduCourseIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationStage")) {
-                    retVal.eduEducationStage = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfEducation")) {
-                    retVal.eduDaysOfEducation = Integer.parseInt(wn2.getTextContent());
+                    retVal.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationTime")) {
+                    retVal.eduEducationTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
                         || wn2.getNodeName().equalsIgnoreCase("clan")) { // Legacy - 0.49.9 removal
                     retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
