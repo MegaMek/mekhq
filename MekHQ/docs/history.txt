@@ -90,7 +90,9 @@ MEKHQ VERSION HISTORY:
 + PR #4201: Fixed Intersected Conditions in CustomizePersonDialog.java
 + PR #4199: Updated PersonnelTableMouseAdapter to Support Enrolling Multiple Personnel
 + PR #4197: Updated Default Support Personnel Counts in Company Generator
-+ Fix 2405: Added Variable Unit Quality to Salvaged Units
++ Fix #2405: Added Variable Unit Quality to Salvaged Units
++ Fix #2085: Added Variable Unit Quality to Unit Markets and Updated Unit Market Logic
++ PR #4208: Added Numerous Improvements to the Turnover and Retention Module
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
