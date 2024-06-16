@@ -18,9 +18,14 @@
  */
 package mekhq.campaign.market.enums;
 
+import megamek.common.Compute;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
 
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 public enum UnitMarketType {
@@ -101,5 +106,51 @@ public enum UnitMarketType {
     @Override
     public String toString() {
         return name;
+    }
+
+
+
+    /**
+     * Returns the quality of a unit based on the given market type.
+     *
+     * @param market the type of market
+     * @return the quality of the unit
+     */
+    public static int getQuality(Campaign campaign, UnitMarketType market) {
+        HashMap<String, Integer> qualityAndModifier = new HashMap<>();
+
+        switch(market) {
+            case OPEN:
+            case MERCENARY:
+                qualityAndModifier.put("quality", Part.QUALITY_C);
+                qualityAndModifier.put("modifier", 0);
+                break;
+            case EMPLOYER:
+                qualityAndModifier.put("quality", Part.QUALITY_B);
+                qualityAndModifier.put("modifier", -1);
+                break;
+            case BLACK_MARKET:
+                if (Compute.d6(1) <= 2) {
+                    qualityAndModifier.put("quality", Part.QUALITY_A);
+                    // this is to force a result of 0 (A)
+                    qualityAndModifier.put("modifier", -12);
+                } else {
+                    qualityAndModifier.put("quality", Part.QUALITY_F);
+                    // this is to force a result of 5 (F)
+                    qualityAndModifier.put("modifier", 12);
+                }
+                break;
+            case FACTORY:
+                qualityAndModifier.put("quality", Part.QUALITY_F);
+                // this is to force a result of 5 (F)
+                qualityAndModifier.put("modifier", 12);
+                break;
+        }
+
+        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            return Unit.getRandomUnitQuality(qualityAndModifier.get("modifier"));
+        } else {
+            return qualityAndModifier.get("quality");
+        }
     }
 }
