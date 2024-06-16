@@ -11,8 +11,8 @@
         <tuition>18500</tuition>
         <durationDays>600</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced Interstellar Studies</qualification>
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel, Small Arms, Medtech</curriculum>
@@ -32,8 +32,8 @@
         <tuition>39500</tuition>
         <durationDays>300</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced Interstellar Command Officer</qualification>
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel, Leadership, Tactics, Small Arms, Medtech</curriculum>
@@ -53,7 +53,7 @@
         <tuition>6500</tuition>
         <durationDays>300</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <qualification>Basic Training</qualification>
         <curriculum>Small Arms, Tactics</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
@@ -72,8 +72,8 @@
         <tuition>15750</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <qualification>School of BattleMech Warfare</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Strategy</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
@@ -105,8 +105,8 @@
         <tuition>13125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced Interstellar Studies</qualification>
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel</curriculum>
@@ -129,8 +129,8 @@
         <tuition>12000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>BattleMech Officer Training Cadre</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership</curriculum>
@@ -168,8 +168,8 @@
         <tuition>10500</tuition>
         <durationDays>900</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <qualification>Mechanized College</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
         <qualificationStartYear>2400</qualificationStartYear>
@@ -193,8 +193,8 @@
         <tuition>15750</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Strategy, Tactics</curriculum>
@@ -215,8 +215,8 @@
         <tuition>21000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>BattleMech Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
@@ -239,8 +239,8 @@
         <tuition>21000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>3</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>Post-Graduate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>BattleMech Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
@@ -268,8 +268,8 @@
         <tuition>23625</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Interstellar Officer Graduate</qualification>
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel, Leadership, Strategy, Tactics</curriculum>
@@ -293,8 +293,8 @@
         <tuition>23625</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Interstellar Officer Graduate</qualification>
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft, Tech/Vessel, Leadership, Strategy, Tactics</curriculum>
@@ -317,8 +317,8 @@
         <tuition>35000</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>BattleMech Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
@@ -346,8 +346,8 @@
         <tuition>14000.</tuition>
         <durationDays>900</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
@@ -371,8 +371,8 @@
         <tuition>14000</tuition>
         <durationDays>900</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Aerospace Training School</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
@@ -398,8 +398,8 @@
         <tuition>4375</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Battle Armor Cadre</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
@@ -420,8 +420,8 @@
         <tuition>42000</tuition>
         <durationDays>300</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Officer Graduate</qualification>
         <curriculum>Administration, Negotiation, Leadership, Strategy, Tactics</curriculum>
@@ -440,8 +440,8 @@
         <tuition>17500</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Training Cadre</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Scrounge</curriculum>
@@ -469,8 +469,8 @@
         <constructionYear>2988</constructionYear>
         <tuition>21000</tuition>
         <durationDays>900</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership</curriculum>
@@ -511,8 +511,8 @@
         <tuition>15750</tuition>
         <durationDays>1320</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Training Cadre</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
@@ -535,8 +535,8 @@
         <tuition>15750</tuition>
         <durationDays>1320</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Training Cadre</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
@@ -558,8 +558,8 @@
         <tuition>40700</tuition>
         <durationDays>300</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
@@ -598,8 +598,8 @@
         <tuition>21000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
@@ -624,8 +624,8 @@
         <tuition>21000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
@@ -650,8 +650,8 @@
         <tuition>4375</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Mechanized Graduate</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle, Piloting/VTOL</curriculum>
@@ -676,8 +676,8 @@
         <tuition>11000</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
@@ -699,8 +699,8 @@
         <tuition>12125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Strategy, Tactics</curriculum>
@@ -722,8 +722,8 @@
         <tuition>35000</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
@@ -744,8 +744,8 @@
         <tuition>35000</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
@@ -770,8 +770,8 @@
         <tuition>10500</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Training Cadre</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
@@ -787,8 +787,8 @@
         <tuition>5250</tuition>
         <durationDays>600</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>4</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced Science &amp; Technology Graduate</qualification>
         <curriculum>Doctor, Tech/Mech</curriculum>
@@ -805,8 +805,8 @@
         <tuition>5250</tuition>
         <durationDays>1300</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
@@ -825,8 +825,8 @@
         <tuition>5250</tuition>
         <durationDays>600</durationDays>
         <facultySkill>4</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>4</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced Science &amp; Technology Graduate</qualification>
         <curriculum>Doctor, Tech/Mech</curriculum>
@@ -868,8 +868,8 @@
         <tuition>17500</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership, Tactics, Strategy</curriculum>
@@ -904,8 +904,8 @@
         <tuition>8750</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership</curriculum>
@@ -925,8 +925,8 @@
         <tuition>8750</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Officer Graduate</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech, Leadership</curriculum>
