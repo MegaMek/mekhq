@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -56,6 +56,8 @@ import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static mekhq.campaign.personnel.Person.getLoyaltyName;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -1444,7 +1446,13 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblLoyalty1, gridBagConstraints);
 
             lblLoyalty2.setName("lblLoyalty2");
-            lblLoyalty2.setText(String.valueOf(person.getLoyalty()));
+
+            int loyaltyModifier = person.getLoyalty();
+            if (person.isCommander()) {
+                loyaltyModifier = MathUtility.clamp(loyaltyModifier - 1, -3, 3);
+            }
+
+            lblLoyalty2.setText(loyaltyModifier + " (" + getLoyaltyName(loyaltyModifier) + ')');
             lblLoyalty2.setLabelFor(lblLoyalty2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
