@@ -109,13 +109,14 @@ public class AutoAwardsController {
     }
 
     /**
-     * This function processes Kill (Scenario) and Injury Awards following the conclusion of a Scenario
+     * This method processes Kill (Scenario) and Injury Awards following the conclusion of a Scenario.
      *
-     * @param c           the campaign to be processed
-     * @param scenarioId  id number for the Scenario just concluded
-     * @param personnel      the people to check award eligibility for and their injury counts
+     * @param c               the campaign to be processed
+     * @param scenarioId      the id number for the Scenario just concluded
+     * @param personnel       the people to check award eligibility for and their injury counts
+     * @param scenarioKills   the Kill data for each personnel in the scenario
      */
-    public void PostScenarioController(Campaign c, int scenarioId, HashMap<UUID, Integer> personnel) {
+    public void PostScenarioController(Campaign c, HashMap<UUID, Integer> personnel, HashMap<UUID, List<Kill>>scenarioKills) {
         LogManager.getLogger().info("autoAwards (Scenario Conclusion) has started");
 
         campaign = c;
@@ -136,9 +137,9 @@ public class AutoAwardsController {
             }
         }
 
-        // beginning the processing & filtering of Kill (Scenario) Awards
+        // beginning the processing of Kill (Scenario) Awards
         if (!killAwards.isEmpty()) {
-            processedData = ScenarioKillAwardsManager(new ArrayList<>(personnel.keySet()), scenarioId);
+            processedData = ScenarioKillAwardsManager(new ArrayList<>(personnel.keySet()), scenarioKills);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -148,7 +149,7 @@ public class AutoAwardsController {
 
         // beginning the processing & filtering of Misc Awards
         if (!miscAwards.isEmpty()) {
-            processedData = MiscAwardsManager(personnel, false, scenarioId);
+            processedData = MiscAwardsManager(personnel, false, true, scenarioKills);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -559,7 +560,7 @@ public class AutoAwardsController {
                 personnelMap.put(person, 0);
             }
 
-            processedData = MiscAwardsManager(personnelMap, missionWasSuccessful, -1);
+            processedData = MiscAwardsManager(personnelMap, missionWasSuccessful, false, null);
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
@@ -775,29 +776,23 @@ public class AutoAwardsController {
     }
 
     /**
-     * This is the manager for this type of award, processing eligibility and preparing awardData
+     * This method is the manager for processing Scenario Kill Awards.
      *
-     * @param personnel the personnel to be processed
-     * @param scenarioId the scenario just completed
+     * @param personnel     the List of personnel to be processed for awards
+     * @param scenarioKills a map of personnel and their corresponding list of Kills
+     * @return a map containing the award data, or null if no awards are applicable
      */
-    private Map<Integer, List<Object>> ScenarioKillAwardsManager(List<UUID> personnel, int scenarioId) {
+    private Map<Integer, List<Object>> ScenarioKillAwardsManager(List<UUID> personnel, HashMap<UUID, List<Kill>> scenarioKills) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
         for (UUID person : personnel) {
+            List<Kill> personalKills = scenarioKills.get(person);
+
             Map<Integer, List<Object>> data;
 
-            List<Kill> allKills = campaign.getKillsFor(campaign.getPerson(person).getId());
-            List<Kill> scenarioKills = new ArrayList<>();
-
-            for (Kill kill : allKills) {
-                if (kill.getScenarioId() == scenarioId) {
-                    scenarioKills.add(kill);
-                }
-            }
-
             try {
-                data = ScenarioKillAwards.ScenarioKillAwardsProcessor(campaign, person, killAwards, scenarioKills.size());
+                data = ScenarioKillAwards.ScenarioKillAwardsProcessor(campaign, person, killAwards, personalKills.size());
             } catch (Exception e) {
                 data = null;
                 LogManager.getLogger().info("{} is not eligible for any Scenario Kill Awards.",
@@ -821,34 +816,29 @@ public class AutoAwardsController {
     }
 
     /**
-     * This method is the manager for processing miscellaneous awards.
+     * This method is the manager for processing Miscellaneous Awards.
      *
-     * @param personnel             the List of personnel to be processed for awards
-     * @param missionWasSuccessful  a boolean indicating if the mission was successful
-     * @param scenarioId             the scenario just completed, or -1 if autoAwards was not triggered by scenario completion
+     * @param personnel        the personnel to be processed
+     * @param missionWasSuccessful    true if the mission was successful, false otherwise
+     * @param wasScenario      true if the award is for a scenario, false otherwise
+     * @param scenarioKills    a map of personnel and their corresponding list of Kills
      * @return a map containing the award data, or null if no awards are applicable
      */
-    private Map<Integer, List<Object>> MiscAwardsManager(HashMap<UUID, Integer> personnel, boolean missionWasSuccessful, int scenarioId) {
+    private Map<Integer, List<Object>> MiscAwardsManager(HashMap<UUID, Integer> personnel, boolean missionWasSuccessful, boolean wasScenario, HashMap<UUID, List<Kill>> scenarioKills) {
         Map<Integer, List<Object>> awardData = new HashMap<>();
         int awardDataKey = 0;
 
         for (UUID person : personnel.keySet()) {
             Map<Integer, List<Object>> data;
-            List<Kill> allKills;
-            List<Kill> scenarioKills = new ArrayList<>();
 
-            if (scenarioId != -1) {
-                allKills = campaign.getKillsFor(campaign.getPerson(person).getId());
+            List<Kill> personalKills = new ArrayList<>();
 
-                for (Kill kill : allKills) {
-                    if (kill.getScenarioId() == scenarioId) {
-                        scenarioKills.add(kill);
-                    }
-                }
+            if (wasScenario) {
+                personalKills = scenarioKills.get(person);
             }
 
             try {
-                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful, scenarioKills.size(), personnel.get(person));
+                data = MiscAwards.MiscAwardsProcessor(campaign, mission, person, miscAwards, missionWasSuccessful, personalKills.size(), personnel.get(person));
             } catch (Exception e) {
                 data = null;
                 LogManager.getLogger().info("{} is not eligible for any Misc Awards.", campaign.getPerson(person).getFullName());

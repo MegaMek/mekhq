@@ -36,6 +36,7 @@ import megamek.server.Server;
 import megameklab.MegaMekLab;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
+import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.event.ScenarioResolvedEvent;
@@ -496,6 +497,7 @@ public class MekHQ implements GameListener {
 
             if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
                 HashMap<UUID, Integer> personnel = new HashMap<>();
+                HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
 
                 for (UUID personId : tracker.getPeopleStatus().keySet()) {
                     Person person = getCampaign().getPerson(personId);
@@ -509,10 +511,11 @@ public class MekHQ implements GameListener {
                     }
 
                     personnel.put(personId, injuryCount);
+                    scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
                 }
 
                 AutoAwardsController autoAwardsController = new AutoAwardsController();
-                autoAwardsController.PostScenarioController(getCampaign(), currentScenario.getId(), personnel);
+                autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills);
             }
 
             // we need to trigger ScenarioResolvedEvent before stopping the thread or currentScenario may become null
