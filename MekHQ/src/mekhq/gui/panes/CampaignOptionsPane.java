@@ -600,6 +600,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // Unit Market
     private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
     private JCheckBox chkUnitMarketRegionalMechVariations;
+    private JLabel lblUnitMarketSpecialUnitChance;
+    private JSpinner spnUnitMarketSpecialUnitChance;
     private JCheckBox chkInstantUnitMarketDelivery;
     private JCheckBox chkUnitMarketReportRefresh;
 
@@ -7478,6 +7480,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
             final boolean enabled = !method.isNone();
             chkUnitMarketRegionalMechVariations.setEnabled(enabled);
+            lblUnitMarketSpecialUnitChance.setEnabled(enabled);
+            spnUnitMarketSpecialUnitChance.setEnabled(enabled);
             chkInstantUnitMarketDelivery.setEnabled(enabled);
             chkUnitMarketReportRefresh.setEnabled(enabled);
         });
@@ -7485,6 +7489,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUnitMarketRegionalMechVariations = new JCheckBox(resources.getString("chkUnitMarketRegionalMechVariations.text"));
         chkUnitMarketRegionalMechVariations.setToolTipText(resources.getString("chkUnitMarketRegionalMechVariations.toolTipText"));
         chkUnitMarketRegionalMechVariations.setName("chkUnitMarketRegionalMechVariations");
+
+        lblUnitMarketSpecialUnitChance = new JLabel();
+        lblUnitMarketSpecialUnitChance.setText(resources.getString("lblUnitMarketSpecialUnitChance.text"));
+        lblUnitMarketSpecialUnitChance.setToolTipText(resources.getString("lblUnitMarketSpecialUnitChance.toolTipText"));
+        lblUnitMarketSpecialUnitChance.setName("lblUnitMarketSpecialUnitChance");
+
+        spnUnitMarketSpecialUnitChance = new JSpinner(new SpinnerNumberModel(30, 0, 100, 1));
+        spnUnitMarketSpecialUnitChance.setToolTipText(resources.getString("lblUnitMarketSpecialUnitChance.toolTipText"));
+        spnUnitMarketSpecialUnitChance.setName("spnUnitMarketSpecialUnitChance");
 
         chkInstantUnitMarketDelivery = new JCheckBox(resources.getString("chkInstantUnitMarketDelivery.text"));
         chkInstantUnitMarketDelivery.setToolTipText(resources.getString("chkInstantUnitMarketDelivery.toolTipText"));
@@ -7513,6 +7526,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblUnitMarketMethod)
                                 .addComponent(comboUnitMarketMethod, Alignment.LEADING))
                         .addComponent(chkUnitMarketRegionalMechVariations)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblUnitMarketSpecialUnitChance)
+                                .addComponent(spnUnitMarketSpecialUnitChance, Alignment.LEADING))
                         .addComponent(chkInstantUnitMarketDelivery)
                         .addComponent(chkUnitMarketReportRefresh)
         );
@@ -7523,6 +7539,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblUnitMarketMethod)
                                 .addComponent(comboUnitMarketMethod))
                         .addComponent(chkUnitMarketRegionalMechVariations)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblUnitMarketSpecialUnitChance)
+                                .addComponent(spnUnitMarketSpecialUnitChance))
                         .addComponent(chkInstantUnitMarketDelivery)
                         .addComponent(chkUnitMarketReportRefresh)
         );
@@ -8358,6 +8377,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Unit Market
         comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
         chkUnitMarketRegionalMechVariations.setSelected(options.isUnitMarketRegionalMechVariations());
+        spnUnitMarketSpecialUnitChance.setValue(options.getUnitMarketSpecialUnitChance());
         chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
         chkUnitMarketReportRefresh.setSelected(options.isUnitMarketReportRefresh());
 
@@ -8911,6 +8931,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Unit Market
             options.setUnitMarketMethod(comboUnitMarketMethod.getSelectedItem());
             options.setUnitMarketRegionalMechVariations(chkUnitMarketRegionalMechVariations.isSelected());
+            options.setUnitMarketSpecialUnitChance((Integer) spnUnitMarketSpecialUnitChance.getValue());
             options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
             options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
 
