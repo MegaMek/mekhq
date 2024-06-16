@@ -1,7 +1,6 @@
 package mekhq.campaign.personnel.autoAwards;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.Kill;
 import mekhq.campaign.personnel.Award;
 import org.apache.logging.log4j.LogManager;
 
@@ -16,10 +15,10 @@ public class ScenarioKillAwards {
      *
      * @param campaign the campaign to be processed
      * @param person the Person to check award eligibility for
-     * @param kills a list of p's relevant kills
+     * @param killCount the number of relevant kills scored by 'person'
      * @param awards awards the awards to be processed (should only include awards where item == kill && ranges == scenario)
      */
-    public static Map<Integer, List<Object>> ScenarioKillAwardsProcessor(Campaign campaign, UUID person, List<Award> awards, List<Kill> kills) {
+    public static Map<Integer, List<Object>> ScenarioKillAwardsProcessor(Campaign campaign, UUID person, List<Award> awards, int killCount) {
         int killsNeeded;
 
         List<Award> eligibleAwards = new ArrayList<>();
@@ -36,7 +35,7 @@ public class ScenarioKillAwards {
                     continue;
                 }
 
-                if (kills.size() >= killsNeeded) {
+                if (killCount >= killsNeeded) {
                     eligibleAwardsBestable.add(award);
                 }
             }
