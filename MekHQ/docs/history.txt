@@ -90,7 +90,14 @@ MEKHQ VERSION HISTORY:
 + PR #4201: Fixed Intersected Conditions in CustomizePersonDialog.java
 + PR #4199: Updated PersonnelTableMouseAdapter to Support Enrolling Multiple Personnel
 + PR #4197: Updated Default Support Personnel Counts in Company Generator
-+ Fix 2405: Added Variable Unit Quality to Salvaged Units
++ Fix #2085: Added Variable Unit Quality to Unit Markets and Updated Unit Market Logic
++ Fix #2405: Added Variable Unit Quality to Salvaged Units
++ PR #4208: Added Numerous Improvements to the Turnover and Retention Module
++ Fix #4210: Rolled Back 'overrideBv' XML Tag, Fixing Non-Random Scenario Modifier Forces Incorrectly Generating Random Mechs
++ PR #4215: Fixed Handling of autoAwards Post-Scenario Kill Tracking
++ PR #4216: Converted Shares Payouts to Use Profits Not Net-Worth
++ PR #4217: Temporarily Removed Clan Support from Education Module, Refactored Remaining Code
++ PR #4218: Added Campaign Option to Control CamOps Unit Rating Within Clamp
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
