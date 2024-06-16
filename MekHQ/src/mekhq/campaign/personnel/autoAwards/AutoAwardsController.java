@@ -109,12 +109,11 @@ public class AutoAwardsController {
     }
 
     /**
-     * This method processes Kill (Scenario) and Injury Awards following the conclusion of a Scenario.
+     * Processes awards after a scenario is concluded.
      *
-     * @param c               the campaign to be processed
-     * @param scenarioId      the id number for the Scenario just concluded
-     * @param personnel       the people to check award eligibility for and their injury counts
-     * @param scenarioKills   the Kill data for each personnel in the scenario
+     * @param c the campaign
+     * @param personnel the personnel involved in the scenario, mapped by their UUID
+     * @param scenarioKills the kills made during the scenario, mapped by personnel UUID
      */
     public void PostScenarioController(Campaign c, HashMap<UUID, Integer> personnel, HashMap<UUID, List<Kill>>scenarioKills) {
         LogManager.getLogger().info("autoAwards (Scenario Conclusion) has started");
@@ -834,7 +833,11 @@ public class AutoAwardsController {
             List<Kill> personalKills = new ArrayList<>();
 
             if (wasScenario) {
-                personalKills = scenarioKills.get(person);
+                // This should only throw an exception if the person we're trying to get wasn't in the scenario.
+                // I'm not sure if that can even happen, but insurance never hurts.
+                try {
+                    personalKills = scenarioKills.get(person);
+                } catch (Exception ignored) {}
             }
 
             try {
