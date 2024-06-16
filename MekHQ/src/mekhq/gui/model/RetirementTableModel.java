@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with MekHQ. If not, see <http://www.gnu.org/licenses/>.
+ */
 package mekhq.gui.model;
 
 import megamek.codeUtilities.ObjectUtility;
@@ -216,9 +234,17 @@ public class RetirementTableModel extends AbstractTableModel {
                         (payBonus.get(p.getId()) ? 2 : 0) +
                         miscMods.get(p.getId()) + generalMod;
             case COL_BONUS_COST:
-                return RetirementDefectionTracker.getPayoutOrBonusValue(campaign, p).toAmountAndSymbolString();
+                Money bonusCost = RetirementDefectionTracker.getPayoutOrBonusValue(campaign, p);
+
+                if (campaign.getCampaignOptions().getTurnoverFrequency().isMonthly()) {
+                    return bonusCost.dividedBy(12).toAmountAndSymbolString();
+                } else if (campaign.getCampaignOptions().getTurnoverFrequency().isWeekly()) {
+                    return bonusCost.dividedBy(52).toAmountAndSymbolString();
+                } else {
+                    return bonusCost;
+                }
             case COL_PAY_BONUS:
-                return payBonus.getOrDefault(p.getId(), false);
+                return payBonus.getOrDefault(p.getId(), campaign.getCampaignOptions().isPayBonusDefault());
             case COL_MISC_MOD:
                 return miscMods.getOrDefault(p.getId(), 0);
             case COL_SHARES:
@@ -244,7 +270,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     payout = payout.minus(campaign.getUnit(unitAssignments.get(p.getId())).getBuyCost());
                 }
 
-                // if the person is under contract we don't check whether they need a unit or are owed a shortfall
+                // if the person is under contract, we don't check whether they need a unit or are owed a shortfall
                 if (ChronoUnit.MONTHS.between(p.getRecruitment(), campaign.getLocalDate())
                         >= campaign.getCampaignOptions().getServiceContractDuration()) {
                     // if the person requires a unit, check to ensure there isn't a shortfall

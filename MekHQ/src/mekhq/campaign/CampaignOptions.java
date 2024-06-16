@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -301,6 +301,7 @@ public class CampaignOptions {
     private boolean useAgeModifiers;
     private boolean useUnitRatingModifiers;
     private boolean useFactionModifiers;
+    private boolean useHostileTerritoryModifiers;
     private boolean useMissionStatusModifiers;
     private boolean useFamilyModifiers;
     private boolean useLoyaltyModifiers;
@@ -981,7 +982,7 @@ public class CampaignOptions {
         // Retirement
         setUseRetirementDateTracking(false);
         setUseRandomRetirement(true);
-        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.NEGOTIATION);
+        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.FIXED);
         setTurnoverDifficulty(SkillLevel.REGULAR);
         setTurnoverFrequency(TurnoverFrequency.MONTHLY);
         setTurnoverFixedTargetNumber(3);
@@ -992,7 +993,7 @@ public class CampaignOptions {
         setUseSubContractSoldiers(false);
         setServiceContractDuration(36);
         setServiceContractModifier(3);
-        setPayBonusDefault(true);
+        setPayBonusDefault(false);
 
         setUseCustomRetirementModifiers(true);
         setUseFatigueModifiers(true);
@@ -1001,10 +1002,11 @@ public class CampaignOptions {
         setUseUnitRatingModifiers(true);
         setUseFactionModifiers(true);
         setUseMissionStatusModifiers(true);
+        setUseHostileTerritoryModifiers(true);
         setUseFamilyModifiers(true);
 
         setUseLoyaltyModifiers(true);
-        setUseHideLoyalty(true);
+        setUseHideLoyalty(false);
 
         setPayoutRateOfficer(3);
         setPayoutRateEnlisted(3);
@@ -1018,7 +1020,7 @@ public class CampaignOptions {
 
         setUseManagementSkill(true);
         setUseCommanderLeadershipOnly(false);
-        setManagementSkillPenalty(-2);
+        setManagementSkillPenalty(0);
 
         setUseFatigue(true);
         setFatigueRate(1);
@@ -2028,6 +2030,14 @@ public class CampaignOptions {
 
     public void setUseMissionStatusModifiers(final boolean useMissionStatusModifiers) {
         this.useMissionStatusModifiers = useMissionStatusModifiers;
+    }
+
+    public boolean isUseHostileTerritoryModifiers() {
+        return useHostileTerritoryModifiers;
+    }
+
+    public void setUseHostileTerritoryModifiers(final boolean useHostileTerritoryModifiers) {
+        this.useHostileTerritoryModifiers = useHostileTerritoryModifiers;
     }
 
     public boolean isUseFamilyModifiers() {
@@ -4732,6 +4742,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnitRatingModifiers", isUseUnitRatingModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionModifiers", isUseFactionModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMissionStatusModifiers", isUseMissionStatusModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useHostileTerritoryModifiers", isUseHostileTerritoryModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFamilyModifiers", isUseFamilyModifiers());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoyaltyModifiers", isUseLoyaltyModifiers());
@@ -5763,6 +5774,8 @@ public class CampaignOptions {
                     retVal.setUseFactionModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMissionStatusModifiers")) {
                     retVal.setUseMissionStatusModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useHostileTerritoryModifiers")) {
+                    retVal.setUseHostileTerritoryModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFamilyModifiers")) {
                     retVal.setUseFamilyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useLoyaltyModifiers")) {

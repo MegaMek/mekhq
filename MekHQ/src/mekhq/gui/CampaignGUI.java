@@ -2,7 +2,7 @@
  * CampaignGUI.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -1209,6 +1209,7 @@ public class CampaignGUI extends JPanel {
          */
         RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
                 getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
+        rdd.setLocation(rdd.getLocation().x, 0);
         rdd.setVisible(true);
 
         if (!rdd.wasAborted()) {
@@ -2404,14 +2405,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) && (getCampaign().checkTurnoverPrompt())) {
-            if (!showRetirementDefectionDialog()) {
-                evt.cancel();
-                return;
-            }
-        }
-
-        if(getCampaign().checkScenariosDue()) {
+        if (getCampaign().checkScenariosDue()) {
             JOptionPane.showMessageDialog(null, getResourceMap().getString("dialogCheckDueScenarios.text"),
                     getResourceMap().getString("dialogCheckDueScenarios.title"), JOptionPane.WARNING_MESSAGE);
             evt.cancel();
@@ -2482,6 +2476,31 @@ public class CampaignGUI extends JPanel {
             if (new OutstandingScenariosNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
                 evt.cancel();
                 return;
+            }
+        }
+
+        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
+            int turnoverPrompt = getCampaign().checkTurnoverPrompt();
+
+            switch (turnoverPrompt) {
+                case -1:
+                    // the user wasn't presented with the dialog
+                    break;
+                case 0:
+                    // the user launched the turnover dialog
+                    if (!showRetirementDefectionDialog()) {
+                        evt.cancel();
+                        return;
+                    }
+                case 1:
+                    // the user picked 'Advance Day Regardless'
+                    break;
+                case 2:
+                    // the user canceled
+                    evt.cancel();
+                    return;
+                default:
+                    throw new IllegalStateException("Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " + turnoverPrompt);
             }
         }
     }
