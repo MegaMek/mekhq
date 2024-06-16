@@ -511,7 +511,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel sharesPanel;
     private JCheckBox chkUseShareSystem;
     private JPanel sharesSubPanel;
-    private JCheckBox chkSharesExcludeLargeCraft;
     private JCheckBox chkSharesForAll;
     //endregion Finances Tab
 
@@ -628,6 +627,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseAtB;
     private JCheckBox chkUseStratCon;
     private MMComboBox<SkillLevel> comboSkillLevel;
+    private JLabel lblAtbCamOpsDivision;
+    private JSpinner spnAtbCamOpsDivision;
 
     // unit administration
     private JCheckBox chkUseAero;
@@ -2823,9 +2824,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = 2;
         panAtB.add(panSubAtBAdmin, gridBagConstraints);
+
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 3;
         panAtB.add(panSubAtBScenario, gridBagConstraints);
+
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
         panAtB.add(panSubAtBContract, gridBagConstraints);
@@ -2852,6 +2855,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkClanVehicles.setToolTipText(resources.getString("chkClanVehicles.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkClanVehicles, gridBagConstraints);
+
+        lblAtbCamOpsDivision = new JLabel(resources.getString("lblAtbCamOpsDivision.text"));
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy++;
+        gridBagConstraints.gridwidth = 1;
+        panSubAtBAdmin.add(lblAtbCamOpsDivision, gridBagConstraints);
+
+        spnAtbCamOpsDivision = new JSpinner(new SpinnerNumberModel(2.5, 1, 10, 0.1));
+        spnAtbCamOpsDivision.setToolTipText(resources.getString("lblAtbCamOpsDivision.toolTipText"));
+        gridBagConstraints.gridx = 1;
+        panSubAtBAdmin.add(spnAtbCamOpsDivision, gridBagConstraints);
 
         chkMercSizeLimited = new JCheckBox(resources.getString("chkMercSizeLimited.text"));
         chkMercSizeLimited.setToolTipText(resources.getString("chkMercSizeLimited.toolTipText"));
@@ -7297,10 +7311,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createSharesSubPanel() {
-        chkSharesExcludeLargeCraft = new JCheckBox(resources.getString("chkSharesExcludeLargeCraft.text"));
-        chkSharesExcludeLargeCraft.setToolTipText(resources.getString("chkSharesExcludeLargeCraft.toolTipText"));
-        chkSharesExcludeLargeCraft.setName("chkSharesExcludeLargeCraft");
-
         chkSharesForAll = new JCheckBox(resources.getString("chkSharesForAll.text"));
         chkSharesForAll.setToolTipText(resources.getString("chkSharesForAll.toolTipText"));
         chkSharesForAll.setName("chkSharesForAll");
@@ -7314,12 +7324,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(layout
                 .createSequentialGroup()
-                .addComponent(chkSharesExcludeLargeCraft)
                 .addComponent(chkSharesForAll));
 
         layout.setHorizontalGroup(layout
                 .createParallelGroup(Alignment.LEADING)
-                .addComponent(chkSharesExcludeLargeCraft)
                 .addComponent(chkSharesForAll));
 
         return sharesSubPanel;
@@ -8270,7 +8278,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Shares
         chkUseShareSystem.setSelected(options.isUseShareSystem());
-        chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
         chkSharesForAll.setSelected(options.isSharesForAll());
 
         // Taxes
@@ -8434,6 +8441,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseVehicles.setSelected(options.isUseVehicles());
         chkClanVehicles.setSelected(options.isClanVehicles());
         chkMercSizeLimited.setSelected(options.isMercSizeLimited());
+        spnAtbCamOpsDivision.setValue(options.getAtbCamOpsDivision());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
         spnBonusPartExchangeValue.setValue(options.getBonusPartExchangeValue());
         spnBonusPartMaxExchangeCount.setValue(options.getBonusPartMaxExchangeCount());
@@ -8914,7 +8922,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setCancelledOrderRefundMultiplier((Double) spnCancelledOrderRefundMultiplier.getValue());
 
             options.setUseShareSystem(chkUseShareSystem.isSelected());
-            options.setSharesExcludeLargeCraft(chkSharesExcludeLargeCraft.isSelected());
             options.setSharesForAll(chkSharesForAll.isSelected());
 
             //region Taxes
@@ -8998,6 +9005,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
             options.setGenerateChases(chkGenerateChases.isSelected());
             options.setMercSizeLimited(chkMercSizeLimited.isSelected());
+            options.setAtbCamOpsDivision((Double) spnAtbCamOpsDivision.getValue());
             options.setRestrictPartsByMission(chkRestrictPartsByMission.isSelected());
             options.setBonusPartExchangeValue((Integer) spnBonusPartExchangeValue.getValue());
             options.setBonusPartMaxExchangeCount((Integer) spnBonusPartMaxExchangeCount.getValue());
@@ -9348,7 +9356,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Shares System
         chkUseShareSystem.setSelected(options.isUseShareSystem());
-        chkSharesExcludeLargeCraft.setSelected(options.isSharesExcludeLargeCraft());
         chkSharesForAll.setSelected(options.isSharesForAll());
     }
 

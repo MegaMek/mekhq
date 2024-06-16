@@ -455,7 +455,6 @@ public class CampaignOptions {
 
     // Shares
     private boolean useShareSystem;
-    private boolean sharesExcludeLargeCraft;
     private boolean sharesForAll;
     //endregion Finance Tab
 
@@ -543,6 +542,7 @@ public class CampaignOptions {
     private boolean useAero;
     private boolean useVehicles;
     private boolean clanVehicles;
+    private double atbCamOpsDivision;
 
     // Contract Operations
     private boolean mercSizeLimited;
@@ -1045,7 +1045,6 @@ public class CampaignOptions {
 
         // Shares
         setUseShareSystem(false);
-        setSharesExcludeLargeCraft(true);
         setSharesForAll(true);
         //endregion Finances Tab
 
@@ -1149,6 +1148,7 @@ public class CampaignOptions {
         useAero = false;
         useVehicles = true;
         clanVehicles = false;
+        atbCamOpsDivision = 2.5;
 
         // Contract Operations
         mercSizeLimited = false;
@@ -4069,6 +4069,14 @@ public class CampaignOptions {
         this.clanVehicles = clanVehicles;
     }
 
+    public double getAtbCamOpsDivision() {
+        return atbCamOpsDivision;
+    }
+
+    public void setAtbCamOpsDivision(final double atbCamOpsDivision) {
+        this.atbCamOpsDivision = atbCamOpsDivision;
+    }
+
     public boolean isDoubleVehicles() {
         return doubleVehicles;
     }
@@ -4147,14 +4155,6 @@ public class CampaignOptions {
 
     public void setUseShareSystem(final boolean useShareSystem) {
         this.useShareSystem = useShareSystem;
-    }
-
-    public boolean isSharesExcludeLargeCraft() {
-        return sharesExcludeLargeCraft;
-    }
-
-    public void setSharesExcludeLargeCraft(final boolean sharesExcludeLargeCraft) {
-        this.sharesExcludeLargeCraft = sharesExcludeLargeCraft;
     }
 
     public boolean isSharesForAll() {
@@ -4798,7 +4798,6 @@ public class CampaignOptions {
 
         // Shares
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", isUseShareSystem());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", isSharesExcludeLargeCraft());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", isSharesForAll());
         //endregion Price Multipliers
 
@@ -4855,6 +4854,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useAero", useAero);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useVehicles", useVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "clanVehicles", clanVehicles);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "atbCamOpsDivision", atbCamOpsDivision);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "doubleVehicles", doubleVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adjustPlayerVehicles", adjustPlayerVehicles);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "opForLanceTypeMechs", getOpForLanceTypeMechs());
@@ -5743,8 +5743,6 @@ public class CampaignOptions {
                 // Shares
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
                     retVal.setUseShareSystem(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
-                    retVal.setSharesExcludeLargeCraft(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
                     retVal.setSharesForAll(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion Price Multipliers
@@ -5833,6 +5831,8 @@ public class CampaignOptions {
                     retVal.useVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanVehicles")) {
                     retVal.clanVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("atbCamOpsDivision")) {
+                    retVal.atbCamOpsDivision = Double.parseDouble(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("doubleVehicles")) {
                     retVal.doubleVehicles = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("adjustPlayerVehicles")) {

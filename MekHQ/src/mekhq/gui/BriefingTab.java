@@ -27,6 +27,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
+import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.event.*;
@@ -537,6 +538,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
         if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
             HashMap<UUID, Integer> personnel = new HashMap<>();
+            HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
 
             for (UUID personId : tracker.getPeopleStatus().keySet()) {
                 Person person = getCampaign().getPerson(personId);
@@ -550,10 +552,11 @@ public final class BriefingTab extends CampaignGuiTab {
                 }
 
                 personnel.put(personId, injuryCount);
+                scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
             }
 
             AutoAwardsController autoAwardsController = new AutoAwardsController();
-            autoAwardsController.PostScenarioController(getCampaign(), scenario.getId(), personnel);
+            autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills);
         }
 
         MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
