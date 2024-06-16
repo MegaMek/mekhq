@@ -22,12 +22,12 @@ import megamek.Version;
 import megamek.common.EntityWeightClass;
 import megamek.common.annotations.Nullable;
 import mekhq.MHQConstants;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.enums.*;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -153,12 +153,12 @@ public class CompanyGenerationOptions {
         // Personnel
         final Map<PersonnelRole, Integer> supportPersonnel = new HashMap<>();
         if (method.isWindchild()) {
-            supportPersonnel.put(PersonnelRole.MECH_TECH, 7);
+            supportPersonnel.put(PersonnelRole.MECH_TECH, 12);
             supportPersonnel.put(PersonnelRole.MECHANIC, 0);
             supportPersonnel.put(PersonnelRole.AERO_TECH, 0);
             supportPersonnel.put(PersonnelRole.DOCTOR, 1);
             supportPersonnel.put(PersonnelRole.ADMINISTRATOR_COMMAND, 1);
-            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 1);
+            supportPersonnel.put(PersonnelRole.ADMINISTRATOR_LOGISTICS, 2);
             supportPersonnel.put(PersonnelRole.ADMINISTRATOR_TRANSPORT, 1);
             supportPersonnel.put(PersonnelRole.ADMINISTRATOR_HR, 1);
         } else { // Defaults to AtB

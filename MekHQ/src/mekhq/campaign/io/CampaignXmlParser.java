@@ -73,6 +73,7 @@ import org.w3c.dom.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import java.io.*;
+import java.time.LocalDate;
 import java.util.*;
 
 public class CampaignXmlParser {
@@ -713,6 +714,14 @@ public class CampaignXmlParser {
                         retVal.setName(null);
                     } else {
                         retVal.setName(val);
+                    }
+                } else if (xn.equalsIgnoreCase("campaignStartDate")) {
+                    String campaignStartDate = wn.getTextContent().trim();
+
+                    if (campaignStartDate.equals("null")) {
+                        retVal.setCampaignStartDate(null);
+                    } else {
+                        retVal.setCampaignStartDate(LocalDate.parse(campaignStartDate));
                     }
                 } else if (xn.equalsIgnoreCase("overtime")) {
                     retVal.setOvertime(Boolean.parseBoolean(wn.getTextContent().trim()));

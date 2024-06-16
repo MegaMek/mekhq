@@ -956,7 +956,7 @@ Note: This ability is only used for BattleMechs.</desc>
 			<displayName>Terrain Master [Mountaineer] (CamOps)</displayName>
 			<lookupName>tm_mountaineer</lookupName>
 			<desc>Movement in rubble or rough cost 1 less MP and elevation changes also cost 1 MP less.
-The mountaineer also recieves a -1 to PSR checks for the given terrain.</desc>
+The mountaineer also receives a -1 to PSR checks for the given terrain.</desc>
 			<xpCost>40</xpCost>
 			<weight>3</weight>
 			<prereqAbilities></prereqAbilities>
