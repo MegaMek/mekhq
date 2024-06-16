@@ -29,7 +29,9 @@ import megamek.common.options.IOption;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.AtBContract;
+import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
+import mekhq.campaign.mission.enums.AtBContractType;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -50,6 +52,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static mekhq.campaign.personnel.Person.getLoyaltyName;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 
 /**
@@ -182,14 +185,14 @@ public class RetirementDefectionTracker {
 
             // Management Skill Modifier
             if (campaign.getCampaignOptions().isUseManagementSkill()) {
-                int modifier = 0;
+                int modifier = campaign.getCampaignOptions().getManagementSkillPenalty();
 
                 if (campaign.getCampaignOptions().isUseCommanderLeadershipOnly()) {
                     if (campaign.getFlaggedCommander().hasSkill((SkillType.S_LEADER))) {
-                        modifier += campaign.getCampaignOptions().getManagementSkillPenalty()
-                                + campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER).getFinalSkillValue();
+                        modifier -= campaign.getFlaggedCommander().getSkill(SkillType.S_LEADER).getFinalSkillValue();
                     }
                 } else {
+                    // unlike commander leadership only, this already factors in the base modifier
                     modifier = getManagementSkillModifier(person);
                 }
 
@@ -233,6 +236,13 @@ public class RetirementDefectionTracker {
                 targetNumber.addModifier(unitRatingModifier, resources.getString("unitRating.text"));
             }
 
+            // Active Mission modifier
+            if (campaign.getCampaignOptions().isUseHostileTerritoryModifiers()) {
+                if (isHostileTerritory(campaign)) {
+                    targetNumber.addModifier(-2, resources.getString("hostileTerritory.text"));
+                }
+            }
+
             // Mission completion status modifiers
             if ((mission != null) && (campaign.getCampaignOptions().isUseMissionStatusModifiers())) {
                 if (mission.getStatus().isSuccess()) {
@@ -246,9 +256,17 @@ public class RetirementDefectionTracker {
 
             // Loyalty
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
-                    && (!campaign.getCampaignOptions().isUseHideLoyalty())
-                    && (person.getLoyalty() != 0)) {
-                targetNumber.addModifier(-person.getLoyalty(), resources.getString("loyalty.text"));
+                    && (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+
+                int loyaltyModifier = person.getLoyalty();
+
+                if (person.isCommander()) {
+                    loyaltyModifier = MathUtility.clamp(loyaltyModifier - 1, -3, 3);
+                }
+
+                if (loyaltyModifier != 0) {
+                    targetNumber.addModifier(loyaltyModifier, getLoyaltyName(loyaltyModifier));
+                }
             }
 
             // Faction Modifiers
@@ -260,11 +278,11 @@ public class RetirementDefectionTracker {
                     targetNumber.addModifier(1, resources.getString("factionPirateCompany.text"));
                 } else if (campaignFaction.isComStarOrWoB()) {
                     if (person.getOriginFaction().isComStarOrWoB()) {
-                        targetNumber.addModifier(2, resources.getString("factionComStarOrWob.text"));
+                        targetNumber.addModifier(-2, resources.getString("factionComStarOrWob.text"));
                     }
                 } else if ((!campaignFaction.isClan()) && (!campaignFaction.isMercenary())) {
                     if (campaignFaction.equals(person.getOriginFaction())) {
-                        targetNumber.addModifier(1, resources.getString("factionLoyalty.text"));
+                        targetNumber.addModifier(-1, resources.getString("factionLoyalty.text"));
                     }
                 }
 
@@ -355,6 +373,39 @@ public class RetirementDefectionTracker {
             targets.put(person.getId(), targetNumber);
         }
         return targets;
+    }
+
+    /**
+     * Determines whether the campaign is in the middle of a contract in hostile territory.
+     * If AtB is disabled, this method only checks whether there is an active contract.
+     *
+     * @param campaign the campaign to check for hostile territory modifier
+     * @return true if the campaign is in hostile territory modifier
+     * or (if AtB is disabled) whether the campaign is in an active contract, false otherwise
+     */
+    private boolean isHostileTerritory(Campaign campaign) {
+        List<AtBContractType> defensiveContracts = Arrays.asList(
+                AtBContractType.GARRISON_DUTY,
+                AtBContractType.CADRE_DUTY,
+                AtBContractType.SECURITY_DUTY,
+                AtBContractType.RIOT_DUTY);
+
+        List<Contract> activeContracts = campaign.getActiveContracts();
+
+        if (!activeContracts.isEmpty()) {
+            if (campaign.getCampaignOptions().isUseAtB()) {
+                Optional<Contract> defensiveContract = activeContracts.stream()
+                        .filter(contract -> contract instanceof AtBContract)
+                        .filter(atBContract -> !defensiveContracts.contains(((AtBContract) atBContract).getContractType()))
+                        .findFirst();
+
+                return defensiveContract.isPresent();
+            } else {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -451,49 +502,49 @@ public class RetirementDefectionTracker {
                 case AEROSPACE:
                     if (person.outRanksUsingSkillTiebreaker(campaign, asfCommander)) {
                         asfCommander = person;
-                        asfCommanderModifier = baseModifier + getIndividualCommanderLeadership(asfCommander);
+                        asfCommanderModifier = baseModifier - getIndividualCommanderLeadership(asfCommander);
                     }
                     break;
                 case VEHICLE:
                     if (person.outRanksUsingSkillTiebreaker(campaign, vehicleCrewCommander)) {
                         vehicleCrewCommander = person;
-                        vehicleCrewCommanderModifier = baseModifier + getIndividualCommanderLeadership(vehicleCrewCommander);
+                        vehicleCrewCommanderModifier = baseModifier - getIndividualCommanderLeadership(vehicleCrewCommander);
                     }
                     break;
                 case INFANTRY:
                     if (person.outRanksUsingSkillTiebreaker(campaign, infantryCommander)) {
                         infantryCommander = person;
-                        infantryCommanderModifier = baseModifier + getIndividualCommanderLeadership(infantryCommander);
+                        infantryCommanderModifier = baseModifier - getIndividualCommanderLeadership(infantryCommander);
                     }
                     break;
                 case NAVAL:
                     if (person.outRanksUsingSkillTiebreaker(campaign, navalCommander)) {
                         navalCommander = person;
-                        navalCommanderModifier = baseModifier + getIndividualCommanderLeadership(navalCommander);
+                        navalCommanderModifier = baseModifier - getIndividualCommanderLeadership(navalCommander);
                     }
                     break;
                 case TECH:
                     if (person.outRanksUsingSkillTiebreaker(campaign, techCommander)) {
                         techCommander = person;
-                        techCommanderModifier = baseModifier + getIndividualCommanderLeadership(techCommander);
+                        techCommanderModifier = baseModifier - getIndividualCommanderLeadership(techCommander);
                     }
                     break;
                 case MEDICAL:
                     if (person.outRanksUsingSkillTiebreaker(campaign, medicalCommander)) {
                         medicalCommander = person;
-                        medicalCommanderModifier = baseModifier + getIndividualCommanderLeadership(medicalCommander);
+                        medicalCommanderModifier = baseModifier - getIndividualCommanderLeadership(medicalCommander);
                     }
                     break;
                 case ADMINISTRATOR:
                     if (person.outRanksUsingSkillTiebreaker(campaign, administrationCommander)) {
                         administrationCommander = person;
-                        administrationCommanderModifier = baseModifier + getIndividualCommanderLeadership(administrationCommander);
+                        administrationCommanderModifier = baseModifier - getIndividualCommanderLeadership(administrationCommander);
                     }
                     break;
                 case MECHWARRIOR:
                     if (person.outRanksUsingSkillTiebreaker(campaign, mechWarriorCommander)) {
                         mechWarriorCommander = person;
-                        mechWarriorCommanderModifier = baseModifier + getIndividualCommanderLeadership(mechWarriorCommander);
+                        mechWarriorCommanderModifier = baseModifier - getIndividualCommanderLeadership(mechWarriorCommander);
                     }
                     break;
                 case CIVILIAN:
@@ -709,7 +760,13 @@ public class RetirementDefectionTracker {
             }
 
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
-                return targetNumber - hrSkill + difficulty - person.getLoyalty();
+                int loyaltyModifier = person.getLoyalty();
+
+                if (person.isCommander()) {
+                    loyaltyModifier = MathUtility.clamp(loyaltyModifier - 1, -3, 3);
+                }
+
+                return targetNumber - hrSkill + difficulty + loyaltyModifier;
             } else {
                 return targetNumber - hrSkill + difficulty;
             }
@@ -866,8 +923,7 @@ public class RetirementDefectionTracker {
      * @param contract The contract associated with the event trigger, if applicable.
      * @return True if the person was successfully removed from the campaign, false otherwise.
      */
-    public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign,
-                                      AtBContract contract) {
+    public boolean removeFromCampaign(Person person, boolean killed, boolean sacked, Campaign campaign, Mission contract) {
         if (!person.getPrisonerStatus().isFree()) {
             return false;
         }
@@ -1084,6 +1140,8 @@ public class RetirementDefectionTracker {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "payout", "id", pid);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weightClass", payouts.get(pid).getWeightClass());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "cbills", payouts.get(pid).getPayoutAmount());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wasKilled", payouts.get(pid).isWasKilled());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "wasSacked", payouts.get(pid).isWasSacked());
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payout");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "payouts");
@@ -1153,8 +1211,12 @@ public class RetirementDefectionTracker {
                                 }
                                 if (wn4.getNodeName().equalsIgnoreCase("weightClass")) {
                                     payout.setWeightClass(Integer.parseInt(wn4.getTextContent()));
-                                } else if (wn4.getNodeName().equalsIgnoreCase("c-bills")) {
+                                } else if (wn4.getNodeName().equalsIgnoreCase("cbills")) {
                                     payout.setPayoutAmount(Money.fromXmlString(wn4.getTextContent().trim()));
+                                } else if (wn4.getNodeName().equalsIgnoreCase("wasKilled")) {
+                                    payout.setWasKilled(Boolean.parseBoolean(wn4.getTextContent()));
+                                } else if (wn4.getNodeName().equalsIgnoreCase("wasSacked")) {
+                                    payout.setWasSacked(Boolean.parseBoolean(wn4.getTextContent()));
                                 }
                             }
                             retVal.payouts.put(pid, payout);
