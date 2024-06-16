@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2014-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -82,6 +82,7 @@ public class RetirementDefectionDialog extends JDialog {
     private JComboBox<PersonnelFilter> cbGroupOverview;
     private JSpinner spnGeneralMod;
     private JLabel lblTotal;
+    private JLabel lblTotalShares;
     private RetirementTable personnelTable;
     private TableRowSorter<RetirementTableModel> personnelSorter;
     private TableRowSorter<RetirementTableModel> retireeSorter;
@@ -134,7 +135,10 @@ public class RetirementDefectionDialog extends JDialog {
         setTitle(resourceMap.getString("title.text"));
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setSize(screenSize);
+        int screenWidth = (int) (screenSize.getWidth() * 0.75);
+        int screenHeight = (int) (screenSize.getHeight() * 0.94);
+
+        setSize(screenWidth, screenHeight);
 
         setLayout(new BorderLayout());
         cardLayout = new CardLayout();
@@ -146,12 +150,7 @@ public class RetirementDefectionDialog extends JDialog {
         txtInstructions.setWrapStyleWord(true);
         txtInstructions.setLineWrap(true);
         if (doRetirement) {
-            String instructions;
-            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
-                instructions = resourceMap.getString("txtInstructions.OverviewShare.text");
-            } else {
-                instructions = resourceMap.getString("txtInstructions.Overview.text");
-            }
+            String instructions = resourceMap.getString("txtInstructions.Overview.text");
             if (null == contract) {
                 instructions += "\n\nDays since last Employee Turnover check: "
                         + ChronoUnit.DAYS.between(rdTracker.getLastRetirementRoll(),
@@ -179,6 +178,25 @@ public class RetirementDefectionDialog extends JDialog {
             panTop.add(cbGroupOverview);
             panTop.add(Box.createHorizontalGlue());
 
+            lblTotal = new JLabel();
+            lblTotal.setHorizontalAlignment(SwingConstants.RIGHT);
+            lblTotal.setText("ERROR LOADING BONUS SELECTION");
+            panTop.add(Box.createRigidArea(new Dimension(5, 0)));
+            panTop.add(lblTotal);
+            panTop.add(Box.createRigidArea(new Dimension(20, 0)));
+
+            JLabel lblTotalSharesDesc = new JLabel();
+            lblTotalShares = new JLabel();
+            lblTotalShares.setHorizontalAlignment(SwingConstants.RIGHT);
+            lblTotalSharesDesc.setText(resourceMap.getString("lblTotalShares.text"));
+            lblTotalShares.setText(Integer.toString(getTotalShares()));
+            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
+                panTop.add(lblTotalSharesDesc);
+                panTop.add(Box.createRigidArea(new Dimension(5, 0)));
+                panTop.add(lblTotalShares);
+                panTop.add(Box.createRigidArea(new Dimension(20, 0)));
+            }
+
             JLabel lblGeneralMod = new JLabel(resourceMap.getString("lblGeneralMod.text"));
             spnGeneralMod = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
             spnGeneralMod.setToolTipText(resourceMap.getString("spnGeneralMod.toolTipText"));
@@ -186,21 +204,9 @@ public class RetirementDefectionDialog extends JDialog {
                 panTop.add(lblGeneralMod);
                 panTop.add(spnGeneralMod);
                 spnGeneralMod.addChangeListener(evt -> personnelTable.setGeneralMod((Integer) spnGeneralMod.getValue()));
+                panTop.add(Box.createRigidArea(new Dimension(10, 0)));
             }
 
-            JLabel lblTotalDesc = new JLabel();
-            lblTotal = new JLabel();
-            lblTotal.setHorizontalAlignment(SwingConstants.RIGHT);
-            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
-                lblTotalDesc.setText(resourceMap.getString("lblTotalShares.text"));
-                lblTotal.setText(Integer.toString(getTotalShares()));
-            } else {
-                lblTotalDesc.setText(resourceMap.getString("lblTotalBonus.text"));
-                lblTotal.setText("0");
-            }
-            panTop.add(lblTotalDesc);
-            panTop.add(Box.createRigidArea(new Dimension(5, 0)));
-            panTop.add(lblTotal);
             panOverview.add(panTop, BorderLayout.PAGE_START);
 
             RetirementTableModel model = new RetirementTableModel(hqView.getCampaign());
@@ -231,30 +237,23 @@ public class RetirementDefectionDialog extends JDialog {
             personnelTable.getColumnModel().getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS)).
             setCellEditor(new DefaultCellEditor(new JCheckBox()));
             XTableColumnModel columnModel = (XTableColumnModel) personnelTable.getColumnModel();
+
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_PAYOUT)), false);
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_UNIT)), false);
-            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
-                columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_BONUS_COST)), false);
-                columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_PAY_BONUS)), false);
-            } else {
+
+            if (!hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
                 columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_SHARES)), false);
             }
             columnModel.setColumnVisible(columnModel.getColumn(personnelTable.convertColumnIndexToView(RetirementTableModel.COL_MISC_MOD)),
                     hqView.getCampaign().getCampaignOptions().isUseCustomRetirementModifiers());
+
             model.setData(targetRolls);
             model.addTableModelListener(ev -> {
-                if (!hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
-                    Money bonus = getTotalBonus();
-                    if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
-                        lblTotal.setText("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
-                                + getTotalBonus().toAmountAndSymbolString() + "</font></html>");
-                        btnRoll.setEnabled(false);
-                    } else {
-                        lblTotal.setText(getTotalBonus().toAmountAndSymbolString());
-                        btnRoll.setEnabled(true);
-                    }
-                }
+                setBonusAndShareTotals(getTotalBonus());
+
+                btnRoll.setEnabled(!getTotalBonus().isGreaterThan(hqView.getCampaign().getFinances().getBalance()));
             });
+            setBonusAndShareTotals(getTotalBonus());
 
             JScrollPane scroll = new JScrollPane();
             scroll.setViewportView(personnelTable);
@@ -366,11 +365,11 @@ public class RetirementDefectionDialog extends JDialog {
         panResults.add(scroll);
         JPanel panAddRemoveBtns = new JPanel();
         panAddRemoveBtns.setLayout(new BoxLayout(panAddRemoveBtns, BoxLayout.Y_AXIS));
-        btnAddUnit = new JButton("<<<");
+        btnAddUnit = new JButton("◄");
         btnAddUnit.setEnabled(false);
         btnAddUnit.addActionListener(ev -> addUnit());
         panAddRemoveBtns.add(btnAddUnit);
-        btnRemoveUnit = new JButton(">>>");
+        btnRemoveUnit = new JButton("►");
         btnRemoveUnit.setEnabled(false);
         btnRemoveUnit.addActionListener(ev -> removeUnit());
         panAddRemoveBtns.add(btnRemoveUnit);
@@ -407,6 +406,21 @@ public class RetirementDefectionDialog extends JDialog {
         btnRoll.setVisible(doRetirement);
         btnDone.setVisible(!doRetirement);
         add(btnPanel, BorderLayout.PAGE_END);
+    }
+
+    private void setBonusAndShareTotals(Money bonus) {
+        if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
+            lblTotal.setText("<html>" + resourceMap.getString("lblTotalBonus.text")
+                    + ' ' + "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                    + getTotalBonus().toAmountAndSymbolString() + "</font></html>");
+        } else {
+            lblTotal.setText(resourceMap.getString("lblTotalBonus.text")
+                    + ' ' + getTotalBonus().toAmountAndSymbolString());
+        }
+
+        if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
+            lblTotalShares.setText(Integer.toString(getTotalShares()));
+        }
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
@@ -454,15 +468,10 @@ public class RetirementDefectionDialog extends JDialog {
 
                 currentPanel = PAN_RESULTS;
                 cardLayout.show(panMain, currentPanel);
-                if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()) {
-                    txtInstructions.setText(resourceMap.getString("txtInstructions.ResultsShare.text"));
-                } else {
-                    txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
-                }
-                if (getTotalBonus().isPositive()) {
-                    hqView.getCampaign().getFinances().debit(TransactionType.SALARIES,
-                            hqView.getCampaign().getLocalDate(), getTotalBonus(), "Bonus Payments");
-                }
+                txtInstructions.setText(resourceMap.getString("txtInstructions.Results.text"));
+
+                hqView.getCampaign().getFinances().debit(TransactionType.SALARIES,
+                        hqView.getCampaign().getLocalDate(), getTotalBonus(), "Bonus Payments");
             } else if (ev.getSource().equals(btnDone)) {
                 for (UUID pid : ((RetirementTableModel) retireeTable.getModel()).getAltPayout().keySet()) {
                     rdTracker.getPayout(pid).setPayoutAmount(((RetirementTableModel) retireeTable.getModel())
@@ -698,6 +707,12 @@ public class RetirementDefectionDialog extends JDialog {
             if (((RetirementTableModel) personnelTable.getModel()).getPayBonus(id)) {
                 retVal = retVal.plus(RetirementDefectionTracker.getPayoutOrBonusValue(hqView.getCampaign(),
                         hqView.getCampaign().getPerson(id)));
+
+                if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isMonthly()) {
+                    retVal = retVal.dividedBy(12);
+                } else if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isWeekly()) {
+                    retVal = retVal.dividedBy(52);
+                }
             }
         }
         return retVal;

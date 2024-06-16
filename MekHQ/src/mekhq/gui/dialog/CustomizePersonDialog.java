@@ -90,6 +90,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private JTextField textToughness;
     private JTextField textFatigue;
     private JComboBox<EducationLevel> textEducationLevel;
+    private JTextField textLoyalty;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -166,6 +167,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         textToughness = new JTextField();
         JLabel lblFatigue = new JLabel();
         textFatigue = new JTextField();
+        JLabel lblLoyalty = new JLabel();
+        textLoyalty = new JTextField();
         JLabel lblToughness = new JLabel();
         textEducationLevel = new JComboBox<>();
         JLabel lblEducationLevel = new JLabel();
@@ -698,6 +701,30 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             y++;
         }
 
+        lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
+        lblLoyalty.setName("lblLoyalty");
+
+        textLoyalty.setText(Integer.toString(person.getLoyalty()));
+        textLoyalty.setName("textLoyalty");
+
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblLoyalty, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textLoyalty, gridBagConstraints);
+
+            y++;
+        }
+
         JLabel lblUnit = new JLabel();
         lblUnit.setText("Original unit:");
         lblUnit.setName("lblUnit");
@@ -1034,24 +1061,26 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
         } catch (NumberFormatException ignored) {}
 
+        try {
+            person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
+        } catch (NumberFormatException ignored) {}
+
+        try {
+            person.setFatigue(Integer.parseInt(textFatigue.getText()));
+        } catch (NumberFormatException ignored) {}
+
         if (null == choiceOriginalUnit.getSelectedItem()) {
-            try {
-                person.setFatigue(Integer.parseInt(textFatigue.getText()));
-            } catch (NumberFormatException ignored) {}
-
-            if (choiceOriginalUnit.getSelectedItem() == null) {
-                person.setOriginalUnit(null);
-                person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
-                person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
-            } else {
-                person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
-            }
-
-            person.setFounder(chkFounder.isSelected());
-            setSkills();
-            setOptions();
-            setVisible(false);
+            person.setOriginalUnit(null);
+            person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
+            person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
+        } else {
+            person.setOriginalUnit((Unit) choiceOriginalUnit.getSelectedItem());
         }
+
+        person.setFounder(chkFounder.isSelected());
+        setSkills();
+        setOptions();
+        setVisible(false);
     }
 
     private void randomName() {

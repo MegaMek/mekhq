@@ -7014,69 +7014,67 @@ public class Campaign implements ITechManager {
         return false;
     }
 
-    public boolean checkRetirementDefections() {
-        if (!getRetirementDefectionTracker().getRetirees().isEmpty()) {
-            Object[] options = {
-                    resources.getString("turnoverPayoutDialog.text"),
-                    resources.getString("turnoverCancel.text")
-            };
-
-            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(
-                    null,
-                    resources.getString("turnoverPersonnelKilled.text"),
-                    resources.getString("turnoverFinalPayments.text"),
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE,
-                    null,
-                    options,
-                    options[0]
-            );
+    /**
+     * Checks if a turnover prompt should be displayed based on campaign options and current date.
+     *
+     * @return An integer representing the user's choice:
+     *         -1 if turnover prompt should not be displayed.
+     *         0 to indicate the user selected "Employee Turnover".
+     *         1 to indicate the user selected "Advance Day Regardless".
+     *         2 to indicate the user selected "Cancel Advance Day".
+     */
+    public int checkTurnoverPrompt() {
+        if (getLocalDate().isBefore(getCampaignStartDate().plusDays(6))) {
+            return -1;
         }
-        return false;
-    }
-
-    public boolean checkTurnoverPrompt() {
-        String period = "";
 
         boolean triggerTurnoverPrompt = false;
 
         switch (campaignOptions.getTurnoverFrequency()) {
             case NEVER:
-                return false;
+                return -1;
             case WEEKLY:
                 triggerTurnoverPrompt = getLocalDate().getDayOfWeek().equals(DayOfWeek.MONDAY);
-                period = resources.getString("turnoverWeekly.text");
                 break;
             case MONTHLY:
                 triggerTurnoverPrompt = getLocalDate().getDayOfMonth() == 1;
-                period = resources.getString("turnoverMonthly.text");
                 break;
             case ANNUALLY:
                 triggerTurnoverPrompt = getLocalDate().getDayOfYear() == 1;
-                period = resources.getString("turnoverAnnually.text");
                 break;
         }
 
         if (triggerTurnoverPrompt) {
+            String dialogTitle;
+            String dialogBody;
+
+            if (getRetirementDefectionTracker().getRetirees().isEmpty()) {
+                dialogTitle = resources.getString("turnoverRollRequired.text");
+                dialogBody = resources.getString("turnoverDialogDescription.text");
+            } else {
+                dialogTitle = resources.getString("turnoverFinalPayments.text");
+                dialogBody = resources.getString("turnoverPersonnelKilled.text");
+            }
+
             Object[] options = {
                     resources.getString("turnoverEmployeeTurnoverDialog.text"),
-                    resources.getString("turnoverNotNow.text")
+                    resources.getString("turnoverAdvanceRegardless"),
+                    resources.getString("turnoverCancel.text")
             };
 
-            return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(
+            return JOptionPane.showOptionDialog(
                     null,
-                    String.format(resources.getString("turnoverDialogDescription.text"),
-                            period),
-                    resources.getString("turnoverRollRequired.text"),
-                    JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.WARNING_MESSAGE,
+                    dialogBody,
+                    dialogTitle,
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.INFORMATION_MESSAGE,
                     null,
                     options,
                     options[0]
             );
         }
 
-        return false;
+        return -1;
     }
 
     public boolean checkScenariosDue() {

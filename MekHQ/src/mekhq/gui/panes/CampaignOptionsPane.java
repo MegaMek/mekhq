@@ -293,6 +293,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseUnitRatingModifiers;
     private JCheckBox chkUseFactionModifiers;
     private JCheckBox chkUseMissionStatusModifiers;
+    private JCheckBox chkUseHostileTerritoryModifiers;
     private JCheckBox chkUseFamilyModifiers;
     private JCheckBox chkUseLoyaltyModifiers;
 
@@ -600,6 +601,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     // Unit Market
     private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
     private JCheckBox chkUnitMarketRegionalMechVariations;
+    private JLabel lblUnitMarketSpecialUnitChance;
+    private JSpinner spnUnitMarketSpecialUnitChance;
     private JCheckBox chkInstantUnitMarketDelivery;
     private JCheckBox chkUnitMarketReportRefresh;
 
@@ -4519,6 +4522,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseMissionStatusModifiers.setName("chkUseMissionStatusModifiers");
         chkUseMissionStatusModifiers.setEnabled(isUseTurnover);
 
+        chkUseHostileTerritoryModifiers = new JCheckBox(resources.getString("chkUseHostileTerritoryModifiers.text"));
+        chkUseHostileTerritoryModifiers.setToolTipText(resources.getString("chkUseHostileTerritoryModifiers.toolTipText"));
+        chkUseHostileTerritoryModifiers.setName("chkUseHostileTerritoryModifiers");
+        chkUseHostileTerritoryModifiers.setEnabled(isUseTurnover);
+
         chkUseFamilyModifiers = new JCheckBox(resources.getString("chkUseFamilyModifiers.text"));
         chkUseFamilyModifiers.setToolTipText(resources.getString("chkUseFamilyModifiers.toolTipText"));
         chkUseFamilyModifiers.setName("chkUseFamilyModifiers");
@@ -4557,6 +4565,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseAgeModifiers)
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
+                        .addComponent(chkUseHostileTerritoryModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
                         .addComponent(chkUseFamilyModifiers)
                         .addGap(15)
@@ -4572,6 +4581,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseAgeModifiers)
                         .addComponent(chkUseUnitRatingModifiers)
                         .addComponent(chkUseFactionModifiers)
+                        .addComponent(chkUseHostileTerritoryModifiers)
                         .addComponent(chkUseMissionStatusModifiers)
                         .addComponent(chkUseFamilyModifiers)
                         .addComponent(chkUseLoyaltyModifiers)
@@ -4866,7 +4876,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         lblManagementSkillPenalty.setName("lblManagementSkillPenalty");
         lblManagementSkillPenalty.setEnabled((isUseTurnover) && (isUseManagementSkill));
 
-        spnManagementSkillPenalty = new JSpinner(new SpinnerNumberModel(-2, -10, 0, 1));
+        spnManagementSkillPenalty = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
         spnManagementSkillPenalty.setToolTipText(resources.getString("lblManagementSkillPenalty.toolTipText"));
         spnManagementSkillPenalty.setName("spnManagementSkillPenalty");
         spnManagementSkillPenalty.setEnabled((isUseTurnover) && (isUseManagementSkill));
@@ -7478,6 +7488,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
             final boolean enabled = !method.isNone();
             chkUnitMarketRegionalMechVariations.setEnabled(enabled);
+            lblUnitMarketSpecialUnitChance.setEnabled(enabled);
+            spnUnitMarketSpecialUnitChance.setEnabled(enabled);
             chkInstantUnitMarketDelivery.setEnabled(enabled);
             chkUnitMarketReportRefresh.setEnabled(enabled);
         });
@@ -7485,6 +7497,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUnitMarketRegionalMechVariations = new JCheckBox(resources.getString("chkUnitMarketRegionalMechVariations.text"));
         chkUnitMarketRegionalMechVariations.setToolTipText(resources.getString("chkUnitMarketRegionalMechVariations.toolTipText"));
         chkUnitMarketRegionalMechVariations.setName("chkUnitMarketRegionalMechVariations");
+
+        lblUnitMarketSpecialUnitChance = new JLabel();
+        lblUnitMarketSpecialUnitChance.setText(resources.getString("lblUnitMarketSpecialUnitChance.text"));
+        lblUnitMarketSpecialUnitChance.setToolTipText(resources.getString("lblUnitMarketSpecialUnitChance.toolTipText"));
+        lblUnitMarketSpecialUnitChance.setName("lblUnitMarketSpecialUnitChance");
+
+        spnUnitMarketSpecialUnitChance = new JSpinner(new SpinnerNumberModel(30, 0, 100, 1));
+        spnUnitMarketSpecialUnitChance.setToolTipText(resources.getString("lblUnitMarketSpecialUnitChance.toolTipText"));
+        spnUnitMarketSpecialUnitChance.setName("spnUnitMarketSpecialUnitChance");
 
         chkInstantUnitMarketDelivery = new JCheckBox(resources.getString("chkInstantUnitMarketDelivery.text"));
         chkInstantUnitMarketDelivery.setToolTipText(resources.getString("chkInstantUnitMarketDelivery.toolTipText"));
@@ -7513,6 +7534,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblUnitMarketMethod)
                                 .addComponent(comboUnitMarketMethod, Alignment.LEADING))
                         .addComponent(chkUnitMarketRegionalMechVariations)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblUnitMarketSpecialUnitChance)
+                                .addComponent(spnUnitMarketSpecialUnitChance, Alignment.LEADING))
                         .addComponent(chkInstantUnitMarketDelivery)
                         .addComponent(chkUnitMarketReportRefresh)
         );
@@ -7523,6 +7547,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblUnitMarketMethod)
                                 .addComponent(comboUnitMarketMethod))
                         .addComponent(chkUnitMarketRegionalMechVariations)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblUnitMarketSpecialUnitChance)
+                                .addComponent(spnUnitMarketSpecialUnitChance))
                         .addComponent(chkInstantUnitMarketDelivery)
                         .addComponent(chkUnitMarketReportRefresh)
         );
@@ -8048,6 +8075,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseAgeModifiers.setSelected(options.isUseAgeModifiers());
         chkUseUnitRatingModifiers.setSelected(options.isUseUnitRatingModifiers());
         chkUseFactionModifiers.setSelected(options.isUseFactionModifiers());
+        chkUseHostileTerritoryModifiers.setSelected(options.isUseHostileTerritoryModifiers());
         chkUseMissionStatusModifiers.setSelected(options.isUseMissionStatusModifiers());
         chkUseFamilyModifiers.setSelected(options.isUseFamilyModifiers());
         chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
@@ -8358,6 +8386,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Unit Market
         comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
         chkUnitMarketRegionalMechVariations.setSelected(options.isUnitMarketRegionalMechVariations());
+        spnUnitMarketSpecialUnitChance.setValue(options.getUnitMarketSpecialUnitChance());
         chkInstantUnitMarketDelivery.setSelected(options.isInstantUnitMarketDelivery());
         chkUnitMarketReportRefresh.setSelected(options.isUnitMarketReportRefresh());
 
@@ -8735,6 +8764,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseAgeModifiers(chkUseAgeModifiers.isSelected());
             options.setUseUnitRatingModifiers(chkUseUnitRatingModifiers.isSelected());
             options.setUseFactionModifiers(chkUseFactionModifiers.isSelected());
+            options.setUseHostileTerritoryModifiers(chkUseHostileTerritoryModifiers.isSelected());
             options.setUseMissionStatusModifiers(chkUseMissionStatusModifiers.isSelected());
             options.setUseFamilyModifiers(chkUseFamilyModifiers.isSelected());
             options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
@@ -8911,6 +8941,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             // Unit Market
             options.setUnitMarketMethod(comboUnitMarketMethod.getSelectedItem());
             options.setUnitMarketRegionalMechVariations(chkUnitMarketRegionalMechVariations.isSelected());
+            options.setUnitMarketSpecialUnitChance((Integer) spnUnitMarketSpecialUnitChance.getValue());
             options.setInstantUnitMarketDelivery(chkInstantUnitMarketDelivery.isSelected());
             options.setUnitMarketReportRefresh(chkUnitMarketReportRefresh.isSelected());
 

@@ -301,6 +301,7 @@ public class CampaignOptions {
     private boolean useAgeModifiers;
     private boolean useUnitRatingModifiers;
     private boolean useFactionModifiers;
+    private boolean useHostileTerritoryModifiers;
     private boolean useMissionStatusModifiers;
     private boolean useFamilyModifiers;
     private boolean useLoyaltyModifiers;
@@ -515,6 +516,7 @@ public class CampaignOptions {
     // Unit Market
     private UnitMarketMethod unitMarketMethod;
     private boolean unitMarketRegionalMechVariations;
+    private int unitMarketSpecialUnitChance;
     private boolean instantUnitMarketDelivery;
     private boolean unitMarketReportRefresh;
 
@@ -956,7 +958,7 @@ public class CampaignOptions {
         // Retirement
         setUseRetirementDateTracking(false);
         setUseRandomRetirement(true);
-        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.NEGOTIATION);
+        setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.FIXED);
         setTurnoverDifficulty(SkillLevel.REGULAR);
         setTurnoverFrequency(TurnoverFrequency.MONTHLY);
         setTurnoverFixedTargetNumber(3);
@@ -967,7 +969,7 @@ public class CampaignOptions {
         setUseSubContractSoldiers(false);
         setServiceContractDuration(36);
         setServiceContractModifier(3);
-        setPayBonusDefault(true);
+        setPayBonusDefault(false);
 
         setUseCustomRetirementModifiers(true);
         setUseFatigueModifiers(true);
@@ -976,10 +978,11 @@ public class CampaignOptions {
         setUseUnitRatingModifiers(true);
         setUseFactionModifiers(true);
         setUseMissionStatusModifiers(true);
+        setUseHostileTerritoryModifiers(true);
         setUseFamilyModifiers(true);
 
         setUseLoyaltyModifiers(true);
-        setUseHideLoyalty(true);
+        setUseHideLoyalty(false);
 
         setPayoutRateOfficer(3);
         setPayoutRateEnlisted(3);
@@ -993,7 +996,7 @@ public class CampaignOptions {
 
         setUseManagementSkill(true);
         setUseCommanderLeadershipOnly(false);
-        setManagementSkillPenalty(-2);
+        setManagementSkillPenalty(0);
 
         setUseFatigue(true);
         setFatigueRate(1);
@@ -1119,6 +1122,7 @@ public class CampaignOptions {
         // Unit Market
         setUnitMarketMethod(UnitMarketMethod.NONE);
         setUnitMarketRegionalMechVariations(true);
+        setUnitMarketSpecialUnitChance(30);
         setInstantUnitMarketDelivery(false);
         setUnitMarketReportRefresh(true);
 
@@ -2002,6 +2006,14 @@ public class CampaignOptions {
 
     public void setUseMissionStatusModifiers(final boolean useMissionStatusModifiers) {
         this.useMissionStatusModifiers = useMissionStatusModifiers;
+    }
+
+    public boolean isUseHostileTerritoryModifiers() {
+        return useHostileTerritoryModifiers;
+    }
+
+    public void setUseHostileTerritoryModifiers(final boolean useHostileTerritoryModifiers) {
+        this.useHostileTerritoryModifiers = useHostileTerritoryModifiers;
     }
 
     public boolean isUseFamilyModifiers() {
@@ -3364,6 +3376,14 @@ public class CampaignOptions {
         this.unitMarketRegionalMechVariations = unitMarketRegionalMechVariations;
     }
 
+    public int getUnitMarketSpecialUnitChance() {
+        return unitMarketSpecialUnitChance;
+    }
+
+    public void setUnitMarketSpecialUnitChance(final int unitMarketSpecialUnitChance) {
+        this.unitMarketSpecialUnitChance = unitMarketSpecialUnitChance;
+    }
+
     public boolean isInstantUnitMarketDelivery() {
         return instantUnitMarketDelivery;
     }
@@ -4602,6 +4622,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useUnitRatingModifiers", isUseUnitRatingModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFactionModifiers", isUseFactionModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useMissionStatusModifiers", isUseMissionStatusModifiers());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useHostileTerritoryModifiers", isUseHostileTerritoryModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFamilyModifiers", isUseFamilyModifiers());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoyaltyModifiers", isUseLoyaltyModifiers());
@@ -4804,6 +4825,7 @@ public class CampaignOptions {
         //region Unit Market
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketMethod", getUnitMarketMethod().name());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketRegionalMechVariations", isUnitMarketRegionalMechVariations());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketSpecialUnitChance", getUnitMarketSpecialUnitChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "instantUnitMarketDelivery", isInstantUnitMarketDelivery());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitMarketReportRefresh", isUnitMarketReportRefresh());
         //endregion Unit Market
@@ -5596,6 +5618,8 @@ public class CampaignOptions {
                     retVal.setUseFactionModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useMissionStatusModifiers")) {
                     retVal.setUseMissionStatusModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useHostileTerritoryModifiers")) {
+                    retVal.setUseHostileTerritoryModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFamilyModifiers")) {
                     retVal.setUseFamilyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useLoyaltyModifiers")) {
@@ -5755,6 +5779,8 @@ public class CampaignOptions {
                     retVal.setUnitMarketMethod(UnitMarketMethod.valueOf(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketRegionalMechVariations")) {
                     retVal.setUnitMarketRegionalMechVariations(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketSpecialUnitChance")) {
+                    retVal.setUnitMarketSpecialUnitChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("instantUnitMarketDelivery")) {
                     retVal.setInstantUnitMarketDelivery(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitMarketReportRefresh")) {
