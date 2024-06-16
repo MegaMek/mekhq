@@ -455,7 +455,6 @@ public class CampaignOptions {
 
     // Shares
     private boolean useShareSystem;
-    private boolean sharesExcludeLargeCraft;
     private boolean sharesForAll;
     //endregion Finance Tab
 
@@ -1045,7 +1044,6 @@ public class CampaignOptions {
 
         // Shares
         setUseShareSystem(false);
-        setSharesExcludeLargeCraft(true);
         setSharesForAll(true);
         //endregion Finances Tab
 
@@ -4149,14 +4147,6 @@ public class CampaignOptions {
         this.useShareSystem = useShareSystem;
     }
 
-    public boolean isSharesExcludeLargeCraft() {
-        return sharesExcludeLargeCraft;
-    }
-
-    public void setSharesExcludeLargeCraft(final boolean sharesExcludeLargeCraft) {
-        this.sharesExcludeLargeCraft = sharesExcludeLargeCraft;
-    }
-
     public boolean isSharesForAll() {
         return sharesForAll;
     }
@@ -4798,7 +4788,6 @@ public class CampaignOptions {
 
         // Shares
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useShareSystem", isUseShareSystem());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesExcludeLargeCraft", isSharesExcludeLargeCraft());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sharesForAll", isSharesForAll());
         //endregion Price Multipliers
 
@@ -5743,8 +5732,6 @@ public class CampaignOptions {
                 // Shares
                 } else if (wn2.getNodeName().equalsIgnoreCase("useShareSystem")) {
                     retVal.setUseShareSystem(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("sharesExcludeLargeCraft")) {
-                    retVal.setSharesExcludeLargeCraft(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("sharesForAll")) {
                     retVal.setSharesForAll(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 //endregion Price Multipliers
