@@ -39,10 +39,16 @@ public class InvalidFactionNagDialog extends AbstractMHQNagDialog {
         // this is a special handler for FedSuns as they're the main culprit behind the issue of users having invalid factions.
         // FS and LA campaigns won't trigger the above conditional, because those factions aren't technically ended when the FedSuns forms
         // they just become dormant.
-        if ((Objects.equals(campaignFaction.getShortName(), "FS")) || (Objects.equals(campaignFaction.getShortName(), "LA"))) {
+        if (Objects.equals(campaignFaction.getShortName(), "LA")) {
             // the dates picked are chosen as these are when mhq does the bulk of the faction ownership transfers
             return ((campaign.getLocalDate().isAfter(LocalDate.of(3040, 1, 18)))
                     && (campaign.getLocalDate().isBefore(LocalDate.of(3067, 4, 20))));
+        }
+
+        // this is another special handler for FedSuns as they're the main culprit behind the issue of users having invalid factions.
+        if (Objects.equals(campaignFaction.getShortName(), "FS")) {
+            return ((campaign.getLocalDate().isAfter(LocalDate.of(3040, 1, 18)))
+                    && (campaign.getLocalDate().isBefore(LocalDate.of(3057, 9, 18))));
         }
 
         return false;
