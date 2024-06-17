@@ -78,57 +78,57 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         Faction faction = campaign.getFaction();
 
         addOffers(campaign, getMarketItemCount("uncommon"), UnitMarketType.OPEN, UnitType.MEK,
-                faction, IUnitRating.DRAGOON_F, -1);
+                faction, IUnitRating.DRAGOON_F, 1);
 
         addOffers(campaign, getMarketItemCount("uncommon"), UnitMarketType.OPEN, UnitType.AEROSPACEFIGHTER,
-                faction, IUnitRating.DRAGOON_F, -1);
+                faction, IUnitRating.DRAGOON_F, 1);
 
         addOffers(campaign, getMarketItemCount("very common"), UnitMarketType.OPEN, UnitType.TANK,
-                faction, IUnitRating.DRAGOON_F, -1);
+                faction, IUnitRating.DRAGOON_F, 1);
 
         addOffers(campaign, getMarketItemCount("common"), UnitMarketType.OPEN, UnitType.CONV_FIGHTER,
-                faction, IUnitRating.DRAGOON_F, -1);
+                faction, IUnitRating.DRAGOON_F, 1);
 
         if ((contract != null) && (campaign.getLocalDate().isAfter(contract.getStartDate().minusDays(1)))) {
             // Employer Market
             faction = contract.getEmployerFaction();
 
             addOffers(campaign, getMarketItemCount("rare"), UnitMarketType.EMPLOYER, UnitType.MEK,
-                    faction, IUnitRating.DRAGOON_D, 1);
+                    faction, IUnitRating.DRAGOON_D, -1);
 
             addOffers(campaign, getMarketItemCount("rare"), UnitMarketType.EMPLOYER, UnitType.AEROSPACEFIGHTER,
-                    faction, IUnitRating.DRAGOON_D, 1);
+                    faction, IUnitRating.DRAGOON_D, -1);
 
             addOffers(campaign, getMarketItemCount("common"), UnitMarketType.EMPLOYER, UnitType.TANK,
-                    faction, IUnitRating.DRAGOON_D, 1);
+                    faction, IUnitRating.DRAGOON_D, -1);
 
             addOffers(campaign, getMarketItemCount("uncommon"), UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER,
-                    faction, IUnitRating.DRAGOON_D, 1);
+                    faction, IUnitRating.DRAGOON_D, -1);
 
             // Unwanted Salvage Market
             faction = contract.getEnemy();
 
             addOffers(campaign, getMarketItemCount("rare"), UnitMarketType.EMPLOYER, UnitType.MEK,
-                    faction, IUnitRating.DRAGOON_F, -2);
+                    faction, IUnitRating.DRAGOON_F, 2);
 
             addOffers(campaign, getMarketItemCount("rare"), UnitMarketType.EMPLOYER, UnitType.AEROSPACEFIGHTER,
-                    faction, IUnitRating.DRAGOON_F, -2);
+                    faction, IUnitRating.DRAGOON_F, 2);
 
             addOffers(campaign, getMarketItemCount("common"), UnitMarketType.EMPLOYER, UnitType.TANK,
-                    faction, IUnitRating.DRAGOON_F, -2);
+                    faction, IUnitRating.DRAGOON_F, 2);
 
             addOffers(campaign, getMarketItemCount("uncommon"), UnitMarketType.EMPLOYER, UnitType.CONV_FIGHTER,
-                    faction, IUnitRating.DRAGOON_F, -2);
+                    faction, IUnitRating.DRAGOON_F, 2);
         }
 
         // Mercenary Market
         if (!campaign.getFaction().isClan()) {
             faction = Factions.getInstance().getFaction("MERC");
 
-            int modifier = -1;
+            int modifier = 1;
 
             if (campaign.getFaction().isMercenary()) {
-                modifier = 1;
+                modifier = -1;
             }
 
             addOffers(campaign, getMarketItemCount("uncommon"), UnitMarketType.MERCENARY, UnitType.MEK,
@@ -151,16 +151,16 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
 
             if ((!campaign.getFaction().isClan()) && (faction != null) && (!faction.isClan())) {
                 addOffers(campaign, getMarketItemCount("rare"), UnitMarketType.FACTORY, UnitType.MEK,
-                        faction, IUnitRating.DRAGOON_A, -2);
+                        faction, IUnitRating.DRAGOON_A, 2);
 
                 addOffers(campaign, getMarketItemCount("rare"), UnitMarketType.FACTORY, UnitType.AEROSPACEFIGHTER,
-                        faction, IUnitRating.DRAGOON_A, -2);
+                        faction, IUnitRating.DRAGOON_A, 2);
 
                 addOffers(campaign, getMarketItemCount("common"), UnitMarketType.FACTORY, UnitType.TANK,
-                        faction, IUnitRating.DRAGOON_A, -2);
+                        faction, IUnitRating.DRAGOON_A, 2);
 
                 addOffers(campaign, getMarketItemCount("uncommon"), UnitMarketType.FACTORY, UnitType.CONV_FIGHTER,
-                        faction, IUnitRating.DRAGOON_A, -2);
+                        faction, IUnitRating.DRAGOON_A, 2);
             }
         }
 
@@ -169,13 +169,13 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
         // Clan Factory Market
         if ((faction.isClan()) && (campaign.getCurrentSystem().getFactionSet(campaign.getLocalDate()).contains(faction))) {
             addOffers(campaign, getMarketItemCount("very common"), UnitMarketType.FACTORY, UnitType.MEK,
-                    faction, IUnitRating.DRAGOON_A, 4);
+                    faction, IUnitRating.DRAGOON_A, -4);
 
             addOffers(campaign, getMarketItemCount("common"), UnitMarketType.FACTORY, UnitType.AEROSPACEFIGHTER,
-                    faction, IUnitRating.DRAGOON_A, 4);
+                    faction, IUnitRating.DRAGOON_A, -4);
 
             addOffers(campaign, getMarketItemCount("uncommon"), UnitMarketType.FACTORY, UnitType.TANK,
-                    faction, IUnitRating.DRAGOON_A, 4);
+                    faction, IUnitRating.DRAGOON_A, -4);
         }
 
         // Black Market
@@ -184,16 +184,16 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     .getFactionSet(campaign.getLocalDate()));
 
             addOffers(campaign, getMarketItemCount("very rare"), UnitMarketType.BLACK_MARKET, UnitType.MEK,
-                    faction, IUnitRating.DRAGOON_A, 4);
+                    faction, IUnitRating.DRAGOON_A, -4);
 
             addOffers(campaign, getMarketItemCount("very rare"), UnitMarketType.BLACK_MARKET, UnitType.AEROSPACEFIGHTER,
-                    faction, IUnitRating.DRAGOON_A, 4);
+                    faction, IUnitRating.DRAGOON_A, -4);
 
             addOffers(campaign, getMarketItemCount("uncommon"), UnitMarketType.BLACK_MARKET, UnitType.TANK,
-                    faction, IUnitRating.DRAGOON_A, 4);
+                    faction, IUnitRating.DRAGOON_A, -4);
 
             addOffers(campaign, getMarketItemCount("rare"), UnitMarketType.BLACK_MARKET, UnitType.CONV_FIGHTER,
-                    faction, IUnitRating.DRAGOON_A, 4);
+                    faction, IUnitRating.DRAGOON_A, -4);
         }
 
         writeRefreshReport(campaign);

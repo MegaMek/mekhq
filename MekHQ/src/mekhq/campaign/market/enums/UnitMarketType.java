@@ -111,7 +111,7 @@ public enum UnitMarketType {
     /**
      * Calculates the price percentage based on a given modifier and d6 roll.
      *
-     * @param modifier the modifier to adjust the price (a positive modifier decreases price, negative decreases price)
+     * @param modifier the modifier to adjust the price (a negative modifier decreases price, positive increases price)
      * @return the calculated price
      * @throws IllegalStateException if the roll value is unexpected
      */
