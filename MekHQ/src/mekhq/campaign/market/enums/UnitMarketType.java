@@ -108,7 +108,48 @@ public enum UnitMarketType {
         return name;
     }
 
+    /**
+     * Calculates the price percentage based on a given modifier and d6 roll.
+     *
+     * @param modifier the modifier to adjust the price (a positive modifier decreases price, negative decreases price)
+     * @return the calculated price
+     * @throws IllegalStateException if the roll value is unexpected
+     */
+    public static int getPricePercentage(int modifier) {
+        int roll = Compute.d6(2);
+        int value = 0;
 
+        switch (roll) {
+            case 2:
+                value = 3 + modifier;
+                break;
+            case 3:
+                value = 2 + modifier;
+                break;
+            case 4:
+            case 5:
+                value = 1 + modifier;
+                break;
+            case 6:
+            case 7:
+            case 8:
+                break;
+            case 9:
+            case 10:
+                value = -1 + modifier;
+                break;
+            case 11:
+                value = -2 + modifier;
+                break;
+            case 12:
+                value = -3 + modifier;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: " + roll);
+        }
+
+        return 100 + (value * 5);
+    }
 
     /**
      * Returns the quality of a unit based on the given market type.
