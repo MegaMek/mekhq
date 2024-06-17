@@ -1110,6 +1110,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <layeredForceIconLogoFilename>Federated Commonwealth.png</layeredForceIconLogoFilename>
         <colorRGB>248,212,44</colorRGB>
         <tags>is,super,playable</tags>
+        <start>3055</start>
+        <end>3067</end>
     </faction>
     <faction>
         <shortname>FVC</shortname>
