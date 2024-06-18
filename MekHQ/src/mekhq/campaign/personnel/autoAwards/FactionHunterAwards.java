@@ -5,7 +5,6 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.universe.Faction;
-import org.apache.logging.log4j.LogManager;
 
 import java.util.*;
 
@@ -26,7 +25,6 @@ public class FactionHunterAwards {
         for (Award award : awards) {
             if (award.canBeAwarded(campaign.getPerson(person))) {
                 List<String> targetFactions = List.of(award.getRange().split(","));
-                LogManager.getLogger().info(targetFactions);
 
                 if (!targetFactions.isEmpty()) {
                     // returns true if missionFaction matches the requirements of the listed targetFactions
