@@ -816,10 +816,12 @@ public class EducationController {
             person.setEduHighestEducation(EducationLevel.parseFromInt(educationLevel));
         }
 
-        if ((academy.isReeducationCamp()) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
-            if (!Objects.equals(person.getOriginFaction(), campaign.getFaction())) {
+        if (academy.isReeducationCamp()) {
+            if (campaign.getCampaignOptions().isUseReeducationCamps()) {
                 person.setOriginFaction(campaign.getFaction());
             }
+
+            person.generateLoyalty(Compute.d6(4));
         }
     }
 
