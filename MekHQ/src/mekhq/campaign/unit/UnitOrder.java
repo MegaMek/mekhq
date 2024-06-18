@@ -116,7 +116,7 @@ public class UnitOrder extends Unit implements IAcquisitionWork {
 
     @Override
     public Object getNewEquipment() {
-        String name = getEntity().getChassis() + " " + getEntity().getModel();
+        String name = getEntity().getFullChassis() + " " + getEntity().getModel();
         name = name.trim();
         MechSummary summary = MechSummaryCache.getInstance().getMech(name);
         if (null == summary) {
