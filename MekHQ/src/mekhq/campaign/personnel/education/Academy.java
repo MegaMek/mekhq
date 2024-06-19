@@ -781,7 +781,7 @@ public class Academy implements Comparable<Academy> {
         } else if ((currentEducationLevel + minimumEducationLevel) == 0) {
             educationLevel = currentEducationLevel + minimumEducationLevel + 1;
         } else {
-            educationLevel = maximumEducationLevel + minimumEducationLevel;
+            educationLevel = currentEducationLevel + minimumEducationLevel;
         }
 
         // this probably isn't necessary, but a little insurance goes a long way
