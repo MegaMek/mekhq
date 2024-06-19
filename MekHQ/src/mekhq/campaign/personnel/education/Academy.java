@@ -30,6 +30,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationLevel.Adapter;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
@@ -718,21 +719,36 @@ public class Academy implements Comparable<Academy> {
      * @return The filtered faction for the local campus, or null if no faction is found.
      */
     public String getFilteredFaction(Campaign campaign, Person person, List<String> factions) {
-        for (String faction : factions) {
-            if ((isFactionRestricted) && (Objects.equals(campaign.getFaction().getShortName(), faction))) {
-                return Factions.getInstance().getFaction(faction).getShortName();
-            } else if ((isFactionRestricted) && (Objects.equals(person.getOriginFaction().getShortName(), faction))) {
-                return Factions.getInstance().getFaction(faction).getShortName();
-            } else if (!RandomFactionGenerator.getInstance().getFactionHints()
-                    .isAtWarWith(person.getOriginFaction(), Factions.getInstance().getFaction(faction),
-                            campaign.getLocalDate())) {
-                return Factions.getInstance().getFaction(faction).getShortName();
-            } else if (!RandomFactionGenerator.getInstance().getFactionHints()
-                    .isAtWarWith(campaign.getFaction(), Factions.getInstance().getFaction(faction),
-                            campaign.getLocalDate())) {
-                return Factions.getInstance().getFaction(faction).getShortName();
-            }
+        if (factions.isEmpty()) {
+            return null;
         }
+
+        Faction originFaction = person.getOriginFaction();
+
+        for (String shortName : factions) {
+             Faction faction = Factions.getInstance().getFaction(shortName);
+
+             if (isFactionRestricted) {
+                 if (Objects.equals(originFaction, faction)) {
+                     return faction.getShortName();
+                 }
+
+                 if (Objects.equals(campaign.getFaction(), faction)) {
+                     return faction.getShortName();
+                 }
+
+                 return null;
+             }
+
+             if (!RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(originFaction, faction, campaign.getLocalDate())) {
+                 return faction.getShortName();
+             }
+
+             if (!RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(), faction, campaign.getLocalDate())) {
+                 return faction.getShortName();
+             }
+        }
+
         return null;
     }
 
