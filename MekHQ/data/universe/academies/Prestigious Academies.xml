@@ -17,7 +17,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Addicks University</name>
@@ -34,7 +34,7 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Aerospace and Interstellar Institute [Dover] (Year One)</name>
@@ -54,7 +54,7 @@
         <qualification>Year One Curriculum</qualification>
         <curriculum>Small Arms, First Aid</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Aerospace and Interstellar Institute [Dover]</name>
@@ -89,7 +89,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Aerospace and Interstellar Institute [Midway] (Year One)</name>
@@ -109,7 +109,7 @@
         <qualification>Year One Curriculum</qualification>
         <curriculum>Small Arms, First Aid</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Aerospace and Interstellar Institute [Midway]</name>
@@ -138,7 +138,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Aitutaki Academy (Year One)</name>
@@ -158,7 +158,7 @@
         <qualification>Year One Curriculum</qualification>
         <curriculum>Small Arms</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Aitutaki Academy</name>
@@ -199,7 +199,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Alarion Naval Academy</name>
@@ -233,7 +233,7 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Albion Military Academy</name>
@@ -346,7 +346,7 @@
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Algedi War College</name>
@@ -381,7 +381,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Allison MechWarrior Institute</name>
@@ -402,7 +402,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>An Ting University</name>
@@ -438,7 +438,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>An Ting University [3055]</name>
@@ -473,7 +473,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Annapolis Naval Academy</name>
@@ -518,7 +518,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Piloting/Naval, Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Annapolis Naval Academy [ComStar]</name>
@@ -565,7 +565,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Piloting/Naval, Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Apollo Military Academy</name>
@@ -625,7 +625,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Armstrong Flight Academy</name>
@@ -661,7 +661,7 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Armstrong Phoenix Academy</name>
@@ -695,7 +695,7 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Athene Combat School</name>
@@ -718,7 +718,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Atreus Officer Training College</name>
@@ -738,7 +738,7 @@
         <qualification>Officer Graduate</qualification>
         <curriculum>Administration, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Blackjack School of Conflict</name>
@@ -787,7 +787,7 @@
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation, Scrounge</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Brotherhood Monastery</name>
@@ -805,7 +805,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Calloway Martial College</name>
@@ -824,7 +824,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Calloway Martial College</name>
@@ -843,7 +843,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Canopian Institute of War</name>
@@ -871,7 +871,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Canopian Institute of War [3080]</name>
@@ -899,7 +899,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Capella War College</name>
@@ -1016,7 +1016,7 @@
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Caph Institute of Technology</name>
@@ -1033,7 +1033,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>College of Talitha</name>
@@ -1050,7 +1050,7 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Combat College of New Earth</name>
@@ -1060,6 +1060,7 @@
         <locationSystem>New Earth (Tau Ceti 2116-)</locationSystem>
         <constructionYear>2331</constructionYear>
         <tuition>17500</tuition>
+        <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
@@ -1100,7 +1101,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Concordat Aerospace Flight School</name>
@@ -1130,7 +1131,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Coventry Academy</name>
@@ -1157,7 +1158,7 @@
         <qualification>BattleMech Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Coventry Military Academy</name>
@@ -1184,7 +1185,7 @@
         <qualification>BattleMech Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Dieron District Gymnasium</name>
@@ -1211,7 +1212,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Dieron District Gymnasium [3078]</name>
@@ -1244,7 +1245,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Dieron Warriors' Academy</name>
@@ -1263,7 +1264,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Dover Institute for Higher Learning</name>
@@ -1287,7 +1288,7 @@
         <qualification>BattleMech Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Ecole Militaire</name>
@@ -1324,7 +1325,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Ecole Militaire [3130]</name>
@@ -1359,7 +1360,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Emma Centrella Martial Academy</name>
@@ -1416,7 +1417,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Emporia Military Academy</name>
@@ -1452,7 +1453,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Filtvelt Military Academy</name>
@@ -1491,7 +1492,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Finmark Air and Space Academy</name>
@@ -1543,7 +1544,7 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Fleet School of Keid</name>
@@ -1594,7 +1595,7 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Flight Academy of Graham</name>
@@ -1627,7 +1628,7 @@
         <qualification>JumpShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Flight Academy of Thorin</name>
@@ -1661,7 +1662,7 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Focht War College [Kentares IV]</name>
@@ -1718,7 +1719,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Focht War College [Tukayyid]</name>
@@ -1776,7 +1777,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Frihet Training Facility (Semester One)</name>
@@ -1795,7 +1796,7 @@
         <curriculum>Small Arms</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Frihet Training Facility</name>
@@ -1831,7 +1832,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Frunze Military Academy</name>
@@ -1887,6 +1888,593 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Galedon Military Academy</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Established on Galedon V before the formation of the Draconis Combine, the Galedon Military Academy is renowned as one of the oldest institutions of its kind. Exclusive to graduates of Galedon Military District primary schools, GMA offers comprehensive training across all DCMS branches, with a focus on rigorous physical conditioning unmatched by other academies.</description>
+        <locationSystem>Galedon V</locationSystem>
+        <constructionYear>2400</constructionYear>
+        <destructionYear>3069</destructionYear>
+        <tuition>11229</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Crew Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Crew Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Crew Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Crew Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>DropShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>DropShip Crew Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>JumpShip Crew Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Crew Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Senior Medical Technician</qualification>
+        <curriculum>Doctor, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Senior BattleMech Technician</qualification>
+        <curriculum>Tech/Mech, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>BattleMech Technician</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Senior Advanced Vehicle Technician</qualification>
+        <curriculum>Tech/Mechanic, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Vehicle Technician</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Senior Aerospace Technician</qualification>
+        <curriculum>Tech/Aero, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Aerospace Technician</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Senior Armored Infantry Technician</qualification>
+        <curriculum>Tech/BA, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Armored Infantry Technician</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Senior Advanced Vessel Technician</qualification>
+        <curriculum>Tech/Vessel, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Advanced Vessel Technician</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Senior Administrator</qualification>
+        <curriculum>Administration, Negotiation, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Gershwin Academy of Combat</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The esteemed Gershwin Academy of Combat, a private institution founded by the Gershwin Mining Collective, specializes in honing the skills of MechWarriors and armored cavalry. Graduates emerge well-equipped for diverse combat scenarios, instilled with discipline and strategic prowess. Aspiring warriors flock to GAC for its distinguished legacy and commitment to producing elite combat personnel.</description>
+        <locationSystem>Zollikofen</locationSystem>
+        <constructionYear>3130</constructionYear>
+        <tuition>15750</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Crew Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Crew Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Crew Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Crew Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Gogh-Bukowski University of New Avalon</name>
+        <type>University</type>
+        <description>Located on New Avalon, Gogh-Bukowski University stands as a leading arts institution in the Inner Sphere, housing schools for Written Arts, Visual Arts, and Musical Arts. With a reputation for its liberal and anti-government stance, the university has historically experienced tensions with the New Avalon Institute of Science.</description>
+        <locationSystem>New Avalon</locationSystem>
+        <constructionYear>2600</constructionYear>
+        <tuition>6250</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>Doctorate</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Philosophy &amp; the Applied Arts</qualification>
+        <curriculum>Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Gunslinger Program</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Gunslinger Program, originally known as the Advanced Combat and Maneuvering Skills Project, was initiated by the Star League Defense Force in response to the First Hidden War. It blends ancient martial philosophies with cutting-edge technology, producing skilled duelists.</description>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2682</constructionYear>
+        <destructionYear>2781</destructionYear>
+        <tuition>36750</tuition>
+        <durationDays>300</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Gunslinger Program [3062]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Gunslinger Program, originally known as the Advanced Combat and Maneuvering Skills Project, was initiated by the Star League Defense Force in response to the First Hidden War. It blends ancient martial philosophies with cutting-edge technology, producing skilled duelists. Though the original program ceased with the fall of the Star League in 2781, it's revived by the Second Star League in 3062 at the Focht War College on Tukayyid. This iteration focuses on teaching the one-on-one combat style favored by the Clans, accepting troops from any member state.</description>
+        <locationSystem>Tukayyid</locationSystem>
+        <constructionYear>3062</constructionYear>
+        <tuition>36750</tuition>
+        <durationDays>300</durationDays>
+        <facultySkill>4</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Hachiman Technical Institute</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Hachiman Technical Institute specializes in battlefield repair and technical training, focusing on maintaining BattleMechs, aerospace fighters, and DropShips. It admits candidates rejected by other Draconis Combine military academies, as well as select trade school graduates.</description>
+        <locationSystem>Hachiman</locationSystem>
+        <constructionYear>2800</constructionYear>
+        <tuition>5250</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>BattleMech Technician</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Technician</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Advanced Vessel Technician</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Hero Training Institute [Cap Rouge]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Situated on Sillery's continent, the Hero Training Institute - Cap Rouge provides training programs for aspiring BattleMech and aerospace fighter pilots.</description>
+        <locationSystem>Cap Rouge</locationSystem>
+        <constructionYear>3072</constructionYear>
+        <tuition>35000</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>9</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Hero Training Institute [Maxwell]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Hero Training Institute offers an unconventional route to becoming a MechWarrior, bypassing traditional credentials. Known for its high fees and extensive advertising, HTI provides subpar training with limited hands-on experience. Nonetheless, it allows graduates to enter mercenary units or non-commissioned positions in the Free Worlds League Military.</description>
+        <locationSystem>Maxwell</locationSystem>
+        <constructionYear>2989</constructionYear>
+        <tuition>52500</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>8</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Hero Training Institute [Payvand]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The second-oldest Hero Training Institute, the Payvand campus, is located in Pejman on the Gooya continent. Despite significant investment in the Maxwell campus, Payvand remains decrepit, with aging simulators reflecting the corporation's neglect in updating its facilities.</description>
+        <locationSystem>Payvand</locationSystem>
+        <constructionYear>3010</constructionYear>
+        <tuition>35000</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>9</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Hero Training Institute [Sorunda]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Hero Training Institute's Sorunda campus sits on the predominantly pacifist Buddhist planet of Serenity, nestled in the Modesty Grasslands. Constructed away from population centers to minimize disruption, the academy faced initial resistance from locals. However, concerns over defense eventually led to the community's approval of its establishment.</description>
+        <locationSystem>Sorunda</locationSystem>
+        <constructionYear>3073</constructionYear>
+        <tuition>35000</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>9</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Hero Training Institute [Sterling]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Hero Training Institute's Sterling campus sits near Starlight on the Graham continent, offering training for BattleMech and aerospace fighter pilots. Sterling is among several new HTI campuses established to meet the heightened demand for military training.</description>
+        <locationSystem>Sterling</locationSystem>
+        <constructionYear>3074</constructionYear>
+        <tuition>35000</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>9</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Hero Training Institute [Trinidad]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Trinidad, the newest Hero Training Institute campus as of 3079, sits in the Arawak Marshlands on the Arawak continent. Founded by ex-SAFE veterans, it offers the Inner Sphere's first private Special Operations training. Its "logistics studies" course, though not officially listed, commands the highest fees and best equipment. Enrollment entails heavy screening and dean's permission, with most applicants relying on referrals.</description>
+        <locationSystem>Trinidad</locationSystem>
+        <constructionYear>3079</constructionYear>
+        <tuition>192500</tuition>
+        <durationDays>600</durationDays>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Humphreys School of Warfare</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Established on Kanata in late 2762, the Humphreys School of Warfare (HSW) is one of three major military academies created by the Dormuth Council to manage high recruitment numbers in the Free Worlds League. It primarily recruits cadets from the Duchy of Andurien and nearby independent worlds. The Star League Intelligence Command closely monitors the institution to identify potential troublemakers in the politically restless Duchy.</description>
+        <locationSystem>Kanata</locationSystem>
+        <constructionYear>2765</constructionYear>
+        <tuition>7875</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Crew Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Crew Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Crew Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Crew Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Humphreys Training Academy</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MechWarriors, providing comprehensive classes instructed by experienced lecturers.</description>
+        <locationSystem>Andurien</locationSystem>
+        <constructionYear>2765</constructionYear>
+        <destructionYear>3040</destructionYear>
+        <tuition>4375</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Humphreys Training Academy [3079]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>After the Andurien Secession, the Humphreys Training Academy was rebranded as the Legionary Training Academy. Upon the Free Worlds League's dissolution, the Duchy of Andurien restored its original name. Despite production challenges, the Anduriens have expanded training for battle armor and aerospace, hiring experienced Andurien Rangers as instructors. Enrollment is limited to low-risk students passing mental and physical tests.</description>
+        <locationSystem>Andurien</locationSystem>
+        <constructionYear>3079</constructionYear>
+        <tuition>4375</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Illiushin Taurian Academy</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Illiushin Taurian Academy is a small academy within the Taurian Concordat that trains conventional troops, alongside a program of IndustrialMech training.</description>
+        <locationSystem>Illiushin</locationSystem>
+        <constructionYear>3130</constructionYear>
+        <tuition>8750</tuition>
+        <durationDays>300</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Armored Crew Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Crew Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Crew Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Crew Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Imperial Institute of Technology</name>
+        <type>University</type>
+        <description>The Imperial Institute of Technology stands as the Draconis Combine's top-tier university for technology studies. It admits only the most talented students in science and mathematics, with some cadets from other academies attending for a year after passing stringent tests.</description>
+        <locationSystem>Xinyang</locationSystem>
+        <constructionYear>2780</constructionYear>
+        <tuition>12500</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>Doctorate</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Internal Security College</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Internal Security College is where the Draconis Combine's Internal Security Force receives training. The facility is heavily fortified, surrounded by 60 kilometers of diacetylsillicate, a corrosive sand, and strictly enforces a no-fly zone within 200 km, shooting down any unauthorized aircraft. Admission to the ISC is through a classified recruitment process, and students' identities are kept secret. The ISC provides rigorous training in psychology, anatomy, and zero-g martial arts.</description>
+        <locationSystem>New Samarkand</locationSystem>
+        <constructionYear>2600</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Irian Academy of Combative Science</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Irian Academy trains MechWarriors and is highly regarded among schools. Students undergo instruction in history and combat, including live fire training in the Radner Proving Grounds.</description>
+        <locationSystem>Irian</locationSystem>
+        <constructionYear>3130</constructionYear>
+        <tuition>4375</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>James McKenna University</name>
+        <type>University</type>
+        <description>Situated in Glasgow on Terra, James McKenna University, named after the founder of the Terran Hegemony, specializes in foreign relations. Its distinguished program prepares graduates for prestigious roles within the Star League's diplomatic corps.</description>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <destructionYear>2777</destructionYear>
+        <tuition>#N/A</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>Doctorate</educationLevelMax>
+        <ageMin>16</ageMin>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Jarvis Military Proving and Training Grounds</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Jarvis Military Proving and Training Grounds serves as a key training facility for infantry and armor crews in the Free Worlds League Military.</description>
+        <locationSystem>Dieudonné</locationSystem>
+        <constructionYear>2800</constructionYear>
+        <destructionYear>3011</destructionYear>
+        <tuition>7875</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Armored Crew Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Crew Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Crew Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Crew Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Jefferson University</name>
+        <type>University</type>
+        <description>Jefferson University, a prominent Federated Suns institution, is renowned for its science and research programs, particularly in physics. The campus features an underground particle accelerator with extensive tunnels for cutting-edge research.</description>
+        <locationSystem>New Syrtis</locationSystem>
+        <constructionYear>2600</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>Doctorate</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
 </academies>
