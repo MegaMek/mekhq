@@ -68,7 +68,7 @@
         <tuition>15750</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>DropShip Command Graduate</qualification>
@@ -123,7 +123,7 @@
         <tuition>7656.25</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Aerospace Graduate</qualification>
@@ -172,7 +172,7 @@
         <tuition>10937.5</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
@@ -247,7 +247,7 @@
         <tuition>11484.375</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
@@ -393,7 +393,7 @@
         <tuition>13125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
@@ -417,7 +417,7 @@
         <tuition>13125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
@@ -452,7 +452,7 @@
         <tuition>13125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
@@ -485,7 +485,7 @@
         <tuition>17850</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced Infantry Command Graduate</qualification>
@@ -532,7 +532,7 @@
         <tuition>17850</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced Infantry Command Graduate</qualification>
@@ -580,7 +580,7 @@
         <tuition>28125</tuition>
         <durationDays>900</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
