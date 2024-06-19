@@ -101,6 +101,7 @@ MEKHQ VERSION HISTORY:
 + Fix #4057: Could not find a mech summary
 + PR #4237: Added Prestigious Academies (A-A)
 + Fix #4235: Fixed Invalid Parsing of Early Childhood when Loading Personnel
++ PR #4242: Added Prestigious Academies D-F
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
