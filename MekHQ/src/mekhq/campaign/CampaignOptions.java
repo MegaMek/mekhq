@@ -898,10 +898,10 @@ public class CampaignOptions {
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
         setEnableShowIneligibleAcademies(true);
-        setEnableShowAgeConflict(true);
+        setEnableShowAgeConflict(false);
         setEnableShowUnqualified(true);
         setEnableShowFactionConflict(true);
-        setEnableShowRangeConflict(true);
+        setEnableShowRangeConflict(false);
         setEnableRandomXp(true);
         setRandomXpRate(1);
         setEnableBonuses(true);
