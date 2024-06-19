@@ -319,7 +319,6 @@
         <name>Boot Camp</name>
         <type>Basic Training</type>
         <isMilitary>true</isMilitary>
-        <promotion>Private</promotion>
         <description>A sprawling, high-security installation where recruits endure intense physical conditioning, drills, and live-fire exercises with both personal and vehicle-scale weaponry. The training regimen emphasizes discipline, loyalty to one's faction, and the strategic use of cutting-edge technology in combined arms warfare.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -350,7 +349,6 @@
         <name>Military Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <promotion>Corporal</promotion>
         <description>A prestigious institution dedicated to training the warriors of the Inner Sphere. Situated within heavily fortified compounds, these academies offer a comprehensive education that blends rigorous physical training, tactical instruction, and academic study. Cadets undergo intensive combat simulations, and study military history, strategy, and ethics.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -362,19 +360,19 @@
         <ageMin>16</ageMin>
         <qualification>MechWarrior Academy</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
-        <qualificationStartYear>2425</qualificationStartYear>
+        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Mechanized Academy</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Flight Academy</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
-        <qualificationStartYear>2439</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Black Naval Academy</qualification>
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Academy</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3052</qualificationStartYear>
+        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Artillery College</qualification>
         <curriculum>Small Arms, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -389,7 +387,6 @@
         <name>NCO Candidate Bootcamp</name>
         <type>NCO Academy</type>
         <isMilitary>true</isMilitary>
-        <promotion>Corporal</promotion>
         <description>A specialized training program designed to prepare enlisted personnel for leadership roles within their respective military units. Held within secure facilities, the bootcamp emphasizes the development of tactical proficiency, effective communication, and leadership skills essential for leading personnel in combat. Cadets undergo intensive physical conditioning, weapons training, and tactical simulations, with a focus on fostering teamwork and initiative.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -408,7 +405,6 @@
         <name>Warrant Officer Candidate School</name>
         <type>Warrant Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <promotion>Warrant Officer</promotion>
         <description>A specialized institution tasked with training promising enlisted personnel for positions of leadership and technical expertise as Warrant Officers. Held in secure military installations, these schools combine intensive academic study with practical training in areas such as engineering, logistics, and advanced tactics. Candidates undergo rigorous evaluations and assessments to demonstrate their aptitude for assuming roles of responsibility within their units.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -426,7 +422,6 @@
         <name>Officer Candidate School</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <promotion>Lieutenant Jr. Grade</promotion>
         <description>A prestigious institution dedicated to training and grooming promising individuals for leadership roles within the military. Held in secure and strategically located facilities, these schools provide a comprehensive curriculum that encompasses both theoretical and practical aspects of warfare, leadership, and strategy. Candidates undergo rigorous physical training, tactical simulations, and academic studies in subjects such as military history, and tactics. The program is designed to identify and cultivate individuals with the potential to command units effectively and uphold the honor and integrity of their respective factions.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
