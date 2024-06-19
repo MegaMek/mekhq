@@ -777,7 +777,7 @@ public class EducationController {
         }
 
         // default graduation
-        campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedChild.text"), ""));
+        campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedChild.text"), person.getEduAcademyName()));
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
 
