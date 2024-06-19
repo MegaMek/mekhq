@@ -86,6 +86,7 @@ public enum EducationLevel {
     public static EducationLevel parseFromString(final String educationLevel) {
         switch (educationLevel) {
             case "None":
+            case "Early Childhood":
                 return EARLY_CHILDHOOD;
             case "High School":
                 return HIGH_SCHOOL;
