@@ -596,6 +596,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkPersonnelMarketReportRefresh;
     private Map<SkillLevel, JSpinner> spnPersonnelMarketRandomRemovalTargets;
     private JSpinner spnPersonnelMarketDylansWeight;
+    private JCheckBox chkUsePersonnelHireHiringHallOnly;
 
     // Unit Market
     private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
@@ -7403,6 +7404,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPersonnelMarketDylansWeight.setToolTipText(resources.getString("lblPersonnelMarketDylansWeight.toolTipText"));
         spnPersonnelMarketDylansWeight.setName("spnPersonnelMarketDylansWeight");
 
+        chkUsePersonnelHireHiringHallOnly = new JCheckBox(resources.getString("chkUsePersonnelHireHiringHallOnly.text"));
+        chkUsePersonnelHireHiringHallOnly.setToolTipText(resources.getString("chkUsePersonnelHireHiringHallOnly.toolTipText"));
+        chkUsePersonnelHireHiringHallOnly.setName("chkUsePersonnelHireHiringHallOnly");
+
         // Programmatically Assign Accessibility Labels
         lblPersonnelMarketType.setLabelFor(comboPersonnelMarketType);
         lblPersonnelMarketDylansWeight.setLabelFor(spnPersonnelMarketDylansWeight);
@@ -7427,6 +7432,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblPersonnelMarketDylansWeight)
                                 .addComponent(spnPersonnelMarketDylansWeight, Alignment.LEADING))
+                        .addComponent(chkUsePersonnelHireHiringHallOnly)
         );
 
         layout.setHorizontalGroup(
@@ -7439,6 +7445,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblPersonnelMarketDylansWeight)
                                 .addComponent(spnPersonnelMarketDylansWeight))
+                        .addComponent(chkUsePersonnelHireHiringHallOnly)
         );
 
         return panel;
@@ -8389,6 +8396,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             entry.getValue().setValue(options.getPersonnelMarketRandomRemovalTargets().get(entry.getKey()));
         }
         spnPersonnelMarketDylansWeight.setValue(options.getPersonnelMarketDylansWeight());
+        chkUsePersonnelHireHiringHallOnly.setSelected(options.isUsePersonnelHireHiringHallOnly());
 
         // Unit Market
         comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
@@ -8944,6 +8952,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 options.getPersonnelMarketRandomRemovalTargets().put(entry.getKey(), (int) entry.getValue().getValue());
             }
             options.setPersonnelMarketDylansWeight((Double) spnPersonnelMarketDylansWeight.getValue());
+            options.setUsePersonnelHireHiringHallOnly(chkUsePersonnelHireHiringHallOnly.isSelected());
 
             // Unit Market
             options.setUnitMarketMethod(comboUnitMarketMethod.getSelectedItem());
