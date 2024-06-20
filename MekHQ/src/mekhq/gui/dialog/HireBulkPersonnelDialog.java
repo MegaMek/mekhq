@@ -18,9 +18,11 @@
  */
 package mekhq.gui.dialog;
 
+import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.Compute;
+import megamek.common.enums.SkillLevel;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
@@ -55,14 +57,18 @@ public class HireBulkPersonnelDialog extends JDialog {
     private JTextField jtf;
 
     private JButton btnHire;
+    private JButton btnGmHire;
     private JButton btnClose;
     private JPanel panButtons;
 
     private JSpinner minAge;
     private JSpinner maxAge;
 
+    private MMComboBox<SkillLevel> skillLevel;
+
     private boolean useAge = false;
-    private int minAgeVal = 19;
+    private boolean useSkill = false;
+    private int minAgeVal = 18;
     private int maxAgeVal = 99;
 
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.HireBulkPersonnelDialog",
@@ -91,12 +97,12 @@ public class HireBulkPersonnelDialog extends JDialog {
     }
 
     private void initComponents() {
-        GridBagConstraints gridBagConstraints;
 
         choiceType = new JComboBox<>();
         choiceRanks = new JComboBox<>();
 
         btnHire = new JButton(resourceMap.getString("btnHire.text"));
+        btnGmHire = new JButton(resourceMap.getString("btnGmHire.text"));
         btnClose = new JButton(resourceMap.getString("btnClose.text"));
         panButtons = new JPanel(new GridBagLayout());
 
@@ -114,11 +120,11 @@ public class HireBulkPersonnelDialog extends JDialog {
         }
         choiceType.setModel(personTypeModel);
         choiceType.setName("choiceType");
-        gridBagConstraints = newConstraints(1, 0, GridBagConstraints.HORIZONTAL);
+        GridBagConstraints gridBagConstraints = newConstraints(1, 0, GridBagConstraints.HORIZONTAL);
         gridBagConstraints.weightx = 1.0;
         choiceType.setSelectedIndex(0);
         choiceType.addActionListener(evt -> {
-            // If we change the type, we need to setup the ranks for that type
+            // If we change the type, we need to set up the ranks for that type
             refreshRanksCombo();
         });
         getContentPane().add(choiceType, gridBagConstraints);
@@ -178,8 +184,9 @@ public class HireBulkPersonnelDialog extends JDialog {
 
         int mainGridPos = 3;
 
+        // GM tools
         if (campaign.isGM()) {
-            // GM tools
+            // Age
             JSeparator sep = new JSeparator();
 
             gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
@@ -228,24 +235,68 @@ public class HireBulkPersonnelDialog extends JDialog {
                     minAge.setValue(maxAgeVal);
                 }
             });
-            //maxAge.setAlignmentY(CENTER_ALIGNMENT);
             ageRangePanel.add(maxAge, newConstraints(2, 0));
+
+            ++ mainGridPos;
+
+            // Skill level
+            gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
+            gridBagConstraints.gridwidth = 2;
+            ++ mainGridPos;
+
+            gridBagConstraints = newConstraints(0, mainGridPos);
+            gridBagConstraints.weightx = 1.0;
+
+            JCheckBox skillRangeCheck = new JCheckBox(resourceMap.getString("lblSkillLevel.text"));
+            skillRangeCheck.addActionListener(e -> {
+                useSkill = ((JCheckBox) e.getSource()).isSelected();
+                skillLevel.setEnabled(useSkill);
+            });
+            getContentPane().add(skillRangeCheck, gridBagConstraints);
+
+            gridBagConstraints = newConstraints(1, mainGridPos);
+            gridBagConstraints.weightx = 1.0;
+
+            JPanel skillRangePanel = new JPanel(new GridBagLayout());
+            getContentPane().add(skillRangePanel, gridBagConstraints);
+
+            skillLevel = new MMComboBox<>("comboSkillLevel", SkillLevel.values());
+            skillLevel.setSelectedItem(SkillLevel.REGULAR);
+            skillLevel.setEnabled(false);
+
+            skillLevel.removeItem(SkillLevel.NONE);
+            skillLevel.removeItem(SkillLevel.HEROIC);
+            skillLevel.removeItem(SkillLevel.LEGENDARY);
+
+            JLabel labelMinSkill = new JLabel("Minimum Skill:");
+            labelMinSkill.setLabelFor(skillLevel);
+            labelMinSkill.setEnabled(false);
+
+            skillRangePanel.add(skillLevel, newConstraints(0, 0));
 
             ++ mainGridPos;
         }
 
-        btnHire.addActionListener(evt -> hire());
+        btnHire.addActionListener(evt -> hire(false));
         gridBagConstraints = newConstraints(0, 0);
         gridBagConstraints.insets = ZERO_INSETS;
 
         panButtons.add(btnHire, gridBagConstraints);
         gridBagConstraints.gridx++;
 
+        if (campaign.isGM()) {
+            btnGmHire.addActionListener(evt -> hire(true));
+            gridBagConstraints.insets = ZERO_INSETS;
+
+            panButtons.add(btnGmHire, gridBagConstraints);
+            gridBagConstraints.gridx++;
+        }
+
         btnClose.addActionListener(evt -> setVisible(false));
         panButtons.add(btnClose, gridBagConstraints);
 
         gridBagConstraints = newConstraints(0, mainGridPos, GridBagConstraints.HORIZONTAL);
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(panButtons, gridBagConstraints);
 
@@ -263,7 +314,7 @@ public class HireBulkPersonnelDialog extends JDialog {
         }
     }
 
-    private void hire() {
+    private void hire(boolean isGmHire) {
         int number = (Integer) spnNumber.getModel().getValue();
         PersonTypeItem selectedItem = (PersonTypeItem) choiceType.getSelectedItem();
         if (selectedItem == null) {
@@ -272,34 +323,41 @@ public class HireBulkPersonnelDialog extends JDialog {
         }
 
         LocalDate today = campaign.getLocalDate();
-        LocalDate earliestBirthDate = today.minus(maxAgeVal + 1, ChronoUnit.YEARS)
-                .plus(1, ChronoUnit.DAYS);
-        final int days = Math.toIntExact(ChronoUnit.DAYS.between(earliestBirthDate,
-                today.minus(minAgeVal, ChronoUnit.YEARS)));
+        LocalDate earliestBirthDate = today.minusYears(maxAgeVal + 1).plusDays(1);
+        final int days = Math.toIntExact(ChronoUnit.DAYS.between(earliestBirthDate, today.minusYears(minAgeVal)));
 
         while (number > 0) {
-            Person p = campaign.newPerson(selectedItem.getRole());
-            p.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
+            Person person = campaign.newPerson(selectedItem.getRole());
 
-            int age = p.getAge(today);
+            // while this isn't the most efficient way of doing this, we don't currently have a way
+            // to generate personnel at specific skill levels
+            if ((useSkill) && (!selectedItem.getRole().isCivilian()) && (!selectedItem.getRole().isAssistant())) {
+                while (person.getSkillLevel(campaign, false) != skillLevel.getSelectedItem()) {
+                    person = campaign.newPerson(selectedItem.getRole());
+                }
+            }
+
+            person.setRank(((RankDisplay) Objects.requireNonNull(choiceRanks.getSelectedItem())).getRankNumeric());
+
+            int age = person.getAge(today);
             if (useAge) {
                 if ((age > maxAgeVal) || (age < minAgeVal)) {
-                    LocalDate birthDay = earliestBirthDate.plus(Compute.randomInt(days), ChronoUnit.DAYS);
-                    p.setBirthday(birthDay);
-                    age = p.getAge(today);
+                    LocalDate birthDay = earliestBirthDate.plusDays(Compute.randomInt(days));
+                    person.setBirthday(birthDay);
+                    age = person.getAge(today);
                 }
             }
 
             // Limit skills by age for children and adolescents
             if (age < 12) {
-                p.removeAllSkills();
+                person.removeAllSkills();
             } else if (age < 14) {
-                p.limitSkills(0);
+                person.limitSkills(0);
             } else if (age < 18) {
-                p.limitSkills(age - 13);
+                person.limitSkills(age - 13);
             }
 
-            if (!campaign.recruitPerson(p)) {
+            if (!campaign.recruitPerson(person, isGmHire)) {
                 number = 0;
             } else {
                 number--;

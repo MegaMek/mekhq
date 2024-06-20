@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,14 +30,15 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
+import megamek.common.planetaryconditions.Atmosphere;
 import megamek.common.util.fileUtils.MegaMekFile;
 import megamek.utilities.BoardClassifier;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignOptions;
 import mekhq.campaign.againstTheBot.AtBConfiguration;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.force.Lance;
@@ -258,7 +259,7 @@ public class AtBDynamicScenarioFactory {
                     generatedLanceCount += generateFixedForce(scenario, contract, campaign, forceTemplate);
                 } else {
                     generatedLanceCount += generateForce(scenario, contract, campaign,
-                        effectiveBV, effectiveUnitCount, weightClass, forceTemplate);
+                        effectiveBV, effectiveUnitCount, weightClass, forceTemplate, false);
                 }
             }
         }
@@ -316,15 +317,12 @@ public class AtBDynamicScenarioFactory {
      * @param effectiveUnitCount The effective unit count, up to this point, of player and allied units
      * @param weightClass        The average weight class to generate this force at
      * @param forceTemplate      The force template to use to generate the force
+     * @param isScenarioModifier true if the source of generateForce() was a scenario modifier
      * @return How many "lances" or other individual units were generated.
      */
-    public static int generateForce (AtBDynamicScenario scenario,
-                                     AtBContract contract,
-                                     Campaign campaign,
-                                     int effectiveBV,
-                                     int effectiveUnitCount,
-                                     int weightClass,
-                                     ScenarioForceTemplate forceTemplate) {
+    public static int generateForce(AtBDynamicScenario scenario, AtBContract contract, Campaign campaign,
+                                    int effectiveBV, int effectiveUnitCount, int weightClass,
+                                    ScenarioForceTemplate forceTemplate, boolean isScenarioModifier) {
         // don't generate forces flagged as player-supplied
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.PlayerSupplied.ordinal()) {
             return 0;
@@ -401,8 +399,18 @@ public class AtBDynamicScenarioFactory {
 
         // determine generation parameters
         int forceBV = 0;
+
+        double forceMultiplier = getDifficultyMultiplier(campaign);
+        forceTemplate.setForceMultiplier(forceMultiplier);
+
         int forceBVBudget = (int) (effectiveBV * forceTemplate.getForceMultiplier());
+
+        if (isScenarioModifier) {
+            forceBVBudget *= campaign.getCampaignOptions().getScenarioModBV();
+        }
+
         int forceUnitBudget = 0;
+
         if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.UnitCountScaled.ordinal()) {
             forceUnitBudget = (int) (effectiveUnitCount * forceTemplate.getForceMultiplier());
         } else if ((forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedUnitCount.ordinal()) ||
@@ -1095,30 +1103,39 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Sets up scenario modifiers for this scenario.
+     * Randomly generates the number of scenario modifiers for a scenario,
+     * for each random scenario in the count a random modifier is applied to the scenario.
      *
-     * @param scenario
+     * @param campaignOptions The prior defined campaign options
+     * @param scenario The scenario to receive the modifiers.
      */
-    public static void setScenarioModifiers(AtBDynamicScenario scenario) {
-        // this is hardcoded for now, but the eventual plan is to let the user configure how many modifiers
-        // they want applied
-        int numModsRoll = Compute.d6(2);
+    public static void setScenarioModifiers(CampaignOptions campaignOptions, AtBDynamicScenario scenario) {
         int numMods = 0;
-        if (numModsRoll >= 11) {
-            numMods = 3;
-        } else if (numModsRoll >= 9) {
-            numMods = 2;
-        } else if (numModsRoll >= 7) {
-            numMods = 1;
-        }
+        boolean addMods = true;
+        int modMax = campaignOptions.getScenarioModMax();
+        int modChance = campaignOptions.getScenarioModChance();
 
-        for (int x = 0; x < numMods; x++) {
-            AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation());
+        if (modMax != 0) {
+            while (addMods) {
+                if (Compute.randomInt(100) < modChance) {
+                    numMods++;
 
-            scenario.addScenarioModifier(scenarioMod);
+                    if (numMods >= modMax) {
+                        addMods = false;
+                    }
+                } else {
+                    addMods = false;
+                }
+            }
 
-            if (scenarioMod.getBlockFurtherEvents()) {
-                break;
+            for (int x = 0; x < numMods; x++) {
+                AtBScenarioModifier scenarioMod = AtBScenarioModifier.getRandomBattleModifier(scenario.getTemplate().mapParameters.getMapLocation());
+
+                scenario.addScenarioModifier(scenarioMod);
+
+                if (scenarioMod.getBlockFurtherEvents()) {
+                    break;
+                }
             }
         }
     }

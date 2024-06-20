@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2013-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -26,6 +26,7 @@ import megamek.client.ui.swing.DialogOptionComponent;
 import megamek.client.ui.swing.DialogOptionListener;
 import megamek.common.Crew;
 import megamek.common.EquipmentType;
+import megamek.common.TechConstants;
 import megamek.common.enums.Gender;
 import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
@@ -35,6 +36,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
@@ -44,8 +46,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.AbstractMHQScrollablePanel;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.control.EditKillLogControl;
-import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.control.EditPersonnelLogControl;
+import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import org.apache.logging.log4j.LogManager;
 
@@ -86,6 +88,9 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private AbstractMHQScrollablePanel skillsPanel;
     private AbstractMHQScrollablePanel optionsPanel;
     private JTextField textToughness;
+    private JTextField textFatigue;
+    private JComboBox<EducationLevel> textEducationLevel;
+    private JTextField textLoyalty;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -160,7 +165,13 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         textNickname = new JTextField();
         textBloodname = new JTextField();
         textToughness = new JTextField();
+        JLabel lblFatigue = new JLabel();
+        textFatigue = new JTextField();
+        JLabel lblLoyalty = new JLabel();
+        textLoyalty = new JTextField();
         JLabel lblToughness = new JLabel();
+        textEducationLevel = new JComboBox<>();
+        JLabel lblEducationLevel = new JLabel();
         JScrollPane scrOptions = new JScrollPane();
         JScrollPane scrSkills = new JScrollPane();
         JPanel panButtons = new JPanel();
@@ -637,6 +648,81 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             panDemog.add(textToughness, gridBagConstraints);
+
+            y++;
+        }
+
+        lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
+        lblFatigue.setName("lblFatigue");
+
+        textFatigue.setText(Integer.toString(person.getFatigue()));
+        textFatigue.setName("textFatigue");
+
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblFatigue, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textFatigue, gridBagConstraints);
+
+            y++;
+        }
+
+        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
+        lblEducationLevel.setName("lblEducationLevel");
+
+        for (EducationLevel level : EducationLevel.values()) {
+            textEducationLevel.addItem(level);
+        }
+        textEducationLevel.setSelectedItem(person.getEduHighestEducation());
+        textEducationLevel.setName("textEducationLevel");
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblEducationLevel, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textEducationLevel, gridBagConstraints);
+
+            y++;
+        }
+
+        lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
+        lblLoyalty.setName("lblLoyalty");
+
+        textLoyalty.setText(Integer.toString(person.getLoyalty()));
+        textLoyalty.setName("textLoyalty");
+
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            panDemog.add(lblLoyalty, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            panDemog.add(textLoyalty, gridBagConstraints);
+
+            y++;
         }
 
         JLabel lblUnit = new JLabel();
@@ -686,19 +772,19 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             choiceOriginalUnit.setSelectedItem(campaign.getUnit(person.getOriginalUnitId()));
         }
         choiceOriginalUnit.addActionListener(ev -> {
-            if (null == choiceOriginalUnit.getSelectedItem()) {
-                choiceUnitWeight.setSelectedIndex(0);
-                choiceUnitTech.setSelectedIndex(0);
-            } else {
+            try {
                 Unit unit = (Unit) choiceOriginalUnit.getSelectedItem();
                 choiceUnitWeight.setSelectedIndex(unit.getEntity().getWeightClass());
                 if (unit.getEntity().isClan()) {
                     choiceUnitTech.setSelectedIndex(2);
-                } else if (unit.getEntity().getTechLevel() > megamek.common.TechConstants.T_INTRO_BOXSET) {
+                } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
                     choiceUnitTech.setSelectedIndex(1);
                 } else {
                     choiceUnitTech.setSelectedIndex(0);
                 }
+            } catch (Exception e) {
+                choiceUnitWeight.setSelectedIndex(person.getOriginalUnitWeight());
+                choiceUnitTech.setSelectedIndex(person.getOriginalUnitTech());
             }
         });
 
@@ -944,19 +1030,21 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         person.setSurname(textSurname.getText());
         person.setPostNominal(textPostNominal.getText());
         person.setCallsign(textNickname.getText());
-        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error"))
-                ? "" : textBloodname.getText());
+        person.setBloodname(textBloodname.getText().equals(resourceMap.getString("textBloodname.error")) ? "" : textBloodname.getText());
         person.setBiography(txtBio.getText());
+
         if (choiceGender.getSelectedItem() != null) {
             person.setGender(person.getGender().isInternal()
                     ? ((Gender) choiceGender.getSelectedItem()).getInternalVariant()
                     : (Gender) choiceGender.getSelectedItem());
         }
+
         person.setBirthday(birthdate);
         person.setRecruitment(recruitment);
         person.setLastRankChangeDate(lastRankChangeDate);
         person.setRetirement(retirement);
         person.setOriginFaction((Faction) choiceFaction.getSelectedItem());
+
         if (choiceSystem.getSelectedItem() != null && choicePlanet.getSelectedItem() != null) {
             person.setOriginPlanet((Planet) choicePlanet.getSelectedItem());
         } else {
@@ -964,15 +1052,31 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         }
         person.setPhenotype((Phenotype) choicePhenotype.getSelectedItem());
         person.setClanPersonnel(chkClan.isSelected());
+
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
-        } catch (NumberFormatException ignored) { }
+        } catch (NumberFormatException ignored) {}
+
+        try {
+            person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
+        } catch (NumberFormatException ignored) {}
+
+        try {
+            person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
+        } catch (NumberFormatException ignored) {}
+
+        try {
+            person.setFatigue(Integer.parseInt(textFatigue.getText()));
+        } catch (NumberFormatException ignored) {}
+
         if (null == choiceOriginalUnit.getSelectedItem()) {
+            person.setOriginalUnit(null);
             person.setOriginalUnitWeight(choiceUnitWeight.getSelectedIndex());
             person.setOriginalUnitTech(choiceUnitTech.getSelectedIndex());
         } else {
-            person.setOriginalUnitId(((Unit) choiceOriginalUnit.getSelectedItem()).getId());
+            person.setOriginalUnit((Unit) choiceOriginalUnit.getSelectedItem());
         }
+
         person.setFounder(chkFounder.isSelected());
         setSkills();
         setOptions();

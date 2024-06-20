@@ -25,13 +25,14 @@ import megamek.common.ITechnology;
 import megamek.common.TargetRoll;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -251,9 +252,9 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
         AmmoStorage newPart = getNewPart();
         newPart.setBrandNew(true);
         if (campaign.getQuartermaster().buyPart(newPart, transitDays)) {
-            return "<font color='green'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b> part found</b>.</font> It will be delivered in " + transitDays + " days.";
         } else {
-            return "<font color='red'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
+            return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> You cannot afford this part. Transaction cancelled</b>.</font>";
         }
     }
 
@@ -264,7 +265,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public String failToFind() {
-        return "<font color='red'><b> part not found</b>.</font>";
+        return "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b> part not found</b>.</font>";
     }
 
     @Override

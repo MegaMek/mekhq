@@ -67,6 +67,9 @@ public class GMToolsDialog extends AbstractMHQDialog {
     private JTabbedPane tabbedPane;
 
     //region General Tab
+    // General Tools Panel
+    private JSpinner spnMorale;
+
     // Dice Panel
     private JSpinner spnDiceCount;
     private JSpinner spnDiceNumber;
@@ -183,6 +186,14 @@ public class GMToolsDialog extends AbstractMHQDialog {
 
     public void setSpnDiceSides(final JSpinner spnDiceSides) {
         this.spnDiceSides = spnDiceSides;
+    }
+
+    public JSpinner getSpnMorale() {
+        return spnMorale;
+    }
+
+    public void setSpnMorale(final JSpinner spnMorale) {
+        this.spnMorale = spnMorale;
     }
 
     public JLabel getLblTotalDiceResult() {
@@ -1362,7 +1373,17 @@ public class GMToolsDialog extends AbstractMHQDialog {
         }
 
         if (getLastRolledUnit() != null) {
-            final Unit unit = getGUI().getCampaign().addNewUnit(getLastRolledUnit(), false, 0);
+            int quality;
+
+            if (getGUI().getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+                quality = Unit.getRandomUnitQuality(0);
+            } else {
+                quality = 3;
+            }
+
+            final Unit unit = getGUI().getCampaign().addNewUnit(getLastRolledUnit(), false, 0, quality);
+
+
             if ((getPerson() != null) && (getPerson().getUnit() == null)) {
                 unit.addPilotOrSoldier(getPerson());
                 getPerson().setOriginalUnit(unit);

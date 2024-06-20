@@ -18,6 +18,7 @@
  */
 package mekhq.gui.panes;
 
+import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.panels.EntityImagePanel;
 import megamek.client.ui.panes.EntityViewPane;
 import megamek.client.ui.preferences.*;
@@ -27,17 +28,19 @@ import megamek.common.UnitType;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.util.sorter.NaturalOrderComparator;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.campaign.market.unitMarket.UnitMarketOffer;
 import mekhq.gui.baseComponents.AbstractMHQSplitPane;
 import mekhq.gui.model.UnitMarketTableModel;
-import megamek.client.ui.models.XTableColumnModel;
 import mekhq.gui.sorter.WeightClassSorter;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
@@ -208,20 +211,20 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(filtersPanel)
-                                .addComponent(getEntityImagePanel(), GroupLayout.Alignment.LEADING))
+                                .addComponent(getEntityImagePanel(), Alignment.LEADING))
                         .addComponent(marketTableScrollPane)
                         .addComponent(lblBlackMarketWarning)
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(filtersPanel)
                                 .addComponent(getEntityImagePanel()))
                         .addComponent(marketTableScrollPane)
-                        .addComponent(lblBlackMarketWarning, GroupLayout.Alignment.TRAILING)
+                        .addComponent(lblBlackMarketWarning, Alignment.TRAILING)
         );
         return panel;
     }
@@ -279,19 +282,19 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkShowMechs())
                                 .addComponent(getChkShowVehicles())
                                 .addComponent(getChkShowAerospace())
-                                .addComponent(getChkShowConvAero(), GroupLayout.Alignment.LEADING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(getChkShowConvAero(), Alignment.LEADING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(getChkFilterByPercentageOfCost())
                                 .addComponent(getSpnCostPercentageThreshold())
-                                .addComponent(lblCostPercentageThreshold, GroupLayout.Alignment.LEADING))
+                                .addComponent(lblCostPercentageThreshold, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(getChkShowMechs())
                                 .addComponent(getChkShowVehicles())
@@ -419,7 +422,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
             final Money price = offer.getPrice();
             if (getCampaign().getFunds().isLessThan(price)) {
-                getCampaign().addReport(String.format(resources.getString("UnitMarketPane.CannotAfford.report"),
+                getCampaign().addReport(String.format("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                                + resources.getString("UnitMarketPane.CannotAfford.report") + "</font>",
                         entity.getShortName()));
                 offersIterator.remove();
                 continue;
@@ -430,7 +434,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                 getCampaign().getFinances().debit(TransactionType.UNIT_PURCHASE, getCampaign().getLocalDate(),
                         price.dividedBy(roll), String.format(resources.getString("UnitMarketPane.PurchasedUnitBlackMarketSwindled.finances"),
                                 entity.getShortName()));
-                getCampaign().addReport(resources.getString("UnitMarketPane.BlackMarketSwindled.report"));
+                getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
+                        + resources.getString("UnitMarketPane.BlackMarketSwindled.report") + "</font>");
                 getCampaign().getUnitMarket().getOffers().remove(offer);
                 offersIterator.remove();
                 continue;
@@ -452,12 +457,24 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         finalizeEntityAcquisition(offers, true);
     }
 
-    private void finalizeEntityAcquisition(final List<UnitMarketOffer> offers,
-                                           final boolean instantDelivery) {
+    /**
+     * Finalizes the acquisition of entities from the market.
+     *
+     * @param offers           the list of UnitMarketOffers to be finalized
+     * @param instantDelivery  indicates if the delivery should be instantaneous
+     */
+    private void finalizeEntityAcquisition(final List<UnitMarketOffer> offers, final boolean instantDelivery) {
         for (final UnitMarketOffer offer : offers) {
-            getCampaign().addNewUnit(offer.getEntity(), false, instantDelivery ? 0 : offer.getTransitDuration());
+            getCampaign().addNewUnit(
+                    offer.getEntity(),
+                    false,
+                    instantDelivery ? 0 : offer.getTransitDuration(),
+                    UnitMarketType.getQuality(campaign, offer.getMarketType())
+            );
+
             if (!instantDelivery) {
-                getCampaign().addReport(String.format(resources.getString("UnitMarketPane.UnitDeliveryLength.report"),
+                getCampaign().addReport("<font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>"
+                        + String.format(resources.getString("UnitMarketPane.UnitDeliveryLength.report") + "</font>",
                         offer.getTransitDuration()));
             }
             getCampaign().getUnitMarket().getOffers().remove(offer);

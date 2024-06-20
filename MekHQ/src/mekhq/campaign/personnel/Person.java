@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 - Jay Lawson (jaylawson39 at yahoo.com). All Rights Reserved.
- * Copyright (c) 2020-2023 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -21,6 +21,7 @@ package mekhq.campaign.personnel;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
+import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -46,6 +47,8 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.mod.am.InjuryUtil;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.enums.*;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -119,10 +122,14 @@ public class Person {
     private LocalDate birthday;
     private LocalDate recruitment;
     private LocalDate lastRankChangeDate;
-    private LocalDate retirement;
     private LocalDate dateOfDeath;
     private List<LogEntry> personnelLog;
     private List<LogEntry> scenarioLog;
+
+    private LocalDate retirement;
+    private int loyalty;
+    private int fatigue;
+    private Boolean isRecoveringFromFatigue;
 
     private Skills skills;
     private PersonnelOptions options;
@@ -189,17 +196,16 @@ public class Person {
     //endregion Against the Bot
 
     //region Education
-    private int eduHighestEducation;
+    private EducationLevel eduHighestEducation;
     private String eduAcademyName;
     private String eduAcademySet;
     private String eduAcademyNameInSet;
     private String eduAcademyFaction;
     private String eduAcademySystem;
     private int eduCourseIndex;
-    private int eduEducationStage;
-    private int eduDaysOfTravelToAcademy;
-    private int eduDaysOfEducation;
-    private int eduDaysOfTravelFromAcademy;
+    private EducationStage eduEducationStage;
+    private int eduJourneyTime;
+    private int eduEducationTime;
     private int eduDaysOfTravel;
     //endregion Education
 
@@ -327,6 +333,9 @@ public class Person {
         recruitment = null;
         lastRankChangeDate = null;
         retirement = null;
+        loyalty = 0;
+        fatigue = 0;
+        isRecoveringFromFatigue = false;
         skills = new Skills();
         options = new PersonnelOptions();
         currentEdge = 0;
@@ -339,14 +348,13 @@ public class Person {
         originalUnitTech = TECH_IS1;
         originalUnitId = null;
         acquisitions = 0;
-        eduHighestEducation = 0;
+        eduHighestEducation = EducationLevel.EARLY_CHILDHOOD;
         eduAcademyName = null;
         eduAcademySystem = null;
         eduCourseIndex = 0;
-        eduEducationStage = 0;
-        eduDaysOfTravelToAcademy = 0;
-        eduDaysOfEducation = 0;
-        eduDaysOfTravelFromAcademy = 0;
+        eduEducationStage = EducationStage.NONE;
+        eduJourneyTime = 0;
+        eduEducationTime = 0;
         eduDaysOfTravel = 0;
         eduAcademySet = null;
         eduAcademyNameInSet = null;
@@ -972,7 +980,7 @@ public class Person {
                     campaign.addReport(String.format(resources.getString("returnedFromMissing.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromMissing(this, campaign.getLocalDate());
-                } else if (getStatus().isAWOL()) {
+                } else if (getStatus().isAwol()) {
                     campaign.addReport(String.format(resources.getString("returnedFromAWOL.report"),
                             getHyperlinkedFullTitle()));
                     ServiceLogger.returnedFromAWOL(this, campaign.getLocalDate());
@@ -986,6 +994,27 @@ public class Person {
             case RETIRED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.retired(this, today);
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
+                    setRetirement(today);
+                }
+                break;
+            case RESIGNED:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.resigned(this, today);
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
+                    setRetirement(today);
+                }
+                break;
+            case DESERTED:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.deserted(this, today);
+                if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
+                    setRetirement(today);
+                }
+                break;
+            case DEFECTED:
+                campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
+                ServiceLogger.defected(this, today);
                 if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
                     setRetirement(today);
                 }
@@ -1035,11 +1064,10 @@ public class Person {
         this.setEduAcademyNameInSet(null);
         this.setEduAcademySystem(null);
         this.setEduCourseIndex(0);
-        this.setEduEducationStage(0);
-        this.setEduDaysOfTravelToAcademy(0);
-        this.setEduDaysOfTravelFromAcademy(0);
+        this.setEduEducationStage(EducationStage.NONE);
+        this.setEduEducationTime(0);
+        this.setEduJourneyTime(0);
         this.setEduDaysOfTravel(0);
-        this.setEduDaysOfEducation(0);
 
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }
@@ -1134,6 +1162,24 @@ public class Person {
                 .getDisplayFormattedOutput(getRecruitment(), today);
     }
 
+    public Integer getYearsInService(final Campaign campaign) {
+        // Get time in service based on year
+        if (getRecruitment() == null) {
+            //use "" they haven't been recruited or are dependents
+            return 0;
+        }
+
+        LocalDate today = campaign.getLocalDate();
+
+        // If the person is dead, we only care about how long they spent in service to the company
+        if (getDateOfDeath() != null) {
+            //use date of death instead of the current day
+            today = getDateOfDeath();
+        }
+
+        return Math.toIntExact(ChronoUnit.YEARS.between(getRecruitment(), today));
+    }
+
     public @Nullable LocalDate getLastRankChangeDate() {
         return lastRankChangeDate;
     }
@@ -1159,14 +1205,6 @@ public class Person {
                 .getDisplayFormattedOutput(getLastRankChangeDate(), today);
     }
 
-    public @Nullable LocalDate getRetirement() {
-        return retirement;
-    }
-
-    public void setRetirement(final @Nullable LocalDate retirement) {
-        this.retirement = retirement;
-    }
-
     public void setId(final UUID id) {
         this.id = id;
     }
@@ -1182,6 +1220,78 @@ public class Person {
     public Genealogy getGenealogy() {
         return genealogy;
     }
+
+    //region Turnover and Retention
+    public @Nullable LocalDate getRetirement() {
+        return retirement;
+    }
+
+    public void setRetirement(final @Nullable LocalDate retirement) {
+        this.retirement = retirement;
+    }
+
+    public int getLoyalty() {
+        return loyalty;
+    }
+
+    /**
+     * Sets the loyalty level of the customer.
+     * The loyalty level should be within the range of -3 to 3.
+     *
+     * @param loyalty the loyalty level to be set
+     */
+    public void setLoyalty(int loyalty) {
+        loyalty = MathUtility.clamp(loyalty, -3, 3);
+
+        this.loyalty = loyalty;
+    }
+
+    /**
+     * @return the loyalty name based on the person's loyalty score.
+     *
+     * @throws IllegalStateException if the loyalty value is not within a -3 to +3 range
+     */
+    public static String getLoyaltyName(int loyalty) {
+        switch (loyalty) {
+            case -3:
+                return "Devoted";
+            case -2:
+                return "Loyal";
+            case -1:
+                return "Reliable";
+            case 0:
+                return "Neutral";
+            case 1:
+                return "Unreliable";
+            case 2:
+                return "Disloyal";
+            case 3:
+                return "Treacherous";
+            default:
+                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/Person.java/getLoyaltyName: " + loyalty);
+        }
+    }
+
+    public int getFatigue() {
+        return fatigue;
+    }
+
+    public void setFatigue(final int fatigue) {
+        this.fatigue = fatigue;
+    }
+
+    public void increaseFatigue(final int fatigue) {
+        this.fatigue = this.fatigue + fatigue;
+    }
+
+    public boolean getIsRecoveringFromFatigue() {
+        return isRecoveringFromFatigue;
+    }
+
+    public void setIsRecoveringFromFatigue(final boolean isRecoveringFromFatigue) {
+        this.isRecoveringFromFatigue = isRecoveringFromFatigue;
+    }
+    //region Turnover and Retention
 
     //region Pregnancy
     public LocalDate getDueDate() {
@@ -1295,28 +1405,20 @@ public class Person {
         this.biography = biography;
     }
 
-    public int getEduHighestEducation() {
+    public EducationLevel getEduHighestEducation() {
         return eduHighestEducation;
     }
 
-    public void setEduHighestEducation(final int eduHighestEducation) {
+    public void setEduHighestEducation(final EducationLevel eduHighestEducation) {
         this.eduHighestEducation = eduHighestEducation;
     }
 
-    public int getEduDaysOfTravelToAcademy() {
-        return eduDaysOfTravelToAcademy;
+    public int getEduJourneyTime() {
+        return eduJourneyTime;
     }
 
-    public void setEduDaysOfTravelToAcademy(final int eduDaysOfTravelToAcademy) {
-        this.eduDaysOfTravelToAcademy = eduDaysOfTravelToAcademy;
-    }
-
-    public int getEduDaysOfTravelFromAcademy() {
-        return eduDaysOfTravelFromAcademy;
-    }
-
-    public void setEduDaysOfTravelFromAcademy(final int eduDaysOfTravelFromAcademy) {
-        this.eduDaysOfTravelFromAcademy = eduDaysOfTravelFromAcademy;
+    public void setEduJourneyTime(final int eduJourneyTime) {
+        this.eduJourneyTime = eduJourneyTime;
     }
 
     public int getEduDaysOfTravel() {
@@ -1327,12 +1429,19 @@ public class Person {
         this.eduDaysOfTravel = eduDaysOfTravel;
     }
 
-    public int getEduDaysOfEducation() {
-        return eduDaysOfEducation;
+    /**
+     * Increments the number educational travel days by 1.
+     */
+    public void incrementEduDaysOfTravel() {
+        this.eduDaysOfTravel++;
     }
 
-    public void setEduDaysOfEducation(final int eduDaysOfEducation) {
-        this.eduDaysOfEducation = eduDaysOfEducation;
+    public int getEduEducationTime() {
+        return eduEducationTime;
+    }
+
+    public void setEduEducationTime(final int eduEducationTime) {
+        this.eduEducationTime = eduEducationTime;
     }
 
     public String getEduAcademySystem() {
@@ -1367,11 +1476,11 @@ public class Person {
         this.eduCourseIndex = eduCourseIndex;
     }
 
-    public int getEduEducationStage() {
+    public EducationStage getEduEducationStage() {
         return eduEducationStage;
     }
 
-    public void setEduEducationStage(final int eduEducationStage) {
+    public void setEduEducationStage(final EducationStage eduEducationStage) {
         this.eduEducationStage = eduEducationStage;
     }
 
@@ -1400,10 +1509,16 @@ public class Person {
         this.clanPersonnel = clanPersonnel;
     }
 
+    /**
+     * @return true if the person is the campaign commander, false otherwise.
+     */
     public boolean isCommander() {
         return commander;
     }
 
+    /**
+     * Flags the person as the campaign commander.
+     */
     public void setCommander(final boolean commander) {
         this.commander = commander;
     }
@@ -1592,6 +1707,9 @@ public class Person {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "recruitment", getRecruitment());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastRankChangeDate", getLastRankChangeDate());
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "retirement", getRetirement());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "loyalty", getLoyalty());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigue", getFatigue());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "isRecoveringFromFatigue", getIsRecoveringFromFatigue());
             for (Skill skill : skills.getSkills()) {
                 skill.writeToXML(pw, indent);
             }
@@ -1667,16 +1785,12 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "acquisitions", acquisitions);
             }
 
-            if (eduHighestEducation != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation);
+            if (eduHighestEducation != EducationLevel.EARLY_CHILDHOOD) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduHighestEducation", eduHighestEducation.toString());
             }
 
-            if (eduDaysOfTravelToAcademy != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelToAcademy", eduDaysOfTravelToAcademy);
-            }
-
-            if (eduDaysOfTravelFromAcademy != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfTravelFromAcademy", eduDaysOfTravelFromAcademy);
+            if (eduJourneyTime != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduJourneyTime", eduJourneyTime);
             }
 
             if (eduDaysOfTravel != 0) {
@@ -1707,12 +1821,12 @@ public class Person {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduCourseIndex", eduCourseIndex);
             }
 
-            if (eduEducationStage != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEducationStage", eduEducationStage);
+            if (eduEducationStage != EducationStage.NONE) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEducationStage", eduEducationStage.toString());
             }
 
-            if (eduDaysOfEducation != 0) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduDaysOfEducation", eduDaysOfEducation);
+            if (eduEducationTime != 0) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "eduEducationTime", eduEducationTime);
             }
 
             //region Flags
@@ -1802,7 +1916,7 @@ public class Person {
                         }
                         retVal.originPlanet = p;
                     } catch (NullPointerException e) {
-                        LogManager.getLogger().error("Error loading originPlanet for " + systemId + ", " + planetId, e);
+                        LogManager.getLogger().error("Error loading originPlanet for {}, {}", systemId, planetId, e);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("phenotype")) {
                     retVal.phenotype = Phenotype.parseFromString(wn2.getTextContent().trim());
@@ -1901,6 +2015,12 @@ public class Person {
                     retVal.lastRankChangeDate = MHQXMLUtility.parseDate(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("retirement")) {
                     retVal.setRetirement(MHQXMLUtility.parseDate(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("loyalty")) {
+                    retVal.loyalty = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("fatigue")) {
+                    retVal.fatigue = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("isRecoveringFromFatigue")) {
+                    retVal.isRecoveringFromFatigue = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("advantages")) {
                     advantages = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("edge")) {
@@ -2014,11 +2134,9 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("originalUnitId")) {
                     retVal.originalUnitId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduHighestEducation")) {
-                    retVal.eduHighestEducation = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelToAcademy")) {
-                    retVal.eduDaysOfTravelToAcademy = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravelFromAcademy")) {
-                    retVal.eduDaysOfTravelFromAcademy = Integer.parseInt(wn2.getTextContent());
+                    retVal.eduHighestEducation = EducationLevel.parseFromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduJourneyTime")) {
+                    retVal.eduJourneyTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfTravel")) {
                     retVal.eduDaysOfTravel = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduAcademySystem")) {
@@ -2034,9 +2152,9 @@ public class Person {
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduCourseIndex")) {
                     retVal.eduCourseIndex = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationStage")) {
-                    retVal.eduEducationStage = Integer.parseInt(wn2.getTextContent());
-                } else if (wn2.getNodeName().equalsIgnoreCase("eduDaysOfEducation")) {
-                    retVal.eduDaysOfEducation = Integer.parseInt(wn2.getTextContent());
+                    retVal.eduEducationStage = EducationStage.parseFromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("eduEducationTime")) {
+                    retVal.eduEducationTime = Integer.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("clanPersonnel")
                         || wn2.getNodeName().equalsIgnoreCase("clan")) { // Legacy - 0.49.9 removal
                     retVal.setClanPersonnel(Boolean.parseBoolean(wn2.getTextContent().trim()));
@@ -2100,7 +2218,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring advantage: " + adv);
+                        LogManager.getLogger().error("Error restoring advantage: {}", adv);
                     }
                 }
             }
@@ -2115,7 +2233,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring edge: " + adv);
+                        LogManager.getLogger().error("Error restoring edge: {}", adv);
                     }
                 }
             }
@@ -2130,7 +2248,7 @@ public class Person {
                     try {
                         retVal.getOptions().getOption(advName).setValue(value);
                     } catch (Exception e) {
-                        LogManager.getLogger().error("Error restoring implants: " + adv);
+                        LogManager.getLogger().error("Error restoring implants: {}", adv);
                     }
                 }
             }
@@ -2139,8 +2257,14 @@ public class Person {
             if (retVal.getRankNumeric() < 0) {
                 retVal.setRank(0);
             }
+
+            // Fixing recruitment dates
+            // I don't know when this metric was added, so we check all versions
+            if (retVal.getRecruitment() == null) {
+                retVal.setRecruitment(c.getLocalDate());
+            }
         } catch (Exception e) {
-            LogManager.getLogger().error("Failed to read person " + retVal.getFullName() + " from file", e);
+            LogManager.getLogger().error("Failed to read person {} from file", retVal.getFullName(), e);
             retVal = null;
         }
 
@@ -2183,22 +2307,26 @@ public class Person {
         }
 
         // CamOps doesn't cover secondary roles, so we just half the base salary of the secondary role.
-        Money secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
+        Money secondaryBase = Money.zero();
 
-        // SpecInf is a special case, this needs to be applied first to bring base salary up to RAW.
-        if (getSecondaryRole().isSoldierOrBattleArmour()) {
-            if (hasSkill(SkillType.S_ANTI_MECH)) {
-                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+        if (!campaign.getCampaignOptions().isDisableSecondaryRoleSalary()) {
+            secondaryBase = campaign.getCampaignOptions().getRoleBaseSalaries()[getSecondaryRole().ordinal()].dividedBy(2);
+
+            // SpecInf is a special case, this needs to be applied first to bring base salary up to RAW.
+            if (getSecondaryRole().isSoldierOrBattleArmour()) {
+                if (hasSkill(SkillType.S_ANTI_MECH)) {
+                    secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                }
             }
-        }
 
-        // Experience modifier
-        secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
+            // Experience modifier
+            secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryXPMultipliers().get(getSkillLevel(campaign, true)));
 
-        // Specialization
-        if (getSecondaryRole().isSoldierOrBattleArmour()) {
-            if (hasSkill(SkillType.S_ANTI_MECH)) {
-                secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+            // Specialization
+            if (getSecondaryRole().isSoldierOrBattleArmour()) {
+                if (hasSkill(SkillType.S_ANTI_MECH)) {
+                    secondaryBase = secondaryBase.multipliedBy(campaign.getCampaignOptions().getSalaryAntiMekMultiplier());
+                }
             }
         }
 
@@ -2387,6 +2515,36 @@ public class Person {
             return getRankNumeric() > other.getRankNumeric();
         }
     }
+
+    /**
+     * Checks if the current person outranks another person using a skill tiebreaker.
+     * If the other person is null, it is considered that the current person outranks them.
+     * If both persons have the same rank numeric value, the rank level is compared.
+     * If both persons have the same rank numeric value and rank level, the experience levels are compared.
+     *
+     * @param campaign   the campaign used to calculate the experience levels
+     * @param otherPerson the other person to compare ranks with
+     * @return true if the current person outranks the other person, false otherwise
+     */
+    public boolean outRanksUsingSkillTiebreaker(Campaign campaign, @Nullable Person otherPerson) {
+        if (otherPerson == null) {
+            return true;
+        } else if (getRankNumeric() == otherPerson.getRankNumeric()) {
+             if (getRankLevel() > otherPerson.getRankLevel()) {
+                 return true;
+             } else if (getRankLevel() < otherPerson.getRankLevel()) {
+                 return false;
+             } else {
+                 if (getExperienceLevel(campaign, false) == otherPerson.getExperienceLevel(campaign, false)) {
+                     return getExperienceLevel(campaign, true) > otherPerson.getExperienceLevel(campaign, true);
+                 } else {
+                     return getExperienceLevel(campaign, false) > otherPerson.getExperienceLevel(campaign, false);
+                 }
+             }
+        } else {
+            return getRankNumeric() > otherPerson.getRankNumeric();
+        }
+    }
     //endregion Ranks
 
     @Override
@@ -2479,7 +2637,19 @@ public class Person {
             case VTOL_PILOT:
                 return hasSkill(SkillType.S_PILOT_VTOL) ? getSkill(SkillType.S_PILOT_VTOL).getExperienceLevel() : SkillType.EXP_NONE;
             case VEHICLE_GUNNER:
-                return hasSkill(SkillType.S_GUN_VEE) ? getSkill(SkillType.S_GUN_VEE).getExperienceLevel() : SkillType.EXP_NONE;
+                if (!campaign.getCampaignOptions().isUseArtillery()) {
+                    return hasSkill(SkillType.S_GUN_VEE) ? getSkill(SkillType.S_GUN_VEE).getExperienceLevel() : SkillType.EXP_NONE;
+                } else {
+                    if ((hasSkill(SkillType.S_GUN_VEE)) && (hasSkill(SkillType.S_ARTILLERY))) {
+                        return Math.max((getSkill(SkillType.S_GUN_VEE).getExperienceLevel()), (getSkill(SkillType.S_ARTILLERY).getExperienceLevel()));
+                    } else if (hasSkill(SkillType.S_GUN_VEE)) {
+                        return getSkill(SkillType.S_GUN_VEE).getExperienceLevel();
+                    } else if (hasSkill(SkillType.S_ARTILLERY)) {
+                        return getSkill(SkillType.S_ARTILLERY).getExperienceLevel();
+                    } else {
+                        return SkillType.EXP_NONE;
+                    }
+                }
             case VEHICLE_CREW:
                 return hasSkill(SkillType.S_TECH_MECHANIC) ? getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() : SkillType.EXP_NONE;
             case AEROSPACE_PILOT:
@@ -2690,7 +2860,7 @@ public class Person {
     }
 
     public String fail() {
-        return " <font color='red'><b>Failed to heal.</b></font>";
+        return " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>Failed to heal.</b></font>";
     }
 
     //region skill
@@ -2799,7 +2969,7 @@ public class Person {
 
     public String succeed() {
         heal();
-        return " <font color='green'><b>Successfully healed one hit.</b></font>";
+        return " <font color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'><b>Successfully healed one hit.</b></font>";
     }
 
     //region Personnel Options
@@ -3509,7 +3679,16 @@ public class Person {
     }
 
     public void setOriginalUnit(final Unit unit) {
+        if (unit == null) {
+            originalUnitId = null;
+            originalUnitTech = 0;
+            originalUnitWeight = 0;
+
+            return;
+        }
+
         originalUnitId = unit.getId();
+
         if (unit.getEntity().isClan()) {
             originalUnitTech = TECH_CLAN;
         } else if (unit.getEntity().getTechLevel() > TechConstants.T_INTRO_BOXSET) {
@@ -3612,5 +3791,67 @@ public class Person {
                 }
             }
         }
+    }
+
+    /**
+     * Generates the loyalty value for a given roll.
+     *
+     * @param roll the 3d6 roll used to determine the loyalty value
+     * @throws IllegalArgumentException if the provided roll is not between 3 and 18
+     */
+    public void generateLoyalty(int roll) {
+        if (roll == 3) {
+            setLoyalty(3);
+        } else if (roll == 4) {
+            setLoyalty(2);
+        } else if (roll <= 6) {
+            setLoyalty(1);
+        } else if (roll <= 14) {
+            setLoyalty(0);
+        } else if (roll <= 16) {
+            setLoyalty(-1);
+        } else if (roll == 17) {
+            setLoyalty(-2);
+        } else  if (roll == 18){
+            setLoyalty(-3);
+        } else {
+            throw new IllegalArgumentException("Invalid roll in mekhq/campaign/personnel/Person.java/generateLoyalty: " + roll);
+        }
+    }
+
+    /**
+     * Calculates the effective fatigue for a person.
+     *
+     * @param campaign the campaign for which to calculate the effective fatigue
+     * @return the effective fatigue value
+     */
+    public int getEffectiveFatigue(Campaign campaign) {
+        int effectiveFatigue = fatigue;
+
+        if (isClanPersonnel()) {
+            effectiveFatigue -= 2;
+        }
+
+        switch (getSkillLevel(campaign, false)) {
+            case NONE:
+            case ULTRA_GREEN:
+            case GREEN:
+            case REGULAR:
+                break;
+            case VETERAN:
+                effectiveFatigue--;
+                break;
+            case ELITE:
+            case HEROIC:
+            case LEGENDARY:
+                effectiveFatigue -= 2;
+                break;
+        }
+
+        if (campaign.getFieldKitchenWithinCapacity()) {
+            effectiveFatigue--;
+        }
+
+        return effectiveFatigue;
     }
 }

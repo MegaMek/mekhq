@@ -46,26 +46,25 @@ public class ForceRenderer extends DefaultTreeCellRenderer {
         setOpaque(false);
 
         if (value instanceof Unit) {
-            String name = "<font color='red'>No Crew</font>";
+            String name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No Crew</font>";
             if (((Unit) value).getEntity() instanceof GunEmplacement) {
                 name = "AutoTurret";
             }
-            String uname;
             String c3network = "";
             StringBuilder transport = new StringBuilder();
             Unit u = (Unit) value;
             Person person = u.getCommander();
             if (person != null) {
                 name = person.getFullTitle();
-                name += " (" + u.getEntity().getCrew().getGunnery() + "/"
-                        + u.getEntity().getCrew().getPiloting() + ")";
+                name += " (" + u.getEntity().getCrew().getGunnery() + '/'
+                        + u.getEntity().getCrew().getPiloting() + ')';
                 if (person.needsFixing() || (u.getEntity().getCrew().getHits() > 0)) {
-                    name = "<font color='red'>" + name + "</font>";
+                    name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + name + "</font>";
                 }
             }
-            uname = "<i>" + u.getName() + "</i>";
+            String uname = "<i>" + u.getName() + "</i>";
             if (u.isDamaged()) {
-                uname = "<font color='red'>" + uname + "</font>";
+                uname = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + uname + "</font>";
             }
 
             Entity entity = u.getEntity();

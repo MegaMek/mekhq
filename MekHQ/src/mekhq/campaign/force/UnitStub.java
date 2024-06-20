@@ -23,9 +23,10 @@ package mekhq.campaign.force;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.icons.AbstractIcon;
 import megamek.common.icons.Portrait;
-import mekhq.utilities.MHQXMLUtility;
+import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -70,18 +71,18 @@ public class UnitStub {
     //endregion Getters/Setters
 
     private String getUnitDescription(Unit u) {
-        String name = "<font color='red'>No Crew</font>";
+        String name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>No Crew</font>";
         Person pp = u.getCommander();
         if (null != pp) {
             name = pp.getFullTitle();
             name += " (" + u.getEntity().getCrew().getGunnery() + "/" + u.getEntity().getCrew().getPiloting() + ")";
             if (pp.needsFixing()) {
-                name = "<font color='red'>" + name + "</font>";
+                name = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + name + "</font>";
             }
         }
         String uname = "<i>" + u.getName() + "</i>";
         if (u.isDamaged()) {
-            uname = "<font color='red'>" + uname + "</font>";
+            uname = "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>" + uname + "</font>";
         }
         return "<html>" + name + ", " + uname + "</html>";
     }

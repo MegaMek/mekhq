@@ -105,7 +105,7 @@
                 </failureEffect>
             </failureEffects>
             <additionalDetails/>
-            <description>Enage the following enemy unit(s) and force(s):</description>
+            <description>Engage the following enemy unit(s) and force(s):</description>
             <destinationEdge>NONE</destinationEdge>
             <objectiveCriterion>Custom</objectiveCriterion>
             <percentage>1</percentage>

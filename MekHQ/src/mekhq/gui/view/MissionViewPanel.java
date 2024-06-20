@@ -24,8 +24,8 @@ import mekhq.campaign.mission.AtBContract;
 import mekhq.campaign.mission.Contract;
 import mekhq.campaign.mission.Mission;
 import mekhq.gui.CampaignGUI;
-import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.baseComponents.JScrollablePanel;
+import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.utilities.MarkdownRenderer;
 
 import javax.swing.*;
@@ -85,6 +85,8 @@ public class MissionViewPanel extends JScrollablePanel {
     private JLabel txtMorale;
     private JLabel lblScore;
     private JLabel txtScore;
+    private JLabel lblBonusParts;
+    private JLabel txtBonusParts;
     private JLabel lblSharePct;
     private JLabel txtSharePct;
 
@@ -514,7 +516,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
             String lead = "<html><font>";
             if (currentSalvagePct > maxSalvagePct) {
-                lead = "<html><font color='red'>";
+                lead = "<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>";
             }
             lblSalvagePct2.setText(lead + currentSalvagePct + "%</font> <span>(max " + maxSalvagePct + "%)</span></html>");
         }
@@ -586,6 +588,8 @@ public class MissionViewPanel extends JScrollablePanel {
         txtSharePct = new JLabel();
         lblScore = new JLabel();
         txtScore = new JLabel();
+        lblBonusParts = new JLabel();
+        txtBonusParts = new JLabel();
 
         GridBagConstraints gridBagConstraints;
         pnlStats.setLayout(new GridBagLayout());
@@ -987,6 +991,26 @@ public class MissionViewPanel extends JScrollablePanel {
             gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
             pnlStats.add(txtScore, gridBagConstraints);
         }
+
+        lblBonusParts.setName("lblBonusParts");
+        lblBonusParts.setText(resourceMap.getString("lblBonusParts.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(lblBonusParts, gridBagConstraints);
+
+        txtBonusParts.setName("txtBonusParts");
+        txtBonusParts.setText(Integer.toString(contract.getNumBonusParts()));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.weightx = 0.5;
+        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        pnlStats.add(txtBonusParts, gridBagConstraints);
 
         txtDesc.setName("txtDesc");
         txtDesc.setEditable(false);

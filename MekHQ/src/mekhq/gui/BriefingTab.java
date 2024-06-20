@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2017-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -27,8 +27,12 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
+import mekhq.campaign.Kill;
 import mekhq.campaign.ResolveScenarioTracker;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.event.*;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Lance;
 import mekhq.campaign.mission.*;
 import mekhq.campaign.mission.atb.AtBScenarioFactory;
@@ -357,36 +361,37 @@ public final class BriefingTab extends CampaignGuiTab {
             if (((AtBContract) mission).contractExtended(getCampaign())) {
                 return;
             }
+        }
 
-            if (getCampaign().getCampaignOptions().getRandomRetirementMethod().isAgainstTheBot()
-                    && getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
-                RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
-                        (AtBContract) mission, true);
-                rdd.setVisible(true);
-                if (rdd.wasAborted()) {
-                    /*
-                     * Once the retirement rolls have been made, the outstanding payouts can be resolved
-                     * without reference to the contract and the dialog can be accessed through the menu
-                     * provided they aren't still assigned to the mission in question.
-                     */
-                    if (!getCampaign().getRetirementDefectionTracker().isOutstanding(mission.getId())) {
-                        return;
-                    }
-                } else {
-                    if ((getCampaign().getRetirementDefectionTracker().getRetirees(mission) != null)
-                            && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
-                        for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
-                            Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
-                            if (admin != null) {
-                                admin.awardXP(getCampaign(), 1);
-                                getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
-                            }
+        if (getCampaign().getCampaignOptions().isUseRandomRetirement()
+                && getCampaign().getCampaignOptions().isUseContractCompletionRandomRetirement()) {
+            RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(), mission, true);
+            rdd.setLocation(rdd.getLocation().x, 0);
+            rdd.setVisible(true);
+
+            if (rdd.wasAborted()) {
+                /*
+                 * Once the retirement rolls have been made, the outstanding payouts can be resolved
+                 * without a reference to the contract and the dialog can be accessed through the menu
+                 * provided they aren't still assigned to the mission in question.
+                 */
+                if (!getCampaign().getRetirementDefectionTracker().isOutstanding(mission.getId())) {
+                    return;
+                }
+            } else {
+                if ((getCampaign().getRetirementDefectionTracker().getRetirees(mission) != null)
+                        && getCampaign().getFinances().getBalance().isGreaterOrEqualThan(rdd.totalPayout())) {
+                    for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
+                        Person admin = getCampaign().findBestInRole(role, SkillType.S_ADMIN);
+                        if (admin != null) {
+                            admin.awardXP(getCampaign(), 1);
+                            getCampaign().addReport(admin.getHyperlinkedName() + " has gained 1 XP.");
                         }
                     }
+                }
 
-                    if (!getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
-                        return;
-                    }
+                if (!getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
+                    return;
                 }
             }
         }
@@ -398,6 +403,8 @@ public final class BriefingTab extends CampaignGuiTab {
             ((AtBContract) mission).checkForFollowup(getCampaign());
         }
 
+        bonusPartExchange((AtBContract) mission);
+
         if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
 
@@ -408,6 +415,36 @@ public final class BriefingTab extends CampaignGuiTab {
 
         final List<Mission> missions = getCampaign().getSortedMissions();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.get(0));
+    }
+
+    /**
+     * Credits the campaign finances with additional funds based on campaign settings and remaining Bonus Parts.
+     *
+     * @param mission the mission just concluded
+     */
+    private void bonusPartExchange(AtBContract mission) {
+        final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+                MekHQ.getMHQOptions().getLocale());
+
+        double bonusPartExchangeValue = getCampaign().getCampaignOptions().getBonusPartExchangeValue();
+
+        if (bonusPartExchangeValue != 0.0) {
+            int bonusPartMaxExchangeCount = getCampaign().getCampaignOptions().getBonusPartMaxExchangeCount();
+
+            int spareBonusParts = mission.getNumBonusParts();
+
+            if (bonusPartMaxExchangeCount != 0) {
+                spareBonusParts = Math.min(bonusPartMaxExchangeCount, spareBonusParts);
+            }
+
+            bonusPartExchangeValue *= spareBonusParts;
+
+            getCampaign().getFinances().credit(
+                    TransactionType.BONUS_EXCHANGE,
+                    getCampaign().getLocalDate(),
+                    Money.of(bonusPartExchangeValue),
+                    resourceMap.getString("spareBonusPartExchange.text"));
+        }
     }
 
     private void deleteMission() {
@@ -487,15 +524,39 @@ public final class BriefingTab extends CampaignGuiTab {
         // tracker.postProcessEntities(control);
         ResolveScenarioWizardDialog resolveDialog = new ResolveScenarioWizardDialog(getFrame(), true, tracker);
         resolveDialog.setVisible(true);
-        if (getCampaign().getCampaignOptions().isUseAtB()
-                && getCampaign().getMission(scenario.getMissionId()) instanceof AtBContract
-                && !getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
+
+        if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
             RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(),
-                    (AtBContract) getCampaign().getMission(scenario.getMissionId()), false);
+                    getCampaign().getMission(scenario.getMissionId()), false);
+            rdd.setLocation(rdd.getLocation().x, 0);
             rdd.setVisible(true);
+
             if (!rdd.wasAborted()) {
                 getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
             }
+        }
+
+        if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
+            HashMap<UUID, Integer> personnel = new HashMap<>();
+            HashMap<UUID, List<Kill>> scenarioKills = new HashMap<>();
+
+            for (UUID personId : tracker.getPeopleStatus().keySet()) {
+                Person person = getCampaign().getPerson(personId);
+                PersonStatus status = tracker.getPeopleStatus().get(personId);
+                int injuryCount = 0;
+
+                if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
+                    if (status.getHits() > person.getHits()) {
+                        injuryCount = status.getHits() - person.getHits();
+                    }
+                }
+
+                personnel.put(personId, injuryCount);
+                scenarioKills.put(personId, tracker.getPeopleStatus().get(personId).getKills());
+            }
+
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+            autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills);
         }
 
         MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));

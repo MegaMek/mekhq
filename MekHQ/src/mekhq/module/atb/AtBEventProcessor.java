@@ -68,7 +68,7 @@ public class AtBEventProcessor {
                     ev.getCampaign().getLocalDate(), Money.of(100000), "Paid recruitment roll")) {
                 doPaidRecruitment(ev.getCampaign());
             } else {
-                ev.getCampaign().addReport("<html><font color=\"red\">Insufficient funds for paid recruitment.</font></html>");
+                ev.getCampaign().addReport("<html><font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Insufficient funds for paid recruitment.</font></html>");
             }
         }
     }

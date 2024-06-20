@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2014-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -79,7 +79,10 @@ public class AutoAwardsDialog extends JDialog {
         setTitle(resourceMap.getString("AutoAwardsDialog.title"));
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setSize(screenSize);
+        int screenWidth = (int) (screenSize.getWidth() * 0.75);
+        int screenHeight = (int) (screenSize.getHeight() * 0.94);
+
+        setSize(screenWidth, screenHeight);
 
         setLayout(new BorderLayout());
         CardLayout cardLayout = new CardLayout();
@@ -91,7 +94,7 @@ public class AutoAwardsDialog extends JDialog {
         JPanel imageAndInstructionsPanel = new JPanel(new BorderLayout());
 
         Image image = new ImageIcon("data/images/awards/awardceremony.png")
-                .getImage().getScaledInstance(screenSize.width, (screenSize.width / 7), Image.SCALE_FAST);
+                .getImage().getScaledInstance(screenWidth, (screenHeight / 7), Image.SCALE_FAST);
         JLabel lblImage = new JLabel(new ImageIcon(image));
         imageAndInstructionsPanel.add(lblImage, BorderLayout.CENTER);
 
@@ -241,6 +244,8 @@ public class AutoAwardsDialog extends JDialog {
                 // if necessary, this initiates the next page
                 if ((currentPageCount + 1) < allData.size()) {
                     AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allData, (currentPageCount + 1));
+                    autoAwardsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
+                    autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
                     autoAwardsDialog.setVisible(true);
                 }
             } else if (event.getSource().equals(btnSkip)) {
@@ -248,6 +253,8 @@ public class AutoAwardsDialog extends JDialog {
 
                 if ((currentPageCount + 1) < allData.size()) {
                     AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allData, (currentPageCount + 1));
+                    autoAwardsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
+                    autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
                     autoAwardsDialog.setVisible(true);
                 }
             } else if (event.getSource().equals(btnSkipAll)) {

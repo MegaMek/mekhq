@@ -9,7 +9,7 @@
         <constructionYear>2300</constructionYear>
         <tuition>47500</tuition>
         <durationDays>1</durationDays>
-        <educationLevelMax>0</educationLevelMax>
+        <educationLevelMax>Early Childhood</educationLevelMax>
         <ageMax>10</ageMax>
         <qualification>General Education</qualification>
         <curriculum>Bonus XP</curriculum>
@@ -18,7 +18,7 @@
     </academy>
     <academy>
         <name>High School</name>
-        <type>1</type>
+        <type>High School</type>
         <isPrepSchool>true</isPrepSchool>
         <description>A technologically advanced facility where students balance traditional academic subjects with a basic education in technical fields such as modern electronics, and computer science. The school fosters a competitive environment to prepare students for potential military service.</description>
         <isLocal>true</isLocal>
@@ -34,7 +34,7 @@
     </academy>
     <academy>
         <name>Preparatory School</name>
-        <type>1</type>
+        <type>High School</type>
         <isPrepSchool>true</isPrepSchool>
         <description>A prestigious institution catering to the elite of the Inner Sphere. Nestled within secure compounds, these schools provide a comprehensive education emphasizing not only academic excellence but also etiquette, and political maneuvering. Students, typically from noble or affluent families, are groomed for leadership roles, learning the intricacies of diplomacy. The curriculum is rigorous, preparing graduates to navigate the complex power dynamics of the Inner Sphere with grace and skill.</description>
         <isLocal>true</isLocal>
@@ -51,7 +51,7 @@
     </academy>
     <academy>
         <name>Military School</name>
-        <type>1</type>
+        <type>High School</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
         <description>A disciplined institution focused on cultivating the skills necessary for future soldiers and officers. Cadets undergo rigorous physical training, tactical simulations, and academic studies in subjects like military history, strategy, and technology.</description>
@@ -73,7 +73,7 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>6250</tuition>
-        <educationLevelMax>0</educationLevelMax>
+        <educationLevelMax>Early Childhood</educationLevelMax>
         <facultySkill>8</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
@@ -96,7 +96,7 @@
     </academy>
     <academy>
         <name>Adult High School</name>
-        <type>1</type>
+        <type>High School</type>
         <description>An institution that caters to individuals who, for various reasons, didn't complete their high school education. These institutions offer flexible schedules and tailored programs to accommodate the diverse backgrounds and goals of adult learners. The environment encourages personal growth and provides opportunities for individuals to acquire the skills necessary for advancement in both civilian and military careers.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -111,15 +111,15 @@
     </academy>
     <academy>
         <name>Technical College</name>
-        <type>2</type>
+        <type>College</type>
         <description>A technical college serves as a hub for specialized education in fields crucial to the advancement of technology and warfare. Students enrolled in technical colleges undergo rigorous training in disciplines such as aerospace engineering, robotics, computer science, and weapon systems development. The curriculum combines theoretical knowledge with practical hands-on experience, utilizing state-of-the-art laboratories and workshops to foster innovation and skill acquisition.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>5000</tuition>
         <durationDays>600</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced BattleMech Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
@@ -145,8 +145,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>5000</tuition>
         <durationDays>600</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Vocational Administrator</qualification>
         <curriculum>Administration</curriculum>
@@ -159,8 +159,8 @@
         <qualificationStartYear>2300</qualificationStartYear>
     </academy>
     <academy>
-        <name>University (Bachelor's)</name>
-        <type>3</type>
+        <name>University</name>
+        <type>University</type>
         <description>A university stands as a beacon of knowledge and innovation amidst the turmoil of interstellar conflict. These institutions offer a wide array of academic disciplines, ranging from the humanities and social sciences to advanced engineering and military strategy. Professors and researchers engage in cutting-edge studies, pushing the boundaries of technology and exploring the depths of history and culture.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
@@ -168,116 +168,34 @@
         <tuition>7500</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Bachelor's in Advanced BattleMech Technologies</qualification>
+        <qualification>Advanced BattleMech Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2425</qualificationStartYear>
-        <qualification>Bachelor's in Advanced Technology &amp; Development</qualification>
+        <qualification>Advanced Technology &amp; Development</qualification>
         <curriculum>Tech/Mechanic</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Bachelor's in Advanced AeroSpace Technologies</qualification>
+        <qualification>Advanced AeroSpace Technologies</qualification>
         <curriculum>Tech/Aero</curriculum>
         <qualificationStartYear>2439</qualificationStartYear>
-        <qualification>Bachelor's in Battle Armor Technology &amp; Development</qualification>
+        <qualification>Battle Armor Technology &amp; Development</qualification>
         <curriculum>Tech/BA</curriculum>
         <qualificationStartYear>3052</qualificationStartYear>
-        <qualification>Bachelor's in Black Naval Technologies</qualification>
+        <qualification>Black Naval Technologies</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Bachelor's in Advanced Systems &amp; Technology</qualification>
+        <qualification>Advanced Systems &amp; Technology</qualification>
         <curriculum>Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Bachelor's in Applied Economics</qualification>
+        <qualification>Applied Economics</qualification>
         <curriculum>Negotiation, Scrounge</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Bachelor's in Advanced Medicine</qualification>
+        <qualification>Advanced Medicine</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Bachelor's in Applied Astrophysics</qualification>
-        <curriculum>Hyperspace Navigation</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-    </academy>
-    <academy>
-        <name>University (Master's)</name>
-        <type>3</type>
-        <description>A university stands as a beacon of knowledge and innovation amidst the turmoil of interstellar conflict. These institutions offer a wide array of academic disciplines, ranging from the humanities and social sciences to advanced engineering and military strategy. Professors and researchers engage in cutting-edge studies, pushing the boundaries of technology and exploring the depths of history and culture.</description>
-        <isLocal>true</isLocal>
-        <locationSystem>Terra</locationSystem>
-        <constructionYear>2300</constructionYear>
-        <tuition>7500</tuition>
-        <durationDays>600</durationDays>
-        <facultySkill>6</facultySkill>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>3</educationLevelMax>
-        <ageMin>16</ageMin>
-        <qualification>Masters's in Advanced BattleMech Technologies</qualification>
-        <curriculum>Tech/Mech</curriculum>
-        <qualificationStartYear>2425</qualificationStartYear>
-        <qualification>Masters's in Advanced Technology &amp; Development</qualification>
-        <curriculum>Tech/Mechanic</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Masters's in Advanced AeroSpace Technologies</qualification>
-        <curriculum>Tech/Aero</curriculum>
-        <qualificationStartYear>2439</qualificationStartYear>
-        <qualification>Masters's in Battle Armor Technology &amp; Development</qualification>
-        <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3052</qualificationStartYear>
-        <qualification>Masters's in Black Naval Technologies</qualification>
-        <curriculum>Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Masters's in Advanced Systems &amp; Technology</qualification>
-        <curriculum>Administration</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Masters's in Applied Economics</qualification>
-        <curriculum>Negotiation, Scrounge</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Masters's in Advanced Medicine</qualification>
-        <curriculum>Doctor</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Masters's in Applied Astrophysics</qualification>
-        <curriculum>Hyperspace Navigation</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-    </academy>
-    <academy>
-        <name>University (Doctorate)</name>
-        <type>3</type>
-        <description>A university stands as a beacon of knowledge and innovation amidst the turmoil of interstellar conflict. These institutions offer a wide array of academic disciplines, ranging from the humanities and social sciences to advanced engineering and military strategy. Professors and researchers engage in cutting-edge studies, pushing the boundaries of technology and exploring the depths of history and culture.</description>
-        <isLocal>true</isLocal>
-        <locationSystem>Terra</locationSystem>
-        <constructionYear>2300</constructionYear>
-        <tuition>7500</tuition>
-        <durationDays>600</durationDays>
-        <facultySkill>6</facultySkill>
-        <educationLevelMin>3</educationLevelMin>
-        <educationLevelMax>4</educationLevelMax>
-        <ageMin>16</ageMin>
-        <qualification>Doctorate in Advanced BattleMech Technologies</qualification>
-        <curriculum>Tech/Mech</curriculum>
-        <qualificationStartYear>2425</qualificationStartYear>
-        <qualification>Doctorate in Advanced Technology &amp; Development</qualification>
-        <curriculum>Tech/Mechanic</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Doctorate in Advanced AeroSpace Technologies</qualification>
-        <curriculum>Tech/Aero</curriculum>
-        <qualificationStartYear>2439</qualificationStartYear>
-        <qualification>Doctorate in Battle Armor Technology &amp; Development</qualification>
-        <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3052</qualificationStartYear>
-        <qualification>Doctorate in Black Naval Technologies</qualification>
-        <curriculum>Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Doctorate in Advanced Systems &amp; Technology</qualification>
-        <curriculum>Administration</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Doctorate in Applied Economics</qualification>
-        <curriculum>Negotiation, Scrounge</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Doctorate in Advanced Medicine</qualification>
-        <curriculum>Doctor</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Doctorate in Applied Astrophysics</qualification>
+        <qualification>Applied Astrophysics</qualification>
         <curriculum>Hyperspace Navigation</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
     </academy>
@@ -289,8 +207,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>750</tuition>
         <durationDays>70</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>1</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>High School</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Field Officer Training</qualification>
         <curriculum>Small Arms</curriculum>
@@ -308,8 +226,8 @@
         <constructionYear>2300</constructionYear>
         <tuition>1750</tuition>
         <durationDays>150</durationDays>
-        <educationLevelMin>0</educationLevelMin>
-        <educationLevelMax>0</educationLevelMax>
+        <educationLevelMin>Early Childhood</educationLevelMin>
+        <educationLevelMax>Early Childhood</educationLevelMax>
         <qualification>Reeducation &amp; Social Encouragement</qualification>
         <curriculum>Bonus XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -317,15 +235,14 @@
     </academy>
     <academy>
         <name>Boot Camp</name>
-        <type>5</type>
+        <type>Basic Training</type>
         <isMilitary>true</isMilitary>
-        <promotion>Private</promotion>
         <description>A sprawling, high-security installation where recruits endure intense physical conditioning, drills, and live-fire exercises with both personal and vehicle-scale weaponry. The training regimen emphasizes discipline, loyalty to one's faction, and the strategic use of cutting-edge technology in combined arms warfare.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>1250</tuition>
-        <educationLevelMax>0</educationLevelMax>
+        <educationLevelMax>Early Childhood</educationLevelMax>
         <durationDays>70</durationDays>
         <facultySkill>8</facultySkill>
         <ageMin>16</ageMin>
@@ -348,33 +265,32 @@
     </academy>
     <academy>
         <name>Military Academy</name>
-        <type>4</type>
+        <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <promotion>Corporal</promotion>
         <description>A prestigious institution dedicated to training the warriors of the Inner Sphere. Situated within heavily fortified compounds, these academies offer a comprehensive education that blends rigorous physical training, tactical instruction, and academic study. Cadets undergo intensive combat simulations, and study military history, strategy, and ethics.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>3500</tuition>
         <durationDays>600</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Academy</qualification>
         <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
-        <qualificationStartYear>2425</qualificationStartYear>
+        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Mechanized Academy</qualification>
         <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Flight Academy</qualification>
         <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
-        <qualificationStartYear>2439</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Black Naval Academy</qualification>
         <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Academy</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3052</qualificationStartYear>
+        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Artillery College</qualification>
         <curriculum>Small Arms, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -387,36 +303,34 @@
     </academy>
     <academy>
         <name>NCO Candidate Bootcamp</name>
-        <type>6</type>
+        <type>NCO Academy</type>
         <isMilitary>true</isMilitary>
-        <promotion>Corporal</promotion>
         <description>A specialized training program designed to prepare enlisted personnel for leadership roles within their respective military units. Held within secure facilities, the bootcamp emphasizes the development of tactical proficiency, effective communication, and leadership skills essential for leading personnel in combat. Cadets undergo intensive physical conditioning, weapons training, and tactical simulations, with a focus on fostering teamwork and initiative.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>3000</tuition>
         <durationDays>70</durationDays>
-        <educationLevelMin>1</educationLevelMin>
-        <educationLevelMax>1</educationLevelMax>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>High School</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>NCO Graduate</qualification>
         <curriculum>Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrant Officer Candidate School</name>
-        <type>7</type>
+        <type>Warrant Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <promotion>Warrant Officer</promotion>
         <description>A specialized institution tasked with training promising enlisted personnel for positions of leadership and technical expertise as Warrant Officers. Held in secure military installations, these schools combine intensive academic study with practical training in areas such as engineering, logistics, and advanced tactics. Candidates undergo rigorous evaluations and assessments to demonstrate their aptitude for assuming roles of responsibility within their units.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>7000</tuition>
         <durationDays>300</durationDays>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Warrant Officer Graduate</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -424,17 +338,16 @@
     </academy>
     <academy>
         <name>Officer Candidate School</name>
-        <type>8</type>
+        <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <promotion>Lieutenant Jr. Grade</promotion>
         <description>A prestigious institution dedicated to training and grooming promising individuals for leadership roles within the military. Held in secure and strategically located facilities, these schools provide a comprehensive curriculum that encompasses both theoretical and practical aspects of warfare, leadership, and strategy. Candidates undergo rigorous physical training, tactical simulations, and academic studies in subjects such as military history, and tactics. The program is designed to identify and cultivate individuals with the potential to command units effectively and uphold the honor and integrity of their respective factions.</description>
         <isLocal>true</isLocal>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>7000</tuition>
         <durationDays>300</durationDays>
-        <educationLevelMin>2</educationLevelMin>
-        <educationLevelMax>2</educationLevelMax>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Field Officer Graduate</qualification>
         <curriculum>Leadership, Tactics</curriculum>

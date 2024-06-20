@@ -24,7 +24,7 @@
 		<fixedUnitCount>4</fixedUnitCount>
 		<forceName>Allied Cavalry Lance</forceName>
 		<generationMethod>5</generationMethod>
-			<fixedMul>AlliedCavLance.mul</fixedMul>	
+			<fixedMul>AlliedCavLance.mul</fixedMul>
 		<generationOrder>1</generationOrder>
 		<maxWeightClass>4</maxWeightClass>
 		<retreatThreshold>0</retreatThreshold>

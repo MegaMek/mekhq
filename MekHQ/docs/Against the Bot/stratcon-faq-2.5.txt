@@ -80,7 +80,7 @@ Your Contract Score is no longer the sole metric of your success.
 
 * Stratcon contract VP's are only awarded for "required by employer" scenarios, and will show "deployment required by contract / -1 VP if lost/ignored; +1 VP if won" and are NOT necessarily Contract Objectives.  There is a screenshot sticky in the Stratcon channel for an example.
 
-* The information about whether a scenario gives VP/SP is stated in red on the scenario description in the StratCon tab. "Operational Victory Points" stated in the briefing tab are internal, meant for the game to find the effect (if any) of the battle.  So, VP discussed in a post-battle resolution screen and VP on the StratCon campaign tab are NOT the same.  The ones on the campaign tab are the only ones that count toward final contract score.
+* The information about whether a scenario gives VP/SP is stated in red on the scenario description in the StratCon tab. "Scenario Victory Points" stated in the briefing tab are internal, meant for the game to find the effect (if any) of the battle.  So, VP discussed in a post-battle resolution screen and VP on the StratCon campaign tab are NOT the same.  The ones on the campaign tab are the only ones that count toward final contract score.
 
 * Orange objectives mean completed, but on-going objectives. Finished strategic objectives turn green.
 

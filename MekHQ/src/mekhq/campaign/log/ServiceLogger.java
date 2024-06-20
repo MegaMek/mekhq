@@ -110,38 +110,6 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduFailed.text"), institution)));
     }
 
-    public static void eduClanWashout(Person person, LocalDate date, String originCaste) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanWashout.text"), originCaste)));
-    }
-
-    public static void eduClanFlee(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanFlee.text")));
-    }
-
-    public static void eduClanWarriorFailed(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanWarriorFailed.text")));
-    }
-
-    public static void eduClanWarrior(Person person, LocalDate date, String kills) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanWarrior.text"), kills)));
-    }
-
-    public static void eduClanFailed(Person person, LocalDate date, String caste) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanFailed.text"), caste)));
-    }
-
-    public static void eduClanPassed(Person person, LocalDate date, String degree, String caste) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduClanPassed.text"), degree, caste)));
-    }
-
-    public static void eduClanLabor(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanLabor.text")));
-    }
-
-    public static void eduClanCreche(Person person, LocalDate date) {
-        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("eduClanCreche.text")));
-    }
-
     public static void recoveredMia(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("recoveredMia.text")));
     }
@@ -172,6 +140,18 @@ public class ServiceLogger {
 
     public static void retired(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("retired.text")));
+    }
+
+    public static void resigned(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("resigned.text")));
+    }
+
+    public static void deserted(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("deserted.text")));
+    }
+
+    public static void defected(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("defected.text")));
     }
 
     public static void promotedTo(Person person, LocalDate date) {
@@ -263,5 +243,11 @@ public class ServiceLogger {
             person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(message,
                     campaign.getCampaignOptions().isUseExtendedTOEForceName() ? force.getFullName() : force.getName())));
         }
+    }
+
+    public static void oprhaned(Person person, LocalDate date) {
+        String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
+
+        person.addLogEntry(new ServiceLogEntry(date, message));
     }
 }
