@@ -61,9 +61,8 @@ class AcademyTests {
     @Test
     void testAcademyCreationAllFields() {
         Academy academy = new Academy("MechWarrior", "MekWarrior Academy", AcademyType.COLLEGE, true,
-                false, "Colonel", true,
-                "Top level MechWarrior Training", 20, true,
-                "FWL", Arrays.asList("Sol", "Terra"), false, 3045,
+                false, true, "Top level MechWarrior Training", 20, true,
+                Arrays.asList("Sol", "Terra"), false, 3045,
                 3089, 3099, 2000, 365, 10,
                 EducationLevel.EARLY_CHILDHOOD, EducationLevel.DOCTORATE, 18, 35, Arrays.asList("MechWarrior", "Leadership"),
                 Arrays.asList("Combat", "Strategy"), Arrays.asList(3050, 3055), 5, 101);
@@ -71,9 +70,7 @@ class AcademyTests {
         assertEquals("MekWarrior Academy", academy.getName());
         assertEquals(AcademyType.COLLEGE, academy.getType());
         assertTrue(academy.isMilitary());
-        assertEquals("Colonel", academy.getPromotion());
         assertEquals(20, academy.getFactionDiscount());
-        assertEquals("FWL", academy.getFaction());
         assertEquals(2000, academy.getTuition());
         assertEquals(Integer.valueOf(3089), academy.getDestructionYear());
     }
