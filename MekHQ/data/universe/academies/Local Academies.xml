@@ -30,7 +30,7 @@
         <qualification>General Education</qualification>
         <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Preparatory School</name>
@@ -47,7 +47,7 @@
         <qualification>General Education</qualification>
         <curriculum>XP, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military School</name>
@@ -107,7 +107,7 @@
         <qualification>General Education</qualification>
         <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Technical College</name>
