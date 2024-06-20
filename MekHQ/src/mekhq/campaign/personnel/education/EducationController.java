@@ -724,9 +724,6 @@ public class EducationController {
 
             if (!academy.isMilitary()) {
                 reportMastersOrDoctorateGain(campaign, person, resources);
-            } else if (!Objects.equals(academy.getPromotion(), "None")) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' +
-                        String.format(resources.getString("graduatedRank.text"), academy.getPromotion()));
             }
 
             return true;
@@ -749,9 +746,6 @@ public class EducationController {
 
             if (!academy.isMilitary()) {
                 reportMastersOrDoctorateGain(campaign, person, resources);
-            } else if (!Objects.equals(academy.getPromotion(), "None")) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedRank.text"),
-                        academy.getPromotion()));
             }
 
             return true;
@@ -771,9 +765,6 @@ public class EducationController {
 
         if (!academy.isMilitary()) {
             reportMastersOrDoctorateGain(campaign, person, resources);
-        } else if (!Objects.equals(academy.getPromotion(), "None")) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedRank.text"),
-                    academy.getPromotion()));
         }
         return true;
     }
@@ -821,7 +812,7 @@ public class EducationController {
         }
 
         // default graduation
-        campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"), ""));
+        campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedChild.text"), person.getEduAcademyName()));
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName());
 
