@@ -164,22 +164,17 @@ public class CustomizeAtBContractDialog extends JDialog {
         btnClose = new JButton();
         txtDesc = new MarkdownEditorPanel("Contract Description");
         JLabel lblPlanetName = new JLabel();
-
-        String[] qualityNames = {"A", "B", "C", "D", "F"};
-
-        if (campaign.getCampaignOptions().isReverseQualityNames()) {
-            qualityNames = new String[] { "F", "D", "C", "B", "A" };
-        }
-
+        // TODO : Switch me to use IUnitRating
+        String[] ratingNames = {"F", "D", "C", "B", "A"};
         final DefaultComboBoxModel<SkillLevel> allySkillModel = new DefaultComboBoxModel<>();
         allySkillModel.addAll(SkillLevel.getGeneratableValues());
         comboAllySkill = new MMComboBox<>("comboAllySkill", allySkillModel);
-        cbAllyQuality = new JComboBox<>(qualityNames);
+        cbAllyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyRating = new JLabel();
         final DefaultComboBoxModel<SkillLevel> enemySkillModel = new DefaultComboBoxModel<>();
         enemySkillModel.addAll(SkillLevel.getGeneratableValues());
         comboEnemySkill = new MMComboBox<>("comboEnemySkill", enemySkillModel);
-        cbEnemyQuality = new JComboBox<>(qualityNames);
+        cbEnemyQuality = new JComboBox<>(ratingNames);
         JLabel lblAllyBotName = new JLabel();
         txtAllyBotName = new JTextField();
         JLabel lblEnemyBotName = new JLabel();

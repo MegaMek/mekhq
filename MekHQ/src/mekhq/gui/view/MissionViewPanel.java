@@ -557,12 +557,8 @@ public class MissionViewPanel extends JScrollablePanel {
         AtBContract contract = (AtBContract) mission;
         Campaign campaign = gui.getCampaign();
 
-        String[] qualityNames = {"A", "B", "C", "D", "F"};
-
-        if (campaign.getCampaignOptions().isReverseQualityNames()) {
-            qualityNames = new String[] { "F", "D", "C", "B", "A" };
-        }
-
+        // TODO : Switch me to use IUnitRating
+        String[] ratingNames = {"F", "D", "C", "B", "A"};
         lblStatus = new JLabel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();
@@ -717,7 +713,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblAllyRating, gridBagConstraints);
 
         txtAllyRating.setName("txtAllyRating");
-        txtAllyRating.setText(contract.getAllySkill() + "/" + qualityNames[contract.getAllyQuality()]);
+        txtAllyRating.setText(contract.getAllySkill() + "/" + ratingNames[contract.getAllyQuality()]);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;
@@ -737,7 +733,7 @@ public class MissionViewPanel extends JScrollablePanel {
         pnlStats.add(lblEnemyRating, gridBagConstraints);
 
         txtEnemyRating.setName("txtEnemyRating");
-        txtEnemyRating.setText(contract.getEnemySkill() + "/" + qualityNames[contract.getEnemyQuality()]);
+        txtEnemyRating.setText(contract.getEnemySkill() + "/" + ratingNames[contract.getEnemyQuality()]);
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = y++;

@@ -117,11 +117,8 @@ public class ContractSummaryPanel extends JPanel {
 
     private void fillStats() {
         //region Variable Initialization
-        String[] qualityNames = {"A", "B", "C", "D", "F"};
-
-        if (campaign.getCampaignOptions().isReverseQualityNames()) {
-            qualityNames = new String[] { "F", "D", "C", "B", "A" };
-        }
+        // TODO : Switch me to use IUnitRating
+        String[] ratingNames = {"F", "D", "C", "B", "A"};
 
         // Initializing the GridBagConstraint used for Labels
         // To use this you MUST AND ONLY overwrite gridy
@@ -242,7 +239,7 @@ public class ContractSummaryPanel extends JPanel {
 
         if (contract instanceof AtBContract) {
             JLabel txtAllyRating = new JLabel(((AtBContract) contract).getAllySkill()
-                    + "/" + qualityNames[((AtBContract) contract).getAllyQuality()]);
+                    + "/" + ratingNames[((AtBContract) contract).getAllyQuality()]);
             txtAllyRating.setName("txtAllyRating");
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtAllyRating, gridBagConstraintsText);
@@ -253,7 +250,7 @@ public class ContractSummaryPanel extends JPanel {
             mainPanel.add(lblEnemyRating, gridBagConstraintsLabels);
 
             JLabel txtEnemyRating = new JLabel(((AtBContract) contract).getEnemySkill()
-                    + "/" + qualityNames[((AtBContract) contract).getEnemyQuality()]);
+                    + "/" + ratingNames[((AtBContract) contract).getEnemyQuality()]);
             txtEnemyRating.setName("txtEnemyRating");
             gridBagConstraintsText.gridy = y;
             mainPanel.add(txtEnemyRating, gridBagConstraintsText);
