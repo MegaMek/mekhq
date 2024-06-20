@@ -184,16 +184,16 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
                     .getFactionSet(campaign.getLocalDate()));
 
             addOffers(campaign, getMarketItemCount("very rare"), UnitMarketType.BLACK_MARKET, UnitType.MEK,
-                    faction, IUnitRating.DRAGOON_A, -4);
+                    faction, IUnitRating.DRAGOON_A, -8);
 
             addOffers(campaign, getMarketItemCount("very rare"), UnitMarketType.BLACK_MARKET, UnitType.AEROSPACEFIGHTER,
-                    faction, IUnitRating.DRAGOON_A, -4);
+                    faction, IUnitRating.DRAGOON_A, -8);
 
-            addOffers(campaign, getMarketItemCount("uncommon"), UnitMarketType.BLACK_MARKET, UnitType.TANK,
-                    faction, IUnitRating.DRAGOON_A, -4);
+            addOffers(campaign, getMarketItemCount("rare"), UnitMarketType.BLACK_MARKET, UnitType.TANK,
+                    faction, IUnitRating.DRAGOON_A, -8);
 
             addOffers(campaign, getMarketItemCount("rare"), UnitMarketType.BLACK_MARKET, UnitType.CONV_FIGHTER,
-                    faction, IUnitRating.DRAGOON_A, -4);
+                    faction, IUnitRating.DRAGOON_A, -8);
         }
 
         writeRefreshReport(campaign);

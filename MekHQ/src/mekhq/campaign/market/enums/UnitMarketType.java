@@ -117,32 +117,33 @@ public enum UnitMarketType {
      */
     public static int getPricePercentage(int modifier) {
         int roll = Compute.d6(2);
-        int value = 0;
+        int value;
 
         switch (roll) {
             case 2:
-                value = 3 + modifier;
+                value = modifier + 3;
                 break;
             case 3:
-                value = 2 + modifier;
+                value = modifier + 2;
                 break;
             case 4:
             case 5:
-                value = 1 + modifier;
+                value = modifier + 1;
                 break;
             case 6:
             case 7:
             case 8:
+                value = modifier;
                 break;
             case 9:
             case 10:
-                value = -1 + modifier;
+                value = modifier - 1;
                 break;
             case 11:
-                value = -2 + modifier;
+                value = modifier - 2;
                 break;
             case 12:
-                value = -3 + modifier;
+                value = modifier - 3;
                 break;
             default:
                 throw new IllegalStateException("Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: " + roll);
