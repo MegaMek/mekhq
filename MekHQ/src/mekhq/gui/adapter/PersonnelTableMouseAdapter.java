@@ -55,6 +55,7 @@ import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.PersonnelTab;
 import mekhq.gui.dialog.*;
@@ -1502,7 +1503,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             // we use 'campaign' a lot here, so let's store it, so we don't have to re-call it every time
             Campaign campaign = gui.getCampaign();
-            boolean campaignIsClan = campaign.getFaction().isClan();
 
             if (StaticChecks.areAllActive(selected)) {
                 // this next block preps variables for use by the menu & tooltip
@@ -1512,13 +1512,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 // this filters out any academy sets that are disabled in Campaign Options,
                 // or not applicable for the current campaign faction
                 if (academySetNames.contains("Local Academies")) {
-                    if ((!campaign.getCampaignOptions().isEnableLocalAcademies()) || (campaignIsClan)) {
+                    if (!campaign.getCampaignOptions().isEnableLocalAcademies()) {
                         academySetNames.remove("Local Academies");
                     }
                 }
 
                 if (academySetNames.contains("Prestigious Academies")) {
-                    if ((!campaign.getCampaignOptions().isEnablePrestigiousAcademies()) || (campaignIsClan)) {
+                    if (!campaign.getCampaignOptions().isEnablePrestigiousAcademies()) {
                         academySetNames.remove("Prestigious Academies");
                     }
                 }
@@ -1530,14 +1530,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     // we filter each academy into one of these three categories
                     JMenu civilianMenu = new JMenu(resources.getString("eduCivilian.text"));
                     JMenu militaryMenu = new JMenu(resources.getString("eduMilitary.text"));
-                    JMenu clanMenu = new JMenu(resources.getString("eduClan.text"));
 
-                    if (campaignIsClan) {
-                        setAcademyMenu.add(clanMenu);
-                    } else {
-                        setAcademyMenu.add(civilianMenu);
-                        setAcademyMenu.add(militaryMenu);
-                    }
+                    setAcademyMenu.add(civilianMenu);
+                    setAcademyMenu.add(militaryMenu);
 
                     List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
                     Collections.sort(academiesOfSet);
@@ -2656,9 +2651,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             } else {
                 // what campuses are accepting applicants?
-                List<String> campuses = academy.getLocationSystems().stream()
-                        .filter(campus -> academy.getFilteredFaction(campaign, person, campaign.getSystemById(campus).getFactions(campaign.getLocalDate())) != null)
-                        .collect(Collectors.toList());
+                List<String> campuses = new ArrayList<>();
+
+                LogManager.getLogger().info(academy.getLocationSystems());
+                for (String campusId : academy.getLocationSystems()) {
+                    PlanetarySystem system = campaign.getSystemById(campusId);
+
+                    if (academy.getFilteredFaction(campaign, person, system.getFactions(campaign.getLocalDate())) != null) {
+                        campuses.add(campusId);
+                    }
+                }
 
                 if (campuses.isEmpty()) {
                     if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowFactionConflict())) {
@@ -2675,12 +2677,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                             educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
                         }
                     } else {
-                        JMenu academyOption = new JMenu(academy.getName());
-                        educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
+                        String faction = academy.getFilteredFaction(campaign, person,
+                                campaign.getSystemById(nearestCampus).getFactions(campaign.getLocalDate()));
 
-                        buildEducationSubMenus(campaign, academy, List.of(person), academyOption, nearestCampus,
-                                academy.getFilteredFaction(campaign, person,
-                                        campaign.getSystemById(nearestCampus).getFactions(campaign.getLocalDate())));
+                        if (faction != null) {
+                            JMenu academyOption = new JMenu(academy.getName());
+
+                            educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
+
+                            buildEducationSubMenus(campaign, academy, List.of(person), academyOption, nearestCampus, faction);
+                        }
                     }
                 }
             }
