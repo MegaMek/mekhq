@@ -557,8 +557,12 @@ public class MissionViewPanel extends JScrollablePanel {
         AtBContract contract = (AtBContract) mission;
         Campaign campaign = gui.getCampaign();
 
-        // TODO : Switch me to use IUnitRating
-        String[] ratingNames = {"F", "D", "C", "B", "A"};
+        String[] ratingNames = {"A", "B", "C", "D", "F"};
+
+        if (campaign.getCampaignOptions().isReverseQualityNames()) {
+            ratingNames = new String[] { "F", "D", "C", "B", "A" };
+        }
+
         lblStatus = new JLabel();
         lblLocation = new JLabel();
         txtLocation = new JLabel();

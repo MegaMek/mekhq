@@ -117,8 +117,11 @@ public class ContractSummaryPanel extends JPanel {
 
     private void fillStats() {
         //region Variable Initialization
-        // TODO : Switch me to use IUnitRating
-        String[] ratingNames = {"F", "D", "C", "B", "A"};
+        String[] ratingNames = {"A", "B", "C", "D", "F"};
+
+        if (campaign.getCampaignOptions().isReverseQualityNames()) {
+            ratingNames = new String[] { "F", "D", "C", "B", "A" };
+        }
 
         // Initializing the GridBagConstraint used for Labels
         // To use this you MUST AND ONLY overwrite gridy
