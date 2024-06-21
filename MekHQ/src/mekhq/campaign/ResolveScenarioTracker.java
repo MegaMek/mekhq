@@ -1475,6 +1475,7 @@ public class ResolveScenarioTracker {
                             person.getHyperlinkedName()));
                 }
 
+                // prisoners should generate with lower than average loyalty, so only roll 2d6
                 person.generateLoyalty(Compute.d6(2));
             } else {
                 continue;
