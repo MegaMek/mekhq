@@ -198,7 +198,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
 
         final JScrollPane marketTableScrollPane = createMarketTablePane();
 
-        final JLabel lblBlackMarketWarning = new JLabel(resources.getString("lblBlackMarketWarning.text"));
+        final JLabel lblMarketDescriptions = new JLabel(resources.getString("lblMarketDescriptions.text"));
 
         // Layout the UI
         JPanel panel = new JPanel();
@@ -215,7 +215,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                                 .addComponent(filtersPanel)
                                 .addComponent(getEntityImagePanel(), Alignment.LEADING))
                         .addComponent(marketTableScrollPane)
-                        .addComponent(lblBlackMarketWarning)
+                        .addComponent(lblMarketDescriptions)
         );
 
         layout.setHorizontalGroup(
@@ -224,7 +224,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                                 .addComponent(filtersPanel)
                                 .addComponent(getEntityImagePanel()))
                         .addComponent(marketTableScrollPane)
-                        .addComponent(lblBlackMarketWarning, Alignment.TRAILING)
+                        .addComponent(lblMarketDescriptions, Alignment.TRAILING)
         );
         return panel;
     }
