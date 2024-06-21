@@ -104,6 +104,23 @@ MEKHQ VERSION HISTORY:
 + PR #4242: Added Prestigious Academies D-F
 + PR #4246: Added Prestigious Academies G-J
 + PR #4248: Fixed Missing Qualification from James McKenna University
++ PR #4224: Corrected Condition for Enabling Prestigious Academies
++ PR #4225: Adjusted Condition for Setting campaignStartDate
++ PR #4226: Updated StratCon Font Colors to use New Font Color MekHQ Options
++ PR #4227: Updated Unit Market Descriptions & Refactored Unit Market Prices
++ PR #4229: Updated Child Education Level Handling & Academy Name Generation
++ PR #4230: Updated Fatigue Display Calculations in PersonViewPanel
++ PR #4231: Added Nag for Invalid Faction & Updated Missing Federation Commonwealth Start/End Date
++ PR #4232: Updated Loyalty Handling for Reeducation Camps
++ PR #4233: Fixed and Enhanced FactionHunterAwards Processing
++ PR #4234: Fixed Total Bonus Incorrectly Applying Repeated Division in Turnover Dialog
++ PR #4251: Adjusted Step Size for Fixed Map Chance AtB Option
++ PR #4252: Added 'getCurrentPrisoners' Method, Fixed Cargo Capacity Nag Dialog
++ PR #4253: Added Option to Restrict AtB Personnel Market to Hiring Halls Only
++ PR #4254: Updated Contract End Dialog Message
++ PR #4255: Relabeled Ally & Enemy Rating in AtB Contract Market to Improve Clarity
++ PR #4256: Fixed 'Advanced Infantry Graduate' Qualifications in Prestigious Academies Missing Start Date
++ PR #4257: Adjusted Curriculum XP to Use a Fixed Value Instead of Dynamic
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
