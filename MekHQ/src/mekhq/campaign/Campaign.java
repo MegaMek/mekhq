@@ -1334,6 +1334,12 @@ public class Campaign implements ITechManager {
                     Gender.RANDOMIZE);
         }
 
+        if (person.getAge(getLocalDate()) <= 16) {
+            person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+        } else {
+            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
+        }
+
         return person;
     }
 
@@ -1707,6 +1713,16 @@ public class Campaign implements ITechManager {
     public List<Person> getActivePersonnel() {
         return getPersonnel().stream()
                 .filter(p -> p.getStatus().isActive())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Provides a filtered list of personnel including only active prisoners.
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getCurrentPrisoners() {
+        return getPersonnel().stream()
+                .filter(p -> p.getPrisonerStatus().isCurrentPrisoner())
                 .collect(Collectors.toList());
     }
 

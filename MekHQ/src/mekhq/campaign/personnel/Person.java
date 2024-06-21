@@ -3800,7 +3800,7 @@ public class Person {
      * @throws IllegalArgumentException if the provided roll is not between 3 and 18
      */
     public void generateLoyalty(int roll) {
-        if (roll == 3) {
+        if (roll <= 3) {
             setLoyalty(3);
         } else if (roll == 4) {
             setLoyalty(2);
@@ -3812,7 +3812,7 @@ public class Person {
             setLoyalty(-1);
         } else if (roll == 17) {
             setLoyalty(-2);
-        } else  if (roll == 18){
+        } else if (roll >= 18){
             setLoyalty(-3);
         } else {
             throw new IllegalArgumentException("Invalid roll in mekhq/campaign/personnel/Person.java/generateLoyalty: " + roll);

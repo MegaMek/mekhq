@@ -21,7 +21,6 @@ package mekhq.gui.dialog.nagDialogs;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
 
 import javax.swing.*;
@@ -29,11 +28,7 @@ import javax.swing.*;
 public class PrisonersNagDialog extends AbstractMHQNagDialog {
     private static boolean hasPrisoners (Campaign campaign) {
         if (!campaign.hasActiveContract()) {
-            for (Person p : campaign.getActivePersonnel()) {
-                if (p.getPrisonerStatus().isCurrentPrisoner()) {
-                    return true;
-                }
-            }
+            return !campaign.getCurrentPrisoners().isEmpty();
         }
         return false;
     }
