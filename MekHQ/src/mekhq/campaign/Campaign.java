@@ -1717,6 +1717,16 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Provides a filtered list of personnel including only active prisoners.
+     * @return a {@link Person} <code>List</code> containing all active personnel
+     */
+    public List<Person> getCurrentPrisoners() {
+        return getPersonnel().stream()
+                .filter(p -> p.getPrisonerStatus().isCurrentPrisoner())
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Provides a filtered list of personnel including only Persons with the AWOL status.
      * @return a {@link Person} <code>List</code> containing all active personnel
      */

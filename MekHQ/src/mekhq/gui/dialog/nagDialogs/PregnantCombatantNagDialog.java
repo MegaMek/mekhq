@@ -32,7 +32,7 @@ public class PregnantCombatantNagDialog extends AbstractMHQNagDialog {
             for (Person p : campaign.getActivePersonnel()) {
                 if (p.isPregnant()) {
                     if (p.hasCombatRole()) {
-                        if(p.getUnit() != null) {
+                        if (p.getUnit() != null) {
                             return true;
                         }
                     }
