@@ -146,6 +146,14 @@ public class EducationController {
     public static String generateName(Academy academy, String campus) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
 
+        if (academy.isPrepSchool()) {
+            if (Compute.d6(1) <= 3) {
+                return campus + ' ' + generateTypeChild(resources) + ' ' + resources.getString("conjoinerOf.text") + ' ' + generateSuffix(resources);
+            } else {
+                return generateTypeChild(resources) + ' ' + resources.getString("conjoinerOf.text") + ' ' + campus;
+            }
+        }
+
         if (Compute.d6(1) <= 3) {
             if (academy.isMilitary()) {
                 return campus + ' ' + generateMilitaryPrefix(resources) + ' ' + generateTypeAdult(resources) + ' ' + resources.getString("conjoinerOf.text") + ' ' + generateSuffix(resources);
@@ -232,6 +240,33 @@ public class EducationController {
                 return resources.getString("typeUniversity.text");
             case 5:
                 return resources.getString("typePolytechnic.text");
+            case 6:
+                return resources.getString("typeSchool.text");
+            default:
+                throw new IllegalStateException("Unexpected roll in generateTypeAdult");
+        }
+    }
+
+
+    /**
+     * Generates a random educational institution type from the provided ResourceBundle.
+     *
+     * @param resources the ResourceBundle containing the localized strings for the educational institution types
+     * @return a randomly selected educational institution type
+     * @throws IllegalStateException if the generated roll is unexpected
+     */
+    private static String generateTypeChild(ResourceBundle resources) {
+        switch (Compute.d6(1)) {
+            case 1:
+                return resources.getString("typeAcademy.text");
+            case 2:
+                return resources.getString("typePreparatorySchool.text");
+            case 3:
+                return resources.getString("typeInstitute.text");
+            case 4:
+                return resources.getString("typeSchoolBoarding.text");
+            case 5:
+                return resources.getString("typeFinishingSchool.text");
             case 6:
                 return resources.getString("typeSchool.text");
             default:
@@ -807,10 +842,12 @@ public class EducationController {
             person.setEduHighestEducation(EducationLevel.parseFromInt(educationLevel));
         }
 
-        if ((academy.isReeducationCamp()) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
-            if (!Objects.equals(person.getOriginFaction(), campaign.getFaction())) {
+        if (academy.isReeducationCamp()) {
+            if (campaign.getCampaignOptions().isUseReeducationCamps()) {
                 person.setOriginFaction(campaign.getFaction());
             }
+
+            person.generateLoyalty(Compute.d6(4));
         }
     }
 
