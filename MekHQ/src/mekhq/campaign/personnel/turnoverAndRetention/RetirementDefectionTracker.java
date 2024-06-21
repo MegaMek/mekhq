@@ -196,7 +196,7 @@ public class RetirementDefectionTracker {
                     modifier = getManagementSkillModifier(person);
                 }
 
-                targetNumber.addModifier(modifier, resources.getString("managementSkill.text"));
+                targetNumber.addModifier(- modifier, resources.getString("managementSkill.text"));
             }
 
             // Shares Modifiers
