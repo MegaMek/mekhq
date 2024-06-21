@@ -888,6 +888,10 @@ public class Academy implements Comparable<Academy> {
                     }
                 }
             }
+        } else {
+            for (String skill : skills) {
+                tooltip.append(skill).append("<br>");
+            }
         }
 
         tooltip.append("<br>");
@@ -925,7 +929,7 @@ public class Academy implements Comparable<Academy> {
 
         tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
 
-        // with travel time out the way; all that's left is to add the last couple of entries
+        // with travel time out the way, all that's left is to add the last couple of entries
         if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
             tooltip.append("<b>").append(resources.getString("reeducation.text")).append("</b> ");
 
@@ -935,6 +939,8 @@ public class Academy implements Comparable<Academy> {
                 } else {
                     tooltip.append(resources.getString("reeducationNoChange.text")).append("<br>");
                 }
+            } else {
+                tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
             }
 
             tooltip.append("<br>");
@@ -945,7 +951,7 @@ public class Academy implements Comparable<Academy> {
 
         if (personnel.size() == 1) {
             tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")
-                    .append(getEducationLevel(person)).append("<br>");
+                    .append(EducationLevel.parseFromInt(getEducationLevel(person))).append("<br>");
         }
 
         return tooltip.append("</html>").toString();
