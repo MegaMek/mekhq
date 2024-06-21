@@ -3195,7 +3195,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JPanel panFixedMapChance = new JPanel();
         JLabel lblFixedMapChance = new JLabel(resources.getString("lblFixedMapChance.text"));
         lblFixedMapChance.setToolTipText(resources.getString("lblFixedMapChance.toolTipText"));
-        spnFixedMapChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 10));
+        spnFixedMapChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         panFixedMapChance.add(lblFixedMapChance);
         panFixedMapChance.add(spnFixedMapChance);
         gridBagConstraints.gridx = 0;
@@ -8491,7 +8491,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
             campaign.setLocalDate(date);
 
-            if (campaign.getCampaignStartDate() == null) {
+            if ((campaign.getCampaignStartDate() == null) || (campaign.getCampaignStartDate().isAfter(campaign.getLocalDate()))) {
                 campaign.setCampaignStartDate(date);
             }
             // Ensure that the MegaMek year GameOption matches the campaign year

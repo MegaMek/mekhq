@@ -1334,6 +1334,12 @@ public class Campaign implements ITechManager {
                     Gender.RANDOMIZE);
         }
 
+        if (person.getAge(getLocalDate()) <= 16) {
+            person.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+        } else {
+            person.setEduHighestEducation(EducationLevel.HIGH_SCHOOL);
+        }
+
         return person;
     }
 
