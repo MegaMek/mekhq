@@ -844,6 +844,8 @@ public class StratconPanel extends JPanel implements ActionListener {
                         .append("'>")
                     .append("<br/>")
                     .append(facility.getFormattedDisplayableName())
+                    .append("<br/>")
+                    .append(facility.getUserDescription())
                     .append("<span>");
             }
 
