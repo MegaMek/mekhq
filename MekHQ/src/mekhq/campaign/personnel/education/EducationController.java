@@ -31,7 +31,10 @@ import mekhq.campaign.personnel.enums.education.EducationStage;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 /**
@@ -116,19 +119,17 @@ public class EducationController {
             person.setEduAcademySystem(campaign.getCurrentSystem().getId());
         } else {
             person.setEduJourneyTime(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
-            person.setEduAcademySystem(campaign.getSystemById(campus).getName(campaign.getLocalDate()));
+            person.setEduAcademySystem(campus);
         }
 
         // this should already be 0, but we reset it just in case
         person.setEduDaysOfTravel(0);
 
-        person.setEduAcademyNameInSet(academy.getName());
-
         // if the academy is Local, we need to generate a name, otherwise we use the listed name
         if (academy.isLocal()) {
             person.setEduAcademyName(generateName(academy, campus));
         } else {
-            person.setEduAcademyName(person.getEduAcademyNameInSet() + " (" + campus + ')');
+            person.setEduAcademyName(person.getEduAcademyNameInSet() + " (" + campaign.getSystemById(campus).getName(campaign.getLocalDate()) + ')');
         }
 
         // we have this all the way at the bottom as a bit of insurance.
