@@ -843,8 +843,14 @@ public class StratconPanel extends JPanel implements ActionListener {
                                 : MekHQ.getMHQOptions().getFontColorNegativeHexColor())
                         .append("'>")
                     .append("<br/>")
-                    .append(facility.getFormattedDisplayableName())
-                    .append("<span>");
+                    .append(facility.getFormattedDisplayableName());
+                    
+                if (facility.getUserDescription() != null) {
+                   infoBuilder.append("<br/>")
+                   .append(facility.getUserDescription());
+                }
+                 
+                infoBuilder.append("<span>");
             }
 
         } else {
