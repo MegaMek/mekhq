@@ -1213,6 +1213,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2356,6 +2357,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2460,6 +2462,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
