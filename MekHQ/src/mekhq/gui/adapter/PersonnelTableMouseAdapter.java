@@ -1518,7 +1518,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (academySetNames.contains("Prestigious Academies")) {
-                    if (!campaign.getCampaignOptions().isEnableLocalAcademies()) {
+                    if (!campaign.getCampaignOptions().isEnablePrestigiousAcademies()) {
                         academySetNames.remove("Prestigious Academies");
                     }
                 }
@@ -2653,7 +2653,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 // what campuses are accepting applicants?
                 List<String> campuses = new ArrayList<>();
 
-                LogManager.getLogger().info(academy.getLocationSystems());
                 for (String campusId : academy.getLocationSystems()) {
                     PlanetarySystem system = campaign.getSystemById(campusId);
 

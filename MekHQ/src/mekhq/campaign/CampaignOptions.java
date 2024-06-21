@@ -384,6 +384,7 @@ public class CampaignOptions {
 
     // Education
     private boolean useEducationModule;
+    private Integer curriculumXpRate;
     private Integer maximumJumpCount;
     private boolean useReeducationCamps;
     private boolean enableLocalAcademies;
@@ -511,6 +512,7 @@ public class CampaignOptions {
     private boolean personnelMarketReportRefresh;
     private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
     private double personnelMarketDylansWeight;
+    private boolean usePersonnelHireHiringHallOnly;
 
     // Unit Market
     private UnitMarketMethod unitMarketMethod;
@@ -893,6 +895,7 @@ public class CampaignOptions {
 
         // Education
         setUseEducationModule(true);
+        setCurriculumXpRate(3);
         setMaximumJumpCount(5);
         setUseReeducationCamps(true);
         setEnableLocalAcademies(true);
@@ -1117,6 +1120,7 @@ public class CampaignOptions {
         getPersonnelMarketRandomRemovalTargets().put(SkillLevel.HEROIC, 11);
         getPersonnelMarketRandomRemovalTargets().put(SkillLevel.LEGENDARY, 11);
         setPersonnelMarketDylansWeight(0.3);
+        setUsePersonnelHireHiringHallOnly(false);
 
         // Unit Market
         setUnitMarketMethod(UnitMarketMethod.NONE);
@@ -2687,6 +2691,14 @@ public class CampaignOptions {
         this.useEducationModule = useEducationModule;
     }
 
+    public Integer getCurriculumXpRate() {
+        return curriculumXpRate;
+    }
+
+    public void setCurriculumXpRate(final int curriculumXpRate) {
+        this.curriculumXpRate = curriculumXpRate;
+    }
+
     public Integer getMaximumJumpCount() {
         return maximumJumpCount;
     }
@@ -3356,6 +3368,14 @@ public class CampaignOptions {
 
     public void setPersonnelMarketDylansWeight(final double personnelMarketDylansWeight) {
         this.personnelMarketDylansWeight = personnelMarketDylansWeight;
+    }
+
+    public boolean isUsePersonnelHireHiringHallOnly() {
+        return usePersonnelHireHiringHallOnly;
+    }
+
+    public void setUsePersonnelHireHiringHallOnly(final boolean usePersonnelHireHiringHallOnly) {
+        this.usePersonnelHireHiringHallOnly = usePersonnelHireHiringHallOnly;
     }
     //endregion Personnel Market
 
@@ -4719,6 +4739,7 @@ public class CampaignOptions {
 
         //region Education
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "curriculumXpRate", getCurriculumXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCount", getMaximumJumpCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReeducationCamps", isUseReeducationCamps());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
@@ -4819,6 +4840,7 @@ public class CampaignOptions {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelMarketRandomRemovalTargets");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketDylansWeight", getPersonnelMarketDylansWeight());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePersonnelHireHiringHallOnly", isUsePersonnelHireHiringHallOnly());
         //endregion Personnel Market
 
         //region Unit Market
@@ -5467,6 +5489,8 @@ public class CampaignOptions {
                     //region Education
                 } else if (wn2.getNodeName().equalsIgnoreCase("useEducationModule")) {
                     retVal.setUseEducationModule(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("curriculumXpRate")) {
+                    retVal.setCurriculumXpRate(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maximumJumpCount")) {
                     retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useReeducationCamps")) {
@@ -5770,6 +5794,8 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
                     retVal.setPersonnelMarketDylansWeight(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePersonnelHireHiringHallOnly")) {
+                    retVal.setUsePersonnelHireHiringHallOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Personnel Market
 
                     //region Unit Market

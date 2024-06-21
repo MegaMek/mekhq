@@ -23,8 +23,6 @@
         <name>Addicks University</name>
         <type>University</type>
         <description>Located in the heart of the Inner Sphere, Addicks University is celebrated for its progressive liberal arts education, particularly in teacher training. The institution uniquely integrates its academic programs with community schools, allowing student teachers to gain invaluable hands-on experience.</description>
-        <factionDiscount>0</factionDiscount>
-        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Addicks</locationSystem>
         <constructionYear>2400</constructionYear>
         <destructionYear>2777</destructionYear>
@@ -34,6 +32,9 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
+        <qualification>Teaching Graduate</qualification>
+        <curriculum>Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1212,6 +1213,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2355,6 +2357,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2459,6 +2462,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>

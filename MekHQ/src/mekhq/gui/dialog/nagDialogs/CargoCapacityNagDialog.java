@@ -36,7 +36,7 @@ public class CargoCapacityNagDialog extends AbstractMHQNagDialog {
     //region Constructors
     public CargoCapacityNagDialog(final JFrame frame, final Campaign campaign) {
         super(frame, "cargoCapacityNagDialog", "cargoCapacityNagDialog.title",
-                "cargoCapacityNagDialog.text", campaign, MHQConstants.NAG_PRISONERS);
+                "cargoCapacityNagDialog.text", campaign, MHQConstants.NAG_CARGO_CAPACITY);
     }
 
     //endregion Constructors

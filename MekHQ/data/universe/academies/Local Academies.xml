@@ -12,7 +12,7 @@
         <educationLevelMax>Early Childhood</educationLevelMax>
         <ageMax>10</ageMax>
         <qualification>General Education</qualification>
-        <curriculum>Bonus XP</curriculum>
+        <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
@@ -28,9 +28,9 @@
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
-        <curriculum>Bonus XP</curriculum>
+        <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Preparatory School</name>
@@ -45,9 +45,9 @@
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
-        <curriculum>Bonus XP, Leadership</curriculum>
+        <curriculum>XP, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military School</name>
@@ -105,9 +105,9 @@
         <ageMin>16</ageMin>
         <durationDays>150</durationDays>
         <qualification>General Education</qualification>
-        <curriculum>Bonus XP</curriculum>
+        <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Technical College</name>
@@ -229,7 +229,7 @@
         <educationLevelMin>Early Childhood</educationLevelMin>
         <educationLevelMax>Early Childhood</educationLevelMax>
         <qualification>Reeducation &amp; Social Encouragement</qualification>
-        <curriculum>Bonus XP</curriculum>
+        <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>

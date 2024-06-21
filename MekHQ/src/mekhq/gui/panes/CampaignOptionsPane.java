@@ -445,6 +445,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     // Education
     private JCheckBox chkUseEducationModule;
+    private JLabel lblCurriculumXpRate;
+    private JSpinner spnCurriculumXpRate;
     private JLabel lblMaximumJumpCount;
     private JSpinner spnMaximumJumpCount;
     private JCheckBox chkUseReeducationCamps;
@@ -596,6 +598,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkPersonnelMarketReportRefresh;
     private Map<SkillLevel, JSpinner> spnPersonnelMarketRandomRemovalTargets;
     private JSpinner spnPersonnelMarketDylansWeight;
+    private JCheckBox chkUsePersonnelHireHiringHallOnly;
 
     // Unit Market
     private MMComboBox<UnitMarketMethod> comboUnitMarketMethod;
@@ -3195,7 +3198,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         JPanel panFixedMapChance = new JPanel();
         JLabel lblFixedMapChance = new JLabel(resources.getString("lblFixedMapChance.text"));
         lblFixedMapChance.setToolTipText(resources.getString("lblFixedMapChance.toolTipText"));
-        spnFixedMapChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 10));
+        spnFixedMapChance = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
         panFixedMapChance.add(lblFixedMapChance);
         panFixedMapChance.add(spnFixedMapChance);
         gridBagConstraints.gridx = 0;
@@ -6041,6 +6044,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel createEducationPanel() {
         // General Settings
+        lblCurriculumXpRate = new JLabel(resources.getString("lblCurriculumXpRate.text"));
+        lblCurriculumXpRate.setToolTipText(resources.getString("lblCurriculumXpRate.toolTip"));
+        lblCurriculumXpRate.setName("lblCurriculumXpRate");
+
+        spnCurriculumXpRate = new JSpinner(new SpinnerNumberModel(3, 1, 10, 1));
+        spnCurriculumXpRate.setToolTipText(resources.getString("lblCurriculumXpRate.toolTip"));
+        spnCurriculumXpRate.setName("spnCurriculumXpRate");
+
         lblMaximumJumpCount = new JLabel(resources.getString("lblMaximumJumpCount.text"));
         lblMaximumJumpCount.setToolTipText(resources.getString("lblMaximumJumpCount.toolTip"));
         lblMaximumJumpCount.setName("lblMaximumJumpCount");
@@ -6087,6 +6098,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseEducationModule.addActionListener(evt -> {
             final boolean isEnabled = chkUseEducationModule.isSelected();
 
+            lblCurriculumXpRate.setEnabled(isEnabled);
+            spnCurriculumXpRate.setEnabled(isEnabled);
             lblMaximumJumpCount.setEnabled(isEnabled);
             spnMaximumJumpCount.setEnabled(isEnabled);
             chkUseReeducationCamps.setEnabled(isEnabled);
@@ -6122,6 +6135,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // this prevents a really annoying bug where disabled options don't stay disabled when
         // reloading Campaign Options
+        lblCurriculumXpRate.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        spnCurriculumXpRate.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         lblMaximumJumpCount.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         spnMaximumJumpCount.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         chkUseReeducationCamps.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
@@ -6147,6 +6162,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addComponent(chkUseEducationModule)
                         .addGap(10)
                         .addGroup(layout.createParallelGroup(Alignment.LEADING)
+                                .addComponent(lblCurriculumXpRate)
+                                .addComponent(spnCurriculumXpRate))
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblMaximumJumpCount)
                                 .addComponent(spnMaximumJumpCount))
                         .addComponent(chkUseReeducationCamps)
@@ -6162,6 +6180,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseEducationModule)
                         .addGap(10)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblCurriculumXpRate)
+                                .addComponent(spnCurriculumXpRate))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblMaximumJumpCount)
                                 .addComponent(spnMaximumJumpCount))
@@ -7403,6 +7424,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnPersonnelMarketDylansWeight.setToolTipText(resources.getString("lblPersonnelMarketDylansWeight.toolTipText"));
         spnPersonnelMarketDylansWeight.setName("spnPersonnelMarketDylansWeight");
 
+        chkUsePersonnelHireHiringHallOnly = new JCheckBox(resources.getString("chkUsePersonnelHireHiringHallOnly.text"));
+        chkUsePersonnelHireHiringHallOnly.setToolTipText(resources.getString("chkUsePersonnelHireHiringHallOnly.toolTipText"));
+        chkUsePersonnelHireHiringHallOnly.setName("chkUsePersonnelHireHiringHallOnly");
+
         // Programmatically Assign Accessibility Labels
         lblPersonnelMarketType.setLabelFor(comboPersonnelMarketType);
         lblPersonnelMarketDylansWeight.setLabelFor(spnPersonnelMarketDylansWeight);
@@ -7427,6 +7452,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblPersonnelMarketDylansWeight)
                                 .addComponent(spnPersonnelMarketDylansWeight, Alignment.LEADING))
+                        .addComponent(chkUsePersonnelHireHiringHallOnly)
         );
 
         layout.setHorizontalGroup(
@@ -7439,6 +7465,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblPersonnelMarketDylansWeight)
                                 .addComponent(spnPersonnelMarketDylansWeight))
+                        .addComponent(chkUsePersonnelHireHiringHallOnly)
         );
 
         return panel;
@@ -8205,6 +8232,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // Education
         chkUseEducationModule.setSelected(options.isUseEducationModule());
+        spnCurriculumXpRate.setValue(options.getCurriculumXpRate());
         spnMaximumJumpCount.setValue(options.getMaximumJumpCount());
         chkUseReeducationCamps.setSelected(options.isUseReeducationCamps());
         chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
@@ -8389,6 +8417,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             entry.getValue().setValue(options.getPersonnelMarketRandomRemovalTargets().get(entry.getKey()));
         }
         spnPersonnelMarketDylansWeight.setValue(options.getPersonnelMarketDylansWeight());
+        chkUsePersonnelHireHiringHallOnly.setSelected(options.isUsePersonnelHireHiringHallOnly());
 
         // Unit Market
         comboUnitMarketMethod.setSelectedItem(options.getUnitMarketMethod());
@@ -8491,7 +8520,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             }
             campaign.setLocalDate(date);
 
-            if (campaign.getCampaignStartDate() == null) {
+            if ((campaign.getCampaignStartDate() == null) || (campaign.getCampaignStartDate().isAfter(campaign.getLocalDate()))) {
                 campaign.setCampaignStartDate(date);
             }
             // Ensure that the MegaMek year GameOption matches the campaign year
@@ -8869,6 +8898,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             // Education
             options.setUseEducationModule(chkUseEducationModule.isSelected());
+            options.setCurriculumXpRate((Integer) spnCurriculumXpRate.getValue());
             options.setMaximumJumpCount((Integer) spnMaximumJumpCount.getValue());
             options.setUseReeducationCamps(chkUseReeducationCamps.isSelected());
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
@@ -8944,6 +8974,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 options.getPersonnelMarketRandomRemovalTargets().put(entry.getKey(), (int) entry.getValue().getValue());
             }
             options.setPersonnelMarketDylansWeight((Double) spnPersonnelMarketDylansWeight.getValue());
+            options.setUsePersonnelHireHiringHallOnly(chkUsePersonnelHireHiringHallOnly.isSelected());
 
             // Unit Market
             options.setUnitMarketMethod(comboUnitMarketMethod.getSelectedItem());
