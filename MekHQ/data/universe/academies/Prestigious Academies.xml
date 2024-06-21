@@ -53,7 +53,27 @@
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Year One Curriculum</qualification>
-        <curriculum>Small Arms, First Aid</curriculum>
+        <curriculum>Small Arms, Medtech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Aerospace and Interstellar Institute [Midway] (Year One)</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Aerospace and Interstellar Institute specializes in training aerospace personnel, including DropShip and JumpShip crews. The curriculum spans covers small arms, Medtech, and specialized aerospace roles. Limited crewing opportunities, especially for JumpShips, create fierce competition, pushing most cadets to train as aerospace fighter pilots.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Midway</locationSystem>
+        <constructionYear>2650</constructionYear>
+        <tuition>8750</tuition>
+        <durationDays>300</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Year One Curriculum</qualification>
+        <curriculum>Small Arms, Medtech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
@@ -66,29 +86,20 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dover</locationSystem>
         <constructionYear>3056</constructionYear>
-        <tuition>15750</tuition>
+        <tuition>21000</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>DropShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>DropShip Crew Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>JumpShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>JumpShip Crew Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>WarShip Crew Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
@@ -108,7 +119,7 @@
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Year One Curriculum</qualification>
-        <curriculum>Small Arms, First Aid</curriculum>
+        <curriculum>Small Arms, Medtech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
@@ -116,7 +127,7 @@
         <name>Aerospace and Interstellar Institute [Midway]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Aerospace and Interstellar Institute specializes in training aerospace personnel, including DropShip and JumpShip crews. The curriculum spans covers small arms, first aid, and specialized aerospace roles. Limited crewing opportunities, especially for JumpShips, create fierce competition, pushing most cadets to train as aerospace fighter pilots.</description>
+        <description>The Aerospace and Interstellar Institute specializes in training aerospace personnel, including DropShip and JumpShip crews. The curriculum spans covers small arms, Medtech, and specialized aerospace roles. Limited crewing opportunities, especially for JumpShips, create fierce competition, pushing most cadets to train as aerospace fighter pilots.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Midway</locationSystem>
@@ -163,6 +174,35 @@
     </academy>
     <academy>
         <name>Aitutaki Academy</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and armored crew training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Aitutaki</locationSystem>
+        <constructionYear>2414</constructionYear>
+        <tuition>4375</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Aitutaki Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and armored crew training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
@@ -170,35 +210,23 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aitutaki</locationSystem>
         <constructionYear>2414</constructionYear>
-        <tuition>10938</tuition>
+        <tuition>17500</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Armored Infantry Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Aerospace Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
@@ -238,6 +266,71 @@
     </academy>
     <academy>
         <name>Albion Military Academy</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Albion Military Academy quickly became the Federated Suns' premier institution. Traditionally, it allows graduates a unique buyout option to serve directly with the Federated Suns, bypassing service requirements. Located near Avalon City, the AMA is pivotal in training various military disciplines and continues to produce highly decorated officers. Despite intense academic and physical demands resulting in a high dropout rate, its graduates often ascend to senior AFFS leadership roles.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Albion (LC)</locationSystem>
+        <constructionYear>2400</constructionYear>
+        <tuition>5906</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Crew Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Crew Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Crew Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Crew Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>DropShip Crew Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Crew Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>BattleMech Technician</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Advanced Vehicle Technician</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Technician</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Armored Infantry Technician</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Vessel Technician</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Albion Military Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Albion Military Academy quickly became the Federated Suns' premier institution. Traditionally, it allows graduates a unique buyout option to serve directly with the Federated Suns, bypassing service requirements. Located near Avalon City, the AMA is pivotal in training various military disciplines and continues to produce highly decorated officers. Despite intense academic and physical demands resulting in a high dropout rate, its graduates often ascend to senior AFFS leadership roles.</description>
@@ -248,104 +341,56 @@
         <tuition>11484</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>VTOL Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Naval Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Fighter Command Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
-        <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Armored Infantry Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Aerospace Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>DropShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>DropShip Crew Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>JumpShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>JumpShip Crew Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Senior BattleMech Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
-        <curriculum>Tech/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
         <curriculum>Tech/Mechanic, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Vehicle Technician</qualification>
-        <curriculum>Tech/Mechanic</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior Aerospace Technician</qualification>
         <curriculum>Tech/Aero, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Aerospace Technician</qualification>
-        <curriculum>Tech/Aero</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Armored Infantry Technician</qualification>
-        <curriculum>Tech/BA</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Advanced Vessel Technician</qualification>
-        <curriculum>Tech/Vessel</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Administrator</qualification>
         <curriculum>Administration, Negotiation, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Junior Administrator</qualification>
-        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -386,6 +431,24 @@
     </academy>
     <academy>
         <name>Allison MechWarrior Institute</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Allison MechWarrior Institute stands as a premier training facility for MechWarriors, adjacent to the Lloyd Marik-Stanley Aerospace School. Producing 375 MechWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets, characterized by athletic contests and pranks that occasionally escalate into conflicts. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed Mechwarriors to uphold loyalty.</description>
+        <locationSystem>New Olympia</locationSystem>
+        <constructionYear>2465</constructionYear>
+        <tuition>5250</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Allison MechWarrior Institute (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Allison MechWarrior Institute stands as a premier training facility for MechWarriors, adjacent to the Lloyd Marik-Stanley Aerospace School. Producing 375 MechWarrior graduates annually, the institute fosters a spirited rivalry with neighboring aerospace cadets, characterized by athletic contests and pranks that occasionally escalate into conflicts. Admission is highly competitive, influenced by political considerations, with a portion of spots reserved for families of Dispossessed Mechwarriors to uphold loyalty.</description>
@@ -394,19 +457,43 @@
         <tuition>13125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>An Ting University</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The An Ting University is a renowned military academy historically dedicated to training MechWarriors. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>An Ting</locationSystem>
+        <constructionYear>2600</constructionYear>
+        <destructionYear>3015</destructionYear>
+        <tuition>5250</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>An Ting University (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>The An Ting University is a renowned military academy historically dedicated to training MechWarriors. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence.</description>
@@ -418,31 +505,46 @@
         <tuition>13125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Armored Infantry Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>An Ting University [3055]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The An Ting University, a renowned military academy historically dedicated to training MechWarriors, faced significant damage from both external attacks and internal strife in 3015 from Sun Zhang Cadre alumni. The academy remained shuttered until 3055 when it reopened with advancements from the Helm Memory Core. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence. Despite past conflicts, it now produces capable graduates, reaffirming its status alongside prestigious institutions like the Sun Zhang MechWarrior Academy.</description>
+        <locationSystem>An Ting</locationSystem>
+        <constructionYear>3055</constructionYear>
+        <tuition>5250</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>An Ting University [3055]</name>
+        <name>An Ting University (Officer) [3055]</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>The An Ting University, a renowned military academy historically dedicated to training MechWarriors, faced significant damage from both external attacks and internal strife in 3015 from Sun Zhang Cadre alumni. The academy remained shuttered until 3055 when it reopened with advancements from the Helm Memory Core. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence. Despite past conflicts, it now produces capable graduates, reaffirming its status alongside prestigious institutions like the Sun Zhang MechWarrior Academy.</description>
@@ -453,76 +555,117 @@
         <tuition>13125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Armored Infantry Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Aerospace Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Annapolis Naval Academy</name>
-        <type>Officer Academy</type>
+        <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the modern era, it commands the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on seamlessly transitioning cadets from seafaring origins to mastering the vastness of space, ensuring that tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
         <closureYear>2779</closureYear>
-        <tuition>17850</tuition>
+        <tuition>7350</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Advanced Infantry Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Piloting/Naval, Small Arms, Anti-Mech</curriculum>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>DropShip Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>DropShip Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>JumpShip Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
         <qualification>JumpShip Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>WarShip Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>WarShip Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior Medical Technician</qualification>
-        <curriculum>Piloting/Naval, Doctor, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Medical Technician</qualification>
-        <curriculum>Piloting/Naval, Doctor</curriculum>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Annapolis Naval Academy (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the modern era, it commands the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on seamlessly transitioning cadets from seafaring origins to mastering the vastness of space, ensuring that tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <closureYear>2779</closureYear>
+        <tuition>12600</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>DropShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Annapolis Naval Academy [ComStar]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the modern era, it commands the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on seamlessly transitioning cadets from seafaring origins to mastering the vastness of space, ensuring that tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2779</constructionYear>
+        <tuition>7350</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>DropShip Crew Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Crew Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Crew Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Annapolis Naval Academy (Officer) [ComStar]</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the modern era, it commands the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on seamlessly transitioning cadets from seafaring origins to mastering the vastness of space, ensuring that tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
@@ -530,46 +673,69 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2779</constructionYear>
-        <tuition>17850</tuition>
+        <tuition>12600</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Advanced Infantry Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Piloting/Naval, Small Arms, Anti-Mech</curriculum>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>DropShip Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>DropShip Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>JumpShip Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>JumpShip Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>WarShip Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>WarShip Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior Medical Technician</qualification>
-        <curriculum>Piloting/Naval, Doctor, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Medical Technician</qualification>
-        <curriculum>Piloting/Naval, Doctor</curriculum>
+        <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Apollo Military Academy</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Esteemed as the premier military institution of the Rim Worlds Republic, the Apollo Military Academy is located on the capital world of the Republic. Known for its rigorous standards and distinguished graduates, AMA excels in producing MechWarriors of superior leadership and combat skills, rivaling those from the most prestigious academies in the Inner Sphere.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Apollo</locationSystem>
+        <constructionYear>2400</constructionYear>
+        <destructionYear>2780</destructionYear>
+        <tuition>15000</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Crew Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Crew Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Crew Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Crew Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Apollo Military Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Esteemed as the premier military institution of the Rim Worlds Republic, the Apollo Military Academy is located on the capital world of the Republic. Known for its rigorous standards and distinguished graduates, AMA excels in producing MechWarriors of superior leadership and combat skills, rivaling those from the most prestigious academies in the Inner Sphere.</description>
@@ -581,50 +747,29 @@
         <tuition>28125</tuition>
         <durationDays>900</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>VTOL Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Naval Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Fighter Command Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
-        <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Aerospace Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -854,23 +999,39 @@
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3058</constructionYear>
         <destructionYear>3071</destructionYear>
-        <tuition>13125</tuition>
+        <tuition>5250</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Aerospace Command Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Canopian Institute of War (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MechWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MechWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <locationSystem>Canopus IV</locationSystem>
+        <constructionYear>3058</constructionYear>
+        <destructionYear>3071</destructionYear>
+        <tuition>13125</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -882,23 +1043,39 @@
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3080</constructionYear>
         <destructionYear>3071</destructionYear>
-        <tuition>13125</tuition>
+        <tuition>5250</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Aerospace Command Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Canopian Institute of War (Officer) [3080]</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MechWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MechWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <locationSystem>Canopus IV</locationSystem>
+        <constructionYear>3080</constructionYear>
+        <destructionYear>3071</destructionYear>
+        <tuition>13125</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -909,113 +1086,128 @@
         <description>Established concurrently with the Capellan Hegemony, the Capella War College stands as the oldest military academy in the Capellan Confederation. Training emphasizes combined-arms tactics and includes cross-training with the local Duchy RTC.</description>
         <locationSystem>Capella</locationSystem>
         <constructionYear>2400</constructionYear>
-        <tuition>11735</tuition>
+        <tuition>6176</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Crew Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>VTOL Crew Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Naval Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Command Graduate</qualification>
-        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Fighter Crew Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Armored Infantry Command Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Advanced Infantry Command Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Aerospace Command Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>DropShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>DropShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>JumpShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
         <qualification>JumpShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>WarShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
-        <curriculum>Tech/Mech, Leadership</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>BattleMech Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Advanced Vehicle Technician</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Technician</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Armored Infantry Technician</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Vessel Technician</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Capella War College (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Established concurrently with the Capellan Hegemony, the Capella War College stands as the oldest military academy in the Capellan Confederation. Training emphasizes combined-arms tactics and includes cross-training with the local Duchy RTC.</description>
+        <locationSystem>Capella</locationSystem>
+        <constructionYear>2400</constructionYear>
+        <tuition>11735</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>DropShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Senior BattleMech Technician</qualification>
+        <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
         <curriculum>Tech/Mechanic, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Vehicle Technician</qualification>
-        <curriculum>Tech/Mechanic</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior Aerospace Technician</qualification>
         <curriculum>Tech/Aero, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Aerospace Technician</qualification>
-        <curriculum>Tech/Aero</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Armored Infantry Technician</qualification>
-        <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Advanced Vessel Technician</qualification>
-        <curriculum>Tech/Vessel</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Administrator</qualification>
         <curriculum>Administration, Negotiation, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Junior Administrator</qualification>
-        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
@@ -1060,49 +1252,64 @@
         <description>Built in 2331, the Combat College was the first military academy on a foreign world. It prided itself on being equal to any academy on Terra. To prove their worth, the graduating warrior and pilot class always challenged the Sandhurst graduates to a military contest.</description>
         <locationSystem>New Earth (Tau Ceti 2116-)</locationSystem>
         <constructionYear>2331</constructionYear>
-        <tuition>17500</tuition>
+        <tuition>9625</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Crew Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>VTOL Crew Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Naval Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Command Graduate</qualification>
-        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Fighter Crew Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Combat College of New Earth (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Built in 2331, the Combat College was the first military academy on a foreign world. It prided itself on being equal to any academy on Terra. To prove their worth, the graduating warrior and pilot class always challenged the Sandhurst graduates to a military contest.</description>
+        <locationSystem>New Earth (Tau Ceti 2116-)</locationSystem>
+        <constructionYear>2331</constructionYear>
+        <tuition>17500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Concordat Aerospace Flight School</name>
@@ -1142,22 +1349,37 @@
         <locationSystem>Coventry</locationSystem>
         <constructionYear>2700</constructionYear>
         <destructionYear>3058</destructionYear>
-        <tuition>14438</tuition>
+        <tuition>9625</tuition>
         <durationDays>1200</durationDays>
         <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>BattleMech Technician</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Coventry Academy (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Coventry Academy, located in Dunnigan near Port Lawrence on Coventry, is a military academy close to the Coventry Metal Works plant. Many professors at the Academy also work at the CMW plant. Due to its close ties to CMW, it has been described as a glorified cadre for the manufacturer, with graduates often requiring additional training on equipment from other manufacturers.</description>
+        <locationSystem>Coventry</locationSystem>
+        <constructionYear>2700</constructionYear>
+        <destructionYear>3058</destructionYear>
+        <tuition>14438</tuition>
+        <durationDays>1200</durationDays>
+        <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior BattleMech Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
-        <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -1168,23 +1390,38 @@
         <description>Originally focused solely on training MechWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMech training.</description>
         <locationSystem>Coventry</locationSystem>
         <constructionYear>3060</constructionYear>
-        <tuition>6563</tuition>
+        <tuition>4375</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Senior BattleMech Technician</qualification>
-        <curriculum>Tech/Mech, Leadership</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>BattleMech Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Coventry Military Academy (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Originally focused solely on training MechWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMech training.</description>
+        <locationSystem>Coventry</locationSystem>
+        <constructionYear>3060</constructionYear>
+        <tuition>6563</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Senior BattleMech Technician</qualification>
+        <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -1196,24 +1433,40 @@
         <locationSystem>Dieron</locationSystem>
         <constructionYear>2800</constructionYear>
         <closureYear>3068</closureYear>
-        <tuition>21875</tuition>
+        <tuition>8750</tuition>
         <durationDays>900</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Dieron District Gymnasium (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mech training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District.</description>
+        <locationSystem>Dieron</locationSystem>
+        <constructionYear>2800</constructionYear>
+        <closureYear>3068</closureYear>
+        <tuition>21875</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1223,30 +1476,45 @@
         <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mech training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068, it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
         <locationSystem>Dieron</locationSystem>
         <constructionYear>3078</constructionYear>
-        <tuition>21875</tuition>
+        <tuition>8750</tuition>
         <durationDays>900</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Dieron District Gymnasium (Officer) [3078]</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mech training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068, it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
+        <locationSystem>Dieron</locationSystem>
+        <constructionYear>3078</constructionYear>
+        <tuition>21875</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Armored Infantry Command Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Armored Infantry Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1371,54 +1639,69 @@
         <description>The Emma Centrella Martial Academy succeeds the Canopian Institute of War, nestled in Astarte on Salonika's continent. Graduating its inaugural class in 3083, murmurs of discontent regarding instructional quality have surfaced, despite the MAF's efforts to secure top-tier instructors.</description>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3083</constructionYear>
-        <tuition>14063</tuition>
+        <tuition>7500</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Crew Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>VTOL Crew Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Naval Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Command Graduate</qualification>
-        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Fighter Crew Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Armored Infantry Command Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Emma Centrella Martial Academy (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Emma Centrella Martial Academy succeeds the Canopian Institute of War, nestled in Astarte on Salonika's continent. Graduating its inaugural class in 3083, murmurs of discontent regarding instructional quality have surfaced, despite the MAF's efforts to secure top-tier instructors.</description>
+        <locationSystem>Canopus IV</locationSystem>
+        <constructionYear>3083</constructionYear>
+        <tuition>14063</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1504,47 +1787,63 @@
         <locationSystem>Finmark</locationSystem>
         <constructionYear>2650</constructionYear>
         <destructionYear>2778</destructionYear>
-        <tuition>9115</tuition>
+        <tuition>5104</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Aerospace Command Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>DropShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>DropShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>JumpShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
         <qualification>JumpShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>WarShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior Aerospace Technician</qualification>
-        <curriculum>Tech/Aero, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Aerospace Technician</qualification>
         <curriculum>Tech/Aero</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior Advanced Vessel Technician</qualification>
-        <curriculum>Tech/Vessel, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Finmark Air and Space Academy (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Finmark Air and Space Academy serves as a vital training ground for the naval officer corps of the Rim Worlds Republic. Positioned in high orbit above Finmark, the administrative hub of the Finmark Province, FASA boasts a substantial annual output of new officers. Offering a comprehensive WarShip program among its military courses, FASA plays a crucial role in shaping Republic naval personnel.</description>
+        <locationSystem>Finmark</locationSystem>
+        <constructionYear>2650</constructionYear>
+        <destructionYear>2778</destructionYear>
+        <tuition>9115</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>DropShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Senior Aerospace Technician</qualification>
+        <curriculum>Tech/Aero, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Senior Advanced Vessel Technician</qualification>
+        <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -1554,48 +1853,65 @@
         <isMilitary>true</isMilitary>
         <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is the Star League's largest training facility for naval personnel. Each school has several WarShips and JumpShips for crew training.</description>
         <locationSystem>Keid</locationSystem>
+        <constructionYear>2300</constructionYear>
         <destructionYear>2774</destructionYear>
-        <tuition>10938</tuition>
+        <tuition>6125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Aerospace Command Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>DropShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>DropShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>JumpShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
         <qualification>JumpShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>WarShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior Aerospace Technician</qualification>
-        <curriculum>Tech/Aero, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Aerospace Technician</qualification>
         <curriculum>Tech/Aero</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior Advanced Vessel Technician</qualification>
-        <curriculum>Tech/Vessel, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Fleet School of Keid (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is the Star League's largest training facility for naval personnel. Each school has several WarShips and JumpShips for crew training.</description>
+        <locationSystem>Keid</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <destructionYear>2774</destructionYear>
+        <tuition>10938</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>DropShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Senior Aerospace Technician</qualification>
+        <curriculum>Tech/Aero, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Senior Advanced Vessel Technician</qualification>
+        <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -1605,30 +1921,47 @@
         <isMilitary>true</isMilitary>
         <description>The Flight Academy of Graham is one of the few schools dedicated solely to training aerospace pilots and one of the few orbiting space academies. Over 2,000 pilots graduate from the academy every year.</description>
         <locationSystem>Graham IV</locationSystem>
+        <constructionYear>2300</constructionYear>
         <destructionYear>2767</destructionYear>
-        <tuition>14875</tuition>
+        <tuition>8750</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Aerospace Command Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>DropShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>DropShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>JumpShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
         <qualification>JumpShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Flight Academy of Graham (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Flight Academy of Graham is one of the few schools dedicated solely to training aerospace pilots and one of the few orbiting space academies. Over 2,000 pilots graduate from the academy every year.</description>
+        <locationSystem>Graham IV</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <destructionYear>2767</destructionYear>
+        <tuition>14875</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>DropShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -1673,54 +2006,69 @@
         <description>Following the Jihad and the destruction of the original Focht War College on Tukayyid, Kentares IV becomes the new location for the college. With significant financial backing from the Federated Suns, the college focuses on training a new generation of leaders for various military roles.</description>
         <locationSystem>Kentares IV</locationSystem>
         <constructionYear>3085</constructionYear>
-        <tuition>14063</tuition>
+        <tuition>7500</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Crew Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>VTOL Crew Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Naval Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Command Graduate</qualification>
-        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Fighter Crew Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Armored Infantry Command Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Focht War College (Officer) [Kentares IV]</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Following the Jihad and the destruction of the original Focht War College on Tukayyid, Kentares IV becomes the new location for the college. With significant financial backing from the Federated Suns, the college focuses on training a new generation of leaders for various military roles.</description>
+        <locationSystem>Kentares IV</locationSystem>
+        <constructionYear>3085</constructionYear>
+        <tuition>14063</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1731,54 +2079,70 @@
         <locationSystem>Tukayyid</locationSystem>
         <constructionYear>3052</constructionYear>
         <destructionYear>3068</destructionYear>
-        <tuition>14063</tuition>
+        <tuition>7500</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Crew Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>VTOL Crew Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Naval Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Command Graduate</qualification>
-        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Fighter Crew Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Armored Infantry Command Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Focht War College (Officer) [Tukayyid]</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Focht War College is pivotal in training the elite ComGuards and later, the forces of the Second Star League. Tukayyid's sparse civilian presence and rugged terrain made it ideal for rigorous military exercises.</description>
+        <locationSystem>Tukayyid</locationSystem>
+        <constructionYear>3052</constructionYear>
+        <destructionYear>3068</destructionYear>
+        <tuition>14063</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1841,54 +2205,70 @@
         <isMilitary>true</isMilitary>
         <description>The Frunze Military Academy is a renowned institution, central in the development of military theory and practice in the former Soviet Union. Frunze graduates are esteemed for their deep tactical acumen and unwavering discipline, preparing them for multifaceted warfare among the stars.</description>
         <locationSystem>Terra</locationSystem>
-        <tuition>33750</tuition>
+        <constructionYear>2300</constructionYear>
+        <tuition>18000</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Crew Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>VTOL Crew Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Naval Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Command Graduate</qualification>
-        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Fighter Crew Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Armored Infantry Command Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Frunze Military Academy (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Frunze Military Academy is a renowned institution, central in the development of military theory and practice in the former Soviet Union. Frunze graduates are esteemed for their deep tactical acumen and unwavering discipline, preparing them for multifaceted warfare among the stars.</description>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>33750</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1899,119 +2279,134 @@
         <locationSystem>Galedon V</locationSystem>
         <constructionYear>2400</constructionYear>
         <destructionYear>3069</destructionYear>
-        <tuition>11229</tuition>
+        <tuition>5833</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Crew Graduate</qualification>
-        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>VTOL Crew Graduate</qualification>
-        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Naval Command Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
-        <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Command Graduate</qualification>
-        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Fighter Crew Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Armored Infantry Command Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
         <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Advanced Infantry Command Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Aerospace Command Graduate</qualification>
-        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>DropShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <qualification>DropShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>JumpShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
         <qualification>JumpShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>WarShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>BattleMech Technician</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Advanced Vehicle Technician</qualification>
+        <curriculum>Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Technician</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Armored Infantry Technician</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Vessel Technician</qualification>
+        <curriculum>Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Galedon Military Academy (Officer)</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Established on Galedon V before the formation of the Draconis Combine, the Galedon Military Academy is renowned as one of the oldest institutions of its kind. Exclusive to graduates of Galedon Military District primary schools, GMA offers comprehensive training across all DCMS branches, with a focus on rigorous physical conditioning unmatched by other academies.</description>
+        <locationSystem>Galedon V</locationSystem>
+        <constructionYear>2400</constructionYear>
+        <destructionYear>3069</destructionYear>
+        <tuition>11229</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>DropShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior BattleMech Technician</qualification>
         <curriculum>Tech/Mech, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>BattleMech Technician</qualification>
-        <curriculum>Tech/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Senior Advanced Vehicle Technician</qualification>
         <curriculum>Tech/Mechanic, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Advanced Vehicle Technician</qualification>
-        <curriculum>Tech/Mechanic</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior Aerospace Technician</qualification>
         <curriculum>Tech/Aero, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Aerospace Technician</qualification>
-        <curriculum>Tech/Aero</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Armored Infantry Technician</qualification>
-        <curriculum>Tech/BA</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Advanced Vessel Technician</qualification>
-        <curriculum>Tech/Vessel</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Senior Administrator</qualification>
         <curriculum>Administration, Negotiation, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Junior Administrator</qualification>
-        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
