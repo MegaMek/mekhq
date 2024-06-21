@@ -882,8 +882,8 @@ public class EducationController {
         }
 
         for (String skill : curriculum) {
-            if (skill.equalsIgnoreCase("bonus xp")) {
-                person.awardXP(campaign, Compute.d6(Math.max(1, educationLevel)));
+            if (skill.equalsIgnoreCase("xp")) {
+                person.awardXP(campaign, educationLevel * campaign.getCampaignOptions().getCurriculumXpRate());
             } else {
                 String skillParsed = Academy.skillParser(skill);
                 int bonus;
@@ -940,18 +940,17 @@ public class EducationController {
                     campaign.addReport(String.format(resources.getString("bonusAdded.text"),
                             person.getFirstName()));
                 } else {
-                    roll = Compute.d6(2);
-                    person.awardXP(campaign, roll);
+                   person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
 
                     campaign.addReport(String.format(resources.getString("bonusXp.text"),
-                            person.getFirstName(), roll));
+                            person.getFirstName(), campaign.getCampaignOptions().getCurriculumXpRate()));
                 }
             } catch (Exception e) {
-                // if we get this, it means the 'skill' was Bonus XP
-                person.awardXP(campaign, Compute.d6(2));
+                // if we get this, it means the 'skill' was XP
+                person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
 
                 campaign.addReport(String.format(resources.getString("bonusXp.text"),
-                        person.getFirstName(), roll));
+                        person.getFirstName(), campaign.getCampaignOptions().getCurriculumXpRate()));
             }
         }
     }

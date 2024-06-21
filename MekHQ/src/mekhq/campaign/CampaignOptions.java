@@ -384,6 +384,7 @@ public class CampaignOptions {
 
     // Education
     private boolean useEducationModule;
+    private Integer curriculumXpRate;
     private Integer maximumJumpCount;
     private boolean useReeducationCamps;
     private boolean enableLocalAcademies;
@@ -894,6 +895,7 @@ public class CampaignOptions {
 
         // Education
         setUseEducationModule(true);
+        setCurriculumXpRate(3);
         setMaximumJumpCount(5);
         setUseReeducationCamps(true);
         setEnableLocalAcademies(true);
@@ -2687,6 +2689,14 @@ public class CampaignOptions {
 
     public void setUseEducationModule(boolean useEducationModule) {
         this.useEducationModule = useEducationModule;
+    }
+
+    public Integer getCurriculumXpRate() {
+        return curriculumXpRate;
+    }
+
+    public void setCurriculumXpRate(final int curriculumXpRate) {
+        this.curriculumXpRate = curriculumXpRate;
     }
 
     public Integer getMaximumJumpCount() {
@@ -4729,6 +4739,7 @@ public class CampaignOptions {
 
         //region Education
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "curriculumXpRate", getCurriculumXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCount", getMaximumJumpCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReeducationCamps", isUseReeducationCamps());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
@@ -5478,6 +5489,8 @@ public class CampaignOptions {
                     //region Education
                 } else if (wn2.getNodeName().equalsIgnoreCase("useEducationModule")) {
                     retVal.setUseEducationModule(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("curriculumXpRate")) {
+                    retVal.setCurriculumXpRate(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maximumJumpCount")) {
                     retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useReeducationCamps")) {
