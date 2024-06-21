@@ -8,6 +8,7 @@
 	<localModifiers>AlliedTurrets.xml</localModifiers>
 	<localModifiers>AlliedOfficerMech.xml</localModifiers>	
         <sharedModifiers>AlliedOfficerMech.xml</sharedModifiers>
-	<userDescription>This base is defended by well-equipped veteran troops, turrets and a commander in a mech. The commander will participate in scenarios on this track.</userDescription>		
+	<userDescription>This base is defended by well-equipped veteran troops, turrets and a commander in a mech. &lt;br&gt;
+The commander will participate in scenarios on this track.</userDescription>		
         <visible>true</visible>
 </StratconFacility>
