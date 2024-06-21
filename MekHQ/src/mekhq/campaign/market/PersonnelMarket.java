@@ -23,7 +23,6 @@ import megamek.common.*;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -34,6 +33,7 @@ import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.HangarStatistics;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -96,11 +96,22 @@ public class PersonnelMarket {
         boolean updated = false;
 
         if (!personnel.isEmpty()) {
-            removePersonnelForDay(c);
+            if ((c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()) && (!c.getAtBConfig().isHiringHall(c.getCurrentSystem().getId(), c.getLocalDate()))) {
+                removeAll();
+            } else if (!c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()) {
+                removePersonnelForDay(c);
+            }
         }
 
         if (null != method) {
-            List<Person> newPersonnel = method.generatePersonnelForDay(c);
+            List<Person> newPersonnel = new ArrayList<>();
+
+            if ((c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()) && (c.getAtBConfig().isHiringHall(c.getCurrentSystem().getId(), c.getLocalDate()))) {
+                newPersonnel = method.generatePersonnelForDay(c);
+            } else if (!c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()) {
+                newPersonnel = method.generatePersonnelForDay(c);
+            }
+
             if ((null != newPersonnel) && !newPersonnel.isEmpty()) {
                 personnel.addAll(newPersonnel);
                 updated = true;
@@ -127,6 +138,14 @@ public class PersonnelMarket {
                 personnel.removeAll(toRemove);
             }
         }
+    }
+
+    /**
+     * Removes all personnel from the market and their attached units.
+     */
+    public void removeAll() {
+        personnel.clear();
+        attachedEntities.clear();
     }
 
     public void setPersonnel(List<Person> p) {

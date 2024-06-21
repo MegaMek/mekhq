@@ -408,8 +408,8 @@ public class RetirementDefectionDialog extends JDialog {
         add(btnPanel, BorderLayout.PAGE_END);
     }
 
-    private void setBonusAndShareTotals(Money bonus) {
-        if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
+    private void setBonusAndShareTotals(Money totalBonuses) {
+        if (totalBonuses.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
             lblTotal.setText("<html>" + resourceMap.getString("lblTotalBonus.text")
                     + ' ' + "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
                     + getTotalBonus().toAmountAndSymbolString() + "</font></html>");
@@ -703,18 +703,20 @@ public class RetirementDefectionDialog extends JDialog {
 
     private Money getTotalBonus() {
         Money retVal = Money.zero();
+
         for (UUID id : targetRolls.keySet()) {
             if (((RetirementTableModel) personnelTable.getModel()).getPayBonus(id)) {
                 retVal = retVal.plus(RetirementDefectionTracker.getPayoutOrBonusValue(hqView.getCampaign(),
                         hqView.getCampaign().getPerson(id)));
-
-                if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isMonthly()) {
-                    retVal = retVal.dividedBy(12);
-                } else if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isWeekly()) {
-                    retVal = retVal.dividedBy(52);
-                }
             }
         }
+
+        if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isMonthly()) {
+            retVal = retVal.dividedBy(12);
+        } else if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isWeekly()) {
+            retVal = retVal.dividedBy(52);
+        }
+
         return retVal;
     }
 
