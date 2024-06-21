@@ -1468,8 +1468,7 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if ((campaign.getCampaignOptions().isUseFatigue())
-                && (person.getEffectiveFatigue(campaign) > 0)) {
+        if ((campaign.getCampaignOptions().isUseFatigue()) && (person.getFatigue() > 0)) {
             lblFatigue1.setName("lblFatigue1");
             lblFatigue1.setText(resourceMap.getString("lblFatigue1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1481,7 +1480,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             StringBuilder fatigueDisplay = new StringBuilder();
             int effectiveFatigue = person.getEffectiveFatigue(campaign);
-            int fatigueTurnoverModifier = MathUtility.clamp(((person.getFatigue() - 1) / 4) - 1, 0, 3);
+            int fatigueTurnoverModifier = MathUtility.clamp(((person.getEffectiveFatigue(campaign) - 1) / 4) - 1, 0, 3);
 
             fatigueDisplay.append(person.getFatigue());
 
