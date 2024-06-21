@@ -18,8 +18,8 @@
  */
 package mekhq.gui.dialog.nagDialogs;
 
-import mekhq.MekHQ;
 import mekhq.MHQConstants;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.AbstractMHQNagDialog;
@@ -29,7 +29,7 @@ import javax.swing.*;
 public class UnmaintainedUnitsNagDialog extends AbstractMHQNagDialog {
     private boolean checkHanger() {
         for (Unit u : getCampaign().getHangar().getUnits()) {
-            if((u.isUnmaintained()) && (!u.isSalvage())) {
+            if ((u.isUnmaintained()) && (!u.isSalvage())) {
                     return true;
             }
         }

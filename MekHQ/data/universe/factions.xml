@@ -1101,6 +1101,8 @@ successor - unimplemented tag describing another faction code as the specified f
     <faction>
         <shortname>FC</shortname>
         <fullname>Federated Commonwealth</fullname>
+        <altNamesByYear year='3028'>Federated Commonwealth Alliance</altNamesByYear>
+        <altNamesByYear year='3055'>Federated Commonwealth</altNamesByYear>
         <alternativeFactionCodes>FS,LA</alternativeFactionCodes>
         <startingPlanet>New Avalon</startingPlanet>
         <eraMods>0,0,0,1,2,2,1,0,0</eraMods>
@@ -1110,6 +1112,8 @@ successor - unimplemented tag describing another faction code as the specified f
         <layeredForceIconLogoFilename>Federated Commonwealth.png</layeredForceIconLogoFilename>
         <colorRGB>248,212,44</colorRGB>
         <tags>is,super,playable</tags>
+        <start>3028</start>
+        <end>3068</end>
     </faction>
     <faction>
         <shortname>FVC</shortname>

@@ -1518,7 +1518,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (academySetNames.contains("Prestigious Academies")) {
-                    if (!campaign.getCampaignOptions().isEnableLocalAcademies()) {
+                    if (!campaign.getCampaignOptions().isEnablePrestigiousAcademies()) {
                         academySetNames.remove("Prestigious Academies");
                     }
                 }
