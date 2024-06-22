@@ -2604,6 +2604,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         boolean showIneligibleAcademies = campaign.getCampaignOptions().isEnableShowIneligibleAcademies();
         // has the academy been constructed, is still standing, & has not closed?
 
+        if (campaign.getCampaignOptions().isEnableOverrideRequirements()) {
+            JMenu academyOption = new JMenu(academy.getName());
+
+            String campus;
+
+            if (academy.isLocal()) {
+                campus = campaign.getCurrentSystem().getId();
+            } else {
+                campus = academy.getLocationSystems().get(0);
+            }
+
+            educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
+
+            buildEducationSubMenus(campaign, academy, List.of(person), academyOption, campus, campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+            return;
+        }
+
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {
@@ -2702,6 +2719,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param civilianMenu  the civilian menu object
      */
     private void buildEducationMenusMassEnroll(Campaign campaign, List<Person> personnel, Academy academy, JMenu militaryMenu, JMenu civilianMenu) {
+        if (campaign.getCampaignOptions().isEnableOverrideRequirements()) {
+            JMenu academyOption = new JMenu(academy.getName());
+
+            String campus;
+
+            if (academy.isLocal()) {
+                campus = campaign.getCurrentSystem().getId();
+            } else {
+                campus = academy.getLocationSystems().get(0);
+            }
+
+            educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
+
+            buildEducationSubMenus(campaign, academy, personnel, academyOption, campus, campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+            return;
+        }
+
         // has the academy been constructed, is still standing, & has not closed?
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
