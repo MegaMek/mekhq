@@ -365,11 +365,11 @@ public class RetirementDefectionDialog extends JDialog {
         panResults.add(scroll);
         JPanel panAddRemoveBtns = new JPanel();
         panAddRemoveBtns.setLayout(new BoxLayout(panAddRemoveBtns, BoxLayout.Y_AXIS));
-        btnAddUnit = new JButton("◄");
+        btnAddUnit = new JButton("<<<");
         btnAddUnit.setEnabled(false);
         btnAddUnit.addActionListener(ev -> addUnit());
         panAddRemoveBtns.add(btnAddUnit);
-        btnRemoveUnit = new JButton("►");
+        btnRemoveUnit = new JButton(">>>");
         btnRemoveUnit.setEnabled(false);
         btnRemoveUnit.addActionListener(ev -> removeUnit());
         panAddRemoveBtns.add(btnRemoveUnit);
