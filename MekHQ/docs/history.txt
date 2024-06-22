@@ -126,6 +126,7 @@ MEKHQ VERSION HISTORY:
 + PR #4262: Separated Officer and Enlisted Curriculums, Corrected Local Academy Data
 + PR #4263: Inverted Management Skill Modifier in RetirementDefectionTracker
 + PR #4264: Updated Education Tooltip Properties to Better Handle Mass Enroll
++ PR #4267: Replaced Non-Universal ASCII Arrow with Braces in Turnover Dialog
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
