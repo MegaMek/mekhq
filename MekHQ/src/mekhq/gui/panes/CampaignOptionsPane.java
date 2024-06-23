@@ -453,6 +453,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEnableLocalAcademies;
     private JCheckBox chkEnablePrestigiousAcademies;
     private JCheckBox chkShowIneligibleAcademies;
+    private JCheckBox chkShowPopulationConflict;
     private JCheckBox chkShowAgeConflict;
     private JCheckBox chkShowUnqualified;
     private JCheckBox chkShowFactionConflict;
@@ -6074,6 +6075,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkShowIneligibleAcademies.addActionListener(evt -> {
             final boolean isEnabled = chkShowIneligibleAcademies.isSelected();
 
+            chkShowPopulationConflict.setEnabled(isEnabled);
             chkShowAgeConflict.setEnabled(isEnabled);
             chkShowUnqualified.setEnabled(isEnabled);
             chkShowFactionConflict.setEnabled(isEnabled);
@@ -6110,6 +6112,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             enableShowIneligiblePanel.setEnabled(isEnabled);
             chkShowIneligibleAcademies.setEnabled(isEnabled);
+            chkShowPopulationConflict.setEnabled(isEnabled);
             chkShowAgeConflict.setEnabled(isEnabled);
             chkShowUnqualified.setEnabled(isEnabled);
             chkShowFactionConflict.setEnabled(isEnabled);
@@ -6237,6 +6240,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createShowIneligiblePanel() {
+        chkShowPopulationConflict = new JCheckBox(resources.getString("chkShowPopulationConflict.text"));
+        chkShowPopulationConflict.setToolTipText(resources.getString("chkShowPopulationConflict.toolTip"));
+        chkShowPopulationConflict.setName("chkShowPopulationConflict");
+
         chkShowAgeConflict = new JCheckBox(resources.getString("chkShowAgeConflict.text"));
         chkShowAgeConflict.setToolTipText(resources.getString("chkShowAgeConflict.toolTip"));
         chkShowAgeConflict.setName("chkShowAgeConflict");
@@ -6255,6 +6262,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         // this prevents a really annoying bug where disabled options don't stay disabled when
         // reloading Campaign Options
+        chkShowPopulationConflict.setEnabled(campaign.getCampaignOptions().isEnableShowIneligibleAcademies());
         chkShowAgeConflict.setEnabled(campaign.getCampaignOptions().isEnableShowIneligibleAcademies());
         chkShowUnqualified.setEnabled(campaign.getCampaignOptions().isEnableShowIneligibleAcademies());
         chkShowFactionConflict.setEnabled(campaign.getCampaignOptions().isEnableShowIneligibleAcademies());
@@ -6272,6 +6280,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setVerticalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
+                        .addComponent(chkShowPopulationConflict)
                         .addComponent(chkShowAgeConflict)
                         .addComponent(chkShowUnqualified)
                         .addComponent(chkShowFactionConflict)
@@ -6280,6 +6289,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
         layout.setHorizontalGroup(
                 layout.createSequentialGroup()
+                        .addComponent(chkShowPopulationConflict)
                         .addComponent(chkShowAgeConflict)
                         .addComponent(chkShowUnqualified)
                         .addComponent(chkShowFactionConflict)
@@ -8238,6 +8248,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
         chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
+        chkShowPopulationConflict.setSelected(options.isEnablePopulationConflict());
         chkShowAgeConflict.setSelected(options.isEnableShowAgeConflict());
         chkShowUnqualified.setSelected(options.isEnableShowUnqualified());
         chkShowFactionConflict.setSelected(options.isEnableShowFactionConflict());
@@ -8904,7 +8915,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
             options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
-            options.setEnableShowAgeConflict(chkShowAgeConflict.isSelected());
+            options.setEnablePopulationConflict(chkShowPopulationConflict.isSelected());
             options.setEnableShowUnqualified(chkShowUnqualified.isSelected());
             options.setEnableShowFactionConflict(chkShowFactionConflict.isSelected());
             options.setEnableShowRangeConflict(chkShowRangeConflict.isSelected());

@@ -2607,10 +2607,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {
-            // is the applicant within the right age bracket?
-            int personAge = person.getAge(campaign.getLocalDate());
+            // is the planet populated (only relevant for Local Academies
+            if ((academy.isLocal()) && (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) == 0)) {
+                if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnablePopulationConflict())) {
+                    JMenuItem academyOption = new JMenuItem("<html>" + academy.getName()
+                            + resources.getString("eduPopulationConflict.text") + "</html>");
 
-            if ((personAge >= academy.getAgeMax()) || (personAge < academy.getAgeMin())) {
+                    educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
+                }
+            // is the applicant within the right age bracket?
+            } else if ((person.getAge(campaign.getLocalDate()) >= academy.getAgeMax()) || (person.getAge(campaign.getLocalDate()) < academy.getAgeMin())) {
                 if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowAgeConflict())) {
                     JMenuItem academyOption;
 
