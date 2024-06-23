@@ -47,7 +47,7 @@ public class Academy implements Comparable<Academy> {
     private String name = "Error: Name Missing";
 
     @XmlElement(name = "type")
-    private AcademyType type = AcademyType.NONE;
+    private String type = "None";
 
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary = false;
@@ -155,7 +155,7 @@ public class Academy implements Comparable<Academy> {
      * @param baseAcademicSkillLevel  the base skill level provided by the academy
      * @param id                      the id number of the academy, used for sorting academies in mhq
      */
-    public Academy(String set, String name, AcademyType type, Boolean isMilitary, Boolean isReeducationCamp,
+    public Academy(String set, String name, String type, Boolean isMilitary, Boolean isReeducationCamp,
                    Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
                    List<String> locationSystems, Boolean isLocal, Integer constructionYear,
                    Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
@@ -233,7 +233,7 @@ public class Academy implements Comparable<Academy> {
      * @return The type of academy.
      */
     public AcademyType getType() {
-        return type;
+        return AcademyType.parseFromString(type);
     }
 
     /**
@@ -241,7 +241,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param type the type to be set.
      */
-    public void setType(final AcademyType type) {
+    public void setType(final String type) {
         this.type = type;
     }
 

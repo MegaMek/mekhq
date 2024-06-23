@@ -104,22 +104,31 @@ public enum AcademyType {
 //region File I/O
     public static AcademyType parseFromString(final String academyType) {
         switch (academyType) {
+            case "0":
             case "None":
                 return NONE;
+            case "1":
             case "High School":
                 return HIGH_SCHOOL;
+            case "2":
             case "College":
                 return COLLEGE;
+            case "3":
             case "University":
                 return UNIVERSITY;
+            case "4":
             case "Military Academy":
                 return MILITARY_ACADEMY;
+            case "5":
             case "Basic Training":
                 return BASIC_TRAINING;
+            case "6":
             case "NCO Academy":
                 return NCO_ACADEMY;
+            case "7":
             case "Warrant Officer Academy":
                 return WARRANT_OFFICER_ACADEMY;
+            case "8":
             case "Officer Academy":
                 return OFFICER_ACADEMY;
             default:
