@@ -2607,8 +2607,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {
-            // is the planet populated (only relevant for Local Academies
-            if ((academy.isLocal()) && (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) == 0)) {
+            // is the planet populated?
+            if (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) == 0) {
                 if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnablePopulationConflict())) {
                     JMenuItem academyOption = new JMenuItem("<html>" + academy.getName()
                             + resources.getString("eduPopulationConflict.text") + "</html>");
@@ -2712,6 +2712,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {
+
+            // is the planet populated?
+            if (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) == 0) {
+                return;
+            }
+
             // are all the applicants within the right age bracket?
             // are all the applicants qualified?
             boolean arePersonnelEligible = personnel.stream()
