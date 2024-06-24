@@ -594,6 +594,7 @@ public class EducationController {
                 // we add this limiter to avoid a bad play experience when someone drops out in the final stretch
                 if (person.getEduEducationTime() >= 10) {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
+                    ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getCurriculums().get(person.getEduCourseIndex()));
                     person.setEduEducationStage(EducationStage.DROPPING_OUT);
                 } else {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
@@ -693,7 +694,7 @@ public class EducationController {
         // qualification failed
         if (graduationRoll < 5) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedFailed.text"));
-            ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName());
+            ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getCurriculums().get(person.getEduCourseIndex()));
 
             improveSkills(campaign, person, academy, false);
 
@@ -719,12 +720,12 @@ public class EducationController {
             }
 
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
-                    resources.getString("graduatedTopLog.text"), person.getEduAcademyName());
+                    resources.getString("graduatedTopLog.text"), person.getEduAcademyName(), academy.getCurriculums().get(person.getEduCourseIndex()));
 
             processGraduation(campaign, person, academy, 2, resources);
 
             if (!academy.isMilitary()) {
-                reportMastersOrDoctorateGain(campaign, person, resources);
+                reportMastersOrDoctorateGain(campaign, person, academy, resources);
             }
 
             return true;
@@ -741,12 +742,12 @@ public class EducationController {
             }
 
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
-                    resources.getString("graduatedHonorsLog.text"), person.getEduAcademyName());
+                    resources.getString("graduatedHonorsLog.text"), person.getEduAcademyName(), academy.getCurriculums().get(person.getEduCourseIndex()));
 
             processGraduation(campaign, person, academy, 1, resources);
 
             if (!academy.isMilitary()) {
-                reportMastersOrDoctorateGain(campaign, person, resources);
+                reportMastersOrDoctorateGain(campaign, person, academy, resources);
             }
 
             return true;
@@ -765,7 +766,7 @@ public class EducationController {
         processGraduation(campaign, person, academy, 0, resources);
 
         if (!academy.isMilitary()) {
-            reportMastersOrDoctorateGain(campaign, person, resources);
+            reportMastersOrDoctorateGain(campaign, person, academy, resources);
         }
         return true;
     }
@@ -777,16 +778,16 @@ public class EducationController {
      * @param person     the person who completed the degree
      * @param resources  the resource bundle containing localized strings
      */
-    private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, ResourceBundle resources) {
+    private static void reportMastersOrDoctorateGain(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         if (person.getEduHighestEducation().isPostGraduate()) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedMasters.text"));
 
-            ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName());
+            ServiceLogger.eduGraduatedMasters(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getCurriculums().get(person.getEduCourseIndex()));
 
         } else if (person.getEduHighestEducation().isDoctorate()) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedDoctorate.text"));
 
-            ServiceLogger.eduGraduatedDoctorate(person, campaign.getLocalDate(), person.getEduAcademyName());
+            ServiceLogger.eduGraduatedDoctorate(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getCurriculums().get(person.getEduCourseIndex()));
 
             person.setPreNominal("Dr");
         }
@@ -805,7 +806,7 @@ public class EducationController {
         // qualification failed
         if (graduationRoll < 30) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedBarely.text"));
-            ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName());
+            ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getCurriculums().get(person.getEduCourseIndex()));
 
             improveSkills(campaign, person, academy, false);
 
