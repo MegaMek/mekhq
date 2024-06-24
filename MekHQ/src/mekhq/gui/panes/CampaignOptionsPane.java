@@ -8248,7 +8248,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
         chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
-        chkShowPopulationConflict.setSelected(options.isEnablePopulationConflict());
+        chkShowPopulationConflict.setSelected(options.isEnableShowPopulationConflict());
         chkShowAgeConflict.setSelected(options.isEnableShowAgeConflict());
         chkShowUnqualified.setSelected(options.isEnableShowUnqualified());
         chkShowFactionConflict.setSelected(options.isEnableShowFactionConflict());
@@ -8915,7 +8915,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
             options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
-            options.setEnablePopulationConflict(chkShowPopulationConflict.isSelected());
+            options.setEnableShowPopulationConflict(chkShowPopulationConflict.isSelected());
             options.setEnableShowUnqualified(chkShowUnqualified.isSelected());
             options.setEnableShowFactionConflict(chkShowFactionConflict.isSelected());
             options.setEnableShowRangeConflict(chkShowRangeConflict.isSelected());

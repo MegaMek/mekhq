@@ -2609,7 +2609,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 && (campaign.getGameYear() < academy.getClosureYear())) {
             // is the planet populated?
             if (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) == 0) {
-                if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnablePopulationConflict())) {
+                if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowPopulationConflict())) {
                     JMenuItem academyOption = new JMenuItem("<html>" + academy.getName()
                             + resources.getString("eduPopulationConflict.text") + "</html>");
 
