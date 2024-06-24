@@ -1060,6 +1060,7 @@ public class Person {
 
         // clean up the save entry
         this.setEduAcademyName(null);
+        this.setEduAcademyFaction(null);
         this.setEduAcademySet(null);
         this.setEduAcademyNameInSet(null);
         this.setEduAcademySystem(null);
