@@ -127,6 +127,11 @@ MEKHQ VERSION HISTORY:
 + PR #4263: Inverted Management Skill Modifier in RetirementDefectionTracker
 + PR #4264: Updated Education Tooltip Properties to Better Handle Mass Enroll
 + PR #4267: Replaced Non-Universal ASCII Arrow with Braces in Turnover Dialog
++ PR #4271: Corrected Scenario BV Allowance Calculations for Scenario Modifiers
++ PR #4272: Updated Turnover & Retention Documentation
++ PR #4273: Corrected Dialog Option for Invalid Faction Nag
++ PR #4275: Fixed Original Unit Value Being Deducted from Payout Sum When Personnel Resign/Retire
++ FIX #4277: enable new network creation for units not in a network
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
