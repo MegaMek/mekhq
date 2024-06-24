@@ -122,6 +122,10 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromLeave.text")));
     }
 
+    public static void returnedFromEducation(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromEducation.text")));
+    }
+
     public static void returnedFromAWOL(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromAWOL.text")));
     }

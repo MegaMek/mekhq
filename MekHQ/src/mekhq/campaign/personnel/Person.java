@@ -975,7 +975,7 @@ public class Person {
                 } else if (getStatus().isStudent()) {
                     campaign.addReport(String.format(resources.getString("returnedFromEducation.report"),
                             getHyperlinkedFullTitle()));
-                    ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+                    ServiceLogger.returnedFromEducation(this, campaign.getLocalDate());
                 } else if (getStatus().isMissing()) {
                     campaign.addReport(String.format(resources.getString("returnedFromMissing.report"),
                             getHyperlinkedFullTitle()));
