@@ -715,7 +715,7 @@ public class EducationController {
                 campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTop.text"),
                         ' ' + resources.getString(graduationEventPicker())));
             } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedTop.text"));
+                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTop.text"), ""));
             }
 
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
