@@ -5,17 +5,17 @@
         <type>College</type>
         <description>The Academies of Kied consist of three distinct colleges dedicated to metallurgy, diplomatic studies, and economics, each renowned for training future leaders and staff officers.</description>
         <locationSystem>Keid</locationSystem>
-        <tuition>3750</tuition>
+        <tuition>7500</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Senior Medical Technician</qualification>
-        <curriculum>Doctor, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -23,6 +23,8 @@
         <name>Addicks University</name>
         <type>University</type>
         <description>Located in the heart of the Inner Sphere, Addicks University is celebrated for its progressive liberal arts education, particularly in teacher training. The institution uniquely integrates its academic programs with community schools, allowing student teachers to gain invaluable hands-on experience.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Addicks</locationSystem>
         <constructionYear>2400</constructionYear>
         <destructionYear>2777</destructionYear>
@@ -34,6 +36,9 @@
         <ageMin>16</ageMin>
         <qualification>Teaching Graduate</qualification>
         <curriculum>Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -58,26 +63,6 @@
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Aerospace and Interstellar Institute [Midway] (Year One)</name>
-        <type>Military Academy</type>
-        <isMilitary>true</isMilitary>
-        <description>The Aerospace and Interstellar Institute specializes in training aerospace personnel, including DropShip and JumpShip crews. The curriculum spans covers small arms, Medtech, and specialized aerospace roles. Limited crewing opportunities, especially for JumpShips, create fierce competition, pushing most cadets to train as aerospace fighter pilots.</description>
-        <factionDiscount>0</factionDiscount>
-        <isFactionRestricted>true</isFactionRestricted>
-        <locationSystem>Midway</locationSystem>
-        <constructionYear>2650</constructionYear>
-        <tuition>8750</tuition>
-        <durationDays>300</durationDays>
-        <facultySkill>6</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
-        <ageMin>16</ageMin>
-        <qualification>Year One Curriculum</qualification>
-        <curriculum>Small Arms, Medtech</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
-    </academy>
-    <academy>
         <name>Aerospace and Interstellar Institute [Dover]</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
@@ -86,7 +71,7 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dover</locationSystem>
         <constructionYear>3056</constructionYear>
-        <tuition>21000</tuition>
+        <tuition>15750</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>College</educationLevelMin>
@@ -127,7 +112,7 @@
         <name>Aerospace and Interstellar Institute [Midway]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Aerospace and Interstellar Institute specializes in training aerospace personnel, including DropShip and JumpShip crews. The curriculum spans covers small arms, Medtech, and specialized aerospace roles. Limited crewing opportunities, especially for JumpShips, create fierce competition, pushing most cadets to train as aerospace fighter pilots.</description>
+        <description>The Aerospace and Interstellar Institute specializes in training aerospace personnel, including DropShip and JumpShip crews. The curriculum spans covers small arms, first aid, and specialized aerospace roles. Limited crewing opportunities, especially for JumpShips, create fierce competition, pushing most cadets to train as aerospace fighter pilots.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Midway</locationSystem>
@@ -135,7 +120,7 @@
         <tuition>7656</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Aerospace Graduate</qualification>
@@ -150,6 +135,35 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Aitutaki Academy</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and armored crew training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Aitutaki</locationSystem>
+        <constructionYear>2414</constructionYear>
+        <tuition>4375</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -210,7 +224,7 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aitutaki</locationSystem>
         <constructionYear>2414</constructionYear>
-        <tuition>17500</tuition>
+        <tuition>10938</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>College</educationLevelMin>
@@ -273,7 +287,7 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Albion (LC)</locationSystem>
         <constructionYear>2400</constructionYear>
-        <tuition>5906</tuition>
+        <tuition>5950</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
@@ -324,9 +338,6 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Junior Administrator</qualification>
-        <curriculum>Administration, Negotiation</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -338,7 +349,7 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Albion (LC)</locationSystem>
         <constructionYear>2400</constructionYear>
-        <tuition>11484</tuition>
+        <tuition>11725</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>College</educationLevelMin>
@@ -389,16 +400,13 @@
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior Administrator</qualification>
-        <curriculum>Administration, Negotiation, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Algedi War College</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>The Algedi War College is particularly recognized for its mobile warfare division. This development aligns with the production of military vehicles across the Arkab worlds. The college primarily admits candidates with an Azami background, reflecting its unique cultural focus. The AWC has seen immense popularity, with its first class contributing roughly ten percent of graduates as volunteers to DCMS line units, demonstrating goodwill to the Coordinator and strengthening military ties.</description>
+        <description>The Algedi War College is particularly recognized for its mobile warfare division. This development aligns with the production of military vehicles on the Arkab worlds. The college primarily admits candidates with an Azami background, reflecting its unique cultural focus. The AWC has seen immense popularity, with its first class contributing roughly ten percent of graduates as volunteers to DCMS line units, demonstrating goodwill to the Coordinator and strengthening military ties.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Algedi</locationSystem>
@@ -524,6 +532,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The An Ting University, a renowned military academy historically dedicated to training MechWarriors, faced significant damage from both external attacks and internal strife in 3015 from Sun Zhang Cadre alumni. The academy remained shuttered until 3055 when it reopened with advancements from the Helm Memory Core. ATU, enjoying support from the DCMS and local government, provides rigorous training with a commitment to military reforms and a focus on loyalty and excellence. Despite past conflicts, it now produces capable graduates, reaffirming its status alongside prestigious institutions like the Sun Zhang MechWarrior Academy.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>An Ting</locationSystem>
         <constructionYear>3055</constructionYear>
         <tuition>5250</tuition>
@@ -574,10 +584,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the modern era, it commands the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on seamlessly transitioning cadets from seafaring origins to mastering the vastness of space, ensuring that tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
-        <factionDiscount>0</factionDiscount>
-        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
-        <constructionYear>2300</constructionYear>
         <closureYear>2779</closureYear>
         <tuition>7350</tuition>
         <durationDays>1200</durationDays>
@@ -608,8 +615,38 @@
         <isMilitary>true</isMilitary>
         <description>Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the modern era, it commands the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on seamlessly transitioning cadets from seafaring origins to mastering the vastness of space, ensuring that tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
         <locationSystem>Terra</locationSystem>
-        <constructionYear>2300</constructionYear>
         <closureYear>2779</closureYear>
+        <tuition>12600</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>DropShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <curriculum>Doctor, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Annapolis Naval Academy (Officer) [ComStar]</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the modern era, it commands the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on seamlessly transitioning cadets from seafaring origins to mastering the vastness of space, ensuring that tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2779</constructionYear>
         <tuition>12600</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
@@ -661,37 +698,6 @@
         <qualificationStartYear>2470</qualificationStartYear>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
-    </academy>
-    <academy>
-        <name>Annapolis Naval Academy (Officer) [ComStar]</name>
-        <type>Officer Academy</type>
-        <isMilitary>true</isMilitary>
-        <description>Annapolis Naval Academy has been a cornerstone of naval tradition since the 19th century. Adapted for the modern era, it commands the cosmos' waves, preparing officers for strategic and tactical command within the fleet. Annapolis prides itself on seamlessly transitioning cadets from seafaring origins to mastering the vastness of space, ensuring that tactical doctrines and leadership skills remain unparalleled in the Inner Sphere.</description>
-        <factionDiscount>0</factionDiscount>
-        <isFactionRestricted>true</isFactionRestricted>
-        <locationSystem>Terra</locationSystem>
-        <constructionYear>2779</constructionYear>
-        <tuition>12600</tuition>
-        <durationDays>1200</durationDays>
-        <facultySkill>5</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
-        <ageMin>16</ageMin>
-        <qualification>Advanced Infantry Command Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>DropShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>JumpShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <qualification>WarShip Command Graduate</qualification>
-        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
-        <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -875,14 +881,14 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Atreus (FWL)</locationSystem>
         <constructionYear>2749</constructionYear>
-        <tuition>10500</tuition>
+        <tuition>21000</tuition>
         <durationDays>300</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Officer Graduate</qualification>
-        <curriculum>Administration, Leadership</curriculum>
+        <qualification>Administrative Command Graduate</qualification>
+        <curriculum>Administration, Negotiation, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
@@ -894,7 +900,7 @@
         <locationSystem>Blackjack</locationSystem>
         <constructionYear>2714</constructionYear>
         <destructionYear>3050</destructionYear>
-        <tuition>11454</tuition>
+        <tuition>11550</tuition>
         <durationDays>900</durationDays>
         <facultySkill>8</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
@@ -930,9 +936,6 @@
         <qualification>Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Scrounge</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Junior Administrator</qualification>
-        <curriculum>Administration, Negotiation, Scrounge</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -958,25 +961,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Calloway Martial College was established to address the surge in military recruitment within the Free Worlds League. As the first of three new schools created by the Dormuth Council, the academy quickly became operational, featuring its own Calloway Training Battalion.</description>
-        <locationSystem>Calloway VI</locationSystem>
-        <constructionYear>2765</constructionYear>
-        <destructionYear>2789</destructionYear>
-        <tuition>8750</tuition>
-        <durationDays>900</durationDays>
-        <facultySkill>6</facultySkill>
-        <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
-        <ageMin>16</ageMin>
-        <qualification>MechWarrior Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
-    </academy>
-    <academy>
-        <name>Calloway Martial College</name>
-        <type>Military Academy</type>
-        <isMilitary>true</isMilitary>
-        <description>The Calloway Martial College was established to address the surge in military recruitment within the Free Worlds League. As the first of three new schools created by the Dormuth Council, the academy quickly became operational, featuring its own Calloway Training Battalion.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Calloway VI</locationSystem>
         <constructionYear>2765</constructionYear>
         <destructionYear>2789</destructionYear>
@@ -996,6 +982,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MechWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MechWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3058</constructionYear>
         <destructionYear>3071</destructionYear>
@@ -1018,6 +1006,8 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MechWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MechWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3058</constructionYear>
         <destructionYear>3071</destructionYear>
@@ -1040,6 +1030,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MechWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MechWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3080</constructionYear>
         <destructionYear>3071</destructionYear>
@@ -1062,6 +1054,8 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established to enhance the Magistracy Armed Forces' training programs, the Canopian Institute of War draws inspiration from the Sun Zhang MechWarrior Academy. The rigorous program spans six months of basic training followed by four years of advanced training for MechWarriors or aerospace pilots. Graduates, distinguished by their gold, silver, and lavender uniforms, often join elite units like the Magistracy Royal Guards or pursue further training at the Victoria Academy of Arms and Technology.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3080</constructionYear>
         <destructionYear>3071</destructionYear>
@@ -1084,9 +1078,11 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established concurrently with the Capellan Hegemony, the Capella War College stands as the oldest military academy in the Capellan Confederation. Training emphasizes combined-arms tactics and includes cross-training with the local Duchy RTC.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Capella</locationSystem>
         <constructionYear>2400</constructionYear>
-        <tuition>6176</tuition>
+        <tuition>6234</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
@@ -1140,9 +1136,6 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Junior Administrator</qualification>
-        <curriculum>Administration, Negotiation</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1150,9 +1143,11 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established concurrently with the Capellan Hegemony, the Capella War College stands as the oldest military academy in the Capellan Confederation. Training emphasizes combined-arms tactics and includes cross-training with the local Duchy RTC.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Capella</locationSystem>
         <constructionYear>2400</constructionYear>
-        <tuition>11735</tuition>
+        <tuition>11977</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>College</educationLevelMin>
@@ -1206,9 +1201,6 @@
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior Administrator</qualification>
-        <curriculum>Administration, Negotiation, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1242,6 +1234,9 @@
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -1315,7 +1310,9 @@
         <name>Concordat Aerospace Flight School</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Operated by seasoned instructors from the Outworlds Alliance, this academy boasts a reputation for excellence. Though it produces fewer graduates than the École Militaire, its focus on quality ensures each cadet emerges as a skilled and disciplined pilot. The school plays a vital role in shaping the aerospace forces of the Taurian Concordat, fostering a legacy of proficiency and valor among its graduates.</description>
+        <description>Operated by seasoned instructors from the Outworlds Alliance, this academy boasts a reputation for excellence. Though it produces fewer graduates than the École Militaire, its focus on quality ensures each cadet emerges as a skilled and disciplined pilot. The school plays a vital role in shaping the aerospace forces of the Taurian Concordat, fostering a legacy of proficiency and valor among its alumni.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Samantha</locationSystem>
         <constructionYear>3130</constructionYear>
         <tuition>7000</tuition>
@@ -1388,6 +1385,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Originally focused solely on training MechWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMech training.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Coventry</locationSystem>
         <constructionYear>3060</constructionYear>
         <tuition>4375</tuition>
@@ -1409,6 +1408,8 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Originally focused solely on training MechWarriors, its ties to Coventry Metal Works drew criticism, but it persisted as a crucial training ground. During the Clan Invasion, cadets and instructors valiantly defended against Clan Jade Falcon, sacrificing parts of the academy to protect Coventry. Reborn as the Coventry Military Academy in 3060 under Lyran Alliance patronage, it flourishes with modern facilities and OmniMech training.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Coventry</locationSystem>
         <constructionYear>3060</constructionYear>
         <tuition>6563</tuition>
@@ -1430,10 +1431,12 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mech training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dieron</locationSystem>
         <constructionYear>2800</constructionYear>
         <closureYear>3068</closureYear>
-        <tuition>8750</tuition>
+        <tuition>11667</tuition>
         <durationDays>900</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
@@ -1452,10 +1455,12 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mech training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dieron</locationSystem>
         <constructionYear>2800</constructionYear>
         <closureYear>3068</closureYear>
-        <tuition>21875</tuition>
+        <tuition>17500</tuition>
         <durationDays>900</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>College</educationLevelMin>
@@ -1474,9 +1479,11 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mech training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068, it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dieron</locationSystem>
         <constructionYear>3078</constructionYear>
-        <tuition>8750</tuition>
+        <tuition>10938</tuition>
         <durationDays>900</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
@@ -1492,36 +1499,39 @@
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
-    </academy>
-    <academy>
-        <name>Dieron District Gymnasium (Officer) [3078]</name>
-        <type>Officer Academy</type>
-        <isMilitary>true</isMilitary>
-        <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mech training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068, it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
-        <locationSystem>Dieron</locationSystem>
-        <constructionYear>3078</constructionYear>
-        <tuition>21875</tuition>
-        <durationDays>900</durationDays>
-        <facultySkill>6</facultySkill>
-        <educationLevelMin>College</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
-        <ageMin>16</ageMin>
-        <qualification>MechWarrior Command Graduate</qualification>
-        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Infantry Command Graduate</qualification>
-        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
-        <qualification>Advanced Infantry Command Graduate</qualification>
-        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
-    </academy>
+    </academy><academy>
+    <name>Dieron District Gymnasium (Officer) [3078]</name>
+    <type>Officer Academy</type>
+    <isMilitary>true</isMilitary>
+    <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mech training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068, it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
+    <factionDiscount>0</factionDiscount>
+    <isFactionRestricted>true</isFactionRestricted>
+    <locationSystem>Dieron</locationSystem>
+    <constructionYear>3078</constructionYear>
+    <tuition>18958</tuition>
+    <durationDays>900</durationDays>
+    <facultySkill>6</facultySkill>
+    <educationLevelMin>College</educationLevelMin>
+    <educationLevelMax>College</educationLevelMax>
+    <ageMin>16</ageMin>
+    <qualification>MechWarrior Command Graduate</qualification>
+    <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+    <qualificationStartYear>2500</qualificationStartYear>
+    <qualification>Armored Infantry Command Graduate</qualification>
+    <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+    <qualificationStartYear>3058</qualificationStartYear>
+    <qualification>Advanced Infantry Command Graduate</qualification>
+    <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+    <qualificationStartYear>2300</qualificationStartYear>
+    <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+</academy>
     <academy>
         <name>Dieron Warriors' Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Dieron Warriors Academy on Shimonita annually produces skilled MechWarriors. Graduates are favored for recruitment into the renowned Dieron Regulars, showcasing the academy's pivotal role in regional military development. All five BattleMech regiment commanders have roots in both the Dieron draft and Sun Zhang MechWarrior Academy, highlighting the DWA's lasting influence.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Shimonita</locationSystem>
         <constructionYear>2700</constructionYear>
         <destructionYear>2990</destructionYear>
@@ -1541,6 +1551,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Dover Institute for Higher Learning rose from the ashes of the People's Reconstruction Effort University of Ashio, destroyed during the Shadow War of 2865. Established in 2910 under Coordinator Shinjiro Kurita's patronage, it prioritizes scientific, technical education, and MechWarrior training. Enrollment is open to all meeting basic criteria, with a rigorous five-month basic training followed by a four-year curriculum exposing cadets to diverse combat scenarios.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dover</locationSystem>
         <constructionYear>2910</constructionYear>
         <tuition>5250</tuition>
@@ -1594,7 +1606,7 @@
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1629,7 +1641,7 @@
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1637,6 +1649,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Emma Centrella Martial Academy succeeds the Canopian Institute of War, nestled in Astarte on Salonika's continent. Graduating its inaugural class in 3083, murmurs of discontent regarding instructional quality have surfaced, despite the MAF's efforts to secure top-tier instructors.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3083</constructionYear>
         <tuition>7500</tuition>
@@ -1673,6 +1687,8 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Emma Centrella Martial Academy succeeds the Canopian Institute of War, nestled in Astarte on Salonika's continent. Graduating its inaugural class in 3083, murmurs of discontent regarding instructional quality have surfaced, despite the MAF's efforts to secure top-tier instructors.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3083</constructionYear>
         <tuition>14063</tuition>
@@ -1709,6 +1725,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Following the cataclysmic events of 3150, the Emporia Military Academy rose from the ashes of the Ritza Academy, embodying resilience and fortitude in the face of adversity. Led by a dedicated faculty and staff, it prepares cadets for the challenges of modern warfare, instilling in them the values of courage, discipline, and honor. Despite the scars of past conflicts, the academy remains steadfast in its commitment to shaping future generations of warriors, ensuring that Emporia's legacy of valor endures for generations to come.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Emporia</locationSystem>
         <constructionYear>3150</constructionYear>
         <tuition>4375</tuition>
@@ -1737,7 +1755,7 @@
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -1745,9 +1763,11 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Filtvelt Military Academy, initially serving the Federated Suns' Outback region and later the Filtvelt Coalition, is built during the late Third Succession War near Undredal's capital. Similar to Kilbourne Academy, FMA offers educational opportunities to civilians in a region scarce in options. Despite lacking advanced resources like simulators, FMA excels by providing intensive practical training, producing graduates well-prepared for real combat situations, though they are often underestimated by larger military entities.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Filtvelt</locationSystem>
         <constructionYear>3000</constructionYear>
-        <tuition>14219</tuition>
+        <tuition>14583</tuition>
         <durationDays>900</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
@@ -1784,6 +1804,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Finmark Air and Space Academy serves as a vital training ground for the naval officer corps of the Rim Worlds Republic. Positioned in high orbit above Finmark, the administrative hub of the Finmark Province, FASA boasts a substantial annual output of new officers. Offering a comprehensive WarShip program among its military courses, FASA plays a crucial role in shaping Republic naval personnel.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Finmark</locationSystem>
         <constructionYear>2650</constructionYear>
         <destructionYear>2778</destructionYear>
@@ -1818,6 +1840,8 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Finmark Air and Space Academy serves as a vital training ground for the naval officer corps of the Rim Worlds Republic. Positioned in high orbit above Finmark, the administrative hub of the Finmark Province, FASA boasts a substantial annual output of new officers. Offering a comprehensive WarShip program among its military courses, FASA plays a crucial role in shaping Republic naval personnel.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Finmark</locationSystem>
         <constructionYear>2650</constructionYear>
         <destructionYear>2778</destructionYear>
@@ -1852,8 +1876,9 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is the Star League's largest training facility for naval personnel. Each school has several WarShips and JumpShips for crew training.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Keid</locationSystem>
-        <constructionYear>2300</constructionYear>
         <destructionYear>2774</destructionYear>
         <tuition>6125</tuition>
         <durationDays>1200</durationDays>
@@ -1886,8 +1911,9 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Next to the Annapolis and Kure Naval Academies, the Fleet School of Keid is the Star League's largest training facility for naval personnel. Each school has several WarShips and JumpShips for crew training.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Keid</locationSystem>
-        <constructionYear>2300</constructionYear>
         <destructionYear>2774</destructionYear>
         <tuition>10938</tuition>
         <durationDays>1200</durationDays>
@@ -1921,7 +1947,6 @@
         <isMilitary>true</isMilitary>
         <description>The Flight Academy of Graham is one of the few schools dedicated solely to training aerospace pilots and one of the few orbiting space academies. Over 2,000 pilots graduate from the academy every year.</description>
         <locationSystem>Graham IV</locationSystem>
-        <constructionYear>2300</constructionYear>
         <destructionYear>2767</destructionYear>
         <tuition>8750</tuition>
         <durationDays>1200</durationDays>
@@ -1946,7 +1971,6 @@
         <isMilitary>true</isMilitary>
         <description>The Flight Academy of Graham is one of the few schools dedicated solely to training aerospace pilots and one of the few orbiting space academies. Over 2,000 pilots graduate from the academy every year.</description>
         <locationSystem>Graham IV</locationSystem>
-        <constructionYear>2300</constructionYear>
         <destructionYear>2767</destructionYear>
         <tuition>14875</tuition>
         <durationDays>1200</durationDays>
@@ -1970,6 +1994,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Flight Academy of Thorin excels in training aerospace personnel for the Lyran Commonwealth Armed Forces. Graduates, distinguished by gray-red 'school rags,' reflect Thorin's Star League legacy.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Thorin</locationSystem>
         <constructionYear>2832</constructionYear>
         <destructionYear>3063</destructionYear>
@@ -2076,6 +2102,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Focht War College is pivotal in training the elite ComGuards and later, the forces of the Second Star League. Tukayyid's sparse civilian presence and rugged terrain made it ideal for rigorous military exercises.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Tukayyid</locationSystem>
         <constructionYear>3052</constructionYear>
         <destructionYear>3068</destructionYear>
@@ -2113,6 +2141,8 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Focht War College is pivotal in training the elite ComGuards and later, the forces of the Second Star League. Tukayyid's sparse civilian presence and rugged terrain made it ideal for rigorous military exercises.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Tukayyid</locationSystem>
         <constructionYear>3052</constructionYear>
         <destructionYear>3068</destructionYear>
@@ -2150,6 +2180,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established in 3055 after the loss of the Radstadt Academy during the Clan Invasion, the Frihet Training Facility became a cornerstone of the Free Rasalhague Republic's military growth efforts.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Grumium</locationSystem>
         <constructionYear>3055</constructionYear>
         <tuition>4375</tuition>
@@ -2168,6 +2200,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established in 3055 after the loss of the Radstadt Academy during the Clan Invasion, the Frihet Training Facility became a cornerstone of the Free Rasalhague Republic's military growth efforts.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Grumium</locationSystem>
         <constructionYear>3055</constructionYear>
         <tuition>7500</tuition>
@@ -2204,8 +2238,9 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Frunze Military Academy is a renowned institution, central in the development of military theory and practice in the former Soviet Union. Frunze graduates are esteemed for their deep tactical acumen and unwavering discipline, preparing them for multifaceted warfare among the stars.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
-        <constructionYear>2300</constructionYear>
         <tuition>18000</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
@@ -2240,8 +2275,9 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Frunze Military Academy is a renowned institution, central in the development of military theory and practice in the former Soviet Union. Frunze graduates are esteemed for their deep tactical acumen and unwavering discipline, preparing them for multifaceted warfare among the stars.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
-        <constructionYear>2300</constructionYear>
         <tuition>33750</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
@@ -2276,10 +2312,12 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established on Galedon V before the formation of the Draconis Combine, the Galedon Military Academy is renowned as one of the oldest institutions of its kind. Exclusive to graduates of Galedon Military District primary schools, GMA offers comprehensive training across all DCMS branches, with a focus on rigorous physical conditioning unmatched by other academies.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Galedon V</locationSystem>
         <constructionYear>2400</constructionYear>
         <destructionYear>3069</destructionYear>
-        <tuition>5833</tuition>
+        <tuition>5868</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
@@ -2336,9 +2374,6 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Junior Administrator</qualification>
-        <curriculum>Administration, Negotiation</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2346,10 +2381,12 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established on Galedon V before the formation of the Draconis Combine, the Galedon Military Academy is renowned as one of the oldest institutions of its kind. Exclusive to graduates of Galedon Military District primary schools, GMA offers comprehensive training across all DCMS branches, with a focus on rigorous physical conditioning unmatched by other academies.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Galedon V</locationSystem>
         <constructionYear>2400</constructionYear>
         <destructionYear>3069</destructionYear>
-        <tuition>11229</tuition>
+        <tuition>11426</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>College</educationLevelMin>
@@ -2405,9 +2442,6 @@
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <qualification>Senior Administrator</qualification>
-        <curriculum>Administration, Negotiation, Leadership</curriculum>
-        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2453,7 +2487,10 @@
         <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Philosophy &amp; the Applied Arts</qualification>
-        <curriculum>Leadership</curriculum>
+        <curriculum>Negotiation, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -2462,6 +2499,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Gunslinger Program, originally known as the Advanced Combat and Maneuvering Skills Project, was initiated by the Star League Defense Force in response to the First Hidden War. It blends ancient martial philosophies with cutting-edge technology, producing skilled duelists.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2682</constructionYear>
         <destructionYear>2781</destructionYear>
@@ -2499,6 +2538,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Hachiman Technical Institute specializes in battlefield repair and technical training, focusing on maintaining BattleMechs, aerospace fighters, and DropShips. It admits candidates rejected by other Draconis Combine military academies, as well as select trade school graduates.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Hachiman</locationSystem>
         <constructionYear>2800</constructionYear>
         <tuition>5250</tuition>
@@ -2657,6 +2698,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established on Kanata in late 2762, the Humphreys School of Warfare (HSW) is one of three major military academies created by the Dormuth Council to manage high recruitment numbers in the Free Worlds League. It primarily recruits cadets from the Duchy of Andurien and nearby independent worlds. The Star League Intelligence Command closely monitors the institution to identify potential troublemakers in the politically restless Duchy.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Kanata</locationSystem>
         <constructionYear>2765</constructionYear>
         <tuition>7875</tuition>
@@ -2752,13 +2795,15 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Imperial Institute of Technology</name>
         <type>University</type>
         <description>The Imperial Institute of Technology stands as the Draconis Combine's top-tier university for technology studies. It admits only the most talented students in science and mathematics, with some cadets from other academies attending for a year after passing stringent tests.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Xinyang</locationSystem>
         <constructionYear>2780</constructionYear>
         <tuition>12500</tuition>
@@ -2770,6 +2815,9 @@
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2777,9 +2825,11 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Internal Security College is where the Draconis Combine's Internal Security Force receives training. The facility is heavily fortified, surrounded by 60 kilometers of diacetylsillicate, a corrosive sand, and strictly enforces a no-fly zone within 200 km, shooting down any unauthorized aircraft. Admission to the ISC is through a classified recruitment process, and students' identities are kept secret. The ISC provides rigorous training in psychology, anatomy, and zero-g martial arts.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Samarkand</locationSystem>
         <constructionYear>2600</constructionYear>
-        <tuition>7500</tuition>
+        <tuition>5250</tuition>
         <durationDays>600</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
@@ -2790,7 +2840,7 @@
         <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
-        <qualificationStartYear>3058</qualificationStartYear>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2815,8 +2865,9 @@
         <name>James McKenna University</name>
         <type>University</type>
         <description>Situated in Glasgow on Terra, James McKenna University, named after the founder of the Terran Hegemony, specializes in foreign relations. Its distinguished program prepares graduates for prestigious roles within the Star League's diplomatic corps.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
-        <constructionYear>2300</constructionYear>
         <destructionYear>2777</destructionYear>
         <tuition>7500</tuition>
         <durationDays>1200</durationDays>
@@ -2827,6 +2878,9 @@
         <qualification>Intergalactic Diplomacy in the Modern Age</qualification>
         <curriculum>Negotiation, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2834,6 +2888,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Jarvis Military Proving and Training Grounds serves as a key training facility for infantry and armor crews in the Free Worlds League Military.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Dieudonné</locationSystem>
         <constructionYear>2800</constructionYear>
         <destructionYear>3011</destructionYear>
@@ -2857,7 +2913,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
-        <qualificationStartYear>2500</qualificationStartYear>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -2874,6 +2930,9 @@
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
