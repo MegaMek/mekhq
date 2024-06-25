@@ -634,6 +634,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Senior Medical Technician</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -665,6 +666,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Senior Medical Technician</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -2425,6 +2427,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Senior Medical Technician</qualification>
         <curriculum>Doctor, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Senior BattleMech Technician</qualification>
@@ -3676,7 +3679,7 @@
         <isMilitary>true</isMilitary>
         <description>The Marshalry Academy trains Marshals in the Fronc Reaches. Since 3075, instruction has taken place in Freedom's Ring, with equal emphasis on law enforcement and combat training. Due to a lack of simulators, cadets learn using the BattleMechs of the instructing Marshals. This hands-on approach ensures that graduates are well-versed in both maintaining order and engaging in combat within the Reaches.</description>
         <locationSystem>Fronc</locationSystem>
-        <constructionYear>3080</constructionYear>
+        <constructionYear>3075</constructionYear>
         <tuition>13125</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
@@ -3694,7 +3697,7 @@
         <isMilitary>true</isMilitary>
         <description>The Marshalry Academy trains Marshals in the Fronc Reaches. Since 3075, instruction has taken place in Freedom's Ring, with equal emphasis on law enforcement and combat training. Due to a lack of simulators, cadets learn using the BattleMechs of the instructing Marshals. This hands-on approach ensures that graduates are well-versed in both maintaining order and engaging in combat within the Reaches.</description>
         <locationSystem>Fronc</locationSystem>
-        <constructionYear>3080</constructionYear>
+        <constructionYear>3075</constructionYear>
         <tuition>13125</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
