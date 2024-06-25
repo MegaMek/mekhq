@@ -2617,7 +2617,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
 
-            buildEducationSubMenus(campaign, academy, List.of(person), academyOption, campus, campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+            List<String> academyFactions = campaign.getSystemById(campus).getFactions(campaign.getLocalDate());
+
+            // in the event the location has no faction, we use the campaign faction.
+            // this is only relevant if we're overriding the academy restrictions, as we won't reach this point during normal play.
+            if (academyFactions.isEmpty()) {
+                buildEducationSubMenus(campaign, academy, List.of(person), academyOption, campus, campaign.getFaction().getShortName());
+            } else {
+                buildEducationSubMenus(campaign, academy, List.of(person), academyOption, campus, campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+            }
             return;
         }
 
