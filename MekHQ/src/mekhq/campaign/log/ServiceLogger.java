@@ -86,12 +86,12 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, status.getLogText()));
     }
 
-    public static void eduEnrolled(Person person, LocalDate date, String institution) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduEnrolled.text"), institution)));
+    public static void eduEnrolled(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduEnrolled.text"), institution, course)));
     }
 
-    public static void eduGraduated(Person person, LocalDate date, String institution) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduated.text"), institution)));
+    public static void eduGraduated(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduated.text"), institution, course)));
     }
 
     public static void eduGraduatedPlus(Person person, LocalDate date, String graduationType, String institution, String course) {
