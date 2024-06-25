@@ -2941,8 +2941,6 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Founded in 2614, the New Avalon Military Academy emerged to train officers for the Armed Forces of the Federated Suns after the Albion Military Academy became exclusive to the Star League Defense Force. NAMA swiftly rivaled AMA in training quality, emphasizing political loyalty to the First Prince.</description>
-        <factionDiscount></factionDiscount>
-        <isFactionRestricted></isFactionRestricted>
         <locationSystem>New Avalon</locationSystem>
         <constructionYear>2614</constructionYear>
         <destructionYear>3067</destructionYear>
@@ -3007,8 +3005,6 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Founded in 2614, the New Avalon Military Academy emerged to train officers for the Armed Forces of the Federated Suns after the Albion Military Academy became exclusive to the Star League Defense Force. NAMA swiftly rivaled AMA in training quality, emphasizing political loyalty to the First Prince. Despite challenges, NAIS persists in producing top MechWarriors and officers, with graduates often joining mercenary units or returning to their home nations.</description>
-        <factionDiscount></factionDiscount>
-        <isFactionRestricted></isFactionRestricted>
         <locationSystem>New Avalon</locationSystem>
         <constructionYear>2614</constructionYear>
         <destructionYear>3067</destructionYear>
@@ -3103,10 +3099,7 @@
     <academy>
         <name>New Cambridge University of Wessex</name>
         <type>University</type>
-        <isMilitary></isMilitary>
         <description>Located near the city of Wessex, this Lyran Commonwealth institution boasts a sprawling campus. New Cambridge University specializes in electronics, robotics, and metallurgy, setting itself apart with its relatively high tuition fees. However, numerous students offset these costs through corporate scholarships.</description>
-        <factionDiscount></factionDiscount>
-        <isFactionRestricted></isFactionRestricted>
         <locationSystem>Coventry</locationSystem>
         <constructionYear>2600</constructionYear>
         <tuition>7500</tuition>
@@ -3124,12 +3117,10 @@
     <academy>
         <name>New Earth University</name>
         <type>University</type>
-        <isMilitary></isMilitary>
         <description>Specializing in the operation and maintenance of commercial spacecraft, New Earth University featured a dual-campus system—one on the planet’s surface and another within a massive space station that served as a training center for JumpShips and DropShips. Unfortunately, both campuses were destroyed during Operation APOTHEOSIS, marking a significant loss in training facilities for space operations.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Earth (Tau Ceti 2116-)</locationSystem>
-        <constructionYear></constructionYear>
         <destructionYear>2770</destructionYear>
         <tuition>15000</tuition>
         <durationDays>900</durationDays>
@@ -3549,8 +3540,8 @@
         <tuition>5250</tuition>
         <durationDays>10</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin></educationLevelMin>
-        <educationLevelMax></educationLevelMax>
+        <educationLevelMin>Early Childhood</educationLevelMin>
+        <educationLevelMax>High School</educationLevelMax>
         <ageMin>12</ageMin>
         <ageMax>16</ageMax>
         <qualification>Basic Curriculum</qualification>
@@ -3621,15 +3612,13 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Operated by Wolf's Dragoons, the Outreach Mercenary Training Command provides top-tier military training outside traditional state institutions. Its programs span from fundamental academic subjects to advanced military courses. The academy is open to anyone able to afford its fees.</description>
-        <factionDiscount></factionDiscount>
-        <isFactionRestricted></isFactionRestricted>
         <locationSystem>Outreach</locationSystem>
         <constructionYear>3056</constructionYear>
         <tuition>10500</tuition>
         <durationDays>300</durationDays>
         <facultySkill>5</facultySkill>
-        <educationLevelMin></educationLevelMin>
-        <educationLevelMax></educationLevelMax>
+        <educationLevelMin>Early Childhood</educationLevelMin>
+        <educationLevelMax>High School</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>100-Grade General Education</qualification>
         <curriculum>XP</curriculum>
@@ -3641,8 +3630,6 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Operated by Wolf's Dragoons, the Outreach Mercenary Training Command provides top-tier military training outside traditional state institutions. Its programs span from fundamental academic subjects to advanced military courses. The academy is open to anyone able to afford its fees.</description>
-        <factionDiscount></factionDiscount>
-        <isFactionRestricted></isFactionRestricted>
         <locationSystem>Outreach</locationSystem>
         <constructionYear>3056</constructionYear>
         <tuition>10500</tuition>
@@ -3661,8 +3648,6 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Operated by Wolf's Dragoons, the Outreach Mercenary Training Command provides top-tier military training outside traditional state institutions. Its programs span from fundamental academic subjects to advanced military courses. The academy is open to anyone able to afford its fees.</description>
-        <factionDiscount></factionDiscount>
-        <isFactionRestricted></isFactionRestricted>
         <locationSystem>Outreach</locationSystem>
         <constructionYear>3056</constructionYear>
         <tuition>11667</tuition>
@@ -3732,8 +3717,6 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Operated by Wolf's Dragoons, the Outreach Mercenary Training Command provides top-tier military training outside traditional state institutions. Its programs span from fundamental academic subjects to advanced military courses. The academy is open to anyone able to afford its fees.</description>
-        <factionDiscount></factionDiscount>
-        <isFactionRestricted></isFactionRestricted>
         <locationSystem>Outreach</locationSystem>
         <constructionYear>3056</constructionYear>
         <tuition>22458</tuition>
@@ -3891,10 +3874,7 @@
     <academy>
         <name>People's Reconstruction Effort University of Ashio</name>
         <type>University</type>
-        <isMilitary></isMilitary>
         <description>The University of Ashio aims to employ war-displaced educators and factory experts, creating a vast library and consultation group for post-war rebuilding. However, it faced opposition from the military and the ISF even before opening.</description>
-        <factionDiscount></factionDiscount>
-        <isFactionRestricted></isFactionRestricted>
         <locationSystem>Dover</locationSystem>
         <constructionYear>2821</constructionYear>
         <destructionYear>2910</destructionYear>
