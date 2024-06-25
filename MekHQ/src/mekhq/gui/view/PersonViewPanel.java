@@ -1434,9 +1434,17 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
+        int loyaltyDisplayCap = 0;
+
+        // commanders dynamically improve their effective loyalty by 1,
+        // so loyalty 1 is the same as loyalty 0 for a non-commander
+        if (person.isCommander()) {
+            loyaltyDisplayCap++;
+        }
+
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
                 && (!campaign.getCampaignOptions().isUseHideLoyalty())
-                && (person.getLoyalty() != 0)) {
+                && (person.getLoyalty() != loyaltyDisplayCap)) {
             lblLoyalty1.setName("lblLoyalty1");
             lblLoyalty1.setText(resourceMap.getString("lblLoyalty1.text"));
             gridBagConstraints = new GridBagConstraints();
