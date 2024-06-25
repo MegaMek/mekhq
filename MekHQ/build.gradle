@@ -31,12 +31,13 @@ sourceSets {
 dependencies {
     implementation "org.megamek:megamek${mmBranchTag}:${version}"
     implementation ("org.megamek:megameklab${mmlBranchTag}:${version}") {
-        // We may want to specify different branches for MM and MML, so we need to exclude the
-        // transitive MM dependency
-        exclude group: 'org.megamek', module: "megamek${mmBranchTag}"
+        // We may want to specify different branches for MM and MML, so we need to exclude the transitive MM dependency
+        exclude group: 'org.megamek', module: "megamek${mmBranchTag}:${version}"
+
         // We don't need the python and javascript engine taking up space
         exclude group: 'org.python', module: 'jython'
         exclude group: 'org.mozilla', module: 'rhino'
+
         // Eclipse IDE Multiple Dependency errors.
         exclude group: 'xml-apis'
     }
@@ -61,7 +62,9 @@ dependencies {
     testImplementation 'org.mockito:mockito-junit-jupiter:5.12.0'
 }
 
-mainClassName = 'mekhq.MekHQ'
+application {
+    mainClass = 'mekhq.MekHQ'
+}
 
 ext {
     mmJvmOptions = ['-Xmx2048m', '--add-opens', 'java.base/java.util=ALL-UNNAMED', '--add-opens', 'java.base/java.util.concurrent=ALL-UNNAMED']
@@ -154,7 +157,7 @@ task mmlJar (type: Jar) {
 jar {
     archiveFileName = "MekHQ.jar"
     manifest {
-        attributes "Main-Class" : mainClassName
+        attributes "Main-Class" : application.mainClass
         attributes "Class-Path" : "${mmJar.archiveFileName.get()} ${mmlJar.archiveFileName.get()} " + (project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }
             .collect { "${lib}/${it.name}" }.join(' '))
@@ -398,8 +401,10 @@ task stageMM (type: GradleBuild) {
     description = 'Prepares files from the MegaMek project'
     group = 'distribution'
 
-    dependsOn gradle.includedBuild('megamek').task(':stageFiles')
-    dependsOn gradle.includedBuild('megamek').task(':createStartScripts')
+    dependsOn gradle.includedBuild('megamek').task(':megamek:stageFiles')
+    dependsOn gradle.includedBuild('megamek').task(':megamek:createStartScripts')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:stageFiles')
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:createStartScripts')
 
     dir = "${mmDir}"
 }
@@ -408,8 +413,6 @@ task stageMML (type: GradleBuild) {
     description = 'Prepares files from the MegaMekLab project'
     group = 'distribution'
 
-    dependsOn gradle.includedBuild('megameklab').task(':stageFiles')
-    dependsOn gradle.includedBuild('megameklab').task(':createStartScripts')
 
     dir = "${mmlDir}"
 }
@@ -418,27 +421,51 @@ windowsDistZip {
     description = 'Creates Windows distribution packaged as a zip archive'
     dependsOn stageFiles
     dependsOn stageMM
-    dependsOn stageMML
+//    dependsOn stageMML
     dependsOn createExe
     dependsOn createMMExe
     dependsOn createMMLExe
+    dependsOn startScripts
+}
+
+windowsDistTar {
+    description = 'Creates Windows distribution packaged as a zip archive'
+    dependsOn stageFiles
+    dependsOn stageMM
+//    dependsOn stageMML
+    dependsOn createExe
+    dependsOn createMMExe
+    dependsOn createMMLExe
+    dependsOn startScripts
+    archiveExtension = 'tar.gz'
+    compression = Compression.GZIP
 }
 
 unixDistTar {
     description = 'Creates *nix distribution packaged as a tar ball'
     dependsOn stageFiles
     dependsOn stageMM
-    dependsOn stageMML
+//    dependsOn stageMML
     dependsOn startScripts
     archiveExtension = 'tar.gz'
     compression = Compression.GZIP
+}
+
+unixDistZip {
+    description = 'Creates *nix distribution packaged as a tar ball'
+    dependsOn stageFiles
+    dependsOn stageMM
+//    dependsOn stageMML
+    dependsOn createStartScripts
+    dependsOn startScripts
 }
 
 distTar {
     description = 'Creates *nix distribution packaged as a tar ball'
     dependsOn stageFiles
     dependsOn stageMM
-    dependsOn stageMML
+//    dependsOn stageMML
+    dependsOn createStartScripts
     dependsOn startScripts
     archiveExtension = 'tar.gz'
     compression = Compression.GZIP
@@ -448,7 +475,8 @@ distZip {
     description = 'Creates *nix distribution packaged as a tar ball'
     dependsOn stageFiles
     dependsOn stageMM
-    dependsOn stageMML
+    // dependsOn stageMML
+    dependsOn createStartScripts
     dependsOn startScripts
 }
 
