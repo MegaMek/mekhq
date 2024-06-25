@@ -86,28 +86,28 @@ public class ServiceLogger {
         person.addLogEntry(new ServiceLogEntry(date, status.getLogText()));
     }
 
-    public static void eduEnrolled(Person person, LocalDate date, String institution) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduEnrolled.text"), institution)));
+    public static void eduEnrolled(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduEnrolled.text"), institution, course)));
     }
 
-    public static void eduGraduated(Person person, LocalDate date, String institution) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduated.text"), institution)));
+    public static void eduGraduated(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduated.text"), institution, course)));
     }
 
-    public static void eduGraduatedPlus(Person person, LocalDate date, String graduationType, String institution) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedPlus.text"), graduationType, institution)));
+    public static void eduGraduatedPlus(Person person, LocalDate date, String graduationType, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedPlus.text"), graduationType, institution, course)));
     }
 
-    public static void eduGraduatedMasters(Person person, LocalDate date, String institution) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedMasters.text"), institution)));
+    public static void eduGraduatedMasters(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedMasters.text"), institution, course)));
     }
 
-    public static void eduGraduatedDoctorate(Person person, LocalDate date, String institution) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedDoctorate.text"), institution)));
+    public static void eduGraduatedDoctorate(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduGraduatedDoctorate.text"), institution, course)));
     }
 
-    public static void eduFailed(Person person, LocalDate date, String institution) {
-        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduFailed.text"), institution)));
+    public static void eduFailed(Person person, LocalDate date, String institution, String course) {
+        person.addLogEntry(new ServiceLogEntry(date, MessageFormat.format(logEntriesResourceMap.getString("eduFailed.text"), institution, course)));
     }
 
     public static void recoveredMia(Person person, LocalDate date) {
@@ -120,6 +120,10 @@ public class ServiceLogger {
 
     public static void returnedFromLeave(Person person, LocalDate date) {
         person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromLeave.text")));
+    }
+
+    public static void returnedFromEducation(Person person, LocalDate date) {
+        person.addLogEntry(new ServiceLogEntry(date, logEntriesResourceMap.getString("returnedFromEducation.text")));
     }
 
     public static void returnedFromAWOL(Person person, LocalDate date) {

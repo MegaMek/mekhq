@@ -132,6 +132,11 @@ MEKHQ VERSION HISTORY:
 + PR #4273: Corrected Dialog Option for Invalid Faction Nag
 + PR #4275: Fixed Original Unit Value Being Deducted from Payout Sum When Personnel Resign/Retire
 + FIX #4277: enable new network creation for units not in a network
++ FIX #4279: Added Check for 'dead' Status in Various Personnel Filters
++ PR #4282: Fixed Graduation Event Failing to Correctly Trigger autoAwards
++ PR #4285: Fixed Commanders Incorrectly Displaying 0 Loyalty
++ PR #4286: Numerous Corrections to the Prestigious Academies
++ PR #4287: Added More Education Module Fixes
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.

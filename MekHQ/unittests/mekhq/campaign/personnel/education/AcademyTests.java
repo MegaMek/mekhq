@@ -60,7 +60,7 @@ class AcademyTests {
 
     @Test
     void testAcademyCreationAllFields() {
-        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", AcademyType.COLLEGE, true,
+        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", "College", true,
                 false, true, "Top level MechWarrior Training", 20, true,
                 Arrays.asList("Sol", "Terra"), false, 3045,
                 3089, 3099, 2000, 365, 10,

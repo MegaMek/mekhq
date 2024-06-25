@@ -365,6 +365,8 @@ public enum PersonnelFilter {
 
     public boolean getFilteredInformation(final Person person, LocalDate currentDate) {
         final boolean active = person.getStatus().isActive() && !person.getPrisonerStatus().isCurrentPrisoner();
+        final boolean dead = person.getStatus().isDead();
+
         switch (this) {
             case ALL:
                 return true;
@@ -480,15 +482,15 @@ public enum PersonnelFilter {
                 return active && (MekHQ.getMHQOptions().getPersonnelFilterOnPrimaryRole()
                         ? person.getPrimaryRole().isAdministratorHR() : person.hasRole(PersonnelRole.ADMINISTRATOR_HR));
             case DEPENDENT:
-                return active && person.getPrimaryRole().isDependent();
+                return ((!dead) && (active && person.getPrimaryRole().isDependent()));
             case FOUNDER:
-                return person.isFounder();
+                return ((!dead) && (person.isFounder()));
             case KIDS:
-                return ((person.isChild(currentDate)) && (!person.getStatus().isLeft()));
+                return ((!dead) && (!person.getStatus().isLeft()) && (person.isChild(currentDate)));
             case PRISONER:
-                return ((person.getPrisonerStatus().isCurrentPrisoner()) || (person.getPrisonerStatus().isBondsman()));
+                return ((!dead) && ((person.getPrisonerStatus().isCurrentPrisoner()) || (person.getPrisonerStatus().isBondsman())));
             case INACTIVE:
-                return !person.getStatus().isActive();
+                return ((!dead) && (!person.getStatus().isActive()));
             case ON_LEAVE:
                 return person.getStatus().isOnLeave();
             case MIA:
