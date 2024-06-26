@@ -36,6 +36,7 @@ import megamek.common.icons.Camouflage;
 import megamek.common.icons.Portrait;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.EntitySavingException;
 import megamek.common.options.*;
 import megamek.common.util.BuildingBlock;
 import megamek.common.weapons.autocannons.ACWeapon;
@@ -4547,16 +4548,20 @@ public class Campaign implements ITechManager {
                 pw1.print(((Mech) en).getMtf());
                 pw1.println("]]></mtf>");
             } else {
-                pw1.print("\t\t<blk><![CDATA[");
-
-                BuildingBlock blk = BLKFile.getBlock(en);
-                for (String s : blk.getAllDataAsString()) {
-                    if (s.isEmpty()) {
-                        continue;
+                try {
+                    BuildingBlock blk = BLKFile.getBlock(en);
+                    pw1.print("\t\t<blk><![CDATA[");
+                    for (String s : blk.getAllDataAsString()) {
+                        if (s.isEmpty()) {
+                            continue;
+                        }
+                        pw1.println(s);
                     }
-                    pw1.println(s);
+                    pw1.println("]]></blk>");
                 }
-                pw1.println("]]></blk>");
+                catch (EntitySavingException e) {
+                    LogManager.getLogger().error("Failed to save custom entity " + en.getDisplayName(), e);
+                }
             }
             pw1.println("\t</custom>");
         }
