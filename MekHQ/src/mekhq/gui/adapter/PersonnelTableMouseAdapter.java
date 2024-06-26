@@ -138,6 +138,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_IMPRISON = "IMPRISON";
     private static final String CMD_FREE = "FREE";
     private static final String CMD_RECRUIT = "RECRUIT";
+    private static final String CMD_ABTAKHA = "ABTAKHA";
     private static final String CMD_RANSOM = "RANSOM";
 
     // MechWarrior Edge Options
@@ -629,6 +630,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_RECRUIT: {
                 for (Person person : people) {
                     if (person.getPrisonerStatus().isPrisonerDefector()) {
+                        person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.FREE, true);
+                    }
+                }
+                break;
+            }
+            case CMD_ABTAKHA: {
+                for (Person person : people) {
+                    if (person.getPrisonerStatus().isBondsman()) {
                         person.setPrisonerStatus(gui.getCampaign(), PrisonerStatus.FREE, true);
                     }
                 }
@@ -1262,6 +1271,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         if (StaticChecks.areAnyWillingToDefect(selected)) {
             popup.add(newMenuItem(resources.getString("recruit.text"), CMD_RECRUIT));
+        }
+
+        if ((gui.getCampaign().getFaction().isClan()) && (StaticChecks.areAnyBondsmen(selected))) {
+            popup.add(newMenuItem(resources.getString("abtakha.text"), CMD_ABTAKHA));
         }
 
         final PersonnelRole[] roles = PersonnelRole.values();
