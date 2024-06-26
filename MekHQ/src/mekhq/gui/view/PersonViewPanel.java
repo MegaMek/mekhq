@@ -1434,17 +1434,15 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        int loyaltyDisplayCap = 0;
+        int loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty());
 
-        // commanders dynamically improve their effective loyalty by 1,
-        // so loyalty 1 is the same as loyalty 0 for a non-commander
         if (person.isCommander()) {
-            loyaltyDisplayCap++;
+            loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty() + 2);;
         }
 
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
                 && (!campaign.getCampaignOptions().isUseHideLoyalty())
-                && (person.getLoyalty() != loyaltyDisplayCap)) {
+                && (loyaltyModifier != 0)) {
             lblLoyalty1.setName("lblLoyalty1");
             lblLoyalty1.setText(resourceMap.getString("lblLoyalty1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1455,11 +1453,6 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblLoyalty1, gridBagConstraints);
 
             lblLoyalty2.setName("lblLoyalty2");
-
-            int loyaltyModifier = person.getLoyalty();
-            if (person.isCommander()) {
-                loyaltyModifier = MathUtility.clamp(loyaltyModifier - 1, -3, 3);
-            }
 
             lblLoyalty2.setText(loyaltyModifier + " (" + getLoyaltyName(loyaltyModifier) + ')');
             lblLoyalty2.setLabelFor(lblLoyalty2);

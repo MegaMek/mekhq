@@ -1013,7 +1013,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
             case CMD_LOYALTY: {
                 for (Person person : people) {
-                    person.generateLoyalty(Compute.d6(3));
+                    person.setLoyalty(Compute.d6(3));
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;

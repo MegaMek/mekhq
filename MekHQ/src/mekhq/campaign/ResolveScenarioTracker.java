@@ -1475,8 +1475,16 @@ public class ResolveScenarioTracker {
                             person.getHyperlinkedName()));
                 }
 
-                // prisoners should generate with lower than average loyalty, so only roll 2d6
-                person.generateLoyalty(Compute.d6(2));
+                // prisoners should generate with lower than average loyalty, so drop the highest roll
+                List<Integer> rolls = new ArrayList<>();
+
+                for (int roll = 0; roll < 4; roll++) {
+                    rolls.add(Compute.d6(1));
+                }
+
+                Collections.sort(rolls);
+
+                person.setLoyalty(rolls.get(0) + rolls.get(1) + rolls.get(2));
             } else {
                 continue;
             }
