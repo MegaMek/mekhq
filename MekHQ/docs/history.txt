@@ -137,6 +137,9 @@ MEKHQ VERSION HISTORY:
 + PR #4285: Fixed Commanders Incorrectly Displaying 0 Loyalty
 + PR #4286: Numerous Corrections to the Prestigious Academies
 + PR #4287: Added More Education Module Fixes
++ PR #4274: Added 'Override Requirements' Campaign Option for Education Module
++ PR #4291: Added Clan Adoption (Abtakha)
++ PR #4292: Switched Loyalty Rating from Static to Dynamic
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
