@@ -141,6 +141,7 @@ MEKHQ VERSION HISTORY:
 + PR #4291: Added Clan Adoption (Abtakha)
 + PR #4292: Switched Loyalty Rating from Static to Dynamic
 + PR #4294: Added Prestigious Academies K-M
++ PR #4295: Added Prestigious Academies N-P
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
