@@ -139,6 +139,7 @@ class AcademyTests {
         when(campaign.getSystemById("Sol")).thenReturn(system);
         when(system.getFactions(Mockito.any())).thenReturn(Arrays.asList("Lyr"));
         when(person.getOriginFaction()).thenReturn(new Faction("FWL", ""));
+        when(campaign.getFaction()).thenReturn(new Faction("FWL", ""));
         assertEquals(1.0, academy.getFactionDiscountAdjusted(campaign, person));
     }
 
