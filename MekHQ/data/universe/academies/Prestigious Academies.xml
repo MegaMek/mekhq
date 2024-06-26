@@ -3335,7 +3335,7 @@
         <description>The New Vandenberg Taurian Academy is a crucial institution focused on training conventional troops. Renowned for its demanding curriculum, the academy specializes in defensive operations, ensuring cadets are equipped with the skills necessary to safeguard the Concordat's interests. The training encompasses advanced tactics and strategies tailored for holding defensive positions and repelling invasions.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
-        <locationSystem>New Vandenberg</locationSystem>
+        <locationSystem>New Vandenburg</locationSystem>
         <constructionYear>3119</constructionYear>
         <tuition>7875</tuition>
         <durationDays>600</durationDays>
@@ -3788,7 +3788,7 @@
         <description>Pacifica Training School stands as one of the Lyran Commonwealth’s foremost MechWarrior training centers. Cadets engage in a series of solo cockpit missions, with each mission increasing in difficulty. They pilot full-size, fully-operational BattleMechs within a specially designed arena, which replicates genuine battlefield conditions.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
-        <locationSystem>Chara III</locationSystem>
+        <locationSystem>Chara (Pacifica)</locationSystem>
         <constructionYear>3000</constructionYear>
         <tuition>35000</tuition>
         <durationDays>900</durationDays>
@@ -3936,12 +3936,30 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Pesht</locationSystem>
         <constructionYear>2400</constructionYear>
-        <tuition>#N/A</tuition>
+        <tuition>26250</tuition>
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
+        <qualification>Armored Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>VTOL Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
