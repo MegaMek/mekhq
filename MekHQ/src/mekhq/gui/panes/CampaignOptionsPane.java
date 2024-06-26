@@ -453,6 +453,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEnableLocalAcademies;
     private JCheckBox chkEnablePrestigiousAcademies;
     private JCheckBox chkShowIneligibleAcademies;
+    private JCheckBox chkEnableOverrideRequirements;
     private JCheckBox chkShowAgeConflict;
     private JCheckBox chkShowUnqualified;
     private JCheckBox chkShowFactionConflict;
@@ -6080,6 +6081,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkShowRangeConflict.setEnabled(isEnabled);
         });
 
+        chkEnableOverrideRequirements = new JCheckBox(resources.getString("chkEnableOverrideRequirements.text"));
+        chkEnableOverrideRequirements.setToolTipText(resources.getString("chkEnableOverrideRequirements.toolTip"));
+        chkEnableOverrideRequirements.setName("chkEnableOverrideRequirements");
+
         final JPanel enableShowIneligiblePanel = createShowIneligiblePanel();
 
         // XP & Skill Bonuses
@@ -6108,6 +6113,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkEnableLocalAcademies.setEnabled(isEnabled);
             chkEnablePrestigiousAcademies.setEnabled(isEnabled);
 
+            chkEnableOverrideRequirements.setEnabled(isEnabled);
             enableShowIneligiblePanel.setEnabled(isEnabled);
             chkShowIneligibleAcademies.setEnabled(isEnabled);
             chkShowAgeConflict.setEnabled(isEnabled);
@@ -6141,6 +6147,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnMaximumJumpCount.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         chkUseReeducationCamps.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         enableStandardSetsPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        chkEnableOverrideRequirements.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         chkShowIneligibleAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         enableShowIneligiblePanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         xpAndSkillBonusesPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
@@ -6169,6 +6176,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnMaximumJumpCount))
                         .addComponent(chkUseReeducationCamps)
                         .addComponent(enableStandardSetsPanel)
+                        .addComponent(chkEnableOverrideRequirements)
                         .addComponent(chkShowIneligibleAcademies)
                         .addComponent(enableShowIneligiblePanel)
                         .addComponent(xpAndSkillBonusesPanel)
@@ -6188,6 +6196,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnMaximumJumpCount))
                         .addComponent(chkUseReeducationCamps)
                         .addComponent(enableStandardSetsPanel)
+                        .addComponent(chkEnableOverrideRequirements)
                         .addComponent(chkShowIneligibleAcademies)
                         .addComponent(enableShowIneligiblePanel)
                         .addComponent(xpAndSkillBonusesPanel)
@@ -6237,6 +6246,10 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     }
 
     private JPanel createShowIneligiblePanel() {
+        chkShowAgeConflict = new JCheckBox(resources.getString("chkShowAgeConflict.text"));
+        chkShowAgeConflict.setToolTipText(resources.getString("chkShowAgeConflict.toolTip"));
+        chkShowAgeConflict.setName("chkShowAgeConflict");
+
         chkShowAgeConflict = new JCheckBox(resources.getString("chkShowAgeConflict.text"));
         chkShowAgeConflict.setToolTipText(resources.getString("chkShowAgeConflict.toolTip"));
         chkShowAgeConflict.setName("chkShowAgeConflict");
@@ -8237,6 +8250,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseReeducationCamps.setSelected(options.isUseReeducationCamps());
         chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
+        chkEnableOverrideRequirements.setSelected(options.isEnableOverrideRequirements());
         chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
         chkShowAgeConflict.setSelected(options.isEnableShowAgeConflict());
         chkShowUnqualified.setSelected(options.isEnableShowUnqualified());
@@ -8903,6 +8917,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseReeducationCamps(chkUseReeducationCamps.isSelected());
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
+            options.setEnableOverrideRequirements(chkEnableOverrideRequirements.isSelected());
             options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
             options.setEnableShowAgeConflict(chkShowAgeConflict.isSelected());
             options.setEnableShowUnqualified(chkShowUnqualified.isSelected());
