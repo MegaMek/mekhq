@@ -258,11 +258,13 @@ public class RetirementDefectionTracker {
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
                     && (!campaign.getCampaignOptions().isUseHideLoyalty())) {
 
-                int loyaltyModifier = person.getLoyalty();
+                int loyaltyScore = person.getLoyalty();
 
                 if (person.isCommander()) {
-                    loyaltyModifier = MathUtility.clamp(loyaltyModifier - 1, -3, 3);
+                    loyaltyScore += 2;
                 }
+
+                int loyaltyModifier = person.getLoyaltyModifier(loyaltyScore);
 
                 if (loyaltyModifier != 0) {
                     targetNumber.addModifier(loyaltyModifier, getLoyaltyName(loyaltyModifier));
@@ -760,19 +762,19 @@ public class RetirementDefectionTracker {
             }
 
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
-                int loyaltyModifier = person.getLoyalty();
+                int loyaltyScore = person.getLoyalty();
 
                 if (person.isCommander()) {
-                    loyaltyModifier = MathUtility.clamp(loyaltyModifier - 1, -3, 3);
+                    loyaltyScore += 2;
                 }
 
-                return targetNumber - hrSkill + difficulty + loyaltyModifier;
+                return targetNumber - hrSkill + difficulty + person.getLoyaltyModifier(loyaltyScore);
             } else {
                 return targetNumber - hrSkill + difficulty;
             }
         } else {
             if ((campaign.getCampaignOptions().isUseLoyaltyModifiers()) && (campaign.getCampaignOptions().isUseHideLoyalty())) {
-                return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() - person.getLoyalty();
+                return campaign.getCampaignOptions().getTurnoverFixedTargetNumber() + person.getLoyalty();
             } else {
                 return campaign.getCampaignOptions().getTurnoverFixedTargetNumber();
             }

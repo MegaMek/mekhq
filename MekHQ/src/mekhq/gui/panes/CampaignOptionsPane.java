@@ -453,6 +453,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEnableLocalAcademies;
     private JCheckBox chkEnablePrestigiousAcademies;
     private JCheckBox chkShowIneligibleAcademies;
+    private JCheckBox chkEnableOverrideRequirements;
     private JCheckBox chkEnableRandomXp;
     private JCheckBox chkEnableBonuses;
     private JLabel lblRandomXpRate;
@@ -6067,6 +6068,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkShowIneligibleAcademies = new JCheckBox(resources.getString("chkShowIneligibleAcademies.text"));
         chkShowIneligibleAcademies.setToolTipText(resources.getString("chkShowIneligibleAcademies.toolTip"));
         chkShowIneligibleAcademies.setName("chkShowIneligibleAcademies");
+        chkEnableOverrideRequirements = new JCheckBox(resources.getString("chkEnableOverrideRequirements.text"));
+        chkEnableOverrideRequirements.setToolTipText(resources.getString("chkEnableOverrideRequirements.toolTip"));
+        chkEnableOverrideRequirements.setName("chkEnableOverrideRequirements");
 
         // XP & Skill Bonuses
         final JPanel xpAndSkillBonusesPanel = createXpAndSkillBonusesPanel();
@@ -6094,6 +6098,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             chkEnableLocalAcademies.setEnabled(isEnabled);
             chkEnablePrestigiousAcademies.setEnabled(isEnabled);
 
+            chkEnableOverrideRequirements.setEnabled(isEnabled);
             chkShowIneligibleAcademies.setEnabled(isEnabled);
 
             xpAndSkillBonusesPanel.setEnabled(isEnabled);
@@ -6122,6 +6127,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnMaximumJumpCount.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         chkUseReeducationCamps.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         enableStandardSetsPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        chkEnableOverrideRequirements.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         chkShowIneligibleAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         xpAndSkillBonusesPanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         dropoutChancePanel.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
@@ -6149,6 +6155,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnMaximumJumpCount))
                         .addComponent(chkUseReeducationCamps)
                         .addComponent(enableStandardSetsPanel)
+                        .addComponent(chkEnableOverrideRequirements)
                         .addComponent(chkShowIneligibleAcademies)
                         .addComponent(xpAndSkillBonusesPanel)
                         .addComponent(dropoutChancePanel)
@@ -6167,6 +6174,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(spnMaximumJumpCount))
                         .addComponent(chkUseReeducationCamps)
                         .addComponent(enableStandardSetsPanel)
+                        .addComponent(chkEnableOverrideRequirements)
                         .addComponent(chkShowIneligibleAcademies)
                         .addComponent(xpAndSkillBonusesPanel)
                         .addComponent(dropoutChancePanel)
@@ -8162,6 +8170,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseReeducationCamps.setSelected(options.isUseReeducationCamps());
         chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
+        chkEnableOverrideRequirements.setSelected(options.isEnableOverrideRequirements());
         chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
         chkEnableRandomXp.setSelected(options.isEnableRandomXp());
         spnRandomXpRate.setValue(options.getRandomXpRate());
@@ -8824,6 +8833,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseReeducationCamps(chkUseReeducationCamps.isSelected());
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
+            options.setEnableOverrideRequirements(chkEnableOverrideRequirements.isSelected());
             options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
             options.setEnableRandomXp(chkEnableRandomXp.isSelected());
             options.setRandomXpRate((Integer) spnRandomXpRate.getValue());

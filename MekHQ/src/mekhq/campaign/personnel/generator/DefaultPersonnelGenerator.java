@@ -81,7 +81,13 @@ public class DefaultPersonnelGenerator extends AbstractPersonnelGenerator {
 
         generateBirthday(campaign, person, expLvl, person.isClanPersonnel() && !person.getPhenotype().isNone());
 
-        person.generateLoyalty(Compute.d6(3));
+        if (expLvl == 0) {
+            person.setLoyalty(Compute.d6(3) + 2);
+        } else if (expLvl == 1) {
+            person.setLoyalty(Compute.d6(3) + 1);
+        } else {
+            person.setLoyalty(Compute.d6(3));
+        }
 
         AbstractSkillGenerator skillGenerator = new DefaultSkillGenerator(getSkillPreferences());
         skillGenerator.generateSkills(campaign, person, expLvl);

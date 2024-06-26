@@ -31,10 +31,7 @@ import mekhq.campaign.personnel.enums.education.EducationStage;
 import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -831,6 +828,23 @@ public class EducationController {
     }
 
     /**
+     * Adjusts the loyalty of a person based on a random roll.
+     * If the roll is 1, the loyalty is decreased by 1.
+     * If the roll is 4 or greater, the loyalty is increased by 1.
+     *
+     * @param person the person whose loyalty is to be adjusted
+     */
+    private static void adjustLoyalty(Person person) {
+        int roll = Compute.d6(1);
+
+        if (roll == 1) {
+            person.setLoyalty(person.getLoyalty() - 1);
+        } else if (roll >= 4) {
+            person.setLoyalty(person.getLoyalty() + 1);
+        }
+    }
+
+    /**
      * Graduates a person from an academy and potentially applies a skill bonus.
      *
      * @param campaign      the campaign associated with the person's education
@@ -858,7 +872,18 @@ public class EducationController {
                 person.setOriginFaction(campaign.getFaction());
             }
 
-            person.generateLoyalty(Compute.d6(4));
+            // brainwashed personnel should have higher than average loyalty, so they roll 4d6 and drop the lowest roll
+            List<Integer> rolls = new ArrayList<>();
+
+            for (int roll = 0; roll < 4; roll++) {
+                rolls.add(Compute.d6(1));
+            }
+
+            Collections.sort(rolls);
+
+            person.setLoyalty(rolls.get(1) + rolls.get(2) + rolls.get(3));
+        } else {
+            adjustLoyalty(person);
         }
     }
 
