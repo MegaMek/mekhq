@@ -389,6 +389,7 @@ public class CampaignOptions {
     private boolean useReeducationCamps;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
+    private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
     private boolean enableShowAgeConflict;
     private boolean enableShowUnqualified;
@@ -900,6 +901,7 @@ public class CampaignOptions {
         setUseReeducationCamps(true);
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
+        setEnableOverrideRequirements(false);
         setEnableShowIneligibleAcademies(true);
         setEnableShowAgeConflict(false);
         setEnableShowUnqualified(true);
@@ -2730,6 +2732,14 @@ public class CampaignOptions {
 
     public void setEnablePrestigiousAcademies(boolean enablePrestigiousAcademies) {
         this.enablePrestigiousAcademies = enablePrestigiousAcademies;
+    }
+
+    public boolean isEnableOverrideRequirements() {
+        return enableOverrideRequirements;
+    }
+
+    public void setEnableOverrideRequirements(boolean enableOverrideRequirements) {
+        this.enableOverrideRequirements = enableOverrideRequirements;
     }
 
     public boolean isEnableShowIneligibleAcademies() {
@@ -4744,6 +4754,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReeducationCamps", isUseReeducationCamps());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableOverrideRequirements", isEnableOverrideRequirements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowAgeConflict", isEnableShowAgeConflict());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowUnqualified", isEnableShowUnqualified());
@@ -5499,6 +5510,8 @@ public class CampaignOptions {
                     retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
                     retVal.setEnablePrestigiousAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableOverrideRequirements")) {
+                    retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
                     retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowAgeConflict")) {

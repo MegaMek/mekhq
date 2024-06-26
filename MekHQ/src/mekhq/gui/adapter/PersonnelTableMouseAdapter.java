@@ -2604,6 +2604,31 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         boolean showIneligibleAcademies = campaign.getCampaignOptions().isEnableShowIneligibleAcademies();
         // has the academy been constructed, is still standing, & has not closed?
 
+        if (campaign.getCampaignOptions().isEnableOverrideRequirements()) {
+            JMenu academyOption = new JMenu(academy.getName());
+
+            String campus;
+
+            if (academy.isLocal()) {
+                campus = campaign.getCurrentSystem().getId();
+            } else {
+                campus = academy.getLocationSystems().get(0);
+            }
+
+            educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
+
+            List<String> academyFactions = campaign.getSystemById(campus).getFactions(campaign.getLocalDate());
+
+            // in the event the location has no faction, we use the campaign faction.
+            // this is only relevant if we're overriding the academy restrictions, as we won't reach this point during normal play.
+            if (academyFactions.isEmpty()) {
+                buildEducationSubMenus(campaign, academy, List.of(person), academyOption, campus, campaign.getFaction().getShortName());
+            } else {
+                buildEducationSubMenus(campaign, academy, List.of(person), academyOption, campus, campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+            }
+            return;
+        }
+
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {
@@ -2702,6 +2727,23 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @param civilianMenu  the civilian menu object
      */
     private void buildEducationMenusMassEnroll(Campaign campaign, List<Person> personnel, Academy academy, JMenu militaryMenu, JMenu civilianMenu) {
+        if (campaign.getCampaignOptions().isEnableOverrideRequirements()) {
+            JMenu academyOption = new JMenu(academy.getName());
+
+            String campus;
+
+            if (academy.isLocal()) {
+                campus = campaign.getCurrentSystem().getId();
+            } else {
+                campus = academy.getLocationSystems().get(0);
+            }
+
+            educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
+
+            buildEducationSubMenus(campaign, academy, personnel, academyOption, campus, campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+            return;
+        }
+
         // has the academy been constructed, is still standing, & has not closed?
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
@@ -2807,7 +2849,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if (courseCount > 0) {
             for (int courseIndex = 0; courseIndex < (courseCount); courseIndex++) {
                 // we also need to make sure the course is being offered
-                if (campaign.getGameYear() >= academy.getQualificationStartYears().get(courseIndex)) {
+                if ((campaign.getCampaignOptions().isEnableOverrideRequirements()) || (campaign.getGameYear() >= academy.getQualificationStartYears().get(courseIndex))) {
                     String course = academy.getQualifications().get(courseIndex);
                     courses = new JMenuItem(course);
 
