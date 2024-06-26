@@ -2849,7 +2849,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if (courseCount > 0) {
             for (int courseIndex = 0; courseIndex < (courseCount); courseIndex++) {
                 // we also need to make sure the course is being offered
-                if (campaign.getGameYear() >= academy.getQualificationStartYears().get(courseIndex)) {
+                if ((campaign.getCampaignOptions().isEnableOverrideRequirements()) || (campaign.getGameYear() >= academy.getQualificationStartYears().get(courseIndex))) {
                     String course = academy.getQualifications().get(courseIndex);
                     courses = new JMenuItem(course);
 
