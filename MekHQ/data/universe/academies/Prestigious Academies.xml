@@ -141,7 +141,7 @@
         <name>Aitutaki Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and armored crew training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
+        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aitutaki</locationSystem>
@@ -170,7 +170,7 @@
         <name>Aitutaki Academy (Year One)</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and armored crew training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
+        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aitutaki</locationSystem>
@@ -190,7 +190,7 @@
         <name>Aitutaki Academy</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and armored crew training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
+        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aitutaki</locationSystem>
@@ -219,7 +219,7 @@
         <name>Aitutaki Academy (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
-        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and armored crew training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
+        <description>Founded in 2414 by Hered Selaj, Aitutaki Military Academy has been a center of anti-Marik sentiment. The academy emphasizes physical training and survival skills in the first year, followed by advanced MechWarrior and Cavalry training. The aerospace program was discontinued after fatal accidents. Strict traditions and combat trials among cadets, scrutinized by the LCCC, define the school's atmosphere.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Aitutaki</locationSystem>
@@ -296,16 +296,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -358,10 +358,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -417,16 +417,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -722,16 +722,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
@@ -761,10 +761,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -778,6 +778,33 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Arc Royal War College of Tamar</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The War College of Tamar was renowned for producing adept tacticians, strategists, and outstanding administrators. After Clan Wolf's initial efforts to rebuild the original college yielded poor results, hostilities with Clan Jade Falcon prompted Clan Wolf to collaborate with House Steiner, resulting in the establishment of a new War College of Tamar on the planet Arc Royal.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Tamar</locationSystem>
+        <constructionYear>3075</constructionYear>
+        <destructionYear>3145</destructionYear>
+        <tuition>17500</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
@@ -911,16 +938,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Scrounge, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Scrounge, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Scrounge, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Scrounge, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Scrounge</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -1093,16 +1120,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -1158,10 +1185,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -1258,16 +1285,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
@@ -1291,10 +1318,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -1323,16 +1350,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Aerospace Graduate</qualification>
@@ -1592,16 +1619,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -1627,16 +1654,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -1665,16 +1692,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -1703,10 +1730,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -1741,16 +1768,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -1779,16 +1806,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -2044,16 +2071,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -2080,10 +2107,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -2119,16 +2146,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -2158,10 +2185,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -2216,16 +2243,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>3081</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -2253,16 +2280,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -2290,10 +2317,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -2329,16 +2356,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -2398,10 +2425,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -2464,16 +2491,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -2734,16 +2761,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
@@ -2841,16 +2868,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
@@ -2959,16 +2986,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
@@ -3149,10 +3176,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -3298,16 +3325,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -3340,10 +3367,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -3381,16 +3408,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -3422,10 +3449,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -3526,16 +3553,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -3646,16 +3673,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -3677,10 +3704,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -3742,16 +3769,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
@@ -3809,16 +3836,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>3067</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -4032,16 +4059,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -4080,10 +4107,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -4149,10 +4176,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -4213,10 +4240,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -4364,16 +4391,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -4432,10 +4459,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -4500,16 +4527,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Administration, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Administration, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Administration, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Administration, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -4538,16 +4565,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Infantry Graduate</qualification>
@@ -4596,16 +4623,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -4649,10 +4676,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -4699,16 +4726,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -4782,16 +4809,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -5034,16 +5061,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, XP, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, XP, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, XP, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, XP, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft, XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -5102,16 +5129,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -5137,10 +5164,10 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -5172,10 +5199,10 @@
         <educationLevelMin>College</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -5219,16 +5246,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Strategy, Tactics, Small Arms, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Strategy, Tactics, Small Arms, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Strategy, Tactics, Small Arms, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Strategy, Tactics, Small Arms, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Strategy, Tactics, Small Arms</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -5260,10 +5287,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Small Arms, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Small Arms, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Small Arms, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -5416,16 +5443,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -5458,10 +5485,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -5500,16 +5527,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -5534,16 +5561,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -5586,10 +5613,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -5638,10 +5665,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -5690,10 +5717,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -5742,10 +5769,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -5793,10 +5820,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -5845,16 +5872,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -5897,16 +5924,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -5949,16 +5976,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -6000,16 +6027,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -6053,16 +6080,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Astech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Astech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Astech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Astech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Astech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -6091,10 +6118,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Astech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Astech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Astech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -6128,10 +6155,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -6167,10 +6194,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -6251,16 +6278,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -6316,10 +6343,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -6382,16 +6409,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -6422,16 +6449,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -6463,16 +6490,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -6503,10 +6530,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -6540,10 +6567,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -6639,16 +6666,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -6780,10 +6807,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -6827,10 +6854,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -6871,16 +6898,16 @@
         <educationLevelMin>High School</educationLevelMin>
         <educationLevelMax>College</educationLevelMax>
         <ageMin>16</ageMin>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -6909,16 +6936,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Strategy</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Strategy</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Strategy</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Strategy</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -6950,10 +6977,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -7038,16 +7065,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -7129,10 +7156,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -7198,10 +7225,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -7287,16 +7314,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -7340,10 +7367,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -7393,16 +7420,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -7431,10 +7458,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -7469,16 +7496,16 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Crew Graduate</qualification>
+        <qualification>Cavalry Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Crew Graduate</qualification>
+        <qualification>Air Cavalry Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Crew Graduate</qualification>
         <curriculum>Piloting/Naval, Gunnery/Vehicle, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>Fighter Crew Graduate</qualification>
+        <qualification>Aircraft Pilot Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Armored Infantry Graduate</qualification>
@@ -7507,10 +7534,10 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <qualification>Armored Command Graduate</qualification>
+        <qualification>Cavalry Command Graduate</qualification>
         <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <qualification>VTOL Command Graduate</qualification>
+        <qualification>Air Cavalry Command Graduate</qualification>
         <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced Naval Command Graduate</qualification>
@@ -7625,5 +7652,879 @@
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Universities of the Puget Sound States</name>
+        <type>University</type>
+        <description>A group of five universities and colleges, including Pacific Lutheran University and the University of Washington, the latter of which maintains an extensive computer system.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Terra</locationSystem>
+        <destructionYear>2780</destructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Blake</name>
+        <type>University</type>
+        <description>After the inconclusive Terran Peace Summit of 3053, Primus Sharilar Mori opened the ComStar Archives and established the University of Blake to distribute technical knowledge among the Great Houses.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>3053</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Canopus</name>
+        <type>University</type>
+        <description>Initially resembling more of a technical school, the University of Canopus has undergone significant enhancements through Taurian expertise and Capellan financial support.</description>
+        <locationSystem>Canopus IV</locationSystem>
+        <constructionYear>2550</constructionYear>
+        <tuition>6250</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Harvard</name>
+        <type>University</type>
+        <description>Believed to be a continuation of Harvard University from ancient Earth, this institution has been educating students for hundreds of years.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>1950</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Lambrecht</name>
+        <type>University</type>
+        <description>The University of Lambrecht specializes in sciences such as astronomy and physics, making significant contributions to advancements in alloys.</description>
+        <locationSystem>Lambrecht</locationSystem>
+        <constructionYear>2350</constructionYear>
+        <destructionYear>2772</destructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Luxen</name>
+        <type>University</type>
+        <description>As a beacon of higher education within the Magistracy of Canopus, the University of Luxen is renowned for its exceptional Canopian Medical Sciences and Training Complex. Additionally, its School of Engineering offers a diverse range of courses, including architecture and military applications.</description>
+        <locationSystem>Luxen</locationSystem>
+        <constructionYear>2751</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Mars</name>
+        <type>University</type>
+        <description>Renowned for its journalism program, the University of Mars produces the influential "Martian Times" newspaper and a respected holonews program distributed throughout the Hegemony.</description>
+        <locationSystem>Terra</locationSystem>
+        <destructionYear>2770</destructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of New Samarkand</name>
+        <type>University</type>
+        <description>The University of New Samarkand is an educational institution located on the planet of New Samarkand, renowned for its notable medical school.</description>
+        <locationSystem>New Samarkand</locationSystem>
+        <constructionYear>2375</constructionYear>
+        <tuition>12500</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Proserpina</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The University of Proserpina, affiliated with the Proserpina Hussars, offers a robust, hands-on military education despite facing resource constraints. Located near volatile borders, it continues to attract students seeking specialized military training.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Proserpina</locationSystem>
+        <constructionYear>2700</constructionYear>
+        <tuition>9625</tuition>
+        <durationDays>1200</durationDays>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>BattleMech Technician</qualification>
+        <curriculum>Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Technician</qualification>
+        <curriculum>Tech/Aero</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Armored Infantry Technician</qualification>
+        <curriculum>Tech/BA</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Robinson</name>
+        <type>University</type>
+        <description>Since its founding, the University of Robinson has led research in advanced engineering.</description>
+        <locationSystem>Robinson</locationSystem>
+        <constructionYear>2500</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Tamar</name>
+        <type>University</type>
+        <description>The University of Tamar is renowned for its business program, drawing students from prominent local merchant families. This academic institution has played a pivotal role in shaping future leaders and professionals in the fields of business and commerce.</description>
+        <locationSystem>Tamar</locationSystem>
+        <constructionYear>2450</constructionYear>
+        <tuition>6250</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Terra</name>
+        <type>University</type>
+        <description>The University of Terra holds historical significance as the site of the original SLCOMNET’s Prime HPG. This institution has been at the forefront of advancing communication technologies, influencing the development and implementation of interstellar messaging systems.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2200</constructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Thorin</name>
+        <type>University</type>
+        <description>Located in the dense forests of Thorin's northern continent, the University of Thorin is renowned for its specialization in economics.</description>
+        <locationSystem>Thorin</locationSystem>
+        <destructionYear>2775</destructionYear>
+        <tuition>7500</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>University of Washington on Donegal</name>
+        <type>University</type>
+        <description>Located in the Queen Anne Hills on the continent of Seattle, this Lyran Commonwealth institution is renowned for its specialization in computers and communications. It boasts some of the Inner Sphere's finest computer science facilities, rivaling even those of ComStar.</description>
+        <locationSystem>Donegal</locationSystem>
+        <tuition>15000</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Victoria Academy of Arms and Technology</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Victoria Academy of Arms and Technology is closely linked with the Shengli Arms factory, shaping a curriculum focused primarily on technical studies. This emphasis benefits future technicians who gain access to the factory's facilities.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Victoria (CC)</locationSystem>
+        <constructionYear>3055</constructionYear>
+        <tuition>14583</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Astech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Cavalry Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Astech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Air Cavalry Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Astech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Crew Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Astech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aircraft Pilot Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Astech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Astech</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>BattleMech Technician</qualification>
+        <curriculum>Tech/Mech, Astech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Advanced Vehicle Technician</qualification>
+        <curriculum>Tech/Mechanic, Astech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Technician</qualification>
+        <curriculum>Tech/Aero, Astech</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>War Academy of Mars</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The War Academy of Mars is part of the "War Triad" alongside Sandhurst Royal Military College and the Military Academy of Aphros. Located near Olympus Mons, the academy specializes in strategic training for officer cadets.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Terra</locationSystem>
+        <destructionYear>3085</destructionYear>
+        <tuition>11426</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Cavalry Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Air Cavalry Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>DropShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>JumpShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Hyperspace Navigation, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>WarShip Command Graduate</qualification>
+        <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2470</qualificationStartYear>
+        <qualification>Senior Medical Technician</qualification>
+        <curriculum>Doctor, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Senior BattleMech Technician</qualification>
+        <curriculum>Tech/Mech, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Senior Advanced Vehicle Technician</qualification>
+        <curriculum>Tech/Mechanic, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Senior Aerospace Technician</qualification>
+        <curriculum>Tech/Aero, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Senior Armored Infantry Technician</qualification>
+        <curriculum>Tech/BA, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Senior Advanced Vessel Technician</qualification>
+        <curriculum>Tech/Vessel, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>War College of Buena</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The War College of Buena initially focused on technician courses and MechWarrior training. Over time, it expanded significantly, producing highly competent technicians, MechWarriors, and aerospace pilots. Training emphasizes practical experience, with cadets spending six months in the Buena Training Battalion engaged in live-fire exercises and anti-pirate missions.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Buena</locationSystem>
+        <constructionYear>3020</constructionYear>
+        <tuition>6563</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Astech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Astech</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Medical Technician</qualification>
+        <curriculum>Doctor, Astech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>BattleMech Technician</qualification>
+        <curriculum>Tech/Mech, Astech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Aerospace Technician</qualification>
+        <curriculum>Tech/Aero, Astech</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Junior Administrator</qualification>
+        <curriculum>Administration, Negotiation, Astech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>War College of Tamar</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The War College of Tamar is renowned for producing adept tacticians, strategists, and outstanding administrators. While the academy's curriculum emphasizes leadership and administrative skills over combat, it also offers training in BattleMech and aerospace operations.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Tamar</locationSystem>
+        <constructionYear>2650</constructionYear>
+        <destructionYear>2915</destructionYear>
+        <tuition>17500</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>War College of Tamar [2025]</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The War College of Tamar is renowned for producing adept tacticians, strategists, and outstanding administrators. While the academy's curriculum emphasizes leadership and administrative skills over combat, it also provides training in BattleMech and aerospace operations. Destroyed by the DCMS in 2915, it was later rebuilt under the initiative of Archon Katrina Steiner.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Tamar</locationSystem>
+        <constructionYear>3025</constructionYear>
+        <destructionYear>3051</destructionYear>
+        <tuition>17500</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Aerospace Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Dai Da Chi</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House Dai Da Chi blends Bushido with modern BattleMech combat. It emphasizes honor, discipline, and loyalty to the Dragon. Known for skilled MechWarriors, they uphold a legacy of honorable combat and serve as a pillar of Combine military prowess.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Drozan</locationSystem>
+        <constructionYear>2991</constructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Fujita</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House Fujita focuses on stealth and precision strikes, specializing in guerrilla tactics and espionage. They excel in reconnaissance and sabotage missions, maintaining secrecy and striking with deadly efficiency against their enemies.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Hunan</locationSystem>
+        <constructionYear>2991</constructionYear>
+        <destructionYear>3076</destructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry WarriorGraduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Hiritsu</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House Hiritsu is renowned for its mastery of heavy BattleMechs and traditional combat techniques. They emphasize strength, resilience, and battlefield strategy. Their elite MechWarriors uphold a legacy of disciplined service and formidable prowess on the battlefield.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Randar</locationSystem>
+        <constructionYear>2920</constructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Ijori</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House Ijori excels in rapid assault and close-quarters combat. They specialize in lightning-fast strikes and agile BattleMech tactics. Known for their aggressive approach and fearless warriors, they play a pivotal role in the Combine's military operations.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Aldebaran</locationSystem>
+        <constructionYear>2991</constructionYear>
+        <destructionYear>3078</destructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Imarra</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House Imarra emphasizes honor and precision in BattleMech combat. They are skilled in both traditional Bushido principles and advanced warfare tactics. Known for their disciplined warriors and strategic acumen, they uphold a legacy of excellence on the battlefield.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Sian</locationSystem>
+        <constructionYear>2864</constructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Kamata</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House Kamata focuses on rapid-response missions and surgical strikes. They excel in precision tactics and covert operations. Known for their agility and decisive maneuvers, they are a critical asset in the Combine's military strategy.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Betelgeuse</locationSystem>
+        <constructionYear>2920</constructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Lu Sann</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House Lu Sann specializes in heavy assault tactics and defensive warfare. They prioritize endurance and resilience in BattleMech combat. Known for their steadfast defense and formidable warriors, they are a stalwart force in the Combine's military strategy.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Grand Base</locationSystem>
+        <constructionYear>2928</constructionYear>
+        <destructionYear>3077</destructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Ma-Tsu Kai</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House Ma-Tsu Kai excels in coordinated assaults and combined arms tactics. They integrate BattleMechs with infantry and aerospace units seamlessly. Known for their decisive maneuvers and versatile combat skills, they are a formidable presence in the Combine's military operations.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>New Aragon</locationSystem>
+        <constructionYear>2991</constructionYear>
+        <destructionYear>3077</destructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Rakshasa</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House Rakshasa is renowned for its unorthodox tactics and psychological warfare expertise. They specialize in disinformation, infiltration, and unconventional combat strategies. Known for their cunning and adaptability, they strike fear into their enemies.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Highspire</locationSystem>
+        <constructionYear>3071</constructionYear>
+        <destructionYear>3074</destructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House Tsang Xiao</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House Tsang Xiao specializes in intelligence gathering and counter-espionage. They excel in covert operations and information warfare. Known for their cunning and strategic acumen, they play a crucial role in defending against internal and external threats.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Wazan</locationSystem>
+        <constructionYear>3070</constructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warrior House White Tiger</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Warrior House White Tiger focuses on defensive tactics and resilience. They specialize in fortifications and counter-assault strategies. Known for their steadfast defense and disciplined warriors, they are a formidable force in protecting Combine territories.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Highspire</locationSystem>
+        <constructionYear>3071</constructionYear>
+        <destructionYear>3074</destructionYear>
+        <tuition>15313</tuition>
+        <durationDays>11</durationDays>
+        <facultySkill>4</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Warrior Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Warrior Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>West Point Military Academy</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>A cornerstone of military leadership on Terra, West Point has been a revered academy since its establishment. The institution prides itself on a legacy of producing tacticians and leaders who have played pivotal roles in shaping the armed forces of the Inner Sphere.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>1802</constructionYear>
+        <tuition>16875</tuition>
+        <durationDays>1200</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Cavalry Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Air Cavalry Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership, Artillery</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Wisdom of the Dragon</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Wisdom of the Dragon is an elite officer finishing school for the DCMS. The academy maintains a highly intense atmosphere, pushing cadets to their physical and mental limits while strictly adhering to bushido principles.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Kagoshima</locationSystem>
+        <constructionYear>2650</constructionYear>
+        <tuition>13125</tuition>
+        <durationDays>600</durationDays>
+        <facultySkill>5</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Cavalry Command Graduate</qualification>
+        <curriculum>Piloting/Ground Vehicle, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Air Cavalry Command Graduate</qualification>
+        <curriculum>Piloting/VTOL, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Advanced Naval Command Graduate</qualification>
+        <curriculum>Piloting/Naval, Gunnery/Vehicle, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Fighter Command Graduate</qualification>
+        <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Command Graduate</qualification>
+        <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
 </academies>
