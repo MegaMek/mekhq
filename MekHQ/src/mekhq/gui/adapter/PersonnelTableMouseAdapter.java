@@ -2616,7 +2616,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private void buildEducationMenusSingleton(Campaign campaign, Person person, Academy academy, JMenu militaryMenu, JMenu civilianMenu) {
         boolean showIneligibleAcademies = campaign.getCampaignOptions().isEnableShowIneligibleAcademies();
         // has the academy been constructed, is still standing, & has not closed?
-
         if (campaign.getCampaignOptions().isEnableOverrideRequirements()) {
             JMenu academyOption = new JMenu(academy.getName());
 
@@ -2759,7 +2758,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
 
-            buildEducationSubMenus(campaign, academy, personnel, academyOption, campus, campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+            List<String> academyFactions = campaign.getSystemById(campus).getFactions(campaign.getLocalDate());
+
+            if (academyFactions.isEmpty()) {
+                buildEducationSubMenus(campaign, academy, personnel, academyOption, campus, campaign.getFaction().getShortName());
+            } else {
+                buildEducationSubMenus(campaign, academy, personnel, academyOption, campus, campaign.getSystemById(campus).getFactions(campaign.getLocalDate()).get(0));
+            }
             return;
         }
 
