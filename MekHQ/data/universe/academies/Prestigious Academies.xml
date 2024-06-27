@@ -5425,7 +5425,7 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Republic Consertvatory</name>
+        <name>Republic Conservatory</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established in 3062, the Liao Conservatory of Military Arts is dedicated to training elite soldiers. Students oversee their own studies, balancing learning, practice, and specialized fields, preparing to join veteran or elite commands upon graduation. Despite being briefly renamed the Republic Conservatory, the academy remains steadfast in its mission, emphasizing the cultivation of individual motivation and excellence.</description>
@@ -5467,7 +5467,7 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>Republic Consertvatory (Officer)</name>
+        <name>Republic Conservatory (Officer)</name>
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Established in 3062, the Liao Conservatory of Military Arts is dedicated to training elite soldiers. Students oversee their own studies, balancing learning, practice, and specialized fields, preparing to join veteran or elite commands upon graduation. Despite being briefly renamed the Republic Conservatory, the academy remains steadfast in its mission, emphasizing the cultivation of individual motivation and excellence.</description>
