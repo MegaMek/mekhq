@@ -2645,11 +2645,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {
-            // is the applicant within the right age bracket?
-            int personAge = person.getAge(campaign.getLocalDate());
+            // is the planet populated?
+            if ((academy.isLocal()) && (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) == 0)) {
+                if (showIneligibleAcademies) {
+                    JMenuItem academyOption = new JMenuItem("<html>" + academy.getName()
+                            + resources.getString("eduPopulationConflict.text") + "</html>");
 
-            if ((personAge >= academy.getAgeMax()) || (personAge < academy.getAgeMin())) {
-                if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowAgeConflict())) {
+                    educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
+                }
+            // is the applicant within the right age bracket?
+            } else if ((person.getAge(campaign.getLocalDate()) >= academy.getAgeMax()) || (person.getAge(campaign.getLocalDate()) < academy.getAgeMin())) {
+                if (showIneligibleAcademies) {
                     JMenuItem academyOption;
 
                     if (academy.getAgeMax() != 9999) {
@@ -2665,7 +2671,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 // is the applicant qualified?
             } else if (!academy.isQualified(person)) {
-                if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowUnqualified())) {
+                if (showIneligibleAcademies) {
                     JMenuItem academyOption = new JMenuItem("<html>" + academy.getName()
                             + String.format(resources.getString("eduUnqualified.text"), academy.getEducationLevelMin()));
                     educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
@@ -2676,7 +2682,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         campaign.getSystemById(campaign.getCurrentSystem().getId()).getFactions(campaign.getLocalDate()));
 
                 if (faction == null) {
-                    if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowFactionConflict())) {
+                    if (showIneligibleAcademies) {
                         JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduFactionConflict.text"));
 
                         educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
@@ -2700,7 +2706,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (campuses.isEmpty()) {
-                    if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowFactionConflict())) {
+                    if (showIneligibleAcademies) {
                         JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduFactionConflict.text"));
                         educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
                     }
@@ -2709,7 +2715,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     String nearestCampus = Academy.getNearestCampus(campaign, campuses);
 
                     if ((campaign.getSimplifiedTravelTime(campaign.getSystemById(nearestCampus)) / 7) > campaign.getCampaignOptions().getMaximumJumpCount()) {
-                        if ((showIneligibleAcademies) && (campaign.getCampaignOptions().isEnableShowRangeConflict())) {
+                        if (showIneligibleAcademies) {
                             JMenuItem academyOption = new JMenuItem("<html>" + academy.getName() + resources.getString("eduRangeConflict.text"));
                             educationJMenuItemAdder(academy, militaryMenu, civilianMenu, academyOption);
                         }
@@ -2761,6 +2767,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if ((campaign.getGameYear() >= academy.getConstructionYear())
                 && (campaign.getGameYear() < academy.getDestructionYear())
                 && (campaign.getGameYear() < academy.getClosureYear())) {
+
+            // is the planet populated?
+            if (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) == 0) {
+                return;
+            }
+
             // are all the applicants within the right age bracket?
             // are all the applicants qualified?
             boolean arePersonnelEligible = personnel.stream()

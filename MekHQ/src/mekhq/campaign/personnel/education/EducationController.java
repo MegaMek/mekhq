@@ -489,6 +489,13 @@ public class EducationController {
                 }
             }
 
+            // has the system been depopulated? Nominally similar to the above, but here we use actual system data, so it's more dynamic.
+            if (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0) {
+                if (checkForAcademyDestruction(campaign, academy, person, resources)) {
+                    return;
+                }
+            }
+
             // is the academy faction at war with person faction, or the campaign faction?
             if (checkForAcademyFactionConflict(campaign, academy, person, resources)) {
                 return;
@@ -656,7 +663,9 @@ public class EducationController {
      * @return true if the academy has been destroyed, false otherwise
      */
     private static boolean checkForAcademyDestruction(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
-        if (campaign.getLocalDate().getYear() >= academy.getDestructionYear()) {
+        // we assume that if the system's population has been depleted, the academy has been destroyed too.
+        if ((campaign.getLocalDate().getYear() >= academy.getDestructionYear())
+                || (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0)) {
             if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().isAllAges())) {
                 if (Compute.d6(2) >= 5) {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventDestruction.text"));
