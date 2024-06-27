@@ -287,24 +287,24 @@ public class EducationController {
         EducationStage educationStage = person.getEduEducationStage();
 
         // is person in transit to the institution?
-        if (educationStage == EducationStage.JOURNEY_TO_CAMPUS) {
+        if (educationStage.isJourneyToCampus()) {
             journeyToAcademy(campaign, person, resources);
             return false;
         }
 
         // is the person on campus and undergoing education
-        if (educationStage == EducationStage.EDUCATION) {
+        if (educationStage.isEducation()) {
             return ongoingEducation(campaign, person, academy, ageBypass, resources);
         }
 
         // if education has concluded and the journey home hasn't started, we begin the journey
-        if ((educationStage == EducationStage.GRADUATING) || (educationStage == EducationStage.DROPPING_OUT)) {
+        if ((educationStage.isGraduating()) || (educationStage.isDroppingOut())) {
             beginJourneyHome(campaign, person, resources);
             return false;
         }
 
         // if we reach this point it means Person is already in transit, so we continue their journey
-        if (educationStage == EducationStage.JOURNEY_FROM_CAMPUS) {
+        if (educationStage.isJourneyFromCampus()) {
             processJourneyHome(campaign, person);
             return false;
         }
@@ -370,8 +370,7 @@ public class EducationController {
             // we use 2 as that would be the value prior the day's decrement
             if (daysOfEducation < 2) {
                 if (graduationPicker(campaign, person, academy, resources)) {
-                    person.setEduEducationStage(EducationStage.GRADUATING);
-                    return true;
+                    return person.getEduEducationStage().isGraduating();
                 } else {
                     return false;
                 }
@@ -393,11 +392,10 @@ public class EducationController {
     private static boolean graduationPicker(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         if (academy.isPrepSchool()) {
             graduateChild(campaign, person, academy, resources);
+            return true;
         } else {
             return graduateAdult(campaign, person, academy, resources);
         }
-
-        return true;
     }
 
     /**
@@ -474,7 +472,7 @@ public class EducationController {
             }
         }
 
-        if (person.getEduEducationStage() != EducationStage.GRADUATING) {
+        if (!person.getEduEducationStage().isGraduating()) {
             // It's unlikely we'll ever get canonical destruction or closure dates for all the academies,
             // so no need to check these more than once a year
             if (campaign.getLocalDate().getDayOfYear() == 1) {
@@ -708,6 +706,8 @@ public class EducationController {
 
             improveSkills(campaign, person, academy, false);
 
+            person.setEduEducationStage(EducationStage.DROPPING_OUT);
+
             return true;
         }
 
@@ -738,6 +738,8 @@ public class EducationController {
                 reportMastersOrDoctorateGain(campaign, person, academy, resources);
             }
 
+            person.setEduEducationStage(EducationStage.GRADUATING);
+
             return true;
         }
 
@@ -760,6 +762,8 @@ public class EducationController {
                 reportMastersOrDoctorateGain(campaign, person, academy, resources);
             }
 
+            person.setEduEducationStage(EducationStage.GRADUATING);
+
             return true;
         }
 
@@ -778,6 +782,9 @@ public class EducationController {
         if (!academy.isMilitary()) {
             reportMastersOrDoctorateGain(campaign, person, academy, resources);
         }
+
+        person.setEduEducationStage(EducationStage.GRADUATING);
+
         return true;
     }
 

@@ -247,7 +247,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblPersonnel, gridBagConstraints);
 
-        if (getCampaign().getCampaignOptions().isUseAdministrativeStrain()) {
+        if ((getCampaign().getCampaignOptions().isUseRandomRetirement()) && (getCampaign().getCampaignOptions().isUseAdministrativeStrain())) {
             JLabel lblAdministrativeCapacityHead = new JLabel(resourceMap.getString("lblAdministrativeCapacity.text"));
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 0;
