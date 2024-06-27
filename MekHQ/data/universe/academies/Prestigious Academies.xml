@@ -1501,32 +1501,33 @@
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
-    </academy><academy>
-    <name>Dieron District Gymnasium (Officer) [3078]</name>
-    <type>Officer Academy</type>
-    <isMilitary>true</isMilitary>
-    <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mech training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068; it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
-    <factionDiscount>0</factionDiscount>
-    <isFactionRestricted>true</isFactionRestricted>
-    <locationSystem>Dieron</locationSystem>
-    <constructionYear>3078</constructionYear>
-    <tuition>18958</tuition>
-    <durationDays>900</durationDays>
-    <facultySkill>6</facultySkill>
-    <educationLevelMin>College</educationLevelMin>
-    <educationLevelMax>College</educationLevelMax>
-    <ageMin>16</ageMin>
-    <qualification>MechWarrior Command Graduate</qualification>
-    <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
-    <qualificationStartYear>2500</qualificationStartYear>
-    <qualification>Armored Infantry Command Graduate</qualification>
-    <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-    <qualificationStartYear>3058</qualificationStartYear>
-    <qualification>Advanced Infantry Command Graduate</qualification>
-    <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
-    <qualificationStartYear>2300</qualificationStartYear>
-    <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
-</academy>
+    </academy>
+    <academy>
+        <name>Dieron District Gymnasium (Officer) [3078]</name>
+        <type>Officer Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Dieron District Gymnasium shapes MechWarriors solely on merit. Prioritizing combat readiness over prestige, it employs an innovative regimen where study time earns simulator and 'Mech training, accelerating student advancement. Graduating fifteen to twenty MechWarriors annually, the DDG is vital to the Dieron Military District. Briefly closed in 3068; it reopened in 3078, attracting attention with its first class of battlesuit trainees, including a notable presence of ISF agents.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
+        <locationSystem>Dieron</locationSystem>
+        <constructionYear>3078</constructionYear>
+        <tuition>18958</tuition>
+        <durationDays>900</durationDays>
+        <facultySkill>6</facultySkill>
+        <educationLevelMin>College</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Command Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Armored Infantry Command Graduate</qualification>
+        <curriculum>Gunnery/Battlesuit, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Advanced Infantry Command Graduate</qualification>
+        <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
     <academy>
         <name>Dieron Warriors' Academy</name>
         <type>Military Academy</type>
@@ -2514,7 +2515,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Gunslinger Program</name>
@@ -2535,7 +2536,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Gunslinger Program [3062]</name>
@@ -2553,7 +2554,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Hachiman Technical Institute</name>
@@ -2764,7 +2765,7 @@
         <qualification>Semester One Curriculum</qualification>
         <curriculum>Small Arms</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Humphreys Training Academy</name>
@@ -2801,7 +2802,7 @@
         <qualification>Semester One Curriculum</qualification>
         <curriculum>Small Arms</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Humphreys Training Academy [3079]</name>
@@ -3013,7 +3014,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Kensai Kami [Luthien]</name>
@@ -3033,7 +3034,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Kensai Kami [McAlister]</name>
@@ -3053,7 +3054,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Kilbourne Academy</name>
@@ -3091,7 +3092,7 @@
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Kilbourne Academy (Officer)</name>
@@ -3129,7 +3130,7 @@
         <qualification>Senior Administrator</qualification>
         <curriculum>Administration, Negotiation, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Krieg Universital</name>
@@ -3178,7 +3179,7 @@
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Kure Naval Academy</name>
@@ -3206,7 +3207,7 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Kure Naval Academy (Officer)</name>
@@ -3234,7 +3235,7 @@
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Legionary Training Academy (Semester One)</name>
@@ -3255,7 +3256,7 @@
         <qualification>Semester One Curriculum</qualification>
         <curriculum>Small Arms</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Legionary Training Academy</name>
@@ -3276,7 +3277,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Liao Conservatory of Military Arts</name>
@@ -3318,7 +3319,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Liao Conservatory of Military Arts (Officer)</name>
@@ -3360,7 +3361,7 @@
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Liao Conservatory of Military Arts [3135]</name>
@@ -3401,7 +3402,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Liao Conservatory of Military Arts [3135] (Officer)</name>
@@ -3442,7 +3443,7 @@
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Lloyd Marik-Stanley Aerospace School (Year One)</name>
@@ -3462,7 +3463,7 @@
         <qualification>Year One Curriculum</qualification>
         <curriculum>Small Arms, Medtech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Lloyd Marik-Stanley Aerospace School</name>
@@ -3491,7 +3492,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Luthien University</name>
@@ -3510,7 +3511,7 @@
         <qualification>Diplomatic Relations</qualification>
         <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Lyons School of Combat Preparedness</name>
@@ -3543,7 +3544,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Magistracy Aerospace Academy</name>
@@ -3576,7 +3577,7 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Magistracy Institute for Strategic Studies</name>
@@ -3606,7 +3607,7 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Magistracy Military Academy</name>
@@ -3626,7 +3627,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, XP</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Malinovsky BattleMech and Tank Academy</name>
@@ -3657,7 +3658,7 @@
         <qualification>Fighter Crew Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Malinovsky BattleMech and Tank Academy (Officer)</name>
@@ -3688,7 +3689,7 @@
         <qualification>Fighter Command Graduate</qualification>
         <curriculum>Piloting/Aircraft, Gunnery/Aircraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Marshalry Academy</name>
@@ -3706,7 +3707,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Small Arms, Administration</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Marshalry Academy (Officer)</name>
@@ -3724,7 +3725,7 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Small Arms, Strategy, Administration, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Martial College of Donegal</name>
@@ -3768,7 +3769,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Meistmorn Academy</name>
@@ -3788,7 +3789,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Melissa Steiner Martial Academy of Bolan</name>
@@ -3826,7 +3827,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military Academy of Aphros</name>
@@ -3859,7 +3860,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2740</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military Academy of Aphros (Officer)</name>
@@ -3892,7 +3893,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2740</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military Academy of Aphros [3061]</name>
@@ -3922,7 +3923,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military Academy of Aphros (Officer) [3061]</name>
@@ -3952,7 +3953,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military Academy of Aphros [3085]</name>
@@ -3981,7 +3982,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military Academy of Aphros (Officer) [3085]</name>
@@ -4010,7 +4011,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military Academy of Somerset</name>
@@ -4058,7 +4059,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military Academy of Somerset (Officer)</name>
@@ -4106,7 +4107,7 @@
         <qualification>WarShip Command Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Minoru Kurita University</name>
@@ -4129,7 +4130,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>NAIS College of Military Science</name>
@@ -4193,7 +4194,7 @@
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>NAIS College of Military Science (3079)</name>
@@ -4257,7 +4258,7 @@
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Nellus Academy</name>
@@ -4289,7 +4290,7 @@
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>New Cambridge University of Wessex</name>
@@ -4306,7 +4307,7 @@
         <qualification>General Sciences</qualification>
         <curriculum>Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>New Earth University</name>
@@ -4343,7 +4344,7 @@
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>New Galedon Military Academy</name>
@@ -4411,7 +4412,7 @@
         <qualification>Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>New Galedon Military Academy (Officer)</name>
@@ -4479,7 +4480,7 @@
         <qualification>Senior Advanced Vessel Technician</qualification>
         <curriculum>Tech/Vessel, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>New Hope Military Academy</name>
@@ -4520,7 +4521,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Administration</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>New Vandenberg Taurian Academy</name>
@@ -4552,7 +4553,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Artillery</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Noius Archipelagus Institute of Science</name>
@@ -4575,7 +4576,7 @@
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Northwind Military Academy</name>
@@ -4628,7 +4629,7 @@
         <qualification>Armored Infantry Technician</qualification>
         <curriculum>Tech/BA</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Northwind Military Academy (Officer)</name>
@@ -4681,7 +4682,7 @@
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Organo Taurian Academy</name>
@@ -4719,7 +4720,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Orloff Military Academy (Basic Training)</name>
@@ -4741,7 +4742,7 @@
         <qualification>Basic Curriculum</qualification>
         <curriculum>Small Arms</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Orloff Military Academy (Advanced Training)</name>
@@ -4761,7 +4762,7 @@
         <qualification>MechWarrior Command Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Osaka Fields Proving Grounds</name>
@@ -4799,7 +4800,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>3061</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Outreach Mercenary Training Command (100-Grade)</name>
@@ -4817,7 +4818,7 @@
         <qualification>100-Grade General Education</qualification>
         <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Outreach Mercenary Training Command (200-Grade)</name>
@@ -4835,7 +4836,7 @@
         <qualification>200-Grade Infantry Graduate</qualification>
         <curriculum>Small Arms, Medtech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Outreach Mercenary Training Command (300-Grade)</name>
@@ -4904,7 +4905,7 @@
         <qualification>300-Grade Administrator</qualification>
         <curriculum>Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Outreach Mercenary Training Command (400-Grade)</name>
@@ -4973,7 +4974,7 @@
         <qualification>400-Grade Administrator</qualification>
         <curriculum>Administration, Negotiation, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Pacifica Training School</name>
@@ -4993,7 +4994,7 @@
         <qualification>MechWarrior Graduate</qualification>
         <curriculum>Piloting/Mech, Gunnery/Mech, Small Arms, Astech, Medtech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Pagoda for Luthien Officers</name>
@@ -5013,7 +5014,7 @@
         <qualification>Etiquette &amp; Kosai-ho</qualification>
         <curriculum>Negotiation, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Pandora College of Military Sciences</name>
@@ -5063,7 +5064,7 @@
         <qualification>WarShip Crew Graduate</qualification>
         <curriculum>Piloting/Spacecraft, Gunnery/Spacecraft, Tech/Vessel, XP</curriculum>
         <qualificationStartYear>2470</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>People's Reconstruction Effort University of Ashio</name>
@@ -5084,7 +5085,7 @@
         <qualification>BattleMech Technician</qualification>
         <curriculum>Tech/Mech</curriculum>
         <qualificationStartYear>2500</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Perdition Taurian Academy</name>
@@ -5119,7 +5120,7 @@
         <qualification>Advanced Infantry Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>-1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Pesht University of Military Science</name>
@@ -5154,7 +5155,7 @@
         <qualification>Advanced Infantry Command Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Point Barrow Military Academy</name>
@@ -5198,7 +5199,7 @@
         <qualification>Senior Armored Infantry Technician</qualification>
         <curriculum>Tech/BA, Leadership</curriculum>
         <qualificationStartYear>3058</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Princefield Military Academy</name>
@@ -5239,7 +5240,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Strategy, Tactics, Small Arms</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Princefield Military Academy (Officer)</name>
@@ -5280,6 +5281,6 @@
         <qualification>Aerospace Command Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Tactics, Strategy, Leadership, Small Arms</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
 </academies>
