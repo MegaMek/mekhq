@@ -147,6 +147,7 @@ MEKHQ VERSION HISTORY:
 + PR #4299: Extended 'Hiring Halls Only' Personnel Market Option to Capital Planets
 + PR #4300: Revised Tuition and Faction discount Calculations
 + PR #4302: Added Prestigious Academies R-T
++ PR #4304: Added Prestigious Academies U-W
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
