@@ -675,12 +675,10 @@ public class Academy implements Comparable<Academy> {
      * @param person        the person for whom the tuition is being calculated
      * @return the adjusted tuition value as an Integer
      */
-    public Integer getTuitionAdjusted(Person person) {
-        if (getEducationLevel(person) < 2) {
-            return tuition;
-        } else {
-            return tuition * getEducationLevel(person);
-        }
+    public int getTuitionAdjusted(Person person) {
+        double educationLevel = Math.max(1, getEducationLevel(person) - (EducationLevel.parseToInt(educationLevelMin) / 4));
+
+        return (int) (tuition * educationLevel);
     }
 
     /**
@@ -691,20 +689,22 @@ public class Academy implements Comparable<Academy> {
      * @return the faction discount as a double value, between 0.00 and 1.00
      */
     public Double getFactionDiscountAdjusted(Campaign campaign, Person person) {
-        List<String> locations;
-
-        if (isLocal) {
-            locations = Collections.singletonList(campaign.getCurrentSystem().getId());
-        } else {
-            locations = locationSystems;
+        if (isFactionRestricted) {
+            return 1.00;
         }
 
-        if (locations.stream()
-                .flatMap(campus -> campaign.getSystemById(campus)
-                        .getFactions(campaign.getLocalDate())
-                        .stream())
-                .anyMatch(faction -> faction.equalsIgnoreCase(person.getOriginFaction().getShortName()))) {
-            return (double) (factionDiscount / 100);
+        List<String> campuses = isLocal ? Collections.singletonList(campaign.getCurrentSystem().getId()) : locationSystems;
+
+        Set<String> relevantFactions = new HashSet<>();
+        relevantFactions.add(campaign.getFaction().getShortName());
+        relevantFactions.add(person.getOriginFaction().getShortName());
+
+        for (String campus : campuses) {
+            List<String> factions = campaign.getSystemById(campus).getFactions(campaign.getLocalDate());
+
+            if (!Collections.disjoint(factions, relevantFactions)) {
+                return (double) (factionDiscount / 100);
+            }
         }
 
         return 1.00;
@@ -898,10 +898,8 @@ public class Academy implements Comparable<Academy> {
 
         // with the skill content resolved, we can move onto the rest of the tooltip
         if (personnel.size() == 1) {
-            if (tuition * getFactionDiscountAdjusted(campaign, person) > 0) {
-                tooltip.append("<b>").append(resources.getString("tuition.text")).append("</b> ")
-                        .append(tuition * getFactionDiscountAdjusted(campaign, person)).append(" CSB").append("<br>");
-            }
+            tooltip.append("<b>").append(resources.getString("tuition.text")).append("</b> ")
+                    .append(getTuitionAdjusted(person) * getFactionDiscountAdjusted(campaign, person)).append(" CSB").append("<br>");
         }
 
         if (isPrepSchool) {
