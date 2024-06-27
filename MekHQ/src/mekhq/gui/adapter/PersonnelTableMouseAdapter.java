@@ -1548,7 +1548,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     setAcademyMenu.add(militaryMenu);
 
                     List<Academy> academiesOfSet = AcademyFactory.getInstance().getAllAcademiesForSet(setName);
-                    Collections.sort(academiesOfSet);
 
                     for (Academy academy : academiesOfSet) {
                         // time to start filtering the academies
