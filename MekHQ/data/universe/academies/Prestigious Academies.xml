@@ -8127,7 +8127,7 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>War College of Tamar [2025]</name>
@@ -8154,7 +8154,26 @@
         <qualification>Aerospace Graduate</qualification>
         <curriculum>Piloting/Aerospace, Gunnery/Aerospace, Leadership</curriculum>
         <qualificationStartYear>2490</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Warner MechWarrior Academy</name>
+        <type>Military Academy</type>
+        <isMilitary>true</isMilitary>
+        <description>The Warner MechWarrior Academy on Solaris VII is a small and informal training school for aspiring MechWarriors, founded by the second-rate arena fighter and con man Clease Vanderholf. Training is conducted using four poorly maintained Chameleons.</description>
+        <locationSystem>Solaris</locationSystem>
+        <constructionYear>3000</constructionYear>
+        <destructionYear>3068</destructionYear>
+        <tuition>875</tuition>
+        <durationDays>80</durationDays>
+        <facultySkill>10</facultySkill>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>MechWarrior Graduate</qualification>
+        <curriculum>Piloting/Mech, Gunnery/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <baseAcademicSkillLevel>-2</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House Dai Da Chi</name>
@@ -8180,7 +8199,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House Fujita</name>
@@ -8207,7 +8226,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House Hiritsu</name>
@@ -8233,7 +8252,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House Ijori</name>
@@ -8260,7 +8279,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House Imarra</name>
@@ -8286,7 +8305,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House Kamata</name>
@@ -8312,7 +8331,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House Lu Sann</name>
@@ -8339,7 +8358,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House Ma-Tsu Kai</name>
@@ -8366,7 +8385,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House Rakshasa</name>
@@ -8393,7 +8412,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House Tsang Xiao</name>
@@ -8419,7 +8438,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Warrior House White Tiger</name>
@@ -8446,7 +8465,7 @@
         <qualification>Advanced Infantry Warrior Graduate</qualification>
         <curriculum>Small Arms, Anti-Mech, Tactics, Strategy, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>West Point Military Academy</name>
