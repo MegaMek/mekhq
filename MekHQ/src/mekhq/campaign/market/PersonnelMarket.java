@@ -31,6 +31,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.HangarStatistics;
+import mekhq.campaign.universe.Factions;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
 import mekhq.utilities.MHQXMLUtility;
@@ -40,6 +41,7 @@ import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PersonnelMarket {
     private List<Person> personnel = new ArrayList<>();
@@ -93,22 +95,29 @@ public class PersonnelMarket {
      * market availability pool
      */
     public void generatePersonnelForDay(Campaign c) {
+        List<String> capitals = Factions.getInstance().getFactions().stream()
+                .map(faction -> faction.getStartingPlanet(c.getLocalDate()))
+                .collect(Collectors.toList());
+
+        String currentSystem = c.getCurrentSystem().getId();
+
         boolean updated = false;
 
         if (!personnel.isEmpty()) {
-            if ((c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()) && (!c.getAtBConfig().isHiringHall(c.getCurrentSystem().getId(), c.getLocalDate()))) {
+            removePersonnelForDay(c);
+            if (c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
+                    && !c.getAtBConfig().isHiringHall(currentSystem, c.getLocalDate())
+                    && !capitals.contains(currentSystem)) {
                 removeAll();
-            } else if (!c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()) {
-                removePersonnelForDay(c);
             }
         }
 
         if (null != method) {
             List<Person> newPersonnel = new ArrayList<>();
 
-            if ((c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()) && (c.getAtBConfig().isHiringHall(c.getCurrentSystem().getId(), c.getLocalDate()))) {
-                newPersonnel = method.generatePersonnelForDay(c);
-            } else if (!c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()) {
+            if (!c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
+                    || c.getAtBConfig().isHiringHall(currentSystem, c.getLocalDate())
+                    || capitals.contains(currentSystem)) {
                 newPersonnel = method.generatePersonnelForDay(c);
             }
 
