@@ -8,7 +8,7 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>47500</tuition>
-        <durationDays>1</durationDays>
+        <durationDays>10</durationDays>
         <educationLevelMax>Early Childhood</educationLevelMax>
         <ageMax>10</ageMax>
         <qualification>General Education</qualification>
