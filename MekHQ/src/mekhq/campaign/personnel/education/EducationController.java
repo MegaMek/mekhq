@@ -594,10 +594,16 @@ public class EducationController {
         if (diceSize > 0) {
             if ((diceSize == 1) || (roll == 0)) {
                 // we add this limiter to avoid a bad play experience when someone drops out in the final stretch
-                if (person.getEduEducationTime() < 10) {
-                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
-                    ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
-                    person.setEduEducationStage(EducationStage.DROPPING_OUT);
+                if (person.getEduEducationTime() >= 10) {
+                    if (academy.isReeducationCamp()) {
+                        person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
+                    } else {
+                        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
+                        ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
+                        person.setEduEducationStage(EducationStage.DROPPING_OUT);
+                    }
+                } else {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
                 }
 
                 return true;
