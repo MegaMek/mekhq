@@ -372,20 +372,12 @@ public class Finances {
      * @return The profits made by the campaign, or zero if no profits were made.
      */
     public Money getProfits() {
-        Money profits = Money.zero();
+        List<Money> startingCapital = getTransactions().stream()
+                .filter(transaction -> (transaction.getType().isStartingCapital()) || (transaction.getType().isFinancialTermEndCarryover()))
+                .map(Transaction::getAmount)
+                .collect(Collectors.toList());
 
-        for (Transaction transaction : getTransactions()) {
-            if ((transaction.getType() == TransactionType.STARTING_CAPITAL)
-                    || (transaction.getType() == TransactionType.FINANCIAL_TERM_END_CARRYOVER)) {
-                continue;
-            }
-
-            if (transaction.getAmount().isPositive()) {
-                profits = profits.plus(transaction.getAmount());
-            } else {
-                profits = profits.minus(transaction.getAmount());
-            }
-        }
+        Money profits = getBalance().minus(startingCapital);
 
         if (profits.isPositive()) {
             return profits;
@@ -402,16 +394,6 @@ public class Finances {
      * @return True if the taxes are paid successfully, false otherwise. (included for debugging)
      */
     private boolean payTaxes(Campaign campaign, Money profits) {
-        if ((campaign.getCampaignOptions().isUseNotMercenaryExemption())
-                && (!campaign.getFaction().isMercenary())) {
-            return false;
-        }
-
-        if ((campaign.getCampaignOptions().isUseClanExemption())
-                && (campaign.getFaction().isClan())) {
-            return false;
-        }
-
         Money taxAmount = profits.multipliedBy((double) campaign.getCampaignOptions().getTaxesPercentage() / 100).round();
 
         return debit(
