@@ -702,8 +702,10 @@ public class Academy implements Comparable<Academy> {
         for (String campus : campuses) {
             List<String> factions = campaign.getSystemById(campus).getFactions(campaign.getLocalDate());
 
-            if (!Collections.disjoint(factions, relevantFactions)) {
-                return (double) (factionDiscount / 100);
+            if (Collections.disjoint(factions, relevantFactions)) {
+                return 1.00;
+            } else {
+                return 1 - ((double) factionDiscount / 100);
             }
         }
 
