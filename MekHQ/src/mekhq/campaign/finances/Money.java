@@ -130,6 +130,10 @@ public class Money implements Comparable<Money> {
         return new Money(getWrapped().minus(amount));
     }
 
+    public Money minus(List<Money> amounts) {
+        return new Money(getWrapped().minus((Iterable<BigMoney>) (amounts.stream().map(Money::getWrapped)::iterator)));
+    }
+
     public Money multipliedBy(long amount) {
         return new Money(getWrapped().multipliedBy(amount));
     }
