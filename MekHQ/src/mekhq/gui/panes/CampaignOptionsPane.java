@@ -504,8 +504,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JPanel taxesSubPanel = new JPanel();
     private JLabel lblTaxesPercentage;
     private JSpinner spnTaxesPercentage;
-    private JCheckBox chkUseNotMercenaryExemption;
-    private JCheckBox chkUseClanExemption;
 
     private JPanel sharesPanel;
     private JCheckBox chkUseShareSystem;
@@ -7195,16 +7193,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnTaxesPercentage.setName("spnTaxesPercentage");
         spnTaxesPercentage.setEnabled(isEnabled);
 
-        chkUseNotMercenaryExemption = new JCheckBox(resources.getString("chkUseNotMercenaryExemption.text"));
-        chkUseNotMercenaryExemption.setToolTipText(resources.getString("chkUseNotMercenaryExemption.toolTipText"));
-        chkUseNotMercenaryExemption.setName("chkUseNotMercenaryExemption");
-        chkUseNotMercenaryExemption.setEnabled(isEnabled);
-
-        chkUseClanExemption = new JCheckBox(resources.getString("chkUseClanExemption.text"));
-        chkUseClanExemption.setToolTipText(resources.getString("chkUseClanExemption.toolTipText"));
-        chkUseClanExemption.setName("chkUseClanExemption");
-        chkUseClanExemption.setEnabled(isEnabled);
-
         taxesSubPanel.setBorder(BorderFactory.createTitledBorder(""));
         taxesSubPanel.setName("taxesSubPanel");
 
@@ -7218,8 +7206,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblTaxesPercentage)
                                 .addComponent(spnTaxesPercentage, Alignment.LEADING))
-                        .addComponent(chkUseNotMercenaryExemption)
-                        .addComponent(chkUseClanExemption)
         );
 
         layout.setHorizontalGroup(
@@ -7227,8 +7213,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblTaxesPercentage)
                                 .addComponent(spnTaxesPercentage))
-                        .addComponent(chkUseNotMercenaryExemption)
-                        .addComponent(chkUseClanExemption)
         );
 
         return taxesSubPanel;
@@ -8241,8 +8225,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Taxes
         chkUseTaxes.setSelected(options.isUseTaxes());
         spnTaxesPercentage.setValue(options.getTaxesPercentage());
-        chkUseNotMercenaryExemption.setSelected(options.isUseNotMercenaryExemption());
-        chkUseClanExemption.setSelected(options.isUseClanExemption());
         //endregion Finances Tab
 
         //region Mercenary Tab
@@ -8884,8 +8866,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             //region Taxes
             options.setUseTaxes(chkUseTaxes.isSelected());
             options.setTaxesPercentage((Integer) spnTaxesPercentage.getValue());
-            options.setUseNotMercenaryExemption(chkUseNotMercenaryExemption.isSelected());
-            options.setUseClanExemption(chkUseClanExemption.isSelected());
             //endregion Taxes
             //endregion Finances Tab
 
@@ -9293,8 +9273,6 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         // Taxes
         chkUseTaxes.setSelected(options.isUseTaxes());
         spnTaxesPercentage.setValue(options.getTaxesPercentage());
-        chkUseClanExemption.setSelected(options.isUseClanExemption());
-        chkUseNotMercenaryExemption.setSelected(options.isUseNotMercenaryExemption());
 
         // Price Multipliers Panel
         spnCommonPartPriceMultiplier.setValue(options.getCommonPartPriceMultiplier());
