@@ -152,6 +152,7 @@ MEKHQ VERSION HISTORY:
 + PR #4307: Fixed Faction Discount to Tuition, Fixed autoAwards Triggering when Personnel Fail to Graduate
 + PR #4308: Fixed Administrative Capacity Displaying while Turnover is Disabled
 + PR #4309: Updated Education Module Documentation, Restored Reeducation Camp Dropout Functionality
++ PR #4164: More detailed auto-selection of bombs
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
