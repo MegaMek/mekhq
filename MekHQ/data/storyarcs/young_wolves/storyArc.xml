@@ -10093,7 +10093,7 @@ scenario resolution.
                         <unitType>0</unitType>
                         <skill>VETERAN</skill>
                         <lanceSize>1</lanceSize>
-                        <forceMultiplier>1.0</forceMultiplier>
+                        <forceMultiplier>0.5</forceMultiplier>
                         <balancingMethod>WEIGHT_ADJ</balancingMethod>
                     </botForceRandomizer>
                     <behaviorSettings>
