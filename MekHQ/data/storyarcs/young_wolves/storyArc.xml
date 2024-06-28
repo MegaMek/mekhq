@@ -147,9 +147,9 @@ That's it. I hope you enjoy the campaign!
             <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
             <assignedForceId>2</assignedForceId>
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-            <!--<nextStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</nextStoryPointId>-->
+            <nextStoryPointId>6b269fae-ad5d-4de8-8970-9251a6b64ede</nextStoryPointId>
             <!-- Real next story point id. Can be commented out to test things -->
-            <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
+            <!--<nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>-->
         </storyPoint>
         <!-- Game over check -->
         <storyPoint name="check_main_char_killed" type="mekhq.campaign.storyarc.storypoint.PersonStatusStoryPoint">
@@ -1699,7 +1699,7 @@ That's it. I hope you enjoy the campaign!
                 all around you. Some are Jade Falcons, but many belong to your own forces. Yet, out of the smoke come
                 more green mechs. One of them hails you on your comm.*
 
-                Wolf commander, you have fought with honor and skill. I ask you to accept defeat so that I will not be
+                Wolf commander, this is Star Captain Mel Ustone. You have fought with honor and skill. I ask you to accept defeat so that I will not be
                 forced to kill a great warrior. I promise that you and your warriors will not remain bondsmen long.
 
                 *You look out at your few remaining warriors before responding.*
@@ -1716,10 +1716,7 @@ That's it. I hope you enjoy the campaign!
                     <nextStoryPointId>6835f1d3-a511-4e5e-bf31-84ee13477946</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
-            <storySplash>
-                <category></category>
-                <filename>splash-postbattle.jpg</filename>
-            </storySplash>
+            <personalityId>704cdc97-ccaa-4955-b498-69e1274b02d5</personalityId>
         </storyPoint>
         <storyPoint name="choice_vlad_wake_up" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
             <id>f01196d7-4b66-4a23-9201-c48b44ad30b5</id>
@@ -10891,6 +10888,14 @@ There is no surrender or hegira available in this battle. You must fight until o
             <portrait>
                 <category></category>
                 <filename>Crichell.jpg</filename>
+            </portrait>
+        </personality>
+        <personality name="mel_ustone">
+            <id>704cdc97-ccaa-4955-b498-69e1274b02d5</id>
+            <title>Star Captain Mel Ustone</title>
+            <portrait>
+                <category></category>
+                <filename>Mel.jpg</filename>
             </portrait>
         </personality>
         <personality name="marketta">
