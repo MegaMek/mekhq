@@ -47,7 +47,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractPersonnelGenerator;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.*;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.companyGeneration.AtBRandomMechParameters;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
@@ -397,6 +397,8 @@ public abstract class AbstractCompanyGenerator {
             return;
         }
 
+
+
         // Improve Skills
         final Skill gunnery = tracker.getPerson().getSkill(SkillType.S_GUN_MECH);
         final Skill piloting = tracker.getPerson().getSkill(SkillType.S_PILOT_MECH);
@@ -445,19 +447,19 @@ public abstract class AbstractCompanyGenerator {
                                                   final int boosts) {
         for (int i = 0; i < boosts; i++) {
             switch (Utilities.dice(1, 3)) {
-                case 0:
+                case 1:
                     tracker.getPerson().improveSkill(SkillType.S_LEADER);
                     if (tracker.getPerson().getSkillLevel(SkillType.S_LEADER) == 0) {
                         tracker.getPerson().improveSkill(SkillType.S_LEADER);
                     }
                     break;
-                case 1:
+                case 2:
                     tracker.getPerson().improveSkill(SkillType.S_STRATEGY);
                     if (tracker.getPerson().getSkillLevel(SkillType.S_STRATEGY) == 0) {
                         tracker.getPerson().improveSkill(SkillType.S_STRATEGY);
                     }
                     break;
-                case 2:
+                case 3:
                     tracker.getPerson().improveSkill(SkillType.S_TACTICS);
                     if (tracker.getPerson().getSkillLevel(SkillType.S_TACTICS) == 0) {
                         tracker.getPerson().improveSkill(SkillType.S_TACTICS);
@@ -942,16 +944,34 @@ public abstract class AbstractCompanyGenerator {
     private List<Unit> createUnits(final Campaign campaign,
                                    final List<CompanyGenerationPersonTracker> trackers) {
         final List<Unit> units = new ArrayList<>();
+
         for (final CompanyGenerationPersonTracker tracker : trackers) {
             if (tracker.getEntity() == null) {
                 continue;
             }
 
-            final Unit unit = campaign.addNewUnit(tracker.getEntity(), false, 0);
+            int quality = 3;
+
+            if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+                int modifier = 0;
+
+                if (tracker.getPerson().isCommander()) {
+                    modifier = 2;
+                } else if (tracker.getPerson().getRank().isOfficer()) {
+                    modifier = 1;
+                }
+
+                quality = Unit.getRandomUnitQuality(modifier);
+            }
+
+            final Unit unit = campaign.addNewUnit(tracker.getEntity(), false, 0, quality);
+
             unit.addPilotOrSoldier(tracker.getPerson());
+
             if (getOptions().isGenerateUnitsAsAttached()) {
                 tracker.getPerson().setOriginalUnit(unit);
             }
+
             units.add(unit);
         }
         return units;
@@ -1286,8 +1306,16 @@ public abstract class AbstractCompanyGenerator {
      */
     private List<Unit> createMothballedSpareUnits(final Campaign campaign,
                                                   final List<Entity> mothballedEntities) {
+        int quality;
+
+        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        } else {
+            quality = 3;
+        }
+
         final List<Unit> mothballedUnits = mothballedEntities.stream()
-                .map(entity -> campaign.addNewUnit(entity, false, 0))
+                .map(entity -> campaign.addNewUnit(entity, false, 0, quality))
                 .collect(Collectors.toList());
         mothballedUnits.forEach(Unit::completeMothball);
         return mothballedUnits;

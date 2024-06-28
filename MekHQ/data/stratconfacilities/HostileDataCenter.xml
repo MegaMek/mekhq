@@ -4,6 +4,7 @@
 	<displayableName>Data Center</displayableName>
         <facilityType>DataCenter</facilityType>
         <owner>Opposing</owner>
-        <sharedModifiers>EnemyMechPatrol.xml</sharedModifiers>		
+        <sharedModifiers>EnemyMechPatrol.xml</sharedModifiers>
+	<userDescription>An additional hostile mech patrol will sweep through scenarios on this track.</userDescription>	
         <visible>false</visible>
 </StratconFacility>

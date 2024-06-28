@@ -23,6 +23,7 @@ package mekhq.campaign.unit;
 
 import megamek.Version;
 import megamek.client.ui.swing.tileset.EntityImage;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.*;
 import megamek.common.InfantryBay.PlatoonType;
 import megamek.common.annotations.Nullable;
@@ -36,7 +37,9 @@ import megamek.common.options.PilotOptions;
 import megamek.common.weapons.InfantryAttack;
 import megamek.common.weapons.bayweapons.BayWeapon;
 import megamek.common.weapons.infantry.InfantryWeapon;
-import mekhq.*;
+import mekhq.MHQStaticDirectoryManager;
+import mekhq.MekHQ;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.PersonCrewAssignmentEvent;
 import mekhq.campaign.event.PersonTechAssignmentEvent;
@@ -62,6 +65,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.PrintWriter;
 import java.math.BigInteger;
@@ -69,8 +73,6 @@ import java.util.List;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import javax.swing.UIManager;
 
 /**
  * This is a wrapper class for entity, so that we can add some functionality to it
@@ -4003,6 +4005,7 @@ public class Unit implements ITechnology {
         entity.getCrew().setGunneryB(Math.min(Math.max(gunnery, 0), 7), slot);
         entity.getCrew().setArtillery(Math.min(Math.max(artillery, 0), 7), slot);
         entity.getCrew().setToughness(p.getToughness(), slot);
+
         entity.getCrew().setExternalIdAsString(p.getId().toString(), slot);
         entity.getCrew().setMissing(false, slot);
     }
@@ -4730,6 +4733,25 @@ public class Unit implements ITechnology {
     }
     //endregion Mothballing/Activation
 
+    /**
+     * Returns all soldiers or battle armor assigned to the unit.
+     * As members of this category appear in both the drivers and gunners list, we only check drivers
+     */
+    public List<Person> getAllInfantry() {
+        return drivers.stream()
+                .filter(person -> entity instanceof Infantry)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Retrieves a list of uninjured soldiers or battle armor assigned to the unit.
+     */
+    public List<Person> getUninjuredInfantry() {
+        return getAllInfantry().stream()
+                .filter(person -> person.getHits() == 0)
+                .collect(Collectors.toList());
+    }
+
     public List<Person> getActiveCrew() {
         List<Person> crew = new ArrayList<>();
         for (Person p : drivers) {
@@ -5314,7 +5336,7 @@ public class Unit implements ITechnology {
             fuelCost = fuelCost.plus(getTonsBurnDay(entity));// * 3 * 15000;
         } else if (entity instanceof ConvFighter) {
             fuelCost = fuelCost.plus(getFighterFuelCost(entity));
-        } else if (entity instanceof megamek.common.Aero) {
+        } else if (entity instanceof Aero) {
             fuelCost = fuelCost.plus(((Aero) entity).getFuelTonnage() * 4.0 * 15000.0);
         } else if ((entity instanceof Tank) || (entity instanceof Mech)) {
             fuelCost = fuelCost.plus(getVehicleFuelCost(entity));
@@ -5354,7 +5376,7 @@ public class Unit implements ITechnology {
             return  (tonsburnday * 15 * 15000);
         } else if ((e instanceof SmallCraft)) {
             return (1.84 * 15 * 15000);
-        } else if (e instanceof megamek.common.Jumpship) {
+        } else if (e instanceof Jumpship) {
             if (e.getWeight() < 50000) {
                 tonsburnday = 2.82;
             } else if (e.getWeight() < 100000) {
@@ -5364,7 +5386,7 @@ public class Unit implements ITechnology {
             } else {
                 tonsburnday = 39.52;
             }
-            if (e instanceof megamek.common.Warship) {
+            if (e instanceof Warship) {
                 return (tonsburnday * 15 * 15000);
             }
             return (tonsburnday * 3 * 15000);
@@ -5685,6 +5707,43 @@ public class Unit implements ITechnology {
                 }
             }
             transportedUnits = newTransportedUnits;
+        }
+    }
+
+    /**
+     * Generates a random unit quality based on a 2d6 roll and a modifier.
+     * This table is based on the AtB Mek Quality table, but is still useful outside of that ruleset
+     *
+     * @param modifier the modifier to be applied to the 2d6 roll
+     * @return an integer representing the generated unit quality
+     * @throws IllegalStateException if an unexpected value is encountered during the switch statement
+     */
+    public static int getRandomUnitQuality(int modifier) {
+        int roll = MathUtility.clamp(
+                (Compute.d6(2) + modifier),
+                2,
+                12
+        );
+
+        switch (roll) {
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+                return Part.QUALITY_A;
+            case 6:
+            case 7:
+            case 8:
+                return Part.QUALITY_B;
+            case 9:
+            case 10:
+                return Part.QUALITY_C;
+            case 11:
+                return Part.QUALITY_D;
+            case 12:
+                return Part.QUALITY_F;
+            default:
+                throw new IllegalStateException("Unexpected value in mekhq/campaign/unit/Unit.java/getRandomUnitQuality: " + roll);
         }
     }
 }

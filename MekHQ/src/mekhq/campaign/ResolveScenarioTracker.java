@@ -2,6 +2,7 @@
  * ResolveScenarioTracker.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
+ * Copyright (c) 2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,9 +38,9 @@ import mekhq.campaign.mission.enums.ScenarioStatus;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.PrisonerStatus;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
@@ -1403,6 +1404,11 @@ public class ResolveScenarioTracker {
 
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if (status.getHits() > person.getHits()) {
+                if ((campaign.getCampaignOptions().isUseFatigue())
+                        && (campaign.getCampaignOptions().isUseInjuryFatigue())) {
+                    person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate() * (status.getHits() - person.getHits()));
+                }
+
                 person.setHits(status.getHits());
             }
 
@@ -1411,6 +1417,7 @@ public class ResolveScenarioTracker {
                 ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(),
                         scenario.getName(), mission.getName());
             }
+
             for (Kill k : status.getKills()) {
                 getCampaign().addKill(k);
             }
@@ -1419,10 +1426,13 @@ public class ResolveScenarioTracker {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
             } else if (status.isDead()) {
                 person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
-                if (getCampaign().getCampaignOptions().isUseAtB() && isAtBContract) {
-                    getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
-                            true, getCampaign(), (AtBContract) mission);
-                }
+                getCampaign().getRetirementDefectionTracker().removeFromCampaign(person,
+                        true, false, getCampaign(), mission);
+            }
+
+            if (!status.isDead()) {
+                person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
+                Fatigue.processFatigueActions(campaign, person);
             }
 
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -1432,28 +1442,6 @@ public class ResolveScenarioTracker {
             if (status.toRemove()) {
                 getCampaign().removePerson(person, false);
             }
-        }
-
-        if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
-            HashMap<UUID, Integer> personnel = new HashMap<>();
-
-            for (UUID personId : peopleStatus.keySet()) {
-                Person person = campaign.getPerson(personId);
-                PersonStatus status = peopleStatus.get(personId);
-                int injuryCount = 0;
-
-                if (!person.getStatus().isDead() || getCampaign().getCampaignOptions().isIssuePosthumousAwards()) {
-                    if (status.getHits() > person.getHits()) {
-                        injuryCount = status.getHits() - person.getHits();
-                    }
-                }
-
-                personnel.put(personId, injuryCount);
-            }
-
-            AutoAwardsController autoAwardsController = new AutoAwardsController();
-
-            autoAwardsController.PostScenarioController(campaign, scenario.getId(), personnel);
         }
 
         //region Prisoners
@@ -1486,6 +1474,17 @@ public class ResolveScenarioTracker {
                     getCampaign().addReport(String.format("You have convinced %s to defect.",
                             person.getHyperlinkedName()));
                 }
+
+                // prisoners should generate with lower than average loyalty, so drop the highest roll
+                List<Integer> rolls = new ArrayList<>();
+
+                for (int roll = 0; roll < 4; roll++) {
+                    rolls.add(Compute.d6(1));
+                }
+
+                Collections.sort(rolls);
+
+                person.setLoyalty(rolls.get(0) + rolls.get(1) + rolls.get(2));
             } else {
                 continue;
             }
@@ -1494,7 +1493,12 @@ public class ResolveScenarioTracker {
                 person.setHits(status.getHits());
             }
 
-            ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            if (status.isCaptured()) {
+                ServiceLogger.capturedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            } else {
+                ServiceLogger.participatedInScenarioDuringMission(person, campaign.getLocalDate(), scenario.getName(), mission.getName());
+            }
+
 
             for (Kill k : status.getKills()) {
                 campaign.addKill(k);
@@ -1643,7 +1647,7 @@ public class ResolveScenarioTracker {
         }
 
         for (Loot loot : actualLoot) {
-            loot.get(campaign, scenario);
+            loot.getLoot(campaign, scenario);
         }
 
         scenario.setStatus(resolution);
@@ -2027,16 +2031,16 @@ public class ResolveScenarioTracker {
             } else {
                 switch (entity.getDamageLevel(false)) {
                     case Entity.DMG_LIGHT:
-                        color = "green";
+                        color =  MekHQ.getMHQOptions().getFontColorPositiveHexColor();
                         break;
                     case Entity.DMG_MODERATE:
                         color = "yellow";
                         break;
                     case Entity.DMG_HEAVY:
-                        color = "orange";
+                        color = MekHQ.getMHQOptions().getFontColorWarningHexColor();
                         break;
                     case Entity.DMG_CRIPPLED:
-                        color = "red";
+                        color = MekHQ.getMHQOptions().getFontColorNegativeHexColor();
                         break;
                 }
             }

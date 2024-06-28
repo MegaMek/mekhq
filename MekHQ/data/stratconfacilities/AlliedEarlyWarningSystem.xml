@@ -5,5 +5,6 @@
         <owner>Allied</owner>
 	<localModifiers>ReinforcementDelayReductionAllied.xml</localModifiers>
         <sharedModifiers>ReinforcementDelayReductionAllied.xml</sharedModifiers>
+	<userDescription>Reduces reinforcement arrival times for allied and player forces.</userDescription>
         <visible>true</visible>
 </StratconFacility>

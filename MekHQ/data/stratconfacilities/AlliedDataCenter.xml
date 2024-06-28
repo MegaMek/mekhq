@@ -4,5 +4,6 @@
         <facilityType>DataCenter</facilityType>
         <owner>Allied</owner>
 	<revealTrack>true</revealTrack>
+	<userDescription>This facility reveals all information about this track as long as it is active.</userDescription>
         <visible>true</visible>
 </StratconFacility>

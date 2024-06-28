@@ -22,13 +22,14 @@ package mekhq.campaign.parts;
 
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
-import mekhq.utilities.MHQXMLUtility;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.work.WorkTime;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -571,19 +572,19 @@ public class ProtomekLocation extends Part {
         }
         toReturn += getDetails() + "<br/>";
         if (getSkillMin() > SkillType.EXP_ELITE) {
-            toReturn += "<font color='red'>Impossible</font>";
+            toReturn += "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Impossible</font>";
         } else {
-            toReturn += "" + getTimeLeft() + " minutes" + scheduled;
+            toReturn += getTimeLeft() + " minutes" + scheduled;
             if (isBlownOff()) {
                 String bonus = getAllMods(null).getValueAsString();
                 if (getAllMods(null).getValue() > -1) {
-                    bonus = "+" + bonus;
+                    bonus = '+' + bonus;
                 }
-                bonus = "(" + bonus + ")";
+                bonus = '(' + bonus + ')';
                 if (!getCampaign().getCampaignOptions().isDestroyByMargin()) {
                     toReturn += ", " + SkillType.getExperienceLevelName(getSkillMin());
                 }
-                toReturn += " " + bonus;
+                toReturn += ' ' + bonus;
                 if (getMode() != WorkTime.NORMAL) {
                     toReturn += "<br/><i>" + getCurrentModeName() + "</i>";
                 }

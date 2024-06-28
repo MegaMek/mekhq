@@ -37,7 +37,11 @@ public enum PersonnelStatus {
     ON_LEAVE("PersonnelStatus.ON_LEAVE.text", "PersonnelStatus.ON_LEAVE.toolTipText", "PersonnelStatus.ON_LEAVE.reportText", "PersonnelStatus.ON_LEAVE.logText"),
     AWOL("PersonnelStatus.AWOL.text", "PersonnelStatus.AWOL.toolTipText", "PersonnelStatus.AWOL.reportText", "PersonnelStatus.AWOL.logText"),
     RETIRED("PersonnelStatus.RETIRED.text", "PersonnelStatus.RETIRED.toolTipText", "PersonnelStatus.RETIRED.reportText", "PersonnelStatus.RETIRED.logText"),
+    RESIGNED("PersonnelStatus.RESIGNED.text", "PersonnelStatus.RESIGNED.toolTipText", "PersonnelStatus.RESIGNED.reportText", "PersonnelStatus.RESIGNED.logText"),
+    SACKED("PersonnelStatus.SACKED.text", "PersonnelStatus.SACKED.toolTipText", "PersonnelStatus.SACKED.reportText", "PersonnelStatus.SACKED.logText"),
+    LEFT("PersonnelStatus.LEFT.text", "PersonnelStatus.LEFT.toolTipText", "PersonnelStatus.LEFT.reportText", "PersonnelStatus.LEFT.logText"),
     DESERTED("PersonnelStatus.DESERTED.text", "PersonnelStatus.DESERTED.toolTipText", "PersonnelStatus.DESERTED.reportText", "PersonnelStatus.DESERTED.logText"),
+    DEFECTED("PersonnelStatus.DEFECTED.text", "PersonnelStatus.DEFECTED.toolTipText", "PersonnelStatus.DEFECTED.reportText", "PersonnelStatus.DEFECTED.logText"),
     STUDENT("PersonnelStatus.STUDENT.text", "PersonnelStatus.STUDENT.toolTipText", "PersonnelStatus.STUDENT.reportText", "PersonnelStatus.STUDENT.logText"),
     MISSING("PersonnelStatus.MISSING.text", "PersonnelStatus.MISSING.toolTipText", "PersonnelStatus.MISSING.reportText", "PersonnelStatus.MISSING.logText"),
     KIA("PersonnelStatus.KIA.text", "PersonnelStatus.KIA.toolTipText", "PersonnelStatus.KIA.reportText", "PersonnelStatus.KIA.logText"),
@@ -103,7 +107,7 @@ public enum PersonnelStatus {
         return this == ON_LEAVE;
     }
 
-    public boolean isAWOL() {
+    public boolean isAwol() {
         return this == AWOL;
     }
 
@@ -111,8 +115,24 @@ public enum PersonnelStatus {
         return this == RETIRED;
     }
 
+    public boolean isResigned() {
+        return this == RESIGNED;
+    }
+
+    public boolean isSacked() {
+        return this == SACKED;
+    }
+
+    public boolean isLeft() {
+        return this == LEFT;
+    }
+
     public boolean isDeserted() {
         return this == DESERTED;
+    }
+
+    public boolean isDefected() {
+        return this == DEFECTED;
     }
 
     public boolean isStudent() {
@@ -171,7 +191,14 @@ public enum PersonnelStatus {
      * @return true if a person is currently absent from the core force, otherwise false
      */
     public boolean isAbsent() {
-        return isMIA() || isPoW() || isOnLeave() || isAWOL() || isStudent() || isMissing();
+        return isMIA() || isPoW() || isOnLeave() || isAwol() || isStudent() || isMissing();
+    }
+
+    /**
+     * @return true if a person has left the unit, otherwise false
+     */
+    public boolean isDepartedUnit() {
+        return isDead() || isRetired() || isResigned() || isSacked() || isDeserted() || isDefected() || isMissing() || isLeft();
     }
 
     /**
@@ -194,7 +221,7 @@ public enum PersonnelStatus {
     public static List<PersonnelStatus> getImplementedStatuses() {
         return Stream.of(values())
                 .filter(personnelStatus -> !personnelStatus.isPoW() && !personnelStatus.isOnLeave()
-                        && !personnelStatus.isAWOL())
+                        && !personnelStatus.isAwol())
                 .collect(Collectors.toList());
     }
 
@@ -224,6 +251,40 @@ public enum PersonnelStatus {
                     return STUDENT;
                 case 5:
                     return MISSING;
+                case 6:
+                    return POW;
+                case 7:
+                    return ON_LEAVE;
+                case 8:
+                    return AWOL;
+                case 9:
+                    return RESIGNED;
+                case 10:
+                    return DESERTED;
+                case 11:
+                    return DEFECTED;
+                case 12:
+                    return HOMICIDE;
+                case 13:
+                    return WOUNDS;
+                case 14:
+                    return DISEASE;
+                case 15:
+                    return ACCIDENTAL;
+                case 16:
+                    return NATURAL_CAUSES;
+                case 17:
+                    return OLD_AGE;
+                case 18:
+                    return MEDICAL_COMPLICATIONS;
+                case 19:
+                    return PREGNANCY_COMPLICATIONS;
+                case 20:
+                    return UNDETERMINED;
+                case 21:
+                    return SUICIDE;
+                case 22:
+                    return SACKED;
                 default:
                     break;
             }
@@ -231,7 +292,7 @@ public enum PersonnelStatus {
 
         }
 
-        LogManager.getLogger().error("Unable to parse " + text + " into a PersonnelStatus. Returning ACTIVE.");
+        LogManager.getLogger().error("Unable to parse {} into a PersonnelStatus. Returning ACTIVE.", text);
         return ACTIVE;
     }
     //endregion File I/O

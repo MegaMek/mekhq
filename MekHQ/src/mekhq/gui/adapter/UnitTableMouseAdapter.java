@@ -26,6 +26,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.icons.Camouflage;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.EntitySavingException;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
 import mekhq.MHQConstants;
@@ -1042,7 +1043,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                             "File Already Exists", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                BLKFile.encode(fileNameCampaign, unit.getEntity());
+                try {
+                    BLKFile.encode(fileNameCampaign, unit.getEntity());
+                }
+                catch (EntitySavingException e) {
+                    LogManager.getLogger().error("Error encoding unit " + unit.getName(), e);
+                    return;
+                }
             }
             gui.getCampaign().addCustom(unit.getEntity().getChassis() + " "
                     + unit.getEntity().getModel());

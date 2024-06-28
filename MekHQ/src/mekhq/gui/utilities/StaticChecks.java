@@ -195,7 +195,7 @@ public class StaticChecks {
 
     public static boolean areAllUnitsNotC3iNetworked(Vector<Unit> units) {
         return units.stream().allMatch(u -> (u.getEntity() != null) && u.getEntity().hasC3i()
-                && (u.getEntity().calculateFreeC3Nodes() < 5));
+                && (u.getEntity().calculateFreeC3Nodes() == 5)); // 5 is the magic number for C3 network
     }
 
     public static boolean areAllUnitsC3iNetworked(Vector<Unit> units) {
@@ -341,6 +341,10 @@ public class StaticChecks {
 
     public static boolean areAnyWillingToDefect(Person... people) {
         return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isPrisonerDefector());
+    }
+
+    public static boolean areAnyBondsmen(Person... people) {
+        return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isBondsman());
     }
 
     public static boolean areAllSameSite(Unit... units) {

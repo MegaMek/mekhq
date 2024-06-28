@@ -114,8 +114,9 @@ public final class MHQConstants extends SuiteConstants {
     public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
     public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
     public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
-    public static final String AUTO_AWARDS_FOREGROUND = "paidRetirementForeground";
-    public static final String AUTO_AWARDS_BACKGROUND = "paidRetirementBackground";
+    public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
+    public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
+    public static final String FONT_COLOR_WARNING = "fontColorWarning";
     //endregion Colours
 
     //region Fonts
@@ -166,6 +167,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_PREGNANT_COMBATANT = "nagPregnantCombatant";
     public static final String NAG_PRISONERS = "nagPrisoners";
     public static final String NAG_UNTREATED_PERSONNEL = "nagUntreatedPersonnel";
+    public static final String NAG_NO_COMMANDER = "nagNoCommander";
+    public static final String NAG_CONTRACT_ENDED = "nagContractEnded";
     public static final String NAG_INSUFFICIENT_ASTECHS = "nagInsufficientAstechs";
     public static final String NAG_INSUFFICIENT_ASTECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";
@@ -173,6 +176,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_UNRESOLVED_STRATCON_CONTACTS = "nagUnresolvedStratConContacts";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
     public static final String NAG_CARGO_CAPACITY = "nagCargoCapacity";
+    public static final String NAG_INVALID_FACTION = "nagInvalidFaction";
     //endregion Nag Tab
 
     //region Miscellaneous Options

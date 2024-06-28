@@ -26,17 +26,20 @@ import megamek.common.MechFileParser;
 import megamek.common.MechSummary;
 import megamek.common.MechSummaryCache;
 import megamek.common.loaders.EntityLoadingException;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.rating.IUnitRating;
+import mekhq.campaign.unit.Unit;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -140,20 +143,90 @@ public class Loot {
 
     }
 
-    public void get(Campaign campaign, Scenario s) {
-        // TODO: put in some reports
+    /**
+     * Looting method that adds loot to the campaign, including cash, parts, and units.
+     *
+     * @param campaign the campaign to add the loot to
+     * @param scenario the scenario during which the loot was acquired
+     */
+    public void getLoot(Campaign campaign, Scenario scenario) {
         if (cash.isPositive()) {
-            campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
-                    "Reward for " + getName() + " during " + s.getName());
-        }
+            LogManager.getLogger().debug("Looting cash: {}", cash);
 
-        for (Entity e : units) {
-            campaign.addNewUnit(e, false, 0);
+            campaign.getFinances().credit(TransactionType.MISCELLANEOUS, campaign.getLocalDate(), cash,
+                    "Reward for " + getName() + " during " + scenario.getName());
         }
 
         for (Part p : parts) {
+            LogManager.getLogger().debug("Looting part: {}", p.getName());
+
             campaign.getQuartermaster().addPart(p, 0);
+
+            LogManager.getLogger().debug("Looting parts complete");
         }
+
+        // This only needs to be done once, so we do it outside the 'loot units' loop for efficiency
+        HashMap<String, Integer> qualityAndModifier = getQualityAndModifier(campaign.getMission(scenario.getMissionId()));
+
+        for (Entity e : units) {
+            LogManager.getLogger().debug("Looting unit: {}", e.getDisplayName());
+
+            if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+                qualityAndModifier.put("quality", Unit.getRandomUnitQuality(qualityAndModifier.get("modifier")));
+            }
+
+            campaign.addNewUnit(e, false, 0, qualityAndModifier.get("quality"));
+
+            LogManager.getLogger().debug("Looting units complete");
+        }
+    }
+
+    /**
+     * Returns fixed quality values, and modifiers (for dynamic quality) used to generate a new unit
+     * with quality based on the equipment quality of the contract OpFor.
+     * If the contract isn't an instance of AtBContract we use fixed values.
+     *
+     * @param contract the mission contract
+     * @return a HashMap containing quality and modifier as key-value pairs:
+     * @throws IllegalStateException if the contract is an instance of AtBContract
+     *         and the enemy quality is not recognized
+     */
+    private static HashMap<String, Integer> getQualityAndModifier(Mission contract) {
+        HashMap<String, Integer> qualityAndModifier = new HashMap<>();
+
+        if (contract instanceof AtBContract) {
+            switch (((AtBContract) contract).getEnemyQuality()) {
+                case IUnitRating.DRAGOON_F:
+                    qualityAndModifier.put("quality", Part.QUALITY_A);
+                    qualityAndModifier.put("modifier", -2);
+                    break;
+                case IUnitRating.DRAGOON_D:
+                    qualityAndModifier.put("quality", Part.QUALITY_B);
+                    qualityAndModifier.put("modifier", -1);
+                    break;
+                case IUnitRating.DRAGOON_C:
+                case IUnitRating.DRAGOON_B:
+                    qualityAndModifier.put("quality", Part.QUALITY_C);
+                    qualityAndModifier.put("modifier", 0);
+                    break;
+                case IUnitRating.DRAGOON_A:
+                    qualityAndModifier.put("quality", Part.QUALITY_D);
+                    qualityAndModifier.put("modifier", 1);
+                    break;
+                case IUnitRating.DRAGOON_ASTAR:
+                    qualityAndModifier.put("quality", Part.QUALITY_F);
+                    qualityAndModifier.put("modifier", 2);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value in mekhq/campaign/mission/Loot.java/getQualityAndModifier: "
+                            + ((AtBContract) contract).getEnemyQuality());
+            }
+        } else {
+            qualityAndModifier.put("quality", 3);
+            qualityAndModifier.put("modifier", 0);
+        }
+
+        return qualityAndModifier;
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {

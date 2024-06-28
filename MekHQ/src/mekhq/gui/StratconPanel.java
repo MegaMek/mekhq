@@ -13,13 +13,16 @@
 */
 package mekhq.gui;
 
+import megamek.common.util.ImageUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Force;
 import mekhq.campaign.mission.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.stratcon.*;
+import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
 import mekhq.gui.stratcon.StratconScenarioWizard;
 import mekhq.gui.stratcon.TrackForceAssignmentUI;
+import org.apache.logging.log4j.LogManager;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -36,9 +39,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import megamek.common.util.ImageUtil;
-import mekhq.campaign.stratcon.StratconBiomeManifest.ImageType;
-import org.apache.logging.log4j.LogManager;
 
 /**
  * This panel handles AtB-Stratcon GUI interactions with a specific scenario track.
@@ -104,7 +104,7 @@ public class StratconPanel extends JPanel implements ActionListener {
     private final TrackForceAssignmentUI assignmentUI;
 
     private final JLabel infoArea;
-    
+
     private final Map<String, BufferedImage> imageCache = new HashMap<>();
 
     /**
@@ -284,7 +284,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             g2D.drawRect((int) clickedPoint.getX(), (int) clickedPoint.getY(), 2, 2);
         }
     }
-    
+
     /**
      * Worker function that generates a hex polygon
      */
@@ -292,7 +292,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         Polygon graphHex = new Polygon();
         int xRadius = HEX_X_RADIUS;
         int yRadius = HEX_Y_RADIUS;
-        
+
         graphHex.addPoint(-xRadius / 2, -yRadius);
         graphHex.addPoint(-xRadius, 0);
         graphHex.addPoint(-xRadius / 2, yRadius);
@@ -316,7 +316,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         int xRadius = HEX_X_RADIUS;
         int yRadius = HEX_Y_RADIUS;
         graphHex.translate(xRadius, yRadius); // I don't remember why, but omitting this causes facilities etc to appear displaced
-        boolean pointFound = false;        
+        boolean pointFound = false;
 
         Point translatedClickedPoint = null;
 
@@ -339,7 +339,7 @@ public class StratconPanel extends JPanel implements ActionListener {
             //g2D.setColor(Color.ORANGE);
             //g2D.drawString(translatedClickedPoint.getX() + ", " + translatedClickedPoint.getY(), (int) clickedPoint.getX(), (int) clickedPoint.getY());
         }
-        
+
         Font pushFont = g2D.getFont();
         Font newFont = pushFont.deriveFont(Font.BOLD, pushFont.getSize());
         g2D.setFont(newFont);
@@ -349,14 +349,14 @@ public class StratconPanel extends JPanel implements ActionListener {
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
-                
+
                 if (drawHexType == DrawHexType.Outline) {
                     g2D.setColor(Color.BLACK);
-                    
+
                     // for legacy campaigns with no terrain data or if there's an un/poorly-defined terrain type
                     // we'll retain drawing a hex outline
                     BufferedImage biomeImage = getImage(currentTrack.getTerrainTile(currentCoords), ImageType.TerrainTile);
-                    
+
                     if (biomeImage == null) {
                         g2D.drawPolygon(graphHex);
                     }
@@ -379,14 +379,14 @@ public class StratconPanel extends JPanel implements ActionListener {
                         if (fogOfWarLayerImage != null) {
                             g2D.drawImage(fogOfWarLayerImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                         }
-                        
+
                         // needs a little more contrast between revealed and un-revealed hexes
                         var push = g2D.getComposite();
                         g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
                         g2D.fillPolygon(graphHex);
                         g2D.setComposite(push);
                     }
-                    
+
                     // useful for graphics coords debugging
                     //g2D.setColor(Color.pink);
                     //g2D.drawString(graphHex.getBounds().getX() + ", " + graphHex.getBounds().getY(), (int) graphHex.getBounds().getX(), (int) graphHex.getBounds().getY());
@@ -431,27 +431,27 @@ public class StratconPanel extends JPanel implements ActionListener {
             int[] translationVector = getRightAndUpVector(x % 2 == 0);
             graphHex.translate(translationVector[0], translationVector[1]);
         }
-        
+
         g2D.setFont(pushFont);
 
         return pointFound;
     }
-    
+
     /**
      * Returns true if the image with the given key has been loaded and cached already.
      */
     private boolean imageLoaded(String imageKey) {
         return imageCache.containsKey(imageKey);
     }
-    
+
     private BufferedImage getFacilityImage(StratconFacility facility) {
-        String imageKeyPrefix = facility.getOwner() == ForceAlignment.Allied ? 
+        String imageKeyPrefix = facility.getOwner() == ForceAlignment.Allied ?
                 StratconBiomeManifest.FACILITY_ALLIED : StratconBiomeManifest.FACILITY_HOSTILE;
         String imageKey = imageKeyPrefix + facility.getFacilityType().name();
-        
+
         return getImage(imageKey, ImageType.Facility);
     }
-    
+
     /**
      * Retrieves a buffered image from a file given a key into the config file (StratconBiomeManifest.xml)
      */
@@ -459,9 +459,9 @@ public class StratconPanel extends JPanel implements ActionListener {
         if (imageCache.containsKey(imageKey)) {
             return imageCache.get(imageKey);
         }
-        
+
         String imageName = null;
-        
+
         switch (imageType) {
             case TerrainTile:
                 imageName = StratconBiomeManifest.getInstance().getBiomeImage(imageKey);
@@ -484,10 +484,10 @@ public class StratconPanel extends JPanel implements ActionListener {
             LogManager.getLogger().error("Unable to load image: " + imageName + " with ID '" + imageKey + "'");
             return null;
         }
-        
+
         BufferedImage scaledImage = ImageUtil.getScaledImage(image, HEX_X_RADIUS * 2, HEX_Y_RADIUS * 2);
 
-        imageCache.put(imageKey, scaledImage);        
+        imageCache.put(imageKey, scaledImage);
         return scaledImage;
     }
 
@@ -513,7 +513,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         scenarioMarker2.addPoint(smallXRadius, -smallYRadius);
 
         Polygon graphHex = generateGraphHex();
-        
+
         boolean trackRevealed = currentTrack.hasActiveTrackReveal();
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
@@ -528,8 +528,8 @@ public class StratconPanel extends JPanel implements ActionListener {
                         ((scenario.getDeploymentDate() != null) ||
                          (scenario.isStrategicObjective() && currentTrack.getRevealedCoords().contains(currentCoords)) ||
                                 currentTrack.isGmRevealed() || trackRevealed)) {
-                    g2D.setColor(Color.RED);
-                    
+                    g2D.setColor(MekHQ.getMHQOptions().getFontColorNegative());
+
                     BufferedImage scenarioImage = getImage(StratconBiomeManifest.FORCE_HOSTILE, ImageType.TerrainTile);
                     if (scenarioImage != null) {
                         g2D.drawImage(scenarioImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
@@ -537,7 +537,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(scenarioMarker);
                         g2D.drawPolygon(scenarioMarker2);
                     }
-                    
+
                     if (currentTrack.getFacility(currentCoords) == null) {
                         drawTextEffect(g2D, scenarioMarker, "Hostile Force Detected", currentCoords);
                     } else if (currentTrack.getFacility(currentCoords).getOwner() == ForceAlignment.Allied) {
@@ -570,7 +570,7 @@ public class StratconPanel extends JPanel implements ActionListener {
         facilityMarker.addPoint(-xRadius, yRadius);
         facilityMarker.addPoint(xRadius, yRadius);
         facilityMarker.addPoint(xRadius, -yRadius);
-        
+
         Polygon graphHex = generateGraphHex();
 
         boolean trackRevealed = currentTrack.hasActiveTrackReveal();
@@ -578,21 +578,21 @@ public class StratconPanel extends JPanel implements ActionListener {
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratconCoords currentCoords = new StratconCoords(x, y);
-                StratconFacility facility = currentTrack.getFacility(currentCoords);             
-                
+                StratconFacility facility = currentTrack.getFacility(currentCoords);
+
                 if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
                     g2D.setColor(facility.getOwner() == ForceAlignment.Allied ? Color.CYAN : Color.RED);
-                    
+
                     BufferedImage facilityImage = getFacilityImage(facility);
 
-                    // draw the image if we can find one. 
+                    // draw the image if we can find one.
                     // Note: we track our current position using the facility marker, so it cannot be removed entirely
                     if (facilityImage != null) {
                         g2D.drawImage(facilityImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
                     } else {
                         g2D.drawPolygon(facilityMarker);
                     }
-                    
+
                     drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
                 }
 
@@ -616,7 +616,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         Shape forceMarker = new Ellipse2D.Double(-xRadius, -yRadius,
                 xRadius * 2.0, yRadius * 2.0);
-        
+
         Polygon graphHex = generateGraphHex();
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
@@ -626,7 +626,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 if (currentTrack.getAssignedCoordForces().containsKey(currentCoords)) {
                     for (int forceID : currentTrack.getAssignedCoordForces().get(currentCoords)) {
                         g2D.setColor(Color.GREEN);
-                        
+
                         BufferedImage forceImage = getImage(StratconBiomeManifest.FORCE_FRIENDLY, ImageType.TerrainTile);
                         if (forceImage != null) {
                             g2D.drawImage(forceImage, null, graphHex.xpoints[1], graphHex.ypoints[0]);
@@ -648,7 +648,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                 int[] downwardVector = getDownwardYVector();
                 AffineTransform ellipseTransform = new AffineTransform();
                 ellipseTransform.translate(downwardVector[0], downwardVector[1]);
-                graphHex.translate(downwardVector[0], downwardVector[1]);                
+                graphHex.translate(downwardVector[0], downwardVector[1]);
                 forceMarker = ellipseTransform.createTransformedShape(forceMarker);
             }
 
@@ -676,17 +676,17 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         g2D.drawLine((int) startX, (int) startY, (int) midPointX, (int) midPointY);
         g2D.drawLine((int) midPointX, (int) midPointY, (int) endPointX, (int) midPointY);
-        
+
         // draw gray rectangle
         Color push = g2D.getColor();
         g2D.setColor(Color.GRAY);
         int rectYStart = (int) midPointY - g2D.getFontMetrics().getHeight();
         int rectWidth = g2D.getFontMetrics().stringWidth(text) + 4;
-        
+
         g2D.fillRect((int) endPointX, rectYStart, rectWidth, g2D.getFontMetrics().getHeight());
         g2D.setColor(push);
         g2D.drawRect((int) endPointX, rectYStart, rectWidth, g2D.getFontMetrics().getHeight());
-        
+
         g2D.drawString(text, (int) endPointX + 2, (int) midPointY - 2);
 
         // register that we drew text off of this hex
@@ -811,7 +811,7 @@ public class StratconPanel extends JPanel implements ActionListener {
 
         boolean coordsRevealed = currentTrack.hasActiveTrackReveal() || currentTrack.getRevealedCoords().contains(boardState.getSelectedCoords());
         if (coordsRevealed) {
-            infoBuilder.append("<span color='green'>Recon complete</span><br/>");
+            infoBuilder.append("<span color='" + MekHQ.getMHQOptions().getFontColorPositiveHexColor() + "'>Recon complete</span><br/>");
         }
 
         if (currentTrack.getAssignedCoordForces().containsKey(boardState.getSelectedCoords())) {
@@ -836,16 +836,25 @@ public class StratconPanel extends JPanel implements ActionListener {
             if ((facility != null) && (facility.getFacilityType() != null)) {
                 if (facility.isStrategicObjective()) {
                     infoBuilder.append(String.format("<br/><span color='%s'>Contract objective located</span>",
-                            facility.getOwner() == ForceAlignment.Allied ? "green" : "red"));
+                            facility.getOwner() == ForceAlignment.Allied ? MekHQ.getMHQOptions().getFontColorPositiveHexColor() : MekHQ.getMHQOptions().getFontColorNegativeHexColor()));
                 }
-                infoBuilder.append((facility.getOwner() == ForceAlignment.Allied) ? "<span color='green'>" : "<span color='red'>")
+                infoBuilder.append("<span color='")
+                        .append(facility.getOwner() == ForceAlignment.Allied ? MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+                                : MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                        .append("'>")
                     .append("<br/>")
-                    .append(facility.getFormattedDisplayableName())
-                    .append("<span>");
+                    .append(facility.getFormattedDisplayableName());
+                    
+                if (facility.getUserDescription() != null) {
+                   infoBuilder.append("<br/>")
+                   .append(facility.getUserDescription());
+                }
+                 
+                infoBuilder.append("<span>");
             }
 
         } else {
-            infoBuilder.append("<span color='red'>Recon incomplete</span>");
+            infoBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegative()).append("'>Recon incomplete</span>");
         }
         infoBuilder.append("<br/>");
 

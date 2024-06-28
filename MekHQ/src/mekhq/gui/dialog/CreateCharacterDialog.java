@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -37,6 +37,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Faction.Tag;
 import mekhq.campaign.universe.Factions;
@@ -93,6 +94,9 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
     private JPanel panSkills;
     private JPanel panOptions;
     private JTextField textToughness;
+    private JComboBox<EducationLevel> textEducationLevel;
+    private JTextField textFatigue;
+    private JTextField textLoyalty;
     private JTextField textPreNominal;
     private JTextField textGivenName;
     private JTextField textSurname;
@@ -187,6 +191,12 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         textBloodname = new JTextField();
         textToughness = new JTextField();
         JLabel lblToughness = new JLabel();
+        textEducationLevel = new JComboBox<>();
+        textFatigue = new JTextField();
+        JLabel lblFatigue = new JLabel();
+        textLoyalty = new JTextField();
+        JLabel lblLoyalty = new JLabel();
+        JLabel lblEducationLevel = new JLabel();
 
         JButton btnRandomName = new JButton();
         JButton btnRandomBloodname = new JButton();
@@ -597,9 +607,105 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             gridBagConstraints.anchor = GridBagConstraints.WEST;
             gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
             demogPanel.add(textToughness, gridBagConstraints);
+
+            y++;
         }
 
-        y++;
+        lblToughness.setText(resourceMap.getString("lblToughness.text")); // NOI18N
+        lblToughness.setName("lblToughness"); // NOI18N
+
+        textToughness.setText(Integer.toString(person.getToughness()));
+        textToughness.setName("textToughness"); // NOI18N
+
+        if (campaign.getCampaignOptions().isUseToughness()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblToughness, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textToughness, gridBagConstraints);
+
+            y++;
+        }
+
+        lblEducationLevel.setText(resourceMap.getString("lblEducationLevel.text"));
+        lblEducationLevel.setName("lblEducationLevel");
+
+        for (EducationLevel level : EducationLevel.values()) {
+            textEducationLevel.addItem(level);
+        }
+
+        textEducationLevel.setName("textEducationLevel");
+
+        if (campaign.getCampaignOptions().isUseEducationModule()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblEducationLevel, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textEducationLevel, gridBagConstraints);
+
+            y++;
+        }
+
+        lblFatigue.setText(resourceMap.getString("lblFatigue.text"));
+        lblFatigue.setName("lblFatigue");
+
+        textFatigue.setText(Integer.toString(person.getFatigue()));
+        textFatigue.setName("textFatigue");
+
+        if (campaign.getCampaignOptions().isUseFatigue()) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblFatigue, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textFatigue, gridBagConstraints);
+
+            y++;
+        }
+
+        lblLoyalty.setText(resourceMap.getString("lblLoyalty.text"));
+        lblLoyalty.setName("lblLoyalty");
+
+        textLoyalty.setText(Integer.toString(person.getLoyalty()));
+        textLoyalty.setName("textLoyalty");
+
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())) {
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.insets = new Insets(0, 5, 0, 0);
+            demogPanel.add(lblLoyalty, gridBagConstraints);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = y;
+            gridBagConstraints.anchor = GridBagConstraints.WEST;
+            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+            demogPanel.add(textLoyalty, gridBagConstraints);
+
+            y++;
+        }
 
         txtBio = new MarkdownEditorPanel("Biography");
         txtBio.setText(person.getBiography());
@@ -1264,6 +1370,18 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
         try {
             person.setToughness(Integer.parseInt(textToughness.getText()));
         } catch (NumberFormatException ignored) { }
+
+        try {
+            person.setFatigue(Integer.parseInt(textFatigue.getText()));
+        } catch (NumberFormatException ignored) { }
+
+        try {
+            person.setLoyalty(Integer.parseInt(textLoyalty.getText()));
+        } catch (NumberFormatException ignored) { }
+
+        try {
+            person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());
+        } catch (NumberFormatException ignored) {}
         person.setPortrait(portrait);
         int xpSpent = xpPool - getSkillXpSpent();
         if (xpSpent > 0) {

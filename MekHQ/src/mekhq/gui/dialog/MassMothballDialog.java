@@ -323,7 +323,7 @@ public class MassMothballDialog extends JDialog implements ActionListener, ListS
         if (completionTime > 0) {
             return String.format("Completion Time: %d minutes", completionTime);
         } else {
-            return "<html>Completion Time: <span color='red'>Never</span></html>";
+            return "<html>Completion Time: <span color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>Never</span></html>";
         }
     }
 

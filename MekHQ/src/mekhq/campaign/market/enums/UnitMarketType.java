@@ -18,9 +18,14 @@
  */
 package mekhq.campaign.market.enums;
 
+import megamek.common.Compute;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.unit.Unit;
 import org.apache.logging.log4j.LogManager;
 
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
 public enum UnitMarketType {
@@ -101,5 +106,93 @@ public enum UnitMarketType {
     @Override
     public String toString() {
         return name;
+    }
+
+    /**
+     * Calculates the price percentage based on a given modifier and d6 roll.
+     *
+     * @param modifier the modifier to adjust the price (a negative modifier decreases price, positive increases price)
+     * @return the calculated price
+     * @throws IllegalStateException if the roll value is unexpected
+     */
+    public static int getPricePercentage(int modifier) {
+        int roll = Compute.d6(2);
+        int value;
+
+        switch (roll) {
+            case 2:
+                value = modifier + 3;
+                break;
+            case 3:
+                value = modifier + 2;
+                break;
+            case 4:
+            case 5:
+                value = modifier + 1;
+                break;
+            case 6:
+            case 7:
+            case 8:
+                value = modifier;
+                break;
+            case 9:
+            case 10:
+                value = modifier - 1;
+                break;
+            case 11:
+                value = modifier - 2;
+                break;
+            case 12:
+                value = modifier - 3;
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value in mekhq/campaign/market/unitMarket/AtBMonthlyUnitMarket.java/getPrice: " + roll);
+        }
+
+        return 100 + (value * 5);
+    }
+
+    /**
+     * Returns the quality of a unit based on the given market type.
+     *
+     * @param market the type of market
+     * @return the quality of the unit
+     */
+    public static int getQuality(Campaign campaign, UnitMarketType market) {
+        HashMap<String, Integer> qualityAndModifier = new HashMap<>();
+
+        switch(market) {
+            case OPEN:
+            case MERCENARY:
+                qualityAndModifier.put("quality", Part.QUALITY_C);
+                qualityAndModifier.put("modifier", 0);
+                break;
+            case EMPLOYER:
+                qualityAndModifier.put("quality", Part.QUALITY_B);
+                qualityAndModifier.put("modifier", -1);
+                break;
+            case BLACK_MARKET:
+                if (Compute.d6(1) <= 2) {
+                    qualityAndModifier.put("quality", Part.QUALITY_A);
+                    // this is to force a result of 0 (A)
+                    qualityAndModifier.put("modifier", -12);
+                } else {
+                    qualityAndModifier.put("quality", Part.QUALITY_F);
+                    // this is to force a result of 5 (F)
+                    qualityAndModifier.put("modifier", 12);
+                }
+                break;
+            case FACTORY:
+                qualityAndModifier.put("quality", Part.QUALITY_F);
+                // this is to force a result of 5 (F)
+                qualityAndModifier.put("modifier", 12);
+                break;
+        }
+
+        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            return Unit.getRandomUnitQuality(qualityAndModifier.get("modifier"));
+        } else {
+            return qualityAndModifier.get("quality");
+        }
     }
 }

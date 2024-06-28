@@ -22,14 +22,13 @@ package mekhq.campaign;
 
 import megamek.common.Compute;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.event.LocationChangedEvent;
-import mekhq.campaign.event.NewDayEvent;
 import mekhq.campaign.event.TransitCompleteEvent;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -220,7 +219,7 @@ public class CurrentLocation {
                                     true, campaign.getCampaignOptions().isEquipmentContractBase()),
                             "Jump from " + currentSystem.getName(campaign.getLocalDate())
                                     + " to " + jumpPath.get(1).getName(campaign.getLocalDate()))) {
-                        campaign.addReport("<font color='red'><b>You cannot afford to make the jump!</b></font>");
+                        campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>You cannot afford to make the jump!</b></font>");
                         return;
                     }
                 }

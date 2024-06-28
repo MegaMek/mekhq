@@ -56,6 +56,7 @@ public class StratconFacility implements Cloneable {
     private ForceAlignment owner;
     private String displayableName;
     private FacilityType facilityType;
+    private String userDescription;
     private boolean visible;
     private int aggroRating;
     private List<String> sharedModifiers = new ArrayList<>();
@@ -92,6 +93,7 @@ public class StratconFacility implements Cloneable {
         clone.scenarioOddsModifier = scenarioOddsModifier;
         clone.weeklySPModifier = weeklySPModifier;
         clone.preventAerospace = preventAerospace;
+        clone.userDescription = userDescription;
         clone.biomes = new ArrayList<>(biomes);
         ReconstructTransientData(clone);
         return clone;
@@ -110,6 +112,7 @@ public class StratconFacility implements Cloneable {
         setWeeklySPModifier(facility.getWeeklySPModifier());
         setPreventAerospace(facility.preventAerospace());
         setBiomes(new ArrayList<>(facility.getBiomes()));
+        setUserDescription(facility.getUserDescription());
         ReconstructTransientData(this);
     }
 
@@ -299,5 +302,13 @@ public class StratconFacility implements Cloneable {
 
     public void setPreventAerospace(boolean preventAerospace) {
         this.preventAerospace = preventAerospace;
+    }
+
+    public String getUserDescription() {
+        return userDescription;
+    }
+
+    public void setUserDescription(String userDescription) {
+        this.userDescription = userDescription;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2019-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -144,7 +144,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
          * Either assigned by player from TO&amp;E or a minimum fixed number of units;
          */
         PlayerOrFixedUnitCount,
-        
+
         /**
          * Using one or more fixed MULs
          */
@@ -354,12 +354,12 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
      * e.g. "Good Intel".
      */
     private boolean subjectToRandomRemoval = true;
-    
+
     /**
      * A file name of a MUL
      */
     private String fixedMul;
-    
+
     @Override
     public ScenarioForceTemplate clone() {
         return new ScenarioForceTemplate(this);
@@ -624,7 +624,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     public void setDeployOffboard(boolean deployOffBoard) {
         this.deployOffBoard = deployOffBoard;
     }
-    
+
     public boolean isSubjectToRandomRemoval() {
         return subjectToRandomRemoval;
     }
@@ -632,7 +632,7 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
     public void setSubjectToRandomRemoval(boolean subjectToRandomRemoval) {
         this.subjectToRandomRemoval = subjectToRandomRemoval;
     }
-    
+
     @Nullable
     public String getFixedMul() {
         return fixedMul;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2018-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -22,18 +22,20 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
+import mekhq.campaign.personnel.enums.education.AcademyType;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.enums.education.EducationLevel.Adapter;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 
 /**
  * The Academy class represents an academy with various properties and methods.
@@ -44,20 +46,17 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "name")
     private String name = "Error: Name Missing";
 
+    @XmlElement(name = "type")
+    private String type = "None";
+
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary = false;
 
-    @XmlElement(name = "promotion")
-    private String promotion = "None";
+    @XmlElement(name = "isReeducationCamp")
+    private Boolean isReeducationCamp = false;
 
     @XmlElement(name = "isPrepSchool")
     private Boolean isPrepSchool = false;
-
-    @XmlElement(name = "isClan")
-    private Boolean isClan = false;
-
-    @XmlElement(name = "isTrueborn")
-    private Boolean isTrueborn = false;
 
     @XmlElement(name = "description")
     private String description = "Error: no description";
@@ -67,9 +66,6 @@ public class Academy implements Comparable<Academy> {
 
     @XmlElement(name = "isFactionRestricted")
     private Boolean isFactionRestricted = false;
-
-    @XmlElement(name = "faction")
-    private String faction = "CS";
 
     @XmlElement(name = "isLocal")
     private Boolean isLocal = false;
@@ -97,16 +93,11 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "facultySkill")
     private Integer facultySkill = 7;
 
-    // 0 = early childhood <= 10
-    // 1 = (11-16) high school
-    // 2 = college / university
-    // 3 = post-grad
-    // 4 = doctorate
-    @XmlElement(name = "educationLevelMin")
-    private Integer educationLevelMin = 0;
+    @XmlJavaTypeAdapter(value = Adapter.class)
+    private EducationLevel educationLevelMin = EducationLevel.EARLY_CHILDHOOD;
 
-    @XmlElement(name = "educationLevelMax")
-    private Integer educationLevelMax = 1;
+    @XmlJavaTypeAdapter(value = Adapter.class)
+    private EducationLevel educationLevelMax = EducationLevel.HIGH_SCHOOL;
 
     @XmlElement(name = "ageMin")
     private Integer ageMin = 0;
@@ -140,15 +131,13 @@ public class Academy implements Comparable<Academy> {
      *
      * @param set                     the set name of the academy
      * @param name                    the name of the academy
+     * @param type                    the type of academy (used by autoAwards)
      * @param isMilitary              indicates if the academy is a military academy (true) or not (false)
-     * @param promotion               indicates the promotion rank earned for completing an academic course
-     * @param isClan                  indicates if the academy is a Clan Sibko or Crèche (true) or not (false)
-     * @param isTrueborn              indicates if the Sibko is intended for Trueborn (true) or not (false)
+     * @param isReeducationCamp       indicates if the academy is a reeducation camp (true) or not (false)
      * @param isPrepSchool            indicates if the academy is focused on children (true) or not (false)
      * @param description             the description of the academy
      * @param factionDiscount         the discount offered by the academy to faction members
      * @param isFactionRestricted     indicates if the academy is restricted to faction members (true) or not (false)
-     * @param faction                 the faction code the academy is restricted to
      * @param isLocal                 indicates if the academy is local (true) or not (false) (overrides locationSystems)
      * @param locationSystems         the list of location systems where the academy is present
      * @param constructionYear        the year when the academy was constructed
@@ -166,24 +155,22 @@ public class Academy implements Comparable<Academy> {
      * @param baseAcademicSkillLevel  the base skill level provided by the academy
      * @param id                      the id number of the academy, used for sorting academies in mhq
      */
-    public Academy(String set, String name, Boolean isMilitary, String promotion, Boolean isClan, Boolean isTrueborn,
+    public Academy(String set, String name, String type, Boolean isMilitary, Boolean isReeducationCamp,
                    Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
-                   String faction, List<String> locationSystems, Boolean isLocal, Integer constructionYear,
+                   List<String> locationSystems, Boolean isLocal, Integer constructionYear,
                    Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
-                   Integer facultySkill, Integer educationLevelMin, Integer educationLevelMax, Integer ageMin,
-                   Integer ageMax, List<String> qualifications, List<String> curriculums, List<Integer> qualificationStartYears,
-                   Integer baseAcademicSkillLevel, Integer id) {
+                   Integer facultySkill, EducationLevel educationLevelMin, EducationLevel educationLevelMax,
+                   Integer ageMin, Integer ageMax, List<String> qualifications, List<String> curriculums,
+                   List<Integer> qualificationStartYears, Integer baseAcademicSkillLevel, Integer id) {
         this.set = set;
         this.name = name;
+        this.type = type;
         this.isMilitary = isMilitary;
-        this.promotion = promotion;
-        this.isClan = isClan;
-        this.isTrueborn = isTrueborn;
+        this.isReeducationCamp = isReeducationCamp;
         this.isPrepSchool = isPrepSchool;
         this.description = description;
         this.factionDiscount = factionDiscount;
         this.isFactionRestricted = isFactionRestricted;
-        this.faction = faction;
         this.isLocal = isLocal;
         this.locationSystems = locationSystems;
         this.constructionYear = constructionYear;
@@ -241,6 +228,24 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
+     * Gets the type of academy.
+     *
+     * @return The type of academy.
+     */
+    public AcademyType getType() {
+        return AcademyType.parseFromString(type);
+    }
+
+    /**
+     * Sets the type of academy.
+     *
+     * @param type the type to be set.
+     */
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    /**
      * Checks if the academy is a military academy.
      *
      * @return {@code true} if the academy is a military academy, {@code false} otherwise.
@@ -259,57 +264,21 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
-     * Retrieves the promotion awarded for completing an academic course.
+     * Determines if the academy is a reeducation camp.
      *
-     * @return the promotion awarded for completing an academic course
+     * @return true, if the academy is a reeducation camp; otherwise, false.
      */
-    public String getPromotion() {
-        return promotion;
+    public boolean isReeducationCamp() {
+        return isReeducationCamp;
     }
 
     /**
-     * Sets the promotion for the academy.
+     * Sets the value of the isReeducationCamp property.
      *
-     * @param promotion the promotion to be set
+     * @param isReeducationCamp the new value for the isReeducationCamp property
      */
-    public void setPromotion(final String promotion) {
-        this.promotion = promotion;
-    }
-
-    /**
-     * Checks if the academy is a Clan Sibko or Crèche.
-     *
-     * @return {@code true} if the academy is a Clan Sibko or Crèche, {@code false} otherwise.
-     */
-    public Boolean isClan() {
-        return isClan;
-    }
-
-    /**
-     * Sets the value indicating whether the academy is a Clan Sibko or Crèche.
-     *
-     * @param isClan true if the academy is a Clan Sibko or Crèche, false otherwise.
-     */
-    public void setIsClan(final boolean isClan) {
-        this.isClan = isClan;
-    }
-
-    /**
-     * Checks if the academy is a Truenorn Sibko or Crèche.
-     *
-     * @return {@code true} if the academy is a Trueborn Sibko or Crèche, {@code false} otherwise.
-     */
-    public Boolean isTrueborn() {
-        return isTrueborn;
-    }
-
-    /**
-     * Sets the value indicating whether the academy is a Trueborn Sibko or Crèche.
-     *
-     * @param isTrueborn true if the academy is a Trueborn Sibko or Crèche, false otherwise.
-     */
-    public void setIsTrueborn(final boolean isTrueborn) {
-        this.isTrueborn = isTrueborn;
+    public void setIsReeducationCamp(final boolean isReeducationCamp) {
+        this.isReeducationCamp = isReeducationCamp;
     }
 
     /**
@@ -547,24 +516,6 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
-     * Retrieves the faction associated with an academy.
-     *
-     * @return The faction of the academy.
-     */
-    public String getFaction() {
-        return faction;
-    }
-
-    /**
-     * Sets the faction of an academy.
-     *
-     * @param faction the faction to be set
-     */
-    public void setFaction(final String faction) {
-        this.faction = faction;
-    }
-
-    /**
      * Retrieves faculty skill level.
      *
      * @return The faculty skill level as an Integer.
@@ -587,7 +538,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The minimum academic tier value as an Integer.
      */
-    public Integer getEducationLevelMin() {
+    public EducationLevel getEducationLevelMin() {
         return educationLevelMin;
     }
 
@@ -596,7 +547,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param educationLevelMin the minimum education level required, as an Integer
      */
-    public void setEducationLevelMin(final Integer educationLevelMin) {
+    public void setEducationLevelMin(final EducationLevel educationLevelMin) {
         this.educationLevelMin = educationLevelMin;
     }
 
@@ -605,7 +556,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @return The maximum academic tier value as an Integer
      */
-    public Integer getEducationLevelMax() {
+    public EducationLevel getEducationLevelMax() {
         return educationLevelMax;
     }
 
@@ -614,7 +565,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param educationLevelMax the maximum education level to be set
      */
-    public void setEducationLevelMax(final Integer educationLevelMax) {
+    public void setEducationLevelMax(final EducationLevel educationLevelMax) {
         this.educationLevelMax = educationLevelMax;
     }
 
@@ -724,12 +675,10 @@ public class Academy implements Comparable<Academy> {
      * @param person        the person for whom the tuition is being calculated
      * @return the adjusted tuition value as an Integer
      */
-    public Integer getTuitionAdjusted(Person person) {
-        if (getEducationLevel(person) < 2) {
-            return tuition;
-        } else {
-            return tuition * getEducationLevel(person);
-        }
+    public int getTuitionAdjusted(Person person) {
+        double educationLevel = Math.max(1, getEducationLevel(person) - (EducationLevel.parseToInt(educationLevelMin) / 4));
+
+        return (int) (tuition * educationLevel);
     }
 
     /**
@@ -740,12 +689,24 @@ public class Academy implements Comparable<Academy> {
      * @return the faction discount as a double value, between 0.00 and 1.00
      */
     public Double getFactionDiscountAdjusted(Campaign campaign, Person person) {
-        if (locationSystems.stream()
-                .flatMap(campus -> campaign.getSystemById(campus)
-                        .getFactions(campaign.getLocalDate())
-                        .stream())
-                .anyMatch(faction -> faction.equalsIgnoreCase(person.getOriginFaction().getShortName()))) {
-            return (double) (factionDiscount / 100);
+        if (isFactionRestricted) {
+            return 1.00;
+        }
+
+        List<String> campuses = isLocal ? Collections.singletonList(campaign.getCurrentSystem().getId()) : locationSystems;
+
+        Set<String> relevantFactions = new HashSet<>();
+        relevantFactions.add(campaign.getFaction().getShortName());
+        relevantFactions.add(person.getOriginFaction().getShortName());
+
+        for (String campus : campuses) {
+            List<String> factions = campaign.getSystemById(campus).getFactions(campaign.getLocalDate());
+
+            if (Collections.disjoint(factions, relevantFactions)) {
+                return 1.00;
+            } else {
+                return 1 - ((double) factionDiscount / 100);
+            }
         }
 
         return 1.00;
@@ -756,27 +717,40 @@ public class Academy implements Comparable<Academy> {
      *
      * @param campaign The campaign being played.
      * @param person The person for whom to filter the faction.
-     * @param system The system in which the local campus is located.
+     * @param factions The factions to check eligibility against.
      * @return The filtered faction for the local campus, or null if no faction is found.
      */
-    public String getFilteredFaction(Campaign campaign, Person person, String system) {
-        List<String> systemOwners = campaign.getSystemById(system).getFactions(campaign.getLocalDate());
-
-        for (String faction : systemOwners) {
-            if ((isFactionRestricted) && (Objects.equals(campaign.getFaction().getShortName(), faction))) {
-                return Factions.getInstance().getFaction(faction).getShortName();
-            } else if ((isFactionRestricted) && (Objects.equals(person.getOriginFaction().getShortName(), faction))) {
-                return Factions.getInstance().getFaction(faction).getShortName();
-            } else if (!RandomFactionGenerator.getInstance().getFactionHints()
-                    .isAtWarWith(person.getOriginFaction(), Factions.getInstance().getFaction(faction),
-                            campaign.getLocalDate())) {
-                return Factions.getInstance().getFaction(faction).getShortName();
-            } else if (!RandomFactionGenerator.getInstance().getFactionHints()
-                    .isAtWarWith(campaign.getFaction(), Factions.getInstance().getFaction(faction),
-                            campaign.getLocalDate())) {
-                return Factions.getInstance().getFaction(faction).getShortName();
-            }
+    public String getFilteredFaction(Campaign campaign, Person person, List<String> factions) {
+        if (factions.isEmpty()) {
+            return null;
         }
+
+        Faction originFaction = person.getOriginFaction();
+
+        for (String shortName : factions) {
+             Faction faction = Factions.getInstance().getFaction(shortName);
+
+             if (isFactionRestricted) {
+                 if (Objects.equals(originFaction, faction)) {
+                     return faction.getShortName();
+                 }
+
+                 if (Objects.equals(campaign.getFaction(), faction)) {
+                     return faction.getShortName();
+                 }
+
+                 return null;
+             }
+
+             if (!RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(originFaction, faction, campaign.getLocalDate())) {
+                 return faction.getShortName();
+             }
+
+             if (!RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(), faction, campaign.getLocalDate())) {
+                 return faction.getShortName();
+             }
+        }
+
         return null;
     }
 
@@ -787,7 +761,7 @@ public class Academy implements Comparable<Academy> {
      * @return True, if the person's highest education level is greater than or equal to the minimum education level required, false otherwise.
      */
     public boolean isQualified(Person person) {
-        return person.getEduHighestEducation() >= educationLevelMin;
+        return EducationLevel.parseToInt(person.getEduHighestEducation()) >= EducationLevel.parseToInt(educationLevelMin);
     }
 
     /**
@@ -797,19 +771,24 @@ public class Academy implements Comparable<Academy> {
      * @param person  The person whose education level needs to be determined.
      * @return The education level of the qualification.
      */
-    int getEducationLevel(Person person) {
+    public int getEducationLevel(Person person) {
+        int currentEducationLevel = EducationLevel.parseToInt(person.getEduHighestEducation());
+        int minimumEducationLevel = EducationLevel.parseToInt(educationLevelMin);
+        int maximumEducationLevel = EducationLevel.parseToInt(educationLevelMax);
+
         int educationLevel;
 
-        if ((person.getEduHighestEducation() + educationLevelMin) >= educationLevelMax) {
-            educationLevel = educationLevelMax;
-        } else if ((person.getEduHighestEducation() + educationLevelMin) == 0) {
-            educationLevel = person.getEduHighestEducation() + educationLevelMin + 1;
+        if ((currentEducationLevel + minimumEducationLevel) >= maximumEducationLevel) {
+            educationLevel = maximumEducationLevel;
+        } else if ((currentEducationLevel + minimumEducationLevel) == 0) {
+            educationLevel = currentEducationLevel + minimumEducationLevel + 1;
         } else {
-            educationLevel = person.getEduHighestEducation() + educationLevelMin;
+            educationLevel = currentEducationLevel + minimumEducationLevel;
         }
 
-        if (educationLevel > 10) {
-            educationLevel = 10;
+        // this probably isn't necessary, but a little insurance goes a long way
+        if (educationLevel > EducationLevel.values().length - 1) {
+            educationLevel = EducationLevel.values().length - 1;
         } else if (educationLevel < 0) {
             educationLevel = 0;
         }
@@ -829,7 +808,7 @@ public class Academy implements Comparable<Academy> {
         if (RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(person.getOriginFaction(),
                 Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate())) {
             return true;
-        // is there a conflict between academy faction & campaign faction?
+            // is there a conflict between academy faction & campaign faction?
         } else {
             return RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(),
                     Factions.getInstance().getFaction(person.getEduAcademyFaction()), campaign.getLocalDate());
@@ -860,14 +839,15 @@ public class Academy implements Comparable<Academy> {
     }
 
     /**
-     * Returns an HTML formatted string to be used as a tooltip.
+     * Retrieves the tooltip for an academy, based on the number of persons in 'personnel'
      *
-     * @param campaign      the current campaign
-     * @param person        the person we're generating the tooltip for
-     * @param courseIndex   the index of the course in the curriculum
-     * @return the tooltip string
+     * @param campaign     The campaign to retrieve the tooltip for.
+     * @param personnel    The list of personnel.
+     * @param courseIndex  The index of the course.
+     * @param destination  The campus.
+     * @return The tooltip as a String.
      */
-    public String getTooltip(Campaign campaign, Person person, int courseIndex, PlanetarySystem destination) {
+    public String getTooltip(Campaign campaign, List<Person> personnel, int courseIndex, PlanetarySystem destination) {
         ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education",
                 MekHQ.getMHQOptions().getLocale());
 
@@ -875,12 +855,12 @@ public class Academy implements Comparable<Academy> {
         tooltip.append("<i>").append(description).append("</i><br><br>");
         tooltip.append("<b>").append(resources.getString("curriculum.text")).append("</b><br>");
 
-        int educationLevel = getEducationLevel(person) + baseAcademicSkillLevel;
+        Person person = personnel.get(0);
 
-        if (educationLevel > 10) {
-            educationLevel = 10;
-        } else if (educationLevel < 0) {
-            educationLevel = 0;
+        int educationLevel = 0;
+
+        if (personnel.size() == 1) {
+            educationLevel = getEducationLevel(person) + baseAcademicSkillLevel;
         }
 
         // here we display the skills
@@ -890,29 +870,40 @@ public class Academy implements Comparable<Academy> {
                 .map(String::trim)
                 .toArray(String[]::new);
 
-        for (String skill : skills) {
-            tooltip.append(skill).append(" (");
+        if (personnel.size() == 1) {
+            for (String skill : skills) {
+                tooltip.append(skill).append(" (");
 
-            if (skill.equalsIgnoreCase("xp bonus") || (skill.equalsIgnoreCase("bonus xp"))) {
-                tooltip.append(educationLevel).append(resources.getString("xpBonus.text")).append(")<br>");
-            } else {
-                String skillParsed = skillParser(skill);
-
-                if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() >= educationLevel)) {
-                    tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                if (skill.equalsIgnoreCase("xp")) {
+                    if (EducationLevel.parseToInt(person.getEduHighestEducation()) >= educationLevel) {
+                        tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                    } else {
+                        tooltip.append(educationLevel * campaign.getCampaignOptions().getCurriculumXpRate()).append(")<br>");
+                    }
                 } else {
-                    tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
+                    String skillParsed = skillParser(skill);
+
+                    if ((person.hasSkill(skillParsed)) && (person.getSkill(skillParsed).getExperienceLevel() >= educationLevel)) {
+                        tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
+                    } else {
+                        tooltip.append(SkillType.getExperienceLevelName(educationLevel)).append(")<br>");
+                    }
                 }
+            }
+        } else {
+            for (String skill : skills) {
+                tooltip.append(skill).append("<br>");
             }
         }
 
         tooltip.append("<br>");
 
         // with the skill content resolved, we can move onto the rest of the tooltip
-        if (tuition * getFactionDiscountAdjusted(campaign, person) > 0) {
+        if (personnel.size() == 1) {
             tooltip.append("<b>").append(resources.getString("tuition.text")).append("</b> ")
-                    .append(tuition * getFactionDiscountAdjusted(campaign, person)).append(" CSB").append("<br>");
+                    .append(getTuitionAdjusted(person) * getFactionDiscountAdjusted(campaign, person)).append(" CSB").append("<br>");
         }
+
         if (isPrepSchool) {
             tooltip.append("<b>").append(resources.getString("duration.text"))
                     .append("</b> ").append(' ').append(String.format(resources.getString("durationAge.text"), ageMax)).append("<br>");
@@ -926,19 +917,7 @@ public class Academy implements Comparable<Academy> {
         }
 
         // we need to do a little extra work to get travel time, to cover academies with multiple campuses or Clan nonsense
-        int distance = 2;
-
-        if ((isClan) && (!isLocal)) {
-            if (!isTrueborn) {
-                try {
-                    distance = campaign.getSimplifiedTravelTime(campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate()));
-                } catch (Exception e) {
-                    distance = campaign.getSimplifiedTravelTime(campaign.getSystemById("Strana Mechty"));
-                }
-            }
-        } else {
-            distance = campaign.getSimplifiedTravelTime(destination);
-        }
+        int distance = campaign.getSimplifiedTravelTime(destination);
 
         tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
 
@@ -948,27 +927,32 @@ public class Academy implements Comparable<Academy> {
             tooltip.append(distance / 7).append(' ').append(resources.getString("durationWeeks.text"));
         }
 
-        if ((isClan) && (!isLocal)) {
-            destination = campaign.getFaction().getStartingPlanet(campaign, campaign.getLocalDate());
+        tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
 
-            try {
-                tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
-            } catch (Exception e) {
-                tooltip.append("Strana Mechty").append(")<br>");
+        // with travel time out the way, all that's left is to add the last couple of entries
+        if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
+            tooltip.append("<b>").append(resources.getString("reeducation.text")).append("</b> ");
+
+            if (personnel.size() == 1) {
+                if (!Objects.equals(person.getOriginFaction().getShortName(), campaign.getFaction().getShortName())) {
+                    tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
+                } else {
+                    tooltip.append(resources.getString("reeducationNoChange.text")).append("<br>");
+                }
+            } else {
+                tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
             }
-        } else {
-            tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
+
+            tooltip.append("<br>");
         }
 
-        // we travel time out the way; all that's left is to add the last couple of entries
-        if ((isMilitary) && (!Objects.equals(promotion, "None"))) {
-            tooltip.append("<b>").append(resources.getString("promotion.text")).append("</b> ")
-                    .append(promotion).append("<br>");
-        }
         tooltip.append("<b>").append(resources.getString("facultySkill.text")).append("</b> ")
                 .append(facultySkill).append ('+').append("<br>");
-        tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")
-                .append(getEducationLevel(person)).append("<br>");
+
+        if (personnel.size() == 1) {
+            tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")
+                    .append(EducationLevel.parseFromInt(getEducationLevel(person))).append("<br>");
+        }
 
         return tooltip.append("</html>").toString();
     }
@@ -990,7 +974,7 @@ public class Academy implements Comparable<Academy> {
                 return SkillType.S_PILOT_AERO;
             case "gunnery/aerospace":
                 return SkillType.S_GUN_AERO;
-            case "piloting/groundvehicle":
+            case "piloting/ground vehicle":
                 return SkillType.S_PILOT_GVEE;
             case "piloting/vtol":
                 return SkillType.S_PILOT_VTOL;

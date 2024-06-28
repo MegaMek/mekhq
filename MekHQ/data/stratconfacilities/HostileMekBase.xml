@@ -5,6 +5,7 @@
         <localModifiers>EnemyMechGarrison.xml</localModifiers>
         <owner>Opposing</owner>
         <sharedModifiers>EnemyMechReinforcements.xml</sharedModifiers>
+	<userDescription>Hostile mechs will participate in scenarios on this track and defend this facility.</userDescription>	
         <visible>false</visible>
 <biomes>
 	<biomeCategory>TerranFacility</biomeCategory>

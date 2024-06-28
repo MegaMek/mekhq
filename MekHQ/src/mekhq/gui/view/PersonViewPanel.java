@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2013-2021 - The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -18,6 +18,7 @@
  */
 package mekhq.gui.view;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.options.IOption;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
@@ -31,6 +32,7 @@ import mekhq.campaign.personnel.*;
 import mekhq.campaign.personnel.education.Academy;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.CampaignGUI;
@@ -55,6 +57,8 @@ import java.awt.event.MouseListener;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static mekhq.campaign.personnel.Person.getLoyaltyName;
 
 /**
  * A custom panel that gets filled in with goodies from a Person record
@@ -341,8 +345,11 @@ public class PersonViewPanel extends JScrollablePanel {
                 rowRibbonsBox.setBackground(Color.RED);
             }
             try {
-                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
-                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
+                int awardTierCount = MathUtility.clamp(
+                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
+                        1,
+                        award.getNumberOfRibbonFiles()
+                );
 
                 String ribbonFileName = award.getRibbonFileName(awardTierCount);
 
@@ -393,8 +400,11 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image medal;
             try {
-                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
-                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
+                int awardTierCount = MathUtility.clamp(
+                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
+                        1,
+                        award.getNumberOfMedalFiles()
+                );
 
                 String medalFileName = award.getMedalFileName(awardTierCount);
 
@@ -442,8 +452,11 @@ public class PersonViewPanel extends JScrollablePanel {
 
             Image miscAward;
             try {
-                int awardTierCount = Math.min(award.getNumberOfMedalFiles(),
-                        Math.max(1, person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()));
+                int awardTierCount = MathUtility.clamp(
+                        (person.getAwardController().getNumberOfAwards(award) / campaign.getCampaignOptions().getAwardTierSize()) + 1,
+                        1,
+                        award.getNumberOfMiscFiles()
+                );
 
                 String miscFileName = award.getMiscFileName(awardTierCount);
 
@@ -945,7 +958,7 @@ public class PersonViewPanel extends JScrollablePanel {
                 lblFormerSpouses2 = new JLabel();
                 lblFormerSpouses2.setName("lblFormerSpouses2");
                 lblFormerSpouses2.getAccessibleContext().getAccessibleRelationSet().add(
-                    new AccessibleRelation(AccessibleRelation.LABELED_BY, lblFormerSpouses1)
+                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblFormerSpouses1)
                 );
                 lblFormerSpouses2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                 lblFormerSpouses2.setText(String.format("<html><a href='#'>%s</a>, %s, %s</html>",
@@ -983,7 +996,7 @@ public class PersonViewPanel extends JScrollablePanel {
                     lblChildren2 = new JLabel();
                     lblChildren2.setName("lblChildren2");
                     lblChildren2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblChildren1)
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblChildren1)
                     );
                     lblChildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblChildren2.setText(String.format("<html><a href='#'>%s</a></html>", child.getFullName()));
@@ -1021,7 +1034,7 @@ public class PersonViewPanel extends JScrollablePanel {
                     lblGrandchildren2 = new JLabel();
                     lblGrandchildren2.setName("lblGrandchildren2");
                     lblGrandchildren2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandchildren1)
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandchildren1)
                     );
                     lblGrandchildren2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblGrandchildren2.setText(String.format("<html><a href='#'>%s</a></html>", grandchild.getFullName()));
@@ -1087,7 +1100,7 @@ public class PersonViewPanel extends JScrollablePanel {
                     lblSiblings2 = new JLabel(String.format("<html>%s</html>", sibling.getHyperlinkedName()));
                     lblSiblings2.setName("lblSiblings2");
                     lblSiblings2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblSiblings1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblSiblings1));
 
                     lblSiblings2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblSiblings2.addMouseListener(new MouseAdapter() {
@@ -1125,7 +1138,7 @@ public class PersonViewPanel extends JScrollablePanel {
                             grandparent.getHyperlinkedName()));
                     lblGrandparents2.setName("lblGrandparents2");
                     lblGrandparents2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandparents1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblGrandparents1));
                     lblGrandparents2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblGrandparents2.addMouseListener(new MouseAdapter() {
                         @Override
@@ -1162,7 +1175,7 @@ public class PersonViewPanel extends JScrollablePanel {
                             auntOrUncle.getHyperlinkedName()));
                     lblAuntsOrUncles2.setName("lblAuntsOrUncles2");
                     lblAuntsOrUncles2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAuntsOrUncles1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAuntsOrUncles1));
 
                     lblAuntsOrUncles2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblAuntsOrUncles2.addMouseListener(new MouseAdapter() {
@@ -1199,7 +1212,7 @@ public class PersonViewPanel extends JScrollablePanel {
                     lblCousins2 = new JLabel();
                     lblCousins2.setName("lblCousins2");
                     lblCousins2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblCousins1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblCousins1));
                     lblCousins2.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                     lblCousins2.setText(String.format("<html>%s</html>", cousin.getHyperlinkedName()));
                     lblCousins2.addMouseListener(new MouseAdapter() {
@@ -1230,15 +1243,21 @@ public class PersonViewPanel extends JScrollablePanel {
         JLabel lblEdgeAvail1 = new JLabel();
         JLabel lblEdgeAvail2 = new JLabel();
 
+        JLabel lblLoyalty1 = new JLabel();
+        JLabel lblLoyalty2 = new JLabel();
+
+        JLabel lblFatigue1 = new JLabel();
+        JLabel lblFatigue2 = new JLabel();
+
         // education
         JLabel lblEducationLevel1 = new JLabel();
         JLabel lblEducationLevel2 = new JLabel();
-        JLabel lblEducationTravelTo1 = new JLabel();
-        JLabel lblEducationTravelTo2 = new JLabel();
+        JLabel lblEducationStage1 = new JLabel();
+        JLabel lblEducationStage2 = new JLabel();
+        JLabel lblEducationJourneyDays1 = new JLabel();
+        JLabel lblEducationJourneyDays2 = new JLabel();
         JLabel lblEducationDays1 = new JLabel();
         JLabel lblEducationDays2 = new JLabel();
-        JLabel lblEducationTravelFrom1 = new JLabel();
-        JLabel lblEducationTravelFrom2 = new JLabel();
 
         GridBagConstraints gridBagConstraints;
 
@@ -1305,7 +1324,7 @@ public class PersonViewPanel extends JScrollablePanel {
                     lblAbility2.setToolTipText(option.getDescription());
                     lblAbility2.setName("lblAbility2");
                     lblAbility2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAbility1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblAbility1));
                     gridBagConstraints.gridy = firsty++;
                     pnlSkills.add(lblAbility2, gridBagConstraints);
                 }
@@ -1335,7 +1354,7 @@ public class PersonViewPanel extends JScrollablePanel {
                     lblImplants2.setToolTipText(option.getDescription());
                     lblImplants2.setName("lblImplants2");
                     lblImplants2.getAccessibleContext().getAccessibleRelationSet().add(
-                        new AccessibleRelation(AccessibleRelation.LABELED_BY, lblImplants1));
+                            new AccessibleRelation(AccessibleRelation.LABELED_BY, lblImplants1));
                     gridBagConstraints.gridy = firsty++;
                     pnlSkills.add(lblImplants2, gridBagConstraints);
                 }
@@ -1415,6 +1434,81 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
+        int loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty());
+
+        if (person.isCommander()) {
+            loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty() + 2);;
+        }
+
+        if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
+                && (!campaign.getCampaignOptions().isUseHideLoyalty())
+                && (loyaltyModifier != 0)) {
+            lblLoyalty1.setName("lblLoyalty1");
+            lblLoyalty1.setText(resourceMap.getString("lblLoyalty1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblLoyalty1, gridBagConstraints);
+
+            lblLoyalty2.setName("lblLoyalty2");
+
+            lblLoyalty2.setText(loyaltyModifier + " (" + getLoyaltyName(loyaltyModifier) + ')');
+            lblLoyalty2.setLabelFor(lblLoyalty2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblLoyalty2, gridBagConstraints);
+
+            firsty++;
+        }
+
+        if ((campaign.getCampaignOptions().isUseFatigue()) && (person.getFatigue() > 0)) {
+            lblFatigue1.setName("lblFatigue1");
+            lblFatigue1.setText(resourceMap.getString("lblFatigue1.text"));
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblFatigue1, gridBagConstraints);
+
+            StringBuilder fatigueDisplay = new StringBuilder();
+            int effectiveFatigue = person.getEffectiveFatigue(campaign);
+            int fatigueTurnoverModifier = MathUtility.clamp(((person.getEffectiveFatigue(campaign) - 1) / 4) - 1, 0, 3);
+
+            fatigueDisplay.append(person.getFatigue());
+
+            if (person.getFatigue() != effectiveFatigue) {
+                fatigueDisplay.append(" / ").append(effectiveFatigue);
+            }
+
+            if (fatigueTurnoverModifier > 0) {
+                fatigueDisplay.append(" (-").append(fatigueTurnoverModifier).append(')');
+            }
+
+            lblFatigue2.setName("lblFatigue2");
+            lblFatigue2.setText(fatigueDisplay.toString());
+            lblFatigue2.setLabelFor(lblFatigue2);
+            gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = firsty;
+            gridBagConstraints.gridwidth = 3;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+            gridBagConstraints.fill = GridBagConstraints.NONE;
+            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+            pnlSkills.add(lblFatigue2, gridBagConstraints);
+
+            firsty++;
+        }
+
         if (campaign.getCampaignOptions().isUseEducationModule()) {
             lblEducationLevel1.setName("lblEducationLevel1");
             lblEducationLevel1.setText(resourceMap.getString("lblEducationLevel1.text"));
@@ -1426,7 +1520,7 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblEducationLevel1, gridBagConstraints);
 
             lblEducationLevel2.setName("lblEducationLevel2");
-            lblEducationLevel2.setText(String.valueOf(person.getEduHighestEducation()));
+            lblEducationLevel2.setText(person.getEduHighestEducation().toString());
             lblEducationLevel1.setLabelFor(lblEducationLevel2);
             gridBagConstraints = new GridBagConstraints();
             gridBagConstraints.gridx = 1;
@@ -1439,84 +1533,115 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblEducationLevel2, gridBagConstraints);
 
             firsty++;
-        }
 
-        if ((campaign.getCampaignOptions().isUseEducationModule()) && (person.getEduDaysOfTravelToAcademy() > 0)) {
-            lblEducationTravelTo1.setName("lblEducationTravelTo1");
-            lblEducationTravelTo1.setText(resourceMap.getString("lblEducationTravelTo1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblEducationTravelTo1, gridBagConstraints);
+            if (person.getEduEducationStage() != EducationStage.NONE) {
+                lblEducationStage1.setName("lblEducationStage1");
+                lblEducationStage1.setText(resourceMap.getString("lblEducationStage1.text"));
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 0;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlSkills.add(lblEducationStage1, gridBagConstraints);
 
-            lblEducationTravelTo2.setName("lblEducationTravelTo2");
-            lblEducationTravelTo2.setText(String.valueOf(person.getEduDaysOfTravelToAcademy()) + ' ' + resourceMap.getString("lblEducationDurationDays.text"));
-            lblEducationTravelTo2.setLabelFor(lblEducationTravelTo2);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblEducationTravelTo2, gridBagConstraints);
-        }
+                lblEducationStage2.setName("lblEducationStage2");
+                lblEducationStage2.setText(person.getEduEducationStage().toString());
+                lblEducationStage2.setLabelFor(lblEducationStage2);
+                gridBagConstraints = new GridBagConstraints();
+                gridBagConstraints.gridx = 1;
+                gridBagConstraints.gridy = firsty;
+                gridBagConstraints.gridwidth = 3;
+                gridBagConstraints.weightx = 1.0;
+                gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                gridBagConstraints.fill = GridBagConstraints.NONE;
+                gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                pnlSkills.add(lblEducationStage2, gridBagConstraints);
 
-        if ((campaign.getCampaignOptions().isUseEducationModule()) && (person.getEduDaysOfEducation() > 0) && (person.getEduDaysOfTravelToAcademy() == 0)) {
-            lblEducationDays1.setName("lblEducationDays1");
-            lblEducationDays1.setText(resourceMap.getString("lblEducationDays1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblEducationDays1, gridBagConstraints);
+                firsty++;
 
-            Academy academy = EducationController.getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+                String educationText;
 
-            lblEducationDays2.setName("lblEducationDays2");
-            if (academy.isPrepSchool()) {
-                lblEducationDays2.setText(String.valueOf(academy.getAgeMax()) + ' ' + resourceMap.getString("lblEducationDurationAge.text"));
-            } else {
-                lblEducationDays2.setText(String.valueOf(person.getEduDaysOfEducation()) + ' ' + resourceMap.getString("lblEducationDurationDays.text"));
+                switch (person.getEduEducationStage()) {
+                    case EDUCATION:
+                        lblEducationDays1.setName("lblEducationDays1");
+                        lblEducationDays1.setText(resourceMap.getString("lblEducationDays1.text"));
+                        gridBagConstraints = new GridBagConstraints();
+                        gridBagConstraints.gridx = 0;
+                        gridBagConstraints.gridy = firsty;
+                        gridBagConstraints.fill = GridBagConstraints.NONE;
+                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                        pnlSkills.add(lblEducationDays1, gridBagConstraints);
+
+                        Academy academy = EducationController.getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                        lblEducationDays2.setName("lblEducationDays2");
+                        if (academy.isPrepSchool()) {
+                            educationText = String.format(resourceMap.getString("lblEducationDurationAge.text"), academy.getAgeMax());
+                        } else {
+                            educationText = String.format(resourceMap.getString("lblEducationDurationDays.text"), person.getEduEducationTime());
+                        }
+
+                        lblEducationDays2.setName("lblEducationDays2");
+                        lblEducationDays2.setText(educationText);
+                        lblEducationDays2.setLabelFor(lblEducationDays2);
+                        gridBagConstraints = new GridBagConstraints();
+                        gridBagConstraints.gridx = 1;
+                        gridBagConstraints.gridy = firsty;
+                        gridBagConstraints.gridwidth = 3;
+                        gridBagConstraints.weightx = 1.0;
+                        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                        gridBagConstraints.fill = GridBagConstraints.NONE;
+                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                        pnlSkills.add(lblEducationDays2, gridBagConstraints);
+
+                        firsty++;
+
+                        break;
+                    case JOURNEY_TO_CAMPUS:
+                    case JOURNEY_FROM_CAMPUS:
+                        lblEducationJourneyDays1.setName("lblEducationJourneyDays1");
+                        lblEducationJourneyDays1.setText(resourceMap.getString("lblEducationJourneyDays1.text"));
+                        gridBagConstraints = new GridBagConstraints();
+                        gridBagConstraints.gridx = 0;
+                        gridBagConstraints.gridy = firsty;
+                        gridBagConstraints.fill = GridBagConstraints.NONE;
+                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                        pnlSkills.add(lblEducationJourneyDays1, gridBagConstraints);
+
+                        if (person.getEduEducationStage() == EducationStage.JOURNEY_TO_CAMPUS) {
+                            educationText = String.format(resourceMap.getString("lblEducationTravelTo.text"),
+                                    person.getEduDaysOfTravel(),
+                                    person.getEduJourneyTime(),
+                                    campaign.getSystemById(person.getEduAcademySystem()).getName(campaign.getLocalDate()));
+                        } else {
+                            educationText = String.format(resourceMap.getString("lblEducationTravelFrom.text"),
+                                    person.getEduDaysOfTravel(),
+                                    person.getEduJourneyTime(),
+                                    campaign.getSystemById(person.getEduAcademySystem()).getName(campaign.getLocalDate()));
+
+                        }
+
+                        lblEducationJourneyDays2.setName("lblEducationJourneyDays2");
+                        lblEducationJourneyDays2.setText(educationText);
+                        lblEducationJourneyDays2.setLabelFor(lblEducationJourneyDays2);
+                        gridBagConstraints = new GridBagConstraints();
+                        gridBagConstraints.gridx = 1;
+                        gridBagConstraints.gridy = firsty;
+                        gridBagConstraints.gridwidth = 3;
+                        gridBagConstraints.weightx = 1.0;
+                        gridBagConstraints.insets = new Insets(0, 10, 0, 0);
+                        gridBagConstraints.fill = GridBagConstraints.NONE;
+                        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+                        pnlSkills.add(lblEducationJourneyDays2, gridBagConstraints);
+
+                        firsty++;
+                        break;
+                    case GRADUATING:
+                    case DROPPING_OUT:
+                    case NONE:
+                        break;
+                }
             }
-            lblEducationDays2.setLabelFor(lblEducationLevel2);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblEducationDays2, gridBagConstraints);
-        }
-
-        if ((campaign.getCampaignOptions().isUseEducationModule()) && (person.getEduDaysOfTravelFromAcademy() > 0)) {
-            lblEducationTravelFrom1.setName("lblEducationTravelFrom1");
-            lblEducationTravelFrom1.setText(resourceMap.getString("lblEducationTravelFrom1.text"));
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 0;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblEducationTravelFrom1, gridBagConstraints);
-
-            lblEducationTravelFrom2.setName("lblEducationTravelFrom2");
-            lblEducationTravelFrom2.setText(String.valueOf(person.getEduDaysOfTravelFromAcademy()) + ' ' + resourceMap.getString("lblEducationDurationDays.text"));
-            lblEducationTravelFrom2.setLabelFor(lblEducationTravelFrom2);
-            gridBagConstraints = new GridBagConstraints();
-            gridBagConstraints.gridx = 1;
-            gridBagConstraints.gridy = firsty;
-            gridBagConstraints.gridwidth = 3;
-            gridBagConstraints.weightx = 1.0;
-            gridBagConstraints.insets = new Insets(0, 10, 0, 0);
-            gridBagConstraints.fill = GridBagConstraints.NONE;
-            gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
-            pnlSkills.add(lblEducationTravelFrom2, gridBagConstraints);
         }
 
         return pnlSkills;
@@ -1524,6 +1649,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillLog() {
         List<LogEntry> logs = person.getPersonnelLog();
+        Collections.reverse(logs);
 
         JPanel pnlLog = new JPanel(new GridBagLayout());
 
@@ -1562,6 +1688,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillScenarioLog() {
         List<LogEntry> scenarioLog = person.getScenarioLog();
+        Collections.reverse(scenarioLog);
 
         JPanel pnlScenariosLog = new JPanel(new GridBagLayout());
 
@@ -1734,6 +1861,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
     private JPanel fillKillRecord() {
         List<Kill> kills = campaign.getKillsFor(person.getId());
+        Collections.reverse(kills);
 
         JPanel pnlKills = new JPanel(new GridBagLayout());
 

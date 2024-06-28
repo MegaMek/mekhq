@@ -112,6 +112,9 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private ColourSelectorButton optionPaidRetirementForeground;
     private ColourSelectorButton optionPaidRetirementBackground;
     private ColourSelectorButton optionStratConHexCoordForeground;
+    private ColourSelectorButton optionFontColorNegative;
+    private ColourSelectorButton optionFontColorWarning;
+    private ColourSelectorButton optionFontColorPositive;
     //endregion Colors
 
     //region Fonts
@@ -147,6 +150,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionPregnantCombatantNag;
     private JCheckBox optionPrisonersNag;
     private JCheckBox optionUntreatedPersonnelNag;
+    private JCheckBox optionNoCommanderNag;
+    private JCheckBox optionContractEndedNag;
     private JCheckBox optionInsufficientAstechsNag;
     private JCheckBox optionInsufficientAstechTimeNag;
     private JCheckBox optionInsufficientMedicsNag;
@@ -154,6 +159,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionUnresolvedStratConContactsNag;
     private JCheckBox optionOutstandingScenariosNag;
     private JCheckBox optionCargoCapacityNag;
+    private JCheckBox optionInvalidFactionNag;
     //endregion Nag Tab
 
     //region Miscellaneous
@@ -485,6 +491,12 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPaidRetirementBackground = new ColourSelectorButton(resources.getString("optionPaidRetirementBackground.text"));
 
         optionStratConHexCoordForeground = new ColourSelectorButton(resources.getString("optionStratConHexCoordForeground.text"));
+
+        optionFontColorNegative = new ColourSelectorButton(resources.getString("optionFontColorNegative.text"));
+
+        optionFontColorWarning = new ColourSelectorButton(resources.getString("optionFontColorWarning.text"));
+
+        optionFontColorPositive = new ColourSelectorButton(resources.getString("optionFontColorPositive.text"));
         //endregion Create Graphical Components
 
         //region Layout
@@ -498,56 +510,61 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionDeployedForeground)
-                                .addComponent(optionDeployedBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionDeployedBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionBelowContractMinimumForeground)
-                                .addComponent(optionBelowContractMinimumBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionBelowContractMinimumBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionInTransitForeground)
-                                .addComponent(optionInTransitBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionInTransitBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionRefittingForeground)
-                                .addComponent(optionRefittingBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionRefittingBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionMothballingForeground)
-                                .addComponent(optionMothballingBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionMothballingBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionMothballedForeground)
-                                .addComponent(optionMothballedBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionMothballedBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionNotRepairableForeground)
-                                .addComponent(optionNotRepairableBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionNotRepairableBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionNonFunctionalForeground)
-                                .addComponent(optionNonFunctionalBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionNonFunctionalBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionNeedsPartsFixedForeground)
-                                .addComponent(optionNeedsPartsFixedBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionNeedsPartsFixedBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionUnmaintainedForeground)
-                                .addComponent(optionUnmaintainedBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionUnmaintainedBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionUncrewedForeground)
-                                .addComponent(optionUncrewedBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionUncrewedBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionLoanOverdueForeground)
-                                .addComponent(optionLoanOverdueBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionLoanOverdueBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionInjuredForeground)
-                                .addComponent(optionInjuredBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionInjuredBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionHealedInjuriesForeground)
-                                .addComponent(optionHealedInjuriesBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionHealedInjuriesBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionPregnantForeground)
-                                .addComponent(optionPregnantBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionPregnantBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionPaidRetirementForeground)
-                                .addComponent(optionPaidRetirementBackground, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(optionPaidRetirementBackground, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(optionStratConHexCoordForeground))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(optionFontColorNegative)
+                                .addComponent(optionFontColorPositive, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(optionFontColorWarning))
         );
 
         layout.setHorizontalGroup(
@@ -602,6 +619,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                                 .addComponent(optionPaidRetirementBackground))
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionStratConHexCoordForeground))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionFontColorNegative)
+                                .addComponent(optionFontColorPositive))
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(optionFontColorWarning))
         );
         //endregion Layout
 
@@ -858,6 +880,14 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionUntreatedPersonnelNag.setToolTipText(resources.getString("optionUntreatedPersonnelNag.toolTipText"));
         optionUntreatedPersonnelNag.setName("optionUntreatedPersonnelNag");
 
+        optionNoCommanderNag = new JCheckBox(resources.getString("optionNoCommanderNag.text"));
+        optionNoCommanderNag.setToolTipText(resources.getString("optionNoCommanderNag.toolTipText"));
+        optionNoCommanderNag.setName("optionNoCommanderNag");
+
+        optionContractEndedNag = new JCheckBox(resources.getString("optionContractEndedNag.text"));
+        optionContractEndedNag.setToolTipText(resources.getString("optionContractEndedNag.toolTipText"));
+        optionContractEndedNag.setName("optionContractEndedNag");
+
         optionInsufficientAstechsNag = new JCheckBox(resources.getString("optionInsufficientAstechsNag.text"));
         optionInsufficientAstechsNag.setToolTipText(resources.getString("optionInsufficientAstechsNag.toolTipText"));
         optionInsufficientAstechsNag.setName("optionInsufficientAstechsNag");
@@ -886,6 +916,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionCargoCapacityNag.setToolTipText(resources.getString("optionCargoCapacityNag.toolTipText"));
         optionCargoCapacityNag.setName("optionCargoCapacityNag");
 
+        optionInvalidFactionNag = new JCheckBox(resources.getString("optionInvalidFactionNag.text"));
+        optionInvalidFactionNag.setToolTipText(resources.getString("optionInvalidFactionNag.toolTipText"));
+        optionInvalidFactionNag.setName("optionInvalidFactionNag");
+
         // Layout the UI
         final JPanel panel = new JPanel();
         panel.setName("nagPanel");
@@ -900,6 +934,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionPregnantCombatantNag)
                         .addComponent(optionPrisonersNag)
                         .addComponent(optionUntreatedPersonnelNag)
+                        .addComponent(optionNoCommanderNag)
+                        .addComponent(optionContractEndedNag)
                         .addComponent(optionInsufficientAstechsNag)
                         .addComponent(optionInsufficientAstechTimeNag)
                         .addComponent(optionInsufficientMedicsNag)
@@ -907,14 +943,17 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionUnresolvedStratConContactsNag)
                         .addComponent(optionOutstandingScenariosNag)
                         .addComponent(optionCargoCapacityNag)
+                        .addComponent(optionInvalidFactionNag)
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(optionUnmaintainedUnitsNag)
                         .addComponent(optionPregnantCombatantNag)
                         .addComponent(optionPrisonersNag)
                         .addComponent(optionUntreatedPersonnelNag)
+                        .addComponent(optionNoCommanderNag)
+                        .addComponent(optionContractEndedNag)
                         .addComponent(optionInsufficientAstechsNag)
                         .addComponent(optionInsufficientAstechTimeNag)
                         .addComponent(optionInsufficientMedicsNag)
@@ -922,6 +961,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionUnresolvedStratConContactsNag)
                         .addComponent(optionOutstandingScenariosNag)
                         .addComponent(optionCargoCapacityNag)
+                        .addComponent(optionInvalidFactionNag)
         );
 
         return panel;
@@ -1144,9 +1184,11 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setHealedInjuriesBackground(optionHealedInjuriesBackground.getColour());
         MekHQ.getMHQOptions().setPregnantForeground(optionPregnantForeground.getColour());
         MekHQ.getMHQOptions().setPregnantBackground(optionPregnantBackground.getColour());
-        MekHQ.getMHQOptions().setPaidRetirementForeground(optionPaidRetirementForeground.getColour());
-        MekHQ.getMHQOptions().setPaidRetirementBackground(optionPaidRetirementBackground.getColour());
         MekHQ.getMHQOptions().setStratConHexCoordForeground(optionStratConHexCoordForeground.getColour());
+        MekHQ.getMHQOptions().setFontColorNegative(optionFontColorNegative.getColour());
+        MekHQ.getMHQOptions().setFontColorWarning(optionFontColorWarning.getColour());
+        MekHQ.getMHQOptions().setFontColorPositive(optionFontColorPositive.getColour());
+
         MekHQ.getMHQOptions().setMedicalViewDialogHandwritingFont(comboMedicalViewDialogHandwritingFont.getFont().getFamily());
 
         MekHQ.getMHQOptions().setNoAutosaveValue(optionNoSave.isSelected());
@@ -1171,6 +1213,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_PREGNANT_COMBATANT, optionPregnantCombatantNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_PRISONERS, optionPrisonersNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL, optionUntreatedPersonnelNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER, optionNoCommanderNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_CONTRACT_ENDED, optionContractEndedNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS, optionInsufficientAstechsNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME, optionInsufficientAstechTimeNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS, optionInsufficientMedicsNag.isSelected());
@@ -1178,6 +1222,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_CARGO_CAPACITY, optionCargoCapacityNag.isSelected());
+        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INVALID_FACTION, optionInvalidFactionNag.isSelected());
 
         PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
         PreferenceManager.getInstance().save();
@@ -1253,9 +1298,10 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionHealedInjuriesBackground.setColour(MekHQ.getMHQOptions().getHealedInjuriesBackground());
         optionPregnantForeground.setColour(MekHQ.getMHQOptions().getPregnantForeground());
         optionPregnantBackground.setColour(MekHQ.getMHQOptions().getPregnantBackground());
-        optionPaidRetirementForeground.setColour(MekHQ.getMHQOptions().getPaidRetirementForeground());
-        optionPaidRetirementBackground.setColour(MekHQ.getMHQOptions().getPaidRetirementBackground());
         optionStratConHexCoordForeground.setColour(MekHQ.getMHQOptions().getStratConHexCoordForeground());
+        optionFontColorNegative.setColour(MekHQ.getMHQOptions().getFontColorNegative());
+        optionFontColorWarning.setColour(MekHQ.getMHQOptions().getFontColorWarning());
+        optionFontColorPositive.setColour(MekHQ.getMHQOptions().getFontColorPositive());
 
         comboMedicalViewDialogHandwritingFont.setSelectedItem(new FontDisplay(MekHQ.getMHQOptions().getMedicalViewDialogHandwritingFont()));
 
@@ -1283,6 +1329,8 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionPregnantCombatantNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_PREGNANT_COMBATANT));
         optionPrisonersNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_PRISONERS));
         optionUntreatedPersonnelNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNTREATED_PERSONNEL));
+        optionNoCommanderNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_NO_COMMANDER));
+        optionContractEndedNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_CONTRACT_ENDED));
         optionInsufficientAstechsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECHS));
         optionInsufficientAstechTimeNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_ASTECH_TIME));
         optionInsufficientMedicsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INSUFFICIENT_MEDICS));
@@ -1290,6 +1338,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
         optionCargoCapacityNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_CARGO_CAPACITY));
+        optionInvalidFactionNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INVALID_FACTION));
 
         txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());
         spnStartGameDelay.setValue(MekHQ.getMHQOptions().getStartGameDelay());

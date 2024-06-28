@@ -22,11 +22,7 @@ import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.*;
 import megamek.client.ui.swing.MechViewPanel;
 import megamek.codeUtilities.StringUtility;
-import megamek.common.Aero;
-import megamek.common.Compute;
-import megamek.common.Entity;
-import megamek.common.Mech;
-import megamek.common.Tank;
+import megamek.common.*;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -35,6 +31,7 @@ import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.unit.actions.HirePersonnelUnitAction;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
@@ -44,6 +41,7 @@ import mekhq.gui.view.PersonViewPanel;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+import javax.swing.RowSorter.SortKey;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -219,7 +217,7 @@ public class PersonnelMarketDialog extends JDialog {
         sorter = new TableRowSorter<>(personnelModel);
 
         final XTableColumnModel columnModel = (XTableColumnModel) tablePersonnel.getColumnModel();
-        final ArrayList<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        final ArrayList<SortKey> sortKeys = new ArrayList<>();
         for (final PersonnelTableModelColumn column : PersonnelTableModel.PERSONNEL_COLUMNS) {
             final TableColumn tableColumn = columnModel.getColumnByModelIndex(column.ordinal());
             if (!personnelMarketColumns.contains(column)) {
@@ -334,7 +332,7 @@ public class PersonnelMarketDialog extends JDialog {
             if (campaign.getFunds().isLessThan((campaign.getCampaignOptions().isPayForRecruitment()
                             ? selectedPerson.getSalary(campaign).multipliedBy(2)
                             : Money.zero()).plus(unitCost))) {
-                 campaign.addReport("<font color='red'><b>Insufficient funds. Transaction cancelled</b>.</font>");
+                 campaign.addReport("<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'><b>Insufficient funds. Transaction cancelled</b>.</font>");
             } else {
                 /* Adding person to campaign changes pid; grab the old one to
                  * use as a key to any attached entity
@@ -378,7 +376,15 @@ public class PersonnelMarketDialog extends JDialog {
                 unitCost, "Purchased " + en.getShortName())) {
             return;
         }
-        Unit unit = campaign.addNewUnit(en, false, 0);
+
+        int quality = 3;
+
+        if (campaign.getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = UnitOrder.getRandomUnitQuality(0);
+        }
+
+        Unit unit = campaign.addNewUnit(en, false, 0, quality);
+
         if (unit == null) {
             // No such unit matching the entity.
             return;
@@ -386,7 +392,6 @@ public class PersonnelMarketDialog extends JDialog {
 
         if (unit.usesSoloPilot()) {
             unit.addPilotOrSoldier(selectedPerson);
-            selectedPerson.setOriginalUnit(unit);
         } else if (unit.usesSoldiers()) {
             unit.addPilotOrSoldier(selectedPerson);
         } else if (selectedPerson.canDrive(en)) {
@@ -397,6 +402,10 @@ public class PersonnelMarketDialog extends JDialog {
             unit.setNavigator(selectedPerson);
         } else {
             unit.addVesselCrew(selectedPerson);
+        }
+
+        if (unit.isCommander(selectedPerson)) {
+            selectedPerson.setOriginalUnit(unit);
         }
 
         HirePersonnelUnitAction hireAction = new HirePersonnelUnitAction(!pay);

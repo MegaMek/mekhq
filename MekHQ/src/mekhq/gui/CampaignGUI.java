@@ -2,7 +2,7 @@
  * CampaignGUI.java
  *
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (c) 2020-2022 - The MegaMek Team. All Rights Reserved.
+ * Copyright (c) 2020-2024 - The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -925,7 +925,7 @@ public class CampaignGUI extends JPanel {
         miRetirementDefectionDialog = new JMenuItem(resourceMap.getString("miRetirementDefectionDialog.text"));
         miRetirementDefectionDialog.setMnemonic(KeyEvent.VK_R);
         miRetirementDefectionDialog.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_DOWN_MASK));
-        miRetirementDefectionDialog.setVisible(!getCampaign().getCampaignOptions().getRandomRetirementMethod().isNone());
+        miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().isUseRandomRetirement());
         miRetirementDefectionDialog.addActionListener(evt -> showRetirementDefectionDialog());
         menuView.add(miRetirementDefectionDialog);
 
@@ -1201,7 +1201,7 @@ public class CampaignGUI extends JPanel {
         }
     }
 
-    public void showRetirementDefectionDialog() {
+    public boolean showRetirementDefectionDialog() {
         /*
          * if there are unresolved personnel, show the results view; otherwise,
          * present the retirement view to give the player a chance to follow a
@@ -1209,9 +1209,14 @@ public class CampaignGUI extends JPanel {
          */
         RetirementDefectionDialog rdd = new RetirementDefectionDialog(this, null,
                 getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty());
+        rdd.setLocation(rdd.getLocation().x, 0);
         rdd.setVisible(true);
+
         if (!rdd.wasAborted()) {
             getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments());
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -1573,6 +1578,8 @@ public class CampaignGUI extends JPanel {
             }
         }
 
+        getCampaign().initTurnover();
+
         if (staticRATs != newOptions.isUseStaticRATs()) {
             getCampaign().initUnitGenerator();
         }
@@ -1890,10 +1897,17 @@ public class CampaignGUI extends JPanel {
 
     protected void loadListFile(final boolean allowNewPilots) {
         final File unitFile = FileDialogs.openUnits(getFrame()).orElse(null);
+
+        int quality = 3;
+
+        if (getCampaign().getCampaignOptions().isUseRandomUnitQualities()) {
+            quality = Unit.getRandomUnitQuality(0);
+        }
+
         if (unitFile != null) {
             try {
                 for (Entity entity : new MULParser(unitFile, getCampaign().getGameOptions()).getEntities()) {
-                    getCampaign().addNewUnit(entity, allowNewPilots, 0);
+                    getCampaign().addNewUnit(entity, allowNewPilots, 0, quality);
                 }
             } catch (Exception e) {
                 LogManager.getLogger().error("", e);
@@ -2266,7 +2280,7 @@ public class CampaignGUI extends JPanel {
         String inDebt = "";
         if (getCampaign().getFinances().isInDebt()) {
             // FIXME : Localize
-            inDebt = " <font color='red'>(in Debt)</font>";
+            inDebt = " <font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>(in Debt)</font>";
         }
         // FIXME : Localize
         String text = "<html><b>Funds</b>: " + funds.toAmountAndSymbolString() + inDebt + "</html>";
@@ -2391,19 +2405,7 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
-        if (getCampaign().checkRetirementDefections()) {
-            showRetirementDefectionDialog();
-            evt.cancel();
-            return;
-        }
-
-        if (getCampaign().checkYearlyRetirements()) {
-            showRetirementDefectionDialog();
-            evt.cancel();
-            return;
-        }
-
-        if(getCampaign().checkScenariosDue()) {
+        if (getCampaign().checkScenariosDue()) {
             JOptionPane.showMessageDialog(null, getResourceMap().getString("dialogCheckDueScenarios.text"),
                     getResourceMap().getString("dialogCheckDueScenarios.title"), JOptionPane.WARNING_MESSAGE);
             evt.cancel();
@@ -2430,7 +2432,22 @@ public class CampaignGUI extends JPanel {
             return;
         }
 
+        if (new EndContractNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new NoCommanderNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
         if (new CargoCapacityNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
+            evt.cancel();
+            return;
+        }
+
+        if (new InvalidFactionNagDialog(getFrame(), getCampaign()).showDialog().isCancelled()) {
             evt.cancel();
             return;
         }
@@ -2466,6 +2483,31 @@ public class CampaignGUI extends JPanel {
                 return;
             }
         }
+
+        if (getCampaign().getCampaignOptions().isUseRandomRetirement()) {
+            int turnoverPrompt = getCampaign().checkTurnoverPrompt();
+
+            switch (turnoverPrompt) {
+                case -1:
+                    // the user wasn't presented with the dialog
+                    break;
+                case 0:
+                    // the user launched the turnover dialog
+                    if (!showRetirementDefectionDialog()) {
+                        evt.cancel();
+                        return;
+                    }
+                case 1:
+                    // the user picked 'Advance Day Regardless'
+                    break;
+                case 2:
+                    // the user canceled
+                    evt.cancel();
+                    return;
+                default:
+                    throw new IllegalStateException("Unexpected value in mekhq/gui/CampaignGUI.java/handleDayEnding: " + turnoverPrompt);
+            }
+        }
     }
 
     @Subscribe
@@ -2490,7 +2532,7 @@ public class CampaignGUI extends JPanel {
         fundsScheduler.schedule();
         refreshPartsAvailability();
 
-        miRetirementDefectionDialog.setVisible(!evt.getOptions().getRandomRetirementMethod().isNone());
+        miRetirementDefectionDialog.setVisible(evt.getOptions().isUseRandomRetirement());
         miAwardEligibilityDialog.setVisible((evt.getOptions().isEnableAutoAwards()));
         miUnitMarket.setVisible(!evt.getOptions().getUnitMarketMethod().isNone());
     }
