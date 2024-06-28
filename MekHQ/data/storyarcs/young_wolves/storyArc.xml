@@ -147,7 +147,7 @@ That's it. I hope you enjoy the campaign!
             <assignedUnitId>ec66a68a-2b74-4301-9e32-4c9e2e5fedb8</assignedUnitId>
             <assignedForceId>2</assignedForceId>
             <personId>2cd38bed-c6e3-4245-83e7-cb9827886372</personId>
-            <!--<nextStoryPointId>dbc0f96e-5b16-11ec-bf63-0242ac130002</nextStoryPointId>-->
+            <!--<nextStoryPointId>0243e946-723c-42d3-ae23-a84597b857ba</nextStoryPointId>-->
             <!-- Real next story point id. Can be commented out to test things -->
             <nextStoryPointId>e0380a14-9bd3-4c95-9669-fb1c3970b7ff</nextStoryPointId>
         </storyPoint>
@@ -1699,7 +1699,7 @@ That's it. I hope you enjoy the campaign!
                 all around you. Some are Jade Falcons, but many belong to your own forces. Yet, out of the smoke come
                 more green mechs. One of them hails you on your comm.*
 
-                Wolf commander, you have fought with honor and skill. I ask you to accept defeat so that I will not be
+                Wolf commander, this is Star Captain Mel Ustone. You have fought with honor and skill. I ask you to accept defeat so that I will not be
                 forced to kill a great warrior. I promise that you and your warriors will not remain bondsmen long.
 
                 *You look out at your few remaining warriors before responding.*
@@ -1716,10 +1716,7 @@ That's it. I hope you enjoy the campaign!
                     <nextStoryPointId>6835f1d3-a511-4e5e-bf31-84ee13477946</nextStoryPointId>
                 </storyOutcome>
             </storyOutcomes>
-            <storySplash>
-                <category></category>
-                <filename>splash-postbattle.jpg</filename>
-            </storySplash>
+            <personalityId>704cdc97-ccaa-4955-b498-69e1274b02d5</personalityId>
         </storyPoint>
         <storyPoint name="choice_vlad_wake_up" type="mekhq.campaign.storyarc.storypoint.ChoiceStoryPoint">
             <id>f01196d7-4b66-4a23-9201-c48b44ad30b5</id>
@@ -3956,8 +3953,11 @@ That's it. I hope you enjoy the campaign!
 
                 Seyla!
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-ceremony.jpg</filename>
+            </storySplash>
             <nextStoryPointId>508d4c18-54ba-41b1-a751-dec92f0d7b1f</nextStoryPointId>
-            <personalityId>c788dea8-35d8-40b2-9fae-78c9f2215120</personalityId>
         </storyPoint>
         <storyPoint name="narr_tobias_alternate_full" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>88dfc686-8fce-40e5-a01a-7e1506726990</id>
@@ -4544,6 +4544,10 @@ That's it. I hope you enjoy the campaign!
                 You have resolved the conflict for the moment, but you do not know what consequences it may have for
                 long term morale.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-mechbay.png</filename>
+            </storySplash>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_knives" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
             <id>03cf5f5b-ac40-47b0-b353-a222a054ebf8</id>
@@ -4556,6 +4560,10 @@ That's it. I hope you enjoy the campaign!
                 off, each in a crouching position with their knife held at the ready. With a cry, they simultaneously
                 move to the attack.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-circlefight.jpg</filename>
+            </storySplash>
             <nextStoryPointId>6274ec0a-94b7-4eb4-9f96-56d92dc9b1df</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_fists" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -4569,6 +4577,10 @@ That's it. I hope you enjoy the campaign!
                 off, each holding their fists in front and balancing delicately on the balls of their feet. With a cry,
                 they simultaneously move to the attack.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-circlefight.jpg</filename>
+            </storySplash>
             <nextStoryPointId>6274ec0a-94b7-4eb4-9f96-56d92dc9b1df</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_unaug_ella_w" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -4591,6 +4603,10 @@ That's it. I hope you enjoy the campaign!
                 It appears that the conflict has been resolved without loss of life. What other consequences may come of
                 it, you know not.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-circlefight.jpg</filename>
+            </storySplash>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
                 <addHits>1</addHits>
@@ -4620,6 +4636,10 @@ That's it. I hope you enjoy the campaign!
                 It appears that the conflict has been resolved without loss of life. What other consequences may come of
                 it, you know not.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-circlefight.jpg</filename>
+            </storySplash>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>3a33fca0-03cc-42d1-89ec-c1576d241e7a</personId>
                 <addHits>1</addHits>
@@ -4643,6 +4663,10 @@ That's it. I hope you enjoy the campaign!
                 backpedaling out of the way. A deep red cut blooms across Felipe's abdomen, and he pauses momentarily to
                 feel his midsection.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-circlefight.jpg</filename>
+            </storySplash>
             <nextStoryPointId>b1852aab-910e-4620-9aa0-79e13a80fc38</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_aug_ella_w_ko" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -4661,6 +4685,10 @@ That's it. I hope you enjoy the campaign!
                 It appears that the conflict has been resolved without loss of life. What other consequences may come of
                 it, you know not.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-circlefight.jpg</filename>
+            </storySplash>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
                 <addHits>3</addHits>
@@ -4688,6 +4716,10 @@ That's it. I hope you enjoy the campaign!
                 It appears that the conflict has been resolved, but not without a terrible price. What other
                 consequences may come of it, you know not.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-circlefight.jpg</filename>
+            </storySplash>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
                 <status>KIA</status>
@@ -4711,6 +4743,10 @@ That's it. I hope you enjoy the campaign!
                 her breath. Felipe quickly jumps on top of her and brings down his knife for a killing blow. At the last
                 second, Ella diverts the blow from its intended location, but it sinks deeply into her right shoulder.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-circlefight.jpg</filename>
+            </storySplash>
             <nextStoryPointId>dc66c2ec-f5a8-49da-ba87-bc575a74be7c</nextStoryPointId>
         </storyPoint>
         <storyPoint name="narr_trothkin_div_aug_felipe_w_ko" type="mekhq.campaign.storyarc.storypoint.NarrativeStoryPoint">
@@ -4729,6 +4765,10 @@ That's it. I hope you enjoy the campaign!
                 It appears that the conflict has been resolved without further loss of life. What other consequences may
                 come of it, you know not.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-circlefight.jpg</filename>
+            </storySplash>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
                 <addHits>1</addHits>
@@ -4758,6 +4798,10 @@ That's it. I hope you enjoy the campaign!
                 It appears that the conflict has been resolved, but not without a terrible price. What other
                 consequences may come of it, you know not.
             </narrative>
+            <storySplash>
+                <category></category>
+                <filename>splash-circlefight.jpg</filename>
+            </storySplash>
             <storyTrigger type="mekhq.campaign.storyarc.storytrigger.ChangePersonStoryTrigger">
                 <personId>ebfa1043-10cb-4e2a-861d-7d05d9d5dbc7</personId>
                 <addHits>1</addHits>
@@ -4929,7 +4973,10 @@ That's it. I hope you enjoy the campaign!
 
                 Seyla!
             </narrative>
-            <personalityId>b1326a7f-0fdf-4da5-92a8-b1e927d1ded2</personalityId>
+            <storySplash>
+                <category></category>
+                <filename>splash-ceremony.jpg</filename>
+            </storySplash>
             <nextStoryPointId>508d4c18-54ba-41b1-a751-dec92f0d7b1f</nextStoryPointId>
         </storyPoint>
         <!-- Travel Story Events -->
@@ -10046,7 +10093,7 @@ scenario resolution.
                         <unitType>0</unitType>
                         <skill>VETERAN</skill>
                         <lanceSize>1</lanceSize>
-                        <forceMultiplier>1.0</forceMultiplier>
+                        <forceMultiplier>0.5</forceMultiplier>
                         <balancingMethod>WEIGHT_ADJ</balancingMethod>
                     </botForceRandomizer>
                     <behaviorSettings>
@@ -10891,6 +10938,14 @@ There is no surrender or hegira available in this battle. You must fight until o
             <portrait>
                 <category></category>
                 <filename>Crichell.jpg</filename>
+            </portrait>
+        </personality>
+        <personality name="mel_ustone">
+            <id>704cdc97-ccaa-4955-b498-69e1274b02d5</id>
+            <title>Star Captain Mel Ustone</title>
+            <portrait>
+                <category></category>
+                <filename>Mel.jpg</filename>
             </portrait>
         </personality>
         <personality name="marketta">
