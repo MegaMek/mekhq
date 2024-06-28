@@ -721,7 +721,7 @@ public class CampaignOptions {
         setShowOriginFaction(true);
 
         // Admin
-        setAdminsHaveNegotiation(true);
+        setAdminsHaveNegotiation(false);
         setAdminExperienceLevelIncludeNegotiation(true);
         setAdminsHaveScrounge(false);
         setAdminExperienceLevelIncludeScrounge(false);
@@ -792,7 +792,7 @@ public class CampaignOptions {
 
         // Awards
         setAwardBonusStyle(AwardBonus.BOTH);
-        setEnableAutoAwards(true);
+        setEnableAutoAwards(false);
         setIssuePosthumousAwards(false);
         setIssueBestAwardOnly(true);
         setIgnoreStandardSet(false);
@@ -889,7 +889,7 @@ public class CampaignOptions {
         setPercentageRandomProcreationRelationshiplessChance(0.00005);
 
         // Education
-        setUseEducationModule(true);
+        setUseEducationModule(false);
         setCurriculumXpRate(3);
         setMaximumJumpCount(5);
         setUseReeducationCamps(true);
@@ -952,7 +952,7 @@ public class CampaignOptions {
         //region Turnover and Retention
         // Retirement
         setUseRetirementDateTracking(false);
-        setUseRandomRetirement(true);
+        setUseRandomRetirement(false);
         setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.FIXED);
         setTurnoverDifficulty(SkillLevel.REGULAR);
         setTurnoverFrequency(TurnoverFrequency.MONTHLY);
@@ -993,7 +993,7 @@ public class CampaignOptions {
         setUseCommanderLeadershipOnly(false);
         setManagementSkillPenalty(0);
 
-        setUseFatigue(true);
+        setUseFatigue(false);
         setFatigueRate(1);
         setUseInjuryFatigue(true);
         setFieldKitchenCapacity(150);
