@@ -137,7 +137,7 @@ task mmJarLibDir (type: Jar) {
 
 task mmlJar (type: Jar) {
     archiveFileName = "MegaMekLab.jar"
-    dependsOn gradle.includedBuild('megameklab').task(':compileTestJava')
+    dependsOn gradle.includedBuild('megameklab').task(':megamek:compileTestJava')
     from "${mmlDir}/megameklab/build/classes/java/main"
     from "${mmlDir}/megameklab/build/resources/main"
     manifest {
