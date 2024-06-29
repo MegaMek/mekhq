@@ -7,7 +7,7 @@ include 'MekHQ'
 // includeBuild('../megamek') will use the local megamek repository instead of a binary jar to fulfill
 // the depedency.
 
-def localSettings = file('settings_local.gradle')
+def localSettings = file('./settings_local.gradle')
 if (localSettings.exists()) {
     apply from: localSettings
 }
