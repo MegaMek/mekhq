@@ -134,14 +134,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      # Setup composite build for MekHQ
-      # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-      # Disabled - 25-Jun-2022 - Causing regular build failures and .
       - name: Setup Composite Build for MekHQ
         run: |
-          echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
-          echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
-          echo "includeBuild '../megamek'" >./megameklab/settings_local.gradle
+          echo "includeBuild '../megamek'" >> ./mekhq/settings_local.gradle
+          echo "includeBuild '../megameklab'" >> ./mekhq/settings_local.gradle
+          echo "includeBuild '../megamek'" >> ./megameklab/settings_local.gradle
 
       - name: Build with Gradle
         working-directory: megameklab
