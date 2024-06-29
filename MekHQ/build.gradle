@@ -94,7 +94,7 @@ run {
 
 task mmJar (type: Jar) {
     description = 'Builds a MegaMek jar from the current source'
-    dependsOn gradle.includedBuild('megamek').task(':compileTestJava')
+    dependsOn gradle.includedBuild('megamek').task(':megamek:compileTestJava')
 
     archiveFileName = "MegaMek.jar"
     from "${mmDir}/megamek/build/classes/java/main"
