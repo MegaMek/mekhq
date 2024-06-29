@@ -89,8 +89,8 @@ jobs:
       #
       #    - mmlRepo: The MML repository to use.
       #    - mmlBranch: The MML branch to use.
-      - name: Find the Right MegaMek Branch
-        id: find_mm
+      - name: Find the Right MegaMekLab Branch
+        id: find_mml
         # Override bash so that it doesn't fail fast (the default) if we can't find the branch
         shell: bash {0}
         # This shell script searches the PR submitter's MM repo for
