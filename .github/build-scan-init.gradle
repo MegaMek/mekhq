@@ -23,22 +23,11 @@ initscript {
 def isTopLevelBuild = gradle.getParent() == null
 
 if (isTopLevelBuild) {
-    def gradleVersion = GradleVersion.current().baseVersion
-    def atLeastGradle5 = gradleVersion >= GradleVersion.version("5.0")
-    def atLeastGradle6 = gradleVersion >= GradleVersion.version("6.0")
-
-    if (atLeastGradle6) {
-        settingsEvaluated {
-            if (!it.pluginManager.hasPlugin("com.gradle.enterprise")) {
-                it.pluginManager.apply(GradleEnterprisePlugin)
-            }
-            configureExtension(it.extensions["gradleEnterprise"])
+    settingsEvaluated {
+        if (!it.pluginManager.hasPlugin("com.gradle.enterprise")) {
+            it.pluginManager.apply(GradleEnterprisePlugin)
         }
-    } else if (atLeastGradle5) {
-        rootProject {
-            pluginManager.apply(BuildScanPlugin)
-            configureExtension(extensions["gradleEnterprise"])
-        }
+        configureExtension(it.extensions["gradleEnterprise"])
     }
 }
 
@@ -57,7 +46,7 @@ void configureExtension(extension) {
         // ref: https://help.github.com/en/actions/reference/workflow-commands-for-github-actions#setting-an-output-parameter
         //
         buildScanPublished { PublishedBuildScan scan ->
-            println "::set-output name=buildScanUri::${scan.buildScanUri}\n"
+            echo "name=buildScanUri::${scan.buildScanUri}\n" >> $GITHUB_OUTPUT
         }
     }
 }
