@@ -131,17 +131,17 @@ jobs:
           # queries: ./path/to/local/query, your-org/your-repo/queries@main
           queries: +security-and-quality
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
       - name: Setup Composite Build for MekHQ
         run: |
           echo "includeBuild '../megamek'" >> ./mekhq/settings_local.gradle
           echo "includeBuild '../megameklab'" >> ./mekhq/settings_local.gradle
           echo "includeBuild '../megamek'" >> ./megameklab/settings_local.gradle
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
       - name: Build with Gradle
-        working-directory: megameklab
+        working-directory: mekhq
         run: ./gradlew build --stacktrace --scan
 
       - name: Perform CodeQL Analysis
