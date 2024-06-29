@@ -41,14 +41,6 @@ jobs:
         with:
           path: mekhq
 
-      # Setup composite build for MekHQ
-      # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-      # Disabled - 25-Jun-2022 - Causing regular build failures and .
-      - name: Setup Composite Build for MekHQ
-        run: |
-          echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
-          echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
-
       # Find the repo and branch to use for MM
       #
       # Output variables:
@@ -123,6 +115,15 @@ jobs:
         with:
           distribution: ${{ matrix.java-distribution }}
           java-version: ${{ matrix.java-version }}
+
+      # Setup composite build for MekHQ
+      # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
+      # Disabled - 25-Jun-2022 - Causing regular build failures and .
+      - name: Setup Composite Build for MekHQ
+        run: |
+          echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
+          echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
+          echo "includeBuild '../megamek'" >./megameklab/settings_local.gradle
 
       # Make sure we can execute the Gradle wrapper
       - name: Grant execute permission for gradlew (*nix or MacOS)
