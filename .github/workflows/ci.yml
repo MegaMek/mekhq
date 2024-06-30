@@ -131,12 +131,12 @@ jobs:
 
       # If the build step fails, try to upload any test logs in case it was a unit test failure.
       # The logs will be relative to the ./mekhq directory.
-      #    - name: Upload Test Logs on Failure
-      #      uses: actions/upload-artifact@v3
-      #      if: failure()
-      #      with:
-      #        name: cd-failure-logs
-      #        path: ./mekhq/MekHQ/build/reports/
+      - name: Upload Test Logs on Failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cd-failure-logs
+          path: ./mekhq/MekHQ/build/reports/
 
       # Upload our Code Coverage Reports to CodeCov.io
       - name: CodeCov.io Coverage Report
@@ -146,25 +146,13 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
-      # If we have a buildScanUri comment on the PR
-      #
-      # NB: This only works if you're on the main MegaMek\mekhq repo
-      #     for now due to a GitHub Actions limitation.
-      # CAW: temporarily halted https://github.com/thollander/actions-comment-pull-request/issues/17
-      #    - name: Comment on PR with Build Scan URI
-      #      uses: thollander/actions-comment-pull-request@master
-      #      if: always() && steps.gradle_build.outputs.buildScanUri != ''
-      #      with:
-      #        message: Build scan available at ${{ steps.gradle_build.outputs.buildScanUri }}
-      #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       # Put the Windows Release in an artifact
       # NB: Due to a GitHub Actions limitation we won't know what the filename is in order to display it somewhere.
       - name: Upload Windows Release
         uses: actions/upload-artifact@v4
         with:
           name: mhq-release-win-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-          path: ./mekhq/MekHQ/build/distributions/mekhq-windows-*.zip
+          path: ./mekhq/MekHQ/build/distributions/*.zip
 
       # Put the non-Windows release in an artifact
       - name: Upload Nix/Mac Release

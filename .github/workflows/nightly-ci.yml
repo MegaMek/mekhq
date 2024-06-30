@@ -34,13 +34,6 @@ jobs:
         with:
           path: mekhq
 
-      # Setup composite build for MekHQ
-      # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-      - name: Setup Composite Build for MekHQ
-        run: |
-          echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
-          echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
-
       # Checkout the latest MegaMek source and put it in: ./megamek
       - name: Checkout MegaMek
         uses: actions/checkout@v4
@@ -55,11 +48,13 @@ jobs:
           repository: MegaMek/megameklab
           path: megameklab
 
-      # Setup composite build for MegaMekLab
+      # Setup composite build for MekHQ
       # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-      - name: Setup Composite Build for MegaMekLab
+      - name: Setup Composite Build for MekHQ
         run: |
-          echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
+          echo "includeBuild '../megamek'" >> ./mekhq/settings_local.gradle
+          echo "includeBuild '../megameklab'" >> ./mekhq/settings_local.gradle
+          echo "includeBuild '../megamek'" >> ./megameklab/settings_local.gradle
 
       # Setup the requested Java Distribution and Version from the matrix
       - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
@@ -68,18 +63,12 @@ jobs:
           distribution: ${{ matrix.java-distribution }}
           java-version: ${{ matrix.java-version }}
 
-      # Don't run this for Windows.
-      - name: Grant execute permission for gradlew (*nix or MacOS)
-        working-directory: mekhq
-        run: chmod +x gradlew
-        if: runner.os != 'Windows'
-
-      # Include --stacktrace to make some build failures easier to figure out.
-      - name: Build with Gradle
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        with:
-          arguments: clean build -x test --continue --stacktrace --max-workers=1 --scan
-          build-root-directory: mekhq
+
+      - name: Build with Gradle
+        working-directory: megameklab
+        run: ./gradlew clean build -x test --continue --stacktrace --scan
 
       - name: Upload Test Logs on Failure
         uses: actions/upload-artifact@v4
@@ -106,4 +95,4 @@ jobs:
         if: always() && matrix.os == 'windows-latest'
         with:
           name: mhq-release-win-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-          path: mekhq/MekHQ/build/distributions/mekhq-windows-*.zip
+          path: mekhq/MekHQ/build/distributions/*.zip
