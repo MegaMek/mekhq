@@ -339,17 +339,14 @@ distributions {
 createExe {
     description = 'Create Windows executable that wraps MekHQ jar'
     mainClassName = application.mainClass
-    outfile = 'MekHQ.exe'
-    def iniFile = 'MekHQ.l4j.ini'
     icon = "${projectDir}/${data}/images/misc/mekhq.ico"
     jarTask = project.tasks.jar
     internalName = 'MekHQ'
     downloadUrl = 'https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
     supportUrl = 'https://megamek.org'
-    copyright = '2024 MegaMek Development Team'
+    copyright = '2024 MegaMek Development Team.'
+    trademarks = 'MechWarrior, BattleMech, `Mech and Aerotech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
     companyName = "MegaMek Development Team"
-    outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${iniFile}"
     jvmOptions = project.ext.mhqJvmOptions
     jreMinVersion = '17'
     messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
@@ -357,7 +354,7 @@ createExe {
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
     doLast {
-        new File("${buildDir}/launch4j/${iniFile}").text = """# Launch4j runtime config
+        new File("${buildDir}/launch4j/MekHQ.l4j.ini").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.mhqJvmOptions.join('\n')}
 """
@@ -367,17 +364,14 @@ ${project.ext.mhqJvmOptions.join('\n')}
 task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
     description = 'Create Windows executable stub for MM jar'
     mainClassName = 'megamek.MegaMek'
-    outfile = 'MegaMek.exe'
-    def iniFile = 'MegaMek.l4j.ini'
     icon = "${mmDir}/megamek/${data}/images/misc/megamek.ico"
     jarTask = project.tasks.mmJar
     internalName = 'MegaMek'
     downloadUrl = 'https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
     supportUrl = 'https://megamek.org'
-    copyright = '2024 MegaMek Development Team'
+    copyright = '2024 MegaMek Development Team.'
+    trademarks = 'MechWarrior, BattleMech, `Mech and Aerotech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
     companyName = "MegaMek Development Team"
-    outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${iniFile}"
     classpath = project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
@@ -386,7 +380,7 @@ task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
     messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
     dontWrapJar = true
     doLast {
-        new File("${buildDir}/launch4j/${iniFile}").text = """# Launch4j runtime config
+        new File("${buildDir}/launch4j/MegaMek.l4j.ini").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.mmJvmOptions.join('\n')}
 """
@@ -396,8 +390,6 @@ ${project.ext.mmJvmOptions.join('\n')}
 task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     description = 'Create Windows executable stub for MML jar'
     mainClassName = 'megameklab.MegaMekLab'
-    outfile = 'MegaMekLab.exe'
-    def iniFile = 'MegaMekLab.l4j.ini'
     jarTask = project.tasks.mmlJar
     classpath = ["lib/${mmJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
@@ -406,16 +398,15 @@ task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
     internalName = 'MegaMekLab'
     downloadUrl = 'https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
     supportUrl = 'https://megamek.org'
-    copyright = '2024 MegaMek Development Team'
+    copyright = '2024 MegaMek Development Team.'
+    trademarks = 'MechWarrior, BattleMech, `Mech and Aerotech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
     companyName = "MegaMek Development Team"
     jvmOptions = project.ext.mmlJvmOptions
     jreMinVersion = '17'
     messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
     dontWrapJar = true
-    outputs.file "${buildDir}/launch4j/${outfile}"
-    outputs.file "${buildDir}/launch4j/${iniFile}"
     doLast {
-        new File("${buildDir}/launch4j/${iniFile}").text = """# Launch4j runtime config
+        new File("${buildDir}/launch4j/MegaMekLab.l4j.ini").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
 ${project.ext.mmlJvmOptions.join('\n')}
 """
