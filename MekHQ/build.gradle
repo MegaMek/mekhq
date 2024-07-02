@@ -73,9 +73,24 @@ application {
 }
 
 ext {
-    mmJvmOptions = ['-Xmx2048m']
-    mmlJvmOptions = ['-Xmx1024m']
-    mhqJvmOptions = ['-Xmx2048m']
+    mmJvmOptions = [
+        '-Xmx2048m',
+        '--add-opens java.base/java.util=ALL-UNNAMED',
+        '--add-opens java.base/java.util.concurrent=ALL-UNNAMED',
+        '-Dsun.awt.disablegrab=true'
+    ]
+    mmlJvmOptions = [
+        '-Xmx2048m',
+        '--add-opens java.base/java.util=ALL-UNNAMED',
+        '--add-opens java.base/java.util.concurrent=ALL-UNNAMED',
+        '-Dsun.awt.disablegrab=true'
+    ]
+    mhqJvmOptions = [
+        '-Xmx2048m',
+        '--add-opens java.base/java.util=ALL-UNNAMED',
+        '--add-opens java.base/java.util.concurrent=ALL-UNNAMED',
+        '-Dsun.awt.disablegrab=true'
+    ]
     campaigns = 'campaigns'
     data = 'data'
     docs = 'docs'
@@ -213,7 +228,7 @@ task createStartScripts (type: CreateStartScripts) {
     doLast {
         // The start script assumes all the files on the classpath will be in the lib directory.
         unixScript.text = unixScript.text.replace('lib/MekHQ', 'MekHQ')
-        windowsScript.text = windowsScript.text.replace('lib\\MekHQ', 'MekHQ')
+        windowsScript.text = windowsScript.text.replace('lib/MekHQ', 'MekHQ')
         // The Windows script just has a single line that needs to be changed to put the script in the root,
         // so we'll do a simple replace
         windowsScript.text = windowsScript.text.replace('set APP_HOME=%DIRNAME%..', '')
