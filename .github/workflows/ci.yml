@@ -152,11 +152,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mhq-release-win-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-          path: ./mekhq/MekHQ/build/distributions/*.zip
+          path: ./mekhq/MekHQ/build/distributions/mekhq-windows-*.zip
 
       # Put the non-Windows release in an artifact
       - name: Upload Nix/Mac Release
         uses: actions/upload-artifact@v4
         with:
           name: mhq-release-nix-mac-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-          path: ./mekhq/MekHQ/build/distributions/*.tar.gz
+          path: ./mekhq/MekHQ/build/distributions/mekhq-unix-*.tar.gz
