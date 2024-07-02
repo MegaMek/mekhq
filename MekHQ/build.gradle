@@ -7,6 +7,12 @@ plugins {
     id 'maven-publish'
     id 'edu.sc.seis.launch4j' version '3.0.5'
     id 'jacoco'
+    id 'java'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 sourceSets {
