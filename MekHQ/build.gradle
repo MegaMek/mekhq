@@ -79,12 +79,7 @@ ext {
         '--add-opens java.base/java.util.concurrent=ALL-UNNAMED',
         '-Dsun.awt.disablegrab=true'
     ]
-    mmlJvmOptions = [
-        '-Xmx2048m',
-        '--add-opens java.base/java.util=ALL-UNNAMED',
-        '--add-opens java.base/java.util.concurrent=ALL-UNNAMED',
-        '-Dsun.awt.disablegrab=true'
-    ]
+    mmlJvmOptions = ['-Xmx2048m']
     mhqJvmOptions = [
         '-Xmx2048m',
         '--add-opens java.base/java.util=ALL-UNNAMED',
