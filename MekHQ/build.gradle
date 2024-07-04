@@ -358,7 +358,6 @@ createExe {
     copyright = '2024 MegaMek Development Team.'
     trademarks = 'MechWarrior, BattleMech, `Mech and Aerotech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
     companyName = "MegaMek Development Team"
-    splashFileName = "${projectDir}/data/images/misc/MekHQ Start_spooky_uhd.png"
     jvmOptions = project.ext.mhqJvmOptions
     jreMinVersion = '17'
     messagesJreVersionError = 'We require a Java Runtime of version 17 or higher installed. https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
@@ -366,6 +365,7 @@ createExe {
     classpath = ["lib/${mmJar.archiveFileName.get()}", "lib/${mmlJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
             .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
             .collect { "${lib}/${it.name}" }
+    dontWrapJar = true
     doLast {
         new File("${buildDir}/launch4j/MekHQ.l4j.ini").text = """# Launch4j runtime config
 # you can add arguments here that will be processed by the JVM at runtime
