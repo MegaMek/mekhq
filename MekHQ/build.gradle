@@ -251,6 +251,13 @@ distributions {
             from ("${mmDir}/megamek/${mmconf}/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
+            from ("${mmDir}/megamek/build/launch4j/lib") {
+                into "${lib}"
+            }
+            from ("${mmlDir}/megameklab/build/launch4j/lib") {
+                into "${lib}"
+            }
+
             from ("${mmlDir}/megameklab/build/files/${data}/images") {
                 into "${data}/images"
             }
@@ -323,6 +330,14 @@ distributions {
             from (fileStagingDir) {
                 exclude 'history.txt'
             }
+
+            from ("${mmDir}/megamek/build/launch4j/lib") {
+                into "${lib}"
+            }
+            from ("${mmlDir}/megameklab/build/launch4j/lib") {
+                into "${lib}"
+            }
+
             from ("${buildDir}/launch4j") {
                 include '*.exe'
                 include '*.ini'
