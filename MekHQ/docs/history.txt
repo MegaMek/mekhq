@@ -1,6 +1,7 @@
 MEKHQ VERSION HISTORY:
 ---------------
 0.50.0-SNAPSHOT (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
++ PR #4332: CI Updates for windows build and normalizing
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
