@@ -379,6 +379,7 @@ launch4j {
     icon = "${projectDir}/${data}/images/misc/mekhq.ico"
     outfile = "MekHQ.exe"
     jarTask = project.tasks.jar
+    windowTitle = 'MekHQ'
     internalName = 'MekHQ'
     downloadUrl = 'https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
     supportUrl = 'https://megamek.org'
@@ -417,7 +418,7 @@ windowsDistZip {
     description = 'Creates Windows distribution packaged as a zip archive'
     dependsOn stageFiles
     dependsOn stageMM
-    dependsOn createExe
+    dependsOn createAllExecutables
     dependsOn createMMExe
     dependsOn createMMLExe
     dependsOn startScripts
@@ -427,7 +428,7 @@ windowsDistTar {
     description = 'Creates Windows distribution packaged as a zip archive'
     dependsOn stageFiles
     dependsOn stageMM
-    dependsOn createExe
+    dependsOn createAllExecutables
     dependsOn createMMExe
     dependsOn createMMLExe
     dependsOn startScripts
