@@ -8,11 +8,11 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>47500</tuition>
-        <durationDays>1</durationDays>
+        <durationDays>10</durationDays>
         <educationLevelMax>Early Childhood</educationLevelMax>
         <ageMax>10</ageMax>
         <qualification>General Education</qualification>
-        <curriculum>Bonus XP</curriculum>
+        <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
@@ -28,9 +28,9 @@
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
-        <curriculum>Bonus XP</curriculum>
+        <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Preparatory School</name>
@@ -45,9 +45,9 @@
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
-        <curriculum>Bonus XP, Leadership</curriculum>
+        <curriculum>XP, Leadership</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Military School</name>
@@ -79,19 +79,19 @@
         <ageMax>16</ageMax>
         <qualification>MechTech Apprenticeship</qualification>
         <curriculum>Astech, Tech/Mech</curriculum>
-        <qualificationStartYear>2425</qualificationStartYear>
+        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Mechanic Apprenticeship</qualification>
         <curriculum>Astech, Tech/Mechanic</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>AeroTech Apprenticeship</qualification>
         <curriculum>Astech, Tech/Aero</curriculum>
-        <qualificationStartYear>2439</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Technician Apprenticeship</qualification>
         <curriculum>Astech, Tech/BA</curriculum>
-        <qualificationStartYear>3052</qualificationStartYear>
+        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Black Naval Apprenticeship</qualification>
         <curriculum>Astech, Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
@@ -105,9 +105,9 @@
         <ageMin>16</ageMin>
         <durationDays>150</durationDays>
         <qualification>General Education</qualification>
-        <curriculum>Bonus XP</curriculum>
+        <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
-        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
         <name>Technical College</name>
@@ -123,19 +123,19 @@
         <ageMin>16</ageMin>
         <qualification>Advanced BattleMech Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
-        <qualificationStartYear>2425</qualificationStartYear>
+        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Technology &amp; Development</qualification>
         <curriculum>Tech/Mechanic</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced AeroSpace Technologies</qualification>
         <curriculum>Tech/Aero</curriculum>
-        <qualificationStartYear>2439</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Technology &amp; Development</qualification>
         <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3052</qualificationStartYear>
+        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Black Naval Technologies</qualification>
         <curriculum>Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
     </academy>
     <academy>
         <name>Trade School</name>
@@ -173,19 +173,19 @@
         <ageMin>16</ageMin>
         <qualification>Advanced BattleMech Technologies</qualification>
         <curriculum>Tech/Mech</curriculum>
-        <qualificationStartYear>2425</qualificationStartYear>
+        <qualificationStartYear>2500</qualificationStartYear>
         <qualification>Advanced Technology &amp; Development</qualification>
         <curriculum>Tech/Mechanic</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Advanced AeroSpace Technologies</qualification>
         <curriculum>Tech/Aero</curriculum>
-        <qualificationStartYear>2439</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Battle Armor Technology &amp; Development</qualification>
         <curriculum>Tech/BA</curriculum>
-        <qualificationStartYear>3052</qualificationStartYear>
+        <qualificationStartYear>3058</qualificationStartYear>
         <qualification>Black Naval Technologies</qualification>
         <curriculum>Tech/Vessel</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
         <qualification>Advanced Systems &amp; Technology</qualification>
         <curriculum>Administration</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
@@ -197,7 +197,7 @@
         <qualificationStartYear>2300</qualificationStartYear>
         <qualification>Applied Astrophysics</qualification>
         <curriculum>Hyperspace Navigation</curriculum>
-        <qualificationStartYear>2470</qualificationStartYear>
+        <qualificationStartYear>2490</qualificationStartYear>
     </academy>
     <academy>
         <name>Police Academy</name>
@@ -229,7 +229,7 @@
         <educationLevelMin>Early Childhood</educationLevelMin>
         <educationLevelMax>Early Childhood</educationLevelMax>
         <qualification>Reeducation &amp; Social Encouragement</qualification>
-        <curriculum>Bonus XP</curriculum>
+        <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>

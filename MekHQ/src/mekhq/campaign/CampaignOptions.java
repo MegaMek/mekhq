@@ -384,15 +384,13 @@ public class CampaignOptions {
 
     // Education
     private boolean useEducationModule;
+    private Integer curriculumXpRate;
     private Integer maximumJumpCount;
     private boolean useReeducationCamps;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
+    private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
-    private boolean enableShowAgeConflict;
-    private boolean enableShowUnqualified;
-    private boolean enableShowFactionConflict;
-    private boolean enableShowRangeConflict;
     private boolean enableRandomXp;
     private Integer randomXpRate;
     private boolean enableBonuses;
@@ -450,8 +448,6 @@ public class CampaignOptions {
     // Taxes
     private boolean useTaxes;
     private int taxesPercentage;
-    private boolean useNotMercenaryExemption;
-    private boolean useClanExemption;
 
     // Shares
     private boolean useShareSystem;
@@ -511,6 +507,7 @@ public class CampaignOptions {
     private boolean personnelMarketReportRefresh;
     private Map<SkillLevel, Integer> personnelMarketRandomRemovalTargets;
     private double personnelMarketDylansWeight;
+    private boolean usePersonnelHireHiringHallOnly;
 
     // Unit Market
     private UnitMarketMethod unitMarketMethod;
@@ -724,7 +721,7 @@ public class CampaignOptions {
         setShowOriginFaction(true);
 
         // Admin
-        setAdminsHaveNegotiation(true);
+        setAdminsHaveNegotiation(false);
         setAdminExperienceLevelIncludeNegotiation(true);
         setAdminsHaveScrounge(false);
         setAdminExperienceLevelIncludeScrounge(false);
@@ -795,7 +792,7 @@ public class CampaignOptions {
 
         // Awards
         setAwardBonusStyle(AwardBonus.BOTH);
-        setEnableAutoAwards(true);
+        setEnableAutoAwards(false);
         setIssuePosthumousAwards(false);
         setIssueBestAwardOnly(true);
         setIgnoreStandardSet(false);
@@ -892,16 +889,14 @@ public class CampaignOptions {
         setPercentageRandomProcreationRelationshiplessChance(0.00005);
 
         // Education
-        setUseEducationModule(true);
+        setUseEducationModule(false);
+        setCurriculumXpRate(3);
         setMaximumJumpCount(5);
         setUseReeducationCamps(true);
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
+        setEnableOverrideRequirements(false);
         setEnableShowIneligibleAcademies(true);
-        setEnableShowAgeConflict(false);
-        setEnableShowUnqualified(true);
-        setEnableShowFactionConflict(true);
-        setEnableShowRangeConflict(false);
         setEnableRandomXp(true);
         setRandomXpRate(1);
         setEnableBonuses(true);
@@ -957,7 +952,7 @@ public class CampaignOptions {
         //region Turnover and Retention
         // Retirement
         setUseRetirementDateTracking(false);
-        setUseRandomRetirement(true);
+        setUseRandomRetirement(false);
         setTurnoverTargetNumberMethod(TurnoverTargetNumberMethod.FIXED);
         setTurnoverDifficulty(SkillLevel.REGULAR);
         setTurnoverFrequency(TurnoverFrequency.MONTHLY);
@@ -998,7 +993,7 @@ public class CampaignOptions {
         setUseCommanderLeadershipOnly(false);
         setManagementSkillPenalty(0);
 
-        setUseFatigue(true);
+        setUseFatigue(false);
         setFatigueRate(1);
         setUseInjuryFatigue(true);
         setFieldKitchenCapacity(150);
@@ -1040,8 +1035,6 @@ public class CampaignOptions {
         // Taxes
         setUseTaxes(false);
         setTaxesPercentage(30);
-        setUseNotMercenaryExemption(true);
-        setUseClanExemption(true);
 
         // Shares
         setUseShareSystem(false);
@@ -1117,6 +1110,7 @@ public class CampaignOptions {
         getPersonnelMarketRandomRemovalTargets().put(SkillLevel.HEROIC, 11);
         getPersonnelMarketRandomRemovalTargets().put(SkillLevel.LEGENDARY, 11);
         setPersonnelMarketDylansWeight(0.3);
+        setUsePersonnelHireHiringHallOnly(false);
 
         // Unit Market
         setUnitMarketMethod(UnitMarketMethod.NONE);
@@ -2687,6 +2681,14 @@ public class CampaignOptions {
         this.useEducationModule = useEducationModule;
     }
 
+    public Integer getCurriculumXpRate() {
+        return curriculumXpRate;
+    }
+
+    public void setCurriculumXpRate(final int curriculumXpRate) {
+        this.curriculumXpRate = curriculumXpRate;
+    }
+
     public Integer getMaximumJumpCount() {
         return maximumJumpCount;
     }
@@ -2720,44 +2722,20 @@ public class CampaignOptions {
         this.enablePrestigiousAcademies = enablePrestigiousAcademies;
     }
 
+    public boolean isEnableOverrideRequirements() {
+        return enableOverrideRequirements;
+    }
+
+    public void setEnableOverrideRequirements(boolean enableOverrideRequirements) {
+        this.enableOverrideRequirements = enableOverrideRequirements;
+    }
+
     public boolean isEnableShowIneligibleAcademies() {
         return enableShowIneligibleAcademies;
     }
 
     public void setEnableShowIneligibleAcademies(boolean enableShowIneligibleAcademies) {
         this.enableShowIneligibleAcademies = enableShowIneligibleAcademies;
-    }
-
-    public boolean isEnableShowAgeConflict() {
-        return enableShowAgeConflict;
-    }
-
-    public void setEnableShowAgeConflict(boolean enableShowAgeConflict) {
-        this.enableShowAgeConflict = enableShowAgeConflict;
-    }
-
-    public boolean isEnableShowUnqualified() {
-        return enableShowUnqualified;
-    }
-
-    public void setEnableShowUnqualified(boolean enableShowUnqualified) {
-        this.enableShowUnqualified = enableShowUnqualified;
-    }
-
-    public boolean isEnableShowFactionConflict() {
-        return enableShowFactionConflict;
-    }
-
-    public void setEnableShowFactionConflict(boolean enableShowFactionConflict) {
-        this.enableShowFactionConflict = enableShowFactionConflict;
-    }
-
-    public boolean isEnableShowRangeConflict() {
-        return enableShowRangeConflict;
-    }
-
-    public void setEnableShowRangeConflict(boolean enableShowRangeConflict) {
-        this.enableShowRangeConflict = enableShowRangeConflict;
     }
 
     public boolean isEnableRandomXp() {
@@ -3305,22 +3283,6 @@ public class CampaignOptions {
     public void setTaxesPercentage(final int taxesPercentage) {
         this.taxesPercentage = taxesPercentage;
     }
-
-    public boolean isUseNotMercenaryExemption() {
-        return useNotMercenaryExemption;
-    }
-
-    public void setUseNotMercenaryExemption(boolean useNotMercenaryExemption) {
-        this.useNotMercenaryExemption = useNotMercenaryExemption;
-    }
-
-    public boolean isUseClanExemption() {
-        return useClanExemption;
-    }
-
-    public void setUseClanExemption(final boolean useClanExemption) {
-        this.useClanExemption = useClanExemption;
-    }
     // endregion Taxes
     //endregion Finances Tab
 
@@ -3356,6 +3318,14 @@ public class CampaignOptions {
 
     public void setPersonnelMarketDylansWeight(final double personnelMarketDylansWeight) {
         this.personnelMarketDylansWeight = personnelMarketDylansWeight;
+    }
+
+    public boolean isUsePersonnelHireHiringHallOnly() {
+        return usePersonnelHireHiringHallOnly;
+    }
+
+    public void setUsePersonnelHireHiringHallOnly(final boolean usePersonnelHireHiringHallOnly) {
+        this.usePersonnelHireHiringHallOnly = usePersonnelHireHiringHallOnly;
     }
     //endregion Personnel Market
 
@@ -4719,15 +4689,13 @@ public class CampaignOptions {
 
         //region Education
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useEducationModule", isUseEducationModule());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "curriculumXpRate", getCurriculumXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "maximumJumpCount", getMaximumJumpCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReeducationCamps", isUseReeducationCamps());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableOverrideRequirements", isEnableOverrideRequirements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowAgeConflict", isEnableShowAgeConflict());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowUnqualified", isEnableShowUnqualified());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowFactionConflict", isEnableShowFactionConflict());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowRangeConflict", isEnableShowRangeConflict());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRandomXp", isEnableRandomXp());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomXpRate", getRandomXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableBonuses", isEnableBonuses());
@@ -4803,8 +4771,6 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useTaxes", isUseTaxes());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "taxesPercentage", getTaxesPercentage());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useNotMercenaryExemption", isUseNotMercenaryExemption());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useClanExemption", isUseClanExemption());
         //region Taxes
         //endregion Taxes
         //endregion Finances Tab
@@ -4819,6 +4785,7 @@ public class CampaignOptions {
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "personnelMarketRandomRemovalTargets");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personnelMarketDylansWeight", getPersonnelMarketDylansWeight());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "usePersonnelHireHiringHallOnly", isUsePersonnelHireHiringHallOnly());
         //endregion Personnel Market
 
         //region Unit Market
@@ -5467,6 +5434,8 @@ public class CampaignOptions {
                     //region Education
                 } else if (wn2.getNodeName().equalsIgnoreCase("useEducationModule")) {
                     retVal.setUseEducationModule(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("curriculumXpRate")) {
+                    retVal.setCurriculumXpRate(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("maximumJumpCount")) {
                     retVal.setMaximumJumpCount(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useReeducationCamps")) {
@@ -5475,16 +5444,10 @@ public class CampaignOptions {
                     retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
                     retVal.setEnablePrestigiousAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableOverrideRequirements")) {
+                    retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
                     retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowAgeConflict")) {
-                    retVal.setEnableShowAgeConflict(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowUnqualified")) {
-                    retVal.setEnableShowUnqualified(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowFactionConflict")) {
-                    retVal.setEnableShowFactionConflict(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableShowRangeConflict")) {
-                    retVal.setEnableShowRangeConflict(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableRandomXp")) {
                     retVal.setEnableRandomXp(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("randomXpRate")) {
@@ -5733,10 +5696,6 @@ public class CampaignOptions {
                     retVal.setUseTaxes(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("taxesPercentage")) {
                     retVal.setTaxesPercentage(Integer.parseInt(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useNotMercenaryExemption")) {
-                    retVal.setUseNotMercenaryExemption(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("useClanExemption")) {
-                    retVal.setUseClanExemption(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Taxes
                     //endregion Finances Tab
 
@@ -5770,6 +5729,8 @@ public class CampaignOptions {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("personnelMarketDylansWeight")) {
                     retVal.setPersonnelMarketDylansWeight(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("usePersonnelHireHiringHallOnly")) {
+                    retVal.setUsePersonnelHireHiringHallOnly(Boolean.parseBoolean(wn2.getTextContent().trim()));
                     //endregion Personnel Market
 
                     //region Unit Market

@@ -23,7 +23,6 @@ import megamek.common.*;
 import megamek.common.event.Subscribe;
 import megamek.common.loaders.EntityLoadingException;
 import mekhq.MekHQ;
-import mekhq.utilities.MHQXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.event.MarketNewPersonnelEvent;
 import mekhq.campaign.event.OptionsChangedEvent;
@@ -32,14 +31,17 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.rating.IUnitRating;
 import mekhq.campaign.unit.HangarStatistics;
+import mekhq.campaign.universe.Factions;
 import mekhq.module.PersonnelMarketServiceManager;
 import mekhq.module.api.PersonnelMarketMethod;
+import mekhq.utilities.MHQXMLUtility;
 import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PersonnelMarket {
     private List<Person> personnel = new ArrayList<>();
@@ -93,14 +95,32 @@ public class PersonnelMarket {
      * market availability pool
      */
     public void generatePersonnelForDay(Campaign c) {
+        List<String> capitals = Factions.getInstance().getFactions().stream()
+                .map(faction -> faction.getStartingPlanet(c.getLocalDate()))
+                .collect(Collectors.toList());
+
+        String currentSystem = c.getCurrentSystem().getId();
+
         boolean updated = false;
 
         if (!personnel.isEmpty()) {
             removePersonnelForDay(c);
+            if (c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
+                    && !c.getAtBConfig().isHiringHall(currentSystem, c.getLocalDate())
+                    && !capitals.contains(currentSystem)) {
+                removeAll();
+            }
         }
 
         if (null != method) {
-            List<Person> newPersonnel = method.generatePersonnelForDay(c);
+            List<Person> newPersonnel = new ArrayList<>();
+
+            if (!c.getCampaignOptions().isUsePersonnelHireHiringHallOnly()
+                    || c.getAtBConfig().isHiringHall(currentSystem, c.getLocalDate())
+                    || capitals.contains(currentSystem)) {
+                newPersonnel = method.generatePersonnelForDay(c);
+            }
+
             if ((null != newPersonnel) && !newPersonnel.isEmpty()) {
                 personnel.addAll(newPersonnel);
                 updated = true;
@@ -127,6 +147,14 @@ public class PersonnelMarket {
                 personnel.removeAll(toRemove);
             }
         }
+    }
+
+    /**
+     * Removes all personnel from the market and their attached units.
+     */
+    public void removeAll() {
+        personnel.clear();
+        attachedEntities.clear();
     }
 
     public void setPersonnel(List<Person> p) {

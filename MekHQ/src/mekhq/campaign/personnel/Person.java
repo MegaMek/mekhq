@@ -21,7 +21,6 @@ package mekhq.campaign.personnel;
 
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
-import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -975,7 +974,7 @@ public class Person {
                 } else if (getStatus().isStudent()) {
                     campaign.addReport(String.format(resources.getString("returnedFromEducation.report"),
                             getHyperlinkedFullTitle()));
-                    ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
+                    ServiceLogger.returnedFromEducation(this, campaign.getLocalDate());
                 } else if (getStatus().isMissing()) {
                     campaign.addReport(String.format(resources.getString("returnedFromMissing.report"),
                             getHyperlinkedFullTitle()));
@@ -1060,6 +1059,7 @@ public class Person {
 
         // clean up the save entry
         this.setEduAcademyName(null);
+        this.setEduAcademyFaction(null);
         this.setEduAcademySet(null);
         this.setEduAcademyNameInSet(null);
         this.setEduAcademySystem(null);
@@ -1234,15 +1234,7 @@ public class Person {
         return loyalty;
     }
 
-    /**
-     * Sets the loyalty level of the customer.
-     * The loyalty level should be within the range of -3 to 3.
-     *
-     * @param loyalty the loyalty level to be set
-     */
     public void setLoyalty(int loyalty) {
-        loyalty = MathUtility.clamp(loyalty, -3, 3);
-
         this.loyalty = loyalty;
     }
 
@@ -3794,29 +3786,28 @@ public class Person {
     }
 
     /**
-     * Generates the loyalty value for a given roll.
+     * Generates the loyalty modifier for a given loyalty score.
      *
-     * @param roll the 3d6 roll used to determine the loyalty value
-     * @throws IllegalArgumentException if the provided roll is not between 3 and 18
+     * @param loyalty the person's loyalty score
      */
-    public void generateLoyalty(int roll) {
-        if (roll == 3) {
-            setLoyalty(3);
-        } else if (roll == 4) {
-            setLoyalty(2);
-        } else if (roll <= 6) {
-            setLoyalty(1);
-        } else if (roll <= 14) {
-            setLoyalty(0);
-        } else if (roll <= 16) {
-            setLoyalty(-1);
-        } else if (roll == 17) {
-            setLoyalty(-2);
-        } else  if (roll == 18){
-            setLoyalty(-3);
-        } else {
-            throw new IllegalArgumentException("Invalid roll in mekhq/campaign/personnel/Person.java/generateLoyalty: " + roll);
+    public int getLoyaltyModifier(int loyalty) {
+        if (loyalty <= 3) {
+            return 3;
+        } else if (loyalty == 4) {
+            return 2;
+        } else if (loyalty == 5 || loyalty == 6) {
+            return 1;
+        } else if (loyalty >= 7 && loyalty <= 14) {
+            return 0;
+        } else if (loyalty == 15 || loyalty == 16) {
+            return -1;
+        } else if (loyalty == 17) {
+            return -2;
+        } else if (loyalty >= 18){
+            return -3;
         }
+
+        return 0;
     }
 
     /**

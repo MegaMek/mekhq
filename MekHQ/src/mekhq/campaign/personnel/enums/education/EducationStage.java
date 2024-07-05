@@ -57,7 +57,7 @@ public enum EducationStage {
         return this == NONE;
     }
 
-    public boolean isJournalToCampus() {
+    public boolean isJourneyToCampus() {
         return this == JOURNEY_TO_CAMPUS;
     }
 

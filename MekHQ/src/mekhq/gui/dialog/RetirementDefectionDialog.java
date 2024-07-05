@@ -365,11 +365,11 @@ public class RetirementDefectionDialog extends JDialog {
         panResults.add(scroll);
         JPanel panAddRemoveBtns = new JPanel();
         panAddRemoveBtns.setLayout(new BoxLayout(panAddRemoveBtns, BoxLayout.Y_AXIS));
-        btnAddUnit = new JButton("◄");
+        btnAddUnit = new JButton("<<<");
         btnAddUnit.setEnabled(false);
         btnAddUnit.addActionListener(ev -> addUnit());
         panAddRemoveBtns.add(btnAddUnit);
-        btnRemoveUnit = new JButton("►");
+        btnRemoveUnit = new JButton(">>>");
         btnRemoveUnit.setEnabled(false);
         btnRemoveUnit.addActionListener(ev -> removeUnit());
         panAddRemoveBtns.add(btnRemoveUnit);
@@ -408,8 +408,8 @@ public class RetirementDefectionDialog extends JDialog {
         add(btnPanel, BorderLayout.PAGE_END);
     }
 
-    private void setBonusAndShareTotals(Money bonus) {
-        if (bonus.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
+    private void setBonusAndShareTotals(Money totalBonuses) {
+        if (totalBonuses.isGreaterThan(hqView.getCampaign().getFinances().getBalance())) {
             lblTotal.setText("<html>" + resourceMap.getString("lblTotalBonus.text")
                     + ' ' + "<font color='" + MekHQ.getMHQOptions().getFontColorNegativeHexColor() + "'>"
                     + getTotalBonus().toAmountAndSymbolString() + "</font></html>");
@@ -636,25 +636,10 @@ public class RetirementDefectionDialog extends JDialog {
             /* If no unit is required as part of the payout, the unit is part or all of the
              * final payout.
              */
-            if ((rdTracker.getPayout(id).getWeightClass() == 0 &&
-                    null != unitAssignments.get(id) &&
-                            null != hqView.getCampaign().getUnit(unitAssignments.get(id)))) {
-                payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
-            } else if ((hqView.getCampaign().getCampaignOptions().isUseShareSystem()
-                    && hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit()
-                    && Objects.equals(hqView.getCampaign().getPerson(id).getOriginalUnitId(), unitAssignments.get(id)))
-                    && hqView.getCampaign().getUnit(unitAssignments.get(id)) != null) {
-                payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
-            }
-
-            /*  If using the share system and tracking the original unit,
-             * the payout is also reduced by the value of the unit.
-             */
-            if (hqView.getCampaign().getCampaignOptions().isUseShareSystem()
-                    && hqView.getCampaign().getCampaignOptions().isTrackOriginalUnit()
-                    && Objects.equals(hqView.getCampaign().getPerson(id).getOriginalUnitId(), unitAssignments.get(id))
-                    && hqView.getCampaign().getUnit(unitAssignments.get(id)) != null) {
-                payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getBuyCost());
+            if ((rdTracker.getPayout(id).getWeightClass() == 0)
+                    && (unitAssignments.get(id) != null)
+                    && (hqView.getCampaign().getUnit(unitAssignments.get(id)) != null)) {
+                payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getSellValue());
             }
 
             // If the person is still under contract, we don't care that they're owed a unit
@@ -703,18 +688,20 @@ public class RetirementDefectionDialog extends JDialog {
 
     private Money getTotalBonus() {
         Money retVal = Money.zero();
+
         for (UUID id : targetRolls.keySet()) {
             if (((RetirementTableModel) personnelTable.getModel()).getPayBonus(id)) {
                 retVal = retVal.plus(RetirementDefectionTracker.getPayoutOrBonusValue(hqView.getCampaign(),
                         hqView.getCampaign().getPerson(id)));
-
-                if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isMonthly()) {
-                    retVal = retVal.dividedBy(12);
-                } else if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isWeekly()) {
-                    retVal = retVal.dividedBy(52);
-                }
             }
         }
+
+        if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isMonthly()) {
+            retVal = retVal.dividedBy(12);
+        } else if (hqView.getCampaign().getCampaignOptions().getTurnoverFrequency().isWeekly()) {
+            retVal = retVal.dividedBy(52);
+        }
+
         return retVal;
     }
 

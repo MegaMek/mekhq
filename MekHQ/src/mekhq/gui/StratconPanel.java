@@ -528,7 +528,7 @@ public class StratconPanel extends JPanel implements ActionListener {
                         ((scenario.getDeploymentDate() != null) ||
                          (scenario.isStrategicObjective() && currentTrack.getRevealedCoords().contains(currentCoords)) ||
                                 currentTrack.isGmRevealed() || trackRevealed)) {
-                    g2D.setColor(Color.RED);
+                    g2D.setColor(MekHQ.getMHQOptions().getFontColorNegative());
 
                     BufferedImage scenarioImage = getImage(StratconBiomeManifest.FORCE_HOSTILE, ImageType.TerrainTile);
                     if (scenarioImage != null) {
@@ -836,16 +836,25 @@ public class StratconPanel extends JPanel implements ActionListener {
             if ((facility != null) && (facility.getFacilityType() != null)) {
                 if (facility.isStrategicObjective()) {
                     infoBuilder.append(String.format("<br/><span color='%s'>Contract objective located</span>",
-                            facility.getOwner() == ForceAlignment.Allied ? "green" : "red"));
+                            facility.getOwner() == ForceAlignment.Allied ? MekHQ.getMHQOptions().getFontColorPositiveHexColor() : MekHQ.getMHQOptions().getFontColorNegativeHexColor()));
                 }
-                infoBuilder.append((facility.getOwner() == ForceAlignment.Allied) ? "<span color='green'>" : "<span color='red'>")
+                infoBuilder.append("<span color='")
+                        .append(facility.getOwner() == ForceAlignment.Allied ? MekHQ.getMHQOptions().getFontColorPositiveHexColor()
+                                : MekHQ.getMHQOptions().getFontColorNegativeHexColor())
+                        .append("'>")
                     .append("<br/>")
-                    .append(facility.getFormattedDisplayableName())
-                    .append("<span>");
+                    .append(facility.getFormattedDisplayableName());
+                    
+                if (facility.getUserDescription() != null) {
+                   infoBuilder.append("<br/>")
+                   .append(facility.getUserDescription());
+                }
+                 
+                infoBuilder.append("<span>");
             }
 
         } else {
-            infoBuilder.append("<span color='red'>Recon incomplete</span>");
+            infoBuilder.append("<span color='").append(MekHQ.getMHQOptions().getFontColorNegative()).append("'>Recon incomplete</span>");
         }
         infoBuilder.append("<br/>");
 

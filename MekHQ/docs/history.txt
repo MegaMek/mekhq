@@ -1,6 +1,9 @@
 MEKHQ VERSION HISTORY:
 ---------------
-0.49.20-SNAPSHOT
+0.50.0-SNAPSHOT (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
++ PR #4332: CI Updates for windows build and normalizing
+
+0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
 + PR #2997: Story Arcs Basic Architecture
 + FIX #4017: Space and Low Atmosphere not saved to xml, when started game after load the correct board type was to megamek
@@ -104,6 +107,57 @@ MEKHQ VERSION HISTORY:
 + PR #4242: Added Prestigious Academies D-F
 + PR #4246: Added Prestigious Academies G-J
 + PR #4248: Fixed Missing Qualification from James McKenna University
++ PR #4224: Corrected Condition for Enabling Prestigious Academies
++ PR #4225: Adjusted Condition for Setting campaignStartDate
++ PR #4226: Updated StratCon Font Colors to use New Font Color MekHQ Options
++ PR #4227: Updated Unit Market Descriptions & Refactored Unit Market Prices
++ PR #4229: Updated Child Education Level Handling & Academy Name Generation
++ PR #4230: Updated Fatigue Display Calculations in PersonViewPanel
++ PR #4231: Added Nag for Invalid Faction & Updated Missing Federation Commonwealth Start/End Date
++ PR #4232: Updated Loyalty Handling for Reeducation Camps
++ PR #4233: Fixed and Enhanced FactionHunterAwards Processing
++ PR #4234: Fixed Total Bonus Incorrectly Applying Repeated Division in Turnover Dialog
++ PR #4251: Adjusted Step Size for Fixed Map Chance AtB Option
++ PR #4252: Added 'getCurrentPrisoners' Method, Fixed Cargo Capacity Nag Dialog
++ PR #4253: Added Option to Restrict AtB Personnel Market to Hiring Halls Only
++ PR #4254: Updated Contract End Dialog Message
++ PR #4255: Relabeled Ally & Enemy Rating in AtB Contract Market to Improve Clarity
++ PR #4256: Fixed 'Advanced Infantry Graduate' Qualifications in Prestigious Academies Missing Start Date
++ PR #4257: Adjusted Curriculum XP to Use a Fixed Value Instead of Dynamic
++ Fix #3974: Add facility description capability to StratCon
++ PR #4261: Fixed Campus Name in Education Module
++ PR #4262: Separated Officer and Enlisted Curriculums, Corrected Local Academy Data
++ PR #4263: Inverted Management Skill Modifier in RetirementDefectionTracker
++ PR #4264: Updated Education Tooltip Properties to Better Handle Mass Enroll
++ PR #4267: Replaced Non-Universal ASCII Arrow with Braces in Turnover Dialog
++ PR #4271: Corrected Scenario BV Allowance Calculations for Scenario Modifiers
++ PR #4272: Updated Turnover & Retention Documentation
++ PR #4273: Corrected Dialog Option for Invalid Faction Nag
++ PR #4275: Fixed Original Unit Value Being Deducted from Payout Sum When Personnel Resign/Retire
++ FIX #4277: enable new network creation for units not in a network
++ FIX #4279: Added Check for 'dead' Status in Various Personnel Filters
++ PR #4282: Fixed Graduation Event Failing to Correctly Trigger autoAwards
++ PR #4285: Fixed Commanders Incorrectly Displaying 0 Loyalty
++ PR #4286: Numerous Corrections to the Prestigious Academies
++ PR #4287: Added More Education Module Fixes
++ PR #4274: Added 'Override Requirements' Campaign Option for Education Module
++ PR #4291: Added Clan Adoption (Abtakha)
++ PR #4292: Switched Loyalty Rating from Static to Dynamic
++ PR #4294: Added Prestigious Academies K-M
++ PR #4295: Added Prestigious Academies N-P
++ PR #4301: Add handling for new save-time exception added by fixes to MML 1537
++ PR #4281: Added Population Check to Education Module
++ PR #4299: Extended 'Hiring Halls Only' Personnel Market Option to Capital Planets
++ PR #4300: Revised Tuition and Faction discount Calculations
++ PR #4302: Added Prestigious Academies R-T
++ PR #4304: Added Prestigious Academies U-W
++ PR #4306: Fixed & Optimized Total Profits Calculation & Removed Tax Exemptions
++ PR #4307: Fixed Faction Discount to Tuition, Fixed autoAwards Triggering when Personnel Fail to Graduate
++ PR #4308: Fixed Administrative Capacity Displaying while Turnover is Disabled
++ PR #4309: Updated Education Module Documentation, Restored Reeducation Camp Dropout Functionality
++ PR #4164: More detailed auto-selection of bombs
++ PR #4312: Young wolves art update
++ PR #4313: Updated Campaign Options Settings to Disable New Components by Default
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.

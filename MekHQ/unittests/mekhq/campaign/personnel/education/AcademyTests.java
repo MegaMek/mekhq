@@ -60,7 +60,7 @@ class AcademyTests {
 
     @Test
     void testAcademyCreationAllFields() {
-        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", AcademyType.COLLEGE, true,
+        Academy academy = new Academy("MechWarrior", "MekWarrior Academy", "College", true,
                 false, true, "Top level MechWarrior Training", 20, true,
                 Arrays.asList("Sol", "Terra"), false, 3045,
                 3089, 3099, 2000, 365, 10,
@@ -139,6 +139,7 @@ class AcademyTests {
         when(campaign.getSystemById("Sol")).thenReturn(system);
         when(system.getFactions(Mockito.any())).thenReturn(Arrays.asList("Lyr"));
         when(person.getOriginFaction()).thenReturn(new Faction("FWL", ""));
+        when(campaign.getFaction()).thenReturn(new Faction("FWL", ""));
         assertEquals(1.0, academy.getFactionDiscountAdjusted(campaign, person));
     }
 

@@ -1434,9 +1434,15 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
+        int loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty());
+
+        if (person.isCommander()) {
+            loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty() + 2);;
+        }
+
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
                 && (!campaign.getCampaignOptions().isUseHideLoyalty())
-                && (person.getLoyalty() != 0)) {
+                && (loyaltyModifier != 0)) {
             lblLoyalty1.setName("lblLoyalty1");
             lblLoyalty1.setText(resourceMap.getString("lblLoyalty1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1447,11 +1453,6 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblLoyalty1, gridBagConstraints);
 
             lblLoyalty2.setName("lblLoyalty2");
-
-            int loyaltyModifier = person.getLoyalty();
-            if (person.isCommander()) {
-                loyaltyModifier = MathUtility.clamp(loyaltyModifier - 1, -3, 3);
-            }
 
             lblLoyalty2.setText(loyaltyModifier + " (" + getLoyaltyName(loyaltyModifier) + ')');
             lblLoyalty2.setLabelFor(lblLoyalty2);
@@ -1468,8 +1469,7 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if ((campaign.getCampaignOptions().isUseFatigue())
-                && (person.getEffectiveFatigue(campaign) > 0)) {
+        if ((campaign.getCampaignOptions().isUseFatigue()) && (person.getFatigue() > 0)) {
             lblFatigue1.setName("lblFatigue1");
             lblFatigue1.setText(resourceMap.getString("lblFatigue1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1481,7 +1481,7 @@ public class PersonViewPanel extends JScrollablePanel {
 
             StringBuilder fatigueDisplay = new StringBuilder();
             int effectiveFatigue = person.getEffectiveFatigue(campaign);
-            int fatigueTurnoverModifier = MathUtility.clamp(((person.getFatigue() - 1) / 4) - 1, 0, 3);
+            int fatigueTurnoverModifier = MathUtility.clamp(((person.getEffectiveFatigue(campaign) - 1) / 4) - 1, 0, 3);
 
             fatigueDisplay.append(person.getFatigue());
 

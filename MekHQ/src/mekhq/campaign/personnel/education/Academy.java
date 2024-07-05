@@ -47,7 +47,7 @@ public class Academy implements Comparable<Academy> {
     private String name = "Error: Name Missing";
 
     @XmlElement(name = "type")
-    private AcademyType type = AcademyType.NONE;
+    private String type = "None";
 
     @XmlElement(name = "isMilitary")
     private Boolean isMilitary = false;
@@ -155,7 +155,7 @@ public class Academy implements Comparable<Academy> {
      * @param baseAcademicSkillLevel  the base skill level provided by the academy
      * @param id                      the id number of the academy, used for sorting academies in mhq
      */
-    public Academy(String set, String name, AcademyType type, Boolean isMilitary, Boolean isReeducationCamp,
+    public Academy(String set, String name, String type, Boolean isMilitary, Boolean isReeducationCamp,
                    Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
                    List<String> locationSystems, Boolean isLocal, Integer constructionYear,
                    Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
@@ -233,7 +233,7 @@ public class Academy implements Comparable<Academy> {
      * @return The type of academy.
      */
     public AcademyType getType() {
-        return type;
+        return AcademyType.parseFromString(type);
     }
 
     /**
@@ -241,7 +241,7 @@ public class Academy implements Comparable<Academy> {
      *
      * @param type the type to be set.
      */
-    public void setType(final AcademyType type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -675,12 +675,10 @@ public class Academy implements Comparable<Academy> {
      * @param person        the person for whom the tuition is being calculated
      * @return the adjusted tuition value as an Integer
      */
-    public Integer getTuitionAdjusted(Person person) {
-        if (getEducationLevel(person) < 2) {
-            return tuition;
-        } else {
-            return tuition * getEducationLevel(person);
-        }
+    public int getTuitionAdjusted(Person person) {
+        double educationLevel = Math.max(1, getEducationLevel(person) - (EducationLevel.parseToInt(educationLevelMin) / 4));
+
+        return (int) (tuition * educationLevel);
     }
 
     /**
@@ -691,20 +689,24 @@ public class Academy implements Comparable<Academy> {
      * @return the faction discount as a double value, between 0.00 and 1.00
      */
     public Double getFactionDiscountAdjusted(Campaign campaign, Person person) {
-        List<String> locations;
-
-        if (isLocal) {
-            locations = Collections.singletonList(campaign.getCurrentSystem().getId());
-        } else {
-            locations = locationSystems;
+        if (isFactionRestricted) {
+            return 1.00;
         }
 
-        if (locations.stream()
-                .flatMap(campus -> campaign.getSystemById(campus)
-                        .getFactions(campaign.getLocalDate())
-                        .stream())
-                .anyMatch(faction -> faction.equalsIgnoreCase(person.getOriginFaction().getShortName()))) {
-            return (double) (factionDiscount / 100);
+        List<String> campuses = isLocal ? Collections.singletonList(campaign.getCurrentSystem().getId()) : locationSystems;
+
+        Set<String> relevantFactions = new HashSet<>();
+        relevantFactions.add(campaign.getFaction().getShortName());
+        relevantFactions.add(person.getOriginFaction().getShortName());
+
+        for (String campus : campuses) {
+            List<String> factions = campaign.getSystemById(campus).getFactions(campaign.getLocalDate());
+
+            if (Collections.disjoint(factions, relevantFactions)) {
+                return 1.00;
+            } else {
+                return 1 - ((double) factionDiscount / 100);
+            }
         }
 
         return 1.00;
@@ -872,11 +874,11 @@ public class Academy implements Comparable<Academy> {
             for (String skill : skills) {
                 tooltip.append(skill).append(" (");
 
-                if (skill.equalsIgnoreCase("xp bonus") || (skill.equalsIgnoreCase("bonus xp"))) {
+                if (skill.equalsIgnoreCase("xp")) {
                     if (EducationLevel.parseToInt(person.getEduHighestEducation()) >= educationLevel) {
                         tooltip.append(resources.getString("nothingToLearn.text")).append(")<br>");
                     } else {
-                        tooltip.append(educationLevel).append(resources.getString("xpBonus.text")).append(")<br>");
+                        tooltip.append(educationLevel * campaign.getCampaignOptions().getCurriculumXpRate()).append(")<br>");
                     }
                 } else {
                     String skillParsed = skillParser(skill);
@@ -888,16 +890,18 @@ public class Academy implements Comparable<Academy> {
                     }
                 }
             }
+        } else {
+            for (String skill : skills) {
+                tooltip.append(skill).append("<br>");
+            }
         }
 
         tooltip.append("<br>");
 
         // with the skill content resolved, we can move onto the rest of the tooltip
         if (personnel.size() == 1) {
-            if (tuition * getFactionDiscountAdjusted(campaign, person) > 0) {
-                tooltip.append("<b>").append(resources.getString("tuition.text")).append("</b> ")
-                        .append(tuition * getFactionDiscountAdjusted(campaign, person)).append(" CSB").append("<br>");
-            }
+            tooltip.append("<b>").append(resources.getString("tuition.text")).append("</b> ")
+                    .append(getTuitionAdjusted(person) * getFactionDiscountAdjusted(campaign, person)).append(" CSB").append("<br>");
         }
 
         if (isPrepSchool) {
@@ -925,7 +929,7 @@ public class Academy implements Comparable<Academy> {
 
         tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
 
-        // with travel time out the way; all that's left is to add the last couple of entries
+        // with travel time out the way, all that's left is to add the last couple of entries
         if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
             tooltip.append("<b>").append(resources.getString("reeducation.text")).append("</b> ");
 
@@ -935,6 +939,8 @@ public class Academy implements Comparable<Academy> {
                 } else {
                     tooltip.append(resources.getString("reeducationNoChange.text")).append("<br>");
                 }
+            } else {
+                tooltip.append(campaign.getFaction().getFullName(campaign.getGameYear())).append("<br>");
             }
 
             tooltip.append("<br>");
@@ -945,7 +951,7 @@ public class Academy implements Comparable<Academy> {
 
         if (personnel.size() == 1) {
             tooltip.append("<b>").append(resources.getString("educationLevel.text")).append("</b> ")
-                    .append(getEducationLevel(person)).append("<br>");
+                    .append(EducationLevel.parseFromInt(getEducationLevel(person))).append("<br>");
         }
 
         return tooltip.append("</html>").toString();

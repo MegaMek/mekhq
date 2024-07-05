@@ -1,109 +1,62 @@
-# Builds MekHQ for Code Coverage
-#
-# Jobs:
-#
-#    - code_coverage: Build MekHQ on the specified Operating Systems for the specified Java versions
-#          and upload the code coverage results to CodeCov.io
-#        - This job will use MM and MML source directly for the build.
 name: MekHQ CI with Code Coverage
 
-# This Action Definition should be triggered only on pushes to master
 on:
   push:
-    branches: [ master ]
+    branches: [master]
 
-# Setup the Build Scan "VCS" link for all gradle invocations
 env:
   GRADLE_OPTS: "-Dscan.link.VCS=https://github.com/MegaMek/mekhq/commit/${{ github.sha }}"
 
 jobs:
-  # Perform build of MekHQ for Code Coverage any time master updated.
   code_coverage:
     runs-on: ${{ matrix.os }}
 
-    # Run this job once for each combination in the matrix below.
     strategy:
       matrix:
-        os: [ ubuntu-latest ] # For Code QL running on *nix is sufficient
-        java-distribution: [ temurin ]
-        java-version: [ 17 ]
+        os: [ubuntu-latest]
+        java-distribution: [temurin]
+        java-version: [17]
 
     steps:
-    # Checkout the Pull Request source and put it in: ./mekhq
-    - uses: actions/checkout@v4
-      with:
-        path: mekhq
+      - uses: actions/checkout@v4
+        with:
+          path: mekhq
 
-    # Setup composite build for MekHQ
-    # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-    - name: Setup Composite Build for MekHQ
-      run: |
-        echo "includeBuild '../megamek'" >./mekhq/settings_local.gradle
-        echo "includeBuild '../megameklab'" >>./mekhq/settings_local.gradle
+      - name: Checkout MegaMek
+        uses: actions/checkout@v4
+        with:
+          repository: MegaMek/megamek
+          path: megamek
 
-    # Checkout the latest MegaMek source and put it in: ./megamek
-    - name: Checkout MegaMek
-      uses: actions/checkout@v4
-      with:
-        repository: MegaMek/megamek
-        path: megamek
+      - name: Checkout MegaMekLab
+        uses: actions/checkout@v4
+        with:
+          repository: MegaMek/megameklab
+          path: megameklab
 
-    # Checkout the latest MegaMekLab source and put it in: ./megameklab
-    - name: Checkout MegaMekLab
-      uses: actions/checkout@v4
-      with:
-        repository: MegaMek/megameklab
-        path: megameklab
+      - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ matrix.java-distribution }}
+          java-version: ${{ matrix.java-version }}
 
-    # Setup composite build for MegaMekLab
-    # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-    - name: Setup Composite Build for MegaMekLab
-      run: |
-        echo "if (gradle.parent == null) includeBuild '../megamek'" >./megameklab/settings_local.gradle
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
 
-    # Setup the requested Java Distribution and Version from the matrix
-    - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
-      uses: actions/setup-java@v4
-      with:
-        distribution: ${{ matrix.java-distribution }}
-        java-version: ${{ matrix.java-version }}
+      - name: Build with Gradle
+        working-directory: mekhq
+        run: ./gradlew test
 
-    # Make sure we can execute the Gradle wrapper
-    - name: Grant execute permission for gradlew (*nix or MacOS)
-      working-directory: mekhq
-      run: chmod +x gradlew
-      if: runner.os != 'Windows'
+      - name: Upload Test Logs on Failure
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: cd-failure-logs
+          path: ./mekhq/MekHQ/build/reports/
 
-    # Build the MekHQ project
-    #
-    # Directory layout:
-    #    /mekhq
-    #        /gradlew
-    #    /megamek
-    #    /megameklab
-    #
-    # Output Variables:
-    #    - buildScanUri
-    - name: Build with Gradle
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        arguments: clean build --no-build-cache --info --stacktrace --max-workers=1 --scan
-        build-root-directory: mekhq
-      
-    # If the build step fails, try to upload any test logs in case it was a unit test failure.
-    #
-    # The logs will be relative to the ./mekhq directory.
-    - name: Upload Test Logs on Failure
-      uses: actions/upload-artifact@v4
-      if: failure()
-      with:
-        name: cd-failure-logs
-        path: ./mekhq/MekHQ/build/reports/
-
-    # Upload our Code Coverage Reports to CodeCov.io
-    - name: CodeCov.io Coverage Report
-      uses: codecov/codecov-action@v3
-      with:
-        directory: ./mekhq/MekHQ/build/reports/jacoco/test
-        fail_ci_if_error: false
-        verbose: true
+      - name: CodeCov.io Coverage Report
+        uses: codecov/codecov-action@v4
+        with:
+          directory: ./mekhq/MekHQ/build/reports/jacoco/test
+          fail_ci_if_error: false
+          verbose: true
