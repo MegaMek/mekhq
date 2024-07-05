@@ -369,6 +369,9 @@ distributions {
             from (mmlJar) {
                 into "${lib}"
             }
+            from(jar) {
+                into "${lib}"
+            }
             from (mmJar)
             from (mmlJar)
             from(jar)
