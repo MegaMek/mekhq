@@ -83,7 +83,7 @@ ext {
     ]
     mmlJvmOptions = ['-Xmx2048m']
     mhqJvmOptions = [
-        '-Xmx2048m',
+        '-Xmx4096m',
         '--add-opens',
         'java.base/java.util=ALL-UNNAMED',
         '--add-opens',
@@ -291,6 +291,10 @@ distributions {
         distributionBaseName = 'mekhq-windows'
         contents {
             from ("${mmDir}/megamek/build/files")
+            from ("${mmDir}/megamek/build/scripts") {
+                include 'mm*'
+                rename 'mm(.*)', 'mm-startup$1'
+            }
             from ("${mmDir}/megamek/docs/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
@@ -307,6 +311,10 @@ distributions {
             }
             from ("${mmlDir}/megameklab/${mmconf}/log4j2.xml") {
                 exclude 'log4j2.xml'
+            }
+            from ("${mmlDir}/megameklab/build/scripts") {
+                include 'mml*'
+                rename 'mml(.*)', 'mml-startup$1'
             }
             from ("docs/history.txt") {
                 rename 'history.txt', 'mhq-history.txt'
@@ -328,6 +336,10 @@ distributions {
                 include '*.ini'
             }
 
+            from (createStartScripts) {
+                include 'mhq*'
+                rename 'mhq(.*)', 'mhq-startup$1'
+            }
             from (project.sourceSets.main.runtimeClasspath.files
                     .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
                 into "${lib}"
@@ -346,8 +358,8 @@ distributions {
     }
 }
 
-createExe {
-    description = 'Create Windows executable that wraps MekHQ jar'
+launch4j {
+    description = 'Create Windows executable for MekHQ'
     mainClassName = application.mainClass
     icon = "${projectDir}/${data}/images/misc/mekhq.ico"
     outfile = "MekHQ.exe"
@@ -360,74 +372,17 @@ createExe {
     companyName = "MegaMek Development Team"
     jvmOptions = project.ext.mhqJvmOptions
     jreMinVersion = '17'
+    dontWrapJar = true
     messagesJreVersionError = 'We require a Java Runtime of version 17 or higher installed. https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
     messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
-    classpath = ["lib/${mmJar.archiveFileName.get()}", "lib/${mmlJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { "${lib}/${it.name}" }
-    dontWrapJar = true
-    doLast {
-        new File("${buildDir}/launch4j/MekHQ.l4j.ini").text = """# Launch4j runtime config
-# you can add arguments here that will be processed by the JVM at runtime
-${project.ext.mhqJvmOptions.join('\n')}
-"""
-    }
 }
 
-task createMMExe (type: Launch4jLibraryTask, dependsOn: mmJar) {
-    description = 'Create Windows executable stub for MM jar'
-    outfile = 'MegaMek.exe'
-    mainClassName = 'megamek.MegaMek'
-    jarTask = project.tasks.mmJar
-    classpath = project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { "${lib}/${it.name}" }
-    icon = "${mmDir}/megamek/${data}/images/misc/megamek.ico"
-    internalName = 'MegaMek'
-    downloadUrl = 'https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
-    supportUrl = 'https://megamek.org'
-    copyright = '2024 MegaMek Development Team.'
-    trademarks = 'MechWarrior, BattleMech, `Mech and Aerotech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
-    companyName = "MegaMek Development Team"
-    jvmOptions = project.ext.mmJvmOptions
-    jreMinVersion = '17'
-    messagesJreVersionError = 'We require a Java Runtime of version 17 or higher installed. https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
-    messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
-    dontWrapJar = true
-    doLast {
-        new File("${buildDir}/launch4j/MegaMek.l4j.ini").text = """# Launch4j runtime config
-# you can add arguments here that will be processed by the JVM at runtime
-${project.ext.mhqJvmOptions.join('\n')}
-"""
-    }
+task createMMExe {
+    dependsOn gradle.includedBuild('megamek').task(':megamek:createAllExecutables')
 }
 
-task createMMLExe (type: Launch4jLibraryTask, dependsOn: mmlJar) {
-    description = 'Create Windows executable stub for MML jar'
-    outfile = 'MegaMekLab.exe'
-    mainClassName = 'megameklab.MegaMekLab'
-    jarTask = project.tasks.mmlJar
-    classpath = ["lib/${mmJar.archiveFileName.get()}"] + project.sourceSets.main.runtimeClasspath.files
-            .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek")}
-            .collect { "${lib}/${it.name}" }
-    icon = "${mmlDir}/megameklab/${data}/images/misc/megameklab.ico"
-    internalName = 'MegaMekLab'
-    downloadUrl = 'https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
-    supportUrl = 'https://megamek.org'
-    copyright = '2024 MegaMek Development Team.'
-    trademarks = 'MechWarrior, BattleMech, `Mech and Aerotech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
-    companyName = "MegaMek Development Team"
-    jvmOptions = project.ext.mmlJvmOptions
-    jreMinVersion = '17'
-    messagesJreVersionError = 'We require a Java Runtime of version 17 or higher installed. https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
-    messagesJreNotFoundError = 'Go here for instructions on installing the correct version of Java: https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
-    dontWrapJar = true
-    doLast {
-        new File("${buildDir}/launch4j/MegaMekLab.l4j.ini").text = """# Launch4j runtime config
-# you can add arguments here that will be processed by the JVM at runtime
-${project.ext.mhqJvmOptions.join('\n')}
-"""
-    }
+task createMMLExe {
+    dependsOn gradle.includedBuild('megameklab').task(':megameklab:createAllExecutables')
 }
 
 
