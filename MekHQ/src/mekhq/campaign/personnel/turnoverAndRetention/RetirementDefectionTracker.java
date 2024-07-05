@@ -457,27 +457,17 @@ public class RetirementDefectionTracker {
      * @return the management skill modifier for the commander
      */
     private static int getCommanderManagementSkill(PersonnelRole role) {
-        switch (Profession.getProfessionFromPersonnelRole(role)) {
-            case AEROSPACE:
-                return asfCommanderModifier;
-            case VEHICLE:
-                return vehicleCrewCommanderModifier;
-            case INFANTRY:
-                return infantryCommanderModifier;
-            case NAVAL:
-                return navalCommanderModifier;
-            case TECH:
-                return techCommanderModifier;
-            case MEDICAL:
-                return medicalCommanderModifier;
-            case ADMINISTRATOR:
-                return administrationCommanderModifier;
-            case MECHWARRIOR:
-                return mechWarriorCommanderModifier;
-            case CIVILIAN:
-                return 0;
-        }
-        return 0;
+        return switch (Profession.getProfessionFromPersonnelRole(role)) {
+            case AEROSPACE -> asfCommanderModifier;
+            case VEHICLE -> vehicleCrewCommanderModifier;
+            case INFANTRY -> infantryCommanderModifier;
+            case NAVAL -> navalCommanderModifier;
+            case TECH -> techCommanderModifier;
+            case MEDICAL -> medicalCommanderModifier;
+            case ADMINISTRATOR -> administrationCommanderModifier;
+            case MECHWARRIOR -> mechWarriorCommanderModifier;
+            case CIVILIAN -> 0;
+        };
     }
 
     /**
@@ -1065,7 +1055,7 @@ public class RetirementDefectionTracker {
 
             // person was killed
             if (killed) {
-                payoutAmount = getPayoutOrBonusValue(campaign, person);
+                payoutAmount = getPayoutOrBonusValue(campaign, person).multipliedBy(campaign.getCampaignOptions().getPayoutRetirementMultiplier());
             // person was sacked
             } else if (sacked) {
                 payoutAmount = Money.of(0);
