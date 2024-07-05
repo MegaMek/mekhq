@@ -48,14 +48,6 @@ jobs:
           repository: MegaMek/megameklab
           path: megameklab
 
-      # Setup composite build for MekHQ
-      # See: https://github.com/MegaMek/megamek/wiki/Working-With-Gradle
-      - name: Setup Composite Build for MekHQ
-        run: |
-          echo "includeBuild '../megamek'" >> ./mekhq/settings_local.gradle
-          echo "includeBuild '../megameklab'" >> ./mekhq/settings_local.gradle
-          echo "includeBuild '../megamek'" >> ./megameklab/settings_local.gradle
-
       # Setup the requested Java Distribution and Version from the matrix
       - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v4

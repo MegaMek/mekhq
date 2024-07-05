@@ -116,12 +116,6 @@ jobs:
           distribution: ${{ matrix.java-distribution }}
           java-version: ${{ matrix.java-version }}
 
-      - name: Setup Composite Build for MekHQ
-        run: |
-          echo "includeBuild '../megamek'" >> ./mekhq/settings_local.gradle
-          echo "includeBuild '../megameklab'" >> ./mekhq/settings_local.gradle
-          echo "includeBuild '../megamek'" >> ./megameklab/settings_local.gradle
-
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
