@@ -1,13 +1,3 @@
-# For most projects, this workflow file will not need changing; you simply need
-# to commit it to your repository.
-#
-# You may wish to alter this file to override the set of languages analyzed,
-# or to provide custom queries or build logic.
-#
-# ******** NOTE ********
-# CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
-# Learn more...
-# https://docs.github.com/en/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#overriding-automatic-language-detection
 name: "CodeQL"
 
 on:
@@ -29,10 +19,9 @@ jobs:
       mmlRepo: ${{ steps.find_mml.outputs.mmRepo }}
       mmlBranch: ${{ steps.find_mml.outputs.mmBranch }}
 
-    # Run this job once for each combination in the matrix below.
     strategy:
       matrix:
-        os: [ubuntu-latest] # For Code QL running on *nix is sufficient
+        os: [ubuntu-latest]
         language: ["java"]
         java-distribution: [temurin]
         java-version: [17]
@@ -44,20 +33,9 @@ jobs:
         with:
           path: mekhq
 
-      # Find the repo and branch to use for MM
-      #
-      # Output variables:
-      #
-      #    - mmRepo: The MM repository to use.
-      #    - mmBranch: The MM branch to use.
       - name: Find the Right MegaMek Branch
         id: find_mm
-        # Override bash so that it doesn't fail fast (the default) if we can't find the branch
         shell: bash {0}
-        # This shell script searches the PR submitter's MM repo for
-        # a branch that has the same name as the current PR branch.
-        # If found it sets the `mmRepo` and `mmBranch` step output variables
-        # to that branch.
         run: |
           git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megamek.git ${{ github.event.pull_request.head.ref }}
           if [ "$?" == "0" ]
@@ -70,7 +48,6 @@ jobs:
           fi
           exit 0
 
-      # Checkout the latest MegaMek source and put it in: ./megamek
       - name: Checkout MegaMek
         uses: actions/checkout@v4
         with:
@@ -78,20 +55,9 @@ jobs:
           ref: ${{ steps.find_mm.outputs.mmBranch }}
           path: megamek
 
-      # Find the repo and branch to use for MML
-      #
-      # Output variables:
-      #
-      #    - mmlRepo: The MML repository to use.
-      #    - mmlBranch: The MML branch to use.
       - name: Find the Right MegaMekLab Branch
         id: find_mml
-        # Override bash so that it doesn't fail fast (the default) if we can't find the branch
         shell: bash {0}
-        # This shell script searches the PR submitter's MM repo for
-        # a branch that has the same name as the current PR branch.
-        # If found it sets the `mmRepo` and `mmBranch` step output variables
-        # to that branch.
         run: |
           git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megameklab.git ${{ github.event.pull_request.head.ref }}
           if [ "$?" == "0" ]
@@ -104,7 +70,6 @@ jobs:
           fi
           exit 0
 
-      # Checkout the latest MegaMekLab source and put it in: ./megameklab
       - name: Checkout MegaMekLab
         uses: actions/checkout@v4
         with:
@@ -112,29 +77,17 @@ jobs:
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
           path: megameklab
 
-      # Setup the requested Java Distribution and Version from the matrix
       - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v4
         with:
           distribution: ${{ matrix.java-distribution }}
           java-version: ${{ matrix.java-version }}
 
-      # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          # If you wish to specify custom queries, you can do so here or in a config file.
-          # By default, queries listed here will override any specified in a config file.
-          # Prefix the list here with "+" to use these queries and those in the config file.
-          # queries: ./path/to/local/query, your-org/your-repo/queries@main
           queries: +security-and-quality
-
-      - name: Setup Composite Build for MekHQ
-        run: |
-          echo "includeBuild '../megamek'" >> ./mekhq/settings_local.gradle
-          echo "includeBuild '../megameklab'" >> ./mekhq/settings_local.gradle
-          echo "includeBuild '../megamek'" >> ./megameklab/settings_local.gradle
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
