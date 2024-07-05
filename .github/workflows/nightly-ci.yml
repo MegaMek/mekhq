@@ -1,16 +1,9 @@
-# Builds MekHQ for CI each Night
-#
-# Jobs:
-#    - nightly_ci: Build MekHQ for CI across multiple platforms and Java versions.
 name: MekHQ Nightly CI
 
 on:
   schedule:
-    # Nightly at Midnight (UTC)
-    # ref: https://crontab.guru/every-night
     - cron: "0 0 * * *"
 
-# Setup the Build Scan "VCS" link for all gradle invocations
 env:
   GRADLE_OPTS: "-Dscan.link.VCS=https://github.com/MegaMek/mekhq/commit/${{ github.sha }}"
 
@@ -18,7 +11,6 @@ jobs:
   nightly_ci:
     runs-on: ${{ matrix.os }}
 
-    # Run this job once for each combination in the matrix below.
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -29,26 +21,22 @@ jobs:
     name: Nightly MekHQ CI ${{ matrix.os }} on ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
 
     steps:
-      # Checkout the latest source and put it in: ./mekhq
       - uses: actions/checkout@v4
         with:
           path: mekhq
 
-      # Checkout the latest MegaMek source and put it in: ./megamek
       - name: Checkout MegaMek
         uses: actions/checkout@v4
         with:
           repository: MegaMek/megamek
           path: megamek
 
-      # Checkout the latest MegaMekLab source and put it in: ./megameklab
       - name: Checkout MegaMekLab
         uses: actions/checkout@v4
         with:
           repository: MegaMek/megameklab
           path: megameklab
 
-      # Setup the requested Java Distribution and Version from the matrix
       - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v4
         with:
@@ -57,10 +45,14 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          build-scan-publish: true
+          build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
+          build-scan-terms-of-use-agree: "yes"
 
       - name: Build with Gradle
         working-directory: megameklab
-        run: ./gradlew clean build -x test --continue --stacktrace --scan
+        run: ./gradlew clean build --stacktrace --scan
 
       - name: Upload Test Logs on Failure
         uses: actions/upload-artifact@v4
@@ -69,18 +61,12 @@ jobs:
           name: ${{ matrix.os }}-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}-ci-failure-logs
           path: mekhq/MekHQ/build/reports/
 
-      # Put the non-Windows Release in an artifact
-      #
-      # NB: Due to a GitHub Actions limitation we won't know what the filename is in order to display it somewhere.
       - name: Upload Nix/Mac Releases
         uses: actions/upload-artifact@v4
         with:
           name: mhq-release-nix-mac-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
           path: mekhq/MekHQ/build/distributions/mekhq-unix-*.tar.gz
 
-      # Put the Windows Release in an artifact
-      #
-      # NB: Due to a GitHub Actions limitation we won't know what the filename is in order to display it somewhere.
       - name: Upload Windows Release
         uses: actions/upload-artifact@v4
         with:

@@ -243,6 +243,7 @@ distributions {
     unix {
        distributionBaseName = 'mekhq-unix'
         contents {
+            // MegaMek Includes
             from ("${mmDir}/megamek/build/files")
             from ("${mmDir}/megamek/build/scripts") {
                 include 'mm*'
@@ -258,10 +259,15 @@ distributions {
             from ("${mmDir}/megamek/build/launch4j/lib") {
                 into "${lib}"
             }
+            from (mmJar) {
+                into "${lib}"
+            }
+            from (mmJar)
+
+            // MegaMek Includes
             from ("${mmlDir}/megameklab/build/launch4j/lib") {
                 into "${lib}"
             }
-
             from ("${mmlDir}/megameklab/build/files/${data}/images") {
                 into "${data}/images"
             }
@@ -276,6 +282,12 @@ distributions {
             from ("${mmlDir}/megameklab/${mmconf}/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
+            from (mmlJar) {
+                into "${lib}"
+            }
+            from (mmlJar)
+
+            // MekHQ Includes
             from ("docs/history.txt") {
                 rename 'history.txt', 'mhq-history.txt'
                 into 'docs'
@@ -287,12 +299,14 @@ distributions {
                 include 'mhq*'
                 rename 'mhq(.*)', 'mhq-startup$1'
             }
+
             from (project.sourceSets.main.runtimeClasspath.files
                     .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
                 into "${lib}"
             }
-            from (mmJar)
-            from (mmlJar)
+            from(jar) {
+                into "${lib}"
+            }
             from (jar)
             duplicatesStrategy = 'exclude'
         }
@@ -301,20 +315,41 @@ distributions {
     windows {
         distributionBaseName = 'mekhq-windows'
         contents {
+            // MegaMek Includes
             from ("${mmDir}/megamek/build/files")
             from ("${mmDir}/megamek/build/scripts") {
                 include 'mm*'
                 rename 'mm(.*)', 'mm-startup$1'
             }
-            from ("${mmDir}/megamek/docs/history.txt") {
+            from ("${mmDir}/megamek/${docs}/history.txt") {
                 rename 'history.txt', 'mm-history.txt'
                 into 'docs'
             }
             from ("${mmDir}/megamek/${mmconf}/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
+            from ("${mmDir}/megamek/build/launch4j/lib") {
+                into "${lib}"
+            }
+            from ("${mmDir}/megamek/build/launch4j") {
+                include '*.exe'
+                include '*.ini'
+            }
+            from (mmJar) {
+                into "${lib}"
+            }
+            from (mmJar)
+
+            // MegaMekLab Includes
+            from ("${mmlDir}/megameklab/build/launch4j/lib") {
+                into "${lib}"
+            }
             from ("${mmlDir}/megameklab/build/files/${data}/images") {
                 into "${data}/images"
+            }
+            from ("${mmlDir}/megameklab/build/scripts") {
+                include 'mml*'
+                rename 'mml(.*)', 'mml-startup$1'
             }
             from ("${mmlDir}/megameklab/${docs}/history.txt") {
                 rename 'history.txt', 'mml-history.txt'
@@ -323,10 +358,16 @@ distributions {
             from ("${mmlDir}/megameklab/${mmconf}/log4j2.xml") {
                 exclude 'log4j2.xml'
             }
-            from ("${mmlDir}/megameklab/build/scripts") {
-                include 'mml*'
-                rename 'mml(.*)', 'mml-startup$1'
+            from ("${mmlDir}/megameklab/build/launch4j") {
+                include '*.exe'
+                include '*.ini'
             }
+            from (mmlJar) {
+                into "${lib}"
+            }
+            from (mmlJar)
+
+            // MekHQ Includes
             from ("docs/history.txt") {
                 rename 'history.txt', 'mhq-history.txt'
                 into 'docs'
@@ -334,46 +375,22 @@ distributions {
             from (fileStagingDir) {
                 exclude 'history.txt'
             }
-
-            from ("${mmDir}/megamek/build/launch4j/lib") {
-                into "${lib}"
-            }
-            from ("${mmlDir}/megameklab/build/launch4j/lib") {
-                into "${lib}"
-            }
-
-            from ("${buildDir}/launch4j") {
-                include '*.exe'
-                include '*.ini'
-            }
-            from ("${mmDir}/megamek/build/launch4j") {
-                include '*.exe'
-                include '*.ini'
-            }
-            from ("${mmlDir}/megameklab/build/launch4j") {
-                include '*.exe'
-                include '*.ini'
-            }
-
             from (createStartScripts) {
                 include 'mhq*'
                 rename 'mhq(.*)', 'mhq-startup$1'
             }
+            from ("${buildDir}/launch4j") {
+                include '*.exe'
+                include '*.ini'
+            }
+
             from (project.sourceSets.main.runtimeClasspath.files
                     .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
-                into "${lib}"
-            }
-            from (mmJar) {
-                into "${lib}"
-            }
-            from (mmlJar) {
                 into "${lib}"
             }
             from(jar) {
                 into "${lib}"
             }
-            from (mmJar)
-            from (mmlJar)
             from(jar)
             duplicatesStrategy = 'exclude'
         }
@@ -421,61 +438,56 @@ task stageMM (type: GradleBuild) {
     dir = "${mmDir}"
 }
 
-windowsDistZip {
-    description = 'Creates Windows distribution packaged as a zip archive'
+tasks.register("packagePrepWork") {
+    description = 'General Catch All for all distributions'
     dependsOn stageFiles
     dependsOn stageMM
+    dependsOn createStartScripts
+    dependsOn startScripts
+}
+
+tasks.register("createAllMMExes") {
     dependsOn createAllExecutables
     dependsOn createMMExe
     dependsOn createMMLExe
-    dependsOn startScripts
+}
+
+windowsDistZip {
+    description = 'Creates Windows distribution packaged as a zip archive'
+    dependsOn packagePrepWork
+    dependsOn createAllMMExes
 }
 
 windowsDistTar {
     description = 'Creates Windows distribution packaged as a zip archive'
-    dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn createAllExecutables
-    dependsOn createMMExe
-    dependsOn createMMLExe
-    dependsOn startScripts
+    dependsOn packagePrepWork
+    dependsOn createAllMMExes
     archiveExtension = 'tar.gz'
     compression = Compression.GZIP
 }
 
 unixDistTar {
     description = 'Creates *nix distribution packaged as a tar ball'
-    dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn startScripts
+    dependsOn packagePrepWork
     archiveExtension = 'tar.gz'
     compression = Compression.GZIP
 }
 
 unixDistZip {
     description = 'Creates *nix distribution packaged as a tar ball'
-    dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn createStartScripts
-    dependsOn startScripts
+    dependsOn packagePrepWork
 }
 
 distTar {
     description = 'Creates *nix distribution packaged as a tar ball'
-    dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn createStartScripts
-    dependsOn startScripts
+    dependsOn packagePrepWork
     archiveExtension = 'tar.gz'
     compression = Compression.GZIP
 }
 
 distZip {
     description = 'Creates *nix distribution packaged as a tar ball'
-    dependsOn stageFiles
-    dependsOn stageMM
-    dependsOn createStartScripts
-    dependsOn startScripts
+    dependsOn packagePrepWork
 }
 
 // The repository can only be cloned into an empty directory so we need to delete anything left over

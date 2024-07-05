@@ -1,22 +1,13 @@
-# Builds MekHQ for CI (and CD via artifacts)
-#
-# Jobs:
-#    - ci_cd: Build MekHQ for CI/CD on the specified Operating Systems for the specified Java versions
-#        - This job will use MM and MML source directly for the build.
 name: MekHQ CI with Gradle
 
-# This Action Definition should be triggered only on
-# Pull Requests being added/updated against master.
 on:
   pull_request:
     branches: [master]
 
-# Setup the Build Scan "VCS" link for all gradle invocations
 env:
   GRADLE_OPTS: "-Dscan.link.VCS=${{ github.event.pull_request.html_url }}"
 
 jobs:
-  # Perform CI (and CD as an artifact) of MekHQ any time a pull request is added or updated.
   ci_cd:
     runs-on: ${{ matrix.os }}
 
@@ -26,35 +17,22 @@ jobs:
       mmlRepo: ${{ steps.find_mml.outputs.mmRepo }}
       mmlBranch: ${{ steps.find_mml.outputs.mmBranch }}
 
-    # Run this job once for each combination in the matrix below.
     strategy:
       matrix:
-        os: [ubuntu-latest] # For CI/CD running on *nix is sufficient
+        os: [ubuntu-latest]
         java-distribution: [temurin]
         java-version: [17]
       fail-fast: false
 
     steps:
-      # Checkout the Pull Request source and put it in: ./mekhq
       - name: Checkout out MekHQ
         uses: actions/checkout@v4
         with:
           path: mekhq
 
-      # Find the repo and branch to use for MM
-      #
-      # Output variables:
-      #
-      #    - mmRepo: The MM repository to use.
-      #    - mmBranch: The MM branch to use.
       - name: Find the Right MegaMek Branch
         id: find_mm
-        # Override bash so that it doesn't fail fast (the default) if we can't find the branch
         shell: bash {0}
-        # This shell script searches the PR submitter's MM repo for
-        # a branch that has the same name as the current PR branch.
-        # If found it sets the `mmRepo` and `mmBranch` step output variables
-        # to that branch.
         run: |
           git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megamek.git ${{ github.event.pull_request.head.ref }}
           if [ "$?" == "0" ]
@@ -67,7 +45,6 @@ jobs:
           fi
           exit 0
 
-      # Checkout the latest MegaMek source and put it in: ./megamek
       - name: Checkout MegaMek
         uses: actions/checkout@v4
         with:
@@ -75,20 +52,9 @@ jobs:
           ref: ${{ steps.find_mm.outputs.mmBranch }}
           path: megamek
 
-      # Find the repo and branch to use for MML
-      #
-      # Output variables:
-      #
-      #    - mmlRepo: The MML repository to use.
-      #    - mmlBranch: The MML branch to use.
       - name: Find the Right MegaMekLab Branch
         id: find_mml
-        # Override bash so that it doesn't fail fast (the default) if we can't find the branch
         shell: bash {0}
-        # This shell script searches the PR submitter's MM repo for
-        # a branch that has the same name as the current PR branch.
-        # If found it sets the `mmRepo` and `mmBranch` step output variables
-        # to that branch.
         run: |
           git ls-remote --exit-code --heads ${{ github.event.pull_request.head.repo.owner.html_url }}/megameklab.git ${{ github.event.pull_request.head.ref }}
           if [ "$?" == "0" ]
@@ -101,7 +67,6 @@ jobs:
           fi
           exit 0
 
-      # Checkout the latest MegaMekLab source and put it in: ./megameklab
       - name: Checkout MegaMekLab
         uses: actions/checkout@v4
         with:
@@ -109,7 +74,6 @@ jobs:
           ref: ${{ steps.find_mml.outputs.mmlBranch }}
           path: megameklab
 
-      # Setup the requested Java Distribution and Version from the matrix
       - name: Set up ${{ matrix.java-distribution }} JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v4
         with:
@@ -118,13 +82,15 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+        with:
+          build-scan-publish: true
+          build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
+          build-scan-terms-of-use-agree: "yes"
 
       - name: Build with Gradle
         working-directory: mekhq
         run: ./gradlew build --stacktrace --scan
 
-      # If the build step fails, try to upload any test logs in case it was a unit test failure.
-      # The logs will be relative to the ./mekhq directory.
       - name: Upload Test Logs on Failure
         uses: actions/upload-artifact@v4
         if: failure()
@@ -132,7 +98,6 @@ jobs:
           name: cd-failure-logs
           path: ./mekhq/MekHQ/build/reports/
 
-      # Upload our Code Coverage Reports to CodeCov.io
       - name: CodeCov.io Coverage Report
         uses: codecov/codecov-action@v4
         with:
@@ -140,15 +105,12 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
-      # Put the Windows Release in an artifact
-      # NB: Due to a GitHub Actions limitation we won't know what the filename is in order to display it somewhere.
       - name: Upload Windows Release
         uses: actions/upload-artifact@v4
         with:
           name: mhq-release-win-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
           path: ./mekhq/MekHQ/build/distributions/mekhq-windows-*.zip
 
-      # Put the non-Windows release in an artifact
       - name: Upload Nix/Mac Release
         uses: actions/upload-artifact@v4
         with:
