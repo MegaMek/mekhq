@@ -82,6 +82,10 @@ ext {
         '-Dsun.awt.disablegrab=true'
     ]
     mmlJvmOptions = ['-Xmx2048m']
+    l4jJvmOptions = [
+        '-Xmx4096m',
+        '-Dsun.awt.disablegrab=true'
+    ]
     mhqJvmOptions = [
         '-Xmx4096m',
         '--add-opens',
@@ -376,7 +380,7 @@ distributions {
 launch4j {
     description = 'Create Windows executable for MekHQ'
     mainClassName = application.mainClass
-    icon = "${projectDir}/${data}/images/misc/mekhq.ico"
+    icon = "${projectDir}/data/images/misc/mekhq.ico"
     outfile = "MekHQ.exe"
     jarTask = project.tasks.jar
     windowTitle = 'MekHQ'
@@ -386,7 +390,7 @@ launch4j {
     copyright = '2024 MegaMek Development Team.'
     trademarks = 'MechWarrior, BattleMech, `Mech and Aerotech - The The Topps Company, Inc. Catalyst Game Labs - InMediaRes Productions, LLC.'
     companyName = "MegaMek Development Team"
-    jvmOptions = project.ext.mhqJvmOptions
+    jvmOptions = project.ext.l4jJvmOptions
     jreMinVersion = '17'
     dontWrapJar = true
     messagesJreVersionError = 'We require a Java Runtime of version 17 or higher installed. https://github.com/MegaMek/megamek/wiki/Updating-to-Adoptium'
