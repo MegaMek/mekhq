@@ -21,7 +21,33 @@
  */
 package mekhq;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import javax.swing.InputMap;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.text.DefaultEditorKit;
+
+import org.apache.logging.log4j.LogManager;
+
+import io.sentry.Sentry;
 import megamek.MegaMek;
+import megamek.SuiteConstants;
 import megamek.client.Client;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
@@ -55,26 +81,12 @@ import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.text.DefaultEditorKit;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * The main class of the application.
  */
 public class MekHQ implements GameListener {
-    //region Variable Declarations
+    // region Variable Declarations
     private static final SuitePreferences mhqPreferences = new SuitePreferences();
     private static final MHQOptions mhqOptions = new MHQOptions();
     private static final EventBus EVENT_BUS = new EventBus();
@@ -104,7 +116,7 @@ public class MekHQ implements GameListener {
     private IconPackage iconPackage = new IconPackage();
 
     private final IAutosaveService autosaveService;
-    //endregion Variable Declarations
+    // endregion Variable Declarations
 
     public static SuitePreferences getMHQPreferences() {
         return mhqPreferences;
@@ -163,9 +175,9 @@ public class MekHQ implements GameListener {
      */
     protected void startup() {
         // Setup user preferences
-        MegaMek.getMMPreferences().loadFromFile(MHQConstants.MM_PREFERENCES_FILE);
-        MegaMekLab.getMMLPreferences().loadFromFile(MHQConstants.MML_PREFERENCES_FILE);
-        getMHQPreferences().loadFromFile(MHQConstants.MHQ_PREFERENCES_FILE);
+        MegaMek.getMMPreferences().loadFromFile(SuiteConstants.MM_PREFERENCES_FILE);
+        MegaMekLab.getMMLPreferences().loadFromFile(SuiteConstants.MML_PREFERENCES_FILE);
+        getMHQPreferences().loadFromFile(SuiteConstants.MHQ_PREFERENCES_FILE);
 
         setUserPreferences();
 
@@ -188,7 +200,7 @@ public class MekHQ implements GameListener {
     }
 
     @Deprecated // These need to be migrated to the Suite Constants / Suite Options Setup
-    private void setUserPreferences() {
+    private static void setUserPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(MekHQ.class);
 
@@ -221,6 +233,7 @@ public class MekHQ implements GameListener {
             financesDirectory = new ObservableString("financesDirectory", ".");
             preferences.manage(new StringPreference(financesDirectory));
         } catch (Exception ex) {
+            Sentry.captureException(ex);
             LogManager.getLogger().error("Failed to set user preferences", ex);
         }
     }
@@ -240,9 +253,9 @@ public class MekHQ implements GameListener {
             campaignGUI.getFrame().dispose();
         }
 
-        MegaMek.getMMPreferences().saveToFile(MHQConstants.MM_PREFERENCES_FILE);
-        MegaMekLab.getMMLPreferences().saveToFile(MHQConstants.MML_PREFERENCES_FILE);
-        getMHQPreferences().saveToFile(MHQConstants.MHQ_PREFERENCES_FILE);
+        MegaMek.getMMPreferences().saveToFile(SuiteConstants.MM_PREFERENCES_FILE);
+        MegaMekLab.getMMLPreferences().saveToFile(SuiteConstants.MML_PREFERENCES_FILE);
+        getMHQPreferences().saveToFile(SuiteConstants.MHQ_PREFERENCES_FILE);
 
         System.exit(0);
     }
@@ -255,12 +268,29 @@ public class MekHQ implements GameListener {
      * Main method launching the application.
      */
     public static void main(String... args) {
+        // Configure Sentry with defaults. Although the client defaults to enabled, the
+        // properties file is used to disable
+        // it and additional configuration can be done inside of the sentry.properties
+        // file. The defaults for everything else is set here.
+        Sentry.init(options -> {
+            options.setEnableExternalConfiguration(true);
+            options.setDsn("https://a05b2064798e2b8d46ac620b4497a072@sentry.tapenvy.us/10");
+            options.setEnvironment("production");
+            options.setTracesSampleRate(0.2);
+            options.setDebug(true);
+            options.setServerName("MegaMekClient");
+            options.setRelease(SuiteConstants.VERSION.toString());
+        });
+
         // First, create a global default exception handler
         Thread.setDefaultUncaughtExceptionHandler((thread, t) -> {
+            Sentry.captureException(t);
             LogManager.getLogger().error("Uncaught Exception Detected", t);
             final String name = t.getClass().getName();
             JOptionPane.showMessageDialog(null,
-                    String.format("Uncaught %s detected. Please open up an issue containing all logs, campaign save file, and customs at https://github.com/MegaMek/mekhq/issues", name),
+                    String.format(
+                            "Uncaught %s detected. Please open up an issue containing all logs, campaign save file, and customs at https://github.com/MegaMek/mekhq/issues",
+                            name),
                     "Uncaught " + name, JOptionPane.ERROR_MESSAGE);
         });
 
@@ -277,7 +307,9 @@ public class MekHQ implements GameListener {
     }
 
     public static void initializeLogging(final String originProject) {
-        LogManager.getLogger().info(getUnderlyingInformation(originProject));
+        if (LogManager.getLogger().isInfoEnabled()) {
+            LogManager.getLogger().info(getUnderlyingInformation(originProject));
+        }
     }
 
     /**
@@ -334,6 +366,7 @@ public class MekHQ implements GameListener {
         try {
             client = new Client(playerName, serverAddress, port);
         } catch (Exception e) {
+            Sentry.captureException(e);
             LogManager.getLogger().error("Failed to connect to server properly", e);
             return;
         }
@@ -417,52 +450,52 @@ public class MekHQ implements GameListener {
 
     @Override
     public void gameBoardChanged(GameBoardChangeEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameBoardNew(GameBoardNewEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameEnd(GameEndEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameEntityChange(GameEntityChangeEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameEntityNew(GameEntityNewEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameEntityNewOffboard(GameEntityNewOffboardEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameEntityRemove(GameEntityRemoveEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameMapQuery(GameMapQueryEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameNewAction(GameNewActionEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gamePhaseChange(GamePhaseChangeEvent e) {
-
+        // Why Empty?
     }
 
     @Override
@@ -486,7 +519,8 @@ public class MekHQ implements GameListener {
             resolveDialog.setVisible(true);
 
             if (!getCampaign().getRetirementDefectionTracker().getRetirees().isEmpty()) {
-                RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI, campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
+                RetirementDefectionDialog rdd = new RetirementDefectionDialog(campaignGUI,
+                        campaignGUI.getCampaign().getMission(currentScenario.getMissionId()), false);
                 rdd.setLocation(rdd.getLocation().x, 0);
                 rdd.setVisible(true);
 
@@ -518,7 +552,8 @@ public class MekHQ implements GameListener {
                 autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills);
             }
 
-            // we need to trigger ScenarioResolvedEvent before stopping the thread or currentScenario may become null
+            // we need to trigger ScenarioResolvedEvent before stopping the thread or
+            // currentScenario may become null
             MekHQ.triggerEvent(new ScenarioResolvedEvent(currentScenario));
             gameThread.requestStop();
 
@@ -532,50 +567,53 @@ public class MekHQ implements GameListener {
             final File tempImageDirectory = new File("data/images/temp");
             if (tempImageDirectory.isDirectory()) {
                 // This can't be null because of the above
-                Stream.of(tempImageDirectory.listFiles()).filter(file -> file.getName().endsWith(".png")).forEach(File::delete);
+                Stream.of(tempImageDirectory.listFiles()).filter(file -> file.getName().endsWith(".png"))
+                        .forEach(File::delete);
             }
         } catch (Exception ex) {
+            Sentry.captureException(ex);
             LogManager.getLogger().error("", ex);
         }
     }
 
     @Override
     public void gamePlayerChange(GamePlayerChangeEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gamePlayerChat(GamePlayerChatEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gamePlayerConnected(GamePlayerConnectedEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gamePlayerDisconnected(GamePlayerDisconnectedEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameReport(GameReportEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameSettingsChange(GameSettingsChangeEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameTurnChange(GameTurnChangeEvent e) {
-
+        // Why Empty?
     }
 
     @Override
     public void gameClientFeedbackRequest(GameCFREvent e) {
+        // Why Empty?
     }
 
     public IconPackage getIconPackage() {
@@ -585,15 +623,15 @@ public class MekHQ implements GameListener {
     /*
      * Access methods for event bus.
      */
-    static public void registerHandler(Object handler) {
+    public static void registerHandler(Object handler) {
         EVENT_BUS.register(handler);
     }
 
-    static public boolean triggerEvent(MMEvent event) {
+    public static boolean triggerEvent(MMEvent event) {
         return EVENT_BUS.trigger(event);
     }
 
-    static public void unregisterHandler(Object handler) {
+    public static void unregisterHandler(Object handler) {
         EVENT_BUS.unregister(handler);
     }
 
@@ -646,9 +684,10 @@ public class MekHQ implements GameListener {
     }
 
     private static void addOSXKeyStrokes(InputMap inputMap) {
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, KeyEvent.META_DOWN_MASK), DefaultEditorKit.copyAction);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.META_DOWN_MASK), DefaultEditorKit.cutAction);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction);
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, KeyEvent.META_DOWN_MASK), DefaultEditorKit.selectAllAction);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.META_DOWN_MASK), DefaultEditorKit.copyAction);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.META_DOWN_MASK), DefaultEditorKit.cutAction);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.META_DOWN_MASK), DefaultEditorKit.pasteAction);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.META_DOWN_MASK),
+                DefaultEditorKit.selectAllAction);
     }
 }

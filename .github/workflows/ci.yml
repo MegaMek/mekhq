@@ -45,6 +45,10 @@ jobs:
           fi
           exit 0
 
+      - name: Add MMRevision file
+        run: |
+          echo ${{ steps.find_mm.outputs.mmBranch }} >> mekhq/mm-revision.txt
+
       - name: Checkout MegaMek
         uses: actions/checkout@v4
         with:
@@ -67,6 +71,10 @@ jobs:
           fi
           exit 0
 
+      - name: Add MMLRevision file
+        run: |
+          echo ${{ steps.find_mml.outputs.mmlBranch }} >> mekhq/mml-revision.txt
+
       - name: Checkout MegaMekLab
         uses: actions/checkout@v4
         with:
@@ -87,6 +95,10 @@ jobs:
           build-scan-terms-of-use-url: "https://gradle.com/terms-of-service"
           build-scan-terms-of-use-agree: "yes"
 
+      - name: Add MHQRevision file
+        run: |
+          echo ${{ github.sha }} >> megamek/mhq-revision.txt
+
       - name: Build with Gradle
         working-directory: mekhq
         run: ./gradlew build --stacktrace --scan
@@ -105,14 +117,14 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
-      - name: Upload Windows Release
+      - name: Upload Tar GZ Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mhq-release-win-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-          path: ./mekhq/MekHQ/build/distributions/mekhq-windows-*.zip
+          name: mhq-release-tgz-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
+          path: mekhq/MekHQ/build/distributions/MekHQ-*.tar.gz
 
-      - name: Upload Nix/Mac Release
+      - name: Upload Zip Release
         uses: actions/upload-artifact@v4
         with:
-          name: mhq-release-nix-mac-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-          path: ./mekhq/MekHQ/build/distributions/mekhq-unix-*.tar.gz
+          name: mhq-release-zip-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
+          path: mekhq/MekHQ/build/distributions/MekHQ-*.zip
