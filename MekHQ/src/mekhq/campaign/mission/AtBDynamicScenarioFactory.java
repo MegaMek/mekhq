@@ -19,10 +19,7 @@
 package mekhq.campaign.mission;
 
 import megamek.client.bot.princess.CardinalEdge;
-import megamek.client.generator.RandomGenderGenerator;
-import megamek.client.generator.RandomNameGenerator;
-import megamek.client.generator.RandomUnitGenerator;
-import megamek.client.generator.TeamLoadoutGenerator;
+import megamek.client.generator.*;
 import megamek.client.generator.enums.SkillGeneratorType;
 import megamek.client.generator.skillGenerators.AbstractSkillGenerator;
 import megamek.client.generator.skillGenerators.TaharqaSkillGenerator;
@@ -31,6 +28,7 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
+import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.common.icons.Camouflage;
@@ -465,7 +463,7 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            if (forceTemplate.getAllowAeroBombs()) {
+            if (campaign.getCampaignOptions().isAutoconfigMunitions() || forceTemplate.getAllowAeroBombs()) {
                 MapLocation mapLocation = scenario.getTemplate().mapParameters.getMapLocation();
                 int ownerBaseQuality;
                 boolean isPirate = faction.isPirate();
@@ -489,12 +487,27 @@ public class AtBDynamicScenarioFactory {
                         break;
                 }
 
+                // Configure generated units with appropriate munitions (for BV calcs)
+                Game cGame = campaign.getGame();
+                TeamLoadoutGenerator tlg = new TeamLoadoutGenerator(cGame);
+                ArrayList<Entity> arrayGeneratedLance = new ArrayList<Entity>(generatedLance);
+                ReconfigurationParameters rp = TeamLoadoutGenerator.generateParameters(
+                        cGame,
+                        cGame.getOptions(),
+                        arrayGeneratedLance,
+                        factionCode,
+                        new ArrayList<Entity>(),
+                        new ArrayList<String>()
+                );
+                MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, arrayGeneratedLance, "");
+                tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp);
+
                 // Load the fighters with bombs
-                TeamLoadoutGenerator.populateAeroBombs(generatedLance,
-                        campaign.getGameYear(),
-                        (mapLocation != MapLocation.Space && mapLocation != MapLocation.LowAtmosphere),
-                        ownerBaseQuality,
-                        isPirate);
+                //TeamLoadoutGenerator.populateAeroBombs(generatedLance,
+                //        campaign.getGameYear(),
+                //        (mapLocation != MapLocation.Space && mapLocation != MapLocation.LowAtmosphere),
+                //        ownerBaseQuality,
+                //        isPirate);
             }
 
             if (forceTemplate.getUseArtillery() && forceTemplate.getDeployOffboard()) {
@@ -511,6 +524,7 @@ public class AtBDynamicScenarioFactory {
 
             // if appropriate, generate an extra BA unit for clan novas
             generatedLance.addAll(generateBAForNova(scenario, generatedLance, factionCode, skill, quality, campaign));
+
 
             for (Entity ent : generatedLance) {
                 forceBV += ent.calculateBattleValue();
