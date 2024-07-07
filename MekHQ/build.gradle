@@ -4,10 +4,10 @@ import java.time.LocalDateTime
 
 plugins {
     id 'application'
-    id 'maven-publish'
     id 'edu.sc.seis.launch4j' version '3.0.5'
     id 'jacoco'
     id 'java'
+    id "io.sentry.jvm.gradle" version "4.9.0"
 }
 
 java {
@@ -199,6 +199,10 @@ task stageFiles(type: Copy) {
     include "${userdata}/data/universe/"
     include 'license.txt'
     include 'SubmitBug.html'
+    include "sentry.properties"
+    include "mm-revision.txt"
+    include "mml-revision.txt"
+    include "mhq-revision.txt"
 
     into fileStagingDir
 
@@ -207,7 +211,7 @@ task stageFiles(type: Copy) {
     inputs.dir "${docs}"
     inputs.dir "${mmconf}"
     inputs.dir "${project.ext.plugins}"
-    inputs.files 'license.txt', 'SubmitBug.html'
+    inputs.files 'license.txt', 'SubmitBug.html', 'sentry.properties', 'mm-revision.txt', 'mml-revision.txt', 'mhq-revision.txt'
     outputs.dir fileStagingDir
 
     doLast {
@@ -239,81 +243,8 @@ task createStartScripts (type: CreateStartScripts) {
 }
 
 distributions {
-    // Creates tasks which package distribution with MM jar and startup script in root directory
-    unix {
-       distributionBaseName = 'mekhq-unix'
-        contents {
-            // MegaMek Includes
-            from ("${mmDir}/megamek/build/files")
-            from ("${mmDir}/megamek/build/scripts") {
-                include 'mm*'
-                rename 'mm(.*)', 'mm-startup$1'
-            }
-            from ("${mmDir}/megamek/${docs}/history.txt") {
-                rename 'history.txt', 'mm-history.txt'
-                into 'docs'
-            }
-            from ("${mmDir}/megamek/${mmconf}/log4j2.xml") {
-                exclude 'log4j2.xml'
-            }
-            from ("${mmDir}/megamek/build/launch4j/lib") {
-                into "${lib}"
-            }
-            from (mmJar) {
-                into "${lib}"
-            }
-            from (mmJar)
-
-            // MegaMek Includes
-            from ("${mmlDir}/megameklab/build/launch4j/lib") {
-                into "${lib}"
-            }
-            from ("${mmlDir}/megameklab/build/files/${data}/images") {
-                into "${data}/images"
-            }
-            from ("${mmlDir}/megameklab/build/scripts") {
-                include 'mml*'
-                rename 'mml(.*)', 'mml-startup$1'
-            }
-            from ("${mmlDir}/megameklab/${docs}/history.txt") {
-                rename 'history.txt', 'mml-history.txt'
-                into "${docs}"
-            }
-            from ("${mmlDir}/megameklab/${mmconf}/log4j2.xml") {
-                exclude 'log4j2.xml'
-            }
-            from (mmlJar) {
-                into "${lib}"
-            }
-            from (mmlJar)
-
-            // MekHQ Includes
-            from ("docs/history.txt") {
-                rename 'history.txt', 'mhq-history.txt'
-                into 'docs'
-            }
-            from (fileStagingDir) {
-                exclude 'history.txt'
-            }
-            from (createStartScripts) {
-                include 'mhq*'
-                rename 'mhq(.*)', 'mhq-startup$1'
-            }
-
-            from (project.sourceSets.main.runtimeClasspath.files
-                    .findAll { it.name.endsWith(".jar") && !it.name.toLowerCase().startsWith("megamek") }) {
-                into "${lib}"
-            }
-            from(jar) {
-                into "${lib}"
-            }
-            from (jar)
-            duplicatesStrategy = 'exclude'
-        }
-    }
-    // Creates tasks which package distribution with MM jar wrapped in Windows executable
-    windows {
-        distributionBaseName = 'mekhq-windows'
+    main {
+        distributionBaseName = 'MekHQ'
         contents {
             // MegaMek Includes
             from ("${mmDir}/megamek/build/files")
@@ -444,38 +375,9 @@ tasks.register("packagePrepWork") {
     dependsOn stageMM
     dependsOn createStartScripts
     dependsOn startScripts
-}
-
-tasks.register("createAllMMExes") {
     dependsOn createAllExecutables
     dependsOn createMMExe
     dependsOn createMMLExe
-}
-
-windowsDistZip {
-    description = 'Creates Windows distribution packaged as a zip archive'
-    dependsOn packagePrepWork
-    dependsOn createAllMMExes
-}
-
-windowsDistTar {
-    description = 'Creates Windows distribution packaged as a zip archive'
-    dependsOn packagePrepWork
-    dependsOn createAllMMExes
-    archiveExtension = 'tar.gz'
-    compression = Compression.GZIP
-}
-
-unixDistTar {
-    description = 'Creates *nix distribution packaged as a tar ball'
-    dependsOn packagePrepWork
-    archiveExtension = 'tar.gz'
-    compression = Compression.GZIP
-}
-
-unixDistZip {
-    description = 'Creates *nix distribution packaged as a tar ball'
-    dependsOn packagePrepWork
 }
 
 distTar {
@@ -559,8 +461,8 @@ task assembleDist(overwrite: true) {
     group = 'distribution'
     dependsOn stageMM
     dependsOn test
-    dependsOn unixDistTar
-    dependsOn windowsDistZip
+    dependsOn distTar
+    dependsOn distZip
 }
 
 task buildFromRepo (type: GradleBuild) {
@@ -637,29 +539,6 @@ task javadocJar(type: Jar) {
     description = 'Creates a documentation archive for publication to a maven repository'
     from javadoc
     archiveClassifier = 'javadoc'
-}
-
-publishing {
-    publications {
-        publishMMLibrary(MavenPublication) {
-            artifactId = "mekhq${mmBranchTag}"
-            from components.java
-            artifact sourcesJar
-//            artifact javadocJar
-
-            pom {
-                name = "MekHQ"
-                description = "MekHQ"
-                url = "https://megamek.org"
-                licenses {
-                    license {
-                        name = "GNU General Public License, version 3"
-                        url = "https://www.gnu.org/licenses/gpl-3.0.en.html"
-                    }
-                }
-            }
-        }
-    }
 }
 
 test {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2020 - The MegaMek Team. All Rights Reserved
+ * Copyright (c) 2013-2024 - The MegaMek Team. All Rights Reserved
  *
  * This file is part of MekHQ.
  *
@@ -24,6 +24,7 @@ import java.util.TreeMap;
 
 /**
  * This is a convenience class that will keep all the various graphics
+ * 
  * @author Jay Lawson
  */
 public class IconPackage {
