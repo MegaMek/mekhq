@@ -1437,7 +1437,7 @@ public class PersonViewPanel extends JScrollablePanel {
         int loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty());
 
         if (person.isCommander()) {
-            loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty() + 2);;
+            loyaltyModifier = person.getLoyaltyModifier(person.getLoyalty() + 2);
         }
 
         if ((campaign.getCampaignOptions().isUseLoyaltyModifiers())
@@ -1469,7 +1469,7 @@ public class PersonViewPanel extends JScrollablePanel {
             firsty++;
         }
 
-        if ((campaign.getCampaignOptions().isUseFatigue()) && (person.getFatigue() > 0)) {
+        if ((campaign.getCampaignOptions().isUseFatigue()) && (person.getEffectiveFatigue(campaign) > 0)) {
             lblFatigue1.setName("lblFatigue1");
             lblFatigue1.setText(resourceMap.getString("lblFatigue1.text"));
             gridBagConstraints = new GridBagConstraints();
@@ -1480,14 +1480,11 @@ public class PersonViewPanel extends JScrollablePanel {
             pnlSkills.add(lblFatigue1, gridBagConstraints);
 
             StringBuilder fatigueDisplay = new StringBuilder();
+
             int effectiveFatigue = person.getEffectiveFatigue(campaign);
             int fatigueTurnoverModifier = MathUtility.clamp(((person.getEffectiveFatigue(campaign) - 1) / 4) - 1, 0, 3);
 
-            fatigueDisplay.append(person.getFatigue());
-
-            if (person.getFatigue() != effectiveFatigue) {
-                fatigueDisplay.append(" / ").append(effectiveFatigue);
-            }
+            fatigueDisplay.append(effectiveFatigue);
 
             if (fatigueTurnoverModifier > 0) {
                 fatigueDisplay.append(" (-").append(fatigueTurnoverModifier).append(')');
