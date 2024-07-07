@@ -150,7 +150,8 @@ public class AtBGameThread extends GameThread {
                     mapSettings.setMedium(MapSettings.MEDIUM_SPACE);
                     mapSettings.getBoardsSelectedVector().add(MapSettings.BOARD_GENERATED);
                 } else if (scenario.isUsingFixedMap()) {
-                    String board = scenario.getMap().replace(".board", ""); // TODO : remove inline file type
+                    // TODO : remove inline file type
+                    String board = scenario.getMap().replace(".board", "");
                     board = board.replace("\\", "/");
                     mapSettings.getBoardsSelectedVector().add(board);
 
@@ -158,18 +159,16 @@ public class AtBGameThread extends GameThread {
                         mapSettings.setMedium(MapSettings.MEDIUM_ATMOSPHERE);
                     }
                 } else {
-                    File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml"); // TODO : Remove inline
-                                                                                             // file path
+                    // TODO : Remove inline file path
+                    File mapgenFile = new File("data/mapgen/" + scenario.getMap() + ".xml");
                     try (InputStream is = new FileInputStream(mapgenFile)) {
                         mapSettings = MapSettings.getInstance(is);
                     } catch (FileNotFoundException ex) {
                         Sentry.captureException(ex);
-
-                        LogManager.getLogger()
-                                .error(
-                                        String.format("Could not load map file data/mapgen/%s.xml", scenario.getMap()),
-                                        ex);
                         // TODO: Remove inline file path
+                        LogManager.getLogger().error(
+                                String.format("Could not load map file data/mapgen/%s.xml", scenario.getMap()),
+                                ex);
                     }
 
                     if (scenario.getBoardType() == Scenario.T_ATMOSPHERE) {
