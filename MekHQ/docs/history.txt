@@ -158,6 +158,10 @@ MEKHQ VERSION HISTORY:
 + PR #4164: More detailed auto-selection of bombs
 + PR #4312: Young wolves art update
 + PR #4313: Updated Campaign Options Settings to Disable New Components by Default
++ PR #4344: Update Payout Calculation for KIA Personnel
++ PR #4345: Updated fatigue display logic in PersonViewPanel
++ PR #4346: Refactored management skill calculation in RetirementDefectionTracker
++ PR #4348: Sentry Additions
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
