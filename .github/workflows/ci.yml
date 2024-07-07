@@ -47,7 +47,7 @@ jobs:
 
       - name: Add MMRevision file
         run: |
-          echo ${{ steps.find_mm.outputs.mmBranch }} >> mekhq/mm-revision.txt
+          echo ${{ steps.find_mm.outputs.mmBranch }} >> mekhq/mekhq/mm-revision.txt
 
       - name: Checkout MegaMek
         uses: actions/checkout@v4
@@ -73,7 +73,7 @@ jobs:
 
       - name: Add MMLRevision file
         run: |
-          echo ${{ steps.find_mml.outputs.mmlBranch }} >> mekhq/mml-revision.txt
+          echo ${{ steps.find_mml.outputs.mmlBranch }} >> mekhq/mekhq/mml-revision.txt
 
       - name: Checkout MegaMekLab
         uses: actions/checkout@v4
@@ -97,7 +97,7 @@ jobs:
 
       - name: Add MHQRevision file
         run: |
-          echo ${{ github.sha }} >> megamek/mhq-revision.txt
+          echo ${{ github.sha }} >> mekhq/mekhq/mhq-revision.txt
 
       - name: Build with Gradle
         working-directory: mekhq

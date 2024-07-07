@@ -52,7 +52,7 @@ jobs:
 
       - name: Add MHQRevision file
         run: |
-          echo ${{ github.sha }} >> megamek/mhq-revision.txt
+          echo ${{ github.sha }} >> mekhq/mekhq/mhq-revision.txt
 
       - name: Build with Gradle
         working-directory: megameklab
