@@ -121,10 +121,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mhq-release-tgz-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-          path: mekhq/MekHQ/build/distributions/MekHQ-*.tar.gz
-
-      - name: Upload Zip Release
-        uses: actions/upload-artifact@v4
-        with:
-          name: mhq-release-zip-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
-          path: mekhq/MekHQ/build/distributions/MekHQ-*.zip
+          path: mekhq/MekHQ/build/distributions/*.tar.gz
+#      - name: Upload Zip Release
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: mhq-release-zip-${{ matrix.java-distribution }}-jdk${{ matrix.java-version }}
+#          path: mekhq/MekHQ/build/distributions/*.zip
