@@ -1359,6 +1359,7 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 en.setDeployRound(deployRound);
             });
 
+            // TODO: replace with TeamLoadoutGenerator call once 0.50.1 errata go in
             boolean isAeroMap = getBoardType() == T_SPACE || getBoardType() == T_ATMOSPHERE;
 
             TeamLoadoutGenerator.populateAeroBombs(aircraft,

@@ -632,6 +632,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseAero;
     private JCheckBox chkUseVehicles;
     private JCheckBox chkClanVehicles;
+    private JCheckBox chkAutoconfigMunitions;
 
     // contract operations
     private JCheckBox chkMercSizeLimited;
@@ -2853,6 +2854,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkClanVehicles.setToolTipText(resources.getString("chkClanVehicles.toolTipText"));
         gridBagConstraints.gridy++;
         panSubAtBAdmin.add(chkClanVehicles, gridBagConstraints);
+
+        chkAutoconfigMunitions = new JCheckBox(resources.getString("chkAutoconfigMunitions.text"));
+        chkAutoconfigMunitions.setToolTipText(resources.getString("chkAutoconfigMunitions.toolTipText"));
+        gridBagConstraints.gridy++;
+        panSubAtBAdmin.add(chkAutoconfigMunitions, gridBagConstraints);
 
         lblAtbCamOpsDivision = new JLabel(resources.getString("lblAtbCamOpsDivision.text"));
         gridBagConstraints.gridx = 0;
@@ -8381,6 +8387,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseAero.setSelected(options.isUseAero());
         chkUseVehicles.setSelected(options.isUseVehicles());
         chkClanVehicles.setSelected(options.isClanVehicles());
+        chkAutoconfigMunitions.setSelected(options.isAutoconfigMunitions());
         chkMercSizeLimited.setSelected(options.isMercSizeLimited());
         spnAtbCamOpsDivision.setValue(options.getAtbCamOpsDivision());
         chkRestrictPartsByMission.setSelected(options.isRestrictPartsByMission());
@@ -8921,6 +8928,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseAero(chkUseAero.isSelected());
             options.setUseVehicles(chkUseVehicles.isSelected());
             options.setClanVehicles(chkClanVehicles.isSelected());
+            options.setAutoconfigMunitions(chkAutoconfigMunitions.isSelected());
             options.setDoubleVehicles(chkDoubleVehicles.isSelected());
             options.setAdjustPlayerVehicles(chkAdjustPlayerVehicles.isSelected());
             options.setOpForLanceTypeMechs((Integer) spnOpForLanceTypeMechs.getValue());

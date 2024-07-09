@@ -487,27 +487,33 @@ public class AtBDynamicScenarioFactory {
                         break;
                 }
 
-                // Configure generated units with appropriate munitions (for BV calcs)
-                Game cGame = campaign.getGame();
-                TeamLoadoutGenerator tlg = new TeamLoadoutGenerator(cGame);
-                ArrayList<Entity> arrayGeneratedLance = new ArrayList<Entity>(generatedLance);
-                ReconfigurationParameters rp = TeamLoadoutGenerator.generateParameters(
-                        cGame,
-                        cGame.getOptions(),
-                        arrayGeneratedLance,
-                        factionCode,
-                        new ArrayList<Entity>(),
-                        new ArrayList<String>()
-                );
-                MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, arrayGeneratedLance, "");
-                tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp);
-
-                // Load the fighters with bombs
-                //TeamLoadoutGenerator.populateAeroBombs(generatedLance,
-                //        campaign.getGameYear(),
-                //        (mapLocation != MapLocation.Space && mapLocation != MapLocation.LowAtmosphere),
-                //        ownerBaseQuality,
-                //        isPirate);
+                if (campaign.getCampaignOptions().isAutoconfigMunitions()) {
+                    // Configure *all* generated units with appropriate munitions (for BV calcs)
+                    Game cGame = campaign.getGame();
+                    TeamLoadoutGenerator tlg = new TeamLoadoutGenerator(cGame);
+                    ArrayList<Entity> arrayGeneratedLance = new ArrayList<Entity>(generatedLance);
+                    // bin fill ratio will be adjusted by the loadout generator based on piracy and quality
+                    ReconfigurationParameters rp = TeamLoadoutGenerator.generateParameters(
+                            cGame,
+                            cGame.getOptions(),
+                            arrayGeneratedLance,
+                            factionCode,
+                            new ArrayList<Entity>(),
+                            new ArrayList<String>(),
+                            ownerBaseQuality,
+                            ((isPirate) ? TeamLoadoutGenerator.UNSET_FILL_RATIO : 1.0f)
+                    );
+                    rp.isPirate = isPirate;
+                    MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, arrayGeneratedLance, "");
+                    tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp);
+                } else {
+                    // Load the fighters with bombs
+                    TeamLoadoutGenerator.populateAeroBombs(generatedLance,
+                            campaign.getGameYear(),
+                            (mapLocation != MapLocation.Space && mapLocation != MapLocation.LowAtmosphere),
+                            ownerBaseQuality,
+                            isPirate);
+                }
             }
 
             if (forceTemplate.getUseArtillery() && forceTemplate.getDeployOffboard()) {
