@@ -22,6 +22,7 @@
 package mekhq.campaign.mission;
 
 import megamek.Version;
+import megamek.client.generator.TeamLoadoutGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.*;
 import megamek.common.annotations.Nullable;
@@ -1358,10 +1359,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 en.setDeployRound(deployRound);
             });
 
+            // TODO: replace with TeamLoadoutGenerator call once 0.50.1 errata go in
             boolean isAeroMap = getBoardType() == T_SPACE || getBoardType() == T_ATMOSPHERE;
 
-            AtBDynamicScenarioFactory.populateAeroBombs(aircraft,
-                    campaign,
+            TeamLoadoutGenerator.populateAeroBombs(aircraft,
+                    campaign.getGameYear(),
                     !isAeroMap,
                     contract.getEnemyQuality(),
                     contract.getEnemy().isPirate());
