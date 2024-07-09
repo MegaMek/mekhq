@@ -752,7 +752,7 @@ public final class BriefingTab extends CampaignGuiTab {
             allyFaction = atbc.getEmployerName(allowedYear);
         }
         Faction opforFaction = Factions.getInstance().getFaction(opforFactionCode);
-        boolean isPirate = opforFaction.isPirate();
+        boolean isPirate = opforFaction.isRebelOrPirate();
 
         // Collect player units to use as configuration fodder
         ArrayList<Entity> playerEntities = new ArrayList<>();

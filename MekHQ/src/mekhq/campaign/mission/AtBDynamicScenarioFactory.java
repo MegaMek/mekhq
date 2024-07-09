@@ -466,7 +466,7 @@ public class AtBDynamicScenarioFactory {
             if (campaign.getCampaignOptions().isAutoconfigMunitions() || forceTemplate.getAllowAeroBombs()) {
                 MapLocation mapLocation = scenario.getTemplate().mapParameters.getMapLocation();
                 int ownerBaseQuality;
-                boolean isPirate = faction.isPirate();
+                boolean isPirate = faction.isRebelOrPirate();
 
                 // Use the raw quality values rather than the diluted 'effective' rating
                 switch (forceAlignment) {
