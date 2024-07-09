@@ -55,7 +55,7 @@ jobs:
           echo ${{ github.sha }} >> mekhq/MekHQ/mhq-revision.txt
 
       - name: Build with Gradle
-        working-directory: megameklab
+        working-directory: mekhq
         run: ./gradlew clean build --stacktrace --scan
 
       - name: Upload Test Logs on Failure
