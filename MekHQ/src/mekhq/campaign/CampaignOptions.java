@@ -578,6 +578,7 @@ public class CampaignOptions {
     private int scenarioModMax;
     private int scenarioModChance;
     private int scenarioModBV;
+    private boolean autoconfigMunitions;
     //endregion Against the Bot Tab
     //endregion Variable Declarations
 
@@ -1182,6 +1183,7 @@ public class CampaignOptions {
         useWeatherConditions = true;
         useLightConditions = true;
         usePlanetaryConditions = false;
+        autoconfigMunitions = true;
         setScenarioModMax(3);
         setScenarioModChance(25);
         setScenarioModBV(50);
@@ -4367,6 +4369,14 @@ public class CampaignOptions {
         this.scenarioModBV = scenarioModBV;
     }
 
+    public boolean isAutoconfigMunitions() {
+        return autoconfigMunitions;
+    }
+
+    public void setAutoconfigMunitions(final boolean autoconfigMunitions) {
+        this.autoconfigMunitions = autoconfigMunitions;
+    }
+
     //region File IO
     public void writeToXml(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "campaignOptions");
@@ -4857,6 +4867,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModMax", scenarioModMax);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModChance", scenarioModChance);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "scenarioModBV", scenarioModBV);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "autoconfigMunitions", autoconfigMunitions);
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetTechAcquisitionBonus", planetTechAcquisitionBonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "planetIndustryAcquisitionBonus", planetIndustryAcquisitionBonus);
@@ -5872,6 +5883,8 @@ public class CampaignOptions {
                     retVal.setScenarioModChance(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("scenarioModBV")) {
                     retVal.setScenarioModBV(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("autoconfigMunitions")) {
+                    retVal.setAutoconfigMunitions(Boolean.parseBoolean(wn2.getTextContent().trim()));
 
                     //region Legacy
                     // Removed in 0.49.*

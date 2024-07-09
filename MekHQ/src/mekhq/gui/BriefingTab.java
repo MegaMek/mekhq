@@ -18,10 +18,15 @@
  */
 package mekhq.gui;
 
+import megamek.client.generator.ReconfigurationParameters;
+import megamek.client.generator.TeamLoadoutGenerator;
 import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
+import megamek.common.Game;
+import megamek.common.Team;
 import megamek.common.annotations.Nullable;
+import megamek.common.containers.MunitionTree;
 import megamek.common.event.Subscribe;
 import megamek.common.options.OptionsConstants;
 import megamek.common.util.sorter.NaturalOrderComparator;
@@ -42,6 +47,8 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.dialog.*;
 import mekhq.gui.enums.MHQTabType;
@@ -61,6 +68,8 @@ import java.io.File;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 
 /**
  * Displays Mission/Contract and Scenario details.
@@ -706,10 +715,84 @@ public final class BriefingTab extends CampaignGuiTab {
             ((AtBScenario) scenario).refresh(getCampaign());
         }
 
+        // Autoconfigure munitions for all non-player forces once more, using finalized forces
+        if (getCampaign().getCampaignOptions().isAutoconfigMunitions()) {
+            autoconfigureBotMunitions(scenario, chosen);
+        }
+
         if (!chosen.isEmpty()) {
             // Ensure that the MegaMek year GameOption matches the campaign year
             getCampaign().getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(getCampaign().getGameYear());
             getCampaignGui().getApplication().startHost(scenario, false, chosen);
+        }
+    }
+
+    /**
+     * Designed to fully kit out all non-player-controlled forces prior to battle.
+     * Does not do any checks for supplies, only for availability to each faction during the current timeframe.
+     * @param scenario
+     * @param chosen
+     */
+    private void autoconfigureBotMunitions(Scenario scenario, List<Unit> chosen) {
+        Game cGame = getCampaign().getGame();
+        ArrayList<String> allyFactionCodes = new ArrayList<>();
+        String opforFactionCode = "IS";
+        String allyFaction = "IS";
+        int opforQuality = RATING_5;
+        HashMap<Integer, ArrayList<Entity>> botTeamMappings = new HashMap<Integer, ArrayList<Entity>>();
+        int allowedYear = cGame.getOptions().intOption(OptionsConstants.ALLOWED_YEAR);
+
+        // This had better be an AtB contract...
+        final Mission mission = comboMission.getSelectedItem();
+        if (mission instanceof AtBContract) {
+            AtBContract atbc = (AtBContract) mission;
+            opforFactionCode = atbc.getEnemyCode();
+            opforQuality = atbc.getEnemyQuality();
+            allyFactionCodes.add(atbc.getEmployerCode());
+            allyFaction = atbc.getEmployerName(allowedYear);
+        }
+        Faction opforFaction = Factions.getInstance().getFaction(opforFactionCode);
+        boolean isPirate = opforFaction.isRebelOrPirate();
+
+        // Collect player units to use as configuration fodder
+        ArrayList<Entity> playerEntities = new ArrayList<>();
+        for (final Unit unit: chosen) {
+            playerEntities.add(unit.getEntity());
+        }
+        allyFactionCodes.add(getCampaign().getFaction().getShortName());
+
+        // Split up bot forces into teams for separate handling
+        for (final BotForce botForce : scenario.getBotForces()) {
+            if (botForce.getName().contains(allyFaction)) {
+                // Stuff with our employer's name should be with us.
+                playerEntities.addAll(botForce.getFixedEntityList());
+            } else {
+                int botTeam = botForce.getTeam();
+                if (!botTeamMappings.containsKey(botTeam)) {
+                    botTeamMappings.put(botTeam, new ArrayList<>());
+                }
+                botTeamMappings.get(botTeam).addAll(botForce.getFixedEntityList());
+            }
+        }
+
+        // Reconfigure each group separately so they only consider their own capabilities
+        for (ArrayList<Entity> entityList: botTeamMappings.values()) {
+            // Configure generated units with appropriate munitions (for BV calcs)
+            TeamLoadoutGenerator tlg = new TeamLoadoutGenerator(cGame);
+            // bin fill ratio will be adjusted by the loadout generator based on piracy and quality
+            ReconfigurationParameters rp = TeamLoadoutGenerator.generateParameters(
+                    cGame,
+                    cGame.getOptions(),
+                    entityList,
+                    opforFactionCode,
+                    playerEntities,
+                    allyFactionCodes,
+                    opforQuality,
+                    ((isPirate) ? TeamLoadoutGenerator.UNSET_FILL_RATIO : 1.0f)
+            );
+            rp.isPirate = isPirate;
+            MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, entityList, "");
+            tlg.reconfigureEntities(entityList, opforFactionCode, mt, rp);
         }
     }
 
