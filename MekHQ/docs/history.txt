@@ -163,6 +163,7 @@ MEKHQ VERSION HISTORY:
 + PR #4346: Refactored management skill calculation in RetirementDefectionTracker
 + PR #4348: Sentry Additions
 + PR #4355: Spelling, typos, grammar, etc
++ PR #4356: Move munition config out of MHQ, use MM autoconfig code
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
