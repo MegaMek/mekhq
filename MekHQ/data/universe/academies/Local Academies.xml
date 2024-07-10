@@ -151,6 +151,61 @@
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
     <academy>
+        <name>College</name>
+        <type>College</type>
+        <description>Colleges play a crucial role in shaping the minds and skills of those who will go on to become productive citizens of the Inner Sphere. Each institution reflects the culture, priorities, and technological advancements of its respective faction.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>5000</tuition>
+        <durationDays>600</durationDays>
+        <educationLevelMin>High School</educationLevelMin>
+        <educationLevelMax>College</educationLevelMax>
+        <ageMin>16</ageMin>
+        <qualification>General Studies</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>Sure, here are the elements sorted alphabetically, keeping the tags in the same order:
+        <qualification>Biology</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Business Studies</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Creative Writing</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Galactic Anthropology</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>General Sciences</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Interstellar History</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Journalism</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Law &amp; Justice</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Literature</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Mathematics</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Political Science</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Social Sciences</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Visual &amp; Performing Arts</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+    </academy>
+    <academy>
         <name>Technical College</name>
         <type>College</type>
         <description>A technical college serves as a hub for specialized education in fields crucial to the advancement of technology and warfare. Students enrolled in technical colleges undergo rigorous training in disciplines such as aerospace engineering, robotics, computer science, and weapon systems development. The curriculum combines theoretical knowledge with practical hands-on experience, utilizing state-of-the-art laboratories and workshops to foster innovation and skill acquisition.</description>
