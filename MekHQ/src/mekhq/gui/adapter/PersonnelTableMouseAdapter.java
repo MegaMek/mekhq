@@ -93,6 +93,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RMV_AWARD = "RMV_AWARD";
     private static final String CMD_BEGIN_EDUCATION = "BEGIN_EDUCATION";
     private static final String CMD_COMPLETE_STAGE = "COMPLETE_STAGE";
+    private static final String CMD_DROP_OUT = "DROP_OUT";
 
     private static final String CMD_EDIT_SALARY = "SALARY";
     private static final String CMD_GIVE_PAYMENT = "GIVE_PAYMENT";
@@ -418,6 +419,38 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     AutoAwardsController autoAwardsController = new AutoAwardsController();
                     autoAwardsController.PostGraduationController(gui.getCampaign(), graduatingPersonnel, academyAttributesMap);
                 }
+                break;
+            }
+            case CMD_DROP_OUT: {
+                for (Person person : people) {
+                    Academy academy = getAcademy(person.getEduAcademySet(), person.getEduAcademyNameInSet());
+
+                    EducationStage educationStage = person.getEduEducationStage();
+
+                    boolean isDroppingOut = false;
+
+                    switch (educationStage) {
+                        case JOURNEY_TO_CAMPUS:
+                        case JOURNEY_FROM_CAMPUS:
+                            // this should be enough to ensure even the most distant academy is reached/returned from
+                            person.setEduDaysOfTravel(9999);
+                            break;
+                        case EDUCATION:
+                            isDroppingOut = true;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if (isDroppingOut) {
+                        EducationController.processForcedDropOut();
+                    } else {
+                        EducationController.processNewDay(gui.getCampaign(), person, true);
+                    }
+
+                    MekHQ.triggerEvent(new PersonStatusChangedEvent(person));
+                }
+
                 break;
             }
             case CMD_IMPROVE: {
@@ -1560,6 +1593,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                     academyMenu.add(setAcademyMenu);
                 }
+            }
+
+            if (StaticChecks.areAllStudents(selected)) {
+                JMenuItem completeStage = new JMenuItem(resources.getString("eduDropOut.text"));
+                completeStage.setToolTipText(resources.getString("eduDropOut.toolTip"));
+                completeStage.setActionCommand(makeCommand(CMD_COMPLETE_STAGE));
+                completeStage.addActionListener(this);
+                academyMenu.add(completeStage);
             }
 
             if ((StaticChecks.areAllStudents(selected)) && (campaign.isGM())) {
