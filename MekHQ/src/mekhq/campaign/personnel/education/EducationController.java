@@ -624,16 +624,12 @@ public class EducationController {
      * @param academy    the academy being checked for closure
      * @param person     the person enrolled in the academy
      * @param resources  the resource bundle for localization.
-     * @return true if the academy has been closed, false otherwise
      */
-    private static boolean checkForAcademyClosure(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
+    private static void checkForAcademyClosure(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
         if (campaign.getLocalDate().getYear() >= academy.getClosureYear()) {
             campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("eventClosure.text"));
             person.setEduEducationStage(EducationStage.DROPPING_OUT);
-
-            return true;
         }
-        return false;
     }
 
     /**
