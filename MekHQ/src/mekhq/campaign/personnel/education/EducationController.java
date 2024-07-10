@@ -939,7 +939,9 @@ public class EducationController {
      */
     private static void addBonusXp(Campaign campaign, Person person, Academy academy, Integer bonusCount) {
         if (EducationLevel.parseToInt(person.getEduHighestEducation()) < academy.getEducationLevel(person)) {
-            int xpRate = Math.max(0, (academy.getDurationDays() - person.getEduEducationTime()) / 150 - academy.getFacultySkill());
+            int xpRate = Math.max(0, (12 - academy.getFacultySkill()) * ((academy.getDurationDays() - person.getEduEducationTime()) / 600));
+
+            xpRate *= campaign.getCampaignOptions().getBonusXpRate();
 
             person.awardXP(campaign, xpRate + bonusCount);
         }

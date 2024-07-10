@@ -1081,9 +1081,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         panSubMaintenance.add(chkUseRandomUnitQualities, gridBagConstraints);
 
-        reverseQualityNames.addActionListener(evt -> {
-            recreateFinancesPanel(reverseQualityNames.isSelected());
-        });
+        reverseQualityNames.addActionListener(evt -> recreateFinancesPanel(reverseQualityNames.isSelected()));
 
         useUnofficialMaintenance = new JCheckBox(resources.getString("useUnofficialMaintenance.text"));
         useUnofficialMaintenance.setToolTipText(resources.getString("useUnofficialMaintenance.toolTipText"));
