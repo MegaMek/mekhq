@@ -1357,7 +1357,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 gui.getCampaign(), gui.getCampaign().getLocalDate(), person,
                                 potentialSpouse, false))
                         .sorted(Comparator.comparing((Person p) -> p.getAge(today))
-                                .thenComparing(Person::getSurname)).collect(Collectors.toList());
+                                .thenComparing(Person::getSurname)).toList();
 
                 for (final Person potentialSpouse : personnel) {
                     final String status;
@@ -1437,9 +1437,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             for (Award award : awardsOfSet) {
                 if ("group".equalsIgnoreCase(award.getItem())) {
-                    awardGroups.add(award.getName());
-                    awardGroupDescriptions.add(award.getDescription());
-                } else if ("group".equalsIgnoreCase(award.getItem())) {
                     awardGroups.add(award.getName());
                     awardGroupDescriptions.add(award.getDescription());
                 }
@@ -1585,7 +1582,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             if (StaticChecks.areAllStudents(selected)) {
                 JMenuItem completeStage = new JMenuItem(resources.getString("eduDropOut.text"));
                 completeStage.setToolTipText(resources.getString("eduDropOut.toolTip"));
-                completeStage.setActionCommand(makeCommand(CMD_COMPLETE_STAGE));
+                completeStage.setActionCommand(makeCommand(CMD_DROP_OUT));
                 completeStage.addActionListener(this);
                 academyMenu.add(completeStage);
             }
