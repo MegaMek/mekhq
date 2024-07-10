@@ -427,25 +427,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                     EducationStage educationStage = person.getEduEducationStage();
 
-                    boolean isDroppingOut = false;
-
                     switch (educationStage) {
-                        case JOURNEY_TO_CAMPUS:
-                        case JOURNEY_FROM_CAMPUS:
-                            // this should be enough to ensure even the most distant academy is reached/returned from
-                            person.setEduDaysOfTravel(9999);
-                            break;
-                        case EDUCATION:
-                            isDroppingOut = true;
-                            break;
-                        default:
-                            break;
-                    }
-
-                    if (isDroppingOut) {
-                        EducationController.processForcedDropOut();
-                    } else {
-                        EducationController.processNewDay(gui.getCampaign(), person, true);
+                        case JOURNEY_TO_CAMPUS, JOURNEY_FROM_CAMPUS
+                                -> person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), PersonnelStatus.ACTIVE);
+                        case EDUCATION
+                                -> EducationController.processForcedDropOut(gui.getCampaign(), person, academy);
+                        default -> {}
                     }
 
                     MekHQ.triggerEvent(new PersonStatusChangedEvent(person));

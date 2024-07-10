@@ -600,6 +600,23 @@ public class EducationController {
     }
 
     /**
+     * This method processes a forced drop out for a person.
+     *
+     * @param campaign the campaign to add the drop out report to
+     * @param person the person who is forced to drop out
+     * @param academy the academy where the person was studying
+     */
+    public static void processForcedDropOut(Campaign campaign, Person person, Academy academy) {
+        ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Education", MekHQ.getMHQOptions().getLocale());
+
+        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
+        ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
+        person.setEduEducationStage(EducationStage.DROPPING_OUT);
+
+        addFacultyXp(campaign, person, academy, 0);
+    }
+
+    /**
      * Checks for a conflict between the academy faction and the person's faction
      *
      * @param campaign the campaign in which the conflict is being checked
