@@ -348,24 +348,22 @@ public class EducationController {
 
                 person.setEduEducationStage(EducationStage.GRADUATING);
 
-                if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                    processNewWeekChecks(campaign, academy, person, resources);
+                // if the person is graduating at the beginning of a month,
+                // they are still entitled to random xp
+                if (campaign.getLocalDate().getDayOfMonth() == 1) {
+                    processNewMonthChecks(campaign, academy, person);
                 }
 
                 return true;
             }
 
-            if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                processNewWeekChecks(campaign, academy, person, resources);
-            }
+            checkForEvents(campaign, person, academy, resources);
 
             return false;
         } else {
             person.setEduEducationTime(daysOfEducation - 1);
 
-            if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
-                processNewWeekChecks(campaign, academy, person, resources);
-            }
+            checkForEvents(campaign, person, academy, resources);
 
             // we use 2 as that would be the value prior the day's decrement
             if (daysOfEducation < 2) {
@@ -378,6 +376,28 @@ public class EducationController {
         }
 
         return false;
+    }
+
+    /**
+     * Checks for any events based on the current date of the campaign.
+     *
+     * @param campaign   the campaign to check events for
+     * @param person     the person involved in the campaign
+     * @param academy    the academy related to the campaign
+     * @param resources  the resource bundle for localized messages
+     */
+    private static void checkForEvents(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+        if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
+            processNewWeekChecks(campaign, academy, person, resources);
+        }
+
+        if (campaign.getLocalDate().getDayOfMonth() == 1) {
+            processNewMonthChecks(campaign, academy, person);
+        }
+
+        if (campaign.getLocalDate().getDayOfYear() == 1) {
+            processNewYearChecks(campaign, academy, person, resources);
+        }
     }
 
     /**
@@ -466,46 +486,61 @@ public class EducationController {
      * @param resources       The resource bundle used for localized strings.
      */
     private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
-        if ((campaign.getCampaignOptions().isEnableRandomXp()) && (campaign.getLocalDate().getDayOfMonth() == 1)) {
+        // has the system been depopulated? Nominally similar to destruction, but here we use actual system data, so it's more dynamic.
+        if (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0) {
+            if (checkForAcademyDestruction(campaign, academy, person, resources)) {
+                return;
+            }
+        }
+
+        // is the academy faction at war with person faction, or the campaign faction?
+        if (checkForAcademyFactionConflict(campaign, academy, person, resources)) {
+            return;
+        }
+
+        // does person want to drop out?
+        if (checkForDropout(campaign, academy, person, resources)) {
+            return;
+        }
+
+        // was there a training accident?
+        checkForTrainingAccidents(campaign, academy, person, resources);
+    }
+
+    /**
+     * Processes the new month checks for a specific person in a campaign.
+     *
+     * @param campaign        The campaign in which the person is participating.
+     * @param academy         The academy where the person is receiving education.
+     * @param person          The person whose new month checks need to be processed.
+     */
+    private static void processNewMonthChecks(Campaign campaign, Academy academy, Person person) {
+        if (campaign.getCampaignOptions().isEnableRandomXp()) {
             if (Compute.d6(2) >= academy.getFacultySkill()) {
                 person.awardXP(campaign, campaign.getCampaignOptions().getRandomXpRate());
             }
         }
+    }
 
-        if (!person.getEduEducationStage().isGraduating()) {
-            // It's unlikely we'll ever get canonical destruction or closure dates for all the academies,
-            // so no need to check these more than once a year
-            if (campaign.getLocalDate().getDayOfYear() == 1) {
-                // time to check whether the academy is still standing.
-                if (checkForAcademyDestruction(campaign, academy, person, resources)) {
-                    return;
-                }
-
-                // is the academy still open?
-                if (checkForAcademyClosure(campaign, academy, person, resources)) {
-                    return;
-                }
-            }
-
-            // has the system been depopulated? Nominally similar to the above, but here we use actual system data, so it's more dynamic.
-            if (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0) {
-                if (checkForAcademyDestruction(campaign, academy, person, resources)) {
-                    return;
-                }
-            }
-
-            // is the academy faction at war with person faction, or the campaign faction?
-            if (checkForAcademyFactionConflict(campaign, academy, person, resources)) {
+    /**
+     * Processes the new year checks for a specific person in a campaign.
+     *
+     * @param campaign        The campaign in which the person is participating.
+     * @param academy         The academy where the person is receiving education.
+     * @param person          The person whose new month checks need to be processed.
+     * @param resources       The resource bundle used for localized strings.
+     */
+    private static void processNewYearChecks(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
+        // It's unlikely we'll ever get canonical destruction or closure dates for all the academies,
+        // so no need to check these more than once a year
+        if (campaign.getLocalDate().getDayOfYear() == 1) {
+            // time to check whether the academy is still standing.
+            if (checkForAcademyDestruction(campaign, academy, person, resources)) {
                 return;
             }
 
-            // does person want to drop out?
-            if (checkForDropout(campaign, academy, person, resources)) {
-                return;
-            }
-
-            // was there a training accident?
-            checkForTrainingAccidents(campaign, academy, person, resources);
+            // is the academy still open?
+            checkForAcademyClosure(campaign, academy, person, resources);
         }
     }
 
