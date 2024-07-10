@@ -582,6 +582,7 @@ public class EducationController {
                         campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
                         ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
                         person.setEduEducationStage(EducationStage.DROPPING_OUT);
+                        addFacultyXp(campaign, person, academy, 0);
                     }
                 } else {
                     campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutRejected.text"));
