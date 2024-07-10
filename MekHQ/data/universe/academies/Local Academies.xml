@@ -1,6 +1,24 @@
 <?xml version="1.0"?>
 <academies>
     <academy>
+        <name>Military Creche</name>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Housed in a secure buildings reinforced against the skirmishes that frequent the Inner Sphere, military creches provide a safe and nurturing environment.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>7650</tuition>
+        <ageMax>3</ageMax>
+        <durationDays>10</durationDays>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <facultySkill>12</facultySkill>
+        <ageMax>3</ageMax>
+        <qualification>Daycare</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
         <name>Boarding School</name>
         <isPrepSchool>true</isPrepSchool>
         <description>A prestigious, well-guarded institution where children of nobility and influential families receive a comprehensive education in subjects ranging from advanced sciences and history to political strategy. The curriculum is designed to groom future leaders and warriors, incorporating rigorous academic coursework, physical training, and simulated combat exercises to prepare students for future leadership roles.</description>
@@ -10,8 +28,28 @@
         <tuition>47500</tuition>
         <durationDays>10</durationDays>
         <educationLevelMax>Early Childhood</educationLevelMax>
+        <facultySkill>11</facultySkill>
+        <ageMin>3</ageMin>
         <ageMax>10</ageMax>
-        <qualification>General Education</qualification>
+        <qualification>Private Education</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Junior School</name>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Junior schools provide foundational education for children, preparing them for the future. These schools are adapted to the needs of their respective regions, reflecting the culture and priorities of each faction.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>12250</tuition>
+        <durationDays>10</durationDays>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <facultySkill>12</facultySkill>
+        <ageMin>3</ageMin>
+        <ageMax>10</ageMax>
+        <qualification>Public Education</qualification>
         <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
@@ -25,9 +63,10 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>3750</tuition>
+        <facultySkill>12</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
-        <qualification>General Education</qualification>
+        <qualification>High School Education</qualification>
         <curriculum>XP</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
@@ -41,7 +80,7 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>22500</tuition>
-        <facultySkill>6</facultySkill>
+        <facultySkill>11</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
@@ -59,6 +98,8 @@
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>6250</tuition>
+        <durationDays>10</durationDays>
+        <facultySkill>12</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>General Education</qualification>
@@ -74,7 +115,7 @@
         <constructionYear>2300</constructionYear>
         <tuition>6250</tuition>
         <educationLevelMax>Early Childhood</educationLevelMax>
-        <facultySkill>8</facultySkill>
+        <facultySkill>12</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>MechTech Apprenticeship</qualification>
