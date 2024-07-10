@@ -454,10 +454,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkEnablePrestigiousAcademies;
     private JCheckBox chkShowIneligibleAcademies;
     private JCheckBox chkEnableOverrideRequirements;
-    private JCheckBox chkEnableRandomXp;
     private JCheckBox chkEnableBonuses;
-    private JLabel lblRandomXpRate;
-    private JSpinner spnRandomXpRate;
+    private JLabel lblBonusXpRate;
+    private JSpinner spnBonusXpRate;
     private JLabel lblAdultDropoutChance;
     private JSpinner spnAdultDropoutChance;
     private JLabel lblChildrenDropoutChance;
@@ -6107,9 +6106,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             xpAndSkillBonusesPanel.setEnabled(isEnabled);
             chkEnableBonuses.setEnabled(isEnabled);
-            lblRandomXpRate.setEnabled(isEnabled);
-            spnRandomXpRate.setEnabled(isEnabled);
-            chkEnableRandomXp.setEnabled(isEnabled);
+            lblBonusXpRate.setEnabled(isEnabled);
+            spnBonusXpRate.setEnabled(isEnabled);
 
             dropoutChancePanel.setEnabled(isEnabled);
             lblAdultDropoutChance.setEnabled(isEnabled);
@@ -6231,33 +6229,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableBonuses.setToolTipText(resources.getString("chkEnableBonuses.toolTip"));
         chkEnableBonuses.setName("chkEnableBonuses");
 
-        lblRandomXpRate = new JLabel(resources.getString("lblRandomXpRate.text"));
-        lblRandomXpRate.setToolTipText(resources.getString("lblRandomXpRate.toolTip"));
-        lblRandomXpRate.setName("lblRandomXpRate");
-        spnRandomXpRate = new JSpinner(new SpinnerNumberModel(1, 1, 10, 1));
-        spnRandomXpRate.setToolTipText(resources.getString("lblRandomXpRate.toolTip"));
-        spnRandomXpRate.setName("spnRandomXpRate");
+        lblBonusXpRate = new JLabel(resources.getString("lblBonusXpRate.text"));
+        lblBonusXpRate.setToolTipText(resources.getString("lblBonusXpRate.toolTip"));
+        lblBonusXpRate.setName("lblBonusXpRate");
 
-        chkEnableRandomXp = new JCheckBox(resources.getString("chkEnableRandomXp.text"));
-        chkEnableRandomXp.setToolTipText(resources.getString("chkEnableRandomXp.toolTip"));
-        chkEnableRandomXp.setName("chkEnableRandomXp");
-        chkEnableRandomXp.addActionListener(evt -> {
-            final boolean isEnabled = chkEnableRandomXp.isSelected();
+        spnBonusXpRate = new JSpinner(new SpinnerNumberModel(1.00, 0.00, 10.00, 0.01));
+        spnBonusXpRate.setToolTipText(resources.getString("lblBonusXpRate.toolTip"));
+        spnBonusXpRate.setName("spnBonusXpRate");
 
-            lblRandomXpRate.setEnabled(isEnabled);
-        });
-
-        // These prevent a really annoying bug where disabled options don't stay disabled when
-        // reloading Campaign Options
-        if ((campaign.getCampaignOptions().isEnableRandomXp()) && (campaign.getCampaignOptions().isUseEducationModule())) {
-            lblRandomXpRate.setEnabled(true);
-            spnRandomXpRate.setEnabled(true);
-        } else {
-            lblRandomXpRate.setEnabled(false);
-            spnRandomXpRate.setEnabled(false);
-        }
         chkEnableBonuses.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
-        chkEnableRandomXp.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // creating the layout
         final JPanel panel = new JPanel();
@@ -6272,19 +6252,17 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkEnableBonuses)
-                        .addComponent(chkEnableRandomXp)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblRandomXpRate)
-                                .addComponent(spnRandomXpRate, Alignment.LEADING))
+                                .addComponent(lblBonusXpRate)
+                                .addComponent(spnBonusXpRate, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkEnableBonuses)
-                        .addComponent(chkEnableRandomXp)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblRandomXpRate)
-                                .addComponent(spnRandomXpRate))
+                                .addComponent(lblBonusXpRate)
+                                .addComponent(spnBonusXpRate))
         );
 
         return panel;
@@ -8162,8 +8140,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
         chkEnableOverrideRequirements.setSelected(options.isEnableOverrideRequirements());
         chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
-        chkEnableRandomXp.setSelected(options.isEnableRandomXp());
-        spnRandomXpRate.setValue(options.getRandomXpRate());
+        spnBonusXpRate.setValue(options.getBonusXpRate());
         chkEnableBonuses.setSelected(options.isEnableBonuses());
         spnAdultDropoutChance.setValue(options.getAdultDropoutChance());
         spnChildrenDropoutChance.setValue(options.getChildrenDropoutChance());
@@ -8824,8 +8801,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
             options.setEnableOverrideRequirements(chkEnableOverrideRequirements.isSelected());
             options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
-            options.setEnableRandomXp(chkEnableRandomXp.isSelected());
-            options.setRandomXpRate((Integer) spnRandomXpRate.getValue());
+            options.setBonusXpRate((Double) spnBonusXpRate.getValue());
             options.setEnableBonuses(chkEnableBonuses.isSelected());
             options.setAdultDropoutChance((Integer) spnAdultDropoutChance.getValue());
             options.setChildrenDropoutChance((Integer) spnChildrenDropoutChance.getValue());
@@ -9397,8 +9373,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             super.addNotify();
             Component c = getParent();
             //  Keep scrolling of the row table in sync with the main table.
-            if (c instanceof JViewport) {
-                JViewport viewport = (JViewport) c;
+            if (c instanceof JViewport viewport) {
                 viewport.addChangeListener(this);
             }
         }

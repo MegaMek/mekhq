@@ -75,33 +75,23 @@ public class CampaignOptions {
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
     public static String getTechLevelName(final int techLevel) {
-        switch (techLevel) {
-            case TECH_INTRO:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
-            case TECH_STANDARD:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
-            case TECH_ADVANCED:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
-            case TECH_EXPERIMENTAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
-            case TECH_UNOFFICIAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
-            default:
-                return "Unknown";
-        }
+        return switch (techLevel) {
+            case TECH_INTRO -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
+            case TECH_STANDARD -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
+            case TECH_ADVANCED -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
+            case TECH_EXPERIMENTAL -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
+            case TECH_UNOFFICIAL -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
+            default -> "Unknown";
+        };
     }
 
     public static String getTransitUnitName(final int unit) {
-        switch (unit) {
-            case TRANSIT_UNIT_DAY:
-                return "Days";
-            case TRANSIT_UNIT_WEEK:
-                return "Weeks";
-            case TRANSIT_UNIT_MONTH:
-                return "Months";
-            default:
-                return "Unknown";
-        }
+        return switch (unit) {
+            case TRANSIT_UNIT_DAY -> "Days";
+            case TRANSIT_UNIT_WEEK -> "Weeks";
+            case TRANSIT_UNIT_MONTH -> "Months";
+            default -> "Unknown";
+        };
     }
     //endregion Magic Numbers
 
@@ -391,8 +381,7 @@ public class CampaignOptions {
     private boolean enablePrestigiousAcademies;
     private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
-    private boolean enableRandomXp;
-    private Integer randomXpRate;
+    private Double bonusXpRate;
     private boolean enableBonuses;
     private Integer adultDropoutChance;
     private Integer childrenDropoutChance;
@@ -898,8 +887,7 @@ public class CampaignOptions {
         setEnablePrestigiousAcademies(true);
         setEnableOverrideRequirements(false);
         setEnableShowIneligibleAcademies(true);
-        setEnableRandomXp(true);
-        setRandomXpRate(1);
+        setBonusXpRate(1.00);
         setEnableBonuses(true);
         setAdultDropoutChance(1000);
         setChildrenDropoutChance(10000);
@@ -2740,20 +2728,12 @@ public class CampaignOptions {
         this.enableShowIneligibleAcademies = enableShowIneligibleAcademies;
     }
 
-    public boolean isEnableRandomXp() {
-        return enableRandomXp;
+    public Double getBonusXpRate() {
+        return bonusXpRate;
     }
 
-    public void setEnableRandomXp(boolean enableRandomXp) {
-        this.enableRandomXp = enableRandomXp;
-    }
-
-    public Integer getRandomXpRate() {
-        return randomXpRate;
-    }
-
-    public void setRandomXpRate(Integer randomXpRate) {
-        this.randomXpRate = randomXpRate;
+    public void setBonusXpRate(Double bonusXpRate) {
+        this.bonusXpRate = bonusXpRate;
     }
 
     public boolean isEnableBonuses() {
@@ -4706,8 +4686,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableOverrideRequirements", isEnableOverrideRequirements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRandomXp", isEnableRandomXp());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomXpRate", getRandomXpRate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonusXpRate", getBonusXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableBonuses", isEnableBonuses());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adultDropoutChance", getAdultDropoutChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childrenDropoutChance", getChildrenDropoutChance());
@@ -5459,10 +5438,8 @@ public class CampaignOptions {
                     retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
                     retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableRandomXp")) {
-                    retVal.setEnableRandomXp(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomXpRate")) {
-                    retVal.setRandomXpRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("bonusXpRate")) {
+                    retVal.setBonusXpRate(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableBonuses")) {
                     retVal.setEnableBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("adultDropoutChance")) {
