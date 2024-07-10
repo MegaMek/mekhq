@@ -381,7 +381,7 @@ public class CampaignOptions {
     private boolean enablePrestigiousAcademies;
     private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
-    private Double bonusXpRate;
+    private Double facultyXpRate;
     private boolean enableBonuses;
     private Integer adultDropoutChance;
     private Integer childrenDropoutChance;
@@ -887,7 +887,7 @@ public class CampaignOptions {
         setEnablePrestigiousAcademies(true);
         setEnableOverrideRequirements(false);
         setEnableShowIneligibleAcademies(true);
-        setBonusXpRate(1.00);
+        setFacultyXpRate(1.00);
         setEnableBonuses(true);
         setAdultDropoutChance(1000);
         setChildrenDropoutChance(10000);
@@ -2728,12 +2728,12 @@ public class CampaignOptions {
         this.enableShowIneligibleAcademies = enableShowIneligibleAcademies;
     }
 
-    public Double getBonusXpRate() {
-        return bonusXpRate;
+    public Double getFacultyXpRate() {
+        return facultyXpRate;
     }
 
-    public void setBonusXpRate(Double bonusXpRate) {
-        this.bonusXpRate = bonusXpRate;
+    public void setFacultyXpRate(Double facultyXpRate) {
+        this.facultyXpRate = facultyXpRate;
     }
 
     public boolean isEnableBonuses() {
@@ -4686,7 +4686,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableOverrideRequirements", isEnableOverrideRequirements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonusXpRate", getBonusXpRate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "facultyXpRate", getFacultyXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableBonuses", isEnableBonuses());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adultDropoutChance", getAdultDropoutChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childrenDropoutChance", getChildrenDropoutChance());
@@ -5438,8 +5438,8 @@ public class CampaignOptions {
                     retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
                     retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("bonusXpRate")) {
-                    retVal.setBonusXpRate(Double.parseDouble(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("facultyXpRate")) {
+                    retVal.setFacultyXpRate(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableBonuses")) {
                     retVal.setEnableBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("adultDropoutChance")) {

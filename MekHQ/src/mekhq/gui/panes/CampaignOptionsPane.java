@@ -455,8 +455,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkShowIneligibleAcademies;
     private JCheckBox chkEnableOverrideRequirements;
     private JCheckBox chkEnableBonuses;
-    private JLabel lblBonusXpRate;
-    private JSpinner spnBonusXpRate;
+    private JLabel lblFacultyXpMultiplier;
+    private JSpinner spnFacultyXpMultiplier;
     private JLabel lblAdultDropoutChance;
     private JSpinner spnAdultDropoutChance;
     private JLabel lblChildrenDropoutChance;
@@ -6104,8 +6104,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
             xpAndSkillBonusesPanel.setEnabled(isEnabled);
             chkEnableBonuses.setEnabled(isEnabled);
-            lblBonusXpRate.setEnabled(isEnabled);
-            spnBonusXpRate.setEnabled(isEnabled);
+            lblFacultyXpMultiplier.setEnabled(isEnabled);
+            spnFacultyXpMultiplier.setEnabled(isEnabled);
 
             dropoutChancePanel.setEnabled(isEnabled);
             lblAdultDropoutChance.setEnabled(isEnabled);
@@ -6227,13 +6227,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnableBonuses.setToolTipText(resources.getString("chkEnableBonuses.toolTip"));
         chkEnableBonuses.setName("chkEnableBonuses");
 
-        lblBonusXpRate = new JLabel(resources.getString("lblBonusXpRate.text"));
-        lblBonusXpRate.setToolTipText(resources.getString("lblBonusXpRate.toolTip"));
-        lblBonusXpRate.setName("lblBonusXpRate");
+        lblFacultyXpMultiplier = new JLabel(resources.getString("lblFacultyXPMultiplier.text"));
+        lblFacultyXpMultiplier.setToolTipText(resources.getString("lblFacultyXPMultiplier.toolTip"));
+        lblFacultyXpMultiplier.setName("lblFacultyXpMultiplier");
 
-        spnBonusXpRate = new JSpinner(new SpinnerNumberModel(1.00, 0.00, 10.00, 0.01));
-        spnBonusXpRate.setToolTipText(resources.getString("lblBonusXpRate.toolTip"));
-        spnBonusXpRate.setName("spnBonusXpRate");
+        spnFacultyXpMultiplier = new JSpinner(new SpinnerNumberModel(1.00, 0.00, 10.00, 0.01));
+        spnFacultyXpMultiplier.setToolTipText(resources.getString("lblFacultyXPMultiplier.toolTip"));
+        spnFacultyXpMultiplier.setName("spnFacultyXpMultiplier");
 
         chkEnableBonuses.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
@@ -6251,16 +6251,16 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createSequentialGroup()
                         .addComponent(chkEnableBonuses)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblBonusXpRate)
-                                .addComponent(spnBonusXpRate, Alignment.LEADING))
+                                .addComponent(lblFacultyXpMultiplier)
+                                .addComponent(spnFacultyXpMultiplier, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkEnableBonuses)
                         .addGroup(layout.createSequentialGroup()
-                                .addComponent(lblBonusXpRate)
-                                .addComponent(spnBonusXpRate))
+                                .addComponent(lblFacultyXpMultiplier)
+                                .addComponent(spnFacultyXpMultiplier))
         );
 
         return panel;
@@ -8138,7 +8138,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
         chkEnableOverrideRequirements.setSelected(options.isEnableOverrideRequirements());
         chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
-        spnBonusXpRate.setValue(options.getBonusXpRate());
+        spnFacultyXpMultiplier.setValue(options.getFacultyXpRate());
         chkEnableBonuses.setSelected(options.isEnableBonuses());
         spnAdultDropoutChance.setValue(options.getAdultDropoutChance());
         spnChildrenDropoutChance.setValue(options.getChildrenDropoutChance());
@@ -8799,7 +8799,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
             options.setEnableOverrideRequirements(chkEnableOverrideRequirements.isSelected());
             options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
-            options.setBonusXpRate((Double) spnBonusXpRate.getValue());
+            options.setFacultyXpRate((Double) spnFacultyXpMultiplier.getValue());
             options.setEnableBonuses(chkEnableBonuses.isSelected());
             options.setAdultDropoutChance((Integer) spnAdultDropoutChance.getValue());
             options.setChildrenDropoutChance((Integer) spnChildrenDropoutChance.getValue());
