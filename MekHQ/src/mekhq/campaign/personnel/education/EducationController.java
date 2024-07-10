@@ -682,7 +682,7 @@ public class EducationController {
             ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
 
             improveSkills(campaign, person, academy, false);
-            addBonusXp(campaign, person, academy, 0);
+            addFacultyXp(campaign, person, academy, 0);
 
             person.setEduEducationStage(EducationStage.DROPPING_OUT);
 
@@ -838,7 +838,7 @@ public class EducationController {
     private static void processGraduation(Campaign campaign, Person person, Academy academy, Integer bonusCount, ResourceBundle resources) {
         improveSkills(campaign, person, academy, true);
 
-        addBonusXp(campaign, person, academy, bonusCount);
+        addFacultyXp(campaign, person, academy, bonusCount);
 
         if ((campaign.getCampaignOptions().isEnableBonuses()) && (bonusCount > 0)) {
             addBonus(campaign, person, academy, bonusCount, resources);
@@ -930,20 +930,22 @@ public class EducationController {
     }
 
     /**
-     * Adds bonus XP to a person based on faculty skill and academy duration.
+     * Adds faculty XP to a person based on faculty skill and academy duration.
      *
      * @param campaign the campaign the person is participating in
      * @param person the person receiving the bonus XP
      * @param academy the academy attended by the person
      * @param bonusCount the number of extra bonus XP to be added (based on graduation level)
      */
-    private static void addBonusXp(Campaign campaign, Person person, Academy academy, Integer bonusCount) {
+    private static void addFacultyXp(Campaign campaign, Person person, Academy academy, Integer bonusCount) {
         if (EducationLevel.parseToInt(person.getEduHighestEducation()) < academy.getEducationLevel(person)) {
-            int xpRate = Math.max(0, (12 - academy.getFacultySkill()) * ((academy.getDurationDays() - person.getEduEducationTime()) / 600));
+            int xpRate = Math.max(1, (12 - academy.getFacultySkill()) * ((academy.getDurationDays() - person.getEduEducationTime()) / 600));
 
-            xpRate *= campaign.getCampaignOptions().getBonusXpRate();
+            xpRate *= campaign.getCampaignOptions().getFacultyXpRate();
 
             person.awardXP(campaign, xpRate + bonusCount);
+        } else {
+            person.awardXP(campaign, 1 + bonusCount);
         }
     }
 
