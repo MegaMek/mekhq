@@ -32,7 +32,6 @@ import org.apache.logging.log4j.LogManager;
 
 import java.time.DayOfWeek;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * The EducationController class is responsible for managing the education process.
@@ -175,22 +174,15 @@ public class EducationController {
      * @throws IllegalStateException if an unexpected roll occurs
      */
     private static String generateMilitaryPrefix(ResourceBundle resources) {
-        switch (Compute.d6(1)) {
-            case 1:
-                return resources.getString("prefixCombinedArms.text");
-            case 2:
-                return resources.getString("prefixCombinedForces.text");
-            case 3:
-                return resources.getString("prefixMilitary.text");
-            case 4:
-                return resources.getString("prefixWar.text");
-            case 5:
-                return resources.getString("prefixWarFighting.text");
-            case 6:
-                return resources.getString("prefixCombat.text");
-            default:
-                throw new IllegalStateException("Unexpected roll in generateMilitaryPrefix");
-        }
+        return switch (Compute.d6(1)) {
+            case 1 -> resources.getString("prefixCombinedArms.text");
+            case 2 -> resources.getString("prefixCombinedForces.text");
+            case 3 -> resources.getString("prefixMilitary.text");
+            case 4 -> resources.getString("prefixWar.text");
+            case 5 -> resources.getString("prefixWarFighting.text");
+            case 6 -> resources.getString("prefixCombat.text");
+            default -> throw new IllegalStateException("Unexpected roll in generateMilitaryPrefix");
+        };
     }
 
     /**
@@ -201,22 +193,15 @@ public class EducationController {
      * @throws IllegalStateException if the random roll is unexpected.
      */
     private static String generateSuffix(ResourceBundle resources) {
-        switch (Compute.d6(1)) {
-            case 1:
-                return resources.getString("suffixTechnology.text");
-            case 2:
-                return resources.getString("suffixTechnologyAdvanced.text");
-            case 3:
-                return resources.getString("suffixScience.text");
-            case 4:
-                return resources.getString("suffixScienceAdvanced.text");
-            case 5:
-                return resources.getString("suffixStudies.text");
-            case 6:
-                return resources.getString("suffixHigherLearning.text");
-            default:
-                throw new IllegalStateException("Unexpected roll in generateSuffix()");
-        }
+        return switch (Compute.d6(1)) {
+            case 1 -> resources.getString("suffixTechnology.text");
+            case 2 -> resources.getString("suffixTechnologyAdvanced.text");
+            case 3 -> resources.getString("suffixScience.text");
+            case 4 -> resources.getString("suffixScienceAdvanced.text");
+            case 5 -> resources.getString("suffixStudies.text");
+            case 6 -> resources.getString("suffixHigherLearning.text");
+            default -> throw new IllegalStateException("Unexpected roll in generateSuffix()");
+        };
     }
 
     /**
@@ -227,22 +212,15 @@ public class EducationController {
      * @throws IllegalStateException if the generated roll is unexpected
      */
     private static String generateTypeAdult(ResourceBundle resources) {
-        switch (Compute.d6(1)) {
-            case 1:
-                return resources.getString("typeAcademy.text");
-            case 2:
-                return resources.getString("typeCollege.text");
-            case 3:
-                return resources.getString("typeInstitute.text");
-            case 4:
-                return resources.getString("typeUniversity.text");
-            case 5:
-                return resources.getString("typePolytechnic.text");
-            case 6:
-                return resources.getString("typeSchool.text");
-            default:
-                throw new IllegalStateException("Unexpected roll in generateTypeAdult");
-        }
+        return switch (Compute.d6(1)) {
+            case 1 -> resources.getString("typeAcademy.text");
+            case 2 -> resources.getString("typeCollege.text");
+            case 3 -> resources.getString("typeInstitute.text");
+            case 4 -> resources.getString("typeUniversity.text");
+            case 5 -> resources.getString("typePolytechnic.text");
+            case 6 -> resources.getString("typeSchool.text");
+            default -> throw new IllegalStateException("Unexpected roll in generateTypeAdult");
+        };
     }
 
 
@@ -254,22 +232,15 @@ public class EducationController {
      * @throws IllegalStateException if the generated roll is unexpected
      */
     private static String generateTypeChild(ResourceBundle resources) {
-        switch (Compute.d6(1)) {
-            case 1:
-                return resources.getString("typeAcademy.text");
-            case 2:
-                return resources.getString("typePreparatorySchool.text");
-            case 3:
-                return resources.getString("typeInstitute.text");
-            case 4:
-                return resources.getString("typeSchoolBoarding.text");
-            case 5:
-                return resources.getString("typeFinishingSchool.text");
-            case 6:
-                return resources.getString("typeSchool.text");
-            default:
-                throw new IllegalStateException("Unexpected roll in generateTypeAdult");
-        }
+        return switch (Compute.d6(1)) {
+            case 1 -> resources.getString("typeAcademy.text");
+            case 2 -> resources.getString("typePreparatorySchool.text");
+            case 3 -> resources.getString("typeInstitute.text");
+            case 4 -> resources.getString("typeSchoolBoarding.text");
+            case 5 -> resources.getString("typeFinishingSchool.text");
+            case 6 -> resources.getString("typeSchool.text");
+            default -> throw new IllegalStateException("Unexpected roll in generateTypeChild");
+        };
     }
 
     /**
@@ -348,12 +319,6 @@ public class EducationController {
 
                 person.setEduEducationStage(EducationStage.GRADUATING);
 
-                // if the person is graduating at the beginning of a month,
-                // they are still entitled to random xp
-                if (campaign.getLocalDate().getDayOfMonth() == 1) {
-                    processNewMonthChecks(campaign, academy, person);
-                }
-
                 return true;
             }
 
@@ -389,10 +354,6 @@ public class EducationController {
     private static void checkForEvents(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         if (campaign.getLocalDate().getDayOfWeek() == DayOfWeek.MONDAY) {
             processNewWeekChecks(campaign, academy, person, resources);
-        }
-
-        if (campaign.getLocalDate().getDayOfMonth() == 1) {
-            processNewMonthChecks(campaign, academy, person);
         }
 
         if (campaign.getLocalDate().getDayOfYear() == 1) {
@@ -505,21 +466,6 @@ public class EducationController {
 
         // was there a training accident?
         checkForTrainingAccidents(campaign, academy, person, resources);
-    }
-
-    /**
-     * Processes the new month checks for a specific person in a campaign.
-     *
-     * @param campaign        The campaign in which the person is participating.
-     * @param academy         The academy where the person is receiving education.
-     * @param person          The person whose new month checks need to be processed.
-     */
-    private static void processNewMonthChecks(Campaign campaign, Academy academy, Person person) {
-        if (campaign.getCampaignOptions().isEnableRandomXp()) {
-            if (Compute.d6(2) >= academy.getFacultySkill()) {
-                person.awardXP(campaign, campaign.getCampaignOptions().getRandomXpRate());
-            }
-        }
     }
 
     /**
@@ -740,6 +686,7 @@ public class EducationController {
             ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
 
             improveSkills(campaign, person, academy, false);
+            addBonusXp(campaign, person, academy, 0);
 
             person.setEduEducationStage(EducationStage.DROPPING_OUT);
 
@@ -855,18 +802,11 @@ public class EducationController {
     private static void graduateChild(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         int graduationRoll = Compute.randomInt(100);
 
-        // qualification failed
         if (graduationRoll < 30) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedBarely.text"));
-            ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
-
-            improveSkills(campaign, person, academy, false);
-
-            return;
+            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedBarely.text"), person.getEduAcademyName()));
+        } else {
+            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedChild.text"), person.getEduAcademyName()));
         }
-
-        // default graduation
-        campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedChild.text"), person.getEduAcademyName()));
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
 
@@ -901,6 +841,8 @@ public class EducationController {
      */
     private static void processGraduation(Campaign campaign, Person person, Academy academy, Integer bonusCount, ResourceBundle resources) {
         improveSkills(campaign, person, academy, true);
+
+        addBonusXp(campaign, person, academy, bonusCount);
 
         if ((campaign.getCampaignOptions().isEnableBonuses()) && (bonusCount > 0)) {
             addBonus(campaign, person, academy, bonusCount, resources);
@@ -992,6 +934,20 @@ public class EducationController {
     }
 
     /**
+     * Adds bonus XP to a person based on faculty skill and academy duration.
+     *
+     * @param campaign the campaign the person is participating in
+     * @param person the person receiving the bonus XP
+     * @param academy the academy attended by the person
+     * @param bonusCount the number of extra bonus XP to be added (based on graduation level)
+     */
+    private static void addBonusXp(Campaign campaign, Person person, Academy academy, Integer bonusCount) {
+        int xpRate = Math.max(0, (academy.getDurationDays() - person.getEduEducationTime()) / 150 - academy.getFacultySkill());
+
+        person.awardXP(campaign, xpRate + bonusCount);
+    }
+
+    /**
      * Adds bonus to a number of skills based on the course curriculum.
      *
      * @param person The person to whom the bonus will be added.
@@ -1004,7 +960,7 @@ public class EducationController {
 
         curriculum = curriculum.stream()
                 .map(String::trim)
-                .collect(Collectors.toList());
+                .toList();
 
         for (int i = 0; i < bonusCount; i++) {
             int roll = Compute.randomInt(curriculum.size());
