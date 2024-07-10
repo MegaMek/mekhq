@@ -75,33 +75,23 @@ public class CampaignOptions {
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
     public static String getTechLevelName(final int techLevel) {
-        switch (techLevel) {
-            case TECH_INTRO:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
-            case TECH_STANDARD:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
-            case TECH_ADVANCED:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
-            case TECH_EXPERIMENTAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
-            case TECH_UNOFFICIAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
-            default:
-                return "Unknown";
-        }
+        return switch (techLevel) {
+            case TECH_INTRO -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
+            case TECH_STANDARD -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
+            case TECH_ADVANCED -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
+            case TECH_EXPERIMENTAL -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
+            case TECH_UNOFFICIAL -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
+            default -> "Unknown";
+        };
     }
 
     public static String getTransitUnitName(final int unit) {
-        switch (unit) {
-            case TRANSIT_UNIT_DAY:
-                return "Days";
-            case TRANSIT_UNIT_WEEK:
-                return "Weeks";
-            case TRANSIT_UNIT_MONTH:
-                return "Months";
-            default:
-                return "Unknown";
-        }
+        return switch (unit) {
+            case TRANSIT_UNIT_DAY -> "Days";
+            case TRANSIT_UNIT_WEEK -> "Weeks";
+            case TRANSIT_UNIT_MONTH -> "Months";
+            default -> "Unknown";
+        };
     }
     //endregion Magic Numbers
 
@@ -723,7 +713,7 @@ public class CampaignOptions {
 
         // Admin
         setAdminsHaveNegotiation(false);
-        setAdminExperienceLevelIncludeNegotiation(true);
+        setAdminExperienceLevelIncludeNegotiation(false);
         setAdminsHaveScrounge(false);
         setAdminExperienceLevelIncludeScrounge(false);
 
