@@ -736,94 +736,68 @@ public enum PersonnelTableModelColumn {
 
     public boolean isVisible(final Campaign campaign, final PersonnelTabView view,
                              final JTable table) {
-        switch (view) {
-            case GRAPHIC: {
+        return switch (view) {
+            case GRAPHIC -> {
                 table.setRowHeight(80);
-                return switch (this) {
+                yield switch (this) {
                     case PERSON, UNIT_ASSIGNMENT, FORCE -> true;
                     default -> false;
                 };
             }
-            case GENERAL: {
-                return switch (this) {
-                    case RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL, PERSONNEL_ROLE, UNIT_ASSIGNMENT, FORCE, DEPLOYED, INJURIES, XP -> true;
-                    case SALARY -> campaign.getCampaignOptions().isPayForSalaries();
-                    default -> false;
-                };
-            }
-            case PILOT_GUNNERY_SKILLS: {
-                return switch (this) {
-                    case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, MEK, GROUND_VEHICLE, NAVAL_VEHICLE, VTOL, AEROSPACE,
-                         CONVENTIONAL_AIRCRAFT, VESSEL, ARTILLERY -> true;
-                    default -> false;
-                };
-            }
-            case INFANTRY_SKILLS: {
-                return switch (this) {
-                    case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, BATTLE_ARMOUR, SMALL_ARMS, ANTI_MEK -> true;
-                    default -> false;
-                };
-            }
-            case TACTICAL_SKILLS: {
-                return switch (this) {
-                    case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, TACTICS, STRATEGY, LEADERSHIP -> true;
-                    default -> false;
-                };
-            }
-            case TECHNICAL_SKILLS: {
-                return switch (this) {
-                    case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, TECH_MEK, TECH_AERO, TECH_MECHANIC, TECH_BA, TECH_VESSEL, MEDICAL ->
-                            true;
-                    default -> false;
-                };
-            }
-            case ADMINISTRATIVE_SKILLS: {
-                return switch (this) {
-                    case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION, SCROUNGE -> true;
-                    default -> false;
-                };
-            }
-            case BIOGRAPHICAL: {
-                return switch (this) {
-                    case RANK, FIRST_NAME, LAST_NAME, AGE, PERSONNEL_STATUS, PERSONNEL_ROLE, EDUCATION -> true;
-                    case ORIGIN_FACTION, ORIGIN_PLANET -> campaign.getCampaignOptions().isShowOriginFaction();
-                    default -> false;
-                };
-            }
-            case FLUFF: {
-                return switch (this) {
-                    case RANK, PRE_NOMINAL, GIVEN_NAME, SURNAME, BLOODNAME, POST_NOMINAL, CALLSIGN, GENDER, PERSONNEL_ROLE, KILLS -> true;
-                    default -> false;
-                };
-            }
-            case DATES: {
-                return switch (this) {
-                    case RANK, FIRST_NAME, LAST_NAME, BIRTHDAY, DEATH_DATE -> true;
-                    case RECRUITMENT_DATE -> campaign.getCampaignOptions().isUseTimeInService();
-                    case LAST_RANK_CHANGE_DATE -> campaign.getCampaignOptions().isUseTimeInRank();
-                    case DUE_DATE ->
-                            campaign.getCampaignOptions().isUseManualProcreation() || !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
-                    case RETIREMENT_DATE -> campaign.getCampaignOptions().isUseRetirementDateTracking();
-                    default -> false;
-                };
-            }
-            case FLAGS: {
-                return switch (this) {
-                    case RANK, FIRST_NAME, LAST_NAME, COMMANDER, FOUNDER, CLAN_PERSONNEL, MARRIAGEABLE, DIVORCEABLE, TRYING_TO_CONCEIVE,
-                         IMMORTAL -> true;
-                    default -> false;
-                };
-            }
-            case OTHER: {
-                return switch (this) {
-                    case RANK, FIRST_NAME, LAST_NAME, TOUGHNESS, FATIGUE, EDGE, SPA_COUNT, IMPLANT_COUNT, PORTRAIT_PATH -> true;
-                    default -> false;
-                };
-            }
-            default: {
-                return false;
-            }
-        }
+            case GENERAL -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, SKILL_LEVEL, PERSONNEL_ROLE, UNIT_ASSIGNMENT, FORCE, DEPLOYED, INJURIES, XP -> true;
+                case SALARY -> campaign.getCampaignOptions().isPayForSalaries();
+                default -> false;
+            };
+            case PILOT_GUNNERY_SKILLS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, MEK, GROUND_VEHICLE, NAVAL_VEHICLE, VTOL, AEROSPACE,
+                     CONVENTIONAL_AIRCRAFT, VESSEL, ARTILLERY -> true;
+                default -> false;
+            };
+            case INFANTRY_SKILLS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, BATTLE_ARMOUR, SMALL_ARMS, ANTI_MEK -> true;
+                default -> false;
+            };
+            case TACTICAL_SKILLS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, TACTICS, STRATEGY, LEADERSHIP -> true;
+                default -> false;
+            };
+            case TECHNICAL_SKILLS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, TECH_MEK, TECH_AERO, TECH_MECHANIC, TECH_BA, TECH_VESSEL, MEDICAL -> true;
+                default -> false;
+            };
+            case ADMINISTRATIVE_SKILLS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, PERSONNEL_ROLE, ADMINISTRATION, NEGOTIATION, SCROUNGE -> true;
+                default -> false;
+            };
+            case BIOGRAPHICAL -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, AGE, PERSONNEL_STATUS, PERSONNEL_ROLE, EDUCATION -> true;
+                case ORIGIN_FACTION, ORIGIN_PLANET -> campaign.getCampaignOptions().isShowOriginFaction();
+                default -> false;
+            };
+            case FLUFF -> switch (this) {
+                case RANK, PRE_NOMINAL, GIVEN_NAME, SURNAME, BLOODNAME, POST_NOMINAL, CALLSIGN, GENDER, PERSONNEL_ROLE, KILLS -> true;
+                default -> false;
+            };
+            case DATES -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, BIRTHDAY, DEATH_DATE -> true;
+                case RECRUITMENT_DATE -> campaign.getCampaignOptions().isUseTimeInService();
+                case LAST_RANK_CHANGE_DATE -> campaign.getCampaignOptions().isUseTimeInRank();
+                case DUE_DATE ->
+                        campaign.getCampaignOptions().isUseManualProcreation() || !campaign.getCampaignOptions().getRandomProcreationMethod().isNone();
+                case RETIREMENT_DATE -> campaign.getCampaignOptions().isUseRetirementDateTracking();
+                default -> false;
+            };
+            case FLAGS -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, COMMANDER, FOUNDER, CLAN_PERSONNEL, MARRIAGEABLE, DIVORCEABLE, TRYING_TO_CONCEIVE,
+                     IMMORTAL -> true;
+                default -> false;
+            };
+            case OTHER -> switch (this) {
+                case RANK, FIRST_NAME, LAST_NAME, TOUGHNESS, FATIGUE, EDGE, SPA_COUNT, IMPLANT_COUNT, PORTRAIT_PATH -> true;
+                default -> false;
+            };
+        };
     }
 
     public Comparator<?> getComparator(final Campaign campaign) {
