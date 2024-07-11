@@ -465,6 +465,7 @@ public class AtBDynamicScenarioFactory {
 
             if (campaign.getCampaignOptions().isAutoconfigMunitions() || forceTemplate.getAllowAeroBombs()) {
                 MapLocation mapLocation = scenario.getTemplate().mapParameters.getMapLocation();
+                boolean onGround = (mapLocation != MapLocation.LowAtmosphere && mapLocation != MapLocation.Space);
                 int ownerBaseQuality;
                 boolean isPirate = faction.isRebelOrPirate();
 
@@ -504,19 +505,22 @@ public class AtBDynamicScenarioFactory {
                             ((isPirate) ? TeamLoadoutGenerator.UNSET_FILL_RATIO : 1.0f)
                     );
                     rp.isPirate = isPirate;
+                    rp.groundMap = onGround;
+                    rp.spaceEnvironment = (mapLocation == MapLocation.Space);
                     MunitionTree mt = TeamLoadoutGenerator.generateMunitionTree(rp, arrayGeneratedLance, "");
                     tlg.reconfigureEntities(arrayGeneratedLance, factionCode, mt, rp);
                 } else {
                     // Load the fighters with bombs
                     TeamLoadoutGenerator.populateAeroBombs(generatedLance,
                             campaign.getGameYear(),
-                            (mapLocation != MapLocation.Space && mapLocation != MapLocation.LowAtmosphere),
+                            onGround,
                             ownerBaseQuality,
                             isPirate);
                 }
             }
 
             if (forceTemplate.getUseArtillery() && forceTemplate.getDeployOffboard()) {
+
                 deployArtilleryOffBoard(generatedLance);
             }
 
