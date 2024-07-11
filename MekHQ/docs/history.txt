@@ -2,6 +2,13 @@ MEKHQ VERSION HISTORY:
 ---------------
 0.50.0-SNAPSHOT (THIS MARKS THE START OF JAVA 17 AS THE MINIMUM REQUIRED)
 + PR #4332: CI Updates for windows build and normalizing
++ PR #4344: Update Payout Calculation for KIA Personnel
++ PR #4345: Updated fatigue display logic in PersonViewPanel
++ PR #4346: Refactored management skill calculation in RetirementDefectionTracker
++ PR #4348: Sentry Additions
++ PR #4355: Spelling, typos, grammar, etc
++ PR #4356: Move munition config out of MHQ, use MM autoconfig code
++ FIX #4326, #4325: Corrected Admin Negotiation Experience Level Campaign Setting & Experience Level Calculations
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
@@ -158,12 +165,6 @@ MEKHQ VERSION HISTORY:
 + PR #4164: More detailed auto-selection of bombs
 + PR #4312: Young wolves art update
 + PR #4313: Updated Campaign Options Settings to Disable New Components by Default
-+ PR #4344: Update Payout Calculation for KIA Personnel
-+ PR #4345: Updated fatigue display logic in PersonViewPanel
-+ PR #4346: Refactored management skill calculation in RetirementDefectionTracker
-+ PR #4348: Sentry Additions
-+ PR #4355: Spelling, typos, grammar, etc
-+ PR #4356: Move munition config out of MHQ, use MM autoconfig code
 
 0.49.19.1 (2024-05-14 1800 UTC)
 + Milestone Release. Backported fixes.
