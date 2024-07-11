@@ -60,9 +60,7 @@ import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
-import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
@@ -847,7 +845,7 @@ public class CampaignXmlParser {
         LogManager.getLogger().info("Load of Force Organization complete!");
     }
 
-    private static void processPersonnelNodes(Campaign retVal, Node wn, Version version) throws NullEntityException {
+    private static void processPersonnelNodes(Campaign retVal, Node wn, Version version) {
         LogManager.getLogger().info("Loading Personnel Nodes from XML...");
 
         NodeList wList = wn.getChildNodes();
