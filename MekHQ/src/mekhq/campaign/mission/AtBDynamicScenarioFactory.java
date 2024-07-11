@@ -520,7 +520,6 @@ public class AtBDynamicScenarioFactory {
             }
 
             if (forceTemplate.getUseArtillery() && forceTemplate.getDeployOffboard()) {
-
                 deployArtilleryOffBoard(generatedLance);
             }
 
