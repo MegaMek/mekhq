@@ -341,6 +341,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseInjuryFatigue;
     private JLabel lblFieldKitchenCapacity;
     private JSpinner spnFieldKitchenCapacity;
+    private JCheckBox chkFieldKitchenIgnoreNonCombatants;
     private JLabel lblFatigueLeaveThreshold;
     private JSpinner spnFatigueLeaveThreshold;
     //endregion Turnover and Retention Tab
@@ -3593,6 +3594,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseInjuryFatigue = new JCheckBox(resources.getString("chkUseInjuryFatigue.text"));
         chkUseInjuryFatigue.setToolTipText(resources.getString("chkUseInjuryFatigue.toolTipText"));
         chkUseInjuryFatigue.setName("chkUseInjuryFatigue");
+        chkUseInjuryFatigue.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
         lblFieldKitchenCapacity = new JLabel(resources.getString("lblFieldKitchenCapacity.text"));
         lblFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
@@ -3603,6 +3605,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnFieldKitchenCapacity.setToolTipText(resources.getString("lblFieldKitchenCapacity.toolTipText"));
         spnFieldKitchenCapacity.setName("spnFieldKitchenCapacity");
         spnFieldKitchenCapacity.setEnabled(campaign.getCampaignOptions().isUseFatigue());
+
+        chkFieldKitchenIgnoreNonCombatants = new JCheckBox(resources.getString("chkFieldKitchenIgnoreNonCombatants.text"));
+        chkFieldKitchenIgnoreNonCombatants.setToolTipText(resources.getString("chkFieldKitchenIgnoreNonCombatants.toolTipText"));
+        chkFieldKitchenIgnoreNonCombatants.setName("chkFieldKitchenIgnoreNonCombatants");
+        chkFieldKitchenIgnoreNonCombatants.setEnabled(campaign.getCampaignOptions().isUseFatigue());
 
         lblFatigueLeaveThreshold = new JLabel(resources.getString("lblFatigueLeaveThreshold.text"));
         lblFatigueLeaveThreshold.setToolTipText(resources.getString("lblFatigueLeaveThreshold.toolTipText"));
@@ -3633,6 +3640,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblFieldKitchenCapacity)
                                 .addComponent(spnFieldKitchenCapacity, Alignment.LEADING))
+                        .addComponent(chkFieldKitchenIgnoreNonCombatants)
                         .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblFatigueLeaveThreshold)
                                 .addComponent(spnFatigueLeaveThreshold, Alignment.LEADING))
@@ -3648,6 +3656,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFieldKitchenCapacity)
                                 .addComponent(spnFieldKitchenCapacity))
+                        .addComponent(chkFieldKitchenIgnoreNonCombatants)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(lblFatigueLeaveThreshold)
                                 .addComponent(spnFatigueLeaveThreshold))
@@ -8061,6 +8070,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnFatigueRate.setValue(options.getFatigueRate());
         chkUseInjuryFatigue.setVisible(options.isUseInjuryFatigue());
         spnFieldKitchenCapacity.setValue(options.getFieldKitchenCapacity());
+        chkFieldKitchenIgnoreNonCombatants.setSelected(options.isUseFieldKitchenIgnoreNonCombatants());
         spnFatigueLeaveThreshold.setValue(options.getFatigueLeaveThreshold());
         //endregion Turnover and Retention Tab
 
@@ -8748,6 +8758,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setFatigueRate((Integer) spnFatigueRate.getValue());
             options.setUseInjuryFatigue(chkUseInjuryFatigue.isSelected());
             options.setFieldKitchenCapacity((Integer) spnFieldKitchenCapacity.getValue());
+            options.setFieldKitchenIgnoreNonCombatants(chkFieldKitchenIgnoreNonCombatants.isSelected());
             options.setFatigueLeaveThreshold((Integer) spnFatigueLeaveThreshold.getValue());
             //endregion Turnover and Retention
 
@@ -9397,8 +9408,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             super.addNotify();
             Component c = getParent();
             //  Keep scrolling of the row table in sync with the main table.
-            if (c instanceof JViewport) {
-                JViewport viewport = (JViewport) c;
+            if (c instanceof JViewport viewport) {
                 viewport.addChangeListener(this);
             }
         }

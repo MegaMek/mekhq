@@ -75,33 +75,23 @@ public class CampaignOptions {
     public static final double MAXIMUM_WARSHIP_EQUIPMENT_PERCENT = 1.0;
 
     public static String getTechLevelName(final int techLevel) {
-        switch (techLevel) {
-            case TECH_INTRO:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
-            case TECH_STANDARD:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
-            case TECH_ADVANCED:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
-            case TECH_EXPERIMENTAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
-            case TECH_UNOFFICIAL:
-                return TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
-            default:
-                return "Unknown";
-        }
+        return switch (techLevel) {
+            case TECH_INTRO -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_INTRO];
+            case TECH_STANDARD -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_STANDARD];
+            case TECH_ADVANCED -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_ADVANCED];
+            case TECH_EXPERIMENTAL -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_EXPERIMENTAL];
+            case TECH_UNOFFICIAL -> TechConstants.T_SIMPLE_NAMES[TechConstants.T_SIMPLE_UNOFFICIAL];
+            default -> "Unknown";
+        };
     }
 
     public static String getTransitUnitName(final int unit) {
-        switch (unit) {
-            case TRANSIT_UNIT_DAY:
-                return "Days";
-            case TRANSIT_UNIT_WEEK:
-                return "Weeks";
-            case TRANSIT_UNIT_MONTH:
-                return "Months";
-            default:
-                return "Unknown";
-        }
+        return switch (unit) {
+            case TRANSIT_UNIT_DAY -> "Days";
+            case TRANSIT_UNIT_WEEK -> "Weeks";
+            case TRANSIT_UNIT_MONTH -> "Months";
+            default -> "Unknown";
+        };
     }
     //endregion Magic Numbers
 
@@ -325,6 +315,7 @@ public class CampaignOptions {
     private int fatigueRate;
     private boolean useInjuryFatigue;
     private int fieldKitchenCapacity;
+    private boolean fieldKitchenIgnoreNonCombatants;
     private int fatigueLeaveThreshold;
 
     // Family
@@ -998,6 +989,7 @@ public class CampaignOptions {
         setFatigueRate(1);
         setUseInjuryFatigue(true);
         setFieldKitchenCapacity(150);
+        setFieldKitchenIgnoreNonCombatants(true);
         setFatigueLeaveThreshold(13);
         //endregion Turnover and Retention
 
@@ -1548,6 +1540,14 @@ public class CampaignOptions {
 
     public void setFieldKitchenCapacity(final Integer fieldKitchenCapacity) {
         this.fieldKitchenCapacity = fieldKitchenCapacity;
+    }
+
+    public boolean isUseFieldKitchenIgnoreNonCombatants() {
+        return fieldKitchenIgnoreNonCombatants;
+    }
+
+    public void setFieldKitchenIgnoreNonCombatants (final boolean fieldKitchenIgnoreNonCombatants) {
+        this.fieldKitchenIgnoreNonCombatants = fieldKitchenIgnoreNonCombatants;
     }
 
     public Integer getFatigueLeaveThreshold() {
@@ -4626,6 +4626,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueRate", getFatigueRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInjuryFatigue", isUseInjuryFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenIgnoreNonCombatants", isUseFieldKitchenIgnoreNonCombatants());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLeaveThreshold", getFatigueLeaveThreshold());
         //endregion Retirement
 
@@ -5630,6 +5631,8 @@ public class CampaignOptions {
                     retVal.setUseInjuryFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
                     retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenIgnoreNonCombatants")) {
+                    retVal.setFieldKitchenIgnoreNonCombatants(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {
                     retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 //endregion Turnover and Retention
