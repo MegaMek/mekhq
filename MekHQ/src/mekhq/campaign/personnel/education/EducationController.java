@@ -947,14 +947,18 @@ public class EducationController {
             academyDuration = academy.getDurationDays() - person.getEduEducationTime();
         }
 
+        double bonusPercentage = (double) bonusCount / 5;
+
         if (EducationLevel.parseToInt(person.getEduHighestEducation()) < academy.getEducationLevel(person)) {
             int xpRate = Math.max(1, (12 - academy.getFacultySkill()) * (academyDuration / 600));
 
             xpRate *= campaign.getCampaignOptions().getFacultyXpRate();
 
-            person.awardXP(campaign, xpRate + bonusCount);
+            int bonusAmount = (int) Math.max(bonusCount, xpRate * bonusPercentage);
+            person.awardXP(campaign, xpRate + bonusAmount);
         } else {
-            person.awardXP(campaign, 1 + bonusCount);
+            int bonusAmount = (int) Math.max(bonusCount, 1 * bonusPercentage);
+            person.awardXP(campaign, 1 + bonusAmount);
         }
     }
 
