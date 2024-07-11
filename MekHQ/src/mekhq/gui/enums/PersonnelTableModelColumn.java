@@ -109,7 +109,8 @@ public enum PersonnelTableModelColumn {
     EDGE("PersonnelTableModelColumn.EDGE.text"),
     SPA_COUNT("PersonnelTableModelColumn.SPA_COUNT.text"),
     IMPLANT_COUNT("PersonnelTableModelColumn.IMPLANT_COUNT.text"),
-    PORTRAIT_PATH("PersonnelTableModelColumn.PORTRAIT_PATH.text");
+    PORTRAIT_PATH("PersonnelTableModelColumn.PORTRAIT_PATH.text"),
+    EDUCATION("PersonnelTableModelColumn.EDUCATION.text");
     //endregion Enum Declarations
 
     //region Variable Declarations
@@ -388,6 +389,10 @@ public enum PersonnelTableModelColumn {
     public boolean isPortraitPath() {
         return this == PORTRAIT_PATH;
     }
+
+    public boolean isEducation() {
+        return this == EDUCATION;
+    }
     //endregion Boolean Comparison Methods
 
     public String getCellValue(final Campaign campaign, final PersonnelMarket personnelMarket,
@@ -489,7 +494,7 @@ public enum PersonnelTableModelColumn {
                                 return unit.getName() + " (" + person.getMaintenanceTimeUsing() + "m)";
                             }
                         } else {
-                            return "" + person.getTechUnits().size() + " units (" + person.getMaintenanceTimeUsing() + "m)";
+                            return person.getTechUnits().size() + " units (" + person.getMaintenanceTimeUsing() + "m)";
                         }
                     }
                 }
@@ -508,7 +513,7 @@ public enum PersonnelTableModelColumn {
                 return (person.hasSkill(SkillType.S_GUN_MECH)
                                 ? Integer.toString(person.getSkill(SkillType.S_GUN_MECH).getFinalSkillValue())
                                 : "-")
-                        + "/"
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_MECH)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_MECH).getFinalSkillValue())
                                 : "-");
@@ -516,7 +521,7 @@ public enum PersonnelTableModelColumn {
                 return (person.hasSkill(SkillType.S_GUN_VEE)
                                 ? Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue())
                                 : "-")
-                        + "/"
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_GVEE)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_GVEE).getFinalSkillValue())
                                 : "-");
@@ -524,7 +529,7 @@ public enum PersonnelTableModelColumn {
                 return (person.hasSkill(SkillType.S_GUN_VEE)
                                 ? Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue())
                                 : "-")
-                        + "/"
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_NVEE)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_NVEE).getFinalSkillValue())
                                 : "-");
@@ -532,7 +537,7 @@ public enum PersonnelTableModelColumn {
                 return (person.hasSkill(SkillType.S_GUN_VEE)
                                 ? Integer.toString(person.getSkill(SkillType.S_GUN_VEE).getFinalSkillValue())
                                 : "-")
-                        + "/"
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_VTOL)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_VTOL).getFinalSkillValue())
                                 : "-");
@@ -540,7 +545,7 @@ public enum PersonnelTableModelColumn {
                 return (person.hasSkill(SkillType.S_GUN_AERO)
                                 ? Integer.toString(person.getSkill(SkillType.S_GUN_AERO).getFinalSkillValue())
                                 : "-")
-                        + "/"
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_AERO)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_AERO).getFinalSkillValue())
                                 : "-");
@@ -548,7 +553,7 @@ public enum PersonnelTableModelColumn {
                 return (person.hasSkill(SkillType.S_GUN_JET)
                                 ? Integer.toString(person.getSkill(SkillType.S_GUN_JET).getFinalSkillValue())
                                 : "-")
-                        + "/"
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_JET)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_JET).getFinalSkillValue())
                                 : "-");
@@ -556,7 +561,7 @@ public enum PersonnelTableModelColumn {
                 return (person.hasSkill(SkillType.S_GUN_SPACE)
                                 ? Integer.toString(person.getSkill(SkillType.S_GUN_SPACE).getFinalSkillValue())
                                 : "-")
-                        + "/"
+                        + '/'
                         + (person.hasSkill(SkillType.S_PILOT_SPACE)
                                 ? Integer.toString(person.getSkill(SkillType.S_PILOT_SPACE).getFinalSkillValue())
                                 : "-");
@@ -673,6 +678,8 @@ public enum PersonnelTableModelColumn {
                 return Integer.toString(person.countOptions(PersonnelOptions.MD_ADVANTAGES));
             case PORTRAIT_PATH:
                 return person.getPortrait().toString();
+            case EDUCATION:
+                return person.getEduHighestEducation().toString();
             default:
                 return "UNIMPLEMENTED";
         }
@@ -880,7 +887,7 @@ public enum PersonnelTableModelColumn {
                     case AGE:
                     case PERSONNEL_STATUS:
                     case PERSONNEL_ROLE:
-                    case FOUNDER:
+                    case EDUCATION:
                         return true;
                     case ORIGIN_FACTION:
                     case ORIGIN_PLANET:
