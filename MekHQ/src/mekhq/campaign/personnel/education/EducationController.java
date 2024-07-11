@@ -939,8 +939,16 @@ public class EducationController {
      * @param bonusCount the number of extra bonus XP to be added (based on graduation level)
      */
     private static void addFacultyXp(Campaign campaign, Person person, Academy academy, Integer bonusCount) {
+        int academyDuration;
+
+        if (academy.isPrepSchool()) {
+            academyDuration = (person.getAge(campaign.getLocalDate()) - academy.getAgeMin()) * 300;
+        } else {
+            academyDuration = academy.getDurationDays() - person.getEduEducationTime();
+        }
+
         if (EducationLevel.parseToInt(person.getEduHighestEducation()) < academy.getEducationLevel(person)) {
-            int xpRate = Math.max(1, (12 - academy.getFacultySkill()) * ((academy.getDurationDays() - person.getEduEducationTime()) / 600));
+            int xpRate = Math.max(1, (12 - academy.getFacultySkill()) * (academyDuration / 600));
 
             xpRate *= campaign.getCampaignOptions().getFacultyXpRate();
 
