@@ -1039,7 +1039,6 @@
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Canopus IV</locationSystem>
         <constructionYear>3058</constructionYear>
-        <destructionYear>3071</destructionYear>
         <tuition>13125</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
@@ -1372,6 +1371,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Coventry Academy, located in Dunnigan near Port Lawrence on Coventry, is a military academy close to the Coventry Metal Works plant. Many professors at the Academy also work at the CMW plant. Due to its close ties to CMW, it has been described as a glorified cadre for the manufacturer, with graduates often requiring additional training on equipment from other manufacturers.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Coventry</locationSystem>
         <constructionYear>2700</constructionYear>
         <destructionYear>3058</destructionYear>
@@ -2780,6 +2781,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MechWarriors, providing comprehensive classes instructed by experienced lecturers.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Andurien</locationSystem>
         <constructionYear>2765</constructionYear>
         <destructionYear>3040</destructionYear>
@@ -2799,6 +2802,8 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The Humphreys Training Academy is the Duchy of Andurien's leading institution for MechWarriors, providing comprehensive classes instructed by experienced lecturers.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Andurien</locationSystem>
         <constructionYear>2765</constructionYear>
         <destructionYear>3040</destructionYear>
@@ -4164,6 +4169,8 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Founded in 2614, the New Avalon Military Academy emerged to train officers for the Armed Forces of the Federated Suns after the Albion Military Academy became exclusive to the Star League Defense Force. NAMA swiftly rivaled AMA in training quality, emphasizing political loyalty to the First Prince.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Avalon</locationSystem>
         <constructionYear>2614</constructionYear>
         <destructionYear>3067</destructionYear>
@@ -4228,9 +4235,10 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>Founded in 2614, the New Avalon Military Academy emerged to train officers for the Armed Forces of the Federated Suns after the Albion Military Academy became exclusive to the Star League Defense Force. NAMA swiftly rivaled AMA in training quality, emphasizing political loyalty to the First Prince. Despite challenges, NAIS persists in producing top MechWarriors and officers, with graduates often joining mercenary units or returning to their home nations.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>New Avalon</locationSystem>
         <constructionYear>2614</constructionYear>
-        <destructionYear>3067</destructionYear>
         <tuition>11977</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
@@ -4585,7 +4593,6 @@
     <academy>
         <name>Noius Archipelagus Institute of Science</name>
         <type>University</type>
-        <isMilitary>true</isMilitary>
         <description>The Noius Archipelagus Institute of Science prioritizes military science and technology, aiming to compete with the prestigious New Avalon Institute of Science. It primarily admits students not accepted into more esteemed institutions, often serving as a last option for those seeking to avoid standard citizenship roles.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
@@ -5031,7 +5038,7 @@
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Luthien</locationSystem>
-        <constructionYear>53600</constructionYear>
+        <constructionYear>2680</constructionYear>
         <tuition>5250</tuition>
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
@@ -6557,7 +6564,6 @@
         <description>The Sentinelry Academy began construction in 3081, driven by Interstellar Agriculture Concerns. Training starts during Rockwellawan's brief arctic summer, hardening cadets in harsh conditions. In 3088, the academy was devastated by a pirate attack, but plans for reconstruction were immediate, underscoring its importance in local defense and officer training.</description>
         <locationSystem>Rockwellawan</locationSystem>
         <constructionYear>3095</constructionYear>
-        <destructionYear>3088</destructionYear>
         <tuition>10938</tuition>
         <durationDays>600</durationDays>
         <facultySkill>6</facultySkill>
@@ -6632,6 +6638,8 @@
         <type>University</type>
         <isMilitary>true</isMilitary>
         <description>Sian University offers a diverse array of courses, particularly in philosophy, political science, economics, and interstellar relations. Enrollment is open to all Capellan citizens, with a strong emphasis on achieving academic excellence.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Sian</locationSystem>
         <constructionYear>2888</constructionYear>
         <tuition>10500</tuition>
@@ -6795,6 +6803,8 @@
         <type>Officer Academy</type>
         <isMilitary>true</isMilitary>
         <description>The St. Ives Academy of Martial Sciences focuses on rigorous military training and academic coursework. Cadets frequently attend classes alongside civilian students from the St. Ives Science Institute. Graduates of the academy are highly esteemed.</description>
+        <factionDiscount>0</factionDiscount>
+        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>St. Ives</locationSystem>
         <constructionYear>2700</constructionYear>
         <destructionYear>3030</destructionYear>
@@ -7578,7 +7588,7 @@
         <description>Named after the heroic aerospace fighter pilot who killed ilKhan Leo Showers during the Clan Invasion, the Tyra Miraborg Memorial Academy is the premier military academy of the Free Rasalhague Republic. Despite internal rivalries, cadets develop a strong camaraderie, essential for future battles.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
-        <locationSystem>Radstadt</locationSystem>
+        <locationSystem>Orestes</locationSystem>
         <constructionYear>3056</constructionYear>
         <tuition>8750</tuition>
         <durationDays>900</durationDays>
@@ -7619,7 +7629,7 @@
         <description>Named after the heroic aerospace fighter pilot who killed ilKhan Leo Showers during the Clan Invasion, the Tyra Miraborg Memorial Academy is the premier military academy of the Free Rasalhague Republic. Despite internal rivalries, cadets develop a strong camaraderie, essential for future battles.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
-        <locationSystem>Radstadt</locationSystem>
+        <locationSystem>Orestes</locationSystem>
         <constructionYear>3056</constructionYear>
         <tuition>16953</tuition>
         <durationDays>900</durationDays>
@@ -7657,8 +7667,6 @@
         <name>Universities of the Puget Sound States</name>
         <type>University</type>
         <description>A group of five universities and colleges, including Pacific Lutheran University and the University of Washington, the latter of which maintains an extensive computer system.</description>
-        <factionDiscount>0</factionDiscount>
-        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
         <destructionYear>2780</destructionYear>
         <tuition>7500</tuition>
@@ -7679,8 +7687,6 @@
         <name>University of Blake</name>
         <type>University</type>
         <description>After the inconclusive Terran Peace Summit of 3053, Primus Sharilar Mori opened the ComStar Archives and established the University of Blake to distribute technical knowledge among the Great Houses.</description>
-        <factionDiscount>0</factionDiscount>
-        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
         <constructionYear>3053</constructionYear>
         <tuition>7500</tuition>
@@ -7721,8 +7727,6 @@
         <name>University of Harvard</name>
         <type>University</type>
         <description>Believed to be a continuation of Harvard University from ancient Earth, this institution has been educating students for hundreds of years.</description>
-        <factionDiscount>0</factionDiscount>
-        <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Terra</locationSystem>
         <constructionYear>1950</constructionYear>
         <tuition>7500</tuition>
@@ -8130,7 +8134,7 @@
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
     </academy>
     <academy>
-        <name>War College of Tamar [2025]</name>
+        <name>War College of Tamar [3025]</name>
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <description>The War College of Tamar is renowned for producing adept tacticians, strategists, and outstanding administrators. While the academy's curriculum emphasizes leadership and administrative skills over combat, it also provides training in BattleMech and aerospace operations. Destroyed by the DCMS in 2915, it was later rebuilt under the initiative of Archon Katrina Steiner.</description>
@@ -8180,7 +8184,7 @@
         <type>Military Academy</type>
         <isMilitary>true</isMilitary>
         <isPrepSchool>true</isPrepSchool>
-        <description>Warrior House Dai Da Chi blends Bushido with modern BattleMech combat. It emphasizes honor, discipline, and loyalty to the Dragon. Known for skilled MechWarriors, they uphold a legacy of honorable combat and serve as a pillar of Combine military prowess.</description>
+        <description>Warrior House Dai Da Chi in BattleTech is a renowned Capellan military unit known for its discipline, martial prowess, and deep loyalty to the Capellan Confederation. This elite House plays a crucial role in safeguarding Capellan interests.</description>
         <factionDiscount>0</factionDiscount>
         <isFactionRestricted>true</isFactionRestricted>
         <locationSystem>Drozan</locationSystem>
