@@ -867,71 +867,37 @@ public class Person {
             }
         }
 
-        switch (role) {
-            case MECHWARRIOR:
-                return hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
-            case LAM_PILOT:
-                return Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO)
-                        .allMatch(this::hasSkill);
-            case GROUND_VEHICLE_DRIVER:
-                return hasSkill(SkillType.S_PILOT_GVEE);
-            case NAVAL_VEHICLE_DRIVER:
-                return hasSkill(SkillType.S_PILOT_NVEE);
-            case VTOL_PILOT:
-                return hasSkill(SkillType.S_PILOT_VTOL);
-            case VEHICLE_GUNNER:
-                return hasSkill(SkillType.S_GUN_VEE);
-            case VEHICLE_CREW:
-                return hasSkill(SkillType.S_TECH_MECHANIC)
-                        && (getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
-            case AEROSPACE_PILOT:
-                return hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
-            case CONVENTIONAL_AIRCRAFT_PILOT:
-                return hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
-            case PROTOMECH_PILOT:
-                return hasSkill(SkillType.S_GUN_PROTO);
-            case BATTLE_ARMOUR:
-                return hasSkill(SkillType.S_GUN_BA);
-            case SOLDIER:
-                return hasSkill(SkillType.S_SMALL_ARMS);
-            case VESSEL_PILOT:
-                return hasSkill(SkillType.S_PILOT_SPACE);
-            case VESSEL_CREW:
-                return hasSkill(SkillType.S_TECH_VESSEL);
-            case VESSEL_GUNNER:
-                return hasSkill(SkillType.S_GUN_SPACE);
-            case VESSEL_NAVIGATOR:
-                return hasSkill(SkillType.S_NAV);
-            case MECH_TECH:
-                return hasSkill(SkillType.S_TECH_MECH)
-                        && (getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
-            case MECHANIC:
-                return hasSkill(SkillType.S_TECH_MECHANIC)
-                        && (getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
-            case AERO_TECH:
-                return hasSkill(SkillType.S_TECH_AERO)
-                        && (getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
-            case BA_TECH:
-                return hasSkill(SkillType.S_TECH_BA)
-                        && (getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
-            case ASTECH:
-                return hasSkill(SkillType.S_ASTECH);
-            case DOCTOR:
-                return hasSkill(SkillType.S_DOCTOR)
-                        && (getSkill(SkillType.S_DOCTOR).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
-            case MEDIC:
-                return hasSkill(SkillType.S_MEDTECH);
-            case ADMINISTRATOR_COMMAND:
-            case ADMINISTRATOR_LOGISTICS:
-            case ADMINISTRATOR_TRANSPORT:
-            case ADMINISTRATOR_HR:
-                return hasSkill(SkillType.S_ADMIN);
-            case DEPENDENT:
-            case NONE:
-                return true;
-            default:
-                return false;
-        }
+        return switch (role) {
+            case MECHWARRIOR -> hasSkill(SkillType.S_GUN_MECH) && hasSkill(SkillType.S_PILOT_MECH);
+            case LAM_PILOT ->
+                    Stream.of(SkillType.S_GUN_MECH, SkillType.S_PILOT_MECH, SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO).allMatch(this::hasSkill);
+            case GROUND_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_GVEE);
+            case NAVAL_VEHICLE_DRIVER -> hasSkill(SkillType.S_PILOT_NVEE);
+            case VTOL_PILOT -> hasSkill(SkillType.S_PILOT_VTOL);
+            case VEHICLE_GUNNER -> hasSkill(SkillType.S_GUN_VEE);
+            case VEHICLE_CREW, MECHANIC ->
+                    hasSkill(SkillType.S_TECH_MECHANIC) && (getSkill(SkillType.S_TECH_MECHANIC).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case AEROSPACE_PILOT -> hasSkill(SkillType.S_GUN_AERO) && hasSkill(SkillType.S_PILOT_AERO);
+            case CONVENTIONAL_AIRCRAFT_PILOT -> hasSkill(SkillType.S_GUN_JET) && hasSkill(SkillType.S_PILOT_JET);
+            case PROTOMECH_PILOT -> hasSkill(SkillType.S_GUN_PROTO);
+            case BATTLE_ARMOUR -> hasSkill(SkillType.S_GUN_BA);
+            case SOLDIER -> hasSkill(SkillType.S_SMALL_ARMS);
+            case VESSEL_PILOT -> hasSkill(SkillType.S_PILOT_SPACE);
+            case VESSEL_CREW -> hasSkill(SkillType.S_TECH_VESSEL);
+            case VESSEL_GUNNER -> hasSkill(SkillType.S_GUN_SPACE);
+            case VESSEL_NAVIGATOR -> hasSkill(SkillType.S_NAV);
+            case MECH_TECH ->
+                    hasSkill(SkillType.S_TECH_MECH) && (getSkill(SkillType.S_TECH_MECH).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case AERO_TECH ->
+                    hasSkill(SkillType.S_TECH_AERO) && (getSkill(SkillType.S_TECH_AERO).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case BA_TECH ->
+                    hasSkill(SkillType.S_TECH_BA) && (getSkill(SkillType.S_TECH_BA).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case ASTECH -> hasSkill(SkillType.S_ASTECH);
+            case DOCTOR -> hasSkill(SkillType.S_DOCTOR) && (getSkill(SkillType.S_DOCTOR).getExperienceLevel() > SkillType.EXP_ULTRA_GREEN);
+            case MEDIC -> hasSkill(SkillType.S_MEDTECH);
+            case ADMINISTRATOR_COMMAND, ADMINISTRATOR_LOGISTICS, ADMINISTRATOR_TRANSPORT, ADMINISTRATOR_HR -> hasSkill(SkillType.S_ADMIN);
+            case DEPENDENT, NONE -> true;
+        };
     }
     //endregion Personnel Roles
 
@@ -1239,29 +1205,23 @@ public class Person {
     }
 
     /**
-     * @return the loyalty name based on the person's loyalty score.
+     * @return the name corresponding to a individual's loyalty modifier.
      *
-     * @throws IllegalStateException if the loyalty value is not within a -3 to +3 range
+     * @param loyaltyModifier the loyalty modifier
+     * @throws IllegalStateException if an unexpected value is passed for loyaltyModifier
      */
-    public static String getLoyaltyName(int loyalty) {
-        switch (loyalty) {
-            case -3:
-                return "Devoted";
-            case -2:
-                return "Loyal";
-            case -1:
-                return "Reliable";
-            case 0:
-                return "Neutral";
-            case 1:
-                return "Unreliable";
-            case 2:
-                return "Disloyal";
-            case 3:
-                return "Treacherous";
-            default:
-                throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/Person.java/getLoyaltyName: " + loyalty);
-        }
+    public static String getLoyaltyName(int loyaltyModifier) {
+        return switch (loyaltyModifier) {
+            case -3 -> "Devoted";
+            case -2 -> "Loyal";
+            case -1 -> "Reliable";
+            case 0 -> "Neutral";
+            case 1 -> "Unreliable";
+            case 2 -> "Disloyal";
+            case 3 -> "Treacherous";
+            default ->
+                    throw new IllegalStateException("Unexpected value in mekhq/campaign/personnel/Person.java/getLoyaltyName: " + loyaltyModifier);
+        };
     }
 
     public int getFatigue() {
@@ -2725,54 +2685,36 @@ public class Person {
             case ADMINISTRATOR_LOGISTICS:
             case ADMINISTRATOR_TRANSPORT:
             case ADMINISTRATOR_HR:
-                if ((campaign.getCampaignOptions().isAdminExperienceLevelIncludeNegotiation())
-                        && (campaign.getCampaignOptions().isAdminExperienceLevelIncludeScrounge())) {
+                int adminLevel = getSkillLevelOrNegative(SkillType.S_ADMIN);
+                int negotiationLevel = getSkillLevelOrNegative(SkillType.S_NEG);
+                int scroungeLevel = getSkillLevelOrNegative(SkillType.S_SCROUNGE);
 
-                    if (Stream.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE).allMatch(this::hasSkill)) {
-                        if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
-                            int rawScore = (int) Math.floor(((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_NEG).getLevel()) + getSkill(SkillType.S_SCROUNGE).getLevel()) / 3.0);
+                int levelSum;
+                boolean includeNegotiation = campaign.getCampaignOptions().isAdminExperienceLevelIncludeNegotiation();
+                boolean includeScrounge = campaign.getCampaignOptions().isAdminExperienceLevelIncludeScrounge();
+                int divisor;
 
-                            if ((getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_NEG).getType().getExperienceLevel(rawScore))
-                                && (getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_SCROUNGE).getType().getExperienceLevel(rawScore))) {
+                if (includeNegotiation && includeScrounge) {
+                    levelSum = adminLevel + negotiationLevel + scroungeLevel;
+                    divisor = 3;
+                }
+                else if (includeNegotiation) {
+                    levelSum = adminLevel + negotiationLevel;
+                    divisor = 2;
+                }
+                else if (includeScrounge) {
+                    levelSum = adminLevel + scroungeLevel;
+                    divisor = 2;
+                }
+                else {
+                    levelSum = adminLevel;
+                    divisor = 1;
+                }
 
-                                return getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) Math.floor((Stream.of(SkillType.S_ADMIN, SkillType.S_NEG, SkillType.S_SCROUNGE).mapToInt(s -> getSkill(s).getLevel()).sum()) / 3.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else if (campaign.getCampaignOptions().isAdminExperienceLevelIncludeNegotiation()) {
-                    if ((hasSkill(SkillType.S_ADMIN)) && (hasSkill(SkillType.S_NEG))) {
-                        if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_NEG).getLevel()) / 2.0);
-
-                            if (getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_NEG).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_NEG).getLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
-                } else if (campaign.getCampaignOptions().isAdminExperienceLevelIncludeScrounge()) {
-                    if ((hasSkill(SkillType.S_ADMIN)) && (hasSkill(SkillType.S_SCROUNGE))) {
-                        if (campaign.getCampaignOptions().isAlternativeQualityAveraging()) {
-                            int rawScore = (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_SCROUNGE).getLevel()) / 2.0);
-
-                            if (getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore) == getSkill(SkillType.S_SCROUNGE).getType().getExperienceLevel(rawScore)) {
-                                return getSkill(SkillType.S_ADMIN).getType().getExperienceLevel(rawScore);
-                            }
-                        }
-
-                        return (int) Math.floor((getSkill(SkillType.S_ADMIN).getLevel() + getSkill(SkillType.S_SCROUNGE).getLevel()) / 2.0);
-                    } else {
-                        return SkillType.EXP_NONE;
-                    }
+                if (levelSum == -divisor) {
+                    return SkillType.EXP_NONE;
                 } else {
-                    return hasSkill(SkillType.S_ADMIN) ? getSkill(SkillType.S_ADMIN).getExperienceLevel() : SkillType.EXP_NONE;
+                    return Math.max(0, levelSum / divisor);
                 }
             case DEPENDENT:
             case NONE:
@@ -2871,6 +2813,20 @@ public class Person {
     public int getSkillLevel(final String skillName) {
         final Skill skill = getSkill(skillName);
         return (skill == null) ? 0 : skill.getExperienceLevel();
+    }
+
+
+    /**
+     * @return the skill level of a person for a given skill, or -1 if the person does not have the skill.
+     *
+     * @param skillName The name of the skill to retrieve the level for.
+     */
+    public int getSkillLevelOrNegative(final String skillName) {
+        if (hasSkill(skillName)) {
+            return getSkill(skillName).getExperienceLevel();
+        } else {
+            return -1;
+        }
     }
 
     public void addSkill(final String skillName, final Skill skill) {
@@ -3018,7 +2974,7 @@ public class Person {
                 final IOption option = j.nextElement();
 
                 if (option.booleanValue()) {
-                    if (adv.length() > 0) {
+                    if (!adv.isEmpty()) {
                         adv.append(sep);
                     }
 
@@ -3046,7 +3002,7 @@ public class Person {
             }
         }
 
-        return (abilityString.length() == 0) ? null : "<html>" + abilityString + "</html>";
+        return (abilityString.isEmpty()) ? null : "<html>" + abilityString + "</html>";
     }
     //endregion Personnel Options
 
@@ -3791,23 +3747,19 @@ public class Person {
      * @param loyalty the person's loyalty score
      */
     public int getLoyaltyModifier(int loyalty) {
-        if (loyalty <= 3) {
-            return 3;
-        } else if (loyalty == 4) {
-            return 2;
-        } else if (loyalty == 5 || loyalty == 6) {
-            return 1;
-        } else if (loyalty >= 7 && loyalty <= 14) {
-            return 0;
-        } else if (loyalty == 15 || loyalty == 16) {
-            return -1;
-        } else if (loyalty == 17) {
-            return -2;
-        } else if (loyalty >= 18){
-            return -3;
+        if (loyalty < 1) {
+            loyalty = 1;
         }
 
-        return 0;
+        return switch (loyalty) {
+            case 1, 2, 3 -> 3;
+            case 4 -> 2;
+            case 5, 6 -> 1;
+            case 7, 8, 9, 10, 11, 12, 13, 14 -> 0;
+            case 15, 16 -> -1;
+            case 17 -> -2;
+            default -> -3;
+        };
     }
 
     /**
