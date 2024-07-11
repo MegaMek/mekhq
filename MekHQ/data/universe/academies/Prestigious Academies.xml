@@ -32,7 +32,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Teaching Graduate</qualification>
         <curriculum>Leadership</curriculum>
@@ -3538,7 +3538,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Diplomatic Relations</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -6646,7 +6646,7 @@
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Modern Medicine</qualification>
         <curriculum>Doctor</curriculum>
@@ -7137,7 +7137,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7673,7 +7673,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7693,7 +7693,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7713,7 +7713,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7733,7 +7733,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7754,7 +7754,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7774,7 +7774,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7794,7 +7794,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7811,7 +7811,7 @@
         <durationDays>900</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7871,7 +7871,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7891,7 +7891,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>6</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7913,7 +7913,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
@@ -7933,7 +7933,7 @@
         <durationDays>1200</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Junior Administrator</qualification>
         <curriculum>Administration, Negotiation</curriculum>
@@ -7949,7 +7949,7 @@
         <durationDays>900</durationDays>
         <facultySkill>5</facultySkill>
         <educationLevelMin>High School</educationLevelMin>
-        <educationLevelMax>College</educationLevelMax>
+        <educationLevelMax>Doctorate</educationLevelMax>
         <ageMin>16</ageMin>
         <qualification>Medical Technician</qualification>
         <curriculum>Doctor</curriculum>
