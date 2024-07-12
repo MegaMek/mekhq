@@ -46,7 +46,7 @@
         <constructionYear>2300</constructionYear>
         <tuition>0</tuition>
         <educationLevelMax>Early Childhood</educationLevelMax>
-        <facultySkill>8</facultySkill>
+        <facultySkill>9</facultySkill>
         <ageMin>10</ageMin>
         <ageMax>16</ageMax>
         <qualification>MechWarrior Apprenticeship</qualification>
@@ -86,5 +86,59 @@
         <curriculum>Medtech, Doctor</curriculum>
         <qualificationStartYear>2300</qualificationStartYear>
         <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>In-House Boot Camp</name>
+        <type>Basic Training</type>
+        <isMilitary>true</isMilitary>
+        <description>In-house training is usually conducted by the unit's more experienced members. This training ensures that new members are well-prepared, cohesive, and loyal to the unit's unique culture and combat style.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>1250</tuition>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <durationDays>70</durationDays>
+        <facultySkill>9</facultySkill>
+        <ageMin>16</ageMin>
+        <qualification>Basic Mechanized Training</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Basic Air Cavalry Training</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/VTOL</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Basic Flight School</qualification>
+        <curriculum>Gunnery/Aircraft, Piloting/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Basic Infantry Training</qualification>
+        <curriculum>Small Arms</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>In-House Basic Training</name>
+        <type>Basic Training</type>
+        <isMilitary>true</isMilitary>
+        <description>In-house training is usually conducted by the unit's more experienced members. Trainees undergo physical conditioning, simulator exercises, and eventually hands-on training in their chosen field.</description>
+        <isLocal>true</isLocal>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>1250</tuition>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <durationDays>150</durationDays>
+        <facultySkill>9</facultySkill>
+        <ageMin>16</ageMin>
+        <qualification>Basic MechWarrior Training</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Basic Aerospace Training</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Basic Black Naval Training</qualification>
+        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Basic Battle Armor Training</qualification>
+        <curriculum>Gunnery/Battlesuit</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
     </academy>
 </academies>
