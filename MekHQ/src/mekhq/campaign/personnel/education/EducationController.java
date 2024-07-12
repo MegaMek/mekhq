@@ -81,10 +81,15 @@ public class EducationController {
 
         enrollPerson(campaign, person, academy, campus, faction, courseIndex);
 
-        campaign.addReport(String.format(resources.getString("offToSchool.text"),
+        if (academy.isHomeSchool()) {
+            campaign.addReport(String.format(resources.getString("homeSchool.text"),
+                    person.getFullName()));
+        } else {
+            campaign.addReport(String.format(resources.getString("offToSchool.text"),
                     person.getFullName(),
                     person.getEduAcademyName(),
                     person.getEduJourneyTime()));
+        }
     }
 
     /**
@@ -103,26 +108,37 @@ public class EducationController {
         // change status will wipe the academic information, so must always precede the setters
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.STUDENT);
 
-        person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
+        if (academy.isHomeSchool()) {
+            // if the student is being homeschooled, we skip the journey to the 'academy'
+            person.setEduEducationStage(EducationStage.EDUCATION);
+        } else {
+            person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
+        }
+
         person.setEduAcademySet(academy.getSet());
         person.setEduAcademyNameInSet(academy.getName());
         person.setEduEducationTime(academy.getDurationDays());
         person.setEduAcademyFaction(faction);
         person.setEduCourseIndex(courseIndex);
 
-        if (academy.isLocal()) {
-            person.setEduJourneyTime(2);
-            person.setEduAcademySystem(campaign.getCurrentSystem().getId());
-        } else {
-            person.setEduJourneyTime(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
-            person.setEduAcademySystem(campus);
+        if (!academy.isHomeSchool()) {
+            if (academy.isLocal()) {
+                person.setEduJourneyTime(2);
+                person.setEduAcademySystem(campaign.getCurrentSystem().getId());
+            } else {
+                person.setEduJourneyTime(campaign.getSimplifiedTravelTime(campaign.getSystemById(campus)));
+                person.setEduAcademySystem(campus);
+            }
         }
 
         // this should already be 0, but we reset it just in case
         person.setEduDaysOfTravel(0);
 
-        // if the academy is Local, we need to generate a name, otherwise we use the listed name
-        if (academy.isLocal()) {
+        // if the academy is Local, we need to generate a name,
+        // otherwise we use the listed name or the campaign name
+        if (academy.isHomeSchool()) {
+            person.setEduAcademyName(campaign.getName());
+        } else if (academy.isLocal()) {
             person.setEduAcademyName(generateName(academy, campus));
         } else {
             person.setEduAcademyName(person.getEduAcademyNameInSet() + " (" + campaign.getSystemById(campus).getName(campaign.getLocalDate()) + ')');
@@ -270,7 +286,7 @@ public class EducationController {
 
         // if education has concluded and the journey home hasn't started, we begin the journey
         if ((educationStage.isGraduating()) || (educationStage.isDroppingOut())) {
-            beginJourneyHome(campaign, person, resources);
+            beginJourneyHome(campaign, person, academy, resources);
             return false;
         }
 
@@ -384,9 +400,17 @@ public class EducationController {
      *
      * @param campaign   the current campaign
      * @param person     the person returning from the academy
+     * @param academy    the academy being attended
      * @param resources  the resource bundle containing localized strings
      */
-    private static void beginJourneyHome(Campaign campaign, Person person, ResourceBundle resources) {
+    private static void beginJourneyHome(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
+        // if the student is being homeschooled, they skip the journey home.
+        if (academy.isHomeSchool()) {
+            person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+
+            return;
+        }
+
         int travelTime = Math.max(2, campaign.getSimplifiedTravelTime(campaign.getSystemById(person.getEduAcademySystem())));
 
         campaign.addReport(person.getHyperlinkedName() + ' '
@@ -447,16 +471,18 @@ public class EducationController {
      * @param resources       The resource bundle used for localized strings.
      */
     private static void processNewWeekChecks(Campaign campaign, Academy academy, Person person, ResourceBundle resources) {
-        // has the system been depopulated? Nominally similar to destruction, but here we use actual system data, so it's more dynamic.
-        if (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0) {
-            if (checkForAcademyDestruction(campaign, academy, person, resources)) {
+        if (!academy.isHomeSchool()) {
+            // has the system been depopulated? Nominally similar to destruction, but here we use actual system data, so it's more dynamic.
+            if (campaign.getSystemById(person.getEduAcademySystem()).getPopulation(campaign.getLocalDate()) == 0) {
+                if (checkForAcademyDestruction(campaign, academy, person, resources)) {
+                    return;
+                }
+            }
+
+            // is the academy faction at war with person faction, or the campaign faction?
+            if (checkForAcademyFactionConflict(campaign, academy, person, resources)) {
                 return;
             }
-        }
-
-        // is the academy faction at war with person faction, or the campaign faction?
-        if (checkForAcademyFactionConflict(campaign, academy, person, resources)) {
-            return;
         }
 
         // does person want to drop out?
@@ -505,6 +531,14 @@ public class EducationController {
 
             if (militaryDiceSize > 1) {
                 roll = Compute.randomInt(militaryDiceSize);
+
+                if (academy.isHomeSchool()) {
+                    int secondRoll = Compute.randomInt(militaryDiceSize);
+
+                    if (secondRoll < roll) {
+                        roll = secondRoll;
+                    }
+                }
             } else {
                 roll = -1;
             }
@@ -579,7 +613,12 @@ public class EducationController {
                     if (academy.isReeducationCamp()) {
                         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.MISSING);
                     } else {
-                        campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
+                        if (academy.isHomeSchool()) {
+                            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOutHomeSchooled.text"));
+                        } else {
+                            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("dropOut.text"));
+                        }
+
                         ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
                         person.setEduEducationStage(EducationStage.DROPPING_OUT);
                         addFacultyXp(campaign, person, academy, 0);
@@ -677,9 +716,26 @@ public class EducationController {
         int graduationRoll = Compute.randomInt(100);
         int roll;
 
+        if (academy.isHomeSchool()) {
+            int secondRoll = Compute.randomInt(100);
+
+            if (secondRoll < graduationRoll) {
+                graduationRoll = secondRoll;
+            }
+
+            if (graduationRoll >= 90) {
+                graduationRoll = 89;
+            }
+        }
+
         // qualification failed
         if (graduationRoll < 5) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedFailed.text"));
+            if (academy.isHomeSchool()) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedFailedHomeSchooled.text"));
+            } else {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedFailed.text"));
+            }
+
             ServiceLogger.eduFailed(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
 
             improveSkills(campaign, person, academy, false);
@@ -702,10 +758,18 @@ public class EducationController {
 
         if (graduationRoll == 99) {
             if (Compute.d6(1) > 5) {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTop.text"),
-                        ' ' + resources.getString(graduationEventPicker())));
+                if (academy.isHomeSchool()) {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                } else {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTop.text"),
+                            ' ' + resources.getString(graduationEventPicker())));
+                }
             } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTop.text"), ""));
+                if (academy.isHomeSchool()) {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                } else {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedTop.text"), ""));
+                }
             }
 
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
@@ -726,10 +790,18 @@ public class EducationController {
         if (graduationRoll >= 90) {
             if (Compute.d6(1) > 5) {
 
-                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedHonors.text"),
-                        ' ' + resources.getString(graduationEventPicker())));
+                if (academy.isHomeSchool()) {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                } else {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedHonors.text"),
+                            ' ' + resources.getString(graduationEventPicker())));
+                }
             } else {
-                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedHonors.text"), ""));
+                if (academy.isHomeSchool()) {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+                } else {
+                    campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedHonors.text"), ""));
+                }
             }
 
             ServiceLogger.eduGraduatedPlus(person, campaign.getLocalDate(),
@@ -748,10 +820,18 @@ public class EducationController {
 
         // default graduation
         if (Compute.d6(1) > 5) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"),
-                    ' ' + resources.getString(graduationEventPicker())));
+            if (academy.isHomeSchool()) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+            } else {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"),
+                        ' ' + resources.getString(graduationEventPicker())));
+            }
         } else {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"), ""));
+            if (academy.isHomeSchool()) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+            } else {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduated.text"), ""));
+            }
         }
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
@@ -799,10 +879,26 @@ public class EducationController {
     private static void graduateChild(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
         int graduationRoll = Compute.randomInt(100);
 
+        if (academy.isHomeSchool()) {
+            int secondRoll = Compute.randomInt(100);
+
+            if (secondRoll < graduationRoll) {
+                graduationRoll = secondRoll;
+            }
+        }
+
         if (graduationRoll < 30) {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedBarely.text"), person.getEduAcademyName()));
+            if (academy.isHomeSchool()) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedBarelyHomeSchooled.text"), person.getEduAcademyName()));
+            } else {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedBarely.text"), person.getEduAcademyName()));
+            }
         } else {
-            campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedChild.text"), person.getEduAcademyName()));
+            if (academy.isHomeSchool()) {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + resources.getString("graduatedHomeSchooled.text"));
+            } else {
+                campaign.addReport(person.getHyperlinkedName() + ' ' + String.format(resources.getString("graduatedChild.text"), person.getEduAcademyName()));
+            }
         }
 
         ServiceLogger.eduGraduated(person, campaign.getLocalDate(), person.getEduAcademyName(), academy.getQualifications().get(person.getEduCourseIndex()));
@@ -903,7 +999,9 @@ public class EducationController {
         }
 
         for (String skill : curriculum) {
-            if (skill.equalsIgnoreCase("xp")) {
+            if (skill.equalsIgnoreCase("none")) {
+                return;
+            } else if (skill.equalsIgnoreCase("xp")) {
                 person.awardXP(campaign, educationLevel * campaign.getCampaignOptions().getCurriculumXpRate());
             } else {
                 String skillParsed = Academy.skillParser(skill);
@@ -996,14 +1094,18 @@ public class EducationController {
                    person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
 
                     campaign.addReport(String.format(resources.getString("bonusXp.text"),
-                            person.getFirstName(), campaign.getCampaignOptions().getCurriculumXpRate()));
+                            person.getFirstName(),
+                            campaign.getCampaignOptions().getCurriculumXpRate()));
                 }
             } catch (Exception e) {
-                // if we get this, it means the 'skill' was XP
-                person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
+                // if we get this, it means the 'skill' was XP or None
+                if (curriculum.get(roll).equalsIgnoreCase("xp")) {
+                    person.awardXP(campaign, campaign.getCampaignOptions().getCurriculumXpRate());
 
-                campaign.addReport(String.format(resources.getString("bonusXp.text"),
-                        person.getFirstName(), campaign.getCampaignOptions().getCurriculumXpRate()));
+                    campaign.addReport(String.format(resources.getString("bonusXp.text"),
+                            person.getFirstName(),
+                            campaign.getCampaignOptions().getCurriculumXpRate()));
+                }
             }
         }
     }
