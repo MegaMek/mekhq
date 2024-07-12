@@ -381,8 +381,7 @@ public class CampaignOptions {
     private boolean enablePrestigiousAcademies;
     private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
-    private boolean enableRandomXp;
-    private Integer randomXpRate;
+    private Double facultyXpRate;
     private boolean enableBonuses;
     private Integer adultDropoutChance;
     private Integer childrenDropoutChance;
@@ -888,8 +887,7 @@ public class CampaignOptions {
         setEnablePrestigiousAcademies(true);
         setEnableOverrideRequirements(false);
         setEnableShowIneligibleAcademies(true);
-        setEnableRandomXp(true);
-        setRandomXpRate(1);
+        setFacultyXpRate(1.00);
         setEnableBonuses(true);
         setAdultDropoutChance(1000);
         setChildrenDropoutChance(10000);
@@ -2730,20 +2728,12 @@ public class CampaignOptions {
         this.enableShowIneligibleAcademies = enableShowIneligibleAcademies;
     }
 
-    public boolean isEnableRandomXp() {
-        return enableRandomXp;
+    public Double getFacultyXpRate() {
+        return facultyXpRate;
     }
 
-    public void setEnableRandomXp(boolean enableRandomXp) {
-        this.enableRandomXp = enableRandomXp;
-    }
-
-    public Integer getRandomXpRate() {
-        return randomXpRate;
-    }
-
-    public void setRandomXpRate(Integer randomXpRate) {
-        this.randomXpRate = randomXpRate;
+    public void setFacultyXpRate(Double facultyXpRate) {
+        this.facultyXpRate = facultyXpRate;
     }
 
     public boolean isEnableBonuses() {
@@ -4696,8 +4686,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableOverrideRequirements", isEnableOverrideRequirements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableRandomXp", isEnableRandomXp());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "randomXpRate", getRandomXpRate());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "facultyXpRate", getFacultyXpRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableBonuses", isEnableBonuses());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "adultDropoutChance", getAdultDropoutChance());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "childrenDropoutChance", getChildrenDropoutChance());
@@ -5449,10 +5438,8 @@ public class CampaignOptions {
                     retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
                     retVal.setEnableShowIneligibleAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("enableRandomXp")) {
-                    retVal.setEnableRandomXp(Boolean.parseBoolean(wn2.getTextContent().trim()));
-                } else if (wn2.getNodeName().equalsIgnoreCase("randomXpRate")) {
-                    retVal.setRandomXpRate(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("facultyXpRate")) {
+                    retVal.setFacultyXpRate(Double.parseDouble(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableBonuses")) {
                     retVal.setEnableBonuses(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("adultDropoutChance")) {
