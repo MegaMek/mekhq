@@ -315,6 +315,7 @@ public class CampaignOptions {
     private int fatigueRate;
     private boolean useInjuryFatigue;
     private int fieldKitchenCapacity;
+    private boolean fieldKitchenIgnoreNonCombatants;
     private int fatigueLeaveThreshold;
 
     // Family
@@ -986,6 +987,7 @@ public class CampaignOptions {
         setFatigueRate(1);
         setUseInjuryFatigue(true);
         setFieldKitchenCapacity(150);
+        setFieldKitchenIgnoreNonCombatants(true);
         setFatigueLeaveThreshold(13);
         //endregion Turnover and Retention
 
@@ -1536,6 +1538,14 @@ public class CampaignOptions {
 
     public void setFieldKitchenCapacity(final Integer fieldKitchenCapacity) {
         this.fieldKitchenCapacity = fieldKitchenCapacity;
+    }
+
+    public boolean isUseFieldKitchenIgnoreNonCombatants() {
+        return fieldKitchenIgnoreNonCombatants;
+    }
+
+    public void setFieldKitchenIgnoreNonCombatants (final boolean fieldKitchenIgnoreNonCombatants) {
+        this.fieldKitchenIgnoreNonCombatants = fieldKitchenIgnoreNonCombatants;
     }
 
     public Integer getFatigueLeaveThreshold() {
@@ -4606,6 +4616,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueRate", getFatigueRate());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useInjuryFatigue", isUseInjuryFatigue());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenCapacity", getFieldKitchenCapacity());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fieldKitchenIgnoreNonCombatants", isUseFieldKitchenIgnoreNonCombatants());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "fatigueLeaveThreshold", getFatigueLeaveThreshold());
         //endregion Retirement
 
@@ -5607,6 +5618,8 @@ public class CampaignOptions {
                     retVal.setUseInjuryFatigue(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenCapacity")) {
                     retVal.setFieldKitchenCapacity(Integer.parseInt(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("fieldKitchenIgnoreNonCombatants")) {
+                    retVal.setFieldKitchenIgnoreNonCombatants(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("fatigueLeaveThreshold")) {
                     retVal.setFatigueLeaveThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 //endregion Turnover and Retention
