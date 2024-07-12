@@ -379,6 +379,7 @@ public class CampaignOptions {
     private boolean useReeducationCamps;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
+    private boolean enableUnitEducation;
     private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
     private Double facultyXpRate;
@@ -885,6 +886,7 @@ public class CampaignOptions {
         setUseReeducationCamps(true);
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
+        setEnableUnitEducation(true);
         setEnableOverrideRequirements(false);
         setEnableShowIneligibleAcademies(true);
         setFacultyXpRate(1.00);
@@ -2710,6 +2712,14 @@ public class CampaignOptions {
 
     public void setEnablePrestigiousAcademies(boolean enablePrestigiousAcademies) {
         this.enablePrestigiousAcademies = enablePrestigiousAcademies;
+    }
+
+    public boolean isEnableUnitEducation() {
+        return enableUnitEducation;
+    }
+
+    public void setEnableUnitEducation(boolean enableUnitEducation) {
+        this.enableUnitEducation = enableUnitEducation;
     }
 
     public boolean isEnableOverrideRequirements() {
@@ -4684,6 +4694,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReeducationCamps", isUseReeducationCamps());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableUnitEducation", isEnableUnitEducation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableOverrideRequirements", isEnableOverrideRequirements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "facultyXpRate", getFacultyXpRate());
@@ -5434,6 +5445,8 @@ public class CampaignOptions {
                     retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
                     retVal.setEnablePrestigiousAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableUnitEducation")) {
+                    retVal.setEnableUnitEducation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableOverrideRequirements")) {
                     retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {

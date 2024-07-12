@@ -452,6 +452,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JCheckBox chkUseReeducationCamps;
     private JCheckBox chkEnableLocalAcademies;
     private JCheckBox chkEnablePrestigiousAcademies;
+    private JCheckBox chkEnableUnitEducation;
     private JCheckBox chkShowIneligibleAcademies;
     private JCheckBox chkEnableOverrideRequirements;
     private JCheckBox chkEnableBonuses;
@@ -6098,6 +6099,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             enableStandardSetsPanel.setEnabled(isEnabled);
             chkEnableLocalAcademies.setEnabled(isEnabled);
             chkEnablePrestigiousAcademies.setEnabled(isEnabled);
+            chkEnableUnitEducation.setEnabled(isEnabled);
 
             chkEnableOverrideRequirements.setEnabled(isEnabled);
             chkShowIneligibleAcademies.setEnabled(isEnabled);
@@ -6192,10 +6194,15 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkEnablePrestigiousAcademies.setToolTipText(resources.getString("chkEnablePrestigiousAcademies.toolTip"));
         chkEnablePrestigiousAcademies.setName("chkEnablePrestigiousAcademies");
 
+        chkEnableUnitEducation = new JCheckBox(resources.getString("chkEnableUnitEducation.text"));
+        chkEnableUnitEducation.setToolTipText(resources.getString("chkEnableUnitEducation.toolTip"));
+        chkEnableUnitEducation.setName("chkEnableUnitEducation");
+
         // these prevent a really annoying bug where disabled options don't stay disabled when
         // reloading Campaign Options
         chkEnableLocalAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
         chkEnablePrestigiousAcademies.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
+        chkEnableUnitEducation.setEnabled(campaign.getCampaignOptions().isUseEducationModule());
 
         // creating the layout
         final JPanel panel = new JPanel();
@@ -6211,12 +6218,14 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkEnableLocalAcademies)
                         .addComponent(chkEnablePrestigiousAcademies)
+                        .addComponent(chkEnableUnitEducation)
         );
 
         layout.setHorizontalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkEnableLocalAcademies)
                         .addComponent(chkEnablePrestigiousAcademies)
+                        .addComponent(chkEnableUnitEducation)
         );
 
         return panel;
@@ -8136,6 +8145,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseReeducationCamps.setSelected(options.isUseReeducationCamps());
         chkEnableLocalAcademies.setSelected(options.isEnableLocalAcademies());
         chkEnablePrestigiousAcademies.setSelected(options.isEnablePrestigiousAcademies());
+        chkEnableUnitEducation.setSelected(options.isEnableUnitEducation());
         chkEnableOverrideRequirements.setSelected(options.isEnableOverrideRequirements());
         chkShowIneligibleAcademies.setSelected(options.isEnableShowIneligibleAcademies());
         spnFacultyXpMultiplier.setValue(options.getFacultyXpRate());
@@ -8797,6 +8807,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseReeducationCamps(chkUseReeducationCamps.isSelected());
             options.setEnableLocalAcademies(chkEnableLocalAcademies.isSelected());
             options.setEnablePrestigiousAcademies(chkEnablePrestigiousAcademies.isSelected());
+            options.setEnableUnitEducation(chkEnableUnitEducation.isSelected());
             options.setEnableOverrideRequirements(chkEnableOverrideRequirements.isSelected());
             options.setEnableShowIneligibleAcademies(chkShowIneligibleAcademies.isSelected());
             options.setFacultyXpRate((Double) spnFacultyXpMultiplier.getValue());
