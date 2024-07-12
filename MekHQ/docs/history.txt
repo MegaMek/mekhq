@@ -9,6 +9,7 @@ MEKHQ VERSION HISTORY:
 + PR #4355: Spelling, typos, grammar, etc
 + PR #4356: Move munition config out of MHQ, use MM autoconfig code
 + FIX #4326, #4325: Corrected Admin Negotiation Experience Level Campaign Setting & Experience Level Calculations
++ PR #4378: Update autoconfig calls to explicitly set ground/space state from scenario data, not game or map info
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
