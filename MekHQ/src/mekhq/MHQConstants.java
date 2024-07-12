@@ -18,10 +18,10 @@
  */
 package mekhq;
 
-import megamek.SuiteConstants;
-
 import java.time.LocalDate;
 import java.time.Month;
+
+import megamek.SuiteConstants;
 
 /**
  * These are constants that hold across MekHQ.
@@ -113,6 +113,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String HEALED_INJURIES_BACKGROUND = "healedInjuriesBackground";
     public static final String PREGNANT_FOREGROUND = "pregnantForeground";
     public static final String PREGNANT_BACKGROUND = "pregnantBackground";
+    public static final String PAID_RETIREMENT_FOREGROUND = "paidRetirementForeground";
+    public static final String PAID_RETIREMENT_BACKGROUND = "paidRetirementBackground";
     public static final String STRATCON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
@@ -175,6 +177,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_SHORT_DEPLOYMENT = "nagShortDeployment";
     public static final String NAG_UNRESOLVED_STRATCON_CONTACTS = "nagUnresolvedStratConContacts";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
+    public static final String NAG_CARGO_CAPACITY = "nagCargoCapacity";
     public static final String NAG_INVALID_FACTION = "nagInvalidFaction";
     // endregion Nag Tab
 

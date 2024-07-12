@@ -21,7 +21,6 @@ package mekhq.campaign;
 import megamek.common.Entity;
 import megamek.common.Infantry;
 import megamek.common.UnitType;
-import mekhq.MekHQ;
 import mekhq.campaign.mission.Mission;
 import mekhq.campaign.mission.enums.MissionStatus;
 import mekhq.campaign.personnel.Person;
@@ -256,33 +255,16 @@ public class CampaignSummary {
      * A report that gives capacity and existing tonnage of all cargo
      * @return a <code>String</code> of the report
      */
-    public StringBuilder getCargoCapacityReport() {
-        int cargoTonsRounded = (int) Math.round(cargoTons);
-        int cargoCapacityRounded = (int) Math.round(cargoCapacity);
-        StringBuilder report = new StringBuilder("<html>");
+    public String getCargoCapacityReport() {
+        return (int) Math.round(cargoTons) + " tons (" + (int) Math.round(cargoCapacity) + " tons capacity)";
+    }
 
-        if (cargoTonsRounded > cargoCapacityRounded) {
-            report.append("<font color='")
-                    .append(MekHQ.getMHQOptions().getFontColorNegativeHexColor())
-                    .append("'>");
-        } else if (cargoTonsRounded == cargoCapacityRounded) {
-            report.append("<font color='")
-                    .append(MekHQ.getMHQOptions().getFontColorWarningHexColor())
-                    .append("'>");
-        }
+    public int getCargoTons() {
+        return (int) Math.round(cargoTons);
+    }
 
-        report.append(cargoTonsRounded)
-                .append(" tons (")
-                .append(cargoCapacityRounded)
-                .append(" tons capacity)");
-
-        if (!report.toString().equals(cargoTonsRounded + " tons (" + cargoCapacityRounded + " tons capacity)")) {
-            report.append("</font></html>");
-        } else {
-            report.append("</html>");
-        }
-
-        return report;
+    public int getCargoCapacity() {
+        return (int) Math.round(cargoCapacity);
     }
 
     /**

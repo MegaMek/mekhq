@@ -71,7 +71,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     // objectives panel
     private JPanel panObjectives;
-    List listObjectives;
+    java.awt.List listObjectives;
 
     // daily report
     private DailyReportLogPanel panLog;
@@ -95,7 +95,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panIcon;
     private JLabel lblIcon;
 
-    private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
+    private static final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
             MekHQ.getMHQOptions().getLocale());
 
     /**
@@ -313,7 +313,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new Insets(1, 5, 1, 5);
         panInfo.add(lblCargoSummaryHead, gridBagConstraints);
-        lblCargoSummary = new JLabel(getCampaign().getCampaignSummary().getCargoCapacityReport().toString());
+        lblCargoSummary = new JLabel(getCampaign().getCampaignSummary().getCargoCapacityReport());
         lblCargoSummaryHead.setLabelFor(lblCargoSummary);
         gridBagConstraints.gridx = 1;
         gridBagConstraints.weightx = 1.0;
@@ -345,7 +345,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private void initObjectivesPanel() {
         panObjectives = new JPanel(new BorderLayout());
         panObjectives.setBorder(BorderFactory.createTitledBorder(resourceMap.getString("panObjectives.title")));
-        listObjectives = new List();
+        listObjectives = new java.awt.List();
         for (String objective : getCampaign().getCurrentObjectives()) {
             listObjectives.add(objective);
         }
@@ -546,7 +546,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblMissionSuccess.setText(getCampaign().getCampaignSummary().getMissionSuccessReport());
         lblExperience.setText(getCampaign().getUnitRating().getAverageExperience().toString());
         lblComposition.setText(getCampaign().getCampaignSummary().getForceCompositionReport());
-        lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport().toString());
+        lblCargoSummary.setText(getCampaign().getCampaignSummary().getCargoCapacityReport());
         lblRepairStatus.setText(getCampaign().getCampaignSummary().getForceRepairReport());
         lblTransportCapacity.setText(getCampaign().getCampaignSummary().getTransportCapacity());
 
