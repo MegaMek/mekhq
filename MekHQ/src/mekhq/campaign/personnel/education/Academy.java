@@ -30,10 +30,7 @@ import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.enums.education.EducationLevel.Adapter;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.universe.RandomFactionGenerator;
+import mekhq.campaign.universe.*;
 
 import java.util.*;
 
@@ -726,29 +723,23 @@ public class Academy implements Comparable<Academy> {
         }
 
         Faction originFaction = person.getOriginFaction();
+        Faction campaignFaction = campaign.getFaction();
+        FactionHints hints = RandomFactionGenerator.getInstance().getFactionHints();
 
         for (String shortName : factions) {
-             Faction faction = Factions.getInstance().getFaction(shortName);
+            Faction faction = Factions.getInstance().getFaction(shortName);
 
-             if (isFactionRestricted) {
-                 if (Objects.equals(originFaction, faction)) {
-                     return faction.getShortName();
-                 }
+            if (isFactionRestricted) {
+                if (faction.equals(originFaction) || faction.equals(campaignFaction)) {
+                    return faction.getShortName();
+                }
+                continue;
+            }
 
-                 if (Objects.equals(campaign.getFaction(), faction)) {
-                     return faction.getShortName();
-                 }
-
-                 return null;
-             }
-
-             if (!RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(originFaction, faction, campaign.getLocalDate())) {
-                 return faction.getShortName();
-             }
-
-             if (!RandomFactionGenerator.getInstance().getFactionHints().isAtWarWith(campaign.getFaction(), faction, campaign.getLocalDate())) {
-                 return faction.getShortName();
-             }
+            if (!hints.isAtWarWith(originFaction, faction, campaign.getLocalDate())
+                    || !hints.isAtWarWith(campaignFaction, faction, campaign.getLocalDate())) {
+                return faction.getShortName();
+            }
         }
 
         return null;
