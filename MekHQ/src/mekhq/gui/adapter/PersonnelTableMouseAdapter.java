@@ -2627,7 +2627,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             String campus;
 
-            if (academy.isLocal()) {
+            if ((academy.isLocal()) || (academy.isHomeSchool())) {
                 campus = campaign.getCurrentSystem().getId();
             } else {
                 campus = academy.getLocationSystems().get(0);
@@ -2683,8 +2683,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             } else if (academy.isLocal()) {
                 // are any of the local academies accepting applicants from person's Faction or campaign's Faction?
-                String faction = academy.getFilteredFaction(campaign, person,
-                        campaign.getSystemById(campaign.getCurrentSystem().getId()).getFactions(campaign.getLocalDate()));
+                String faction = academy.getFilteredFaction(campaign, person, campaign.getSystemById(campaign.getCurrentSystem().getId()).getFactions(campaign.getLocalDate()));
 
                 if (faction == null) {
                     if (showIneligibleAcademies) {
@@ -2696,8 +2695,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     JMenu academyOption = new JMenu(academy.getName());
                     educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
 
-                    buildEducationSubMenus(campaign, academy, List.of(person), academyOption,  campaign.getCurrentSystem().getId(), campaign.getFaction().getShortName());
+                    buildEducationSubMenus(campaign, academy, List.of(person), academyOption, campaign.getCurrentSystem().getId(), faction);
                 }
+            } else if (academy.isHomeSchool()) {
+                JMenu academyOption = new JMenu(academy.getName());
+                educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
+
+                buildEducationSubMenus(campaign, academy, List.of(person), academyOption, campaign.getCurrentSystem().getId(), campaign.getFaction().getShortName());
             } else {
                 // what campuses are accepting applicants?
                 List<String> campuses = new ArrayList<>();
@@ -2756,7 +2760,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             String campus;
 
-            if (academy.isLocal()) {
+            if ((academy.isLocal()) || (academy.isHomeSchool())) {
                 campus = campaign.getCurrentSystem().getId();
             } else {
                 campus = academy.getLocationSystems().get(0);
@@ -2780,7 +2784,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 && (campaign.getGameYear() < academy.getClosureYear())) {
 
             // is the planet populated?
-            if (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) == 0) {
+            if ((campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) == 0) && (!academy.isHomeSchool())) {
                 return;
             }
 
@@ -2809,8 +2813,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     JMenu academyOption = new JMenu(academy.getName());
                     educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
 
-                    buildEducationSubMenus(campaign, academy, personnel, academyOption, campaign.getCurrentSystem().getId(), campaign.getFaction().getShortName());
+                    buildEducationSubMenus(campaign, academy, personnel, academyOption, campaign.getCurrentSystem().getId(), String.valueOf(suitableFaction));
                 }
+            } else if (academy.isHomeSchool()) {
+                JMenu academyOption = new JMenu(academy.getName());
+                educationJMenuAdder(academy, militaryMenu, civilianMenu, academyOption);
+
+                buildEducationSubMenus(campaign, academy, personnel, academyOption, campaign.getCurrentSystem().getId(), campaign.getFaction().getShortName());
             } else {
                 // find the campuses that accept applications from all members of the group
                 List<String> suitableCampuses = personnel.stream()
@@ -2889,7 +2898,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     String course = academy.getQualifications().get(courseIndex);
                     courses = new JMenuItem(course);
 
-                    if (academy.isLocal()) {
+                    if ((academy.isLocal()) || (academy.isHomeSchool())) {
                         courses.setToolTipText(academy.getTooltip(campaign, personnel, courseIndex, campaign.getCurrentSystem()));
                         courses.setActionCommand(makeCommand(CMD_BEGIN_EDUCATION, academy.getSet(), academy.getName(), String.valueOf(courseIndex), campaign.getCurrentSystem().getId(), faction));
                     } else {
