@@ -92,7 +92,7 @@
         <type>Basic Training</type>
         <isMilitary>true</isMilitary>
         <description>In-house training is usually conducted by the unit's more experienced members. This training ensures that new members are well-prepared, cohesive, and loyal to the unit's unique culture and combat style.</description>
-        <isLocal>true</isLocal>
+        <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>1250</tuition>
@@ -119,7 +119,7 @@
         <type>Basic Training</type>
         <isMilitary>true</isMilitary>
         <description>In-house training is usually conducted by the unit's more experienced members. Trainees undergo physical conditioning, simulator exercises, and eventually hands-on training in their chosen field.</description>
-        <isLocal>true</isLocal>
+        <isHomeSchool>true</isHomeSchool>
         <locationSystem>Terra</locationSystem>
         <constructionYear>2300</constructionYear>
         <tuition>1250</tuition>
