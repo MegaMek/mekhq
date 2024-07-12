@@ -1536,6 +1536,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
 
+                if (academySetNames.contains("Unit Education")) {
+                    if (!campaign.getCampaignOptions().isEnableUnitEducation()) {
+                        academySetNames.remove("Unit Education");
+                    }
+                }
+
                 // We then start processing the remaining academy sets
                 for (String setName : academySetNames) {
                     JMenu setAcademyMenu = new JMenu(setName);
