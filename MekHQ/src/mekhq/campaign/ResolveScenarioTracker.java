@@ -1401,8 +1401,7 @@ public class ResolveScenarioTracker {
 
             MekHQ.triggerEvent(new PersonBattleFinishedEvent(person, status));
             if (status.getHits() > person.getHits()) {
-                if ((campaign.getCampaignOptions().isUseFatigue())
-                        && (campaign.getCampaignOptions().isUseInjuryFatigue())) {
+                if (campaign.getCampaignOptions().isUseInjuryFatigue()) {
                     person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate() * (status.getHits() - person.getHits()));
                 }
 
