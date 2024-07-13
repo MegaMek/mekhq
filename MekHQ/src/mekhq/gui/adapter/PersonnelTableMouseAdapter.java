@@ -141,6 +141,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_RECRUIT = "RECRUIT";
     private static final String CMD_ABTAKHA = "ABTAKHA";
     private static final String CMD_RANSOM = "RANSOM";
+    private static final String CMD_RANSOM_FRIENDLY = "RANSOM_FRIENDLY";
 
     // MechWarrior Edge Options
     private static final String OPT_EDGE_MASC_FAILURE = "edge_when_masc_fails";
@@ -680,6 +681,33 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     gui.getCampaign().addFunds(TransactionType.RANSOM, total, resources.getString("ransom.text"));
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person, false);
+                    }
+                }
+                break;
+            }
+            case CMD_RANSOM_FRIENDLY: {
+                Money total = Money.zero();
+                total = total.plus(Arrays.stream(people)
+                        .map(person -> person.getRansomValue(gui.getCampaign()))
+                        .collect(Collectors.toList()));
+
+                if (gui.getCampaign().getFunds().isLessThan(total)) {
+                    gui.getCampaign().addReport(String.format(resources.getString("unableToRansom.format"),
+                            people.length,
+                            total.toAmountAndSymbolString()));
+                    break;
+                }
+
+                if (0 == JOptionPane.showConfirmDialog(
+                        null,
+                        String.format(resources.getString("ransomQ.format"), people.length, total.toAmountAndSymbolString()),
+                        resources.getString("ransom.text"),
+                        JOptionPane.YES_NO_OPTION)) {
+                    gui.getCampaign().addReport(String.format(resources.getString("ransomReport.format"),
+                            people.length, total.toAmountAndSymbolString()));
+                    gui.getCampaign().removeFunds(TransactionType.RANSOM, total, resources.getString("ransom.text"));
+                    for (Person person : people) {
+                        person.changeStatus(gui.getCampaign(), gui.getCampaign().getLocalDate(), PersonnelStatus.ACTIVE);
                     }
                 }
                 break;
@@ -1286,6 +1314,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPrisoners(selected)) {
+            popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
+        }
+
+        if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPow(selected)) {
             popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
         }
 
