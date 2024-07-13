@@ -21,6 +21,30 @@
  */
 package mekhq;
 
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Window;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import javax.swing.InputMap;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.text.DefaultEditorKit;
+
+import org.apache.logging.log4j.LogManager;
+
 import io.sentry.Sentry;
 import megamek.MegaMek;
 import megamek.SuiteConstants;
@@ -47,7 +71,6 @@ import mekhq.campaign.mission.AtBScenario;
 import mekhq.campaign.mission.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.stratcon.StratconRulesManager;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
@@ -58,21 +81,6 @@ import mekhq.gui.preferences.StringPreference;
 import mekhq.gui.utilities.ObservableString;
 import mekhq.service.AutosaveService;
 import mekhq.service.IAutosaveService;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.text.DefaultEditorKit;
-import java.awt.*;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
 
 /**
  * The main class of the application.
@@ -542,14 +550,6 @@ public class MekHQ implements GameListener {
 
                 AutoAwardsController autoAwardsController = new AutoAwardsController();
                 autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills);
-            }
-
-            for (UUID personId : tracker.getPeopleStatus().keySet()) {
-                Person person = getCampaign().getPerson(personId);
-
-                if (person.getStatus() == PersonnelStatus.MIA && !control) {
-                    person.changeStatus(campaignGUI.getCampaign(), campaignGUI.getCampaign().getLocalDate(), PersonnelStatus.POW);
-                }
             }
 
             // we need to trigger ScenarioResolvedEvent before stopping the thread or
