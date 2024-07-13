@@ -29,6 +29,7 @@ import mekhq.campaign.mission.Contract;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationOptions;
 import mekhq.campaign.universe.companyGeneration.CompanyGenerationPersonTracker;
@@ -145,6 +146,11 @@ public class CompanyGenerationDialog extends AbstractMHQValidationButtonDialog {
         generator.applyPhaseThreeToCampaign(getCampaign(), trackers, units, parts, armour, ammunition, contract);
 
         MekHQ.triggerEvent(new OrganizationChangedEvent(getCompanyGenerationOptionsPanel().getCampaign().getForces()));
+
+        if (campaign.getCampaignOptions().isEnableAutoAwards()) {
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+            autoAwardsController.ManualController(campaign, false);
+        }
     }
 
     @Override
