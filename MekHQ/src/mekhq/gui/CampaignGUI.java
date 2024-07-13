@@ -1223,7 +1223,7 @@ public class CampaignGUI extends JPanel {
     public void showAwardEligibilityDialog() {
         AutoAwardsController autoAwardsController = new AutoAwardsController();
 
-        autoAwardsController.ManualController(getCampaign());
+        autoAwardsController.ManualController(getCampaign(), true);
     }
 
     private static void enableFullScreenMode(Window window) {
@@ -1613,10 +1613,10 @@ public class CampaignGUI extends JPanel {
                 if (getCampaign().isWorkingOnRefit(tech) || tech.isEngineer()) {
                     continue;
                 }
-                name = tech.getFullName() + ", " + tech.getSkillLevel(getCampaign(), false) + " "
+                name = tech.getFullName() + ", " + tech.getSkillLevel(getCampaign(), false) + ' '
                         + tech.getPrimaryRoleDesc() + " ("
                         + getCampaign().getTargetFor(r, tech).getValueAsString() + "+), "
-                        + tech.getMinutesLeft() + "/" + tech.getDailyAvailableTechTime() + " minutes";
+                        + tech.getMinutesLeft() + '/' + tech.getDailyAvailableTechTime() + " minutes";
                 techHash.put(name, tech);
                 if (tech.isRightTechTypeFor(r)) {
                     techList.add(lastRightTech++, name);
@@ -1673,7 +1673,7 @@ public class CampaignGUI extends JPanel {
         }
         if (0 != JOptionPane
                 .showConfirmDialog(null, RefitRefurbish
-                                + r.getUnit().getName() + "?", "Proceed?",
+                                + r.getUnit().getName() + '?', "Proceed?",
                         JOptionPane.YES_NO_OPTION)) {
             return;
         }
@@ -1729,7 +1729,7 @@ public class CampaignGUI extends JPanel {
         Object[] nameArray = techHash.keySet().toArray();
 
         String s = (String) JOptionPane.showInputDialog(frame,
-                "Which tech should work on " + desc + "?", "Select Tech",
+                "Which tech should work on " + desc + '?', "Select Tech",
                 JOptionPane.PLAIN_MESSAGE, null, nameArray, nameArray[0]);
         if (null == s) {
             return null;
@@ -1782,7 +1782,7 @@ public class CampaignGUI extends JPanel {
                     dialogTitle,
                     format,
                     MekHQ.getPersonnelDirectory().getValue(),
-                    filename + "." + format.getRecommendedExtension())
+                    filename + '.' + format.getRecommendedExtension())
                     .ifPresent(f -> {
                         MekHQ.getPersonnelDirectory().setValue(f.getParent());
                         File file = checkFileEnding(f, format.getRecommendedExtension());
@@ -1814,7 +1814,7 @@ public class CampaignGUI extends JPanel {
                     dialogTitle,
                     format,
                     MekHQ.getUnitsDirectory().getValue(),
-                    filename + "." + format.getRecommendedExtension())
+                    filename + '.' + format.getRecommendedExtension())
                     .ifPresent(f -> {
                         MekHQ.getUnitsDirectory().setValue(f.getParent());
                         File file = checkFileEnding(f, format.getRecommendedExtension());
@@ -1846,7 +1846,7 @@ public class CampaignGUI extends JPanel {
                     dialogTitle,
                     format,
                     MekHQ.getFinancesDirectory().getValue(),
-                    filename + "." + format.getRecommendedExtension())
+                    filename + '.' + format.getRecommendedExtension())
                     .ifPresent(f -> {
                         MekHQ.getFinancesDirectory().setValue(f.getParent());
                         File file = checkFileEnding(f, format.getRecommendedExtension());
@@ -1888,8 +1888,8 @@ public class CampaignGUI extends JPanel {
      */
     private File checkFileEnding(File file, String format) {
         String path = file.getPath();
-        if (!path.endsWith("." + format)) {
-            path += "." + format;
+        if (!path.endsWith('.' + format)) {
+            path += '.' + format;
             file = new File(path);
         }
         return file;
@@ -1962,7 +1962,7 @@ public class CampaignGUI extends JPanel {
                 Person p = Person.generateInstanceFromXML(wn2, getCampaign(), version);
                 if ((p != null) && (getCampaign().getPerson(p.getId()) != null)) {
                     LogManager.getLogger().error("ERROR: Cannot load person who exists, ignoring. (Name: "
-                            + p.getFullName() + ", Id " + p.getId() + ")");
+                            + p.getFullName() + ", Id " + p.getId() + ')');
                     p = null;
                 }
 

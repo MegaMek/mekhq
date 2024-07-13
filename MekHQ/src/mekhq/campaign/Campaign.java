@@ -3642,6 +3642,11 @@ public class Campaign implements ITechManager {
             processEducationNewDay();
         }
 
+        if ((campaignOptions.isEnableAutoAwards()) && (getLocalDate().getDayOfMonth() == 1)) {
+            AutoAwardsController autoAwardsController = new AutoAwardsController();
+            autoAwardsController.ManualController(this, false);
+        }
+
         resetAstechMinutes();
 
         processNewDayUnits();
