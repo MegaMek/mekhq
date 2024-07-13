@@ -138,6 +138,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
     private static final String CMD_IMPRISON = "IMPRISON";
     private static final String CMD_FREE = "FREE";
+    private static final String CMD_EXECUTE = "EXECUTE";
+    private static final String CMD_JETTISON = "JETTISON";
     private static final String CMD_RECRUIT = "RECRUIT";
     private static final String CMD_ABTAKHA = "ABTAKHA";
     private static final String CMD_RANSOM = "RANSOM";
@@ -633,13 +635,37 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_FREE: {
-                // TODO: Warn in particular for "freeing" in deep space, leading to Geneva Conventions violation (#1400 adding Crime to MekHQ)
-                // TODO: Record the people into some NPC pool, if still alive
                 String title = (people.length == 1) ? people[0].getFullTitle()
                         : String.format(resources.getString("numPrisoners.text"), people.length);
                 if (0 == JOptionPane.showConfirmDialog(null,
                         String.format(resources.getString("confirmFree.format"), title),
                         resources.getString("freeQ.text"),
+                        JOptionPane.YES_NO_OPTION)) {
+                    for (Person person : people) {
+                        gui.getCampaign().removePerson(person);
+                    }
+                }
+                break;
+            }
+            case CMD_EXECUTE: {
+                String title = (people.length == 1) ? people[0].getFullTitle()
+                        : String.format(resources.getString("numPrisoners.text"), people.length);
+                if (0 == JOptionPane.showConfirmDialog(null,
+                        String.format(resources.getString("confirmExecute.format"), title),
+                        resources.getString("executeQ.text"),
+                        JOptionPane.YES_NO_OPTION)) {
+                    for (Person person : people) {
+                        gui.getCampaign().removePerson(person);
+                    }
+                }
+                break;
+            }
+            case CMD_JETTISON: {
+                String title = (people.length == 1) ? people[0].getFullTitle()
+                        : String.format(resources.getString("numPrisoners.text"), people.length);
+                if (0 == JOptionPane.showConfirmDialog(null,
+                        String.format(resources.getString("confirmJettison.format"), title),
+                        resources.getString("jettisonQ.text"),
                         JOptionPane.YES_NO_OPTION)) {
                     for (Person person : people) {
                         gui.getCampaign().removePerson(person);
@@ -1281,8 +1307,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if (StaticChecks.areAnyFree(selected)) {
             popup.add(newMenuItem(resources.getString("imprison.text"), CMD_IMPRISON));
         } else {
-            // If none are free, then we can put the Free option
-            popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
+            if (gui.getCampaign().getLocation().isOnPlanet()) {
+                popup.add(newMenuItem(resources.getString("free.text"), CMD_FREE));
+                popup.add(newMenuItem(resources.getString("execute.text"), CMD_EXECUTE));
+            } else {
+                popup.add(newMenuItem(resources.getString("jettison.text"), CMD_JETTISON));
+            }
         }
 
         if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPrisoners(selected)) {
