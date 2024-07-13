@@ -21,6 +21,7 @@
 package mekhq.campaign.personnel.autoAwards;
 
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.mission.AtBContract;
@@ -33,6 +34,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.AutoAwardsDialog;
 import org.apache.logging.log4j.LogManager;
 
+import javax.swing.*;
 import java.awt.Dialog.ModalityType;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -72,9 +74,17 @@ public class AutoAwardsController {
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, false, null);
+            ProcessAwards(personnel, false, null, true);
         } else {
             LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
+
+            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
+                    MekHQ.getMHQOptions().getLocale());
+
+            JOptionPane.showMessageDialog(null,
+                    resources.getString("txtNoneEligible.text"),
+                    resources.getString("AutoAwardsDialog.title"),
+                    JOptionPane.INFORMATION_MESSAGE);
         }
 
         LogManager.getLogger().info("autoAwards (Manual) has finished");
@@ -100,7 +110,7 @@ public class AutoAwardsController {
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, missionWasSuccessful, null);
+            ProcessAwards(personnel, missionWasSuccessful, null, false);
         } else {
             LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
@@ -182,7 +192,7 @@ public class AutoAwardsController {
         // we have to do multiple isEmpty() checks as, at any point in the removal process, we could end up with null personnel
         if (!personnel.isEmpty()) {
             // This is the main workhorse function
-            ProcessAwards(personnel, false, academyAttributes);
+            ProcessAwards(personnel, false, academyAttributes, false);
         } else {
             LogManager.getLogger().info("AutoAwards found no personnel, skipping the Award Ceremony");
         }
@@ -514,8 +524,9 @@ public class AutoAwardsController {
      * @param personnel               the List of personnel to process awards for
      * @param missionWasSuccessful    true if the mission was successful, false otherwise
      * @param academyAttributes       a map of academy attributes, null if not processing graduation awards
+     * @param isManualPrompt          whether autoAwards was triggered manually
      */
-    private void ProcessAwards(List<UUID> personnel, Boolean missionWasSuccessful, @Nullable HashMap<UUID, List<Object>> academyAttributes) {
+    private void ProcessAwards(List<UUID> personnel, Boolean missionWasSuccessful, @Nullable HashMap<UUID, List<Object>> academyAttributes, boolean isManualPrompt) {
         Map<Integer, Map<Integer, List<Object>>> allAwardData = new HashMap<>();
         Map<Integer, List<Object>> processedData;
         int allAwardDataKey = 0;
@@ -626,6 +637,16 @@ public class AutoAwardsController {
             autoAwardsDialog.setVisible(true);
         } else {
             LogManager.getLogger().info("Zero personnel were found eligible for Awards");
+
+            final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
+                    MekHQ.getMHQOptions().getLocale());
+
+            if (isManualPrompt) {
+                JOptionPane.showMessageDialog(null,
+                        resources.getString("txtNoneEligible.text"),
+                        resources.getString("AutoAwardsDialog.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
 
