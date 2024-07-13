@@ -973,9 +973,13 @@ public class Person {
             case DESERTED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
                 ServiceLogger.deserted(this, today);
+
                 if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
                     setRetirement(today);
                 }
+
+                refreshLoyalty(campaign);
+
                 break;
             case DEFECTED:
                 campaign.addReport(String.format(status.getReportText(), getHyperlinkedFullTitle()));
@@ -983,6 +987,9 @@ public class Person {
                 if (campaign.getCampaignOptions().isUseRetirementDateTracking()) {
                     setRetirement(today);
                 }
+
+                refreshLoyalty(campaign);
+
                 break;
             case PREGNANCY_COMPLICATIONS:
                 campaign.getProcreation().processPregnancyComplications(campaign, campaign.getLocalDate(), this);
@@ -1000,10 +1007,12 @@ public class Person {
 
         if (status.isDead()) {
             setDateOfDeath(today);
-            // Don't forget to tell the spouse
+            // Remember to tell the spouse
             if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse().getStatus().isDeadOrMIA()) {
                 campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), getGenealogy().getSpouse());
             }
+
+            refreshLoyalty(campaign);
         }
 
         if (status.isActive()) {
@@ -1041,6 +1050,22 @@ public class Person {
         this.setEduDaysOfTravel(0);
 
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
+    }
+
+    private void refreshLoyalty(Campaign campaign) {
+        if (isCommander()) {
+            if (campaign.getCampaignOptions().isUseLeadershipChangeRefresh()) {
+                for (Person person : campaign.getPersonnel()) {
+                    if (person.getStatus().isDepartedUnit()) {
+                        continue;
+                    }
+                    if (person.getPrisonerStatus().isCurrentPrisoner()) {
+                        continue;
+                    }
+                    person.setLoyalty(Compute.d6(3));
+                }
+            }
+        }
     }
 
     /**
