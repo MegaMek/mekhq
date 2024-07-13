@@ -112,53 +112,28 @@ public class RetirementTableModel extends AbstractTableModel {
     }
 
     public int getColumnWidth(int c) {
-        switch (c) {
-            case COL_PERSON:
-            case COL_ASSIGN:
-            case COL_FORCE:
-            case COL_UNIT:
-                return 70;
-            case COL_BONUS_COST:
-            case COL_PAYOUT:
-            case COL_TARGET:
-            case COL_SHARES:
-            case COL_MISC_MOD:
-                return 50;
-            case COL_PAY_BONUS:
-            default:
-                return 20;
-        }
+        return switch (c) {
+            case COL_PERSON, COL_ASSIGN, COL_FORCE, COL_UNIT -> 70;
+            case COL_BONUS_COST, COL_PAYOUT, COL_TARGET, COL_SHARES, COL_MISC_MOD -> 50;
+            default -> 20;
+        };
     }
 
     public int getAlignment(int col) {
-        switch (col) {
-            case COL_PERSON:
-                return SwingConstants.LEFT;
-            case COL_ASSIGN:
-            case COL_FORCE:
-            case COL_UNIT:
-            case COL_BONUS_COST:
-            case COL_PAYOUT:
-            case COL_TARGET:
-            case COL_PAY_BONUS:
-            case COL_SHARES:
-            case COL_MISC_MOD:
-            default:
-                return SwingConstants.CENTER;
+        if (col == COL_PERSON) {
+            return SwingConstants.LEFT;
+        } else {
+            return SwingConstants.CENTER;
         }
     }
 
     @Override
     public boolean isCellEditable(int row, int col) {
-        switch (col) {
-            case COL_PAYOUT:
-                return editPayout;
-            case COL_PAY_BONUS:
-            case COL_MISC_MOD:
-                return true;
-            default:
-                return false;
-        }
+        return switch (col) {
+            case COL_PAYOUT -> editPayout;
+            case COL_PAY_BONUS, COL_MISC_MOD -> true;
+            default -> false;
+        };
     }
 
     @Override
@@ -236,7 +211,9 @@ public class RetirementTableModel extends AbstractTableModel {
             case COL_BONUS_COST:
                 Money bonusCost = RetirementDefectionTracker.getPayoutOrBonusValue(campaign, p);
 
-                if (campaign.getCampaignOptions().getTurnoverFrequency().isMonthly()) {
+                if (campaign.getCampaignOptions().getTurnoverFrequency().isQuarterly()) {
+                    return bonusCost.dividedBy(3).toAmountAndSymbolString();
+                } else if (campaign.getCampaignOptions().getTurnoverFrequency().isMonthly()) {
                     return bonusCost.dividedBy(12).toAmountAndSymbolString();
                 } else if (campaign.getCampaignOptions().getTurnoverFrequency().isWeekly()) {
                     return bonusCost.dividedBy(52).toAmountAndSymbolString();
