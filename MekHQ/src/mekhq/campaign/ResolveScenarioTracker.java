@@ -702,8 +702,7 @@ public class ResolveScenarioTracker {
                     continue;
                 }
                 // Now let's see how many passengers and crew we picked up
-                if (e instanceof SmallCraft) {
-                    SmallCraft craft = (SmallCraft) e;
+                if (e instanceof SmallCraft craft) {
                     if (craft.getPassengers().get(en.getExternalIdAsString()) != null) {
                         rescuedPassengers += craft.getPassengers().get(en.getExternalIdAsString());
                     }
@@ -711,8 +710,7 @@ public class ResolveScenarioTracker {
                     if (craft.getNOtherCrew().get(en.getExternalIdAsString()) != null) {
                         rescuedCrew += craft.getNOtherCrew().get(en.getExternalIdAsString());
                     }
-                } else if (e instanceof EjectedCrew) {
-                    EjectedCrew crew = (EjectedCrew) e;
+                } else if (e instanceof EjectedCrew crew) {
                     if (crew.getPassengers().get(en.getExternalIdAsString()) != null) {
                         rescuedPassengers += crew.getPassengers().get(en.getExternalIdAsString());
                     }
@@ -1283,8 +1281,7 @@ public class ResolveScenarioTracker {
 
         // if it's an AtB scenario, load up all the bot units into the entities collection
         // for objective processing
-        if (scenario instanceof AtBScenario) {
-            AtBScenario atbScenario = (AtBScenario) scenario;
+        if (scenario instanceof AtBScenario atbScenario) {
             for (Entity e : atbScenario.getAlliesPlayer()) {
                 entities.put(UUID.fromString(e.getExternalIdAsString()), e);
             }
@@ -1432,7 +1429,10 @@ public class ResolveScenarioTracker {
 
             if (!status.isDead()) {
                 person.increaseFatigue(campaign.getCampaignOptions().getFatigueRate());
-                Fatigue.processFatigueActions(campaign, person);
+
+                if (campaign.getCampaignOptions().isUseFatigue()) {
+                    Fatigue.processFatigueActions(campaign, person);
+                }
             }
 
             if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
@@ -1514,7 +1514,7 @@ public class ResolveScenarioTracker {
                     prisonerRansoms, "Prisoner ransoms for " + getScenario().getName());
             getCampaign().addReport(prisonerRansoms.toAmountAndSymbolString()
                     + " has been credited to your account for prisoner ransoms following "
-                    + getScenario().getName() + ".");
+                    + getScenario().getName() + '.');
         }
         //endregion Prisoners
 
@@ -1614,7 +1614,7 @@ public class ResolveScenarioTracker {
                         unitRansoms, "Unit sales for " + getScenario().getName());
                 getCampaign().addReport(unitRansoms.toAmountAndSymbolString()
                         + " has been credited to your account from unit salvage sold following "
-                        + getScenario().getName() + ".");
+                        + getScenario().getName() + '.');
                 if (isContract) {
                     ((Contract) mission).addSalvageByUnit(unitRansoms);
                 }
@@ -1825,11 +1825,7 @@ public class ResolveScenarioTracker {
 
         public void setHits(int h) {
             hits = h;
-            if (hits >= 6) {
-                setDead(true);
-            } else {
-                setDead(false);
-            }
+            setDead(hits >= 6);
         }
 
         public boolean isDead() {
@@ -1978,7 +1974,7 @@ public class ResolveScenarioTracker {
         }
 
         public String getLookupName() {
-            String s = chassis + " " + model;
+            String s = chassis + ' ' + model;
             s = s.trim();
             return s;
         }
