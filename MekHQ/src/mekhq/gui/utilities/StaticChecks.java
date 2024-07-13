@@ -339,10 +339,6 @@ public class StaticChecks {
         return Stream.of(people).allMatch(p -> p.getPrisonerStatus().isCurrentPrisoner());
     }
 
-    public static boolean areAllPow(Person... people) {
-        return Stream.of(people).allMatch(p -> p.getStatus().isPoW());
-    }
-
     public static boolean areAnyWillingToDefect(Person... people) {
         return Stream.of(people).anyMatch(p -> p.getPrisonerStatus().isPrisonerDefector());
     }
