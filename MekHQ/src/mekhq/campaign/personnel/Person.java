@@ -1004,6 +1004,11 @@ public class Person {
             if (getGenealogy().hasSpouse() && !getGenealogy().getSpouse().getStatus().isDeadOrMIA()) {
                 campaign.getDivorce().widowed(campaign, campaign.getLocalDate(), getGenealogy().getSpouse());
             }
+
+            // release the commander flag.
+            if (isCommander()) {
+                setCommander(false);
+            }
         }
 
         if (status.isActive()) {
