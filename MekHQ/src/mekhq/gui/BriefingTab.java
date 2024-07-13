@@ -24,7 +24,6 @@ import megamek.client.ui.baseComponents.MMComboBox;
 import megamek.common.Entity;
 import megamek.common.EntityListFile;
 import megamek.common.Game;
-import megamek.common.Team;
 import megamek.common.annotations.Nullable;
 import megamek.common.containers.MunitionTree;
 import megamek.common.event.Subscribe;
@@ -46,6 +45,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -67,7 +67,6 @@ import java.awt.*;
 import java.io.File;
 import java.util.List;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 
@@ -127,11 +126,10 @@ public final class BriefingTab extends CampaignGuiTab {
     public void initTab() {
         final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
                 MekHQ.getMHQOptions().getLocale());
-        GridBagConstraints gridBagConstraints;
 
         panMission = new JPanel(new GridBagLayout());
 
-        gridBagConstraints = new GridBagConstraints();
+        GridBagConstraints gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = GridBagConstraints.NONE;
@@ -410,9 +408,8 @@ public final class BriefingTab extends CampaignGuiTab {
 
         if (getCampaign().getCampaignOptions().isUseAtB() && (mission instanceof AtBContract)) {
             ((AtBContract) mission).checkForFollowup(getCampaign());
+            bonusPartExchange((AtBContract) mission);
         }
-
-        bonusPartExchange((AtBContract) mission);
 
         if (getCampaign().getCampaignOptions().isEnableAutoAwards()) {
             AutoAwardsController autoAwardsController = new AutoAwardsController();
@@ -568,6 +565,14 @@ public final class BriefingTab extends CampaignGuiTab {
             autoAwardsController.PostScenarioController(getCampaign(), personnel, scenarioKills);
         }
 
+        for (UUID personId : tracker.getPeopleStatus().keySet()) {
+            Person person = getCampaign().getPerson(personId);
+
+            if (person.getStatus() == PersonnelStatus.MIA && !control) {
+                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.POW);
+            }
+        }
+
         MekHQ.triggerEvent(new ScenarioResolvedEvent(scenario));
     }
 
@@ -589,7 +594,7 @@ public final class BriefingTab extends CampaignGuiTab {
         final List<Unit> units = unitIds.stream()
                 .map(unitId -> getCampaign().getUnit(unitId))
                 .filter(unit -> (unit != null) && (unit.getEntity() != null))
-                .collect(Collectors.toList());
+                .toList();
 
         final List<Entity> chosen = new ArrayList<>();
         final StringBuilder undeployed = new StringBuilder();
@@ -603,7 +608,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (undeployed.length() > 0) {
+        if (!undeployed.isEmpty()) {
             final Object[] options = { "Continue", "Cancel" };
             if (JOptionPane.showOptionDialog(getFrame(),
                     "The following units could not be deployed:" + undeployed,
@@ -621,7 +626,7 @@ public final class BriefingTab extends CampaignGuiTab {
         // add bot forces
         chosen.addAll(scenario.getBotForces().stream()
                 .flatMap(botForce -> botForce.getFullEntityList(getCampaign()).stream())
-                .collect(Collectors.toList()));
+                .toList());
 
         if (!chosen.isEmpty()) {
             UnitPrintManager.printAllUnits(chosen, true);
@@ -667,7 +672,7 @@ public final class BriefingTab extends CampaignGuiTab {
                     chosen.add(u);
 
                 } else {
-                    undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
+                    undeployed.append('\n').append(u.getName()).append(" (").append(u.checkDeployment()).append(')');
                 }
             }
         }
@@ -678,7 +683,7 @@ public final class BriefingTab extends CampaignGuiTab {
             AtBDynamicScenarioFactory.setPlayerDeploymentZones((AtBDynamicScenario) scenario, getCampaign());
         }
 
-        if (undeployed.length() > 0) {
+        if (!undeployed.isEmpty()) {
             Object[] options = { "Continue", "Cancel" };
             int n = JOptionPane.showOptionDialog(getFrame(),
                     "The following units could not be deployed:" + undeployed, "Could not deploy some units",
@@ -743,13 +748,12 @@ public final class BriefingTab extends CampaignGuiTab {
         String opforFactionCode = "IS";
         String allyFaction = "IS";
         int opforQuality = RATING_5;
-        HashMap<Integer, ArrayList<Entity>> botTeamMappings = new HashMap<Integer, ArrayList<Entity>>();
+        HashMap<Integer, ArrayList<Entity>> botTeamMappings = new HashMap<>();
         int allowedYear = cGame.getOptions().intOption(OptionsConstants.ALLOWED_YEAR);
 
         // This had better be an AtB contract...
         final Mission mission = comboMission.getSelectedItem();
-        if (mission instanceof AtBContract) {
-            AtBContract atbc = (AtBContract) mission;
+        if (mission instanceof AtBContract atbc) {
             opforFactionCode = atbc.getEnemyCode();
             opforQuality = atbc.getEnemyQuality();
             allyFactionCodes.add(atbc.getEmployerCode());
@@ -830,12 +834,12 @@ public final class BriefingTab extends CampaignGuiTab {
                     chosen.add(u);
 
                 } else {
-                    undeployed.append("\n").append(u.getName()).append(" (").append(u.checkDeployment()).append(")");
+                    undeployed.append('\n').append(u.getName()).append(" (").append(u.checkDeployment()).append(')');
                 }
             }
         }
 
-        if (undeployed.length() > 0) {
+        if (!undeployed.isEmpty()) {
             Object[] options = { "Continue", "Cancel" };
             int n = JOptionPane.showOptionDialog(getFrame(),
                     "The following units could not be deployed:" + undeployed, "Could not deploy some units",
@@ -868,7 +872,7 @@ public final class BriefingTab extends CampaignGuiTab {
         final List<Unit> units = unitIds.stream()
                 .map(unitId -> getCampaign().getUnit(unitId))
                 .filter(unit -> (unit != null) && (unit.getEntity() != null))
-                .collect(Collectors.toList());
+                .toList();
 
         final ArrayList<Entity> chosen = new ArrayList<>();
         final StringBuilder undeployed = new StringBuilder();
@@ -882,7 +886,7 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
-        if (undeployed.length() > 0) {
+        if (!undeployed.isEmpty()) {
             final Object[] options = { "Continue", "Cancel" };
             if (JOptionPane.showOptionDialog(getFrame(),
                     "The following units could not be deployed:" + undeployed,
@@ -1077,8 +1081,7 @@ public final class BriefingTab extends CampaignGuiTab {
     public void handle(ScenarioChangedEvent evt) {
         final Mission mission = comboMission.getSelectedItem();
         if ((evt.getScenario() != null)
-                && (((mission == null) && (evt.getScenario().getMissionId() == -1))
-                || (mission != null) && (evt.getScenario().getMissionId() == mission.getId()))) {
+                && (mission == null ? evt.getScenario().getMissionId() == -1 : evt.getScenario().getMissionId() == mission.getId())) {
             scenarioTable.repaint();
             if (evt.getScenario().getId() == selectedScenario) {
                 scenarioViewScheduler.schedule();
