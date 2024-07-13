@@ -1318,7 +1318,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         if (gui.getCampaign().getCampaignOptions().isUseAtBPrisonerRansom() && StaticChecks.areAllPow(selected)) {
-            popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM));
+            popup.add(newMenuItem(resources.getString("ransom.text"), CMD_RANSOM_FRIENDLY));
         }
 
         if (StaticChecks.areAnyWillingToDefect(selected)) {
