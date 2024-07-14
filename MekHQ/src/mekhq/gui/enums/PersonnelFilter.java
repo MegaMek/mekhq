@@ -494,7 +494,7 @@ public enum PersonnelFilter {
             case ON_LEAVE:
                 return person.getStatus().isOnLeave();
             case MIA:
-                return person.getStatus().isMIA();
+                return person.getStatus().isMIA() || person.getStatus().isPoW();
             case RETIRED:
                 return person.getStatus().isRetired();
             case RESIGNED:

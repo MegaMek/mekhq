@@ -158,7 +158,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
     private JCheckBox optionShortDeploymentNag;
     private JCheckBox optionUnresolvedStratConContactsNag;
     private JCheckBox optionOutstandingScenariosNag;
-    private JCheckBox optionCargoCapacityNag;
     private JCheckBox optionInvalidFactionNag;
     //endregion Nag Tab
 
@@ -350,14 +349,14 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
 
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(labelDisplayDateFormat)
                                 .addComponent(optionDisplayDateFormat)
-                                .addComponent(labelDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                .addComponent(labelDisplayDateFormatExample, Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(labelLongDisplayDateFormat)
                                 .addComponent(optionLongDisplayDateFormat)
-                                .addComponent(labelLongDisplayDateFormatExample, GroupLayout.Alignment.TRAILING))
+                                .addComponent(labelLongDisplayDateFormatExample, Alignment.TRAILING))
                         .addComponent(optionHistoricalDailyLog)
                         .addComponent(chkCompanyGeneratorStartup)
                         .addComponent(chkShowCompanyGenerator)
@@ -366,19 +365,19 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionCommandCenterMRMS)
                         .addComponent(lblInterstellarMapTab)
                         .addComponent(chkInterstellarMapShowJumpRadius)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblInterstellarMapShowJumpRadiusMinimumZoom)
-                                .addComponent(spnInterstellarMapShowJumpRadiusMinimumZoom, GroupLayout.Alignment.TRAILING))
+                                .addComponent(spnInterstellarMapShowJumpRadiusMinimumZoom, Alignment.TRAILING))
                         .addComponent(btnInterstellarMapJumpRadiusColour)
                         .addComponent(chkInterstellarMapShowPlanetaryAcquisitionRadius)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(lblInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom)
-                                .addComponent(spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom, GroupLayout.Alignment.TRAILING))
+                                .addComponent(spnInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom, Alignment.TRAILING))
                         .addComponent(btnInterstellarMapPlanetaryAcquisitionRadiusColour)
                         .addComponent(chkInterstellarMapShowContractSearchRadius)
                         .addComponent(btnInterstellarMapContractSearchRadiusColour)
                         .addComponent(labelPersonnelDisplay)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
                                 .addComponent(labelPersonnelFilterStyle)
                                 .addComponent(optionPersonnelFilterStyle, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
@@ -386,7 +385,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(labelDisplayDateFormat)
                                 .addComponent(optionDisplayDateFormat)
@@ -568,7 +567,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
                                 .addComponent(optionDeployedForeground)
                                 .addComponent(optionDeployedBackground))
@@ -716,14 +715,14 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionSaveMonthly)
                         .addComponent(optionSaveYearly)
                         .addComponent(checkSaveBeforeMissions)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                 .addComponent(labelSavedGamesCount)
                                 .addComponent(spinnerSavedGamesCount, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(optionNoSave)
                         .addComponent(optionSaveDaily)
                         .addComponent(optionSaveWeekly)
@@ -805,14 +804,14 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(chkNewDayMedicPoolFill)
                         .addComponent(chkNewDayMRMS)
                         .addComponent(chkNewDayForceIconOperationalStatus)
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(Alignment.LEADING)
                                 .addComponent(lblNewDayForceIconOperationalStatusStyle)
                                 .addComponent(comboNewDayForceIconOperationalStatusStyle, GroupLayout.DEFAULT_SIZE,
                                         GroupLayout.DEFAULT_SIZE, 40))
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkNewDayAstechPoolFill)
                         .addComponent(chkNewDayMedicPoolFill)
                         .addComponent(chkNewDayMRMS)
@@ -853,7 +852,7 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         );
 
         layout.setHorizontalGroup(
-                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(optionPreferGzippedOutput)
                         .addComponent(optionWriteCustomsToXML)
                         .addComponent(optionSaveMothballState)
@@ -912,10 +911,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionOutstandingScenariosNag.setToolTipText(resources.getString("optionOutstandingScenariosNag.toolTipText"));
         optionOutstandingScenariosNag.setName("optionOutstandingScenariosNag");
 
-        optionCargoCapacityNag = new JCheckBox(resources.getString("optionCargoCapacityNag.text"));
-        optionCargoCapacityNag.setToolTipText(resources.getString("optionCargoCapacityNag.toolTipText"));
-        optionCargoCapacityNag.setName("optionCargoCapacityNag");
-
         optionInvalidFactionNag = new JCheckBox(resources.getString("optionInvalidFactionNag.text"));
         optionInvalidFactionNag.setToolTipText(resources.getString("optionInvalidFactionNag.toolTipText"));
         optionInvalidFactionNag.setName("optionInvalidFactionNag");
@@ -942,7 +937,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionShortDeploymentNag)
                         .addComponent(optionUnresolvedStratConContactsNag)
                         .addComponent(optionOutstandingScenariosNag)
-                        .addComponent(optionCargoCapacityNag)
                         .addComponent(optionInvalidFactionNag)
         );
 
@@ -960,7 +954,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
                         .addComponent(optionShortDeploymentNag)
                         .addComponent(optionUnresolvedStratConContactsNag)
                         .addComponent(optionOutstandingScenariosNag)
-                        .addComponent(optionCargoCapacityNag)
                         .addComponent(optionInvalidFactionNag)
         );
 
@@ -1221,7 +1214,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT, optionShortDeploymentNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS, optionUnresolvedStratConContactsNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS, optionOutstandingScenariosNag.isSelected());
-        MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_CARGO_CAPACITY, optionCargoCapacityNag.isSelected());
         MekHQ.getMHQOptions().setNagDialogIgnore(MHQConstants.NAG_INVALID_FACTION, optionInvalidFactionNag.isSelected());
 
         PreferenceManager.getClientPreferences().setUserDir(txtUserDir.getText());
@@ -1337,7 +1329,6 @@ public class MHQOptionsDialog extends AbstractMHQButtonDialog {
         optionShortDeploymentNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_SHORT_DEPLOYMENT));
         optionUnresolvedStratConContactsNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_UNRESOLVED_STRATCON_CONTACTS));
         optionOutstandingScenariosNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_OUTSTANDING_SCENARIOS));
-        optionCargoCapacityNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_CARGO_CAPACITY));
         optionInvalidFactionNag.setSelected(MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_INVALID_FACTION));
 
         txtUserDir.setText(PreferenceManager.getClientPreferences().getUserDir());

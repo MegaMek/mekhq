@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+<academies>
+    <academy>
+        <name>Unit Creche</name>
+        <isPrepSchool>true</isPrepSchool>
+        <description>A unit creche serves as a communal living and training space for the youngest children of mercenaries. While the creche fosters a strong sense of community it fails to provide the level of education afforded to more formal settings.</description>
+        <isHomeSchool>true</isHomeSchool>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>0</tuition>
+        <ageMax>3</ageMax>
+        <durationDays>10</durationDays>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <facultySkill>12</facultySkill>
+        <ageMax>3</ageMax>
+        <qualification>Daycare</qualification>
+        <curriculum>None</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Home Schooling</name>
+        <isPrepSchool>true</isPrepSchool>
+        <description>Home schooling often occurs in mercenary companies posted to remote or frontier regions where formal educational facilities are scarce. The company provides a basic education using a mix of digital resources and practical skills training.</description>
+        <isHomeSchool>true</isHomeSchool>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>0</tuition>
+        <durationDays>10</durationDays>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <facultySkill>12</facultySkill>
+        <ageMin>3</ageMin>
+        <ageMax>10</ageMax>
+        <qualification>Basic Education</qualification>
+        <curriculum>XP</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>Apprenticeship</name>
+        <isMilitary>true</isMilitary>
+        <isPrepSchool>true</isPrepSchool>
+        <description>An apprenticeship is a hands-on training program where young recruits learn from experienced personnel. Apprentices start with basic skills, and gradually take on more responsibilities. This mentorship-based training emphasizes practical experience, but lacks any formal qualifications. Furthermore, apprenticing to an active military unit has its dangers.</description>
+        <isHomeSchool>true</isHomeSchool>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>0</tuition>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <facultySkill>9</facultySkill>
+        <ageMin>10</ageMin>
+        <ageMax>16</ageMax>
+        <qualification>MechWarrior Apprenticeship</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Mechanized Apprenticeship</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Aerospace Apprenticeship</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Black Naval Apprenticeship</qualification>
+        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Infantry Apprenticeship</qualification>
+        <curriculum>Small Arms, Anti-Mech</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>MechTech Apprenticeship</qualification>
+        <curriculum>Astech, Tech/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Mechanic Apprenticeship</qualification>
+        <curriculum>Astech, Tech/Mechanic</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>AeroTech Apprenticeship</qualification>
+        <curriculum>Astech, Tech/Aero</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Battle Armor Technician Apprenticeship</qualification>
+        <curriculum>Astech, Tech/BA</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <qualification>Black Naval Tech Apprenticeship</qualification>
+        <curriculum>Astech, Tech/Vessel</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Administrative Apprenticeship</qualification>
+        <curriculum>Administration, Scrounge</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Medical Apprenticeship</qualification>
+        <curriculum>Medtech, Doctor</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>1</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>In-House Boot Camp</name>
+        <type>Basic Training</type>
+        <isMilitary>true</isMilitary>
+        <description>In-house training is usually conducted by the unit's more experienced members. This training ensures that new members are well-prepared, cohesive, and loyal to the unit's unique culture and combat style.</description>
+        <isHomeSchool>true</isHomeSchool>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>1250</tuition>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <durationDays>70</durationDays>
+        <facultySkill>9</facultySkill>
+        <ageMin>16</ageMin>
+        <qualification>Basic Mechanized Training</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/Ground Vehicle</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Basic Air Cavalry Training</qualification>
+        <curriculum>Gunnery/Vehicle, Piloting/VTOL</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Basic Flight School</qualification>
+        <curriculum>Gunnery/Aircraft, Piloting/Aircraft</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <qualification>Basic Infantry Training</qualification>
+        <curriculum>Small Arms</curriculum>
+        <qualificationStartYear>2300</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+    <academy>
+        <name>In-House Basic Training</name>
+        <type>Basic Training</type>
+        <isMilitary>true</isMilitary>
+        <description>In-house training is usually conducted by the unit's more experienced members. Trainees undergo physical conditioning, simulator exercises, and eventually hands-on training in their chosen field.</description>
+        <isHomeSchool>true</isHomeSchool>
+        <locationSystem>Terra</locationSystem>
+        <constructionYear>2300</constructionYear>
+        <tuition>1250</tuition>
+        <educationLevelMax>Early Childhood</educationLevelMax>
+        <durationDays>150</durationDays>
+        <facultySkill>9</facultySkill>
+        <ageMin>16</ageMin>
+        <qualification>Basic MechWarrior Training</qualification>
+        <curriculum>Gunnery/Mech, Piloting/Mech</curriculum>
+        <qualificationStartYear>2500</qualificationStartYear>
+        <qualification>Basic Aerospace Training</qualification>
+        <curriculum>Gunnery/Aerospace, Piloting/Aerospace</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Basic Black Naval Training</qualification>
+        <curriculum>Gunnery/Spacecraft, Piloting/Spacecraft</curriculum>
+        <qualificationStartYear>2490</qualificationStartYear>
+        <qualification>Basic Battle Armor Training</qualification>
+        <curriculum>Gunnery/Battlesuit</curriculum>
+        <qualificationStartYear>3058</qualificationStartYear>
+        <baseAcademicSkillLevel>0</baseAcademicSkillLevel>
+    </academy>
+</academies>

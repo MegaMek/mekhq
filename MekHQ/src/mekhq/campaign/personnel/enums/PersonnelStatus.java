@@ -220,8 +220,6 @@ public enum PersonnelStatus {
 
     public static List<PersonnelStatus> getImplementedStatuses() {
         return Stream.of(values())
-                .filter(personnelStatus -> !personnelStatus.isPoW() && !personnelStatus.isOnLeave()
-                        && !personnelStatus.isAwol())
                 .collect(Collectors.toList());
     }
 

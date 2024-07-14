@@ -51,6 +51,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillType;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -59,9 +60,8 @@ import mekhq.campaign.storyarc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
-import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.Planet.PlanetaryEvent;
-import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.PlanetarySystem.PlanetarySystemEvent;
 import mekhq.campaign.universe.Systems;
 import mekhq.io.idReferenceClasses.PersonIdReference;
 import mekhq.io.migration.*;
@@ -75,6 +75,7 @@ import javax.xml.parsers.DocumentBuilder;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class CampaignXmlParser {
     private InputStream is;
@@ -849,7 +850,7 @@ public class CampaignXmlParser {
 
         NodeList wList = wn.getChildNodes();
 
-        // Okay, lets iterate through the children, eh?
+        // Okay, let's iterate through the children, eh?
         for (int x = 0; x < wList.getLength(); x++) {
             Node wn2 = wList.item(x);
 
@@ -861,7 +862,7 @@ public class CampaignXmlParser {
             if (!wn2.getNodeName().equalsIgnoreCase("person")) {
                 // Error condition of sorts!
                 // Errr, what should we do here?
-                LogManager.getLogger().error("Unknown node type not loaded in Personnel nodes: " + wn2.getNodeName());
+                LogManager.getLogger().error("Unknown node type not loaded in Personnel nodes: {}", wn2.getNodeName());
 
                 continue;
             }
@@ -871,6 +872,25 @@ public class CampaignXmlParser {
             if (p != null) {
                 retVal.importPerson(p);
             }
+        }
+
+        // this block verifies all in-use academies are valid
+        List<String> missingList = new ArrayList<>();
+
+        for (Person person : retVal.getPersonnel()) {
+            String academySet = person.getEduAcademySet();
+            String academyNameInSet = person.getEduAcademyNameInSet();
+
+            if ((academyNameInSet != null) && (EducationController.getAcademy(academySet, academyNameInSet) == null)) {
+                String message = academyNameInSet + " from set " + academySet;
+                if ((!missingList.contains(message)) && (!missingList.contains('\n' + message))) {
+                    missingList.add((missingList.isEmpty() ? "" : "\n") + message);
+                }
+            }
+        }
+
+        if (!missingList.isEmpty()) {
+            throw new NullPointerException(missingList.toString());
         }
 
         LogManager.getLogger().info("Load Personnel Nodes Complete!");
@@ -1154,9 +1174,9 @@ public class CampaignXmlParser {
         } else {
             StringBuilder unitListString = new StringBuilder();
             for (String s : unitList) {
-                unitListString.append("\n").append(s);
+                unitListString.append('\n').append(s);
             }
-            LogManager.getLogger().error(String.format("Could not load the following units: %s", unitListString.toString()));
+            LogManager.getLogger().error(String.format("Could not load the following units: %s", unitListString));
             return unitListString.toString();
         }
     }
@@ -1292,7 +1312,7 @@ public class CampaignXmlParser {
         }
 
         // Replace parts that need to be replaced
-        for (Map.Entry<Integer, Part> entry : replaceParts.entrySet()) {
+        for (Entry<Integer, Part> entry : replaceParts.entrySet()) {
             int partId = entry.getKey();
             Part oldPart = retVal.getWarehouse().getPart(partId);
             if (oldPart != null) {
@@ -1313,8 +1333,7 @@ public class CampaignXmlParser {
             Unit u = prt.getUnit();
             if (u != null) {
                 // get rid of any equipmentparts without types, locations or mounteds
-                if (prt instanceof EquipmentPart) {
-                    final EquipmentPart ePart = (EquipmentPart) prt;
+                if (prt instanceof EquipmentPart ePart) {
 
                     // Null Type... parsing failure
                     if (ePart.getType() == null) {
@@ -1455,7 +1474,7 @@ public class CampaignXmlParser {
             }
         }
         for (Part prt : removeParts) {
-            LogManager.getLogger().debug("Removing part #" + prt.getId() + " " + prt.getName());
+            LogManager.getLogger().debug("Removing part #" + prt.getId() + ' ' + prt.getName());
             retVal.getWarehouse().removePart(prt);
         }
     }
@@ -1487,8 +1506,8 @@ public class CampaignXmlParser {
     }
 
     private static void updatePlanetaryEventsFromXML(Node wn) {
-        List<Planet.PlanetaryEvent> events;
-        Map<Integer, List<Planet.PlanetaryEvent>> eventsMap = new HashMap<>();
+        List<PlanetaryEvent> events;
+        Map<Integer, List<PlanetaryEvent>> eventsMap = new HashMap<>();
 
         NodeList wList = wn.getChildNodes();
         for (int x = 0; x < wList.getLength(); x++) {
@@ -1502,7 +1521,7 @@ public class CampaignXmlParser {
             if (wn2.getNodeName().equalsIgnoreCase("system")) {
                 NodeList systemNodes = wn2.getChildNodes();
                 String systemId = null;
-                List<PlanetarySystem.PlanetarySystemEvent> sysEvents = new ArrayList<>();
+                List<PlanetarySystemEvent> sysEvents = new ArrayList<>();
                 eventsMap.clear();
                 for (int n = 0; n < systemNodes.getLength(); ++n) {
                     Node systemNode = systemNodes.item(n);
@@ -1512,7 +1531,7 @@ public class CampaignXmlParser {
                     if (systemNode.getNodeName().equalsIgnoreCase("id")) {
                         systemId = systemNode.getTextContent();
                     } else if (systemNode.getNodeName().equalsIgnoreCase("event")) {
-                        PlanetarySystem.PlanetarySystemEvent event = Systems.getInstance().readPlanetarySystemEvent(systemNode);
+                        PlanetarySystemEvent event = Systems.getInstance().readPlanetarySystemEvent(systemNode);
                         if (null != event) {
                             event.custom = true;
                             sysEvents.add(event);
@@ -1529,7 +1548,7 @@ public class CampaignXmlParser {
                             if (planetNode.getNodeName().equalsIgnoreCase("sysPos")) {
                                 sysPos = Integer.parseInt(planetNode.getTextContent());
                             } else if (planetNode.getNodeName().equalsIgnoreCase("event")) {
-                                Planet.PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
+                                PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
                                 if (null != event) {
                                     event.custom = true;
                                     events.add(event);
@@ -1543,9 +1562,9 @@ public class CampaignXmlParser {
                 }
                 if (null != systemId) {
                     //iterate through events hash and assign events to planets
-                    Iterator<Map.Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
+                    Iterator<Entry<Integer, List<PlanetaryEvent>>> it = eventsMap.entrySet().iterator();
                     while (it.hasNext()) {
-                        Map.Entry<Integer, List<PlanetaryEvent>> pair = it.next();
+                        Entry<Integer, List<PlanetaryEvent>> pair = it.next();
                         Systems.getInstance().updatePlanetaryEvents(systemId, pair.getValue(), true, pair.getKey());
                     }
                     //check for system-wide events
@@ -1569,7 +1588,7 @@ public class CampaignXmlParser {
                     if (planetNode.getNodeName().equalsIgnoreCase("id")) {
                         planetId = planetNode.getTextContent();
                     } else if (planetNode.getNodeName().equalsIgnoreCase("event")) {
-                        Planet.PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
+                        PlanetaryEvent event = Systems.getInstance().readPlanetaryEvent(planetNode);
                         if (null != event) {
                             event.custom = true;
                             events.add(event);

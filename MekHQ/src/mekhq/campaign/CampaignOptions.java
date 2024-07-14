@@ -297,6 +297,7 @@ public class CampaignOptions {
     private boolean useFamilyModifiers;
     private boolean useLoyaltyModifiers;
     private boolean useHideLoyalty;
+    private boolean useLeadershipChangeRefresh;
 
     private int payoutRateOfficer;
     private int payoutRateEnlisted;
@@ -381,6 +382,7 @@ public class CampaignOptions {
     private boolean useReeducationCamps;
     private boolean enableLocalAcademies;
     private boolean enablePrestigiousAcademies;
+    private boolean enableUnitEducation;
     private boolean enableOverrideRequirements;
     private boolean enableShowIneligibleAcademies;
     private Double facultyXpRate;
@@ -887,6 +889,7 @@ public class CampaignOptions {
         setUseReeducationCamps(true);
         setEnableLocalAcademies(true);
         setEnablePrestigiousAcademies(true);
+        setEnableUnitEducation(true);
         setEnableOverrideRequirements(false);
         setEnableShowIneligibleAcademies(true);
         setFacultyXpRate(1.00);
@@ -970,6 +973,7 @@ public class CampaignOptions {
 
         setUseLoyaltyModifiers(true);
         setUseHideLoyalty(false);
+        setUseLeadershipChangeRefresh(true);
 
         setPayoutRateOfficer(3);
         setPayoutRateEnlisted(3);
@@ -1892,6 +1896,14 @@ public class CampaignOptions {
         this.useHideLoyalty = useHideLoyalty;
     }
 
+    public boolean isUseLeadershipChangeRefresh() {
+        return useLeadershipChangeRefresh;
+    }
+
+    public void setUseLeadershipChangeRefresh(final boolean useLeadershipChangeRefresh) {
+        this.useLeadershipChangeRefresh = useLeadershipChangeRefresh;
+    }
+
     public boolean isUseRandomFounderTurnover() {
         return useRandomFounderTurnover;
     }
@@ -2730,6 +2742,14 @@ public class CampaignOptions {
 
     public void setEnablePrestigiousAcademies(boolean enablePrestigiousAcademies) {
         this.enablePrestigiousAcademies = enablePrestigiousAcademies;
+    }
+
+    public boolean isEnableUnitEducation() {
+        return enableUnitEducation;
+    }
+
+    public void setEnableUnitEducation(boolean enableUnitEducation) {
+        this.enableUnitEducation = enableUnitEducation;
     }
 
     public boolean isEnableOverrideRequirements() {
@@ -4608,6 +4628,7 @@ public class CampaignOptions {
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLoyaltyModifiers", isUseLoyaltyModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useHideLoyalty", isUseHideLoyalty());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useLeadershipChangeRefresh", isUseLeadershipChangeRefresh());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateOfficer", getPayoutRateOfficer());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payoutRateEnlisted", getPayoutRateEnlisted());
@@ -4706,6 +4727,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useReeducationCamps", isUseReeducationCamps());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableLocalAcademies", isEnableLocalAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enablePrestigiousAcademies", isEnablePrestigiousAcademies());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableUnitEducation", isEnableUnitEducation());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableOverrideRequirements", isEnableOverrideRequirements());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "enableShowIneligibleAcademies", isEnableShowIneligibleAcademies());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "facultyXpRate", getFacultyXpRate());
@@ -5456,6 +5478,8 @@ public class CampaignOptions {
                     retVal.setEnableLocalAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enablePrestigiousAcademies")) {
                     retVal.setEnablePrestigiousAcademies(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("enableUnitEducation")) {
+                    retVal.setEnableUnitEducation(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableOverrideRequirements")) {
                     retVal.setEnableOverrideRequirements(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("enableShowIneligibleAcademies")) {
@@ -5601,6 +5625,8 @@ public class CampaignOptions {
                     retVal.setUseLoyaltyModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useHideLoyalty")) {
                     retVal.setUseHideLoyalty(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("useLeadershipChangeRefresh")) {
+                    retVal.setUseLeadershipChangeRefresh(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateOfficer")) {
                     retVal.setPayoutRateOfficer(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payoutRateEnlisted")) {

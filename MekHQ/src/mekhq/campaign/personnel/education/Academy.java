@@ -67,6 +67,9 @@ public class Academy implements Comparable<Academy> {
     @XmlElement(name = "isLocal")
     private Boolean isLocal = false;
 
+    @XmlElement(name = "isHomeSchool")
+    private Boolean isHomeSchool = false;
+
     @XmlElement(name = "locationSystem")
     private List<String> locationSystems;
 
@@ -136,6 +139,7 @@ public class Academy implements Comparable<Academy> {
      * @param factionDiscount         the discount offered by the academy to faction members
      * @param isFactionRestricted     indicates if the academy is restricted to faction members (true) or not (false)
      * @param isLocal                 indicates if the academy is local (true) or not (false) (overrides locationSystems)
+     * @param isHomeSchool            indicates if the academy is a home school (true) or not (false)
      * @param locationSystems         the list of location systems where the academy is present
      * @param constructionYear        the year when the academy was constructed
      * @param destructionYear         the year when the academy was destroyed
@@ -154,7 +158,7 @@ public class Academy implements Comparable<Academy> {
      */
     public Academy(String set, String name, String type, Boolean isMilitary, Boolean isReeducationCamp,
                    Boolean isPrepSchool, String description, Integer factionDiscount, Boolean isFactionRestricted,
-                   List<String> locationSystems, Boolean isLocal, Integer constructionYear,
+                   List<String> locationSystems, Boolean isLocal, Boolean isHomeSchool, Integer constructionYear,
                    Integer destructionYear, Integer closureYear, Integer tuition, Integer durationDays,
                    Integer facultySkill, EducationLevel educationLevelMin, EducationLevel educationLevelMax,
                    Integer ageMin, Integer ageMax, List<String> qualifications, List<String> curriculums,
@@ -169,6 +173,7 @@ public class Academy implements Comparable<Academy> {
         this.factionDiscount = factionDiscount;
         this.isFactionRestricted = isFactionRestricted;
         this.isLocal = isLocal;
+        this.isHomeSchool = isHomeSchool;
         this.locationSystems = locationSystems;
         this.constructionYear = constructionYear;
         this.destructionYear = destructionYear;
@@ -312,6 +317,22 @@ public class Academy implements Comparable<Academy> {
      */
     public void setIsLocal(final boolean isLocal) {
         this.isLocal = isLocal;
+    }
+
+    /**
+     * @return {@code true} if the academy is a home school, {@code false} otherwise.
+     */
+    public Boolean isHomeSchool() {
+        return isHomeSchool;
+    }
+
+    /**
+     * Sets the value indicating whether the academy is a home school.
+     *
+     * @param isHomeSchool true if the academy is a home school, false otherwise.
+     */
+    public void setIsHomeSchool(final boolean isHomeSchool) {
+        this.isHomeSchool = isHomeSchool;
     }
 
     /**
@@ -863,7 +884,12 @@ public class Academy implements Comparable<Academy> {
 
         if (personnel.size() == 1) {
             for (String skill : skills) {
-                tooltip.append(skill).append(" (");
+                if (skill.equalsIgnoreCase("none")) {
+                    tooltip.append(skill).append("<br>");
+                    continue;
+                } else {
+                    tooltip.append(skill).append(" (");
+                }
 
                 if (skill.equalsIgnoreCase("xp")) {
                     if (EducationLevel.parseToInt(person.getEduHighestEducation()) >= educationLevel) {
@@ -907,18 +933,20 @@ public class Academy implements Comparable<Academy> {
             }
         }
 
-        // we need to do a little extra work to get travel time, to cover academies with multiple campuses or Clan nonsense
-        int distance = campaign.getSimplifiedTravelTime(destination);
+        // we need to do a little extra work to get travel time, to cover academies with multiple campuses
+        if (!isHomeSchool) {
+            int distance = campaign.getSimplifiedTravelTime(destination);
 
-        tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
+            tooltip.append("<b>").append(resources.getString("distance.text")).append("</b> ");
 
-        if ((distance / 7) < 1) {
-            tooltip.append(distance).append(' ').append(resources.getString("durationDays.text"));
-        } else {
-            tooltip.append(distance / 7).append(' ').append(resources.getString("durationWeeks.text"));
+            if ((distance / 7) < 1) {
+                tooltip.append(distance).append(' ').append(resources.getString("durationDays.text"));
+            } else {
+                tooltip.append(distance / 7).append(' ').append(resources.getString("durationWeeks.text"));
+            }
+
+            tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
         }
-
-        tooltip.append(" (").append(destination.getName(campaign.getLocalDate())).append(")<br>");
 
         // with travel time out the way, all that's left is to add the last couple of entries
         if ((isReeducationCamp) && (campaign.getCampaignOptions().isUseReeducationCamps())) {
