@@ -162,6 +162,16 @@ public class AutoAwardsController {
 
             if (processedData != null) {
                 allAwardData.put(allAwardDataKey, processedData);
+                allAwardDataKey++;
+            }
+        }
+
+        // beginning the processing & filtering of scenario awards
+        if (!scenarioAwards.isEmpty()) {
+            processedData = ScenarioAwardsManager(new ArrayList<>(personnel.keySet()));
+
+            if (processedData != null) {
+                allAwardData.put(allAwardDataKey, processedData);
             }
         }
 
