@@ -26,6 +26,7 @@ public enum TurnoverFrequency {
     NEVER("TurnoverFrequency.NEVER.text", "TurnoverFrequency.NEVER.toolTipText"),
     WEEKLY("TurnoverFrequency.WEEKLY.text", "TurnoverFrequency.WEEKLY.toolTipText"),
     MONTHLY("TurnoverFrequency.MONTHLY.text", "TurnoverFrequency.MONTHLY.toolTipText"),
+    QUARTERLY("TurnoverFrequency.QUARTERLY.text", "TurnoverFrequency.QUARTERLY.toolTipText"),
     ANNUALLY("TurnoverFrequency.ANNUALLY.text", "TurnoverFrequency.ANNUALLY.toolTipText");
 
     private final String name;
@@ -52,6 +53,10 @@ public enum TurnoverFrequency {
 
     public boolean isMonthly() {
         return this == MONTHLY;
+    }
+
+    public boolean isQuarterly() {
+        return this == QUARTERLY;
     }
 
     public boolean isAnnually() {

@@ -283,6 +283,8 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
     private JLabel lblServiceContractModifier;
     private JSpinner spnServiceContractModifier;
     private JCheckBox chkPayBonusDefault;
+    private JLabel lblPayBonusDefaultThreshold;
+    private JSpinner spnPayBonusDefaultThreshold;
 
     // Modifiers
     private JPanel turnoverAndRetentionModifiersPanel = new JPanel();
@@ -4439,6 +4441,22 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkPayBonusDefault.setToolTipText(resources.getString("chkPayBonusDefault.toolTipText"));
         chkPayBonusDefault.setName("chkPayBonusDefault");
         chkPayBonusDefault.setEnabled(isUseTurnover);
+        chkPayBonusDefault.addActionListener(evt -> {
+            boolean isEnabled = chkPayBonusDefault.isSelected();
+
+            lblPayBonusDefaultThreshold.setEnabled(isEnabled);
+            spnPayBonusDefaultThreshold.setEnabled(isEnabled);
+        });
+
+        lblPayBonusDefaultThreshold = new JLabel(resources.getString("lblPayBonusDefaultThreshold.text"));
+        lblPayBonusDefaultThreshold.setToolTipText(resources.getString("lblPayBonusDefaultThreshold.toolTipText"));
+        lblPayBonusDefaultThreshold.setName("lblPayBonusDefaultThreshold");
+        lblPayBonusDefaultThreshold.setEnabled((isUseTurnover) && (campaign.getCampaignOptions().isPayBonusDefault()));
+
+        spnPayBonusDefaultThreshold = new JSpinner(new SpinnerNumberModel(3, 0, 12, 1));
+        spnPayBonusDefaultThreshold.setToolTipText(resources.getString("lblPayBonusDefaultThreshold.toolTipText"));
+        spnPayBonusDefaultThreshold.setName("spnPayBonusDefaultThreshold");
+        spnPayBonusDefaultThreshold.setEnabled((isUseTurnover) && (campaign.getCampaignOptions().isPayBonusDefault()));
 
         turnoverAndRetentionSettingsPanel.setBorder(BorderFactory.createTitledBorder(resources.getString("turnoverAndRetentionSettingsPanel.title")));
         turnoverAndRetentionSettingsPanel.setName("turnoverAndRetentionSettingsPanel");
@@ -4476,6 +4494,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblServiceContractModifier)
                                 .addComponent(spnServiceContractModifier, Alignment.LEADING))
                         .addComponent(chkPayBonusDefault)
+                        .addGroup(layout.createParallelGroup(Alignment.BASELINE)
+                                .addComponent(lblPayBonusDefaultThreshold)
+                                .addComponent(spnPayBonusDefaultThreshold, Alignment.LEADING))
         );
 
         layout.setHorizontalGroup(
@@ -4505,6 +4526,9 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
                                 .addComponent(lblServiceContractModifier)
                                 .addComponent(spnServiceContractModifier))
                         .addComponent(chkPayBonusDefault)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblPayBonusDefaultThreshold)
+                                .addComponent(spnPayBonusDefaultThreshold))
         );
 
         return turnoverAndRetentionSettingsPanel;
@@ -8019,6 +8043,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         spnServiceContractDuration.setValue(options.getServiceContractDuration());
         spnServiceContractModifier.setValue(options.getServiceContractModifier());
         chkPayBonusDefault.setSelected(options.isPayBonusDefault());
+        spnPayBonusDefaultThreshold.setValue(options.getPayBonusDefaultThreshold());
 
         // Modifiers
         chkUseCustomRetirementModifiers.setSelected(options.isUseCustomRetirementModifiers());
@@ -8707,6 +8732,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setServiceContractDuration((Integer) spnServiceContractDuration.getValue());
             options.setServiceContractModifier((Integer) spnServiceContractModifier.getValue());
             options.setPayBonusDefault(chkPayBonusDefault.isSelected());
+            options.setPayBonusDefaultThreshold((Integer) spnPayBonusDefaultThreshold.getValue());
 
             // Modifiers
             options.setUseCustomRetirementModifiers(chkUseCustomRetirementModifiers.isSelected());

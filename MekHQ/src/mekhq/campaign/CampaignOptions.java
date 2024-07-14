@@ -284,6 +284,7 @@ public class CampaignOptions {
     private int serviceContractDuration;
     private int serviceContractModifier;
     private boolean payBonusDefault;
+    private int payBonusDefaultThreshold;
 
     private boolean useCustomRetirementModifiers;
     private boolean useFatigueModifiers;
@@ -956,6 +957,7 @@ public class CampaignOptions {
         setServiceContractDuration(36);
         setServiceContractModifier(3);
         setPayBonusDefault(false);
+        setPayBonusDefaultThreshold(3);
 
         setUseCustomRetirementModifiers(true);
         setUseFatigueModifiers(true);
@@ -2098,6 +2100,14 @@ public class CampaignOptions {
 
     public void setPayBonusDefault(final boolean payBonusDefault) {
         this.payBonusDefault = payBonusDefault;
+    }
+
+    public int getPayBonusDefaultThreshold() {
+        return payBonusDefaultThreshold;
+    }
+
+    public void setPayBonusDefaultThreshold(final int payBonusDefaultThreshold) {
+        this.payBonusDefaultThreshold = payBonusDefaultThreshold;
     }
     //endregion Retirement
 
@@ -4594,6 +4604,7 @@ public class CampaignOptions {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractDuration", getServiceContractDuration());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "serviceContractModifier", getServiceContractModifier());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payBonusDefault", isPayBonusDefault());
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "payBonusDefaultThreshold", getPayBonusDefaultThreshold());
 
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useCustomRetirementModifiers", isUseCustomRetirementModifiers());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "useFatigueModifiers", isUseFatigueModifiers());
@@ -5577,6 +5588,8 @@ public class CampaignOptions {
                     retVal.setServiceContractModifier(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("payBonusDefault")) {
                     retVal.setPayBonusDefault(Boolean.parseBoolean(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("payBonusDefaultThreshold")) {
+                    retVal.setPayBonusDefaultThreshold(Integer.parseInt(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useCustomRetirementModifiers")) {
                     retVal.setUseCustomRetirementModifiers(Boolean.parseBoolean(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("useFatigueModifiers")) {
