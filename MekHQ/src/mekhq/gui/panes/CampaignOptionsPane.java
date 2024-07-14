@@ -301,6 +301,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
 
     private JPanel loyaltySubPanel = new JPanel();
     private JCheckBox chkUseHideLoyalty;
+    private JCheckBox chkUseLeadershipChangeRefresh;
 
     // Payout
     private JPanel turnoverAndRetentionPayoutPanel = new JPanel();
@@ -4258,6 +4259,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             boolean isUseLoyaltyModifiers = chkUseLoyaltyModifiers.isSelected();
             loyaltySubPanel.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
             chkUseHideLoyalty.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
+            chkUseLeadershipChangeRefresh.setEnabled((isEnabled) && (isUseLoyaltyModifiers));
 
             boolean isUseServiceBonus = chkUsePayoutServiceBonus.isSelected();
             payoutServiceBonusSubPanel.setEnabled((isEnabled) && (isUseServiceBonus));
@@ -4646,6 +4648,11 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseHideLoyalty.setName("chkUseHideLoyalty");
         chkUseHideLoyalty.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
 
+        chkUseLeadershipChangeRefresh = new JCheckBox(resources.getString("chkUseLeadershipChangeRefresh.text"));
+        chkUseLeadershipChangeRefresh.setToolTipText(resources.getString("chkUseLeadershipChangeRefresh.toolTipText"));
+        chkUseLeadershipChangeRefresh.setName("chkUseLeadershipChangeRefresh");
+        chkUseLeadershipChangeRefresh.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
+
         loyaltySubPanel.setBorder(BorderFactory.createTitledBorder(""));
         loyaltySubPanel.setName("loyaltySubPanel");
         loyaltySubPanel.setEnabled(isUseTurnover && campaign.getCampaignOptions().isUseLoyaltyModifiers());
@@ -4658,11 +4665,13 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         layout.setVerticalGroup(
                 layout.createSequentialGroup()
                         .addComponent(chkUseHideLoyalty)
+                        .addComponent(chkUseLeadershipChangeRefresh)
         );
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(Alignment.LEADING)
                         .addComponent(chkUseHideLoyalty)
+                        .addComponent(chkUseLeadershipChangeRefresh)
         );
     }
 
@@ -8057,6 +8066,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
         chkUseFamilyModifiers.setSelected(options.isUseFamilyModifiers());
         chkUseLoyaltyModifiers.setSelected(options.isUseLoyaltyModifiers());
         chkUseHideLoyalty.setSelected(options.isUseHideLoyalty());
+        chkUseLeadershipChangeRefresh.setSelected(options.isUseLeadershipChangeRefresh());
 
         // Payouts
         spnPayoutRateOfficer.setValue(options.getPayoutRateOfficer());
@@ -8746,6 +8756,7 @@ public class CampaignOptionsPane extends AbstractMHQTabbedPane {
             options.setUseFamilyModifiers(chkUseFamilyModifiers.isSelected());
             options.setUseLoyaltyModifiers(chkUseLoyaltyModifiers.isSelected());
             options.setUseHideLoyalty(chkUseHideLoyalty.isSelected());
+            options.setUseLeadershipChangeRefresh(chkUseLeadershipChangeRefresh.isSelected());
 
             // Payouts
             options.setPayoutRateOfficer((Integer) spnPayoutRateOfficer.getValue());
