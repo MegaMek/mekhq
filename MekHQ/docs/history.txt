@@ -19,6 +19,10 @@ MEKHQ VERSION HISTORY:
 + RFE #4361: Updated & Corrected Prestigious Academy Information and Added Three New Types of Local Academy
 + FIX #4384: Refactored Faction Restriction Checks in Academy Class
 + PR #4385: Updated Logic for Identifying Pregnant Combatants
++ PR #4390: Added Quarterly Turnover Frequency Option
++ PR #4391: Added Campaign Option to Automate Retention Bonus Payments Based on a Threshold
++ PR #4391: Added Campaign Option to Automate Retention Bonus Payments Based on a Threshold
++ PR #4396: Changed some wording around to help avoid confusion about StratCon
 
 0.49.20 (2024-06-28 2100 UTC) (THIS IS THE LAST VERSION TO SUPPORT JAVA 11)
 + PR #4005: Code internals: DialogOptionsListener update
