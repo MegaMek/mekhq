@@ -214,42 +214,38 @@ public class AutoAwardsController {
      * Builds a list of personnel autoAwards should process
      */
     private List<UUID> getPersonnel() {
-        List<UUID> personnel = campaign.getActivePersonnel()
+        boolean issuePosthumous = campaign.getCampaignOptions().isIssuePosthumousAwards();
+
+        List<UUID> personnel = campaign.getPersonnel()
                 .stream()
+                .filter(person ->
+                        ((!person.getStatus().isDepartedUnit()) && (!person.getPrisonerStatus().isCurrentPrisoner()) && (!person.hasRole(PersonnelRole.DEPENDENT)))
+                                || ((issuePosthumous) && (person.getStatus().isDead()) && (filterOutPersonnel(person)))
+                )
                 .map(Person::getId)
                 .collect(Collectors.toList());
 
-        // if posthumous Awards are enabled, we add the relevant dead people
-        if (campaign.getCampaignOptions().isIssuePosthumousAwards()) {
-            List<UUID> deadPeople = campaign.getPersonnel()
-                    .stream().filter(person -> person.getStatus().isDead())
-                    .map(Person::getId)
-                    .collect(Collectors.toList());
+        LogManager.getLogger().debug("Personnel {}", personnel);
 
-            LogManager.getLogger().info("deadPeople {}", deadPeople);
-
-            if (!deadPeople.isEmpty()) {
-                personnel.addAll(deadPeople);
-            }
-        }
-
-        // Prisoners and Dependents are not eligible for Awards
-        if (!personnel.isEmpty()) {
-            removeDependentsAndPrisoners(personnel);
-        }
         return personnel;
     }
 
     /**
-     * Filters out anyone with the Prisoner status, or Dependent role
+     * Filters out personnel based on specific criteria.
      *
-     * @param personnel personnel to process
+     * @param person the person to be filtered
+     * @return true if the person should be filtered out, false otherwise
      */
-    private void removeDependentsAndPrisoners(List<UUID> personnel) {
-        if (!personnel.isEmpty()) {
-            personnel.removeIf(person -> (campaign.getPerson(person).hasRole(PersonnelRole.DEPENDENT))
-                    || (campaign.getPerson(person).getPrisonerStatus().isCurrentPrisoner()));
-        }
+    private boolean filterOutPersonnel(Person person) {
+        return !((person.getPrisonerStatus().isCurrentPrisoner()) || (person.hasRole(PersonnelRole.DEPENDENT)))
+                &&
+                !((person.getStatus().isRetired())
+                || (person.getStatus().isResigned())
+                || (person.getStatus().isSacked())
+                || (person.getStatus().isDeserted())
+                || (person.getStatus().isDefected())
+                || (person.getStatus().isMissing())
+                || (person.getStatus().isLeft()));
     }
 
     /**
