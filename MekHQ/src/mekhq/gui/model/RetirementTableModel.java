@@ -88,9 +88,12 @@ public class RetirementTableModel extends AbstractTableModel {
     public void setData(Map<UUID, TargetRoll> targets) {
         this.targets = targets;
         data.clear();
+
         for (UUID id : targets.keySet()) {
             data.add(id);
-            payBonus.put(id, campaign.getCampaignOptions().isPayBonusDefault());
+            payBonus.put(id,
+                    ((campaign.getCampaignOptions().isPayBonusDefault())
+                    && (targets.get(id).getValue() >= campaign.getCampaignOptions().getPayBonusDefaultThreshold())));
             miscMods.put(id, 0);
         }
         fireTableDataChanged();
@@ -221,7 +224,7 @@ public class RetirementTableModel extends AbstractTableModel {
                     return bonusCost;
                 }
             case COL_PAY_BONUS:
-                return payBonus.getOrDefault(p.getId(), campaign.getCampaignOptions().isPayBonusDefault());
+                return payBonus.getOrDefault(p.getId(), false);
             case COL_MISC_MOD:
                 return miscMods.getOrDefault(p.getId(), 0);
             case COL_SHARES:
