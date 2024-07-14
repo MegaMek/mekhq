@@ -881,17 +881,10 @@ public class CampaignXmlParser {
             String academySet = person.getEduAcademySet();
             String academyNameInSet = person.getEduAcademyNameInSet();
 
-            if (EducationController.getAcademy(academySet, academyNameInSet) == null) {
-                if (missingList.contains(academyNameInSet + " from set " + academySet)) {
-                    continue;
-                } else if (missingList.contains('\n' + academyNameInSet + " from set " + academySet)) {
-                    continue;
-                }
-
-                if (missingList.isEmpty()) {
-                    missingList.add(academyNameInSet + " from set " + academySet);
-                } else {
-                    missingList.add('\n' + academyNameInSet + " from set " + academySet);
+            if ((academyNameInSet != null) && (EducationController.getAcademy(academySet, academyNameInSet) == null)) {
+                String message = academyNameInSet + " from set " + academySet;
+                if ((!missingList.contains(message)) && (!missingList.contains('\n' + message))) {
+                    missingList.add((missingList.isEmpty() ? "" : "\n") + message);
                 }
             }
         }
